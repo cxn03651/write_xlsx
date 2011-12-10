@@ -3088,8 +3088,8 @@ module Writexlsx
     #
     # Write the cell value <v> element.
     #
-    def write_cell_value(value = 0)
-      value ||= 0
+    def write_cell_value(value = '')
+      value ||= ''
       value = value.to_i if value == value.to_i
       @writer.data_element('v', value)
     end

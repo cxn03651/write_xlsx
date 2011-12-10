@@ -15,4 +15,18 @@ class TestWriteCellValue < Test::Unit::TestCase
     expected = '<v>1</v>'
     assert_equal(expected, result)
   end
+
+  def test_write_cell_value_without_parameter
+    @worksheet.__send__('write_cell_value')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<v></v>'
+    assert_equal(expected, result)
+  end
+
+  def test_write_cell_value_with_null_string
+    @worksheet.__send__('write_cell_value', '')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<v></v>'
+    assert_equal(expected, result)
+  end
 end
