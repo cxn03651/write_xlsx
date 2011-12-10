@@ -1,6 +1,6 @@
 = write_xlsx
 
-Description goes here.
+gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem. write_xlsx is converted from Perl's module Excel::Writer::XLSX.
 
 == Contributing to write_xlsx
  
@@ -13,7 +13,7 @@ Description goes here.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
 
 == Copyright
+Original was written in Perl by John McNamara(jmcnamara@cpan.org).
 
-Copyright (c) 2011 Hideo NAKAMURA. See LICENSE.txt for
-further details.
+Converted to ruby by Hideo NAKAMURA(cxn03651@msj.biglobe.ne.jp) Copyright (c) 2011 HIDEO NAKAMURA. See LICENSE.txt for further details.
 
