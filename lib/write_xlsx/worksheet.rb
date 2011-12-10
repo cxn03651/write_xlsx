@@ -3048,7 +3048,7 @@ module Writexlsx
         # Write a formula.
         @writer.start_tag('c', attributes)
         write_cell_formula(token)
-        write_cell_value(cell[3])
+        write_cell_value(cell[3] || 0)
         @writer.end_tag('c')
       when 'a'
         # Write an array formula.
