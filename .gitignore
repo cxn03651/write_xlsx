@@ -34,15 +34,21 @@ pkg
 #tmtags
 
 # For emacs:
-#*~
-#\#*
-#.\#*
+*~
+\#*
+.\#*
 
 # For vim:
-#*.swp
+*.swp
 
 # For redcar:
 #.redcar
 
 # For rubinius:
 #*.rbc
+
+# working directory
+work
+
+# Gemfile.lock ???
+Gemfile.lock
