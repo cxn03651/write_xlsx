@@ -1817,6 +1817,38 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(@expected_dir, @result_dir, xlsx)
   end
 
+  def test_right_to_left
+    xlsx = 'right_to_left.xlsx'
+    workbook = WriteXLSX.new(xlsx)
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+
+    worksheet2.right_to_left
+
+    worksheet1.write(0, 0, 'Hello')    #  A1, B1, C1, ...
+    worksheet2.write(0, 0, 'Hello')    # ..., C1, B1, A1
+    workbook.close
+    compare_xlsx(@expected_dir, @result_dir, xlsx)
+  end
+
+  def test_tab_colors
+    xlsx = 'tab_colors.xlsx'
+    workbook = WriteXLSX.new(xlsx)
+
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+    worksheet4 = workbook.add_worksheet
+
+    # Worksheet1 will have the default tab colour.
+    worksheet2.set_tab_color('red')
+    worksheet3.set_tab_color('green')
+    worksheet4.set_tab_color(0x35)    # Orange
+
+    workbook.close
+    compare_xlsx(@expected_dir, @result_dir, xlsx)
+  end
+
   def test_autofilter
     xlsx = 'autofilter.xlsx'
     workbook = WriteXLSX.new(xlsx)
