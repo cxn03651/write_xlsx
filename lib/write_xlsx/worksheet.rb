@@ -444,6 +444,7 @@ module Writexlsx
     # Set all the page margins to the same value in inches.
     #
     def set_margins(margin)
+      margin = margin.gsub(/[^\d\.]/, '') if margin.respond_to?(:gsub)
       set_margin_left(margin)
       set_margin_right(margin)
       set_margin_top(margin)

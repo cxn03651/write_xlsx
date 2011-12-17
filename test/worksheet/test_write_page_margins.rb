@@ -86,4 +86,12 @@ class TestWorksheetWritePageMargins < Test::Unit::TestCase
     expected = '<pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.5" />'
     assert_equal(expected, result)
   end
+
+  def test_write_page_margins_with_white_space
+    @worksheet.set_margins(" 0.5\n")
+    @worksheet.__send__('write_page_margins')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0.3" footer="0.3" />'
+    assert_equal(expected, result)
+  end
 end
