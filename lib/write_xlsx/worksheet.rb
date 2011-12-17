@@ -444,7 +444,6 @@ module Writexlsx
     # Set all the page margins to the same value in inches.
     #
     def set_margins(margin)
-      margin = margin.gsub(/[^\d\.]/, '') if margin.respond_to?(:gsub)
       set_margin_left(margin)
       set_margin_right(margin)
       set_margin_top(margin)
@@ -471,28 +470,28 @@ module Writexlsx
     # Set the left margin in inches.
     #
     def set_margin_left(margin = 0.7)
-      @margin_left = margin
+      @margin_left = remove_white_space(margin)
     end
 
     #
     # Set the right margin in inches.
     #
     def set_margin_right(margin = 0.7)
-      @margin_right = margin
+      @margin_right = remove_white_space(margin)
     end
 
     #
     # Set the top margin in inches.
     #
     def set_margin_top(margin = 0.75)
-      @margin_top = margin
+      @margin_top = remove_white_space(margin)
     end
 
     #
     # Set the bottom margin in inches.
     #
     def set_margin_bottom(margin = 0.75)
-      @margin_bottom = margin
+      @margin_bottom = remove_white_space(margin)
     end
 
     #
@@ -4270,6 +4269,14 @@ module Writexlsx
 
     def drawing?
       !!@drawing
+    end
+
+    def remove_white_space(margin)
+      if margin.respond_to?(:gsub)
+        margin.gsub(/[^\d\.]/, '')
+      else
+        margin
+      end
     end
   end
 end
