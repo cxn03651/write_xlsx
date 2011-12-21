@@ -2075,48 +2075,4 @@ class TestExampleMatch < Test::Unit::TestCase
     East      Grape     6000      February
 EOS
   end
-
-  def compare_xlsx(expected, result, xlsx)
-    begin
-      prepare_compare(expected, result, xlsx)
-      expected_files = files(expected)
-      result_files   = files(result)
-
-      not_exists = expected_files - result_files
-      assert(not_exists.empty?, "These files does not exist: #{not_exists.to_s}")
-
-      additional_exist = result_files - expected_files
-      assert(additional_exist.empty?, "These files must not exist: #{additional_exist.to_s}")
-
-      expected_files.each do |file|
-        assert_equal(got_to_array(IO.read(File.join(expected, file))),
-                     got_to_array(IO.read(File.join(result, file))),
-                     "#{file} differs.")
-      end
-    ensure
-      cleanup(xlsx)
-    end
-  end
-
-  def prepare_compare(expected, result, xlsx)
-    prepare_xlsx(expected, File.join(@perl_output, xlsx))
-    prepare_xlsx(result, xlsx)
-  end
-
-  def prepare_xlsx(dir, xlsx)
-    Dir.mkdir(dir)
-    system("unzip -q #{xlsx} -d #{dir}")
-  end
-
-  def files(dir)
-    Dir.glob(File.join(dir, "**/*")).select { |f| File.file?(f) }.
-                                     reject { |f| File.basename(f) =~ /(core|theme1)\.xml/ }.
-                                     collect { |f| f.sub(Regexp.new("^#{dir}"), '') }
-  end
-
-  def cleanup(xlsx)
-    system("rm -rf #{xlsx}")          if File.exist?(xlsx)
-    system("rm -rf #{@expected_dir}") if File.exist?(@expected_dir)
-    system("rm -rf #{@result_dir}")   if File.exist?(@result_dir)
-  end
 end
