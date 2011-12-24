@@ -38,7 +38,7 @@ chart.add_series(
 )
 
 # Configure second series. Note alternative use of array ref to define
-# ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].$chart->add_series(
+# ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
 chart.add_series(
     :name       => '=Sheet1!$C$1',
     :categories => [ 'Sheet1', 1, 6, 0, 0 ],
