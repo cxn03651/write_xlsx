@@ -60,6 +60,8 @@ module Writexlsx
       @horiz_cat_axis    = 0
       @horiz_val_axis    = 1
       @protection        = 0
+      @x_axis            = {}
+      @y_axis            = {}
 
       set_default_properties
     end
@@ -144,20 +146,24 @@ module Writexlsx
       # Set the labels properties for the series.
       labels = get_labels_properties(params[:data_labels])
 
+      # Set the "invert if negative" fill property.
+      invert_if_neg = params[:invert_if_negative]
+
       # Add the user supplied data to the internal structures.
       @series << {
-        :_values       => values,
-        :_categories   => categories,
-        :_name         => name,
-        :_name_formula => name_formula,
-        :_name_id      => name_id,
-        :_val_data_id  => val_id,
-        :_cat_data_id  => cat_id,
-        :_line         => line,
-        :_fill         => fill,
-        :_marker       => marker,
-        :_trendline    => trendline,
-        :_labels       => labels
+        :_values        => values,
+        :_categories    => categories,
+        :_name          => name,
+        :_name_formula  => name_formula,
+        :_name_id       => name_id,
+        :_val_data_id   => val_id,
+        :_cat_data_id   => cat_id,
+        :_line          => line,
+        :_fill          => fill,
+        :_marker        => marker,
+        :_trendline     => trendline,
+        :_labels        => labels,
+        :_invert_if_neg => invert_if_neg
       }
     end
 
@@ -165,14 +171,7 @@ module Writexlsx
     # Set the properties of the X-axis.
     #
     def set_x_axis(params)
-      name, name_formula = process_names(params[:name], params[:name_formula])
-
-      data_id = get_data_id(name_formula, params[:data])
-
-      @x_axis_name    = name
-      @x_axis_formula = name_formula
-      @x_axis_data_id = data_id
-      @x_axis_reverse = params[:reverse]
+      @x_axis = convert_axis_args(params)
     end
 
     ###############################################################################
@@ -182,13 +181,7 @@ module Writexlsx
     # Set the properties of the Y-axis.
     #
     def set_y_axis(params)
-      name, name_formula = process_names(params[:name], params[name_formula])
-      data_id = get_data_id(name_formula, params[:data])
-
-      @y_axis_name    = name
-      @y_axis_formula = name_formula
-      @y_axis_data_id = data_id
-      @y_axis_reverse = params[:reverse]
+      @y_axis = convert_axis_args(params)
     end
 
     #
@@ -363,6 +356,37 @@ module Writexlsx
     private
 
     #
+    # Convert user defined axis values into private hash values.
+    #
+    def convert_axis_args(params)
+      name, name_formula = process_names(params[:name], params[:name_formula])
+
+      data_id = get_data_id(name_formula, params[:data])
+
+      axis = {
+        :_name            => name,
+        :_formula         => name_formula,
+        :_data_id         => data_id,
+        :_reverse         => params[:reverse],
+        :_min             => params[:min],
+        :_max             => params[:max],
+        :_minor_unit      => params[:minor_unit],
+        :_major_unit      => params[:major_unit],
+        :_minor_unit_type => params[:minor_unit_type],
+        :_major_unit_type => params[:major_unit_type],
+        :_log_base        => params[:log_base],
+        :_crossing        => params[:crossing],
+        :_position        => params[:position],
+        :_label_position  => params[:label_position]
+      }
+
+      # Only use the first letter of bottom, top, left or right.
+      axis[:_position] = axis[:_position].downcase[0, 1] if axis[:_position]
+
+      axis
+    end
+
+    #
     # Convert and aref of row col values to a range formula.
     #
     def aref_to_formula(data)
@@ -453,7 +477,7 @@ module Writexlsx
 
       # Set undefined colors to black.
       unless index
-        index = 0x08;
+        index = 0x08
         raise "Unknown color '#{color}' used in chart formatting."
       end
 
@@ -893,6 +917,9 @@ module Writexlsx
       # Write the c:marker element.
       write_marker(series[:_marker])
 
+      # Write the c:invertIfNegative element.
+      write_c_invert_if_negative(series[:_invert_if_neg])
+
       # Write the c:dLbls element.
       write_d_lbls(series[:labels])
 
@@ -1054,28 +1081,31 @@ module Writexlsx
     end
 
     #
-    # Write the <c:catAx> element.
+    # Write the <c:catAx> element. Usually the X axis.
     #
     def write_cat_axis(position = nil)
-      position  ||= @cat_axis_position
-      horiz     = @horiz_cat_axis
-      x_reverse = @x_axis_reverse
-      y_reverse = @y_axis_reverse
+      position = @cat_axis_position
+      horiz    = @horiz_cat_axis
+      x_axis   = @x_axis
+      y_axis   = @y_axis
+      
+      # Overwrite the default axis position with a user supplied value.
+      position = x_axis[:_position] || position
 
       @writer.start_tag('c:catAx')
 
       write_axis_id(@axis_ids[0])
 
       # Write the c:scaling element.
-      write_scaling(x_reverse)
+      write_scaling(x_axis[:_reverse])
 
       # Write the c:axPos element.
-      write_axis_pos(position, y_reverse)
+      write_axis_pos(position, y_axis[:_reverse])
 
       # Write the axis title elements.
-      if title = @x_axis_formula
-        write_title_formula(title, @x_axis_data_id, horiz)
-      elsif title = @x_axis_name
+      if title = @x_axis[:_formula]
+        write_title_formula(title, @x_axis[:_data_id], horiz)
+      elsif title = @x_axis[:_name]
         write_title_rich(title, horiz)
       end
 
@@ -1083,13 +1113,19 @@ module Writexlsx
       write_num_fmt
 
       # Write the c:tickLblPos element.
-      write_tick_label_pos('nextTo')
+      write_tick_label_pos(x_axis[:_label_position])
 
       # Write the c:crossAx element.
       write_cross_axis(@axis_ids[1])
 
-      # Write the c:crosses element.
-      write_crosses('autoZero')
+      # Note, the category crossing comes from the value axis.
+      if y_axis[:_crossing].nil? || y_axis[:_crossing] == 'max'
+        # Write the c:crosses element.
+        write_crosses(y_axis[:_crossing])
+      else
+        # Write the c:crossesAt element.
+        write_c_crosses(y_axis[:_crossing])
+      end
 
       # Write the c:auto element.
       write_auto(1)
@@ -1104,33 +1140,36 @@ module Writexlsx
     end
 
     #
-    # Write the <c:valAx> element.
+    # Write the <c:valAx> element. Usually the Y axis.
     #
     # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
     #
     def write_val_axis(position = nil, hide_major_gridlines = nil)
       position ||= @val_axis_position
       horiz      = @horiz_val_axis
-      x_reverse  = @x_axis_reverse
-      y_reverse  = @y_axis_reverse
+      x_axis     = @x_axis
+      y_axis     = @y_axis
+
+      # Overwrite the default axis position with a user supplied value.
+      position = y_axis[:_position] || position
 
       @writer.start_tag('c:valAx')
 
       write_axis_id(@axis_ids[1])
 
       # Write the c:scaling element.
-      write_scaling(y_reverse)
+      write_scaling(y_axis[:_reverse], y_axis[:_min], y_axis[:_max], y_axis[:_log_base])
 
       # Write the c:axPos element.
-      write_axis_pos(position, x_reverse)
+      write_axis_pos(position, x_axis[:_reverse])
 
       # Write the c:majorGridlines element.
       write_major_gridlines unless hide_major_gridlines
 
       # Write the axis title elements.
-      if title = @y_axis_formula
-        write_title_formula(title, @y_axis_data_id, horiz)
-      elsif title = @y_axis_name
+      if title = @y_axis[:_formula]
+        write_title_formula(title, @y_axis[:_data_id], horiz)
+      elsif title = @y_axis[:_name]
         write_title_rich(title, horiz)
       end
 
@@ -1138,47 +1177,63 @@ module Writexlsx
       write_number_format
 
       # Write the c:tickLblPos element.
-      write_tick_label_pos('nextTo')
+      write_tick_label_pos(y_axis[:_label_position])
 
       # Write the c:crossAx element.
       write_cross_axis(@axis_ids[0])
 
-      # Write the c:crosses element.
-      write_crosses('autoZero')
+      # Note, the category crossing comes from the value axis.
+      if x_axis[:crossing].nil? || x_axis[:_crossing] == 'max'
+        # Write the c:crosses element.
+        write_crosses(x_axis[:_crossing])
+      else
+        # Write the c:crossesAt element.
+        write_c_crosses_at(x_axis[:_crossing])
+      end
 
       # Write the c:crossBetween element.
       write_cross_between
 
+      # Write the c:majorUnit element.
+      write_c_major_unit(y_axis[:_major_unit])
+      
+      # Write the c:minorUnit element.
+      write_c_minor_unit(y_axis[:_minor_unit])
+      
       @writer.end_tag('c:valAx')
     end
 
     #
     # Write the <c:valAx> element. This is for the second valAx in scatter plots.
     #
+    # Usually the X axis.
     #
     def write_cat_val_axis(position, hide_major_gridlines)
       position ||= @val_axis_position
       horiz                = @horiz_val_axis
-      x_reverse            = @x_axis_reverse
-      y_reverse            = @y_axis_reverse
+      x_axis               = @x_axis
+      y_axis               = @y_axis
+
+      # Overwrite the default axis position with a user supplied value.
+      position = x_axis[:_position] || position
 
       @writer.start_tag('c:valAx')
 
       write_axis_id(@axis_ids[0])
 
       # Write the c:scaling element.
-      write_scaling(x_reverse)
+      write_scaling(x_axis[:_reverse], x_axis[:_min], x_axis[:_max], x_axis[:_log_base])
 
       # Write the c:axPos element.
-      write_axis_pos(position, y_reverse)
+      write_axis_pos(position, y_axis[:_reverse])
 
       # Write the c:majorGridlines element.
       write_major_gridlines unless hide_major_gridlines
 
       # Write the axis title elements.
-      if title = @x_axis_formula
-        write_title_formula(title, @y_axis_data_id, horiz)
-      elsif title = @x_axis_name
+      if title = @x_axis[:_formula]
+        write_title_formula(title, @y_axis[:_data_id], horiz)
+      elsif title = @x_axis[:_name]
         write_title_rich(title, horiz)
       end
 
@@ -1186,42 +1241,54 @@ module Writexlsx
       write_number_format
 
       # Write the c:tickLblPos element.
-      write_tick_label_pos('nextTo')
+      write_tick_label_pos(x_axis[:_label_position])
 
       # Write the c:crossAx element.
       write_cross_axis(@axis_ids[1])
 
-      # Write the c:crosses element.
-      write_crosses('autoZero')
+      # Note, the category crossing comes from the value axis.
+      if y_axis[:_clossing].nil? || y_axis[:_crossing] == 'max'
+        # Write the c:crosses element.
+        write_crosses(y_axis[:_crossing])
+      else
+        # Write the c:crossesAt element.
+        write_c_crosses_at(y_axis[:_crossing])
+      end
 
       # Write the c:crossBetween element.
       write_cross_between
+
+      # Write the c:majorunit element.
+      write_c_major_unit(y_axis[:_major_unit])
+
+      # Write the c:minorUnit element.
+      write_c_minor_unit(y_axis[:_minor_unit])
 
       @writer.end_tag('c:valAx')
     end
 
     #
-    # Write the <c:dateAx> element.
+    # Write the <c:dateAx> element. Usually the X axis.
     #
     def write_date_axis(position = nil)
-      position ||= @cat_axis_position
-      x_reverse  = @x_axis_reverse
-      y_reverse  = @y_axis_reverse
+      position  = @cat_axis_position
+      x_axis    = @x_axis
+      y_axis    = @y_axis
 
       @writer.start_tag('c:dateAx')
 
       write_axis_id(@axis_ids[0])
 
       # Write the c:scaling element.
-      write_scaling(x_reverse)
+      write_scaling(x_axis[:reverse], x_axis[:_min], x_axis[:_max], x_axis[:_log_base])
 
       # Write the c:axPos element.
-      write_axis_pos(position, y_reverse)
+      write_axis_pos(position, y_axis[:reverse])
 
       # Write the axis title elements.
-      if title = @x_axis_formula
-        write_title_formula(title, @x_axis_data_id)
-      elsif title = @x_axis_name
+      if title = x_axis[:_formula]
+        write_title_formula(title, x_axis[:_data_id])
+      elsif title = x_axis[:_name]
         write_title_rich(title)
       end
 
@@ -1229,13 +1296,19 @@ module Writexlsx
       write_num_fmt('dd/mm/yyyy')
 
       # Write the c:tickLblPos element.
-      write_tick_label_pos('nextTo')
+      write_tick_label_pos(x_axis[:_label_position])
 
       # Write the c:crossAx element.
       write_cross_axis(@axis_ids[1])
 
-      # Write the c:crosses element.
-      write_crosses('autoZero')
+      # Note, the category crossing comes from the value axis.
+      if y_axis[:_crossing].nil? || y_axis[:_crossing] == 'max'
+        # Write the c:crossing element.
+        write_crosses(y_axis[:_crossing])
+      else
+        # Write the c:crossesAt element.
+        write_c_crosses_at(y_axis[:_crossing])
+      end
 
       # Write the c:auto element.
       write_auto(1)
@@ -1243,17 +1316,42 @@ module Writexlsx
       # Write the c:labelOffset element.
       write_label_offset(100)
 
+      # Write the c:majorUnit element.
+      write_c_major_unit(x_axis[:_major_unit])
+      
+      # Write the c:majorTimeUnit element.
+      if !x_axis[:_major_unit].nil?
+        write_c_major_time_unit(x_axis[:_major_unit_type])
+      end
+      
+      # Write the c:minorUnit element.
+      write_c_minor_unit(x_axis[:_minor_unit])
+      
+      # Write the c:minorTimeUnit element.
+      if !x_axis[:_minor_unit].nil?
+        write_c_minor_time_unit(x_axis[:_minor_unit_type])
+      end
+
       @writer.end_tag('c:dateAx')
     end
 
     #
     # Write the <c:scaling> element.
     #
-    def write_scaling(reverse)
+    def write_scaling(reverse, min = nil, max = nil, log_base = nil)
       @writer.start_tag('c:scaling')
+      
+      # Write the c:logBase element.
+      write_c_log_base(log_base)
 
       # Write the c:orientation element.
       write_orientation(reverse)
+
+      # Write the c:max element.
+      write_c_max(max)
+      
+      # Write the c:min element.
+      write_c_min(min)
 
       @writer.end_tag('c:scaling')
     end
@@ -1267,6 +1365,50 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:orientation', attributes)
+    end
+
+    #
+    # Write the <c:logBase> element.
+    #
+    def write_c_log_base(val)
+      return if val == 0 || val.nil?
+
+      attributes = ['val', val]
+      
+      @writer.empty_tag('c:logBase', attributes)
+    end
+
+    #
+    # Write the <c:orientation> element.
+    #
+    def write_orientation(reverse = 'maxMin')
+      val = 'minMax'
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:orientation', attributes)
+    end
+
+    #
+    # Write the <c:max> element.
+    #
+    def write_c_max(max = nil)
+      return if max.nil?
+
+      attributes = ['val', max]
+
+      @writer.empty_tag('c:max', attributes)
+    end
+
+    #
+    # Write the <c:min> element.
+    #
+    def write_c_min(min = nil)
+      return if min.nil?
+
+      attributes = ['val', min]
+
+      @writer.empty_tag('c:min', attributes)
     end
 
     #
@@ -1305,6 +1447,9 @@ module Writexlsx
     # Write the <c:tickLblPos> element.
     #
     def write_tick_label_pos(val)
+      val ||= 'nextTo'
+      val = 'nextTo' if val == 'next_to'
+
       attributes = ['val', val]
 
       @writer.empty_tag('c:tickLblPos', attributes)
@@ -1313,7 +1458,7 @@ module Writexlsx
     #
     # Write the <c:crossAx> element.
     #
-    def write_cross_axis(val)
+    def write_cross_axis(val = 'autoZero')
       attributes = ['val', val]
 
       @writer.empty_tag('c:crossAx', attributes)
@@ -1323,9 +1468,20 @@ module Writexlsx
     # Write the <c:crosses> element.
     #
     def write_crosses(val)
+      val ||= 'autoZero'
+      
       attributes = ['val', val]
 
       @writer.empty_tag('c:crosses', attributes)
+    end
+
+    #
+    # Write the <c:crossesAt> element.
+    #
+    def write_c_crosses_at(val)
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:crossesAt', attributes)
     end
 
     #
@@ -1388,6 +1544,46 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:crossBetween', attributes)
+    end
+
+    #
+    # Write the <c:majorUnit> element.
+    #
+    def write_c_major_unit(val = nil)
+      return unless val
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:majorUnit', attributes)
+    end
+
+    #
+    # Write the <c:minorUnit> element.
+    #
+    def write_c_minor_unit(val = nil)
+      return unless val
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:minorUnit', attributes)
+    end
+
+    #
+    # Write the <c:majorTimeUnit> element.
+    #
+    def write_c_major_time_unit(val = 'days')
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:majorTimeUnit', attributes)
+    end
+
+    #
+    # Write the <c:minorTimeUnit> element.
+    #
+    def write_c_minor_time_unit(val = 'days')
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:minorTimeUnit', attributes)
     end
 
     #
@@ -1980,7 +2176,7 @@ module Writexlsx
     #
     # Write the <c:order> element.
     #
-    def write_trendline_order(val)
+    def write_trendline_order(val = 2)
       attributes = ['val', val]
 
       @writer.empty_tag('c:order', attributes)
@@ -1989,9 +2185,7 @@ module Writexlsx
     #
     # Write the <c:period> element.
     #
-    def write_period(val)
-      val  ||= 2
-
+    def write_period(val = 2)
       attributes = ['val', val]
 
       @writer.empty_tag('c:period', attributes)
@@ -2188,6 +2382,19 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:delete', attributes)
+    end
+
+    #
+    # Write the <c:invertIfNegative> element.
+    #
+    def write_c_invert_if_negative(invert = nil)
+      val    = 1
+
+      return unless invert
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:invertIfNegative', attributes)
     end
   end
 end

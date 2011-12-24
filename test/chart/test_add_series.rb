@@ -9,19 +9,20 @@ class TestAddSeries < Test::Unit::TestCase
 
   def test_add_series_only_values
     expected = {
-                  :_categories   => nil,
-                  :_values       => '=Sheet1!$A$1:$A$5',
-                  :_name         => nil,
-                  :_name_formula => nil,
-                  :_name_id      => nil,
-                  :_cat_data_id  => nil,
-                  :_val_data_id  => 0,
-                  :_line         => { :_defined => 0 },
-                  :_fill         => { :_defined => 0 },
-                  :_marker       => nil,
-                  :_trendline    => nil,
-                  :_labels       => nil
-                }
+      :_categories    => nil,
+      :_values        => '=Sheet1!$A$1:$A$5',
+      :_name          => nil,
+      :_name_formula  => nil,
+      :_name_id       => nil,
+      :_cat_data_id   => nil,
+      :_val_data_id   => 0,
+      :_line          => { :_defined => 0 },
+      :_fill          => { :_defined => 0 },
+      :_marker        => nil,
+      :_trendline     => nil,
+      :_labels        => nil,
+      :_invert_if_neg => nil
+    }
 
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
 
@@ -43,7 +44,8 @@ class TestAddSeries < Test::Unit::TestCase
                   :_fill         => { :_defined => 0 },
                   :_marker       => nil,
                   :_trendline    => nil,
-                  :_labels       => nil
+                  :_labels        => nil,
+                  :_invert_if_neg => nil
                 }
                ]
 
@@ -71,7 +73,8 @@ class TestAddSeries < Test::Unit::TestCase
                   :_fill         => { :_defined => 0 },
                   :_marker       => nil,
                   :_trendline    => nil,
-                  :_labels       => nil
+                  :_labels       => nil,
+                  :_invert_if_neg => nil
                 }
                ]
 
@@ -95,6 +98,7 @@ class TestAddSeries < Test::Unit::TestCase
       :_marker       => nil,
       :_trendline    => nil,
       :_labels       => nil,
+      :_invert_if_neg => nil
     }
 
     @chart.add_series(

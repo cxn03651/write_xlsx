@@ -32,11 +32,8 @@ module Writexlsx
       # Override the virtual superclass method with a chart specific method.
       #
       def write_chart_type
-        # Reverse meaning of X and Y axis for Bar charts.
-        @x_axis_name, @y_axis_name       = @y_axis_name, @x_axis_name
-        @x_axis_formula, @y_axis_formula = @y_axis_formula, @x_axis_formula
-        @x_axis_data_id, @y_axis_data_id = @y_axis_data_id, @x_axis_data_id
-        @x_axis_reverse, @y_axis_reverse = @y_axis_reverse, @x_axis_reverse
+        # Reverse X and Y axes for Bar charts.
+        @x_axis, @y_axis = @y_axis, @x_axis
 
         # Write the c:barChart element.
         write_bar_chart

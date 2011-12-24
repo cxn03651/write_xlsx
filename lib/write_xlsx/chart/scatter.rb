@@ -22,8 +22,9 @@ module Writexlsx
 
       def initialize
         super(self.class)
-        @cross_between = 'midCat'
-        @horiz_val_axis    = 0
+        @subtype        = 'marker_only'
+        @cross_between  = 'midCat'
+        @horiz_val_axis = 0
       end
 
       #
@@ -38,13 +39,24 @@ module Writexlsx
       # Write the <c:pieChart> element.
       #
       def write_scatter_chart
+        style   = 'lineMarker'
+        subtype = @subtype
+
+        # Set the user defined chart subtype
+        case subtype
+        when 'marker_only', 'straight_with_markers', 'straight'
+          style = 'lineMarker'
+        when 'smooth_with_markers', 'smooth'
+          style = 'smoothMarker'
+        end
+
         # Add default formatting to the series data.
         modify_series_formatting
 
         @writer.start_tag('c:scatterChart')
 
         # Write the c:scatterStyle element.
-        write_scatter_style
+        write_scatter_style(style)
 
         # Write the series elements.
         write_series
@@ -86,6 +98,9 @@ module Writexlsx
 
         # Write the c:yVal element.
         write_y_val(series)
+
+        # Write the c:smooth element.
+        write_c_smooth
 
         @writer.end_tag('c:ser')
       end
@@ -168,27 +183,53 @@ module Writexlsx
       #
       # Write the <c:scatterStyle> element.
       #
-      def write_scatter_style
-        val  = 'lineMarker'
-
+      def write_scatter_style(val)
         attributes = ['val', val]
 
         @writer.empty_tag('c:scatterStyle', attributes)
       end
 
       #
-      # Add default formatting to the series data.
+      # Write the <c:smooth> element.
+      #
+      def write_c_smooth
+        subtype = @subtype
+        val     = 1
+
+        return unless subtype =~ /smooth/
+
+        attributes = ['val', val]
+
+        @writer.empty_tag('c:smooth', attributes)
+      end
+
+      #
+      # Add default formatting to the series data unless it has already been
+      # specified by the user.
       #
       def modify_series_formatting
-        @series.collect! do |series|
-          if series[:_line][:_defined].nil? || series[:_line][:_defined] == 0
-              series[:_line] = {
-                  :width    => 2.25,
-                  :none     => 1,
-                  :_defined => 1
-              }
+        subtype = @subtype
+
+        # The default scatter style "markers only" requires a line type
+        if subtype == 'marker_only'
+          # Go through each series and define default values.
+          @series.each do |series|
+            # Set a line type unless there is already a user defined type.
+            if series[:_line][:_defined] == 0
+              series[:_line] = { :width => 2.25, :none => 1, :_defined => 1 }
+            end
           end
-          series
+        end
+
+        # Turn markers off for subtypes that don't have them
+        unless subtype =~ /marker/
+          # Go through each series and define default values.
+          @series.each do |series|
+            # Set a marker type unless there is already a user defined type.
+            if series[:_marker][:_defined] == 0
+              series[:_marker] = { :type => 'none', :_defined => 1 }
+            end
+          end
         end
       end
     end
