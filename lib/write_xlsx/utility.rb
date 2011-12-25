@@ -92,4 +92,16 @@ module Utility
   def xml_str
     @writer.string
   end
+  
+  def self.delete_files(path)
+    if FileTest.file?(path)
+      File.delete(path)
+    elsif FileTest.directory?(path)
+      Dir.foreach(path) do |file|
+        next if file =~ /^\.\.?$/  # '.' or '..'
+        delete_files(path.sub(/\/+$/,"") + '/' + file)
+      end
+      Dir.rmdir(path)
+    end
+  end
 end
