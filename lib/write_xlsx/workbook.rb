@@ -596,7 +596,7 @@ module Writexlsx
 
       # Store the xlsx component files with the temp dir name removed.
       ZipFileUtils.zip("#{tempdir}", @filename)
-      system("rm -rf #{tempdir}")
+      Utility.delete_files(tempdir)
     end
 
     #
