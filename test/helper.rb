@@ -83,8 +83,8 @@ class Test::Unit::TestCase
   end
 
   def cleanup(xlsx)
-    system("rm -rf #{xlsx}")          if File.exist?(xlsx)
-    system("rm -rf #{@expected_dir}") if File.exist?(@expected_dir)
-    system("rm -rf #{@result_dir}")   if File.exist?(@result_dir)
+    Utility.delete_files(xlsx)          if File.exist?(xlsx)
+    Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
+    Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
   end
 end

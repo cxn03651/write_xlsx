@@ -5,7 +5,7 @@ require 'write_xlsx'
 class TestDeleteFiles < Test::Unit::TestCase
   def setup
     @dir_path = 'test_delete_empty_directory'
-    system("rm -rf #{@dir_path}") if FileTest.exist?(@dir_path)
+    Utility.delete_files(@dir_path) if FileTest.exist?(@dir_path)
   end
   
   def test_delete_empty_directory
