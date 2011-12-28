@@ -66,15 +66,6 @@ module Writexlsx
       @str_array  = []
 
       add_format(:xf_index => 0)
-
-=begin
-      if file.respond_to?(:to_str) && file != ''
-#            @filehandle = open(file, "wb")
-        @internal_fh = true
-      else
-        @filehandle = file
-      end
-=end
       set_color_palette
     end
 
