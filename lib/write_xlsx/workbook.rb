@@ -54,7 +54,7 @@ module Writexlsx
       @named_ranges        = []
       @custom_colors       = []
       @doc_properties      = {}
-      @local_time          = [Time.now]
+      @local_time          = Time.now
       @num_comment_files   = 0
       @image_types         = {}
       @images              = []
@@ -318,6 +318,40 @@ module Writexlsx
       end
 
       @defined_names.push([ name, sheet_index, formula])
+    end
+
+    #
+    # Set the document properties such as Title, Author etc. These are written to
+    # property sets in the OLE container.
+    #
+    def set_properties(params)
+      # Ignore if no args were passed.
+      return -1 if params.empty?
+
+      # List of valid input parameters.
+      valid = {
+        :title       => 1,
+        :subject     => 1,
+        :author      => 1,
+        :keywords    => 1,
+        :comments    => 1,
+        :last_author => 1,
+        :created     => 1,
+        :category    => 1,
+        :manager     => 1,
+        :company     => 1,
+        :status      => 1
+      }
+
+      # Check for valid input parameters.
+      params.each_key do |key|
+        return -1 unless valid.has_key?(key)
+      end
+
+      # Set the creation time unless specified by the user.
+      params[:created] = @local_time unless params.has_key?(:created)
+
+      @doc_properties = params.dup
     end
 
     def activesheet=(worksheet)

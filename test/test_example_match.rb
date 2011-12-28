@@ -1785,6 +1785,30 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(@expected_dir, @result_dir, xlsx)
   end
 
+  def test_properties
+    xlsx = 'properties.xlsx'
+    workbook  = WriteXLSX.new(xlsx)
+    worksheet = workbook.add_worksheet
+
+    workbook.set_properties(
+                            :title    => 'This is an example spreadsheet',
+                            :subject  => 'With document properties',
+                            :author   => 'John McNamara',
+                            :manager  => 'Dr. Heinz Doofenshmirtz',
+                            :company  => 'of Wolves',
+                            :category => 'Example spreadsheets',
+                            :keywords => 'Sample, Example, Properties',
+                            :comments => 'Created with Perl and Excel::Writer::XLSX',
+                            :status   => 'Quo'
+                            )
+
+    worksheet.set_column('A:A', 70)
+    worksheet.write('A1', "Select 'Office Button -> Prepare -> Properties' to see the file properties.")
+
+    workbook.close
+    compare_xlsx(@expected_dir, @result_dir, xlsx)
+  end
+
   def test_rich_strings
     xlsx = 'rich_strings.xlsx'
     workbook  = WriteXLSX.new(xlsx)
