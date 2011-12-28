@@ -25,7 +25,7 @@ module Writexlsx
     attr_reader :image_types, :images
     attr_reader :named_ranges
 
-    def initialize(file)
+    def initialize(file, default_formats = {})
       @writer = Package::XMLWriterSimple.new
 
       @tempdir  = File.join(Dir.tmpdir, Digest::MD5.hexdigest(Time.now.to_s))
@@ -65,7 +65,7 @@ module Writexlsx
       @str_table  = {}
       @str_array  = []
 
-      add_format(:xf_index => 0)
+      add_format(default_formats.merge(:xf_index => 0))
       set_color_palette
     end
 
