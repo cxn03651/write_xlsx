@@ -2,10 +2,11 @@
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/styles'
+require 'stringio'
 
 class TestStyles02 < Test::Unit::TestCase
   def test_styles_02
-    workbook = WriteXLSX.new
+    workbook = WriteXLSX.new(StringIO.new)
 
     format1 = workbook.add_format(:bold => 1)
     format2 = workbook.add_format(:italic => 1)

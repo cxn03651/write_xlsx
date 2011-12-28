@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 require 'write_xlsx'
+require 'stringio'
 
 #
 # class for test_calculate_spans
@@ -16,7 +17,7 @@ end
 
 class TestCalculateSpans < Test::Unit::TestCase
   def setup
-    @workbook = WriteXLSX.new
+    @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
   end
 

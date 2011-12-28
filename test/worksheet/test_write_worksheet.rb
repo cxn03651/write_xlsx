@@ -2,10 +2,11 @@
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
+require 'stringio'
 
 class TestWriteWorksheet < Test::Unit::TestCase
   def setup
-    @workbook = WriteXLSX.new
+    @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
   end
 

@@ -2,10 +2,11 @@
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/styles'
+require 'stringio'
 
 class TestStyles06 < Test::Unit::TestCase
   def test_styles_06
-    workbook = WriteXLSX.new
+    workbook = WriteXLSX.new(StringIO.new)
 
     format1 = workbook.add_format(
       :left         => 1,

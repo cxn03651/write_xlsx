@@ -25,18 +25,16 @@ module Writexlsx
     attr_reader :image_types, :images
     attr_reader :named_ranges
 
-    def initialize(file = '')
+    def initialize(file)
       @writer = Package::XMLWriterSimple.new
 
-      @filename            = file
-      @tempdir             = nil
+      @tempdir  = File.join(Dir.tmpdir, Digest::MD5.hexdigest(Time.now.to_s))
+      setup_filename(file)
       @date_1904           = false
       @activesheet         = 0
       @firstsheet          = 0
       @selected            = 0
       @fileclosed          = false
-      @filehandle          = nil
-      @internal_fh         = false
       @sheet_name          = 'Sheet'
       @chart_name          = 'Chart'
       @sheetname_count     = 0
@@ -69,13 +67,14 @@ module Writexlsx
 
       add_format(:xf_index => 0)
 
+=begin
       if file.respond_to?(:to_str) && file != ''
 #            @filehandle = open(file, "wb")
         @internal_fh = true
       else
         @filehandle = file
       end
-
+=end
       set_color_palette
     end
 
@@ -338,6 +337,18 @@ module Writexlsx
 
     private
 
+    def setup_filename(file)
+      if file.respond_to?(:to_str) && file != ''
+        @filename = file
+        @fileobj  = nil
+      elsif file.respond_to?(:write)
+        @filename = File.join(@tempdir, Digest::MD5.hexdigest(Time.now.to_s) + '.xlsx.tmp')
+        @fileobj  = file
+      else
+        raise "'file' must be valid filename String of IO object."
+      end
+    end
+
     #
     # Check for valid worksheet names. We check the length, if it contains any
     # invalid characters and if the name is unique in the workbook.
@@ -559,7 +570,6 @@ module Writexlsx
     # Assemble worksheets into a workbook.
     #
     def store_workbook
-      tempdir  = Dir.tmpdir + '/' + Digest::MD5.hexdigest(Time.now.to_s)
       packager = Package::Packager.new
 
       # Add a default worksheet if non have been added.
@@ -588,15 +598,16 @@ module Writexlsx
 
       # Package the workbook.
       packager.add_workbook(self)
-      packager.set_package_dir(tempdir)
+      packager.set_package_dir(@tempdir)
       packager.create_package
 
       # Free up the Packager object.
       packager = nil
 
       # Store the xlsx component files with the temp dir name removed.
-      ZipFileUtils.zip("#{tempdir}", @filename)
-      Utility.delete_files(tempdir)
+      ZipFileUtils.zip("#{@tempdir}", @filename)
+      IO.copy_stream(@filename, @fileobj) if @fileobj
+      Utility.delete_files(@tempdir)
     end
 
     #

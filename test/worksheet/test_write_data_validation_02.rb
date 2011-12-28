@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 require 'write_xlsx'
+require 'stringio'
 
 class TestWriteDataValidation02 < Test::Unit::TestCase
   def setup
-    @workbook = WriteXLSX.new
+    @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
   end
 
@@ -36,7 +37,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_equal_1
     ['equal to', '=', '=='].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',
@@ -52,7 +53,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_not_equal_1
     ['not equal to', '<>', '!='].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',
@@ -68,7 +69,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_greater_than_1
     ['greater than', '>'].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',
@@ -84,7 +85,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_less_than_1
     ['less than', '<'].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',
@@ -100,7 +101,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_greater_than_or_equal_to_1
     ['greater than or equal to', '>='].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',
@@ -116,7 +117,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
 
   def test_write_data_validations_integer_less_than_or_equal_to_1
     ['less than or equal to', '<='].each do |operator|
-      workbook = WriteXLSX.new
+      workbook = WriteXLSX.new(StringIO.new)
       worksheet = workbook.add_worksheet('')
       worksheet.data_validation('B5',
         :validate      => 'integer',

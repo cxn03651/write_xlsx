@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 require 'write_xlsx'
+require 'stringio'
 
 class TestStyles01 < Test::Unit::TestCase
   def test_styles_01
-    workbook = WriteXLSX.new
+    workbook = WriteXLSX.new(StringIO.new)
     workbook.__send__('prepare_format_properties')
 
     @style = Writexlsx::Package::Styles.new

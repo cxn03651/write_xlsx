@@ -2,10 +2,11 @@
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
+require 'stringio'
 
 class TestWriteAutofilter < Test::Unit::TestCase
   def setup
-    @workbook = WriteXLSX.new
+    @workbook = WriteXLSX.new(StringIO.new)
   end
 
   def test_write_auto_filter_with_no_filter

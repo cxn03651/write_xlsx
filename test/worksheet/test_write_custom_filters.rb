@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 require 'write_xlsx'
+require 'stringio'
 
 class TestWriteCustomFilters < Test::Unit::TestCase
   def setup
-    @workbook = WriteXLSX.new
+    @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
   end
 
