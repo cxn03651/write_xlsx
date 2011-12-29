@@ -180,6 +180,21 @@ module Writexlsx
       @writer.close
     end
 
+    #
+    # At least one worksheet should be added to a new workbook. A worksheet is used to write data into cells:
+    #
+    #     worksheet1 = workbook.add_worksheet               # Sheet1
+    #     worksheet2 = workbook.add_worksheet('Foglio2')    # Foglio2
+    #     worksheet3 = workbook.add_worksheet('Data')       # Data
+    #     worksheet4 = workbook.add_worksheet               # Sheet4
+    # If name is not specified the default Excel convention will be followed, i.e. Sheet1, Sheet2, etc.
+    #
+    # The worksheet name must be a valid Excel worksheet name,
+    # i.e. it cannot contain any of the following characters,
+    # [ ] : * ? / \ and it must be less than 32 characters.
+    # In addition, you cannot use the same, case insensitive,
+    # sheetname for more than one worksheet.
+    #
     def add_worksheet(name = '')
       index = @worksheets.size
       name  = check_sheetname(name)
