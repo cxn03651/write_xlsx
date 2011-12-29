@@ -345,6 +345,27 @@ module Writexlsx
     # Create a defined name in Excel. We handle global/workbook level names and
     # local/worksheet names.
     #
+    # This method is used to defined a name that can be used to represent a value,
+    # a single cell or a range of cells in a workbook.
+    #
+    #   For example to set a global/workbook name:
+    #
+    #   # Global/workbook names.
+    #   workbook.define_name('Exchange_rate', '=0.96')
+    #   workbook.define_name('Sales',         '=Sheet1!$G$1:$H$10')
+    #
+    # It is also possible to define a local/worksheet name by prefixing the name
+    # with the sheet name using the syntax sheetname!definedname:
+    #
+    #   # Local/worksheet name.
+    #   workbook.define_name('Sheet2!Sales',  '=Sheet2!$G$1:$G$10')
+    #   If the sheet name contains spaces or special characters
+    # you must enclose it in single quotes like in Excel:
+    #
+    #   workbook.define_name("'New Data'!Sales",  '=Sheet2!$G$1:$G$10')
+    #
+    # See the defined_name.rb program in the examples dir of the distro.
+    #
     def define_name(name, formula)
       sheet_index = nil
       sheetname   = ''
