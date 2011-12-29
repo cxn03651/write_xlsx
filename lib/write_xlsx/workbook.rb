@@ -119,9 +119,6 @@ module Writexlsx
       # In case close() is called twice, by user and by DESTROY.
       return if @fileclosed
 
-      # Test filehandle in case new() failed and the user didn't check.
-#          return nil unless @filehandle
-
       @fileclosed = 1
       store_workbook
     end
