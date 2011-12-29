@@ -123,14 +123,23 @@ module Writexlsx
       store_workbook
     end
 
+    #
+    # user must not use. it is internal method.
+    #
     def set_xml_writer(filename)
       @writer.set_xml_writer(filename)
     end
 
+    #
+    # user must not use. it is internal method.
+    #
     def xml_str
       @writer.string
     end
 
+    #
+    # user must not use. it is internal method.
+    #
     def assemble_xml_file
       return unless @writer
 
