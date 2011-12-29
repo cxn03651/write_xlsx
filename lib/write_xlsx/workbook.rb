@@ -317,7 +317,15 @@ module Writexlsx
     end
 
     #
-    # Add a new format to the Excel workbook.
+    # The add_format method can be used to create new Format objects
+    # which are used to apply formatting to a cell. You can either define
+    # the properties at creation time via a hash of property values
+    # or later via method calls.
+    #
+    #     format1 = workbook.add_format(property_hash) # Set properties at creation
+    #     format2 = workbook.add_format                # Set properties later
+    #
+    # See the Format Class's rdoc for more details about Format properties and how to set them.
     #
     def add_format(properties)
       init_data = [
