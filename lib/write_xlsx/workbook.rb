@@ -207,9 +207,73 @@ module Writexlsx
     end
 
     #
-    # Create a chart for embedding or as as new sheet.
+    # This method is use to create a new chart either as a standalone worksheet
+    # (the default) or as an embeddable object that can be inserted into
+    # a worksheet via the insert_chart() Worksheet method.
     #
-    def add_chart(params)
+    #     chart = workbook.add_chart(:type => 'column')
+    #
+    # The properties that can be set are:
+    #
+    #     :type     (required)
+    #     :subtype  (optional)
+    #     :name     (optional)
+    #     :embedded (optional)
+    #
+    # :type
+    #
+    # This is a required parameter. It defines the type of chart that will be created.
+    #
+    #     chart = workbook.add_chart(:type => 'line')
+    #
+    # The available types are:
+    #
+    #     area
+    #     bar
+    #     column
+    #     line
+    #     pie
+    #     scatter
+    #     stock
+    #
+    # :subtype
+    #
+    # Used to define a chart subtype where available.
+    #
+    #     chart = workbook.add_chart(:type => 'bar', :subtype => 'stacked')
+    #
+    # Currently only Bar and Column charts support subtypes
+    # (stacked and percent_stacked). See the documentation for those chart
+    # types.
+    #
+    # :name
+    #
+    # Set the name for the chart sheet. The name property is optional and
+    # if it isn't supplied will default to Chart1 .. n. The name must be
+    # a valid Excel worksheet name. See add_worksheet for more details on
+    # valid sheet names. The name property can be omitted for embedded charts.
+    #
+    #     chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
+    #
+    # :embedded
+    #
+    # Specifies that the Chart object will be inserted in a worksheet
+    # via the insert_chart Worksheet method. It is an error to try insert
+    # a Chart that doesn't have this flag set.
+    #
+    #     chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    #
+    #     # Configure the chart.
+    #     ...
+    #
+    #     # Insert the chart into the a worksheet.
+    #     worksheet.insert_chart('E2', chart)
+    #
+    # See Chart for details on how to configure the chart object
+    # once it is created. See also the chart_*.pl programs in the examples
+    # directory of the distro.
+    #
+    def add_chart(params = {})
       name     = ''
       index    = @worksheets.size
 
