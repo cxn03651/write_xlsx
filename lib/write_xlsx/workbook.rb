@@ -25,6 +25,49 @@ module Writexlsx
     attr_reader :image_types, :images
     attr_reader :named_ranges
 
+    #
+    # A new Excel workbook is created using the new() constructor which accepts either a filename
+    # or a filehandle as a parameter.
+    # The following example creates a new Excel file based on a filename:
+    #
+    #   workbook  = WriteXLSX.new('filename.xlsx')
+    #   worksheet = workbook.add_worksheet
+    #   worksheet.write(0, 0, 'Hi Excel!')
+    #   workbook.close
+    #
+    # Here are some other examples of using new() with filenames:
+    #
+    #   workbook1 = WriteXLSX.new(filename)
+    #   workbook2 = WriteXLSX.new('/tmp/filename.xlsx')
+    #   workbook3 = WriteXLSX.new("c:\\tmp\\filename.xlsx")
+    #   workbook4 = WriteXLSX.new('c:\tmp\filename.xlsx')
+    #
+    # The last two examples demonstrates how to create a file on DOS or Windows where it is
+    # necessary to either escape the directory separator \ or to use single quotes to ensure
+    # that it isn't interpolated.
+    #
+    # It is recommended that the filename uses the extension .xlsx rather than .xls since
+    # the latter causes an Excel warning when used with the XLSX format.
+    #
+    # The new() constructor returns a WriteXLSX object that you can use to add worksheets and
+    # store data.
+    #
+    # You can also pass a valid IO object to the new() constructor.
+    #
+    #   xlsx = StringIO.new
+    #   workbook = WriteXLSX.new(xlsx)
+    #   ....
+    #   workbook.close
+    #   # you can get XLSX binary data as xlsx.string
+    #
+    # And you can pass default_formats parameter like this:
+    #
+    #   formats = {
+    #     :font => 'Arial',
+    #     :size => 10.5
+    #   }
+    #   workbook = WriteXLSX.new('file.xlsx', formats)
+    #
     def initialize(file, default_formats = {})
       @writer = Package::XMLWriterSimple.new
 
