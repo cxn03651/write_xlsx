@@ -123,6 +123,46 @@ module Writexlsx
       store_workbook
     end
 
+    # get array of Worksheet objects
+    #
+    # :call-seq:
+    #   sheets              -> array of all Wordsheet object
+    #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
+    #
+    # The sheets() method returns a array, or a sliced array, of the worksheets
+    # in a workbook.
+    #
+    # If no arguments are passed the method returns a list of all the worksheets
+    # in the workbook. This is useful if you want to repeat an operation on each
+    # worksheet:
+    #
+    #     workbook.sheets.each do |worksheet|
+    #        print worksheet.get_name
+    #     end
+    #
+    # You can also specify a slice list to return one or more worksheet objects:
+    #
+    #     worksheet = workbook.sheets(0)
+    #     worksheet.write('A1', 'Hello')
+    #
+    # you can write the above example as:
+    #
+    #     workbook.sheets(0).write('A1', 'Hello')
+    #
+    # The following example returns the first and last worksheet in a workbook:
+    #
+    #     workbook.sheets(0, -1).each do |sheet|
+    #        # Do something
+    #     end
+    #
+    def sheets(*args)
+      if args.empty?
+        @worksheets
+      else
+        args.collect{|i| @worksheets[i] }
+      end
+    end
+
     #
     # user must not use. it is internal method.
     #
