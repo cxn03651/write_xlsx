@@ -462,6 +462,92 @@ module Writexlsx
       @doc_properties = params.dup
     end
 
+    #
+    # Change the RGB components of the elements in the colour palette.
+    #
+    # The set_custom_color() method can be used to override one of the built-in
+    # palette values with a more suitable colour.
+    #
+    # The value for _index_ should be in the range 8..63, see "COLOURS IN EXCEL".
+    #
+    # The default named colours use the following indices:
+    #
+    #      8   =>   black
+    #      9   =>   white
+    #     10   =>   red
+    #     11   =>   lime
+    #     12   =>   blue
+    #     13   =>   yellow
+    #     14   =>   magenta
+    #     15   =>   cyan
+    #     16   =>   brown
+    #     17   =>   green
+    #     18   =>   navy
+    #     20   =>   purple
+    #     22   =>   silver
+    #     23   =>   gray
+    #     33   =>   pink
+    #     53   =>   orange
+    #
+    # A new colour is set using its RGB (red green blue) components. The red,
+    # green and blue values must be in the range 0..255. You can determine the
+    # required values in Excel using the Tools->Options->Colors->Modify dialog.
+    #
+    # The set_custom_color() workbook method can also be used with a HTML style
+    # #rrggbb hex value:
+    #
+    #     workbook.set_custom_color(40, 255,  102,  0   ) # Orange
+    #     workbook.set_custom_color(40, 0xFF, 0x66, 0x00) # Same thing
+    #     workbook.set_custom_color(40, '#FF6600'       ) # Same thing
+    #
+    #     font = workbook.add_format(:color => 40)   # Use the modified colour
+    #
+    # The return value from set_custom_color() is the index of the colour that
+    # was changed:
+    #
+    #     ferrari = workbook.set_custom_color(40, 216, 12, 12)
+    #
+    #     format  = workbook.add_format(
+    #                                 :bg_color => ferrari,
+    #                                 :pattern  => 1,
+    #                                 :border   => 1
+    #                            )
+    #
+    # Note, In the XLSX format the color palette isn't actually confined to 53
+    # unique colors. The WriteXLSX gem will be extended at a later stage to
+    # support the newer, semi-infinite, palette.
+    #
+    def set_custom_color(index, red = 0, green = 0, blue = 0)
+      # Match a HTML #xxyyzz style parameter
+      if !red.nil? && red =~ /^#(\w\w)(\w\w)(\w\w)/
+        red   = $1.hex
+        green = $2.hex
+        blue  = $3.hex
+      end
+
+      # Check that the colour index is the right range
+      if index < 8 || index > 64
+        raise "Color index #{index} outside range: 8 <= index <= 64"
+      end
+
+      # Check that the colour components are in the right range
+      if (red   < 0 || red   > 255) ||
+         (green < 0 || green > 255) ||
+         (blue  < 0 || blue  > 255)
+        raise "Color component outside range: 0 <= color <= 255"
+      end
+
+      index -=8       # Adjust colour index (wingless dragonfly)
+
+      # Set the RGB value
+      @palette[index] = [red, green, blue]
+
+      # Store the custome colors for the style.xml file.
+      @custom_colors << sprintf("FF%02X%02X%02X", red, green, blue)
+
+      index + 8
+    end
+
     def activesheet=(worksheet)
       @activesheet = worksheet
     end
