@@ -448,8 +448,32 @@ module Writexlsx
     end
 
     #
-    # Set the document properties such as Title, Author etc. These are written to
-    # property sets in the OLE container.
+    # The set_properties method can be used to set the document properties
+    # of the Excel file created by WriteXLSX. These properties are visible
+    # when you use the Office Button -> Prepare -> Properties option in Excel
+    # and are also available to external applications that read or index windows files.
+    #
+    # The properties should be passed in hash format as follows:
+    #
+    #     workbook.set_properties(
+    #       :title    => 'This is an example spreadsheet',
+    #       :author   => 'Hideo NAKAMURA',
+    #       :comments => 'Created with Ruby and WriteXLSX'
+    #     )
+    #
+    # The properties that can be set are:
+    #
+    #     :title
+    #     :subject
+    #     :author
+    #     :manager
+    #     :company
+    #     :category
+    #     :keywords
+    #     :comments
+    #     :status
+    #
+    # See also the properties.rb program in the examples directory of the distro.
     #
     def set_properties(params)
       # Ignore if no args were passed.
