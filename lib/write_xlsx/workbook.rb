@@ -126,21 +126,21 @@ module Writexlsx
     #
     # user must not use. it is internal method.
     #
-    def set_xml_writer(filename)
+    def set_xml_writer(filename)  #:nodoc:
       @writer.set_xml_writer(filename)
     end
 
     #
     # user must not use. it is internal method.
     #
-    def xml_str
+    def xml_str  #:nodoc:
       @writer.string
     end
 
     #
     # user must not use. it is internal method.
     #
-    def assemble_xml_file
+    def assemble_xml_file  #:nodoc:
       return unless @writer
 
       # Prepare format object for passing to Style.pm.
