@@ -113,7 +113,7 @@ module Writexlsx
     end
 
     #
-    # Calls finalization methods.
+    # write XLSX data to file or IO object.
     #
     def close
       # In case close() is called twice, by user and by DESTROY.
