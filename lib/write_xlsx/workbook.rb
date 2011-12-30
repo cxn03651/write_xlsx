@@ -164,6 +164,30 @@ module Writexlsx
     end
 
     #
+    # Set the date system: false = 1900 (the default), true = 1904
+    #
+    # Excel stores dates as real numbers where the integer part stores
+    # the number of days since the epoch and the fractional part stores
+    # the percentage of the day. The epoch can be either 1900 or 1904.
+    # Excel for Windows uses 1900 and Excel for Macintosh uses 1904.
+    # However, Excel on either platform will convert automatically between
+    # one system and the other.
+    #
+    # WriteXLSX stores dates in the 1900 format by default. If you wish to
+    # change this you can call the set_1904() workbook method.
+    # You can query the current value by calling the get_1904() workbook method.
+    # This returns 0 for 1900 and 1 for 1904.
+    #
+    # In general you probably won't need to use set_1904().
+    #
+    def set_1904(mode = true)
+      unless sheets.empty?
+        raise "set_1904() must be called before add_worksheet()"
+      end
+      @date_1904 = (!mode || mode == 0) ? false : true
+    end
+
+    #
     # user must not use. it is internal method.
     #
     def set_xml_writer(filename)  #:nodoc:
