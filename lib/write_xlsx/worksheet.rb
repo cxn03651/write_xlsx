@@ -8,6 +8,97 @@ require 'write_xlsx/utility'
 require 'tempfile'
 
 module Writexlsx
+  #
+  # A new worksheet is created by calling the add_worksheet() method from a workbook object:
+  #
+  #     worksheet1 = workbook.add_worksheet
+  #     worksheet2 = workbook.add_worksheet
+  #
+  # The following methods are available through a new worksheet:
+  #
+  #     write
+  #     write_number
+  #     write_string
+  #     write_rich_string
+  #     write_blank
+  #     write_row
+  #     write_col
+  #     write_date_time
+  #     write_url
+  #     write_url_range
+  #     write_formula
+  #     write_comment
+  #     show_comments
+  #     set_comments_author
+  #     insert_image
+  #     insert_chart
+  #     data_validation
+  #     conditional_format
+  #     get_name
+  #     activate
+  #     select
+  #     hide
+  #     set_first_sheet
+  #     protect
+  #     set_selection
+  #     set_row
+  #     set_column
+  #     outline_settings
+  #     freeze_panes
+  #     split_panes
+  #     merge_range
+  #     merge_range_type
+  #     set_zoom
+  #     right_to_left
+  #     hide_zero
+  #     set_tab_color
+  #     autofilter
+  #     filter_column
+  #     filter_column_list
+  #
+  # ==Cell notation
+  #
+  # WriteXLSX supports two forms of notation to designate the position of cells:
+  # Row-column notation and A1 notation.
+  #
+  # Row-column notation uses a zero based index for both row and column
+  # while A1 notation uses the standard Excel alphanumeric sequence of column letter
+  # and 1-based row. For example:
+  #
+  #     (0, 0)      # The top left cell in row-column notation.
+  #     ('A1')      # The top left cell in A1 notation.
+  #
+  #     (1999, 29)  # Row-column notation.
+  #     ('AD2000')  # The same cell in A1 notation.
+  #
+  # Row-column notation is useful if you are referring to cells programmatically:
+  #
+  #     (0..9).each do |i|
+  #       worksheet.write(i, 0, 'Hello')    # Cells A1 to A10
+  #     end
+  #
+  # A1 notation is useful for setting up a worksheet manually and
+  # for working with formulas:
+  #
+  #     worksheet.write('H1', 200)
+  #     worksheet.write('H2', '=H1+1')
+  #
+  # In formulas and applicable methods you can also use the A:A column notation:
+  #
+  #     worksheet.write('A1', '=SUM(B:B)')
+  #
+  # The Writexlsx::Utility module that is included in the distro contains
+  # helper functions for dealing with A1 notation, for example:
+  #
+  #     include Writexlsx::Utility
+  #
+  #     row, col = xl_cell_to_rowcol('C2')    # (1, 2)
+  #     str      = xl_rowcol_to_cell(1, 2)    # C2
+  #
+  # For simplicity, the parameter lists for the worksheet method calls in the
+  # following sections are given in terms of row-column notation. In all cases
+  # it is also possible to use A1 notation.
+  #
   class Worksheet
     include Writexlsx::Utility
 
@@ -23,7 +114,7 @@ module Writexlsx
     attr_reader :vml_data_id, :vml_shape_id, :comments_array
     attr_reader :autofilter_area, :hidden
 
-    def initialize(workbook, index, name)
+    def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
 
       @workbook = workbook
@@ -103,11 +194,11 @@ module Writexlsx
       @dxf_priority = 1
     end
 
-    def set_xml_writer(filename)
+    def set_xml_writer(filename) #:nodoc:
       @writer.set_xml_writer(filename)
     end
 
-    def assemble_xml_file
+    def assemble_xml_file #:nodoc:
       @writer.xml_decl
       write_worksheet
       write_sheet_pr
@@ -136,6 +227,18 @@ module Writexlsx
       @writer.close
     end
 
+    #
+    # The name() method is used to retrieve the name of a worksheet.
+    # For example:
+    #
+    #     workbook.sheets.each do |sheet|
+    #       print sheet.name
+    #     end
+    #
+    # For reasons related to the design of WriteXLSX and to the internals
+    # of Excel there is no set_name() method. The only way to set the
+    # worksheet name is via the add_worksheet() method.
+    #
     def name
       @name
     end
@@ -143,6 +246,18 @@ module Writexlsx
     #
     # Set this worksheet as a selected worksheet, i.e. the worksheet has its tab
     # highlighted.
+    #
+    # The select() method is used to indicate that a worksheet is selected in
+    # a multi-sheet workbook:
+    #
+    #     worksheet1.activate
+    #     worksheet2.select
+    #     worksheet3.select
+    #
+    # A selected worksheet has its tab highlighted. Selecting worksheets is a
+    # way of grouping them together so that, for example, several worksheets
+    # could be printed in one go. A worksheet that has been activated via
+    # the activate() method will also appear as selected.
     #
     def select
       @hidden   = false  # Selected worksheet can't be hidden.
@@ -153,6 +268,21 @@ module Writexlsx
     # Set this worksheet as the active worksheet, i.e. the worksheet that is
     # displayed when the workbook is opened. Also set it as selected.
     #
+    # The activate() method is used to specify which worksheet is initially
+    # visible in a multi-sheet workbook:
+    #
+    #     worksheet1 = workbook.add_worksheet('To')
+    #     worksheet2 = workbook.add_worksheet('the')
+    #     worksheet3 = workbook.add_worksheet('wind')
+    #
+    #     worksheet3.activate
+    #
+    # This is similar to the Excel VBA activate method. More than one worksheet
+    # can be selected via the select() method, see below, however only one
+    # worksheet can be active.
+    #
+    # The default active worksheet is the first worksheet.
+    #
     def activate
       @hidden = false
       @selected = true
@@ -161,6 +291,22 @@ module Writexlsx
 
     #
     # Hide this worksheet.
+    #
+    # The hide() method is used to hide a worksheet:
+    #
+    #     worksheet2.hide
+    #
+    # You may wish to hide a worksheet in order to avoid confusing a user
+    # with intermediate data or calculations.
+    #
+    # A hidden worksheet can not be activated or selected so this method
+    # is mutually exclusive with the activate() and select() methods. In
+    # addition, since the first worksheet will default to being the active
+    # worksheet, you cannot hide the first worksheet without activating another
+    # sheet:
+    #
+    #     worksheet2.activate
+    #     worksheet1.hide
     #
     def hide
       @hidden = true
@@ -178,6 +324,21 @@ module Writexlsx
     # when there are a large number of worksheets and the activated
     # worksheet is not visible on the screen.
     #
+    # The activate() method determines which worksheet is initially selected.
+    # However, if there are a large number of worksheets the selected
+    # worksheet may not appear on the screen. To avoid this you can select
+    # which is the leftmost visible worksheet using set_first_sheet():
+    #
+    #     20.times { workbook.add_worksheet }
+    #
+    #     worksheet21 = workbook.add_worksheet
+    #     worksheet22 = workbook.add_worksheet
+    #
+    #     worksheet21.set_first_sheet
+    #     worksheet22.activate
+    #
+    # This method is not required very often. The default value is the first worksheet.
+    #
     def set_first_sheet
       @hidden = false
       @workbook.firstsheet = self
@@ -186,6 +347,58 @@ module Writexlsx
     #
     # Set the worksheet protection flags to prevent modification of worksheet
     # objects.
+    #
+    # The protect() method is used to protect a worksheet from modification:
+    #
+    #     worksheet.protect
+    #
+    # The protect() method also has the effect of enabling a cell's locked
+    # and hidden properties if they have been set. A locked cell cannot be
+    # edited and this property is on by default for all cells. A hidden
+    # cell will display the results of a formula but not the formula itself.
+    #
+    # See the protection.rb program in the examples directory of the distro
+    # for an illustrative example and the set_locked and set_hidden format
+    # methods in "CELL FORMATTING".
+    #
+    # You can optionally add a password to the worksheet protection:
+    #
+    #     worksheet.protect('drowssap')
+    #
+    # Passing the empty string '' is the same as turning on protection
+    # without a password.
+    #
+    # Note, the worksheet level password in Excel provides very weak
+    # protection. It does not encrypt your data and is very easy to
+    # deactivate. Full workbook encryption is not supported by WriteXLSX
+    # since it requires a completely different file format and would take
+    # several man months to implement.
+    #
+    # You can specify which worksheet elements that you which to protect
+    # by passing a hash_ref with any or all of the following keys:
+    #
+    #     # Default shown.
+    #     options = {
+    #         :objects               => false,
+    #         :scenarios             => false,
+    #         :format_cells          => false,
+    #         :format_columns        => false,
+    #         :format_rows           => false,
+    #         :insert_columns        => false,
+    #         :insert_rows           => false,
+    #         :insert_hyperlinks     => false,
+    #         :delete_columns        => false,
+    #         :delete_rows           => false,
+    #         :select_locked_cells   => true,
+    #         :sort                  => false,
+    #         :autofilter            => false,
+    #         :pivot_tables          => false,
+    #         :select_unlocked_cells => true
+    #     }
+    # The default boolean values are shown above. Individual elements
+    # can be protected as follows:
+    #
+    #     worksheet.protect('drowssap', { :insert_rows => true } )
     #
     def protect(password = nil, options = {})
       # Default values for objects that can be protected.
@@ -299,11 +512,11 @@ module Writexlsx
       case args.size
       when 2
         # Single cell selection.
-        active_cell = xl_rowcol_to_cell( args[0], args[1] )
+        active_cell = xl_rowcol_to_cell(args[0], args[1])
         sqref = active_cell
       when 4
         # Range selection.
-        active_cell = xl_rowcol_to_cell( args[0], args[1] )
+        active_cell = xl_rowcol_to_cell(args[0], args[1])
 
         row_first, col_first, row_last, col_last = args
 
@@ -353,7 +566,7 @@ module Writexlsx
     # file format and isn't sufficient to describe all cases of split panes.
     # It should probably be something like:
     #
-    #     split_panes( $y, $x, $top_row, $left_col, $offset_row, $offset_col )
+    #     split_panes($y, $x, $top_row, $left_col, $offset_row, $offset_col)
     #
     # I'll look at changing this if it becomes an issue.
     #
@@ -550,6 +763,72 @@ module Writexlsx
       end
     end
 
+    #
+    # :call-seq:
+    #  write(row, column [ , token [ , format ] ])
+    #
+    # Excel makes a distinction between data types such as strings, numbers,
+    # blanks, formulas and hyperlinks. To simplify the process of writing
+    # data the write() method acts as a general alias for several more
+    # specific methods:
+    #
+    #     write_string
+    #     write_number
+    #     write_blank
+    #     write_formula
+    #     write_url
+    #     write_row
+    #     write_col
+    #
+    # The general rule is that if the data looks like a something then
+    # a something is written. Here are some examples in both row-column
+    # and A1 notation:
+    #
+    #                                                     # Same as:
+    #     worksheet.write(0, 0, 'Hello'                ) # write_string()
+    #     worksheet.write(1, 0, 'One'                  ) # write_string()
+    #     worksheet.write(2, 0,  2                     ) # write_number()
+    #     worksheet.write(3, 0,  3.00001               ) # write_number()
+    #     worksheet.write(4, 0,  ""                    ) # write_blank()
+    #     worksheet.write(5, 0,  ''                    ) # write_blank()
+    #     worksheet.write(6, 0,  nil                   ) # write_blank()
+    #     worksheet.write(7, 0                         ) # write_blank()
+    #     worksheet.write(8, 0,  'http://www.ruby.com/') # write_url()
+    #     worksheet.write('A9',  'ftp://ftp.ruby.org/' ) # write_url()
+    #     worksheet.write('A10', 'internal:Sheet1!A1'  ) # write_url()
+    #     worksheet.write('A11', 'external:c:\foo.xlsx') # write_url()
+    #     worksheet.write('A12', '=A3 + 3*A4'          ) # write_formula()
+    #     worksheet.write('A13', '=SIN(PI()/4)'        ) # write_formula()
+    #     worksheet.write('A14', [1, 2]                ) # write_row()
+    #     worksheet.write('A15', [ [1, 2] ]            ) # write_col()
+    #
+    #     # Write an array formula. Not available in writeexcel gem.
+    #     worksheet.write('A16', '{=SUM(A1:B1*A2:B2)}' ) # write_formula()
+    #
+    # The format parameter is optional. It should be a valid Format object.
+    #
+    #     format = workbook.add_format
+    #     format.set_bold
+    #     format.set_color('red')
+    #     format.set_align('center')
+    #
+    #     worksheet.write(4, 0, 'Hello', $format)    # Formatted string
+    #
+    # The write() method will ignore empty strings or nil tokens unless a format
+    # is also supplied. As such you needn't worry about special handling for
+    # empty or nil in your data. See also the write_blank() method.
+    #
+    # One problem with the write() method is that occasionally data looks like
+    # a number but you don't want it treated as a number. For example, zip
+    # codes or ID numbers often start with a leading zero.
+    # If you want to write this data with leading zero(s), use write_string.
+    #
+    # The write methods return:
+    #     0 for success.
+    #    -1 for insufficient number of arguments.
+    #    -2 for row or column out of bounds.
+    #    -3 for string too long.
+    #
     def write(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       args = row_col_notation(args)
@@ -588,13 +867,78 @@ module Writexlsx
     end
 
     #
-    # write_row($row, $col, $array_ref, $format)
+    # :call-seq:
+    #   write_row(row, col, array [ , format ] )
     #
-    # Write a row of data starting from ($row, $col). Call write_col() if any of
-    # the elements of the array ref are in turn array refs. This allows the writing
+    # Write a row of data starting from (row, col). Call write_col() if any of
+    # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
     # Returns: the first encountered error value or zero for no errors
+    #
+    # The write_row() method can be used to write a 1D or 2D array of data
+    # in one go. This is useful for converting the results of a database
+    # query into an Excel worksheet. You must pass a reference to the array
+    # of data rather than the array itself. The write() method is then
+    # called for each element of the data. For example:
+    #
+    #     array = ['awk', 'gawk', 'mawk']
+    #
+    #     worksheet.write_row(0, 0, array)
+    #
+    #     # The above example is equivalent to:
+    #     worksheet.write(0, 0, array[0])
+    #     worksheet.write(0, 1, array[1])
+    #     worksheet.write(0, 2, array[2])
+    #
+    # Note: For convenience the write() method behaves in the same way as
+    # write_row() if it is passed an array reference.
+    # Therefore the following two method calls are equivalent:
+    #
+    #     worksheet.write_row('A1', array)    # Write a row of data
+    #     worksheet.write(    'A1', array)    # Same thing
+    #
+    # As with all of the write methods the format parameter is optional.
+    # If a format is specified it is applied to all the elements of the
+    # data array.
+    #
+    # Array references within the data will be treated as columns.
+    # This allows you to write 2D arrays of data in one go. For example:
+    #
+    #     eec =  [
+    #                 ['maggie', 'milly', 'molly', 'may'  ],
+    #                 [13,       14,      15,      16     ],
+    #                 ['shell',  'star',  'crab',  'stone']
+    #            ]
+    #
+    #     worksheet.write_row('A1', eec)
+    # Would produce a worksheet as follows:
+    #
+    #      -----------------------------------------------------------
+    #     |   |    A    |    B    |    C    |    D    |    E    | ...
+    #      -----------------------------------------------------------
+    #     | 1 | maggie  | 13      | shell   | ...     |  ...    | ...
+    #     | 2 | milly   | 14      | star    | ...     |  ...    | ...
+    #     | 3 | molly   | 15      | crab    | ...     |  ...    | ...
+    #     | 4 | may     | 16      | stone   | ...     |  ...    | ...
+    #     | 5 | ...     | ...     | ...     | ...     |  ...    | ...
+    #     | 6 | ...     | ...     | ...     | ...     |  ...    | ...
+    #
+    # To write the data in a row-column order refer to the write_col()
+    # method below.
+    #
+    # Any nil in the data will be ignored unless a format is applied to
+    # the data, in which case a formatted blank cell will be written.
+    # In either case the appropriate row or column value will still
+    # be incremented.
+    #
+    # The write_row() method returns the first error encountered when
+    # writing the elements of the data or zero if no errors were
+    # encountered. See the return values described for the write()
+    # method.
+    #
+    # See also the write_arrays.rb program in the examples directory
+    # of the distro.
     #
     def write_row(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -624,13 +968,80 @@ module Writexlsx
     end
 
     #
-    # write_col($row, $col, $array_ref, $format)
+    # :call-seq:
+    #   write_col(row, col, array [ , format ] )
     #
-    # Write a column of data starting from ($row, $col). Call write_row() if any of
-    # the elements of the array ref are in turn array refs. This allows the writing
+    # Write a column of data starting from (row, col). Call write_row() if any of
+    # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
     # Returns: the first encountered error value or zero for no errors
+    #
+    # The write_col() method can be used to write a 1D or 2D array of data
+    # in one go. This is useful for converting the results of a database
+    # query into an Excel worksheet. You must pass a reference to the array
+    # of data rather than the array itself. The write() method is then
+    # called for each element of the data. For example:
+    #
+    #     array = [ 'awk', 'gawk', 'mawk' ]
+    #
+    #     worksheet.write_col(0, 0, array)
+    #
+    #     # The above example is equivalent to:
+    #     worksheet.write(0, 0, array[0])
+    #     worksheet.write(1, 0, array[1])
+    #     worksheet.write(2, 0, array[2])
+    #
+    # As with all of the write methods the format parameter is optional.
+    # If a format is specified it is applied to all the elements of the
+    # data array.
+    #
+    # Array references within the data will be treated as rows.
+    # This allows you to write 2D arrays of data in one go. For example:
+    #
+    #     eec =  [
+    #                 ['maggie', 'milly', 'molly', 'may'  ],
+    #                 [13,       14,      15,      16     ],
+    #                 ['shell',  'star',  'crab',  'stone']
+    #            ]
+    #
+    #     worksheet.write_col('A1', eec)
+    #
+    # Would produce a worksheet as follows:
+    #
+    #      -----------------------------------------------------------
+    #     |   |    A    |    B    |    C    |    D    |    E    | ...
+    #      -----------------------------------------------------------
+    #     | 1 | maggie  | milly   | molly   | may     |  ...    | ...
+    #     | 2 | 13      | 14      | 15      | 16      |  ...    | ...
+    #     | 3 | shell   | star    | crab    | stone   |  ...    | ...
+    #     | 4 | ...     | ...     | ...     | ...     |  ...    | ...
+    #     | 5 | ...     | ...     | ...     | ...     |  ...    | ...
+    #     | 6 | ...     | ...     | ...     | ...     |  ...    | ...
+    #
+    # To write the data in a column-row order refer to the write_row()
+    # method above.
+    #
+    # Any nil in the data will be ignored unless a format is applied to
+    # the data, in which case a formatted blank cell will be written.
+    # In either case the appropriate row or column value will still be
+    # incremented.
+    #
+    # As noted above the write() method can be used as a synonym for
+    # write_row() and write_row() handles nested array refs as columns.
+    # Therefore, the following two method calls are equivalent although
+    # the more explicit call to write_col() would be preferable for
+    # maintainability:
+    #
+    #     worksheet.write_col('A1', array     ) # Write a column of data
+    #     worksheet.write(    'A1', [ array ] ) # Same thing
+    #
+    # The write_col() method returns the first error encountered when
+    # writing the elements of the data or zero if no errors were encountered.
+    # See the return values described for the write() method above.
+    #
+    # See also the write_arrays.rb program in the examples directory of
+    # the distro.
     #
     def write_col(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -656,11 +1067,186 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #   write_comment(row, column, string, options = {})
+    #
     # Write a comment to the specified row and column (zero indexed).
     #
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
+    # write_comment methods return:
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #
+    # The write_comment() method is used to add a comment to a cell.
+    # A cell comment is indicated in Excel by a small red triangle in the
+    # upper right-hand corner of the cell. Moving the cursor over the red
+    # triangle will reveal the comment.
+    #
+    # The following example shows how to add a comment to a cell:
+    #
+    #     worksheet.write(        2, 2, 'Hello')
+    #     worksheet.write_comment(2, 2, 'This is a comment.')
+    #
+    # As usual you can replace the row and column parameters with an A1
+    # cell reference. See the note about "Cell notation".
+    #
+    #     worksheet.write(        'C3', 'Hello')
+    #     worksheet.write_comment('C3', 'This is a comment.')
+    #
+    # The write_comment() method will also handle strings in UTF-8 format.
+    #
+    #     worksheet.write_comment('C3', "\x{263a}")       # Smiley
+    #     worksheet.write_comment('C4', 'Comment ca va?')
+    #
+    # In addition to the basic 3 argument form of write_comment() you can
+    # pass in several optional key/value pairs to control the format of
+    # the comment. For example:
+    #
+    #     worksheet.write_comment('C3', 'Hello', :visible => 1, :author => 'Perl')
+    #
+    # Most of these options are quite specific and in general the default
+    # comment behaviour will be all that you need. However, should you
+    # need greater control over the format of the cell comment the
+    # following options are available:
+    #
+    #     :author
+    #     :visible
+    #     :x_scale
+    #     :width
+    #     :y_scale
+    #     :height
+    #     :color
+    #     :start_cell
+    #     :start_row
+    #     :start_col
+    #     :x_offset
+    #     :y_offset
+    #
+    # ===Option: author
+    #
+    # This option is used to indicate who is the author of the cell
+    # comment. Excel displays the author of the comment in the status
+    # bar at the bottom of the worksheet. This is usually of interest
+    # in corporate environments where several people might review and
+    # provide comments to a workbook.
+    #
+    #     worksheet.write_comment('C3', 'Atonement', :author => 'Ian McEwan')
+    #
+    # The default author for all cell comments can be set using the
+    # set_comments_author() method.
+    #
+    #     worksheet.set_comments_author('Ruby')
+    #
+    # ===Option: visible
+    #
+    # This option is used to make a cell comment visible when the worksheet
+    # is opened. The default behaviour in Excel is that comments are
+    # initially hidden. However, it is also possible in Excel to make
+    # individual or all comments visible. In WriteXLSX individual
+    # comments can be made visible as follows:
+    #
+    #     worksheet.write_comment('C3', 'Hello', :visible => 1 )
+    #
+    # It is possible to make all comments in a worksheet visible
+    # using the show_comments() worksheet method. Alternatively, if all of
+    # the cell comments have been made visible you can hide individual comments:
+    #
+    #     worksheet.write_comment('C3', 'Hello', :visible => 0)
+    #
+    # ===Option: x_scale
+    #
+    # This option is used to set the width of the cell comment box as a
+    # factor of the default width.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :x_scale => 2)
+    #     worksheet.write_comment('C4', 'Hello', :x_scale => 4.2)
+    #
+    # ===Option: width
+    #
+    # This option is used to set the width of the cell comment box
+    # explicitly in pixels.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :width => 200)
+    #
+    # ===Option: y_scale
+    #
+    # This option is used to set the height of the cell comment box as a
+    # factor of the default height.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :y_scale => 2)
+    #     worksheet.write_comment('C4', 'Hello', :y_scale => 4.2)
+    #
+    # ===Option: height
+    #
+    # This option is used to set the height of the cell comment box
+    # explicitly in pixels.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :height => 200)
+    #
+    # ===Option: color
+    #
+    # This option is used to set the background colour of cell comment
+    # box. You can use one of the named colours recognised by WriteXLSX
+    # or a colour index. See "COLOURS IN EXCEL".
+    #
+    #     worksheet.write_comment('C3', 'Hello', :color => 'green')
+    #     worksheet.write_comment('C4', 'Hello', :color => 0x35)      # Orange
+    #
+    # ===Option: start_cell
+    #
+    # This option is used to set the cell in which the comment will appear.
+    # By default Excel displays comments one cell to the right and one cell
+    # above the cell to which the comment relates. However, you can change
+    # this behaviour if you wish. In the following example the comment
+    # which would appear by default in cell D2 is moved to E2.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :start_cell => 'E2')
+    #
+    # ===Option: start_row
+    #
+    # This option is used to set the row in which the comment will appear.
+    # See the start_cell option above. The row is zero indexed.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :start_row => 0)
+    #
+    # ===Option: start_col
+    #
+    # This option is used to set the column in which the comment will appear.
+    # See the start_cell option above. The column is zero indexed.
+    #
+    #     worksheet.write_comment('C3', 'Hello', :start_col => 4)
+    #
+    # ===Option: x_offset
+    #
+    # This option is used to change the x offset, in pixels, of a comment
+    # within a cell:
+    #
+    #     worksheet.write_comment('C3', $comment, :x_offset => 30)
+    #
+    # ===Option: y_offset
+    #
+    # This option is used to change the y offset, in pixels, of a comment
+    # within a cell:
+    #
+    #     worksheet.write_comment('C3', $comment, :x_offset => 30)
+    #
+    # You can apply as many of these options as you require.
+    #
+    # Note about using options that adjust the position of the cell comment
+    # such as start_cell, start_row, start_col, x_offset and y_offset:
+    # Excel only displays offset cell comments when they are displayed as
+    # "visible". Excel does not display hidden cells as moved when you
+    # mouse over them.
+    #
+    # Note about row height and comments. If you specify the height of a
+    # row that contains a comment then Excel::Writer::XLSX will adjust the
+    # height of the comment to maintain the default or user specified
+    # dimensions. However, the height of a row can also be adjusted
+    # automatically by Excel if the text wrap property is set or large
+    # fonts are used in the cell. This means that the height of the row
+    # is unknown to the module at run time and thus the comment box is
+    # stretched with the row. Use the set_row() method to specify the
+    # row height explicitly and avoid this problem.
     #
     def write_comment(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -683,6 +1269,24 @@ module Writexlsx
       end
     end
 
+    #
+    # :call-seq:
+    #   write_number(row, column, number [ , format ] )
+    #
+    # Write an integer or a float to the cell specified by row and column:
+    #
+    #     worksheet.write_number(0, 0, 123456)
+    #     worksheet.write_number('A2', 2.3451)
+    #
+    # See the note about "Cell notation".
+    # The format parameter is optional.
+    #
+    # In general it is sufficient to use the write() method.
+    #
+    # Note: some versions of Excel 2007 do not display the calculated values
+    # of formulas written by WriteXLSX. Applying all available Service Packs
+    # to Excel should fix this.
+    #
     def write_number(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       args = row_col_notation(args)
@@ -702,12 +1306,40 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #   write_string(row, column, string [, format ] )
+    #
     # Write a string to the specified row and column (zero indexed).
-    # $format is optional.
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
-    #         -3 : long string truncated to 32767 chars
+    # format is optional.
+    #
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #           -3 : long string truncated to 32767 chars
+    #
+    # write_string methods return:
+    #
+    #     worksheet.write_string(0, 0, 'Your text here')
+    #     worksheet.write_string('A2', 'or here')
+    #
+    # The maximum string size is 32767 characters. However the maximum
+    # string segment that Excel can display in a cell is 1000.
+    # All 32767 characters can be displayed in the formula bar.
+    #
+    # In general it is sufficient to use the write() method.
+    # However, you may sometimes wish to use the write_string() method
+    # to write data that looks like a number but that you don't want
+    # treated as a number. For example, zip codes or phone numbers:
+    #
+    #     # Write as a plain string
+    #     worksheet.write_string('A1', '01209')
+    #
+    # However, if the user edits this string Excel may convert it back
+    # to a number. To get around this you can use the Excel text format @:
+    #
+    #     # Format as a string. Doesn't change to a number when edited
+    #     format1 = workbook.add_format(:num_format => '@')
+    #     worksheet.write_string('A2', '01209', format1)
     #
     def write_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -733,17 +1365,103 @@ module Writexlsx
       str_error
     end
 
-    # write_rich_string( $row, $column, $format, $string, ..., $cell_format )
+    #
+    # :call-seq:
+    #    write_rich_string(row, column, format, string,  [,cell_format] )
     #
     # The write_rich_string() method is used to write strings with multiple formats.
     # The method receives string fragments prefixed by format objects. The final
     # format object is used as the cell format.
     #
-    # Returns  0 : normal termination.
-    #         -1 : insufficient number of arguments.
-    #         -2 : row or column out of range.
-    #         -3 : long string truncated to 32767 chars.
-    #         -4 : 2 consecutive formats used.
+    # write_rich_string methods return:
+    #
+    #   Returns  0 : normal termination.
+    #           -1 : insufficient number of arguments.
+    #           -2 : row or column out of range.
+    #           -3 : long string truncated to 32767 chars.
+    #           -4 : 2 consecutive formats used.
+    #
+    # For example to write the string "This is bold and this is italic"
+    # you would use the following:
+    #
+    #     bold   = workbook.add_format(:bold   => 1)
+    #     italic = workbook.add_format(:italic => 1)
+    #
+    #     worksheet.write_rich_string('A1',
+    #         'This is ', bold, 'bold', ' and this is ', italic, 'italic')
+    #
+    # The basic rule is to break the string into fragments and put a format
+    # object before the fragment that you want to format. For example:
+    #
+    #     # Unformatted string.
+    #       'This is an example string'
+    #
+    #     # Break it into fragments.
+    #       'This is an ', 'example', ' string'
+    #
+    #     # Add formatting before the fragments you want formatted.
+    #       'This is an ', format, 'example', ' string'
+    #
+    #     # In WriteXLSX.
+    #     worksheet.write_rich_string('A1',
+    #         'This is an ', format, 'example', ' string')
+    # String fragments that don't have a format are given a default
+    # format. So for example when writing the string "Some bold text"
+    # you would use the first example below but it would be equivalent
+    # to the second:
+    #
+    #     # With default formatting:
+    #     bold    = workbook.add_format(:bold => 1)
+    #
+    #     worksheet.write_rich_string('A1',
+    #         'Some ', bold, 'bold', ' text')
+    #
+    #     # Or more explicitly:
+    #     bold    = workbook.add_format(:bold => 1)
+    #     default = workbook.add_format
+    #
+    #     worksheet.write_rich_string('A1',
+    #         default, 'Some ', bold, 'bold', default, ' text')
+    #
+    # As with Excel, only the font properties of the format such as font
+    # name, style, size, underline, color and effects are applied to the
+    # string fragments. Other features such as border, background and
+    # alignment must be applied to the cell.
+    #
+    # The write_rich_string() method allows you to do this by using the
+    # last argument as a cell format (if it is a format object).
+    # The following example centers a rich string in the cell:
+    #
+    #     bold   = workbook.add_format(:bold  => 1)
+    #     center = workbook.add_format(:align => 'center')
+    #
+    #     worksheet.write_rich_string('A5',
+    #         'Some ', bold, 'bold text', ' centered', center)
+    #
+    # See the rich_strings.rb example in the distro for more examples.
+    #
+    #     bold   = workbook.add_format(:bold        => 1)
+    #     italic = workbook.add_format(:italic      => 1)
+    #     red    = workbook.add_format(:color       => 'red')
+    #     blue   = workbook.add_format(:color       => 'blue')
+    #     center = workbook.add_format(:align       => 'center')
+    #     super  = workbook.add_format(:font_script => 1)
+    #
+    #     # Write some strings with multiple formats.
+    #     worksheet.write_rich_string('A1',
+    #         'This is ', bold, 'bold', ' and this is ', italic, 'italic')
+    #
+    #     worksheet.write_rich_string('A3',
+    #         'This is ', red, 'red', ' and this is ', blue, 'blue')
+    #
+    #     worksheet.write_rich_string('A5',
+    #         'Some ', bold, 'bold text', ' centered', center)
+    #
+    #     worksheet.write_rich_string('A7',
+    #         italic, 'j = k', super, '(n-1)', center)
+    #
+    # As with write_sting() the maximum string size is 32767 characters.
+    # See also the note about "Cell notation".
     #
     def write_rich_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -835,7 +1553,8 @@ module Writexlsx
     end
 
     #
-    # write_blank($row, $col, $format)
+    # :call-seq:
+    #   write_blank(row, col, format)
     #
     # Write a blank cell to the specified row and column (zero indexed).
     # A blank cell is used to specify formatting without adding a string
@@ -845,9 +1564,25 @@ module Writexlsx
     # a BLANK record unless a format is specified. This is mainly an optimisation
     # for the write_row() and write_col() methods.
     #
-    # Returns  0 : normal termination (including no format)
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
+    # write_blank methods return:
+    #   Returns  0 : normal termination (including no format)
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #
+    # Excel differentiates between an "Empty" cell and a "Blank" cell.
+    # An "Empty" cell is a cell which doesn't contain data whilst a "Blank"
+    # cell is a cell which doesn't contain data but does contain formatting.
+    # Excel stores "Blank" cells but ignores "Empty" cells.
+    #
+    # As such, if you write an empty cell without formatting it is ignored:
+    #
+    #     worksheet.write('A1', nil, format )    # write_blank()
+    #     worksheet.write('A2', nil )            # Ignored
+    #
+    # This seemingly uninteresting fact means that you can write arrays of
+    # data without special treatment for undef or empty string values.
+    #
+    # See the note about "Cell notation".
     #
     def write_blank(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -869,6 +1604,37 @@ module Writexlsx
       0
     end
 
+    #
+    # :call-seq:
+    #   write_formula(row, column, formula [ , format [ , value ] ] )
+    #
+    # Write a formula or function to the cell specified by row and column:
+    #
+    #     worksheet.write_formula(0, 0, '=$B$3 + B4')
+    #     worksheet.write_formula(1, 0, '=SIN(PI()/4)')
+    #     worksheet.write_formula(2, 0, '=SUM(B1:B5)')
+    #     worksheet.write_formula('A4', '=IF(A3>1,"Yes", "No")')
+    #     worksheet.write_formula('A5', '=AVERAGE(1, 2, 3, 4)')
+    #     worksheet.write_formula('A6', '=DATEVALUE("1-Jan-2001")')
+    # Array formulas are also supported:
+    #
+    #     worksheet.write_formula('A7', '{=SUM(A1:B1*A2:B2)}')
+    #
+    # See also the write_array_formula() method.
+    #
+    # See the note about "Cell notation". For more information about
+    # writing Excel formulas see "FORMULAS AND FUNCTIONS IN EXCEL"
+    #
+    # If required, it is also possible to specify the calculated value
+    # of the formula. This is occasionally necessary when working with
+    # non-Excel applications that don't calculate the value of the
+    # formula. The calculated value is added at the end of the argument list:
+    #
+    #     worksheet.write('A1', '=2+2', format, 4)
+    #
+    # However, this probably isn't something that will ever need to do.
+    # If you do use this feature then do so with care.
+    #
     def write_formula(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       args = row_col_notation(args)
@@ -878,7 +1644,7 @@ module Writexlsx
       row, col, formula, format, value = args
 
       if formula =~ /^\{=.*\}$/
-        return write_array_formula(row, col, row, col, formula, format, value )
+        return write_array_formula(row, col, row, col, formula, format, value)
       end
 
       # Check that row and col are valid and store max and min values
@@ -891,23 +1657,55 @@ module Writexlsx
     end
 
     #
-    # write_array_formula($row1, $col1, $row2, $col2, $formula, $format)
+    # :call-seq:
+    #   write_array_formula(row1, col1, row2, col2, formula [ , format [ , value ] ] )
     #
     # Write an array formula to the specified row and column (zero indexed).
     #
-    #  my $row1    = $_[0]           # First row
-    #  my $col1    = $_[1]           # First column
-    #  my $row2    = $_[2]           # Last row
-    #  my $col2    = $_[3]           # Last column
-    #  my $formula = $_[4]           # The formula text string
-    #  my $xf      = $_[5]           # The format object.
-    #  my $value   = $_[6]           # Optional formula value.
+    # format is optional.
     #
-    # $format is optional.
+    # write_array_formula methods return:
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
     #
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
+    # In Excel an array formula is a formula that performs a calculation
+    # on a set of values. It can return a single value or a range of values.
+    #
+    # An array formula is indicated by a pair of braces around the
+    # formula: {=SUM(A1:B1*A2:B2)}. If the array formula returns a single
+    # value then the first and last parameters should be the same:
+    #
+    #     worksheet.write_array_formula('A1:A1', '{=SUM(B1:C1*B2:C2)}')
+    #
+    # It this case however it is easier to just use the write_formula()
+    # or write() methods:
+    #
+    #     # Same as above but more concise.
+    #     worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}')
+    #     worksheet.write_formula('A1', '{=SUM(B1:C1*B2:C2)}')
+    #
+    # For array formulas that return a range of values you must specify
+    # the range that the return values will be written to:
+    #
+    #     worksheet.write_array_formula('A1:A3',    '{=TREND(C1:C3,B1:B3)}')
+    #     worksheet.write_array_formula(0, 0, 2, 0, '{=TREND(C1:C3,B1:B3)}')
+    #
+    # If required, it is also possible to specify the calculated value of
+    # the formula. This is occasionally necessary when working with non-Excel
+    # applications that don't calculate the value of the formula.
+    # The calculated value is added at the end of the argument list:
+    #
+    #     worksheet.write_array_formula('A1:A3', '{=TREND(C1:C3,B1:B3)}', format, 105)
+    #
+    # In addition, some early versions of Excel 2007 don't calculate the
+    # values of array formulas when they aren't supplied. Installing the
+    # latest Office Service Pack should fix this issue.
+    #
+    # See also the array_formula.rb program in the examples directory of
+    # the distro.
+    #
+    # Note: Array formulas are not supported by writeexcel gem.
     #
     def write_array_formula(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -940,26 +1738,84 @@ module Writexlsx
       0
     end
 
+    #
+    # Deprecated. This is a writeexcel method that is no longer required
+    # by WriteXLSX. See below.
+    #
     def store_formula(string)
       string.split(/(\$?[A-I]?[A-Z]\$?\d+)/)
     end
 
     #
-    # write_url($row, $col, $url, $string, $format)
+    # :call-seq:
+    #   write_url(row, column, url [ , format, string, tool_tip ] )
     #
-    # Write a hyperlink. This is comprised of two elements: the visible label and
-    # the invisible link. The visible label is the same as the link unless an
-    # alternative string is specified. The label is written using the
-    # write_string() method. Therefore the max characters string limit applies.
-    # $string and $format are optional and their order is interchangeable.
+    # Write a hyperlink to a URL in the cell specified by row and column.
+    # The hyperlink is comprised of two elements: the visible label and
+    # the invisible link. The visible label is the same as the link unless
+    # an alternative label is specified. The label parameter is optional.
+    # The label is written using the write() method. Therefore it is
+    # possible to write strings, numbers or formulas as labels.
     #
     # The hyperlink can be to a http, ftp, mail, internal sheet, or external
     # directory url.
     #
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
-    #         -3 : long string truncated to 32767 chars
+    # write_url methods return:
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #           -3 : long string truncated to 32767 chars
+    #
+    # The format parameter is also optional, however, without a format
+    # the link won't look like a format.
+    #
+    # The suggested format is:
+    #
+    #     format = workbook.add_format(:color => 'blue', :underline => 1)
+    #
+    # Note, this behaviour is different from writeexcel gem which
+    # provides a default hyperlink format if one isn't specified
+    # by the user.
+    #
+    # There are four web style URI's supported:
+    # http://, https://, ftp:// and mailto::
+    #
+    #     worksheet.write_url(0, 0, 'ftp://www.ruby.org/',  format)
+    #     worksheet.write_url(1, 0, 'http://www.ruby.com/', format, 'Ruby')
+    #     worksheet.write_url('A3', 'http://www.ruby.com/', format)
+    #     worksheet.write_url('A4', 'mailto:foo@bar.com', format)
+    #
+    # There are two local URIs supported: internal: and external:.
+    # These are used for hyperlinks to internal worksheet references or
+    # external workbook and worksheet references:
+    #
+    #     worksheet.write_url('A6',  'internal:Sheet2!A1',              format)
+    #     worksheet.write_url('A7',  'internal:Sheet2!A1',              format)
+    #     worksheet.write_url('A8',  'internal:Sheet2!A1:B2',           format)
+    #     worksheet.write_url('A9',  %q{internal:'Sales Data'!A1},      format)
+    #     worksheet.write_url('A10', 'external:c:\temp\foo.xlsx',       format)
+    #     worksheet.write_url('A11', 'external:c:\foo.xlsx#Sheet2!A1',  format)
+    #     worksheet.write_url('A12', 'external:..\foo.xlsx',            format)
+    #     worksheet.write_url('A13', 'external:..\foo.xlsx#Sheet2!A1',  format)
+    #     worksheet.write_url('A13', 'external:\\\\NET\share\foo.xlsx', format)
+    #
+    # All of the these URI types are recognised by the write() method, see above.
+    #
+    # Worksheet references are typically of the form Sheet1!A1. You can
+    # also refer to a worksheet range using the standard Excel notation:
+    # Sheet1!A1:B2.
+    #
+    # In external links the workbook and worksheet name must be separated
+    # by the # character: external:Workbook.xlsx#Sheet1!A1'.
+    #
+    # You can also link to a named range in the target worksheet. For
+    # example say you have a named range called my_name in the workbook
+    # c:\temp\foo.xlsx you could link to it as follows:
+    #
+    #     worksheet.write_url('A14', 'external:c:\temp\foo.xlsx#my_name')
+    #
+    # Excel requires that worksheet names containing spaces or non
+    # alphanumeric characters are single quoted as follows 'Sales Data'!A1.
     #
     def write_url(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -1037,15 +1893,53 @@ module Writexlsx
     end
 
     #
-    # write_date_time ($row, $col, $string, $format)
+    # :call-seq:
+    #   write_date_time (row, col, date_string [ , format ] )
     #
     # Write a datetime string in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format as a
     # number representing an Excel date. $format is optional.
     #
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
-    #         -3 : Invalid date_time, written as string
+    # write_date_time methods return:
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #           -3 : Invalid date_time, written as string
+    #
+    # The write_date_time() method can be used to write a date or time
+    # to the cell specified by row and column:
+    #
+    #     worksheet.write_date_time('A1', '2004-05-13T23:20', date_format)
+    #
+    # The date_string should be in the following format:
+    #
+    #     yyyy-mm-ddThh:mm:ss.sss
+    #
+    # This conforms to an ISO8601 date but it should be noted that the
+    # full range of ISO8601 formats are not supported.
+    #
+    # The following variations on the $date_string parameter are permitted:
+    #
+    #     yyyy-mm-ddThh:mm:ss.sss         # Standard format
+    #     yyyy-mm-ddT                     # No time
+    #               Thh:mm:ss.sss         # No date
+    #     yyyy-mm-ddThh:mm:ss.sssZ        # Additional Z (but not time zones)
+    #     yyyy-mm-ddThh:mm:ss             # No fractional seconds
+    #     yyyy-mm-ddThh:mm                # No seconds
+    #
+    # Note that the T is required in all cases.
+    #
+    # A date should always have a $format, otherwise it will appear
+    # as a number, see "DATES AND TIME IN EXCEL" and "CELL FORMATTING".
+    # Here is a typical example:
+    #
+    #     date_format = workbook.add_format(:num_format => 'mm/dd/yy')
+    #     worksheet.write_date_time('A1', '2004-05-13T23:20', date_format)
+    #
+    # Valid dates should be in the range 1900-01-01 to 9999-12-31,
+    # for the 1900 epoch and 1904-01-01 to 9999-12-31, for the 1904 epoch.
+    # As with Excel, dates outside these ranges will be written as a string.
+    #
+    # See also the date_time.rb program in the examples directory of the distro.
     #
     def write_date_time(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -1070,9 +1964,42 @@ module Writexlsx
     end
 
     #
-    # Insert a chart into a worksheet. The $chart argument should be a Chart
+    # :call-seq:
+    #   insert_chart(row, column, chart [ , x, y, scale_x, scale_y ] )
+    #
+    # Insert a chart into a worksheet. The chart argument should be a Chart
     # object or else it is assumed to be a filename of an external binary file.
     # The latter is for backwards compatibility.
+    #
+    # This method can be used to insert a Chart object into a worksheet.
+    # The Chart must be created by the add_chart() Workbook method and
+    # it must have the embedded option set.
+    #
+    #     chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    #
+    #     # Configure the chart.
+    #     ...
+    #
+    #     # Insert the chart into the a worksheet.
+    #     worksheet.insert_chart('E2', chart)
+    #
+    # See add_chart() for details on how to create the Chart object and
+    # Writexlsx::Chart for details on how to configure it. See also the
+    # chart_*.rb programs in the examples directory of the distro.
+    #
+    # The x, y, scale_x and scale_y parameters are optional.
+    #
+    # The parameters x and y can be used to specify an offset from the top
+    # left hand corner of the cell specified by row and column. The offset
+    # values are in pixels.
+    #
+    #     worksheet1.insert_chart('E2', chart, 3, 3)
+    #
+    # The parameters scale_x and scale_y can be used to scale the inserted
+    # image horizontally and vertically:
+    #
+    #     # Scale the width by 120% and the height by 150%
+    #     worksheet.insert_chart('E2', chart, 0, 0, 1.2, 1.5)
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
@@ -1092,7 +2019,49 @@ module Writexlsx
     end
 
     #
-    # Insert an image into the worksheet.
+    # :call-seq:
+    #   insert_image(row, column, filename [ , x, y, scale_x, scale_y ] )
+    #
+    # Partially supported. Currently only works for 96 dpi images. This
+    # will be fixed in an upcoming release.
+    #--
+    # This method can be used to insert a image into a worksheet. The image
+    # can be in PNG, JPEG or BMP format. The x, y, scale_x and scale_y
+    # parameters are optional.
+    #
+    #     worksheet1.insert_image('A1', 'ruby.bmp')
+    #     worksheet2.insert_image('A1', '../images/ruby.bmp')
+    #     worksheet3.insert_image('A1', '.c:\images\ruby.bmp')
+    #
+    # The parameters x and y can be used to specify an offset from the top
+    # left hand corner of the cell specified by row and column. The offset
+    # values are in pixels.
+    #
+    #     worksheet1.insert_image('A1', 'ruby.bmp', 32, 10)
+    #
+    # The offsets can be greater than the width or height of the underlying
+    # cell. This can be occasionally useful if you wish to align two or more
+    # images relative to the same cell.
+    #
+    # The parameters $scale_x and $scale_y can be used to scale the inserted
+    # image horizontally and vertically:
+    #
+    #     # Scale the inserted image: width x 2.0, height x 0.8
+    #     worksheet.insert_image('A1', 'perl.bmp', 0, 0, 2, 0.8)
+    #
+    # See also the images.rb program in the examples directory of the distro.
+    #
+    # Note: you must call set_row() or set_column() before insert_image()
+    # if you wish to change the default dimensions of any of the rows or
+    # columns that the image occupies. The height of a row can also change
+    # if you use a font that is larger than the default. This in turn will
+    # affect the scaling of your image. To avoid this you should explicitly
+    # set the height of the row using set_row() if it contains a font size
+    # that will change the row height.
+    #
+    # BMP images must be 24 bit, true colour, bitmaps. In general it is
+    # best to avoid BMP images since they aren't compressed.
+    #++
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
@@ -1108,6 +2077,24 @@ module Writexlsx
       @images << [row, col, image, x_offset, y_offset, scale_x, scale_y]
     end
 
+    #
+    # :call-seq:
+    #   repeat_formula(row, column, formula [ , format ] )
+    #
+    # Deprecated. This is a writeexcel gem's method that is no longer
+    # required by WriteXLSX.
+    #
+    # In writeexcel it was computationally expensive to write formulas
+    # since they were parsed by a recursive descent parser. The store_formula()
+    # and repeat_formula() methods were used as a way of avoiding the overhead
+    # of repeated formulas by reusing a pre-parsed formula.
+    #
+    # In WriteXLSX this is no longer necessary since it is just as quick
+    # to write a formula as it is to write a string or a number.
+    #
+    # The methods remain for backward compatibility but new WriteXLSX
+    # programs shouldn't use them.
+    #
     def repeat_formula(*args)
       args = row_col_notation(args)
       return -1 if args.size < 2   # Check the number of args
@@ -1373,19 +2360,19 @@ module Writexlsx
       if type == 'string'
         write_string(row_first, col_first, *args)
       elsif type == 'number'
-        write_number( row_first, col_first, *args)
+        write_number(row_first, col_first, *args)
       elsif type == 'blank'
-        write_blank( row_first, col_first, *args)
+        write_blank(row_first, col_first, *args)
       elsif type == 'date_time'
-        write_date_time( row_first, col_first, *args)
+        write_date_time(row_first, col_first, *args)
       elsif type == 'rich_string'
-        write_rich_string( row_first, col_first, *args)
+        write_rich_string(row_first, col_first, *args)
       elsif type == 'url'
-        write_url( row_first, col_first, *args)
+        write_url(row_first, col_first, *args)
       elsif type == 'formula'
-        write_formula( row_first, col_first, *args)
+        write_formula(row_first, col_first, *args)
       elsif type == 'array_formula'
-        write_formula_array( row_first, col_first, *args)
+        write_formula_array(row_first, col_first, *args)
       else
         raise "Unknown type '#{type}'"
       end
@@ -1394,25 +2381,45 @@ module Writexlsx
       (row_first .. row_last).each do |row|
         (col_first .. col_last).each do |col|
           next if row == row_first && col == col_first
-          write_blank( row, col, format )
+          write_blank(row, col, format)
         end
       end
     end
 
     #
-    # conditional_formatting($row, $col, {...})
+    # :call-seq:
+    #   conditional_formatting(cell_or_cell_range, options)
     #
     # This method handles the interface to Excel conditional formatting.
     #
     # We allow the format to be called on one cell or a range of cells. The
     # hashref contains the formatting parameters and must be the last param:
-    #    conditional_formatting($row, $col, {...})
-    #    conditional_formatting($first_row, $first_col, $last_row, $last_col, {...})
     #
-    # Returns  0 : normal termination
-    #         -1 : insufficient number of arguments
-    #         -2 : row or column out of range
-    #         -3 : incorrect parameter.
+    #    conditional_formatting(row, col, {...})
+    #    conditional_formatting(first_row, first_col, last_row, last_col, {...})
+    #
+    # conditional_formatting methods return:
+    #   Returns  0 : normal termination
+    #           -1 : insufficient number of arguments
+    #           -2 : row or column out of range
+    #           -3 : incorrect parameter.
+    #
+    # The conditional_format() method is used to add formatting to a cell
+    # or range of cells based on user defined criteria.
+    #
+    #     worksheet.conditional_formatting('A1:J10',
+    #         {
+    #             :type     => 'cell',
+    #             :criteria => '>=',
+    #             :value    => 50,
+    #             :format   => $format1
+    #         }
+    #     )
+    #
+    # This method contains a lot of parameters and is described in detail in
+    # a separate section "CONDITIONAL FORMATTING IN EXCEL".
+    #
+    # See also the conditional_format.pl program in the examples directory of the distro
     #
     def conditional_formatting(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -1542,6 +2549,32 @@ module Writexlsx
       @cond_formats[range] << param
     end
 
+    #
+    # :call-seq:
+    #   data_validation(cell_or_cell_range, options)
+    #
+    # The data_validation() method is used to construct an Excel data
+    # validation or to limit the user input to a dropdown list of values.
+    #
+    #     worksheet.data_validation('B3',
+    #         {
+    #             :validate => 'integer',
+    #             :criteria => '>',
+    #             :value    => 100
+    #         })
+    #
+    #     worksheet.data_validation('B5:B9',
+    #         {
+    #             :validate => 'list',
+    #             :value    => ['open', 'high', 'close']
+    #         })
+    #
+    # This method contains a lot of parameters and is described in detail
+    # in a separate section "DATA VALIDATION IN EXCEL".
+    #
+    # See also the data_validate.rb program in the examples directory
+    # of the distro
+    #
     def data_validation(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       args = row_col_notation(args)
@@ -1889,8 +2922,41 @@ module Writexlsx
     #
     # Make any comments in the worksheet visible.
     #
+    # This method is used to make all cell comments visible when a worksheet
+    # is opened.
+    #
+    #     worksheet.show_comments
+    #
+    # Individual comments can be made visible using the visible parameter of
+    # the write_comment method (see above):
+    #
+    #     worksheet.write_comment('C3', 'Hello', :visible => 1)
+    #
+    # If all of the cell comments have been made visible you can hide
+    # individual comments as follows:
+    #
+    #     worksheet.show_comments
+    #     worksheet.write_comment('C3', 'Hello', :visible => 0)
+    #
     def show_comments(visible = true)
       @comments_visible = visible
+    end
+
+    #
+    # Set the default author of the cell comments.
+    #
+    # This method is used to set the default author of all cell comments.
+    #
+    #     worksheet.set_comments_author('Ruby')
+    #
+    # Individual comment authors can be set using the author parameter
+    # of the write_comment method.
+    #
+    # The default comment author is an empty string, '',
+    # if no author is specified.
+    #
+    def set_comments_author(author = '')
+      @comments_author = author if author
     end
 
     def has_comments?
@@ -1931,7 +2997,7 @@ module Writexlsx
 
       # The VML o:idmap data id contains a comma separated range when there is
       # more than one 1024 block of comments, like this: data="1,2".
-      ( 1 .. ( count / 1024 ) ).each do |i|
+      (1 .. (count / 1024)).each do |i|
         vml_data_id = "vml_data_id,#{start_data_id + i}"
       end
 
@@ -1951,8 +3017,8 @@ module Writexlsx
       scale_x ||= 0
       scale_y ||= 0
 
-      width  = ( 0.5 + ( 480 * scale_x ) ).to_i
-      height = ( 0.5 + ( 288 * scale_y ) ).to_i
+      width  = (0.5 + (480 * scale_x)).to_i
+      height = (0.5 + (288 * scale_y)).to_i
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
@@ -2037,7 +3103,7 @@ module Writexlsx
     #           'x = "foo bar"'
     #           'x = "foo "" bar"'
     #
-    def extract_filter_tokens(expression = nil)
+    def extract_filter_tokens(expression = nil) #:nodoc:
       return [] unless expression
 
       tokens = []
@@ -2072,7 +3138,7 @@ module Writexlsx
     #          ('x', '==', 2000) -> exp1
     #          ('x', '>',  2000, 'and', 'x', '<', 5000) -> exp1 and exp2
     #
-    def parse_filter_expression(expression, tokens)
+    def parse_filter_expression(expression, tokens) #:nodoc:
       # The number of tokens will be either 3 (for 1 expression)
       # or 7 (for 2  expressions).
       #
@@ -2189,7 +3255,7 @@ module Writexlsx
     # Convert from an Excel internal colour index to a XML style #RRGGBB index
     # based on the default or user defined values in the Workbook palette.
     #
-    def get_palette_color(index)
+    def get_palette_color(index) #:nodoc:
       # Adjust the colour index.
       index -= 8
 
@@ -2269,7 +3335,7 @@ module Writexlsx
     #   2. Sorts the list.
     #   3. Removes 0 from the list if present.
     #
-    def sort_pagebreaks(*args)
+    def sort_pagebreaks(*args) #:nodoc:
       return [] if args.empty?
 
       breaks = args.uniq.sort
@@ -2332,7 +3398,7 @@ module Writexlsx
     #    y2           # Distance to bottom of object.
     #    width        # Width of object frame.
     #    height       # Height of object frame.
-    def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false)
+    def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false) #:nodoc:
       x_abs = 0    # Absolute distance to left side of object.
       y_abs = 0    # Absolute distance to top  side of object.
 
@@ -2410,10 +3476,10 @@ module Writexlsx
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height)
+    def position_object_emus(col_start, row_start, x1, y1, width, height) #:nodoc:
       is_drawing = true
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels( col_start, row_start, x1, y1, width, height, is_drawing)
+        position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing)
 
       # Convert the pixel values to EMUs. See above.
       x1    *= 9_525
@@ -2431,7 +3497,7 @@ module Writexlsx
     # column width to the nearest pixel. If the width hasn't been set by the user
     # we use the default value. If the column is hidden it has a value of zero.
     #
-    def size_col(col)
+    def size_col(col) #:nodoc:
       max_digit_width = 7    # For Calabri 11.
       padding         = 5
 
@@ -2458,7 +3524,7 @@ module Writexlsx
     # hasn't been set by the user we use the default value. If the row is hidden
     # it has a value of zero.
     #
-    def size_row(row)
+    def size_row(row) #:nodoc:
       # Look up the cell value to see if it has been changed
       if @row_sizes[row]
         height = @row_sizes[row]
@@ -2478,7 +3544,7 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def get_shared_string_index(str)
+    def get_shared_string_index(str) #:nodoc:
       # Add the string to the shared string table.
       unless @workbook.str_table[str]
         @workbook.str_table[str] = @workbook.str_unique
@@ -2492,7 +3558,7 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, image_id, drawing_id, width, height, name, image_type)
+    def prepare_image(index, image_id, drawing_id, width, height, name, image_type) #:nodoc:
       drawing_type = 2
       drawing
 
@@ -2504,8 +3570,8 @@ module Writexlsx
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
       # Convert from pixels to emus.
-      width  = int( 0.5 + ( width * 9_525 ) )
-      height = int( 0.5 + ( height * 9_525 ) )
+      width  = int(0.5 + (width * 9_525))
+      height = int(0.5 + (height * 9_525))
 
       # Create a Drawing object to use with worksheet unless one already exists.
       if !drawing?
@@ -2528,7 +3594,7 @@ module Writexlsx
     # This method handles the additional optional parameters to write_comment() as
     # well as calculating the comment object position and vertices.
     #
-    def comment_params(row, col, string, options = {})
+    def comment_params(row, col, string, options = {}) #:nodoc:
       default_width  = 128
       default_height = 74
 
@@ -2641,14 +3707,14 @@ module Writexlsx
       params[:height] = params[:height] * params[:y_scale] if params[:y_scale]
 
       # Round the dimensions to the nearest pixel.
-      params[:width]  = ( 0.5 + params[:width] ).to_i
-      params[:height] = ( 0.5 + params[:height] ).to_i
+      params[:width]  = (0.5 + params[:width]).to_i
+      params[:height] = (0.5 + params[:height]).to_i
 
       # Calculate the positions of comment object.
       vertices = position_object_pixels(
         params[:start_col], params[:start_row], params[:x_offset],
         params[:y_offset],  params[:width],     params[:height]
-        )
+       )
 
       # Add the width and height for VML.
       vertices << [params[:width], params[:height]]
@@ -2669,7 +3735,7 @@ module Writexlsx
     #
     # Based on the algorithm provided by Daniel Rentz of OpenOffice.
     #
-    def encode_password(password)
+    def encode_password(password) #:nodoc:
       i = 0
       chars = password.split(//)
       count = chars.size
@@ -2692,7 +3758,7 @@ module Writexlsx
     #
     # Write the <worksheet> element. This is the root element of Worksheet.
     #
-    def write_worksheet
+    def write_worksheet #:nodoc:
         schema                 = 'http://schemas.openxmlformats.org/'
         attributes = [
           'xmlns',    schema + 'spreadsheetml/2006/main',
@@ -2704,7 +3770,7 @@ module Writexlsx
     #
     # Write the <sheetPr> element for Sheet level properties.
     #
-    def write_sheet_pr
+    def write_sheet_pr #:nodoc:
       return if !fit_page? && !filter_on? && !tab_color?
       attributes = []
       (attributes << 'filterMode' << 1) if filter_on?
@@ -2722,7 +3788,7 @@ module Writexlsx
     #
     # Write the <pageSetUpPr> element.
     #
-    def write_page_set_up_pr
+    def write_page_set_up_pr #:nodoc:
       return unless fit_page?
 
       attributes = ['fitToPage', 1]
@@ -2732,7 +3798,7 @@ module Writexlsx
     # Write the <dimension> element. This specifies the range of cells in the
     # worksheet. As a special case, empty spreadsheets use 'A1' as a range.
     #
-    def write_dimension
+    def write_dimension #:nodoc:
       if !@dim_rowmin && !@dim_colmin
         # If the min dims are undefined then no dimensions have been set
         # and we use the default 'A1'.
@@ -2764,13 +3830,13 @@ module Writexlsx
     #
     # Write the <sheetViews> element.
     #
-    def write_sheet_views
+    def write_sheet_views #:nodoc:
       @writer.start_tag('sheetViews', [])
       write_sheet_view
       @writer.end_tag('sheetViews')
     end
 
-    def write_sheet_view
+    def write_sheet_view #:nodoc:
       attributes = []
       # Hide screen gridlines if required
       attributes << 'showGridLines' << 0 unless screen_gridlines?
@@ -2809,14 +3875,14 @@ module Writexlsx
     #
     # Write the <selection> elements.
     #
-    def write_selections
+    def write_selections #:nodoc:
       @selections.each { |selection| write_selection(*selection) }
     end
 
     #
     # Write the <selection> element.
     #
-    def write_selection(pane, active_cell, sqref)
+    def write_selection(pane, active_cell, sqref) #:nodoc:
       attributes  = []
       (attributes << 'pane' << pane) if pane
       (attributes << 'activeCell' << active_cell) if active_cell
@@ -2828,7 +3894,7 @@ module Writexlsx
     #
     # Write the <sheetFormatPr> element.
     #
-    def write_sheet_format_pr
+    def write_sheet_format_pr #:nodoc:
       base_col_width     = 10
       default_row_height = 15
 
@@ -2841,7 +3907,7 @@ module Writexlsx
     #
     # Write the <cols> element and <col> sub elements.
     #
-    def write_cols
+    def write_cols #:nodoc:
       # Exit unless some column have been formatted.
       return if @colinfo.empty?
 
@@ -2854,7 +3920,7 @@ module Writexlsx
     #
     # Write the <col> element.
     #
-    def write_col_info(*args)
+    def write_col_info(*args) #:nodoc:
       min = args[0] || 0
       max = args[1] || 0
       width = args[2]
@@ -2890,7 +3956,7 @@ module Writexlsx
       max_digit_width = 7.0    # For Calabri 11.
       padding         = 5.0
       if width && width > 0
-        width = ((width * max_digit_width + padding ) / max_digit_width * 256).to_i/256.0
+        width = ((width * max_digit_width + padding) / max_digit_width * 256).to_i/256.0
       end
       attributes = [
           'min',   min + 1,
@@ -2910,7 +3976,7 @@ module Writexlsx
     #
     # Write the <sheetData> element.
     #
-    def write_sheet_data
+    def write_sheet_data #:nodoc:
       if !@dim_rowmin
         # If the dimensions aren't defined then there is no data to write.
         @writer.empty_tag('sheetData')
@@ -2924,7 +3990,7 @@ module Writexlsx
     #
     # Write out the worksheet data as a series of rows and cells.
     #
-    def write_rows
+    def write_rows #:nodoc:
       calculate_spans
 
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
@@ -2937,7 +4003,7 @@ module Writexlsx
         # Write the cells if the row contains data.
         if @table[row_num]
           if !@set_rows[row_num]
-            write_row_element(row_num, span )
+            write_row_element(row_num, span)
           else
             write_row_element(row_num, span, *(@set_rows[row_num]))
           end
@@ -2961,7 +4027,7 @@ module Writexlsx
     # table is reset. That way only one row of data is kept in memory at any one
     # time. We don't write span data in the optimised case since it is optional.
     #
-    def write_single_row(current_row = 0)
+    def write_single_row(current_row = 0) #:nodoc:
       row_num     = @previous_row
 
       # Set the new previous row as the current row.
@@ -2996,7 +4062,7 @@ module Writexlsx
     #
     # Write the <row> element.
     #
-    def write_row_element(r, spans = nil, height = 15, format = nil, hidden = false, level = 0, collapsed = false, empty_row = false)
+    def write_row_element(r, spans = nil, height = 15, format = nil, hidden = false, level = 0, collapsed = false, empty_row = false) #:nodoc:
       height    ||= 15
       hidden    ||= 0
       level     ||= 0
@@ -3008,14 +4074,14 @@ module Writexlsx
 
       xf_index = format.get_xf_index if format
 
-      (attributes << 'spans'        << spans ) if spans
+      (attributes << 'spans'        << spans) if spans
       (attributes << 's'            << xf_index) if xf_index != 0
-      (attributes << 'customFormat' << 1     ) if format
+      (attributes << 'customFormat' << 1    ) if format
       (attributes << 'ht'           << height) if height != 15
-      (attributes << 'hidden'       << 1     ) if !!hidden && hidden != 0
-      (attributes << 'customHeight' << 1     ) if height != 15
-      (attributes << 'outlineLevel' << level ) if !!level && level != 0
-      (attributes << 'collapsed'    << 1     ) if !!collapsed && collapsed != 0
+      (attributes << 'hidden'       << 1    ) if !!hidden && hidden != 0
+      (attributes << 'customHeight' << 1    ) if height != 15
+      (attributes << 'outlineLevel' << level) if !!level && level != 0
+      (attributes << 'collapsed'    << 1    ) if !!collapsed && collapsed != 0
 
       if empty_row && empty_row != 0
         @writer.empty_tag('row', attributes)
@@ -3027,7 +4093,7 @@ module Writexlsx
     #
     # Write and empty <row> element, i.e., attributes only, no cell data.
     #
-    def write_empty_row(*args)
+    def write_empty_row(*args) #:nodoc:
         new_args = args.dup
         new_args[7] = 1
         write_row_element(*new_args)
@@ -3049,13 +4115,13 @@ module Writexlsx
     #       $xf:    is the XF format object index.
     #       @args:  additional args relevant to the specific data type.
     #
-    def write_cell(row, col, cell)
+    def write_cell(row, col, cell) #:nodoc:
       type, token, xf = cell
 
       xf_index = 0
       xf_index = xf.get_xf_index if xf.respond_to?(:get_xf_index)
 
-      range = xl_rowcol_to_cell( row, col )
+      range = xl_rowcol_to_cell(row, col)
       attributes = ['r', range]
 
       # Add the cell format index.
@@ -3126,7 +4192,7 @@ module Writexlsx
     #
     # Write the cell value <v> element.
     #
-    def write_cell_value(value = '')
+    def write_cell_value(value = '') #:nodoc:
       value ||= ''
       value = value.to_i if value == value.to_i
       @writer.data_element('v', value)
@@ -3135,14 +4201,14 @@ module Writexlsx
     #
     # Write the cell formula <f> element.
     #
-    def write_cell_formula(formula = '')
+    def write_cell_formula(formula = '') #:nodoc:
       @writer.data_element('f', formula)
     end
 
     #
     # Write the cell array formula <f> element.
     #
-    def write_cell_array_formula(formula, range)
+    def write_cell_array_formula(formula, range) #:nodoc:
       attributes = ['t', 'array', 'ref', range]
 
       @writer.data_element('f', formula, attributes)
@@ -3151,7 +4217,7 @@ module Writexlsx
     #
     # Write the frozen or split <pane> elements.
     #
-    def write_panes
+    def write_panes #:nodoc:
       return if @panes.empty?
 
       if @panes[4] == 2
@@ -3164,7 +4230,7 @@ module Writexlsx
     #
     # Write the <pane> element for freeze panes.
     #
-    def write_freeze_panes(row, col, top_row, left_col, type)
+    def write_freeze_panes(row, col, top_row, left_col, type) #:nodoc:
       y_split       = row
       x_split       = col
       top_left_cell = xl_rowcol_to_cell(top_row, left_col)
@@ -3218,7 +4284,7 @@ module Writexlsx
     #
     # See also, implementers note for split_panes().
     #
-    def write_split_panes(row, col, top_row, left_col, type)
+    def write_split_panes(row, col, top_row, left_col, type) #:nodoc:
       has_selection = false
       y_split = row
       x_split = col
@@ -3238,8 +4304,8 @@ module Writexlsx
       # on the pixels dimensions. This is only a workaround and doesn't take
       # adjusted cell dimensions into account.
       if top_row == row && left_col == col
-        top_row  = (0.5 + ( y_split - 300 ) / 20 / 15).to_i
-        left_col = (0.5 + ( x_split - 390 ) / 20 / 3 * 4 / 64).to_i
+        top_row  = (0.5 + (y_split - 300) / 20 / 15).to_i
+        left_col = (0.5 + (x_split - 390) / 20 / 3 * 4 / 64).to_i
       end
 
       top_left_cell = xl_rowcol_to_cell(top_row, left_col)
@@ -3272,7 +4338,7 @@ module Writexlsx
       (attributes << 'xSplit' << x_split) if x_split > 0
       (attributes << 'ySplit' << y_split) if y_split > 0
       attributes << 'topLeftCell' << top_left_cell
-      (attributes << 'activePane' << active_pane ) if has_selection
+      (attributes << 'activePane' << active_pane) if has_selection
 
       @writer.empty_tag('pane', attributes)
     end
@@ -3280,13 +4346,13 @@ module Writexlsx
     #
     # Convert column width from user units to pane split width.
     #
-    def calculate_x_split_width(width)
+    def calculate_x_split_width(width) #:nodoc:
       max_digit_width = 7    # For Calabri 11.
       padding         = 5
 
       # Convert to pixels.
       if width < 1
-        pixels = int( width * 12 + 0.5 )
+        pixels = int(width * 12 + 0.5)
       else
         pixels = (width * max_digit_width + 0.5).to_i + padding
       end
@@ -3304,7 +4370,7 @@ module Writexlsx
     #
     # Write the <sheetCalcPr> element for the worksheet calculation properties.
     #
-    def write_sheet_calc_pr
+    def write_sheet_calc_pr #:nodoc:
       full_calc_on_load = 1
 
       attributes = ['fullCalcOnLoad', full_calc_on_load]
@@ -3315,7 +4381,7 @@ module Writexlsx
     #
     # Write the <phoneticPr> element.
     #
-    def write_phonetic_pr
+    def write_phonetic_pr #:nodoc:
       font_id = 1
       type    = 'noConversion'
 
@@ -3330,7 +4396,7 @@ module Writexlsx
     #
     # Write the <pageMargins> element.
     #
-    def write_page_margins
+    def write_page_margins #:nodoc:
       attributes = [
         'left',   @margin_left,
         'right',  @margin_right,
@@ -3361,7 +4427,7 @@ module Writexlsx
     #     r:id="rId1"
     # />
     #
-    def write_page_setup
+    def write_page_setup #:nodoc:
       attributes = []
 
       return unless page_setup_changed?
@@ -3393,7 +4459,7 @@ module Writexlsx
     #
     # Write the <extLst> element.
     #
-    def write_ext_lst
+    def write_ext_lst #:nodoc:
       @writer.start_tag('extLst')
       write_ext
       @writer.end_tag('extLst')
@@ -3402,7 +4468,7 @@ module Writexlsx
     #
     # Write the <ext> element.
     #
-    def write_ext
+    def write_ext #:nodoc:
       xmlnsmx = 'http://schemas.microsoft.com/office/mac/excel/2008/main'
       uri     = 'http://schemas.microsoft.com/office/mac/excel/2008/main'
 
@@ -3419,7 +4485,7 @@ module Writexlsx
     #
     # Write the <mx:PLV> element.
     #
-    def write_mx_plv
+    def write_mx_plv #:nodoc:
       mode     = 1
       one_page = 0
       w_scale  = 0
@@ -3436,7 +4502,7 @@ module Writexlsx
     #
     # Write the <mergeCells> element.
     #
-    def write_merge_cells
+    def write_merge_cells #:nodoc:
       return if @merge.empty?
 
       attributes = ['count', @merge.size]
@@ -3453,7 +4519,7 @@ module Writexlsx
     #
     # Write the <mergeCell> element.
     #
-    def write_merge_cell(merged_range)
+    def write_merge_cell(merged_range) #:nodoc:
       row_min, col_min, row_max, col_max = merged_range
 
       # Convert the merge dimensions to a cell range.
@@ -3469,7 +4535,7 @@ module Writexlsx
     #
     # Write the <printOptions> element.
     #
-    def write_print_options
+    def write_print_options #:nodoc:
       attributes = []
 
       return unless print_options_changed?
@@ -3492,7 +4558,7 @@ module Writexlsx
     #
     # Write the <headerFooter> element.
     #
-    def write_header_footer
+    def write_header_footer #:nodoc:
       return unless header_footer_changed?
 
       @writer.start_tag('headerFooter')
@@ -3504,7 +4570,7 @@ module Writexlsx
     #
     # Write the <oddHeader> element.
     #
-    def write_odd_header
+    def write_odd_header #:nodoc:
       @writer.data_element('oddHeader', @header)
     end
 
@@ -3512,14 +4578,14 @@ module Writexlsx
     #
     # Write the <oddFooter> element.
     #
-    def write_odd_footer
+    def write_odd_footer #:nodoc:
       @writer.data_element('oddFooter', @footer)
     end
 
     #
     # Write the <rowBreaks> element.
     #
-    def write_row_breaks
+    def write_row_breaks #:nodoc:
       page_breaks = sort_pagebreaks(*(@hbreaks))
       count       = page_breaks.size
 
@@ -3537,7 +4603,7 @@ module Writexlsx
     #
     # Write the <colBreaks> element.
     #
-    def write_col_breaks
+    def write_col_breaks #:nodoc:
       page_breaks = sort_pagebreaks(*(@vbreaks))
       count       = page_breaks.size
 
@@ -3555,7 +4621,7 @@ module Writexlsx
     #
     # Write the <brk> element.
     #
-    def write_brk(id, max)
+    def write_brk(id, max) #:nodoc:
       attributes = [
         'id',  id,
         'max', max,
@@ -3568,7 +4634,7 @@ module Writexlsx
     #
     # Write the <autoFilter> element.
     #
-    def write_auto_filter
+    def write_auto_filter #:nodoc:
       return unless autofilter_ref?
 
       attributes = ['ref', @autofilter_ref]
@@ -3588,7 +4654,7 @@ module Writexlsx
     # Function to iterate through the columns that form part of an autofilter
     # range and write the appropriate filters.
     #
-    def write_autofilters
+    def write_autofilters #:nodoc:
       col1, col2 = @filter_range
 
       (col1 .. col2).each do |col|
@@ -3606,7 +4672,7 @@ module Writexlsx
     #
     # Write the <filterColumn> element.
     #
-    def write_filter_column(col_id, type, *filters)
+    def write_filter_column(col_id, type, *filters) #:nodoc:
       attributes = ['colId', col_id]
 
       @writer.start_tag('filterColumn', attributes)
@@ -3624,7 +4690,7 @@ module Writexlsx
     #
     # Write the <filters> element.
     #
-    def write_filters(*filters)
+    def write_filters(*filters) #:nodoc:
       if filters.size == 1 && filters[0] == 'blanks'
         # Special case for blank cells only.
         @writer.empty_tag('filters', ['blank', 1])
@@ -3639,7 +4705,7 @@ module Writexlsx
     #
     # Write the <filter> element.
     #
-    def write_filter(val)
+    def write_filter(val) #:nodoc:
       @writer.empty_tag('filter', ['val', val])
     end
 
@@ -3647,7 +4713,7 @@ module Writexlsx
     #
     # Write the <customFilters> element.
     #
-    def write_custom_filters(*tokens)
+    def write_custom_filters(*tokens) #:nodoc:
       if tokens.size == 2
         # One filter expression only.
         @writer.start_tag('customFilters')
@@ -3675,7 +4741,7 @@ module Writexlsx
     #
     # Write the <customFilter> element.
     #
-    def write_custom_filter(operator, val)
+    def write_custom_filter(operator, val) #:nodoc:
       operators = {
         1  => 'lessThan',
         2  => 'equal',
@@ -3705,7 +4771,7 @@ module Writexlsx
     # Write the <hyperlinks> element. The attributes are different for internal
     # and external links.
     #
-    def write_hyperlinks
+    def write_hyperlinks #:nodoc:
       return if @hlink_refs.empty?
 
       @writer.start_tag('hyperlinks')
@@ -3726,7 +4792,7 @@ module Writexlsx
     #
     # Write the <hyperlink> element for external links.
     #
-    def write_hyperlink_external(row, col, id, location = nil, tooltip = nil)
+    def write_hyperlink_external(row, col, id, location = nil, tooltip = nil) #:nodoc:
       ref = xl_rowcol_to_cell(row, col)
       r_id = "rId#{id}"
 
@@ -3741,7 +4807,7 @@ module Writexlsx
     #
     # Write the <hyperlink> element for internal links.
     #
-    def write_hyperlink_internal(row, col, location, display, tooltip = nil)
+    def write_hyperlink_internal(row, col, location, display, tooltip = nil) #:nodoc:
       ref = xl_rowcol_to_cell(row, col)
 
       attributes = ['ref', ref, 'location', location]
@@ -3755,7 +4821,7 @@ module Writexlsx
     #
     # Write the <tabColor> element.
     #
-    def write_tab_color
+    def write_tab_color #:nodoc:
       return unless tab_color?
 
       attributes = ['rgb', get_palette_color(@tab_color)]
@@ -3765,7 +4831,7 @@ module Writexlsx
     #
     # Write the <sheetProtection> element.
     #
-    def write_sheet_protection
+    def write_sheet_protection #:nodoc:
       return unless protect?
 
       attributes = []
@@ -3797,14 +4863,14 @@ module Writexlsx
     #
     # Write the <drawing> elements.
     #
-    def write_drawings
+    def write_drawings #:nodoc:
       write_drawing(@hlink_count + 1) if drawing?
     end
 
     #
     # Write the <drawing> element.
     #
-    def write_drawing(id)
+    def write_drawing(id) #:nodoc:
       r_id = "rId#{id}"
 
       attributes = ['r:id', r_id]
@@ -3815,7 +4881,7 @@ module Writexlsx
     #
     # Write the <legacyDrawing> element.
     #
-    def write_legacy_drawing
+    def write_legacy_drawing #:nodoc:
       return unless @has_comments
 
       # Increment the relationship id for any drawings or comments.
@@ -3830,7 +4896,7 @@ module Writexlsx
     #
     # Write the <font> element.
     #
-    def write_font(format)
+    def write_font(format) #:nodoc:
       @rstring.start_tag('rPr')
 
       @rstring.empty_tag('b')       if !format.bold.nil? && format.bold != 0
@@ -3872,7 +4938,7 @@ module Writexlsx
     #
     # Write the underline font element.
     #
-    def write_underline(underline)
+    def write_underline(underline) #:nodoc:
       # Handle the underline variants.
       if underline == 2
         attributes = [val, 'double']
@@ -3890,7 +4956,7 @@ module Writexlsx
     #
     # Write the <vertAlign> font sub-element.
     #
-    def write_vert_align(val)
+    def write_vert_align(val) #:nodoc:
       attributes = ['val', val]
 
       @rstring.empty_tag('vertAlign', attributes)
@@ -3899,7 +4965,7 @@ module Writexlsx
     #
     # Write the <color> element.
     #
-    def write_color(name, value)
+    def write_color(name, value) #:nodoc:
       attributes = [name, value]
 
       @rstring.empty_tag('color', attributes)
@@ -3908,7 +4974,7 @@ module Writexlsx
     #
     # Write the <dataValidations> element.
     #
-    def write_data_validations
+    def write_data_validations #:nodoc:
       return if @validations.empty?
 
       attributes = ['count', @validations.size]
@@ -3921,7 +4987,7 @@ module Writexlsx
     #
     # Write the <dataValidation> element.
     #
-    def write_data_validation(param)
+    def write_data_validation(param) #:nodoc:
       sqref      = ''
       attributes = []
 
@@ -3979,7 +5045,7 @@ module Writexlsx
     #
     # Write the <formula1> element.
     #
-    def write_formula_1(formula)
+    def write_formula_1(formula) #:nodoc:
       # Convert a list array ref into a comma separated string.
       formula   = %!"#{formula.join(',')}"! if formula.kind_of?(Array)
 
@@ -3988,11 +5054,11 @@ module Writexlsx
       @writer.data_element('formula1', formula)
     end
 
-    # _write_formula_2()
+    # write_formula_2()
     #
     # Write the <formula2> element.
     #
-    def write_formula_2(formula)
+    def write_formula_2(formula) #:nodoc:
       formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
 
       @writer.data_element('formula2', formula)
@@ -4000,14 +5066,14 @@ module Writexlsx
 
     # in Perl module : _write_formula()
     #
-    def write_formula_tag(data)
+    def write_formula_tag(data) #:nodoc:
       @writer.data_element('formula', data)
     end
 
     #
     # Write the Worksheet conditional formats.
     #
-    def write_conditional_formats
+    def write_conditional_formats #:nodoc:
       ranges = @cond_formats.keys.sort
       return if ranges.empty?
 
@@ -4017,7 +5083,7 @@ module Writexlsx
     #
     # Write the <conditionalFormatting> element.
     #
-    def write_conditional_formatting(range, params)
+    def write_conditional_formatting(range, params) #:nodoc:
       attributes = ['sqref', range]
 
       @writer.start_tag('conditionalFormatting', attributes)
@@ -4030,7 +5096,7 @@ module Writexlsx
     #
     # Write the <cfRule> element.
     #
-    def write_cf_rule(param)
+    def write_cf_rule(param) #:nodoc:
       attributes = ['type' , param[:type]]
 
       if param[:format]
@@ -4053,7 +5119,7 @@ module Writexlsx
       @writer.end_tag('cfRule')
     end
 
-    def store_data_to_table(row, col, data)
+    def store_data_to_table(row, col, data) #:nodoc:
       if @table[row]
         @table[row][col] = data
       else
@@ -4107,7 +5173,7 @@ module Writexlsx
     #
     # The span is the same for each block of 16 rows.
     #
-    def calculate_spans
+    def calculate_spans #:nodoc:
       span_min = nil
       span_max = 0
       spans = []
@@ -4142,7 +5208,7 @@ module Writexlsx
       @row_spans = spans
     end
 
-    def xf(format)
+    def xf(format) #:nodoc:
       if format.kind_of?(Format)
         format.xf_index
       else
@@ -4154,7 +5220,7 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def shared_string_index(str)
+    def shared_string_index(str) #:nodoc:
       # Add the string to the shared string table.
       unless @workbook.str_table[str]
         @workbook.str_table[str] = @workbook.str_unique
@@ -4171,7 +5237,7 @@ module Writexlsx
     # Convert zero indexed rows and columns to the format required by worksheet
     # named ranges, eg, "Sheet1!$A$1:$C$13".
     #
-    def convert_name_area(row_num_1, col_num_1, row_num_2, col_num_2)
+    def convert_name_area(row_num_1, col_num_1, row_num_2, col_num_2) #:nodoc:
       range1       = ''
       range2       = ''
       row_col_only = false
@@ -4212,12 +5278,12 @@ module Writexlsx
     # special characters or if the look like something that isn't a sheet name.
     # TODO. We need to handle more special cases.
     #
-    def quote_sheetname(sheetname)
+    def quote_sheetname(sheetname) #:nodoc:
       return sheetname if sheetname =~ /^Sheet\d+$/
       return "'#{sheetname}'"
     end
 
-    def fit_page?
+    def fit_page? #:nodoc:
       if @fit_page
         @fit_page != 0
       else
@@ -4225,7 +5291,7 @@ module Writexlsx
       end
     end
 
-    def filter_on?
+    def filter_on? #:nodoc:
       if @filter_on
         @filter_on != 0
       else
@@ -4233,7 +5299,7 @@ module Writexlsx
       end
     end
 
-    def tab_color?
+    def tab_color? #:nodoc:
       if @tab_color
         @tab_color != 0
       else
@@ -4241,75 +5307,75 @@ module Writexlsx
       end
     end
 
-    def zoom_scale_normal?
+    def zoom_scale_normal? #:nodoc:
       !!@zoom_scale_normal
     end
 
-    def page_view?
+    def page_view? #:nodoc:
       !!@page_view
     end
 
-    def right_to_left?
+    def right_to_left? #:nodoc:
       !!@right_to_left
     end
 
-    def show_zeros?
+    def show_zeros? #:nodoc:
       !!@show_zeros
     end
 
-    def screen_gridlines?
+    def screen_gridlines? #:nodoc:
       !!@screen_gridlines
     end
 
-    def protect?
+    def protect? #:nodoc:
       !!@protect
     end
 
-    def autofilter_ref?
+    def autofilter_ref? #:nodoc:
       !!@autofilter_ref
     end
 
-    def date_1904?
+    def date_1904? #:nodoc:
       @workbook.date_1904?
     end
 
-    def print_options_changed?
+    def print_options_changed? #:nodoc:
       !!@print_options_changed
     end
 
-    def hcenter?
+    def hcenter? #:nodoc:
       !!@hcenter
     end
 
-    def vcenter?
+    def vcenter? #:nodoc:
       !!@vcenter
     end
 
-    def print_headers?
+    def print_headers? #:nodoc:
       !!@print_headers
     end
 
-    def print_gridlines?
+    def print_gridlines? #:nodoc:
       !!@print_gridlines
     end
 
-    def page_setup_changed?
+    def page_setup_changed? #:nodoc:
       !!@page_setup_changed
     end
 
-    def orientation?
+    def orientation? #:nodoc:
       !!@orientation
     end
 
-    def header_footer_changed?
+    def header_footer_changed? #:nodoc:
       !!@header_footer_changed
     end
 
-    def drawing?
+    def drawing? #:nodoc:
       !!@drawing
     end
 
-    def remove_white_space(margin)
+    def remove_white_space(margin) #:nodoc:
       if margin.respond_to?(:gsub)
         margin.gsub(/[^\d\.]/, '')
       else
