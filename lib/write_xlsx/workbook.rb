@@ -27,7 +27,7 @@ module Writexlsx
 
     #
     # A new Excel workbook is created using the new() constructor which accepts either a filename
-    # or a filehandle as a parameter.
+    # or a IO object as a parameter.
     # The following example creates a new Excel file based on a filename:
     #
     #   workbook  = WriteXLSX.new('filename.xlsx')
