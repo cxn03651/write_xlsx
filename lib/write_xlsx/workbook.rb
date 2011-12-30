@@ -187,6 +187,10 @@ module Writexlsx
       @date_1904 = (!mode || mode == 0) ? false : true
     end
 
+    def get_1904
+      @date_1904
+    end
+
     #
     # user must not use. it is internal method.
     #
