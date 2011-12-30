@@ -618,24 +618,22 @@ module Writexlsx
       index + 8
     end
 
-    def activesheet=(worksheet)
+    def activesheet=(worksheet) #:nodoc:
       @activesheet = worksheet
     end
 
-    def writer
+    def writer #:nodoc:
       @writer
     end
 
-    attr_writer :date_1904
-
-    def date_1904?
+    def date_1904? #:nodoc:
       @date_1904 ||= false
       !!@date_1904
     end
 
     private
 
-    def setup_filename(file)
+    def setup_filename(file) #:nodoc:
       if file.respond_to?(:to_str) && file != ''
         @filename = file
         @fileobj  = nil
@@ -650,7 +648,7 @@ module Writexlsx
     #
     # Sets the colour palette to the Excel defaults.
     #
-    def set_color_palette
+    def set_color_palette #:nodoc:
       @palette = [
             [ 0x00, 0x00, 0x00, 0x00 ],    # 8
             [ 0xff, 0xff, 0xff, 0x00 ],    # 9
@@ -715,7 +713,7 @@ module Writexlsx
     # Check for valid worksheet names. We check the length, if it contains any
     # invalid characters and if the name is unique in the workbook.
     #
-    def check_sheetname(name, chart = nil)
+    def check_sheetname(name, chart = nil) #:nodoc:
       name  ||= ''
       invalid_char = /[\[\]:*?\/\\]/
 
@@ -761,7 +759,7 @@ module Writexlsx
     # Convert a range formula such as Sheet1!$B$1:$B$5 into a sheet name and cell
     # range such as ( 'Sheet1', 0, 1, 4, 1 ).
     #
-    def get_chart_range(range)
+    def get_chart_range(range) #:nodoc:
       # Split the range formula into sheetname and cells at the last '!'.
       pos = range.rindex('!')
       return nil unless pos
@@ -791,11 +789,11 @@ module Writexlsx
       return [sheetname, row_start, col_start, row_end, col_end]
     end
 
-    def write_xml_declaration
+    def write_xml_declaration #:nodoc:
       @writer.xml_decl
     end
 
-    def write_workbook
+    def write_workbook #:nodoc:
       schema  = 'http://schemas.openxmlformats.org'
       attributes = [
         'xmlns',
@@ -806,11 +804,11 @@ module Writexlsx
       @writer.start_tag('workbook', attributes)
     end
 
-    def write_workbook_end
+    def write_workbook_end #:nodoc:
       @writer.end_tag('workbook')
     end
 
-    def write_file_version
+    def write_file_version #:nodoc:
       attributes = [
         'appName', 'xl',
         'lastEdited', 4,
@@ -820,17 +818,17 @@ module Writexlsx
       @writer.empty_tag('fileVersion', attributes)
     end
 
-    def write_workbook_pr
+    def write_workbook_pr #:nodoc:
       attributes = date_1904? ? ['date1904', 1] : []
       attributes << 'defaultThemeVersion' << 124226
       @writer.empty_tag('workbookPr', attributes)
     end
 
-    def write_book_views
+    def write_book_views #:nodoc:
       @writer.start_tag('bookViews') << write_workbook_view << @writer.end_tag('bookViews')
     end
 
-    def write_workbook_view
+    def write_workbook_view #:nodoc:
       attributes = [
         'xWindow',        240,
         'yWindow',         15,
@@ -846,7 +844,7 @@ module Writexlsx
       @writer.empty_tag('workbookView', attributes)
     end
 
-    def write_sheets
+    def write_sheets #:nodoc:
       str = @writer.start_tag('sheets')
       id_num = 1
       @worksheets.each do |sheet|
@@ -856,7 +854,7 @@ module Writexlsx
       str << @writer.end_tag('sheets')
     end
 
-    def write_sheet(name, sheet_id, hidden = false)
+    def write_sheet(name, sheet_id, hidden = false) #:nodoc:
       attributes = [
         'name',    name,
         'sheetId', sheet_id
@@ -869,17 +867,17 @@ module Writexlsx
       @writer.empty_tag('sheet', attributes)
     end
 
-    def write_calc_pr
+    def write_calc_pr #:nodoc:
       attributes = ['calcId', 124519]
       @writer.empty_tag('calcPr', attributes)
     end
 
-    def write_ext_lst
+    def write_ext_lst #:nodoc:
       tag = 'extLst'
       @writer.start_tag(tag) << write_ext << @writer.end_tag(tag)
     end
 
-    def write_ext
+    def write_ext #:nodoc:
       tag = 'ext'
       attributes = [
         'xmlns:mx', 'http://schemas.microsoft.com/office/mac/excel/2008/main',
@@ -888,11 +886,11 @@ module Writexlsx
       @writer.start_tag(tag, attributes) << write_mx_arch_id << @writer.end_tag(tag)
     end
 
-    def write_mx_arch_id
+    def write_mx_arch_id #:nodoc:
       @writer.empty_tag('mx:ArchID', ['Flags', 2])
     end
 
-    def write_defined_names
+    def write_defined_names #:nodoc:
       return if @defined_names.nil? || @defined_names.empty?
       tag = 'definedNames'
       str = @writer.start_tag(tag)
@@ -900,7 +898,7 @@ module Writexlsx
       str << @writer.end_tag(tag)
     end
 
-    def write_defined_name(data)
+    def write_defined_name(data) #:nodoc:
       name, id, range, hidden = data
 
       attributes = ['name', name]
@@ -910,28 +908,28 @@ module Writexlsx
       @writer.data_element('definedName', range, attributes)
     end
 
-    def write_io(str)
+    def write_io(str) #:nodoc:
       @writer << str
       str
     end
 
-    def firstsheet
+    def firstsheet #:nodoc:
       @firstsheet ||= 0
     end
 
-    def activesheet
+    def activesheet #:nodoc:
       @activesheet ||= 0
     end
 
     # for test
-    def defined_names
+    def defined_names #:nodoc:
       @defined_names ||= []
     end
 
     #
     # Assemble worksheets into a workbook.
     #
-    def store_workbook
+    def store_workbook #:nodoc:
       packager = Package::Packager.new
 
       # Add a default worksheet if non have been added.
@@ -975,7 +973,7 @@ module Writexlsx
     #
     # Convert the SST string data from a hash to an array.
     #
-    def prepare_sst_string_data
+    def prepare_sst_string_data #:nodoc:
       strings = []
 
       @str_table.each_key { |key| strings[@str_table[key]] = key }
@@ -988,7 +986,7 @@ module Writexlsx
     #
     # Prepare all of the format properties prior to passing them to Styles.pm.
     #
-    def prepare_format_properties
+    def prepare_format_properties #:nodoc:
       # Separate format objects into XF and DXF formats.
       prepare_formats
 
@@ -1009,7 +1007,7 @@ module Writexlsx
     # Iterate through the XF Format objects and separate them into XF and DXF
     # formats.
     #
-    def prepare_formats
+    def prepare_formats #:nodoc:
       @formats.each do |format|
         xf_index  = format.xf_index
         dxf_index = format.dxf_index
@@ -1022,7 +1020,7 @@ module Writexlsx
     #
     # Set the default index for each format. This is mainly used for testing.
     #
-    def set_default_xf_indices
+    def set_default_xf_indices #:nodoc:
       @formats.each { |format| format.get_xf_index }
     end
 
@@ -1030,7 +1028,7 @@ module Writexlsx
     # Iterate through the XF Format objects and give them an index to non-default
     # font elements.
     #
-    def prepare_fonts
+    def prepare_fonts #:nodoc:
       fonts = {}
       index = 0
 
@@ -1068,7 +1066,7 @@ module Writexlsx
     #
     # User defined records start from index 0xA4.
     #
-    def prepare_num_formats
+    def prepare_num_formats #:nodoc:
       num_formats      = {}
       index            = 164
       num_format_count = 0
@@ -1107,7 +1105,7 @@ module Writexlsx
     # Iterate through the XF Format objects and give them an index to non-default
     # border elements.
     #
-    def prepare_borders
+    def prepare_borders #:nodoc:
       borders = {}
       index = 0
 
@@ -1143,7 +1141,7 @@ module Writexlsx
     # The user defined fill properties start from 2 since there are 2 default
     # fills: patternType="none" and patternType="gray125".
     #
-    def prepare_fills
+    def prepare_fills #:nodoc:
       fills = {}
       index = 2    # Start from 2. See above.
 
@@ -1199,7 +1197,7 @@ module Writexlsx
     # any user defined names. Stores the defined names for the Workbook.xml and
     # the named ranges for App.xml.
     #
-    def prepare_defined_names
+    def prepare_defined_names #:nodoc:
       defined_names =  @defined_names
 
       @worksheets.each do |sheet|
@@ -1243,7 +1241,7 @@ module Writexlsx
     #
     # Iterate through the worksheets and set up the comment data.
     #
-    def prepare_comments
+    def prepare_comments #:nodoc:
       comment_id   = 0
       vml_data_id  = 1
       vml_shape_id = 1024
@@ -1282,7 +1280,7 @@ module Writexlsx
     # Add "cached" data to charts to provide the numCache and strCache data for
     # series and title/axis ranges.
     #
-    def add_chart_data
+    def add_chart_data #:nodoc:
       worksheets = {}
       seen_ranges = {}
 
@@ -1347,7 +1345,7 @@ module Writexlsx
     # issues in the the Spreadsheet::WriteExcel binary version. Also makes
     # comparison testing easier.
     #
-    def sort_defined_names(names)
+    def sort_defined_names(names) #:nodoc:
       names.sort do |a, b|
         name_a  = normalise_defined_name(a[0])
         name_b  = normalise_defined_name(b[0])
@@ -1371,13 +1369,13 @@ module Writexlsx
 
     # Used in the above sort routine to normalise the defined names. Removes any
     # leading '_xmln.' from internal names and lowercases the strings.
-    def normalise_defined_name(name)
+    def normalise_defined_name(name) #:nodoc:
       name.sub(/^_xlnm./, '').downcase
     end
 
     # Used in the above sort routine to normalise the worksheet names for the
     # secondary sort. Removes leading quote and lowercases the strings.
-    def normalise_sheet_name(name)
+    def normalise_sheet_name(name) #:nodoc:
       name.sub(/^'/, '').downcase
     end
 
@@ -1385,7 +1383,7 @@ module Writexlsx
     # Extract the named ranges from the sorted list of defined names. These are
     # used in the App.xml file.
     #
-    def extract_named_ranges(defined_names)
+    def extract_named_ranges(defined_names) #:nodoc:
       named_ranges = []
 
       defined_names.each do |defined_name|
@@ -1416,7 +1414,7 @@ module Writexlsx
     #
     # Iterate through the worksheets and set up any chart or image drawings.
     #
-    def prepare_drawings
+    def prepare_drawings #:nodoc:
       chart_ref_id = 0
       image_ref_id = 0
       drawing_id   = 0
@@ -1452,7 +1450,7 @@ module Writexlsx
     #
     # Convert a sheet name to its index. Return undef otherwise.
     #
-    def get_sheet_index(sheetname)
+    def get_sheet_index(sheetname) #:nodoc:
       sheet_count = @sheetnames.size
       sheet_index = nil
 
