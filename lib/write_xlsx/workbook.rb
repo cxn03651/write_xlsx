@@ -259,7 +259,9 @@ module Writexlsx
     #
     # The worksheet name must be a valid Excel worksheet name,
     # i.e. it cannot contain any of the following characters,
-    # [ ] : * ? / \ and it must be less than 32 characters.
+    #     [ ] : * ? / \
+    #
+    # and it must be less than 32 characters.
     # In addition, you cannot use the same, case insensitive,
     # sheetname for more than one worksheet.
     #
