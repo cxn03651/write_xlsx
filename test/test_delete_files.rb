@@ -5,13 +5,13 @@ require 'write_xlsx'
 class TestDeleteFiles < Test::Unit::TestCase
   def setup
     @dir_path = 'test_delete_empty_directory'
-    Utility.delete_files(@dir_path) if FileTest.exist?(@dir_path)
+    Writexlsx::Utility.delete_files(@dir_path) if FileTest.exist?(@dir_path)
   end
   
   def test_delete_empty_directory
     Dir.mkdir(@dir_path)
     assert(FileTest.exist?(@dir_path))
-    Utility.delete_files(@dir_path)
+    Writexlsx::Utility.delete_files(@dir_path)
     assert(!FileTest.exist?(@dir_path))
   end
   
@@ -21,7 +21,7 @@ class TestDeleteFiles < Test::Unit::TestCase
     File.open(File.join(@dir_path, filename), "w") { |file| file.write("str") }
     assert(FileTest.exist?(@dir_path))
     assert(FileTest.exist?(File.join(@dir_path, filename)))
-    Utility.delete_files(@dir_path)
+    Writexlsx::Utility.delete_files(@dir_path)
     assert(!FileTest.exist?(@dir_path))
   end
 
@@ -31,7 +31,7 @@ class TestDeleteFiles < Test::Unit::TestCase
     Dir.mkdir(File.join(@dir_path, subdir_name))
     assert(FileTest.exist?(@dir_path))
     assert(FileTest.exist?(File.join(@dir_path, subdir_name)))
-    Utility.delete_files(@dir_path)
+    Writexlsx::Utility.delete_files(@dir_path)
     assert(!FileTest.exist?(@dir_path))
   end
 end

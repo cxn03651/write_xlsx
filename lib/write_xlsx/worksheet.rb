@@ -9,7 +9,7 @@ require 'tempfile'
 
 module Writexlsx
   class Worksheet
-    include Utility
+    include Writexlsx::Utility
 
     RowMax   = 1048576  # :nodoc:
     ColMax   = 16384    # :nodoc:

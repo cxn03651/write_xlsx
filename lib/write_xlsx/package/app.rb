@@ -6,7 +6,7 @@ module Writexlsx
   module Package
     class App
 
-      include Utility
+      include Writexlsx::Utility
 
       def initialize
         @writer = Package::XMLWriterSimple.new

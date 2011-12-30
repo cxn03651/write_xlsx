@@ -5,8 +5,8 @@ require 'write_xlsx'
 class TestExampleMatch < Test::Unit::TestCase
   def setup
     setup_dir_var
-    Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
-    Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
+    Writexlsx::Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
+    Writexlsx::Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
     raise "cannot create test working directory." if File.exist?(@expected_dir) || File.exist?(@result_dir)
     @obj = Writexlsx::Package::XMLWriterSimple.new
   end

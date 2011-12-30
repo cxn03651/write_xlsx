@@ -6,7 +6,7 @@ module Writexlsx
   module Package
     class Relationships
 
-      include Utility
+      include Writexlsx::Utility
 
       Schema_root     = 'http://schemas.openxmlformats.org'
       Package_schema  = Schema_root + '/package/2006/relationships'

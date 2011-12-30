@@ -83,8 +83,8 @@ class Test::Unit::TestCase
   end
 
   def cleanup(xlsx)
-    Utility.delete_files(xlsx)          if File.exist?(xlsx)
-    Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
-    Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
+    Writexlsx::Utility.delete_files(xlsx)          if File.exist?(xlsx)
+    Writexlsx::Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
+    Writexlsx::Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
   end
 end

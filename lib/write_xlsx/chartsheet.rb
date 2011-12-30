@@ -13,7 +13,7 @@ require 'write_xlsx/worksheet'
 
 module Writexlsx
   class Chartsheet < Worksheet
-    include Utility
+    include Writexlsx::Utility
 
     def initialize(workbook, index, name)
       super

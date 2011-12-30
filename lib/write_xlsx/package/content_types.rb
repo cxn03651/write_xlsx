@@ -6,7 +6,7 @@ module Writexlsx
   module Package
     class ContentTypes
 
-      include Utility
+      include Writexlsx::Utility
 
       App_package  = 'application/vnd.openxmlformats-package.'
       App_document = 'application/vnd.openxmlformats-officedocument.'

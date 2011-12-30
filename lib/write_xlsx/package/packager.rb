@@ -15,7 +15,7 @@ module Writexlsx
   module Package
     class Packager
 
-      include Utility
+      include Writexlsx::Utility
 
       def initialize
         @package_dir       = ''

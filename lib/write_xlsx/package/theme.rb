@@ -7,7 +7,7 @@ module Writexlsx
   module Package
     class Theme
 
-      include Utility
+      include Writexlsx::Utility
 
       def initialize
         @writer = nil

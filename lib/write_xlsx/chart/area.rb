@@ -18,7 +18,7 @@ require 'write_xlsx/utility'
 module Writexlsx
   class Chart
     class Area < self
-      include Utility
+      include Writexlsx::Utility
 
       def initialize
         super(self.class)

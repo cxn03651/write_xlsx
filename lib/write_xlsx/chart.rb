@@ -4,7 +4,7 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
-    include Utility
+    include Writexlsx::Utility
 
     attr_accessor :id
     attr_writer :index, :palette

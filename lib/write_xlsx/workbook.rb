@@ -13,7 +13,7 @@ require 'digest/md5'
 module Writexlsx
   class Workbook
 
-    include Utility
+    include Writexlsx::Utility
 
     attr_accessor :str_total, :str_unique, :str_table
     attr_writer :firstsheet
@@ -967,7 +967,7 @@ module Writexlsx
       # Store the xlsx component files with the temp dir name removed.
       ZipFileUtils.zip("#{@tempdir}", @filename)
       IO.copy_stream(@filename, @fileobj) if @fileobj
-      Utility.delete_files(@tempdir)
+      Writexlsx::Utility.delete_files(@tempdir)
     end
 
     #
