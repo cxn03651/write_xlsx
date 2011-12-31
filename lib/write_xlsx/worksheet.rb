@@ -1186,7 +1186,7 @@ module Writexlsx
       @repeat_cols = area
     end
 
-    def get_print_area
+    def get_print_area # :nodoc:
       @print_area.dup
     end
 
@@ -3889,11 +3889,11 @@ module Writexlsx
       @comments_author = author if author
     end
 
-    def has_comments?
+    def has_comments? # :nodoc:
       !!@has_comments
     end
 
-    def is_chartsheet?
+    def is_chartsheet? # :nodoc:
       !!@is_chartsheet
     end
 
@@ -3901,7 +3901,7 @@ module Writexlsx
     # Turn the HoH that stores the comments into an array for easier handling
     # and set the external links.
     #
-    def prepare_comments(vml_data_id, vml_shape_id, comment_id)
+    def prepare_comments(vml_data_id, vml_shape_id, comment_id) # :nodoc:
       comments = []
 
       # We sort the comments by row and column but that isn't strictly required.
@@ -3940,7 +3940,7 @@ module Writexlsx
     #
     # Set up chart/drawings.
     #
-    def prepare_chart(index, chart_id, drawing_id)
+    def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
       row, col, chart, x_offset, y_offset, scale_x, scale_y  = @charts[index]
