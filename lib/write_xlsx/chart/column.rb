@@ -16,6 +16,15 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
+    # The Column chart module also supports the following sub-types:
+    #
+    #     stacked
+    #     percent_stacked
+    # These can be specified at creation time via the add_chart() Worksheet
+    # method:
+    #
+    #     chart = workbook.add_chart( :type => 'column', :subtype => 'stacked' )
+    #
     class Column < self
       include Writexlsx::Utility
 
