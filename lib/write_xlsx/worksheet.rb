@@ -315,7 +315,7 @@ module Writexlsx
       @workbook.firstsheet  = 0
     end
 
-    def hidden?
+    def hidden? # :nodoc:
       @hidden
     end
 
@@ -439,10 +439,89 @@ module Writexlsx
     end
 
     #
-    # set_column($firstcol, $lastcol, $width, $format, $hidden, $level)
+    # :call-seq:
+    #   set_column(firstcol, lastcol, width, format, hidden, level)
     #
-    # Set the width of a single column or a range of columns.
-    # See also: _write_col_info
+    # This method can be used to change the default properties of a single
+    # column or a range of columns. All parameters apart from first_col
+    # and last_col are optional.
+    #
+    # If set_column() is applied to a single column the value of first_col
+    # and last_col should be the same. In the case where $last_col is zero
+    # it is set to the same value as first_col.
+    #
+    # It is also possible, and generally clearer, to specify a column range
+    # using the form of A1 notation used for columns. See the note about
+    # "Cell notation".
+    #
+    # Examples:
+    #
+    #     worksheet.set_column(0, 0, 20)    # Column  A   width set to 20
+    #     worksheet.set_column(1, 3, 30)    # Columns B-D width set to 30
+    #     worksheet.set_column('E:E', 20)   # Column  E   width set to 20
+    #     worksheet.set_column('F:H', 30)   # Columns F-H width set to 30
+    #
+    # The width corresponds to the column width value that is specified in
+    # Excel. It is approximately equal to the length of a string in the
+    # default font of Arial 10. Unfortunately, there is no way to specify
+    # "AutoFit" for a column in the Excel file format. This feature is
+    # only available at runtime from within Excel.
+    #
+    # As usual the format parameter is optional, for additional information,
+    # see "CELL FORMATTING". If you wish to set the format without changing
+    # the width you can pass undef as the width parameter:
+    #
+    #     worksheet.set_column(0, 0, nil, format)
+    #
+    # The format parameter will be applied to any cells in the column that
+    # don't have a format. For example
+    #
+    #     worksheet.set_column( 'A:A', nil, format1 )    # Set format for col 1
+    #     worksheet.write( 'A1', 'Hello' )                  # Defaults to format1
+    #     worksheet.write( 'A2', 'Hello', format2 )        # Keeps format2
+    #
+    # If you wish to define a column format in this way you should call the
+    # method before any calls to write(). If you call it afterwards it
+    # won't have any effect.
+    #
+    # A default row format takes precedence over a default column format
+    #
+    #     worksheet.set_row( 0, nil, format1 )           # Set format for row 1
+    #     worksheet.set_column( 'A:A', nil, format2 )    # Set format for col 1
+    #     worksheet.write( 'A1', 'Hello' )               # Defaults to format1
+    #     worksheet.write( 'A2', 'Hello' )               # Defaults to format2
+    #
+    # The hidden parameter should be set to 1 if you wish to hide a column.
+    # This can be used, for example, to hide intermediary steps in a
+    # complicated calculation:
+    #
+    #     worksheet.set_column( 'D:D', 20,  format, 1 )
+    #     worksheet.set_column( 'E:E', nil, nil,    1 )
+    #
+    # The level parameter is used to set the outline level of the column.
+    # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
+    # columns with the same outline level are grouped together into a single
+    # outline.
+    #
+    # The following example sets an outline level of 1 for columns B to G:
+    #
+    #     worksheet.set_column( 'B:G', nil, nil, 0, 1 )
+    #
+    # The hidden parameter can also be used to hide collapsed outlined
+    # columns when used in conjunction with the level parameter.
+    #
+    #     worksheet.set_column( 'B:G', nil, nil, 1, 1 )
+    #
+    # For collapsed outlines you should also indicate which row has the
+    # collapsed + symbol using the optional collapsed parameter.
+    #
+    #     worksheet.set_column( 'H:H', nil, nil, 0, 0, 1 )
+    #
+    # For a more complete example see the outline.rb and outline_collapsed.rb
+    # programs in the examples directory of the distro.
+    #
+    # Excel allows up to 7 outline levels. Therefore the level parameter
+    # should be in the range 0 <= level <= 7.
     #
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -501,7 +580,28 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #   set_selection(cell_or_cell_range)
+    #
     # Set which cell or cells are selected in a worksheet.
+    #
+    # This method can be used to specify which cell or cells are selected
+    # in a worksheet. The most common requirement is to select a single cell,
+    # in which case $last_row and $last_col can be omitted. The active cell
+    # within a selected range is determined by the order in which first and
+    # last are specified. It is also possible to specify a cell or a range
+    # using A1 notation. See the note about "Cell notation".
+    #
+    # Examples:
+    #
+    #     worksheet1.set_selection(3, 3)          # 1. Cell D4.
+    #     worksheet2.set_selection(3, 3, 6, 6)    # 2. Cells D4 to G7.
+    #     worksheet3.set_selection(6, 6, 3, 3)    # 3. Cells G7 to D4.
+    #     worksheet4.set_selection('D4')          # Same as 1.
+    #     worksheet5.set_selection('D4:G7')       # Same as 2.
+    #     worksheet6.set_selection('G7:D4')       # Same as 3.
+    #
+    # The default cell selections is (0, 0), 'A1'.
     #
     def set_selection(*args)
       return if args.empty?
@@ -542,7 +642,45 @@ module Writexlsx
     end
 
     #
-    # Set panes and mark them as frozen.
+    # :call-seq:
+    #   freeze_panes(row, col [ , top_row, left_col ] )
+    #
+    # This method can be used to divide a worksheet into horizontal or
+    # vertical regions known as panes and to also "freeze" these panes so
+    # that the splitter bars are not visible. This is the same as the
+    # Window->Freeze Panes menu command in Excel
+    #
+    # The parameters $row and $col are used to specify the location of
+    # the split. It should be noted that the split is specified at the
+    # top or left of a cell and that the method uses zero based indexing.
+    # Therefore to freeze the first row of a worksheet it is necessary
+    # to specify the split at row 2 (which is 1 as the zero-based index).
+    # This might lead you to think that you are using a 1 based index
+    # but this is not the case.
+    #
+    # You can set one of the $row and $col parameters as zero if you
+    # do not want either a vertical or horizontal split.
+    #
+    # Examples:
+    #
+    #     worksheet.freeze_panes(1, 0)    # Freeze the first row
+    #     worksheet.freeze_panes('A2')    # Same using A1 notation
+    #     worksheet.freeze_panes(0, 1)    # Freeze the first column
+    #     worksheet.freeze_panes('B1')    # Same using A1 notation
+    #     worksheet.freeze_panes(1, 2)    # Freeze first row and first 2 columns
+    #     worksheet.freeze_panes('C2')    # Same using A1 notation
+    #
+    # The parameters $top_row and $left_col are optional. They are used
+    # to specify the top-most or left-most visible row or column in the
+    # scrolling region of the panes. For example to freeze the first row
+    # and to have the scrolling region begin at row twenty:
+    #
+    #     worksheet.freeze_panes(1, 0, 20, 0)
+    #
+    # You cannot use A1 notation for the $top_row and $left_col parameters.
+    #
+    # See also the panes.pl program in the examples directory of the
+    # distribution.
     #
     def freeze_panes(*args)
       return if args.empty?
@@ -560,8 +698,11 @@ module Writexlsx
     end
 
     #
-    # Set panes and mark them as split.
+    # :call-seq:
+    #   split_panes(y, x, top_row, left_col, offset_row, offset_col)
     #
+    # Set panes and mark them as split.
+    #--
     # Implementers note. The API for this method doesn't map well from the XLS
     # file format and isn't sufficient to describe all cases of split panes.
     # It should probably be something like:
@@ -569,6 +710,35 @@ module Writexlsx
     #     split_panes($y, $x, $top_row, $left_col, $offset_row, $offset_col)
     #
     # I'll look at changing this if it becomes an issue.
+    #++
+    # This method can be used to divide a worksheet into horizontal or vertical
+    # regions known as panes. This method is different from the freeze_panes()
+    # method in that the splits between the panes will be visible to the user
+    # and each pane will have its own scroll bars.
+    #
+    # The parameters $y and $x are used to specify the vertical and horizontal
+    # position of the split. The units for $y and $x are the same as those
+    # used by Excel to specify row height and column width. However, the
+    # vertical and horizontal units are different from each other. Therefore
+    # you must specify the $y and $x parameters in terms of the row heights
+    # and column widths that you have set or the default values which are 15
+    # for a row and 8.43 for a column.
+    #
+    # You can set one of the $y and $x parameters as zero if you do not want
+    # either a vertical or horizontal split. The parameters top_row and left_col
+    # are optional. They are used to specify the top-most or left-most visible
+    # row or column in the bottom-right pane.
+    #
+    # Example:
+    #
+    #     worksheet.split_panes(15, 0   )    # First row
+    #     worksheet.split_panes( 0, 8.43)    # First column
+    #     worksheet.split_panes(15, 8.43)    # First row and column
+    #
+    # You cannot use A1 notation with this method.
+    #
+    # See also the freeze_panes() method and the panes.rb program in the
+    # examples directory of the distribution.
     #
     def split_panes(*args)
       # Call freeze panes but add the type flag for split panes.
@@ -577,6 +747,8 @@ module Writexlsx
 
     #
     # Set the page orientation as portrait.
+    # The default worksheet orientation is portrait, so you won't generally
+    # need to call this method.
     #
     def set_portrait
       @orientation        = true
@@ -592,7 +764,7 @@ module Writexlsx
     end
 
     #
-    # Set the page view mode for Mac Excel.
+    # This method is used to display the worksheet in "Page View/Layout" mode.
     #
     def set_page_view(flag = true)
       @page_view = !!flag
@@ -601,12 +773,81 @@ module Writexlsx
     #
     # Set the colour of the worksheet tab.
     #
+    # The set_tab_color() method is used to change the colour of the worksheet
+    # tab. This feature is only available in Excel 2002 and later. You can use
+    # one of the standard colour names provided by the Format object or a
+    # colour index. See "COLOURS IN EXCEL" and the set_custom_color() method.
+    #
+    #     worksheet1.set_tab_color('red')
+    #     worksheet2.set_tab_color(0x0C)
+    #
+    # See the tab_colors.pl program in the examples directory of the distro.
+    #
     def set_tab_color(color)
       @tab_color = Colors.new.get_color(color)
     end
 
     #
     # Set the paper type. Ex. 1 = US Letter, 9 = A4
+    #
+    # This method is used to set the paper format for the printed output of
+    # a worksheet. The following paper styles are available:
+    #
+    #     Index   Paper format            Paper size
+    #     =====   ============            ==========
+    #       0     Printer default         -
+    #       1     Letter                  8 1/2 x 11 in
+    #       2     Letter Small            8 1/2 x 11 in
+    #       3     Tabloid                 11 x 17 in
+    #       4     Ledger                  17 x 11 in
+    #       5     Legal                   8 1/2 x 14 in
+    #       6     Statement               5 1/2 x 8 1/2 in
+    #       7     Executive               7 1/4 x 10 1/2 in
+    #       8     A3                      297 x 420 mm
+    #       9     A4                      210 x 297 mm
+    #      10     A4 Small                210 x 297 mm
+    #      11     A5                      148 x 210 mm
+    #      12     B4                      250 x 354 mm
+    #      13     B5                      182 x 257 mm
+    #      14     Folio                   8 1/2 x 13 in
+    #      15     Quarto                  215 x 275 mm
+    #      16     -                       10x14 in
+    #      17     -                       11x17 in
+    #      18     Note                    8 1/2 x 11 in
+    #      19     Envelope  9             3 7/8 x 8 7/8
+    #      20     Envelope 10             4 1/8 x 9 1/2
+    #      21     Envelope 11             4 1/2 x 10 3/8
+    #      22     Envelope 12             4 3/4 x 11
+    #      23     Envelope 14             5 x 11 1/2
+    #      24     C size sheet            -
+    #      25     D size sheet            -
+    #      26     E size sheet            -
+    #      27     Envelope DL             110 x 220 mm
+    #      28     Envelope C3             324 x 458 mm
+    #      29     Envelope C4             229 x 324 mm
+    #      30     Envelope C5             162 x 229 mm
+    #      31     Envelope C6             114 x 162 mm
+    #      32     Envelope C65            114 x 229 mm
+    #      33     Envelope B4             250 x 353 mm
+    #      34     Envelope B5             176 x 250 mm
+    #      35     Envelope B6             176 x 125 mm
+    #      36     Envelope                110 x 230 mm
+    #      37     Monarch                 3.875 x 7.5 in
+    #      38     Envelope                3 5/8 x 6 1/2 in
+    #      39     Fanfold                 14 7/8 x 11 in
+    #      40     German Std Fanfold      8 1/2 x 12 in
+    #      41     German Legal Fanfold    8 1/2 x 13 in
+    #
+    # Note, it is likely that not all of these paper types will be available
+    # to the end user since it will depend on the paper formats that the
+    # user's printer supports. Therefore, it is best to stick to standard
+    # paper types.
+    #
+    #     worksheet.set_paper(1)    # US Letter
+    #     worksheet.set_paper(9)    # A4
+    #
+    # If you do not specify a paper type the worksheet will print using
+    # the printer's default paper.
     #
     def set_paper(paper_size)
       if paper_size
@@ -617,6 +858,152 @@ module Writexlsx
 
     #
     # Set the page header caption and optional margin.
+    #
+    # Headers and footers are generated using a string which is a combination
+    # of plain text and control characters. The margin parameter is optional.
+    #
+    # The available control character are:
+    #
+    #     Control             Category            Description
+    #     =======             ========            ===========
+    #     &L                  Justification       Left
+    #     &C                                      Center
+    #     &R                                      Right
+    #
+    #     &P                  Information         Page number
+    #     &N                                      Total number of pages
+    #     &D                                      Date
+    #     &T                                      Time
+    #     &F                                      File name
+    #     &A                                      Worksheet name
+    #     &Z                                      Workbook path
+    #
+    #     &fontsize           Font                Font size
+    #     &"font,style"                           Font name and style
+    #     &U                                      Single underline
+    #     &E                                      Double underline
+    #     &S                                      Strikethrough
+    #     &X                                      Superscript
+    #     &Y                                      Subscript
+    #
+    #     &&                  Miscellaneous       Literal ampersand &
+    #
+    # Text in headers and footers can be justified (aligned) to the left,
+    # center and right by prefixing the text with the control characters
+    # &L, &C and &R.
+    #
+    # For example (with ASCII art representation of the results):
+    #
+    #     worksheet.set_header('&LHello')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     | Hello                                                         |
+    #     |                                                               |
+    #
+    #
+    #     worksheet.set_header('&CHello')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     |                          Hello                                |
+    #     |                                                               |
+    #
+    #
+    #     worksheet.set_header('&RHello')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     |                                                         Hello |
+    #     |                                                               |
+    #
+    # For simple text, if you do not specify any justification the text will
+    # be centred. However, you must prefix the text with &C if you specify
+    # a font name or any other formatting:
+    #
+    #     worksheet.set_header('Hello')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     |                          Hello                                |
+    #     |                                                               |
+    #
+    # You can have text in each of the justification regions:
+    #
+    #     worksheet.set_header('&LCiao&CBello&RCielo')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     | Ciao                     Bello                          Cielo |
+    #     |                                                               |
+    #
+    # The information control characters act as variables that Excel will update
+    # as the workbook or worksheet changes. Times and dates are in the users
+    # default format:
+    #
+    #     worksheet.set_header('&CPage &P of &N')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     |                        Page 1 of 6                            |
+    #     |                                                               |
+    #
+    #
+    #     worksheet.set_header('&CUpdated at &T')
+    #
+    #      ---------------------------------------------------------------
+    #     |                                                               |
+    #     |                    Updated at 12:30 PM                        |
+    #     |                                                               |
+    #
+    # You can specify the font size of a section of the text by prefixing it
+    # with the control character &n where n is the font size:
+    #
+    #     worksheet1.set_header('&C&30Hello Big' )
+    #     worksheet2.set_header('&C&10Hello Small' )
+    #
+    # You can specify the font of a section of the text by prefixing it with
+    # the control sequence &"font,style" where fontname is a font name such
+    # as "Courier New" or "Times New Roman" and style is one of the standard
+    # Windows font descriptions: "Regular", "Italic", "Bold" or "Bold Italic":
+    #
+    #     worksheet1.set_header('&C&"Courier New,Italic"Hello')
+    #     worksheet2.set_header('&C&"Courier New,Bold Italic"Hello')
+    #     worksheet3.set_header('&C&"Times New Roman,Regular"Hello')
+    #
+    # It is possible to combine all of these features together to create
+    # sophisticated headers and footers. As an aid to setting up complicated
+    # headers and footers you can record a page set-up as a macro in Excel
+    # and look at the format strings that VBA produces. Remember however
+    # that VBA uses two double quotes "" to indicate a single double quote.
+    # For the last example above the equivalent VBA code looks like this:
+    #
+    #     .LeftHeader   = ""
+    #     .CenterHeader = "&""Times New Roman,Regular""Hello"
+    #     .RightHeader  = ""
+    #
+    # To include a single literal ampersand & in a header or footer you
+    # should use a double ampersand &&:
+    #
+    #     worksheet1.set_header('&CCuriouser && Curiouser - Attorneys at Law')
+    #
+    # As stated above the margin parameter is optional. As with the other
+    # margins the value should be in inches. The default header and footer
+    # margin is 0.3 inch. Note, the default margin is different from the
+    # default used in the binary file format by Spreadsheet::WriteExcel.
+    # The header and footer margin size can be set as follows:
+    #
+    #     worksheet.set_header('&CHello', 0.75)
+    #
+    # The header and footer margins are independent of the top and bottom
+    # margins.
+    #
+    # Note, the header or footer string must be less than 255 characters.
+    # Strings longer than this will not be written and a warning will be
+    # generated.
+    #
+    # See, also the headers.rb program in the examples directory of the
+    # distribution.
     #
     def set_header(string = '', margin = 0.3)
       raise 'Header string must be less than 255 characters' if string.length >= 255
@@ -629,6 +1016,8 @@ module Writexlsx
     #
     # Set the page footer caption and optional margin.
     #
+    # The syntax of the set_footer() method is the same as set_header()
+    #
     def set_footer(string = '', margin = 0.3)
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
@@ -638,7 +1027,7 @@ module Writexlsx
     end
 
     #
-    # Center the page horizontally.
+    # Center the worksheet data horizontally between the margins on the printed page:
     #
     def center_horizontally
       @print_options_changed = true
@@ -646,7 +1035,7 @@ module Writexlsx
     end
 
     #
-    # Center the page horizontally.
+    # Center the worksheet data vertically between the margins on the printed page:
     #
     def center_vertically
       @print_options_changed = true
@@ -655,6 +1044,23 @@ module Writexlsx
 
     #
     # Set all the page margins to the same value in inches.
+    #
+    # There are several methods available for setting the worksheet margins
+    # on the printed page:
+    #
+    #     set_margins()        # Set all margins to the same value
+    #     set_margins_LR()     # Set left and right margins to the same value
+    #     set_margins_TB()     # Set top and bottom margins to the same value
+    #     set_margin_left()    # Set left margin
+    #     set_margin_right()   # Set right margin
+    #     set_margin_top()     # Set top margin
+    #     set_margin_bottom()  # Set bottom margin
+    #
+    # All of these methods take a distance in inches as a parameter.
+    # Note: 1 inch = 25.4mm. ;-) The default left and right margin is 0.7 inch.
+    # The default top and bottom margin is 0.75 inch. Note, these defaults
+    # are different from the defaults used in the binary file format
+    # by writeexcel gem.
     #
     def set_margins(margin)
       set_margin_left(margin)
@@ -665,6 +1071,7 @@ module Writexlsx
 
     #
     # Set the left and right margins to the same value in inches.
+    # See set_margins
     #
     def set_margins_LR(margin)
       set_margin_left(margin)
@@ -673,6 +1080,7 @@ module Writexlsx
 
     #
     # Set the top and bottom margins to the same value in inches.
+    # See set_margins
     #
     def set_margins_TB(margin)
       set_margin_top(margin)
@@ -681,6 +1089,7 @@ module Writexlsx
 
     #
     # Set the left margin in inches.
+    # See set_margins
     #
     def set_margin_left(margin = 0.7)
       @margin_left = remove_white_space(margin)
@@ -688,6 +1097,7 @@ module Writexlsx
 
     #
     # Set the right margin in inches.
+    # See set_margins
     #
     def set_margin_right(margin = 0.7)
       @margin_right = remove_white_space(margin)
@@ -695,6 +1105,7 @@ module Writexlsx
 
     #
     # Set the top margin in inches.
+    # See set_margins
     #
     def set_margin_top(margin = 0.75)
       @margin_top = remove_white_space(margin)
@@ -708,7 +1119,16 @@ module Writexlsx
     end
 
     #
-    # Set the rows to repeat at the top of each printed page.
+    # Set the number of rows to repeat at the top of each printed page.
+    #
+    # For large Excel documents it is often desirable to have the first row
+    # or rows of the worksheet print out at the top of each page. This can
+    # be achieved by using the repeat_rows() method. The parameters
+    # first_row and last_row are zero based. The last_row parameter is
+    # optional if you only wish to specify one row:
+    #
+    #     worksheet1.repeat_rows(0)    # Repeat the first row
+    #     worksheet2.repeat_rows(0, 1) # Repeat the first two rows
     #
     def repeat_rows(row_min, row_max = nil)
       row_max ||= row_min
@@ -725,10 +1145,82 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #   repeat_columns(first_col, last_col = nil)
+    #
+    # Set the columns to repeat at the left hand side of each printed page.
+    #
+    # For large Excel documents it is often desirable to have the first
+    # column or columns of the worksheet print out at the left hand side
+    # of each page. This can be achieved by using the repeat_columns()
+    # method. The parameters first_column and last_column are zero based.
+    # The last_column parameter is optional if you only wish to specify
+    # one column. You can also specify the columns using A1 column
+    # notation, see the note about "Cell notation".
+    #
+    #     worksheet1.repeat_columns(0)        # Repeat the first column
+    #     worksheet2.repeat_columns(0, 1)     # Repeat the first two columns
+    #     worksheet3.repeat_columns('A:A')    # Repeat the first column
+    #     worksheet4.repeat_columns('A:B')    # Repeat the first two columns
+    #
+    def repeat_columns(*args)
+      if args[0] =~ /^\D/
+        args = substitute_cellref(args)
+        # Returned values $row1 and $row2 aren't required here. Remove them.
+        args = [args[1], args[3]]
+      end
+
+      col_min = args[0]
+      col_max = args[1] || args[0]
+
+      # Convert to A notation.
+      col_min = xl_col_to_name(args[0], 1)
+      col_max = xl_col_to_name(args[1], 1)
+
+      area = col_min +  ':' + col_max
+
+      # Build up the print area range "=Sheet2!C1:C2"
+      sheetname = quote_sheetname(@name)
+      area = sheetname + "!" + area
+
+      @repeat_cols = area
+    end
+
     def get_print_area
       @print_area.dup
     end
 
+    #
+    # :call-seq:
+    #   print_area(first_row, first_col, last_row, last_col)
+    #
+    # This method is used to specify the area of the worksheet that will
+    # be printed. All four parameters must be specified. You can also use
+    # A1 notation, see the note about "Cell notation".
+    #
+    #     $worksheet1->print_area( 'A1:H20' );    # Cells A1 to H20
+    #     $worksheet2->print_area( 0, 0, 19, 7 ); # The same
+    #     $worksheet2->print_area( 'A:H' );       # Columns A to H if rows have data
+    #
+    def print_area(*args)
+      return @print_area if args.empty?
+      
+      args = substitute_cellref(args) if args[0] =~ /^\D/
+      # Check for a cell reference in A1 notation and substitute row and column
+      return if args.size != 4    # Require 4 parameters
+
+      row1, col1, row2, col2 = args
+
+      # Ignore max print area since this is the same as no print area for Excel.
+      if row1 == 0 && col1 == 0 && row2 == @xls_rowmax - 1 && col2 == @xls_colmax - 1
+        return
+      end
+
+      # Build up the print area range "=Sheet2!R1C1:R2C1"
+      @print_area = convert_name_area(row1, col1, row2, col2)
+    end
+
+    #
     # Set the worksheet zoom factor.
     #
     def set_zoom(scale = 100)
@@ -742,7 +1234,45 @@ module Writexlsx
     end
 
     #
+    # Set the scale factor of the printed page.
+    # Scale factors in the range 10 <= scale <= 400 are valid:
+    #
+    #     worksheet1.set_print_scale( 50)
+    #     worksheet2.set_print_scale( 75)
+    #     worksheet3.set_print_scale(300)
+    #     worksheet4.set_print_scale(400)
+    #
+    # The default scale factor is 100. Note, set_print_scale() does not
+    # affect the scale of the visible page in Excel. For that you should
+    # use set_zoom().
+    #
+    # Note also that although it is valid to use both fit_to_pages() and
+    # set_print_scale() on the same worksheet only one of these options
+    # can be active at a time. The last method call made will set
+    # the active option.
+    #
+    def set_print_scale(scale = 100)
+      # Confine the scale to Excel's range
+      scale = 100 if scale < 10 || scale > 400
+
+      # Turn off "fit to page" option.
+      @fit_page = 0
+
+      @print_scale        = scale.to_i
+      @page_setup_changed = 1
+    end
+
+    #
     # Display the worksheet right to left for some eastern versions of Excel.
+    #
+    # The right_to_left() method is used to change the default direction
+    # of the worksheet from left-to-right, with the A1 cell in the top
+    # left, to right-to-left, with the he A1 cell in the top right.
+    #
+    #     worksheet.right_to_left
+    #
+    # This is useful when creating Arabic, Hebrew or other near or far
+    # eastern worksheets that use right-to-left as the default direction.
     #
     def right_to_left(flag = true)
       @right_to_left = !!flag
@@ -751,12 +1281,36 @@ module Writexlsx
     #
     # Hide cell zero values.
     #
+    # The hide_zero() method is used to hide any zero values that appear
+    # in cells.
+    #
+    #     worksheet.hide_zero
+    #
+    # In Excel this option is found under Tools->Options->View.
+    #
     def hide_zero(flag = true)
         @show_zeros = !flag
     end
 
     #
     # Set the order in which pages are printed.
+    #
+    # The print_across method is used to change the default print direction.
+    # This is referred to by Excel as the sheet "page order".
+    #
+    #     worksheet.print_across
+    #
+    # The default page order is shown below for a worksheet that extends
+    # over 4 pages. The order is called "down then across":
+    #
+    #     [1] [3]
+    #     [2] [4]
+    #
+    # However, by using the print_across method the print order will be
+    # changed to "across then down":
+    #
+    #     [1] [2]
+    #     [3] [4]
     #
     def print_across(page_order = true)
       if page_order
@@ -765,6 +1319,18 @@ module Writexlsx
       else
         @page_order = false
       end
+    end
+
+    #
+    # The set_start_page() method is used to set the number of the
+    # starting page when the worksheet is printed out.
+    # The default value is 1.
+    #
+    #     worksheet.set_start_page(2)
+    #
+    def set_start_page(page_start)
+      @page_start   = page_start
+      @custom_start = 1
     end
 
     #
@@ -1742,6 +2308,46 @@ module Writexlsx
       0
     end
 
+    # The outline_settings() method is used to control the appearance of
+    # outlines in Excel. Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
+    #
+    # The visible parameter is used to control whether or not outlines are
+    # visible. Setting this parameter to 0 will cause all outlines on the
+    # worksheet to be hidden. They can be unhidden in Excel by means of the
+    # "Show Outline Symbols" command button. The default setting is 1 for
+    # visible outlines.
+    #
+    #     worksheet.outline_settings(0)
+    #
+    # The symbols_below parameter is used to control whether the row outline
+    # symbol will appear above or below the outline level bar. The default
+    # setting is 1 for symbols to appear below the outline level bar.
+    #
+    # The symbols_right parameter is used to control whether the column
+    # outline symbol will appear to the left or the right of the outline level
+    # bar. The default setting is 1 for symbols to appear to the right of
+    # the outline level bar.
+    #
+    # The auto_style parameter is used to control whether the automatic
+    # outline generator in Excel uses automatic styles when creating an
+    # outline. This has no effect on a file generated by WriteXLSX but it
+    # does have an effect on how the worksheet behaves after it is created.
+    # The default setting is 0 for "Automatic Styles" to be turned off.
+    #
+    # The default settings for all of these parameters correspond to Excel's
+    # default parameters.
+    #
+    # The worksheet parameters controlled by outline_settings() are rarely used.
+    #
+    def outline_settings(visible = 1, symbols_below = 1, symbols_right = 1, auto_style = 0)
+      @outline_on    = visible
+      @outline_below = symbols_below
+      @outline_right = symbols_right
+      @outline_style = auto_style
+
+      @outline_changed = 1
+    end
+
     #
     # Deprecated. This is a writeexcel method that is no longer required
     # by WriteXLSX. See below.
@@ -2246,7 +2852,66 @@ module Writexlsx
     end
 
     #
-    # This method is used to set the height and XF format for a row.
+    # :call-seq:
+    #   set_row(row [ , height, format, hidden, level, collapsed ] )
+    #
+    # This method can be used to change the default properties of a row.
+    # All parameters apart from row are optional.
+    #
+    # The most common use for this method is to change the height of a row:
+    #
+    #     worksheet.set_row(0, 20)    # Row 1 height set to 20
+    #
+    # If you wish to set the format without changing the height you can
+    # pass undef as the height parameter:
+    #
+    #     worksheet.set_row(0, nil, format)
+    #
+    # The format parameter will be applied to any cells in the row that
+    # don't have a format. For example
+    #
+    #     worksheet.set_row(0, nil, format1)      # Set the format for row 1
+    #     worksheet.write('A1', 'Hello')          # Defaults to $format1
+    #     worksheet.write('B1', 'Hello', format2) # Keeps $format2
+    #
+    # If you wish to define a row format in this way you should call the
+    # method before any calls to write(). Calling it afterwards will overwrite
+    # any format that was previously specified.
+    #
+    # The $hidden parameter should be set to 1 if you wish to hide a row.
+    # This can be used, for example, to hide intermediary steps in a
+    # complicated calculation:
+    #
+    #     worksheet.set_row(0, 20,  format, 1)
+    #     worksheet.set_row(1, nil, nil,    1)
+    #
+    # The level parameter is used to set the outline level of the row.
+    # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
+    # rows with the same outline level are grouped together into a single
+    # outline.
+    #
+    # The following example sets an outline level of 1 for rows 1
+    # and 2 (zero-indexed):
+    #
+    #     worksheet.set_row(1, nil, nil, 0, 1)
+    #     worksheet.set_row(2, nil, nil, 0, 1)
+    #
+    # The hidden parameter can also be used to hide collapsed outlined rows
+    # when used in conjunction with the level parameter.
+    #
+    #     worksheet.set_row(1, nil, nil, 1, 1)
+    #     worksheet.set_row(2, nil, nil, 1, 1)
+    #
+    # For collapsed outlines you should also indicate which row has the
+    # collapsed + symbol using the optional collapsed parameter.
+    #
+    #     worksheet.set_row(3, nil, nil, 0, 0, 1)
+    #
+    # For a more complete example see the outline.rb and outline_collapsed.rb
+    # programs in the examples directory of the distro.
+    #
+    # Excel allows up to 7 outline levels. Therefore the level parameter
+    # should be in the range 0 <= $level <= 7.
     #
     def set_row(*args)
       row = args[0]
@@ -2793,6 +3458,23 @@ module Writexlsx
     # This was mainly useful for Excel 5 where printed gridlines were on by
     # default.
     #
+    # This method is used to hide the gridlines on the screen and printed
+    # page. Gridlines are the lines that divide the cells on a worksheet.
+    # Screen and printed gridlines are turned on by default in an Excel
+    # worksheet. If you have defined your own cell borders you may wish
+    # to hide the default gridlines.
+    #
+    #     worksheet.hide_gridlines
+    #
+    # The following values of option are valid:
+    #
+    #     0 : Don't hide gridlines
+    #     1 : Hide printed gridlines only
+    #     2 : Hide screen and printed gridlines
+    #
+    # If you don't supply an argument or use undef the default option
+    # is 1, i.e. only the printed gridlines are hidden.
+    #
     def hide_gridlines(option = true)
       if option == true
         @print_gridlines  = false
@@ -2807,10 +3489,94 @@ module Writexlsx
       end
     end
 
+    # Set the option to print the row and column headers on the printed page.
     #
-    # autofilter($first_row, $first_col, $last_row, $last_col)
+    # An Excel worksheet looks something like the following;
+    #
+    #      ------------------------------------------
+    #     |   |   A   |   B   |   C   |   D   |  ...
+    #      ------------------------------------------
+    #     | 1 |       |       |       |       |  ...
+    #     | 2 |       |       |       |       |  ...
+    #     | 3 |       |       |       |       |  ...
+    #     | 4 |       |       |       |       |  ...
+    #     |...|  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # The headers are the letters and numbers at the top and the left of the
+    # worksheet. Since these headers serve mainly as a indication of position
+    # on the worksheet they generally do not appear on the printed page.
+    # If you wish to have them printed you can use the
+    # print_row_col_headers() method :
+    #
+    #     worksheet.print_row_col_headers
+    #
+    # Do not confuse these headers with page headers as described in the
+    # set_header() section above.
+    #
+    def print_row_col_headers(headers = 1)
+      if headers
+        @print_headers         = 1
+        @print_options_changed = 1
+      else
+        @print_headers = 0
+      end
+    end
+
+    #
+    # The fit_to_pages() method is used to fit the printed area to a specific
+    # number of pages both vertically and horizontally. If the printed area
+    # exceeds the specified number of pages it will be scaled down to fit.
+    # This guarantees that the printed area will always appear on the
+    # specified number of pages even if the page size or margins change.
+    #
+    #     worksheet1.fit_to_pages(1, 1)    # Fit to 1x1 pages
+    #     worksheet2.fit_to_pages(2, 1)    # Fit to 2x1 pages
+    #     worksheet3.fit_to_pages(1, 2)    # Fit to 1x2 pages
+    #
+    # The print area can be defined using the print_area() method
+    # as described above.
+    #
+    # A common requirement is to fit the printed output to n pages wide
+    # but have the height be as long as necessary. To achieve this set
+    # the height to zero:
+    #
+    #     worksheet1.fit_to_pages(1, 0)    # 1 page wide and as long as necessary
+    #
+    # Note that although it is valid to use both fit_to_pages() and
+    # set_print_scale() on the same worksheet only one of these options can
+    # be active at a time. The last method call made will set the active option.
+    #
+    # Note that fit_to_pages() will override any manual page breaks that
+    # are defined in the worksheet.
+    #
+    def fit_to_pages(width = 1, height = 1)
+      @fit_page           = 1
+      @fit_width          = width
+      @fit_height         = height
+      @page_setup_changed = 1
+    end
+
+    #
+    # :call-seq:
+    #   autofilter(first_row, first_col, last_row, last_col)
     #
     # Set the autofilter area in the worksheet.
+    #
+    # This method allows an autofilter to be added to a worksheet.
+    # An autofilter is a way of adding drop down lists to the headers of a 2D
+    # range of worksheet data. This is turn allow users to filter the data
+    # based on simple criteria so that some data is shown and some is hidden.
+    #
+    # To add an autofilter to a worksheet:
+    #
+    #     worksheet.autofilter(0, 0, 10, 3)
+    #     worksheet.autofilter('A1:D11')    # Same as above in A1 notation.
+    #
+    # Filter conditions can be applied using the filter_column() or
+    # filter_column_list() method.
+    #
+    # See the autofilter.rb program in the examples directory of the distro
+    # for a more detailed example.
     #
     def autofilter(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2835,6 +3601,87 @@ module Writexlsx
 
     #
     # Set the column filter criteria.
+    #
+    # The filter_column method can be used to filter columns in a autofilter
+    # range based on simple conditions.
+    #
+    # NOTE: It isn't sufficient to just specify the filter condition.
+    # You must also hide any rows that don't match the filter condition.
+    # Rows are hidden using the set_row() visible parameter. WriteXLSX cannot
+    # do this automatically since it isn't part of the file format.
+    # See the autofilter.rb program in the examples directory of the distro
+    # for an example.
+    #
+    # The conditions for the filter are specified using simple expressions:
+    #
+    #     worksheet.filter_column('A', 'x > 2000')
+    #     worksheet.filter_column('B', 'x > 2000 and x < 5000')
+    #
+    # The column parameter can either be a zero indexed column number or
+    # a string column name.
+    #
+    # The following operators are available:
+    #
+    #     Operator        Synonyms
+    #        ==           =   eq  =~
+    #        !=           <>  ne  !=
+    #        >
+    #        <
+    #        >=
+    #        <=
+    #
+    #        and          &&
+    #        or           ||
+    #
+    # The operator synonyms are just syntactic sugar to make you more
+    # comfortable using the expressions. It is important to remember that
+    # the expressions will be interpreted by Excel and not by ruby.
+    #
+    # An expression can comprise a single statement or two statements
+    # separated by the and and or operators. For example:
+    #
+    #     'x <  2000'
+    #     'x >  2000'
+    #     'x == 2000'
+    #     'x >  2000 and x <  5000'
+    #     'x == 2000 or  x == 5000'
+    #
+    # Filtering of blank or non-blank data can be achieved by using a value
+    # of Blanks or NonBlanks in the expression:
+    #
+    #     'x == Blanks'
+    #     'x == NonBlanks'
+    #
+    # Excel also allows some simple string matching operations:
+    #
+    #     'x =~ b*'   # begins with b
+    #     'x !~ b*'   # doesn't begin with b
+    #     'x =~ *b'   # ends with b
+    #     'x !~ *b'   # doesn't end with b
+    #     'x =~ *b*'  # contains b
+    #     'x !~ *b*'  # doesn't contains b
+    #
+    # You can also use * to match any character or number and ? to match any
+    # single character or number. No other regular expression quantifier is
+    # supported by Excel's filters. Excel's regular expression characters can
+    # be escaped using ~.
+    #
+    # The placeholder variable x in the above examples can be replaced by any
+    # simple string. The actual placeholder name is ignored internally so the
+    # following are all equivalent:
+    #
+    #     'x     < 2000'
+    #     'col   < 2000'
+    #     'Price < 2000'
+    #
+    # Also, note that a filter condition can only be applied to a column
+    # in a range specified by the autofilter() Worksheet method.
+    #
+    # See the autofilter.rb program in the examples directory of the distro
+    # for a more detailed example.
+    #
+    # Note Spreadsheet::WriteExcel supports Top 10 style filters. These aren't
+    # currently supported by WriteXLSX but may be added later.
     #
     def filter_column(col, expression)
       raise "Must call autofilter before filter_column" unless @autofilter_area
@@ -2883,6 +3730,46 @@ module Writexlsx
     #
     # Set the column filter criteria in Excel 2007 list style.
     #
+    # Prior to Excel 2007 it was only possible to have either 1 or 2 filter
+    # conditions such as the ones shown above in the filter_column method.
+    #
+    # Excel 2007 introduced a new list style filter where it is possible
+    # to specify 1 or more 'or' style criteria. For example if your column
+    # contained data for the first six months the initial data would be
+    # displayed as all selected as shown on the left. Then if you selected
+    # 'March', 'April' and 'May' they would be displayed as shown on the right.
+    #
+    #     No criteria selected      Some criteria selected.
+    #
+    #     [/] (Select all)          [X] (Select all)
+    #     [/] January               [ ] January
+    #     [/] February              [ ] February
+    #     [/] March                 [/] March
+    #     [/] April                 [/] April
+    #     [/] May                   [/] May
+    #     [/] June                  [ ] June
+    #
+    # The filter_column_list() method can be used to represent these types of
+    # filters:
+    #
+    #     worksheet.filter_column_list('A', 'March', 'April', 'May')
+    #
+    # The column parameter can either be a zero indexed column number or
+    # a string column name.
+    #
+    # One or more criteria can be selected:
+    #
+    #     worksheet.filter_column_list(0, 'March')
+    #     worksheet.filter_column_list(1, 100, 110, 120, 130)
+    #
+    # NOTE: It isn't sufficient to just specify the filter condition. You must
+    # also hide any rows that don't match the filter condition. Rows are hidden
+    # using the set_row() visible parameter. WriteXLSX cannot do this
+    # automatically since it isn't part of the file format.
+    # See the autofilter.rb program in the examples directory of the distro
+    # for an example. e conditions for the filter are specified
+    # using simple expressions:
+    #
     def filter_column_list(col, *tokens)
       tokens.flatten!
       raise "Must call autofilter before filter_column_list" unless @autofilter_area
@@ -2912,12 +3799,51 @@ module Writexlsx
     #
     # Store the horizontal page breaks on a worksheet.
     #
+    # Add horizontal page breaks to a worksheet. A page break causes all
+    # the data that follows it to be printed on the next page. Horizontal
+    # page breaks act between rows. To create a page break between rows
+    # 20 and 21 you must specify the break at row 21. However in zero index
+    # notation this is actually row 20. So you can pretend for a small
+    # while that you are using 1 index notation:
+    #
+    #     worksheet1.set_h_pagebreaks( 20 )    # Break between row 20 and 21
+    #
+    # The set_h_pagebreaks() method will accept a list of page breaks
+    # and you can call it more than once:
+    #
+    #     worksheet2.set_h_pagebreaks( 20,  40,  60,  80,  100 )    # Add breaks
+    #     worksheet2.set_h_pagebreaks( 120, 140, 160, 180, 200 )    # Add some more
+    #
+    # Note: If you specify the "fit to page" option via the fit_to_pages()
+    # method it will override all manual page breaks.
+    #
+    # There is a silent limitation of about 1000 horizontal page breaks
+    # per worksheet in line with an Excel internal limitation.
+    #
     def set_h_pagebreaks(*args)
       @hbreaks += args
     end
 
     #
     # Store the vertical page breaks on a worksheet.
+    #
+    # Add vertical page breaks to a worksheet. A page break causes all the
+    # data that follows it to be printed on the next page. Vertical page breaks
+    # act between columns. To create a page break between columns 20 and 21
+    # you must specify the break at column 21. However in zero index notation
+    # this is actually column 20. So you can pretend for a small while that
+    # you are using 1 index notation:
+    #
+    #     worksheet1.set_v_pagebreaks(20) # Break between column 20 and 21
+    #
+    # The set_v_pagebreaks() method will accept a list of page breaks
+    # and you can call it more than once:
+    #
+    #     worksheet2.set_v_pagebreaks( 20,  40,  60,  80,  100 )    # Add breaks
+    #     worksheet2.set_v_pagebreaks( 120, 140, 160, 180, 200 )    # Add some more
+    #
+    # Note: If you specify the "fit to page" option via the fit_to_pages()
+    # method it will override all manual page breaks.
     #
     def set_v_pagebreaks(*args)
       @vbreaks += args
