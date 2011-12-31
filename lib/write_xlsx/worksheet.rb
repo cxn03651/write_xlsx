@@ -108,7 +108,7 @@ module Writexlsx
     Buffer   = 4096     # :nodoc:
 
     attr_writer :fit_page
-    attr_reader :print_area, :index, :_repeat_cols, :_repeat_rows
+    attr_reader :index, :_repeat_cols, :_repeat_rows
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
     attr_reader :vml_data_id, :vml_shape_id, :comments_array
@@ -725,6 +725,10 @@ module Writexlsx
     end
 
     #
+    def get_print_area
+      @print_area.dup
+    end
+
     # Set the worksheet zoom factor.
     #
     def set_zoom(scale = 100)
