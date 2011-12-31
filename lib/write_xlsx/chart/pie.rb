@@ -17,6 +17,12 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
+    # A Pie chart doesn't have an X or Y axis so the following common chart
+    # methods are ignored.
+    #
+    #     chart.set_x_axis
+    #     chart.set_y_axis
+    #
     class Pie < self
       include Writexlsx::Utility
 
