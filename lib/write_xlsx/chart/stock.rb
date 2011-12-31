@@ -17,6 +17,10 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
+    #
+    # The default Stock chart is an High-Low-Close chart.
+    # A series must be added for each of these data sources.
+    #
     class Stock < self
       include Writexlsx::Utility
 
