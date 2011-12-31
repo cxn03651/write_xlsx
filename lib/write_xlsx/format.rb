@@ -423,10 +423,6 @@ module Writexlsx
       set_text_h_align(6)
     end
 
-    def set_bold(bold = 1)
-      @bold = bold ? 1 : 0
-    end
-
     #
     # Set cells borders to the same style
     #
