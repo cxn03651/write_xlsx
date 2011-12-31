@@ -3,17 +3,408 @@ require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
+  # ==SYNOPSIS 
+  #
+  # To create a simple Excel file with a chart using WriteXLSX:
+  #
+  #     require 'rubygems'
+  #     require 'write_xlsx'
+  #
+  #     workbook  = WriteXLSX.new( 'chart.xlsx' )
+  #     worksheet = workbook.add_worksheet
+  #
+  #     # Add the worksheet data the chart refers to.
+  #     data = [
+  #         [ 'Category', 2, 3, 4, 5, 6, 7 ],
+  #         [ 'Value',    1, 4, 5, 2, 1, 5 ]
+  #     ]
+  #
+  #     worksheet.write( 'A1', data )
+  #
+  #     # Add a worksheet chart.
+  #     chart = workbook.add_chart( type => 'column' )
+  #
+  #     # Configure the chart.
+  #     chart.add_series(
+  #         :categories => '=Sheet1!$A$2:$A$7',
+  #         :values     => '=Sheet1!$B$2:$B$7'
+  #     )
+  #
+  #     workbook.close
+  #
+  # ==DESCRIPTION 
+  #
+  # The Chart module is an abstract base class for modules that implement
+  # charts in WriteXLSX. The information below is applicable to all of
+  # the available subclasses.
+  #
+  # The Chart module isn't used directly. A chart object is created via
+  # the Workbook add_chart() method where the chart type is specified:
+  #
+  #     chart = workbook.add_chart( :type => 'column' )
+  #
+  # Currently the supported chart types are:
+  #
+  # ===area
+  # Creates an Area (filled line) style chart. See Writexlsx::Chart::Area.
+  #
+  # ===bar
+  # Creates a Bar style (transposed histogram) chart. See Writexlsx::Chart::Bar.
+  #
+  # ===column
+  # Creates a column style (histogram) chart. See Writexlsx::Chart::Column.
+  #
+  # ===line
+  # Creates a Line style chart. See Writexlsx::Chart::Line.
+  #
+  # ===pie
+  # Creates an Pie style chart. See Writexlsx::Chart::Pie.
+  #
+  # ===scatter
+  # Creates an Scatter style chart. See Writexlsx::Chart::Scatter.
+  #
+  # ===stock
+  # Creates an Stock style chart. See Writexlsx::Chart::Stock.
+  #
+  # ==CHART FORMATTING 
+  #
+  # The following chart formatting properties can be set for any chart object
+  # that they apply to (and that are supported by Excel::Writer::XLSX) such
+  # as chart lines, column fill areas, plot area borders, markers and other
+  # chart elements documented above.
+  #
+  #     line
+  #     border
+  #     fill
+  #     marker
+  #     trendline
+  #     data_labels
+  # Chart formatting properties are generally set using hash refs.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { color => 'blue' }
+  #     )
+  # In some cases the format properties can be nested. For example a marker
+  # may contain border and fill sub-properties.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { color => 'blue' },
+  #         :marker     => {
+  #             :type    => 'square',
+  #             :size    => 5,
+  #             :border  => { color => 'red' },
+  #             :fill    => { color => 'yellow' }
+  #         }
+  #     )
+  # ===Line
+  #
+  # The line format is used to specify properties of line objects that appear
+  # in a chart such as a plotted line on a chart or a border.
+  #
+  # The following properties can be set for line formats in a chart.
+  #
+  #     none
+  #     color
+  #     width
+  #     dash_type
+  # The none property is uses to turn the line off (it is always on by default
+  # except in Scatter charts). This is useful if you wish to plot a series
+  # with markers but without a line.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { none => 1 }
+  #     )
+  # The color property sets the color of the line.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { color => 'red' }
+  #     )
+  # The available colors are shown in the main WriteXLSX documentation.
+  # It is also possible to set the color of a line with a HTML style RGB color:
+  #
+  #     chart.add_series(
+  #         :line       => { color => '#FF0000' }
+  #     )
+  # The width property sets the width of the line. It should be specified
+  # in increments of 0.25 of a point as in Excel.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { width => 3.25 }
+  #     )
+  # The dash_type property sets the dash style of the line.
+  #
+  #     chart->add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => { dash_type => 'dash_dot' }
+  #     )
+  # The following dash_type values are available. They are shown in the
+  # order that they appear in the Excel dialog.
+  #
+  #     solid
+  #     round_dot
+  #     square_dot
+  #     dash
+  #     dash_dot
+  #     long_dash
+  #     long_dash_dot
+  #     long_dash_dot_dot
+  # The default line style is solid.
+  #
+  # More than one line property can be specified at time:
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :line       => {
+  #             :color     => 'red',
+  #             :width     => 1.25,
+  #             :dash_type => 'square_dot'
+  #         }
+  #     )
+  # ===Border
+  #
+  # The border property is a synonym for line.
+  #
+  # It can be used as a descriptive substitute for line in chart types such
+  # as Bar and Column that have a border and fill style rather than a line
+  # style. In general chart objects with a border property will also have a
+  # fill property.
+  #
+  # ===Fill
+  #
+  # The fill format is used to specify filled areas of chart objects such
+  # as the interior of a column or the background of the chart itself.
+  #
+  # The following properties can be set for fill formats in a chart.
+  #
+  #     none
+  #     color
+  # The none property is uses to turn the fill property off (it is
+  # generally on by default).
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :fill       => { none => 1 }
+  #     )
+  # The color property sets the color of the fill area.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :fill       => { color => 'red' }
+  #     )
+  # The available colors are shown in the main WriteXLSX documentation.
+  # It is also possible to set the color of a fill with a HTML style RGB color:
+  #
+  #     chart.add_series(
+  #         :fill       => { color => '#FF0000' }
+  #     )
+  # The fill format is generally used in conjunction with a border format
+  # which has the same properties as a line format.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :border     => { color => 'red' },
+  #         :fill       => { color => 'yellow' }
+  #     )
+  # ===Marker
+  #
+  # The marker format specifies the properties of the markers used to
+  # distinguish series on a chart. In general only Line and Scatter
+  # chart types and trendlines use markers.
+  #
+  # The following properties can be set for marker formats in a chart.
+  #
+  #     type
+  #     size
+  #     border
+  #     fill
+  # The type property sets the type of marker that is used with a series.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :marker     => { type => 'diamond' }
+  #     )
+  # The following type properties can be set for marker formats in a chart.
+  # These are shown in the same order as in the Excel format dialog.
+  #
+  #     automatic
+  #     none
+  #     square
+  #     diamond
+  #     triangle
+  #     x
+  #     star
+  #     short_dash
+  #     long_dash
+  #     circle
+  #     plus
+  # The automatic type is a special case which turns on a marker using the
+  # default marker style for the particular series number.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :marker     => { type => 'automatic' }
+  #     )
+  # If automatic is on then other marker properties such as size,
+  # border or fill cannot be set.
+  #
+  # The size property sets the size of the marker and is generally used in
+  # conjunction with type.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :marker     => { type => 'diamond', size => 7 }
+  #     )
+  # Nested border and fill properties can also be set for a marker.
+  # These have the same sub-properties as shown above.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :marker     => {
+  #             :type    => 'square',
+  #             :size    => 5,
+  #             :border  => { color => 'red' },
+  #             :fill    => { color => 'yellow' }
+  #         }
+  #     )
+  # ===Trendline
+  #
+  # A trendline can be added to a chart series to indicate trends in the data
+  # such as a moving average or a polynomial fit.
+  #
+  # The following properties can be set for trendline formats in a chart.
+  #
+  #     type
+  #     order       (for polynomial trends)
+  #     period      (for moving average)
+  #     forward     (for all except moving average)
+  #     backward    (for all except moving average)
+  #     name
+  #     line
+  # The type property sets the type of trendline in the series.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :trendline  => { type => 'linear' }
+  #     )
+  # The available trendline types are:
+  #
+  #     exponential
+  #     linear
+  #     log
+  #     moving_average
+  #     polynomial
+  #     power
+  # A polynomial trendline can also specify the order of the polynomial.
+  # The default value is 2.
+  #
+  #     chart.add_series(
+  #         :values    => '=Sheet1!$B$1:$B$5',
+  #         :trendline => {
+  #             :type  => 'polynomial',
+  #             :order => 3
+  #         }
+  #     )
+  # A moving_average trendline can also the period of the moving average.
+  # The default value is 2.
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :trendline  => {
+  #             :type   => 'moving_average',
+  #             :period => 3
+  #         }
+  #     )
+  # The forward and backward properties set the forecast period of the
+  # trendline.
+  #
+  #     chart.add_series(
+  #         :values    => '=Sheet1!$B$1:$B$5',
+  #         :trendline => {
+  #             :type     => 'linear',
+  #             :forward  => 0.5,
+  #             :backward => 0.5
+  #         }
+  #     )
+  # The name property sets an optional name for the trendline that will
+  # appear in the chart legend. If it isn't specified the Excel default
+  # name will be displayed. This is usually a combination of the trendline
+  # type and the series name.
+  #
+  #     chart.add_series(
+  #         :values    => '=Sheet1!$B$1:$B$5',
+  #         :trendline => {
+  #             :type => 'linear',
+  #             :name => 'Interpolated trend'
+  #         }
+  #     )
+  # Several of these properties can be set in one go:
+  #
+  #     chart.add_series(
+  #         :values     => '=Sheet1!$B$1:$B$5',
+  #         :trendline  => {
+  #             :type     => 'linear',
+  #             :name     => 'My trend name',
+  #             :forward  => 0.5,
+  #             :backward => 0.5,
+  #             :line     => {
+  #                 :color     => 'red',
+  #                 :width     => 1,
+  #                 :dash_type => 'long_dash'
+  #             }
+  #         }
+  #     )
+  # Trendlines cannot be added to series in a stacked chart or pie chart or
+  # (when implemented) to 3-D, radar, surface, or doughnut charts.
+  #
+  # ==Data Labels
+  #
+  # Data labels can be added to a chart series to indicate the values of
+  # the plotted data points.
+  #
+  # The following properties can be set for data_labels formats in a chart.
+  #
+  #     value
+  #     category
+  #     series_name
+  # The value property turns on the Value data label for a series.
+  #
+  #     chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { value => 1 }
+  #     )
+  # The category property turns on the Category Name data label for a series.
+  #
+  #     chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { category => 1 }
+  #     )
+  # The series_name property turns on the Series Name data label for a series.
+  #
+  #     chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { series_name => 1 }
+  #     )
+  # Other formatting options
+  #
+  # Other formatting options will be added in time. If there is a feature that
+  # you would like to see included drop me a line.
+  #
   class Chart
     include Writexlsx::Utility
 
-    attr_accessor :id
-    attr_writer :index, :palette
-    attr_reader :embedded, :formula_ids, :formula_data
+    attr_accessor :id   # :nodoc:
+    attr_writer :index, :palette   # :nodoc:
+    attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
 
     #
     # Factory method for returning chart objects based on their class type.
     #
-    def self.factory(chart_subclass)
+    def self.factory(chart_subclass) # :nodoc:
       case chart_subclass.downcase.capitalize
       when 'Area'
         require 'write_xlsx/chart/area'
@@ -39,7 +430,7 @@ module Writexlsx
       end
     end
 
-    def initialize(subtype)
+    def initialize(subtype)   # :nodoc:
       @writer = Package::XMLWriterSimple.new
 
       @subtype           = subtype
@@ -66,14 +457,14 @@ module Writexlsx
       set_default_properties
     end
 
-    def set_xml_writer(filename)
+    def set_xml_writer(filename)   # :nodoc:
       @writer.set_xml_writer(filename)
     end
 
     #
     # Assemble and write the XML file.
     #
-    def assemble_xml_file
+    def assemble_xml_file   # :nodoc:
       @writer.xml_decl
 
       # Write the c:chartSpace element.
@@ -102,9 +493,98 @@ module Writexlsx
       @writer.close
     end
 
-
     #
     # Add a series and it's properties to a chart.
+    #
+    # In an Excel chart a "series" is a collection of information such as
+    # values, x-axis labels and the formatting that define which data is
+    # plotted.
+    #
+    # With a WriteXLSX chart object the add_series() method is used to
+    # set the properties for a series:
+    #
+    #     chart.add_series(
+    #         :categories => '=Sheet1!$A$2:$A$10', # Optional.
+    #         :values     => '=Sheet1!$B$2:$B$10', # Required.
+    #         :line       => { color => 'blue' }
+    #     )
+    #
+    # The properties that can be set are:
+    #
+    # ====:values
+    # This is the most important property of a series and must be set
+    # for every chart object. It links the chart with the worksheet data
+    # that it displays. A formula or array ref can be used for the
+    # data range, see below.
+    #
+    # ====:categories
+    # This sets the chart category labels. The category is more or less
+    # the same as the X-axis. In most chart types the categories property
+    # is optional and the chart will just assume a sequential series
+    # from 1 .. n.
+    #
+    # ====:name
+    # Set the name for the series. The name is displayed in the chart
+    # legend and in the formula bar. The name property is optional and
+    # if it isn't supplied it will default to Series 1 .. n.
+    #
+    # ====:line
+    # Set the properties of the series line type such as colour and
+    # width. See the "CHART FORMATTING" section below.
+    #
+    # ====:border
+    # Set the border properties of the series such as colour and style.
+    # See the "CHART FORMATTING" section below.
+    #
+    # ====:fill
+    # Set the fill properties of the series such as colour. See the
+    # "CHART FORMATTING" section below.
+    #
+    # ====:marker
+    # Set the properties of the series marker such as style and color.
+    # See the "CHART FORMATTING" section below.
+    #
+    # ====:trendline
+    # Set the properties of the series trendline such as linear,
+    # polynomial and moving average types. See the "CHART FORMATTING"
+    # section below.
+    #
+    # ====:data_labels
+    # Set data labels for the series. See the "CHART FORMATTING"
+    # section below.
+    #
+    # ====:invert_if_negative
+    # Invert the fill colour for negative values. Usually only applicable
+    # to column and bar charts.
+    #
+    # The categories and values can take either a range formula such
+    # as =Sheet1!$A$2:$A$7 or, more usefully when generating the range
+    # programmatically, an array ref with zero indexed row/column values:
+    #
+    #      [ sheetname, row_start, row_end, col_start, col_end ]
+    # The following are equivalent:
+    #
+    #     chart.add_series( categories => '=Sheet1!$A$2:$A$7'      ) # Same as ...
+    #     chart.add_series( categories => [ 'Sheet1', 1, 6, 0, 0 ] ) # Zero-indexed.
+    #
+    # You can add more than one series to a chart. In fact, some chart
+    # types such as stock require it. The series numbering and order in
+    # the Excel chart will be the same as the order in which that are added
+    # in Excel::Writer::XLSX.
+    #
+    #     # Add the first series.
+    #     chart.add_series(
+    #         :categories => '=Sheet1!$A$2:$A$7',
+    #         :values     => '=Sheet1!$B$2:$B$7',
+    #         :name       => 'Test data series 1'
+    #     )
+    #
+    #     # Add another series. Same categories. Different range values.
+    #     chart.add_series(
+    #         :categories => '=Sheet1!$A$2:$A$7',
+    #         :values     => '=Sheet1!$C$2:$C$7',
+    #         :name       => 'Test data series 2'
+    #     )
     #
     def add_series(params)
       # Check that the required input has been specified.
@@ -170,15 +650,107 @@ module Writexlsx
     #
     # Set the properties of the X-axis.
     #
+    # The set_x_axis() method is used to set properties of the X axis.
+    #
+    #     chart.set_x_axis( :name => 'Quarterly results' )
+    #
+    # The properties that can be set are:
+    #
+    #     :name
+    #     :min
+    #     :max
+    #     :minor_unit
+    #     :major_unit
+    #     :crossing
+    #     :reverse
+    #     :log_base
+    #     :label_position
+    #
+    # These are explained below. Some properties are only applicable to value
+    # or category axes, as indicated. See "Value and Category Axes" for an
+    # explanation of Excel's distinction between the axis types.
+    #
+    # ====:name
+    # Set the name (title or caption) for the axis. The name is displayed
+    # below the X axis. The name property is optional. The default is to
+    # have no axis name. (Applicable to category and value axes).
+    #
+    #     chart.set_x_axis( :name => 'Quarterly results' )
+    #
+    # The name can also be a formula such as =Sheet1!$A$1.
+    #
+    # ====:min
+    # Set the minimum value for the axis range.
+    # (Applicable to value axes only).
+    #
+    #     chart.set_x_axis( :min => 20 )
+    # ====:max
+    # Set the maximum value for the axis range.
+    # (Applicable to value axes only).
+    #
+    #     chart.set_x_axis( :max => 80 )
+    # ====:minor_unit
+    # Set the increment of the minor units in the axis range.
+    # (Applicable to value axes only).
+    #
+    #     chart.set_x_axis( :minor_unit => 0.4 )
+    # ====:major_unit
+    # Set the increment of the major units in the axis range.
+    # (Applicable to value axes only).
+    #
+    #     chart.set_x_axis( :major_unit => 2 )
+    # ====:crossing
+    # Set the position where the y axis will cross the x axis.
+    # (Applicable to category and value axes).
+    #
+    # The crossing value can either be the string 'max' to set the crossing
+    # at the maximum axis value or a numeric value.
+    #
+    #     chart.set_x_axis( :crossing => 3 )
+    #     # or
+    #     chart.set_x_axis( :crossing => 'max' )
+    # For category axes the numeric value must be an integer to represent
+    # the category number that the axis crosses at. For value axes it can
+    # have any value associated with the axis.
+    #
+    # If crossing is omitted (the default) the crossing will be set
+    # automatically by Excel based on the chart data.
+    #
+    # ====:reverse
+    # Reverse the order of the axis categories or values.
+    # (Applicable to category and value axes).
+    #
+    #     chart.set_x_axis( :reverse => 1 )
+    # ====:log_base
+    # Set the log base of the axis range.
+    # (Applicable to value axes only).
+    #
+    #     chart.set_x_axis( :log_base => 10 )
+    # ====:label_position
+    # Set the "Axis labels" position for the axis.
+    # The following positions are available:
+    #
+    #     next_to (the default)
+    #     high
+    #     low
+    #     none
+    # More than one property can be set in a call to set_x_axis:
+    #
+    #     chart.set_x_axis(
+    #         :name => 'Quarterly results',
+    #         :min  => 10,
+    #         :max  => 80
+    #     )
+    #
     def set_x_axis(params)
       @x_axis = convert_axis_args(params)
     end
 
-    ###############################################################################
-    #
-    # set_y_axis
     #
     # Set the properties of the Y-axis.
+    #
+    # The set_y_axis() method is used to set properties of the Y axis.
+    # The properties that can be set are the same as for set_x_axis,
     #
     def set_y_axis(params)
       @y_axis = convert_axis_args(params)
@@ -186,6 +758,16 @@ module Writexlsx
 
     #
     # Set the properties of the chart title.
+    #
+    # The set_title() method is used to set properties of the chart title.
+    #
+    #     chart.set_title( :name => 'Year End Results' )
+    # The properties that can be set are:
+    #
+    # ====:name
+    # Set the name (title) for the chart. The name is displayed above the
+    # chart. The name can also be a formula such as =Sheet1!$A$1. The name
+    # property is optional. The default is to have no chart title.
     #
     def set_title(params)
       name, name_formula = process_names(params[:name], params[:name_formula])
@@ -200,6 +782,32 @@ module Writexlsx
     #
     # Set the properties of the chart legend.
     #
+    # The set_legend() method is used to set properties of the chart legend.
+    #
+    #     chart.set_legend( :position => 'none' )
+    # The properties that can be set are:
+    #
+    # ====:position
+    # Set the position of the chart legend.
+    #
+    #     chart.set_legend( :position => 'bottom' )
+    # The default legend position is right. The available positions are:
+    #
+    #     none
+    #     top
+    #     bottom
+    #     left
+    #     right
+    #     overlay_left
+    #     overlay_right
+    # ====:delete_series
+    # This allows you to remove 1 or more series from the the legend
+    # (the series will still display on the chart). This property takes
+    # an array ref as an argument and the series are zero indexed:
+    #
+    #     # Delete/hide series index 0 and 2 from the legend.
+    #     chart.set_legend( :delete_series => [0, 2] )
+    #
     def set_legend(params)
       @legend_position = params[:position] || 'right'
       @legend_delete_series = params[:delete_series]
@@ -207,6 +815,13 @@ module Writexlsx
 
     #
     # Set the properties of the chart plotarea.
+    #
+    # The set_plotarea() method is used to set properties of the plot area
+    # of a chart.
+    #
+    # This method isn't implemented yet and is only available in
+    # writeexcel gem. However, it can be simulated using the
+    # set_style() method.
     #
     def set_plotarea(params)
 
@@ -262,6 +877,13 @@ module Writexlsx
 
     #
     # Set the properties of the chart chartarea.
+    #
+    # The set_chartarea() method is used to set the properties of the chart
+    # area.
+    #
+    # This method isn't implemented yet and is only available in
+    # writeexcel gem. However, it can be simulated using the
+    # set_style() method.
     #
     def set_chartarea(params)
       # TODO. Need to refactor for XLSX format.
@@ -323,6 +945,11 @@ module Writexlsx
     #
     # Set on of the 42 built-in Excel chart styles. The default style is 2.
     #
+    # The set_style() method is used to set the style of the chart to one
+    # of the 42 built-in styles available on the 'Design' tab in Excel:
+    #
+    #     chart.set_style( 4 )
+    #
     def set_style(style_id = 2)
       style_id = 2 if style_id < 0 || style_id > 42
       @style_id = style_id
@@ -358,7 +985,7 @@ module Writexlsx
     #
     # Convert user defined axis values into private hash values.
     #
-    def convert_axis_args(params)
+    def convert_axis_args(params) # :nodoc:
       name, name_formula = process_names(params[:name], params[:name_formula])
 
       data_id = get_data_id(name_formula, params[:data])
@@ -389,7 +1016,7 @@ module Writexlsx
     #
     # Convert and aref of row col values to a range formula.
     #
-    def aref_to_formula(data)
+    def aref_to_formula(data) # :nodoc:
       # If it isn't an array ref it is probably a formula already.
       return data unless data.kind_of?(Array)
       xl_range_formula(*data)
@@ -398,7 +1025,7 @@ module Writexlsx
     #
     # Switch name and name_formula parameters if required.
     #
-    def process_names(name = nil, name_formula = nil)
+    def process_names(name = nil, name_formula = nil) # :nodoc:
       # Name looks like a formula, use it to set name_formula.
       if name && name =~ /^=[^!]+!\$/
         name_formula = name
@@ -413,7 +1040,7 @@ module Writexlsx
     #
     # TODO. Need to handle date type.
     #
-    def get_data_type(data)
+    def get_data_type(data) # :nodoc:
       # Check for no data in the series.
       return 'none' unless data
       return 'none' if data.empty?
@@ -436,7 +1063,7 @@ module Writexlsx
     # If there is no user defined data then it will be populated by the parent
     # workbook in Workbook::_add_chart_data
     #
-    def get_data_id(formula, data)
+    def get_data_id(formula, data) # :nodoc:
       # Ignore series without a range formula.
       return unless formula
 
@@ -466,7 +1093,7 @@ module Writexlsx
     #
     # Convert the user specified colour index or string to a rgb colour.
     #
-    def get_color(color)
+    def get_color(color) # :nodoc:
       # Convert a HTML style #RRGGBB color.
       if color and color =~ /^#[0-9a-fA-F]{6}$/
         color = color.sub(/^#/, '')
@@ -489,7 +1116,7 @@ module Writexlsx
     # based on the default or user defined values in the Workbook palette.
     # Note: This version doesn't add an alpha channel.
     #
-    def get_palette_color(index)
+    def get_palette_color(index) # :nodoc:
       palette = @palette
 
       # Adjust the colour index.
@@ -505,7 +1132,7 @@ module Writexlsx
     # Get the Excel chart index for line pattern that corresponds to the user
     # defined value.
     #
-    def get_line_pattern(value)
+    def get_line_pattern(value) # :nodoc:
       value = value.downcase
       default = 0
 
@@ -543,7 +1170,7 @@ module Writexlsx
     # Get the Excel chart index for line weight that corresponds to the user
     # defined value.
     #
-    def get_line_weight(value)
+    def get_line_weight(value) # :nodoc:
       value = value.downcase
       default = 0
 
@@ -570,7 +1197,7 @@ module Writexlsx
     #
     # Convert user defined line properties to the structure required internally.
     #
-    def get_line_properties(line)
+    def get_line_properties(line) # :nodoc:
       return { :_defined => 0 } unless line
 
       dash_types = {
@@ -606,7 +1233,7 @@ module Writexlsx
     #
     # Convert user defined fill properties to the structure required internally.
     #
-    def get_fill_properties(fill)
+    def get_fill_properties(fill) # :nodoc:
       return { :_defined => 0 } unless fill
 
       fill[:_defined] = 1
@@ -617,7 +1244,7 @@ module Writexlsx
     #
     # Convert user defined marker properties to the structure required internally.
     #
-    def get_marker_properties(marker)
+    def get_marker_properties(marker) # :nodoc:
       return unless marker
 
       types = {
@@ -668,7 +1295,7 @@ module Writexlsx
     #
     # Convert user defined trendline properties to the structure required internally.
     #
-    def get_trendline_properties(trendline)
+    def get_trendline_properties(trendline) # :nodoc:
       return unless trendline
 
       types = {
@@ -707,7 +1334,7 @@ module Writexlsx
     #
     # Convert user defined labels properties to the structure required internally.
     #
-    def get_labels_properties(labels)
+    def get_labels_properties(labels) # :nodoc:
       return nil unless labels
 
       return labels
@@ -716,7 +1343,7 @@ module Writexlsx
     #
     # Add a unique id for an axis.
     #
-    def add_axis_id
+    def add_axis_id # :nodoc:
       chart_id   = 1 + @id
       axis_count = 1 + @axis_ids.size
 
@@ -730,7 +1357,7 @@ module Writexlsx
     #
     # Setup the default properties for a chart.
     #
-    def set_default_properties
+    def set_default_properties # :nodoc:
       @chartarea = {
         :_visible          => 0,
         :_fg_color_index   => 0x4E,
@@ -765,7 +1392,7 @@ module Writexlsx
     #
     # Write the <c:chartSpace> element.
     #
-    def write_chart_space
+    def write_chart_space # :nodoc:
       schema  = 'http://schemas.openxmlformats.org/'
       xmlns_c = schema + 'drawingml/2006/chart'
       xmlns_a = schema + 'drawingml/2006/main'
@@ -783,7 +1410,7 @@ module Writexlsx
     #
     # Write the <c:lang> element.
     #
-    def write_lang
+    def write_lang # :nodoc:
       val  = 'en-US'
 
       attributes = ['val', val]
@@ -794,7 +1421,7 @@ module Writexlsx
     #
     # Write the <c:style> element.
     #
-    def write_style
+    def write_style # :nodoc:
       style_id = @style_id
 
       # Don't write an element for the default style, 2.
@@ -808,7 +1435,7 @@ module Writexlsx
     #
     # Write the <c:chart> element.
     #
-    def write_chart
+    def write_chart # :nodoc:
       @writer.start_tag('c:chart')
 
       # Write the chart title elements.
@@ -833,7 +1460,7 @@ module Writexlsx
     #
     # Write the <c:plotArea> element.
     #
-    def write_plot_area
+    def write_plot_area # :nodoc:
       @writer.start_tag('c:plotArea')
 
       # Write the c:layout element.
@@ -854,7 +1481,7 @@ module Writexlsx
     #
     # Write the <c:layout> element.
     #
-    def write_layout
+    def write_layout # :nodoc:
       @writer.empty_tag('c:layout')
     end
 
@@ -862,13 +1489,13 @@ module Writexlsx
     # Write the chart type element. This method should be overridden by the
     # subclasses.
     #
-    def write_chart_type
+    def write_chart_type # :nodoc:
     end
 
     #
     # Write the <c:grouping> element.
     #
-    def write_grouping(val)
+    def write_grouping(val) # :nodoc:
       attributes = ['val', val]
       @writer.empty_tag('c:grouping', attributes)
     end
@@ -876,7 +1503,7 @@ module Writexlsx
     #
     # Write the series elements.
     #
-    def write_series
+    def write_series # :nodoc:
       # Write each series with subelements.
       index = 0
       @series.each do |series|
@@ -899,7 +1526,7 @@ module Writexlsx
     #
     # Write the <c:ser> element.
     #
-    def write_ser(index, series)
+    def write_ser(index, series) # :nodoc:
       @writer.start_tag('c:ser')
 
       # Write the c:idx element.
@@ -938,7 +1565,7 @@ module Writexlsx
     #
     # Write the <c:idx> element.
     #
-    def write_idx(val)
+    def write_idx(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:idx', attributes)
@@ -947,7 +1574,7 @@ module Writexlsx
     #
     # Write the <c:order> element.
     #
-    def write_order(val)
+    def write_order(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:order', attributes)
@@ -956,7 +1583,7 @@ module Writexlsx
     #
     # Write the series name.
     #
-    def write_series_name(series)
+    def write_series_name(series) # :nodoc:
       if name = series[:_name_formula]
         write_tx_formula(name, series[:_name_id])
       elsif name = series[:_name]
@@ -967,7 +1594,7 @@ module Writexlsx
     #
     # Write the <c:cat> element.
     #
-    def write_cat(series)
+    def write_cat(series) # :nodoc:
 
       formula = series[:_categories]
       data_id = series[:_cat_data_id]
@@ -1000,7 +1627,7 @@ module Writexlsx
     #
     # Write the <c:val> element.
     #
-    def write_val(series)
+    def write_val(series) # :nodoc:
       formula = series[:_values]
       data_id = series[:_val_data_id]
       data    = @formula_data[data_id]
@@ -1024,7 +1651,7 @@ module Writexlsx
     #
     # Write the <c:numRef> element.
     #
-    def write_num_ref(formula, data, type)
+    def write_num_ref(formula, data, type) # :nodoc:
       @writer.start_tag('c:numRef')
 
       # Write the c:f element.
@@ -1044,7 +1671,7 @@ module Writexlsx
     #
     # Write the <c:strRef> element.
     #
-    def write_str_ref(formula, data, type)
+    def write_str_ref(formula, data, type) # :nodoc:
       @writer.start_tag('c:strRef')
 
       # Write the c:f element.
@@ -1064,7 +1691,7 @@ module Writexlsx
     #
     # Write the <c:f> element.
     #
-    def write_series_formula(formula)
+    def write_series_formula(formula) # :nodoc:
       # Strip the leading '=' from the formula.
       formula = formula.sub(/^=/, '')
 
@@ -1074,7 +1701,7 @@ module Writexlsx
     #
     # Write the <c:axId> element.
     #
-    def write_axis_id(val)
+    def write_axis_id(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:axId', attributes)
@@ -1083,7 +1710,7 @@ module Writexlsx
     #
     # Write the <c:catAx> element. Usually the X axis.
     #
-    def write_cat_axis(position = nil)
+    def write_cat_axis(position = nil) # :nodoc:
       position = @cat_axis_position
       horiz    = @horiz_cat_axis
       x_axis   = @x_axis
@@ -1144,7 +1771,7 @@ module Writexlsx
     #
     # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
     #
-    def write_val_axis(position = nil, hide_major_gridlines = nil)
+    def write_val_axis(position = nil, hide_major_gridlines = nil) # :nodoc:
       position ||= @val_axis_position
       horiz      = @horiz_val_axis
       x_axis     = @x_axis
@@ -1208,7 +1835,7 @@ module Writexlsx
     #
     # Usually the X axis.
     #
-    def write_cat_val_axis(position, hide_major_gridlines)
+    def write_cat_val_axis(position, hide_major_gridlines) # :nodoc:
       position ||= @val_axis_position
       horiz                = @horiz_val_axis
       x_axis               = @x_axis
@@ -1270,7 +1897,7 @@ module Writexlsx
     #
     # Write the <c:dateAx> element. Usually the X axis.
     #
-    def write_date_axis(position = nil)
+    def write_date_axis(position = nil) # :nodoc:
       position  = @cat_axis_position
       x_axis    = @x_axis
       y_axis    = @y_axis
@@ -1338,7 +1965,7 @@ module Writexlsx
     #
     # Write the <c:scaling> element.
     #
-    def write_scaling(reverse, min = nil, max = nil, log_base = nil)
+    def write_scaling(reverse, min = nil, max = nil, log_base = nil) # :nodoc:
       @writer.start_tag('c:scaling')
       
       # Write the c:logBase element.
@@ -1359,7 +1986,7 @@ module Writexlsx
     #
     # Write the <c:orientation> element.
     #
-    def write_orientation(reverse = nil)
+    def write_orientation(reverse = nil) # :nodoc:
       val     = reverse ? 'maxMin' : 'minMax'
 
       attributes = ['val', val]
@@ -1370,7 +1997,7 @@ module Writexlsx
     #
     # Write the <c:logBase> element.
     #
-    def write_c_log_base(val)
+    def write_c_log_base(val) # :nodoc:
       return if val == 0 || val.nil?
 
       attributes = ['val', val]
@@ -1381,7 +2008,7 @@ module Writexlsx
     #
     # Write the <c:orientation> element.
     #
-    def write_orientation(reverse = 'maxMin')
+    def write_orientation(reverse = 'maxMin') # :nodoc:
       val = 'minMax'
 
       attributes = ['val', val]
@@ -1392,7 +2019,7 @@ module Writexlsx
     #
     # Write the <c:max> element.
     #
-    def write_c_max(max = nil)
+    def write_c_max(max = nil) # :nodoc:
       return if max.nil?
 
       attributes = ['val', max]
@@ -1403,7 +2030,7 @@ module Writexlsx
     #
     # Write the <c:min> element.
     #
-    def write_c_min(min = nil)
+    def write_c_min(min = nil) # :nodoc:
       return if min.nil?
 
       attributes = ['val', min]
@@ -1414,7 +2041,7 @@ module Writexlsx
     #
     # Write the <c:axPos> element.
     #
-    def write_axis_pos(val, reverse = false)
+    def write_axis_pos(val, reverse = false) # :nodoc:
       if reverse
         val = 'r' if val == 'l'
         val = 't' if val == 'b'
@@ -1428,7 +2055,7 @@ module Writexlsx
     #
     # Write the <c:numFmt> element.
     #
-    def write_num_fmt(format_code = nil)
+    def write_num_fmt(format_code = nil) # :nodoc:
       format_code ||= 'General'
       source_linked = 1
 
@@ -1446,7 +2073,7 @@ module Writexlsx
     #
     # Write the <c:tickLblPos> element.
     #
-    def write_tick_label_pos(val)
+    def write_tick_label_pos(val) # :nodoc:
       val ||= 'nextTo'
       val = 'nextTo' if val == 'next_to'
 
@@ -1458,7 +2085,7 @@ module Writexlsx
     #
     # Write the <c:crossAx> element.
     #
-    def write_cross_axis(val = 'autoZero')
+    def write_cross_axis(val = 'autoZero') # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:crossAx', attributes)
@@ -1467,7 +2094,7 @@ module Writexlsx
     #
     # Write the <c:crosses> element.
     #
-    def write_crosses(val)
+    def write_crosses(val) # :nodoc:
       val ||= 'autoZero'
       
       attributes = ['val', val]
@@ -1478,7 +2105,7 @@ module Writexlsx
     #
     # Write the <c:crossesAt> element.
     #
-    def write_c_crosses_at(val)
+    def write_c_crosses_at(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:crossesAt', attributes)
@@ -1487,7 +2114,7 @@ module Writexlsx
     #
     # Write the <c:auto> element.
     #
-    def write_auto(val)
+    def write_auto(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:auto', attributes)
@@ -1496,7 +2123,7 @@ module Writexlsx
     #
     # Write the <c:labelAlign> element.
     #
-    def write_label_align(val)
+    def write_label_align(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:lblAlgn', attributes)
@@ -1505,7 +2132,7 @@ module Writexlsx
     #
     # Write the <c:labelOffset> element.
     #
-    def write_label_offset(val)
+    def write_label_offset(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:lblOffset', attributes)
@@ -1514,7 +2141,7 @@ module Writexlsx
     #
     # Write the <c:majorGridlines> element.
     #
-    def write_major_gridlines
+    def write_major_gridlines # :nodoc:
       @writer.empty_tag('c:majorGridlines')
     end
 
@@ -1523,7 +2150,7 @@ module Writexlsx
     #
     # TODO. Merge/replace with _write_num_fmt.
     #
-    def write_number_format
+    def write_number_format # :nodoc:
       format_code   = 'General'
       source_linked = 1
 
@@ -1538,7 +2165,7 @@ module Writexlsx
     #
     # Write the <c:crossBetween> element.
     #
-    def write_cross_between
+    def write_cross_between # :nodoc:
       val  = @cross_between || 'between'
 
       attributes = ['val', val]
@@ -1549,7 +2176,7 @@ module Writexlsx
     #
     # Write the <c:majorUnit> element.
     #
-    def write_c_major_unit(val = nil)
+    def write_c_major_unit(val = nil) # :nodoc:
       return unless val
 
       attributes = ['val', val]
@@ -1560,7 +2187,7 @@ module Writexlsx
     #
     # Write the <c:minorUnit> element.
     #
-    def write_c_minor_unit(val = nil)
+    def write_c_minor_unit(val = nil) # :nodoc:
       return unless val
 
       attributes = ['val', val]
@@ -1571,7 +2198,7 @@ module Writexlsx
     #
     # Write the <c:majorTimeUnit> element.
     #
-    def write_c_major_time_unit(val = 'days')
+    def write_c_major_time_unit(val = 'days') # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:majorTimeUnit', attributes)
@@ -1580,7 +2207,7 @@ module Writexlsx
     #
     # Write the <c:minorTimeUnit> element.
     #
-    def write_c_minor_time_unit(val = 'days')
+    def write_c_minor_time_unit(val = 'days') # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:minorTimeUnit', attributes)
@@ -1589,7 +2216,7 @@ module Writexlsx
     #
     # Write the <c:legend> element.
     #
-    def write_legend
+    def write_legend # :nodoc:
       position      = @legend_position
       overlay       = false
 
@@ -1637,7 +2264,7 @@ module Writexlsx
     #
     # Write the <c:legendPos> element.
     #
-    def write_legend_pos(val)
+    def write_legend_pos(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:legendPos', attributes)
@@ -1646,7 +2273,7 @@ module Writexlsx
     #
     # Write the <c:legendEntry> element.
     #
-    def write_legend_entry(index)
+    def write_legend_entry(index) # :nodoc:
       @writer.start_tag('c:legendEntry')
 
       # Write the c:idx element.
@@ -1661,7 +2288,7 @@ module Writexlsx
     #
     # Write the <c:overlay> element.
     #
-    def write_overlay
+    def write_overlay # :nodoc:
       val  = 1
 
       attributes = ['val', val]
@@ -1672,7 +2299,7 @@ module Writexlsx
     #
     # Write the <c:plotVisOnly> element.
     #
-    def write_plot_vis_only
+    def write_plot_vis_only # :nodoc:
       val  = 1
 
       attributes = ['val', val]
@@ -1683,7 +2310,7 @@ module Writexlsx
     #
     # Write the <c:printSettings> element.
     #
-    def write_print_settings
+    def write_print_settings # :nodoc:
       @writer.start_tag('c:printSettings')
 
       # Write the c:headerFooter element.
@@ -1701,14 +2328,14 @@ module Writexlsx
     #
     # Write the <c:headerFooter> element.
     #
-    def write_header_footer
+    def write_header_footer # :nodoc:
       @writer.empty_tag('c:headerFooter')
     end
 
     #
     # Write the <c:pageMargins> element.
     #
-    def write_page_margins
+    def write_page_margins # :nodoc:
       b      = 0.75
       l      = 0.7
       r      = 0.7
@@ -1731,14 +2358,14 @@ module Writexlsx
     #
     # Write the <c:pageSetup> element.
     #
-    def write_page_setup
+    def write_page_setup # :nodoc:
       @writer.empty_tag('c:pageSetup')
     end
 
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, horiz = nil)
+    def write_title_rich(title, horiz = nil) # :nodoc:
       @writer.start_tag('c:title')
 
       # Write the c:tx element.
@@ -1753,7 +2380,7 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, data_id, horiz)
+    def write_title_formula(title, data_id, horiz) # :nodoc:
       @writer.start_tag('c:title')
 
       # Write the c:tx element.
@@ -1771,7 +2398,7 @@ module Writexlsx
     #
     # Write the <c:tx> element.
     #
-    def write_tx_rich(title, horiz)
+    def write_tx_rich(title, horiz) # :nodoc:
       @writer.start_tag('c:tx')
 
       # Write the c:rich element.
@@ -1783,7 +2410,7 @@ module Writexlsx
     #
     # Write the <c:tx> element with a simple value such as for series names.
     #
-    def write_tx_value(title)
+    def write_tx_value(title) # :nodoc:
       @writer.start_tag('c:tx')
 
       # Write the c:v element.
@@ -1795,7 +2422,7 @@ module Writexlsx
     #
     # Write the <c:tx> element.
     #
-    def write_tx_formula(title, data_id)
+    def write_tx_formula(title, data_id) # :nodoc:
       data = @formula_data[data_id] if data_id
 
       @writer.start_tag('c:tx')
@@ -1809,7 +2436,7 @@ module Writexlsx
     #
     # Write the <c:rich> element.
     #
-    def write_rich(title, horiz)
+    def write_rich(title, horiz) # :nodoc:
       @writer.start_tag('c:rich')
 
       # Write the a:bodyPr element.
@@ -1827,7 +2454,7 @@ module Writexlsx
     #
     # Write the <a:bodyPr> element.
     #
-    def write_a_body_pr(horiz)
+    def write_a_body_pr(horiz) # :nodoc:
       rot   = -5400000
       vert  = 'horz'
 
@@ -1844,14 +2471,14 @@ module Writexlsx
     #
     # Write the <a:lstStyle> element.
     #
-    def write_a_lst_style
+    def write_a_lst_style # :nodoc:
       @writer.empty_tag('a:lstStyle')
     end
 
     #
     # Write the <a:p> element for rich string titles.
     #
-    def write_a_p_rich(title)
+    def write_a_p_rich(title) # :nodoc:
       @writer.start_tag('a:p')
 
       # Write the a:pPr element.
@@ -1866,7 +2493,7 @@ module Writexlsx
     #
     # Write the <a:p> element for formula titles.
     #
-    def write_a_p_formula(title)
+    def write_a_p_formula(title) # :nodoc:
       @writer.start_tag('a:p')
 
       # Write the a:pPr element.
@@ -1881,7 +2508,7 @@ module Writexlsx
     #
     # Write the <a:pPr> element for rich string titles.
     #
-    def write_a_p_pr_rich
+    def write_a_p_pr_rich # :nodoc:
       @writer.start_tag('a:pPr')
 
       # Write the a:defRPr element.
@@ -1893,7 +2520,7 @@ module Writexlsx
     #
     # Write the <a:pPr> element for formula titles.
     #
-    def write_a_p_pr_formula
+    def write_a_p_pr_formula # :nodoc:
       @writer.start_tag('a:pPr')
 
       # Write the a:defRPr element.
@@ -1905,14 +2532,14 @@ module Writexlsx
     #
     # Write the <a:defRPr> element.
     #
-    def write_a_def_rpr
+    def write_a_def_rpr # :nodoc:
       @writer.empty_tag('a:defRPr')
     end
 
     #
     # Write the <a:endParaRPr> element.
     #
-    def write_a_end_para_rpr
+    def write_a_end_para_rpr # :nodoc:
       lang = 'en-US'
 
       attributes = ['lang', lang]
@@ -1923,7 +2550,7 @@ module Writexlsx
     #
     # Write the <a:r> element.
     #
-    def write_a_r(title)
+    def write_a_r(title) # :nodoc:
       @writer.start_tag('a:r')
 
       # Write the a:rPr element.
@@ -1938,7 +2565,7 @@ module Writexlsx
     #
     # Write the <a:rPr> element.
     #
-    def write_a_r_pr
+    def write_a_r_pr # :nodoc:
       lang = 'en-US'
 
       attributes = ['lang', lang]
@@ -1949,14 +2576,14 @@ module Writexlsx
     #
     # Write the <a:t> element.
     #
-    def write_a_t(title)
+    def write_a_t(title) # :nodoc:
       @writer.data_element('a:t', title)
     end
 
     #
     # Write the <c:txPr> element.
     #
-    def write_tx_pr(horiz)
+    def write_tx_pr(horiz) # :nodoc:
       @writer.start_tag('c:txPr')
 
       # Write the a:bodyPr element.
@@ -1974,7 +2601,7 @@ module Writexlsx
     #
     # Write the <c:marker> element.
     #
-    def write_marker(marker = nil)
+    def write_marker(marker = nil) # :nodoc:
       marker ||= @default_marker
 
       return if marker.nil? || marker == 0
@@ -1998,7 +2625,7 @@ module Writexlsx
     #
     # Write the <c:marker> element without a sub-element.
     #
-    def write_marker_value
+    def write_marker_value # :nodoc:
       style = @default_marker
 
       return unless style
@@ -2011,7 +2638,7 @@ module Writexlsx
     #
     # Write the <c:size> element.
     #
-    def write_marker_size(val)
+    def write_marker_size(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:size', attributes)
@@ -2020,7 +2647,7 @@ module Writexlsx
     #
     # Write the <c:symbol> element.
     #
-    def write_symbol(val)
+    def write_symbol(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:symbol', attributes)
@@ -2029,7 +2656,7 @@ module Writexlsx
     #
     # Write the <c:spPr> element.
     #
-    def write_sp_pr(series)
+    def write_sp_pr(series) # :nodoc:
       return if (!series.has_key?(:_line) || series[:_line][:_defined].nil? || series[:_line][:_defined]== 0) &&
                 (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined]== 0)
 
@@ -2047,7 +2674,7 @@ module Writexlsx
     #
     # Write the <a:ln> element.
     #
-    def write_a_ln(line)
+    def write_a_ln(line) # :nodoc:
       attributes = []
 
       # Add the line width as an attribute.
@@ -2084,14 +2711,14 @@ module Writexlsx
     #
     # Write the <a:noFill> element.
     #
-    def write_a_no_fill
+    def write_a_no_fill # :nodoc:
       @writer.empty_tag('a:noFill')
     end
 
     #
     # Write the <a:solidFill> element.
     #
-    def write_a_solid_fill(line)
+    def write_a_solid_fill(line) # :nodoc:
       @writer.start_tag('a:solidFill')
 
       if line[:color]
@@ -2107,7 +2734,7 @@ module Writexlsx
     #
     # Write the <a:srgbClr> element.
     #
-    def write_a_srgb_clr(val)
+    def write_a_srgb_clr(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('a:srgbClr', attributes)
@@ -2116,7 +2743,7 @@ module Writexlsx
     #
     # Write the <a:prstDash> element.
     #
-    def write_a_prst_dash(val)
+    def write_a_prst_dash(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('a:prstDash', attributes)
@@ -2125,7 +2752,7 @@ module Writexlsx
     #
     # Write the <c:trendline> element.
     #
-    def write_trendline(trendline)
+    def write_trendline(trendline) # :nodoc:
       return unless trendline
 
       @writer.start_tag('c:trendline')
@@ -2158,7 +2785,7 @@ module Writexlsx
     #
     # Write the <c:trendlineType> element.
     #
-    def write_trendline_type(val)
+    def write_trendline_type(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:trendlineType', attributes)
@@ -2167,7 +2794,7 @@ module Writexlsx
     #
     # Write the <c:name> element.
     #
-    def write_name(data)
+    def write_name(data) # :nodoc:
       return unless data
 
       @writer.data_element('c:name', data)
@@ -2176,7 +2803,7 @@ module Writexlsx
     #
     # Write the <c:order> element.
     #
-    def write_trendline_order(val = 2)
+    def write_trendline_order(val = 2) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:order', attributes)
@@ -2185,7 +2812,7 @@ module Writexlsx
     #
     # Write the <c:period> element.
     #
-    def write_period(val = 2)
+    def write_period(val = 2) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:period', attributes)
@@ -2194,7 +2821,7 @@ module Writexlsx
     #
     # Write the <c:forward> element.
     #
-    def write_forward(val)
+    def write_forward(val) # :nodoc:
       return unless val
 
       attributes = ['val', val]
@@ -2205,7 +2832,7 @@ module Writexlsx
     #
     # Write the <c:backward> element.
     #
-    def write_backward(val)
+    def write_backward(val) # :nodoc:
       return unless val
 
       attributes = ['val', val]
@@ -2216,14 +2843,14 @@ module Writexlsx
     #
     # Write the <c:hiLowLines> element.
     #
-    def write_hi_low_lines
+    def write_hi_low_lines # :nodoc:
       @writer.empty_tag('c:hiLowLines')
     end
 
     #
     # Write the <c:overlap> element.
     #
-    def write_overlap
+    def write_overlap # :nodoc:
       val  = 100
 
       attributes = ['val', val]
@@ -2234,7 +2861,7 @@ module Writexlsx
     #
     # Write the <c:numCache> element.
     #
-    def write_num_cache(data)
+    def write_num_cache(data) # :nodoc:
       count = data.size
 
       @writer.start_tag('c:numCache')
@@ -2257,7 +2884,7 @@ module Writexlsx
     #
     # Write the <c:strCache> element.
     #
-    def write_str_cache(data)
+    def write_str_cache(data) # :nodoc:
       count = data.size
 
       @writer.start_tag('c:strCache')
@@ -2277,14 +2904,14 @@ module Writexlsx
     #
     # Write the <c:formatCode> element.
     #
-    def write_format_code(data)
+    def write_format_code(data) # :nodoc:
       @writer.data_element('c:formatCode', data)
     end
 
     #
     # Write the <c:ptCount> element.
     #
-    def write_pt_count(val)
+    def write_pt_count(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:ptCount', attributes)
@@ -2293,7 +2920,7 @@ module Writexlsx
     #
     # Write the <c:pt> element.
     #
-    def write_pt(idx, value)
+    def write_pt(idx, value) # :nodoc:
       return unless value
 
       attributes = ['idx', idx]
@@ -2309,14 +2936,14 @@ module Writexlsx
     #
     # Write the <c:v> element.
     #
-    def write_v(data)
+    def write_v(data) # :nodoc:
       @writer.data_element('c:v', data)
     end
 
     #
     # Write the <c:protection> element.
     #
-    def write_protection
+    def write_protection # :nodoc:
       return if @protection == 0
 
       @writer.empty_tag('c:protection')
@@ -2325,7 +2952,7 @@ module Writexlsx
     #
     # Write the <c:dLbls> element.
     #
-    def write_d_lbls(labels)
+    def write_d_lbls(labels) # :nodoc:
       return unless labels
 
       @writer.start_tag('c:dLbls')
@@ -2345,7 +2972,7 @@ module Writexlsx
     #
     # Write the <c:showVal> element.
     #
-    def write_show_val
+    def write_show_val # :nodoc:
       val  = 1
 
       attributes = ['val', val]
@@ -2356,7 +2983,7 @@ module Writexlsx
     #
     # Write the <c:showCatName> element.
     #
-    def write_show_cat_name
+    def write_show_cat_name # :nodoc:
       val  = 1
 
       attributes = ['val', val]
@@ -2367,7 +2994,7 @@ module Writexlsx
     #
     # Write the <c:showSerName> element.
     #
-    def write_show_ser_name
+    def write_show_ser_name # :nodoc:
       val  = 1
 
       attributes = ['val', val]
@@ -2378,7 +3005,7 @@ module Writexlsx
     #
     # Write the <c:delete> element.
     #
-    def write_delete(val)
+    def write_delete(val) # :nodoc:
       attributes = ['val', val]
 
       @writer.empty_tag('c:delete', attributes)
@@ -2387,7 +3014,7 @@ module Writexlsx
     #
     # Write the <c:invertIfNegative> element.
     #
-    def write_c_invert_if_negative(invert = nil)
+    def write_c_invert_if_negative(invert = nil) # :nodoc:
       val    = 1
 
       return unless invert
