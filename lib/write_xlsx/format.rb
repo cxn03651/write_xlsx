@@ -200,13 +200,6 @@ module Writexlsx
       @bold = (bold && bold != 0) ? 1 : 0
     end
 
-    def set_border(style)
-      set_bottom(style)
-      set_top(style)
-      set_left(style)
-      set_right(style)
-    end
-
     def inspect
       to_s
     end
