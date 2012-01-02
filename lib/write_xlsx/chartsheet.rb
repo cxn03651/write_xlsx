@@ -74,7 +74,7 @@ module Writexlsx
       options[:content]   = 1
       options[:scenarios] = 1
 
-      protect(password, options)
+      super(password, options)
     end
 
 
