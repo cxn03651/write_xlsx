@@ -3135,24 +3135,7 @@ module Writexlsx
       return -3 unless param.has_key?(:criteria)
 
       # List of valid criteria types.
-      criteria_type = {
-          'between'                  => 'between',
-          'not between'              => 'notBetween',
-          'equal to'                 => 'equal',
-          '='                        => 'equal',
-          '=='                       => 'equal',
-          'not equal to'             => 'notEqual',
-          '!='                       => 'notEqual',
-          '<>'                       => 'notEqual',
-          'greater than'             => 'greaterThan',
-          '>'                        => 'greaterThan',
-          'less than'                => 'lessThan',
-          '<'                        => 'lessThan',
-          'greater than or equal to' => 'greaterThanOrEqual',
-          '>='                       => 'greaterThanOrEqual',
-          'less than or equal to'    => 'lessThanOrEqual',
-          '<='                       => 'lessThanOrEqual'
-      }
+      criteria_type = valid_criteria_type
 
       # Check for valid criteria types.
       if criteria_type.has_key?(param[:criteria].downcase)
@@ -3352,24 +3335,7 @@ module Writexlsx
       end
 
       # List of valid criteria types.
-      criteria_type = {
-        'between'                     => 'between',
-        'not between'                 => 'notBetween',
-        'equal to'                    => 'equal',
-        '='                           => 'equal',
-        '=='                          => 'equal',
-        'not equal to'                => 'notEqual',
-        '!='                          => 'notEqual',
-        '<>'                          => 'notEqual',
-        'greater than'                => 'greaterThan',
-        '>'                           => 'greaterThan',
-        'less than'                   => 'lessThan',
-        '<'                           => 'lessThan',
-        'greater than or equal to'    => 'greaterThanOrEqual',
-        '>='                          => 'greaterThanOrEqual',
-        'less than or equal to'       => 'lessThanOrEqual',
-        '<='                          => 'lessThanOrEqual'
-      }
+      criteria_type = valid_criteria_type
 
       # Check for valid criteria types.
       unless criteria_type.has_key?(param[:criteria].downcase)
@@ -6311,6 +6277,28 @@ module Writexlsx
       else
         margin
       end
+    end
+
+    # List of valid criteria types.
+    def valid_criteria_type  # :nodoc:
+      {
+        'between'                     => 'between',
+        'not between'                 => 'notBetween',
+        'equal to'                    => 'equal',
+        '='                           => 'equal',
+        '=='                          => 'equal',
+        'not equal to'                => 'notEqual',
+        '!='                          => 'notEqual',
+        '<>'                          => 'notEqual',
+        'greater than'                => 'greaterThan',
+        '>'                           => 'greaterThan',
+        'less than'                   => 'lessThan',
+        '<'                           => 'lessThan',
+        'greater than or equal to'    => 'greaterThanOrEqual',
+        '>='                          => 'greaterThanOrEqual',
+        'less than or equal to'       => 'lessThanOrEqual',
+        '<='                          => 'lessThanOrEqual'
+      }
     end
   end
 end
