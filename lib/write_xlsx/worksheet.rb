@@ -469,7 +469,7 @@ module Writexlsx
     #
     # As usual the format parameter is optional, for additional information,
     # see "CELL FORMATTING". If you wish to set the format without changing
-    # the width you can pass undef as the width parameter:
+    # the width you can pass nil as the width parameter:
     #
     #     worksheet.set_column(0, 0, nil, format)
     #
@@ -570,7 +570,7 @@ module Writexlsx
 
       # Store the col sizes for use when calculating image vertices taking
       # hidden columns into account. Also store the column formats.
-      width  ||= 0                        # Ensure width isn't undef.
+      width  ||= 0                        # Ensure width isn't nil.
       width = 0 if hidden && hidden != 0  # Set width to zero if col is hidden
 
       (firstcol .. lastcol).each do |col|
@@ -2150,7 +2150,7 @@ module Writexlsx
     #     worksheet.write('A2', nil )            # Ignored
     #
     # This seemingly uninteresting fact means that you can write arrays of
-    # data without special treatment for undef or empty string values.
+    # data without special treatment for nil or empty string values.
     #
     # See the note about "Cell notation".
     #
@@ -2748,7 +2748,7 @@ module Writexlsx
     #
     # Returns:
     #            A decimal number representing a valid Excel date, or
-    #            undef if the date is invalid.
+    #            nil if the date is invalid.
     #
     def convert_date_time(date_time_string)       #:nodoc:
       date_time = date_time_string
@@ -2863,7 +2863,7 @@ module Writexlsx
     #     worksheet.set_row(0, 20)    # Row 1 height set to 20
     #
     # If you wish to set the format without changing the height you can
-    # pass undef as the height parameter:
+    # pass nil as the height parameter:
     #
     #     worksheet.set_row(0, nil, format)
     #
@@ -3438,8 +3438,8 @@ module Writexlsx
     #     1 : Hide printed gridlines only
     #     2 : Hide screen and printed gridlines
     #
-    # If you don't supply an argument or use undef the default option
-    # is 1, i.e. only the printed gridlines are hidden.
+    # If you don't supply an argument or use nil the default option
+    # is true, i.e. only the printed gridlines are hidden.
     #
     def hide_gridlines(option = true)
       if option == true
@@ -3936,7 +3936,7 @@ module Writexlsx
     #
     # Returns a range of data from the worksheet _table to be used in chart
     # cached data. Strings are returned as SST ids and decoded in the workbook.
-    # Return undefs for data that doesn't exist since Excel can chart series
+    # Return nils for data that doesn't exist since Excel can chart series
     # with data missing.
     #
     def get_range_data(row_start, col_start, row_end, col_end)
@@ -3945,7 +3945,7 @@ module Writexlsx
       # Iterate through the table data.
       data = []
       (row_start .. row_end).each do |row_num|
-        # Store undef if row doesn't exist.
+        # Store nil if row doesn't exist.
         if !@table[row_num]
           data << nil
           next
@@ -3977,7 +3977,7 @@ module Writexlsx
               ''
             end
           else
-            # Store undef if col doesn't exist.
+            # Store nil if col doesn't exist.
             data << nil
           end
         end
