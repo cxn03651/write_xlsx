@@ -3,7 +3,7 @@
 #
 # Chartsheet - A class for writing the Excel XLSX Chartsheet files.
 #
-# Used in conjunction with Excel::Writer::XLSX
+# Used in conjunction with WriteXLSX
 #
 # Copyright 2000-2011, John McNamara, jmcnamara@cpan.org
 # Convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
@@ -28,7 +28,7 @@ module Writexlsx
     #
     # Assemble and write the XML file.
     #
-    def assemble_xml_file
+    def assemble_xml_file # :nodoc:
       return unless @writer
       write_xml_declaration
 
@@ -121,7 +121,7 @@ module Writexlsx
     #
     # Set up chart/drawings.
     #
-    def prepare_chart(index, chart_id, drawing_id)
+    def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing = Drawing.new
       @drawing = $drawing
       @drawing.orientation = @orientation
@@ -134,7 +134,7 @@ module Writexlsx
     #
     # Write the <chartsheet> element. This is the root element of Chartsheet.
     #
-    def write_chartsheet
+    def write_chartsheet # :nodoc:
       schema                 = 'http://schemas.openxmlformats.org/'
       xmlns                  = schema + 'spreadsheetml/2006/main'
       xmlns_r                = schema + 'officeDocument/2006/relationships'
@@ -154,7 +154,7 @@ module Writexlsx
     #
     # Write the <sheetPr> element for Sheet level properties.
     #
-    def _write_sheet_pr
+    def _write_sheet_pr # :nodoc:
 
       attributes = []
 
