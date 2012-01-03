@@ -108,6 +108,7 @@ module Writexlsx
       attr_accessor :repeat_rows, :repeat_cols, :print_area                   # :nodoc:
       attr_accessor :hbreaks, :vbreaks, :scale                                # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
+      attr_accessor :across                                                   # :nodoc:
 
       def initialize # :nodoc:
         @margin_left = 0.7
@@ -126,6 +127,7 @@ module Writexlsx
         @fit_width  = nil
         @fit_height = nil
         @page_setup_changed = false
+        @across = false
       end
 
       def attributes    # :nodoc:
@@ -1443,21 +1445,24 @@ module Writexlsx
     #     [1] [2]
     #     [3] [4]
     #
-    def print_across(page_order = true)
-      if page_order
-        @page_order         = true
+    def print_across(across = true)
+      if across
+        @print_style.across             = true
         @print_style.page_setup_changed = true
       else
-        @page_order = false
+        @print_style.across = false
       end
     end
 
     #
+    # Not implememt yet.
+    #--
     # The set_start_page() method is used to set the number of the
     # starting page when the worksheet is printed out.
     # The default value is 1.
     #
     #     worksheet.set_start_page(2)
+    #++
     #
     def set_start_page(page_start)
       @page_start   = page_start
@@ -5370,7 +5375,7 @@ module Writexlsx
       attributes << 'fitToHeight' << @print_style.fit_height if @print_style.fit_page && @print_style.fit_height != 1
 
       # Set the page print direction.
-      attributes << 'pageOrder' << "overThenDown" if @page_order
+      attributes << 'pageOrder' << "overThenDown" if print_across?
 
       # Set page orientation.
       if orientation?
@@ -6305,6 +6310,10 @@ module Writexlsx
       end
     end
 
+    def print_across?
+      @print_style.across
+    end
+    
     # List of valid criteria types.
     def valid_criteria_type  # :nodoc:
       {
