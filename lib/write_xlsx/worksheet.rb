@@ -102,6 +102,40 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
+    class PrintStyle # :nodoc:
+      attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
+      attr_accessor :margin_header, :margin_footer                            # :nodoc:
+      attr_accessor :_repeat_rows, :_repeat_cols, :print_area                 # :nodoc:
+      attr_accessor :hbreaks, :vbreaks, :print_scale, :fit_page               # :nodoc:
+      
+      def initialize # :nodoc:
+        @margin_left = 0.7
+        @margin_right = 0.7
+        @margin_top = 0.75
+        @margin_bottom = 0.75
+        @margin_header = 0.3
+        @margin_footer = 0.3
+        @_repeat_rows   = ''
+        @_repeat_cols   = ''
+        @print_area    = ''
+        @hbreaks = []
+        @vbreaks = []
+        @print_scale = 100
+        @fit_page = false
+      end
+      
+      def attributes    # :nodoc:
+        [
+         'left',   @margin_left,
+         'right',  @margin_right,
+         'top',    @margin_top,
+         'bottom', @margin_bottom,
+         'header', @margin_header,
+         'footer', @margin_footer
+        ]
+      end
+    end
+
     RowMax   = 1048576  # :nodoc:
     ColMax   = 16384    # :nodoc:
     StrMax   = 32767    # :nodoc:
@@ -123,15 +157,17 @@ module Writexlsx
       @colinfo = []
       @table = []
       @filter_on = false
-      @margin_left = 0.7
-      @margin_right = 0.7
-      @margin_top = 0.75
-      @margin_bottom = 0.75
-      @margin_header = 0.3
-      @margin_footer = 0.3
+
+      @print_style = PrintStyle.new
+      
       @_repeat_rows   = ''
       @_repeat_cols   = ''
       @print_area    = ''
+      @hbreaks = []
+      @vbreaks = []
+      @print_scale = 100
+      @fit_page = false
+
       @screen_gridlines = true
       @show_zeros = true
       @xls_rowmax = RowMax
@@ -147,9 +183,6 @@ module Writexlsx
       @tab_color  = 0
 
       @orientation = true
-
-      @hbreaks = []
-      @vbreaks = []
 
       @set_cols = {}
       @set_rows = {}
@@ -177,7 +210,6 @@ module Writexlsx
       @images                 = []
 
       @zoom = 100
-      @print_scale = 100
       @outline_row_level = 0
       @outline_col_level = 0
 
@@ -185,8 +217,6 @@ module Writexlsx
 
       @has_comments = false
       @comments = {}
-
-      @fit_page = false
 
       @validations = []
 
@@ -1009,7 +1039,7 @@ module Writexlsx
       raise 'Header string must be less than 255 characters' if string.length >= 255
 
       @header                = string
-      @margin_header         = margin
+      @print_style.margin_header = margin
       @header_footer_changed = true
     end
 
@@ -1022,7 +1052,7 @@ module Writexlsx
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
       @footer                = string
-      @margin_footer         = margin
+      @print_style.margin_footer = margin
       @header_footer_changed = true
     end
 
@@ -1048,6 +1078,85 @@ module Writexlsx
     # There are several methods available for setting the worksheet margins
     # on the printed page:
     #
+    #     margins=()                # Set all margins to the same value
+    #     margins_left_right=()     # Set left and right margins to the same value
+    #     margins_top_bottom=()     # Set top and bottom margins to the same value
+    #     margin_left=()            # Set left margin
+    #     margin_right=()           # Set right margin
+    #     margin_top=()             # Set top margin
+    #     margin_bottom=()          # Set bottom margin
+    #
+    # All of these methods take a distance in inches as a parameter.
+    # Note: 1 inch = 25.4mm. ;-) The default left and right margin is 0.7 inch.
+    # The default top and bottom margin is 0.75 inch. Note, these defaults
+    # are different from the defaults used in the binary file format
+    # by writeexcel gem.
+    #
+    def margins=(margin)
+      self::margin_left   = margin
+      self::margin_right  = margin
+      self::margin_top    = margin
+      self::margin_bottom = margin
+    end
+
+    #
+    # Set the left and right margins to the same value in inches.
+    # See set_margins
+    #
+    def margins_left_right=(margin)
+      self::margin_left  = margin
+      self::margin_right = margin
+    end
+
+    #
+    # Set the top and bottom margins to the same value in inches.
+    # See set_margins
+    #
+    def margins_top_bottom=(margin)
+      self::margin_top    = margin
+      self::margin_bottom = margin
+    end
+
+    #
+    # Set the left margin in inches.
+    # See margins=()
+    #
+    def margin_left=(margin)
+      @print_style.margin_left = remove_white_space(margin)
+    end
+
+    #
+    # Set the right margin in inches.
+    # See margins=()
+    #
+    def margin_right=(margin)
+      @print_style.margin_right = remove_white_space(margin)
+    end
+
+    #
+    # Set the top margin in inches.
+    # See margins=()
+    #
+    def margin_top=(margin)
+      @print_style.margin_top = remove_white_space(margin)
+    end
+
+    #
+    # Set the bottom margin in inches.
+    # See margins=()
+    #
+    def margin_bottom=(margin)
+      @print_style.margin_bottom = remove_white_space(margin)
+    end
+
+    #
+    # set_margin_* methods are deprecated. use margin_*=().
+    #
+    # Set all the page margins to the same value in inches.
+    #
+    # There are several methods available for setting the worksheet margins
+    # on the printed page:
+    #
     #     set_margins()        # Set all margins to the same value
     #     set_margins_LR()     # Set left and right margins to the same value
     #     set_margins_TB()     # Set top and bottom margins to the same value
@@ -1063,59 +1172,68 @@ module Writexlsx
     # by writeexcel gem.
     #
     def set_margins(margin)
-      set_margin_left(margin)
-      set_margin_right(margin)
-      set_margin_top(margin)
-      set_margin_bottom(margin)
+      put_deprecate_message("#{self}.set_margins")
+      self::margin = margin
     end
 
     #
+    # this method is deprecated. use margin_left_right=().
     # Set the left and right margins to the same value in inches.
     # See set_margins
     #
     def set_margins_LR(margin)
-      set_margin_left(margin)
-      set_margin_right(margin)
+      put_deprecate_message("#{self}.set_margins_LR")
+      self::margins_left_right = margin
     end
 
     #
+    # this method is deprecated. use margin_top_bottom=().
     # Set the top and bottom margins to the same value in inches.
     # See set_margins
     #
     def set_margins_TB(margin)
-      set_margin_top(margin)
-      set_margin_bottom(margin)
+      put_deprecate_message("#{self}.set_margins_TB")
+      self::margins_top_bottom = margin
     end
 
     #
+    # this method is deprecated. use margin_left=()
     # Set the left margin in inches.
     # See set_margins
     #
     def set_margin_left(margin = 0.7)
-      @margin_left = remove_white_space(margin)
+      put_deprecate_message("#{self}.set_margin_left")
+      self::margin_left = margin
     end
 
     #
+    # this method is deprecated. use margin_right=()
     # Set the right margin in inches.
     # See set_margins
     #
     def set_margin_right(margin = 0.7)
-      @margin_right = remove_white_space(margin)
+      put_deprecate_message("#{self}.set_margin_right")
+      self::margin_right = margin
     end
 
     #
+    # this method is deprecated. use margin_top=()
     # Set the top margin in inches.
     # See set_margins
     #
     def set_margin_top(margin = 0.75)
-      @margin_top = remove_white_space(margin)
+      put_deprecate_message("#{self}.set_margin_top")
+      self::margin_top = margin
     end
 
     #
+    # this method is deprecated. use margin_bottom=()
     # Set the bottom margin in inches.
+    # See set_margins
     #
     def set_margin_bottom(margin = 0.75)
-      @margin_bottom = remove_white_space(margin)
+      put_deprecate_message("#{self}.set_margin_bottom")
+      self::margin_bottom = margin
     end
 
     #
@@ -5233,15 +5351,7 @@ module Writexlsx
     # Write the <pageMargins> element.
     #
     def write_page_margins #:nodoc:
-      attributes = [
-        'left',   @margin_left,
-        'right',  @margin_right,
-        'top',    @margin_top,
-        'bottom', @margin_bottom,
-        'header', @margin_header,
-        'footer', @margin_footer
-      ]
-      @writer.empty_tag('pageMargins', attributes)
+      @writer.empty_tag('pageMargins', @print_style.attributes)
     end
 
     #
