@@ -1212,7 +1212,7 @@ module Writexlsx
 
         # Check for Print Area settings.
         if !sheet.print_area.empty?
-          range = sheet.get_print_area
+          range = sheet.print_area
 
           # Store the defined names.
           defined_names << ['_xlnm.Print_Area', sheet.index, range]

@@ -1310,7 +1310,7 @@ module Writexlsx
       @print_style.repeat_cols
     end
 
-    def get_print_area # :nodoc:
+    def print_area # :nodoc:
       @print_area.dup
     end
 
