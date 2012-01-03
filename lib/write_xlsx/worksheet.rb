@@ -3652,21 +3652,7 @@ module Writexlsx
     def filter_column(col, expression)
       raise "Must call autofilter before filter_column" unless @autofilter_area
 
-      # Check for a column reference in A1 notation and substitute.
-      if col =~ /^\D/
-        col_letter = col
-
-        # Convert col ref to a cell ref and then to a col number.
-        dummy, col = substitute_cellref("#{col}1")
-        raise "Invalid column '#{col_letter}'" if col >= @xls_colmax
-      end
-
-      col_first, col_last = @filter_range
-
-      # Reject column if it is outside filter range.
-      if col < col_first or col > col_last
-        raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
-      end
+      col = prepare_filter_column(col)
 
       tokens = extract_filter_tokens(expression)
 
@@ -3738,24 +3724,10 @@ module Writexlsx
     #
     def filter_column_list(col, *tokens)
       tokens.flatten!
-      raise "Must call autofilter before filter_column_list" unless @autofilter_area
       raise "Incorrect number of arguments to filter_column_list" if tokens.empty?
+      raise "Must call autofilter before filter_column_list" unless @autofilter_area
 
-      # Check for a column reference in A1 notation and substitute.
-      if col =~ /^\D/
-        col_letter = col
-
-        # Convert col ref to a cell ref and then to a col number.
-        dummy, col = substitute_cellref("#{col}1")
-        raise "Invalid column '#{col_letter}'" if col >= @xls_colmax
-      end
-
-      col_first, col_last = @filter_range
-
-      # Reject column if it is outside filter range.
-      if col < col_first || col > col_last
-        raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
-      end
+      col = prepare_filter_column(col)
 
       @filter_cols[col] = tokens
       @filter_type[col] = 1           # Default style.
@@ -6287,6 +6259,25 @@ module Writexlsx
         @selections << [ 'bottomLeft', active_cell, sqref ]
       end
       active_pane
+    end
+
+    def prepare_filter_column(col) # :nodoc:
+      # Check for a column reference in A1 notation and substitute.
+      if col =~ /^\D/
+        col_letter = col
+
+        # Convert col ref to a cell ref and then to a col number.
+        dummy, col = substitute_cellref("#{col}1")
+        raise "Invalid column '#{col_letter}'" if col >= @xls_colmax
+      end
+
+      col_first, col_last = @filter_range
+
+      # Reject column if it is outside filter range.
+      if col < col_first or col > col_last
+        raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
+      end
+      col
     end
   end
 end
