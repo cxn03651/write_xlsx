@@ -105,9 +105,10 @@ module Writexlsx
     class PrintStyle # :nodoc:
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
-      attr_accessor :_repeat_rows, :_repeat_cols, :print_area                 # :nodoc:
+      attr_accessor :repeat_rows, :repeat_cols, :print_area                   # :nodoc:
       attr_accessor :hbreaks, :vbreaks, :print_scale                          # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
+
       def initialize # :nodoc:
         @margin_left = 0.7
         @margin_right = 0.7
@@ -115,8 +116,8 @@ module Writexlsx
         @margin_bottom = 0.75
         @margin_header = 0.3
         @margin_footer = 0.3
-        @_repeat_rows   = ''
-        @_repeat_cols   = ''
+        @repeat_rows   = ''
+        @repeat_cols   = ''
         @print_area    = ''
         @hbreaks = []
         @vbreaks = []
@@ -126,7 +127,7 @@ module Writexlsx
         @fit_height = nil
         @page_setup_changed = false
       end
-      
+
       def attributes    # :nodoc:
         [
          'left',   @margin_left,
@@ -144,8 +145,7 @@ module Writexlsx
     StrMax   = 32767    # :nodoc:
     Buffer   = 4096     # :nodoc:
 
-    attr_writer :fit_page
-    attr_reader :index, :_repeat_cols, :_repeat_rows
+    attr_reader :index 
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
     attr_reader :vml_data_id, :vml_shape_id, :comments_array
@@ -163,8 +163,6 @@ module Writexlsx
 
       @print_style = PrintStyle.new
       
-      @_repeat_rows   = ''
-      @_repeat_cols   = ''
       @print_area    = ''
       @hbreaks = []
       @vbreaks = []
@@ -1261,9 +1259,12 @@ module Writexlsx
 
       # Build up the print titles "Sheet1!$1:$2"
       sheetname = quote_sheetname(name)
-      @_repeat_rows = "#{sheetname}!#{area}"
+      @print_style.repeat_rows = "#{sheetname}!#{area}"
     end
 
+    def print_repeat_rows   # :nodoc:
+      @print_style.repeat_rows
+    end
     #
     # :call-seq:
     #   repeat_columns(first_col, last_col = nil)
@@ -1303,7 +1304,11 @@ module Writexlsx
       sheetname = quote_sheetname(@name)
       area = sheetname + "!" + area
 
-      @repeat_cols = area
+      @print_style.repeat_cols = area
+    end
+
+    def print_repeat_cols  # :nodoc:
+      @print_style.repeat_cols
     end
 
     def get_print_area # :nodoc:

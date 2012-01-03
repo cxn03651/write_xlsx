@@ -1219,13 +1219,13 @@ module Writexlsx
         end
 
         # Check for repeat rows/cols. aka, Print Titles.
-        if !sheet._repeat_cols.empty? || !sheet._repeat_rows.empty?
+        if !sheet.print_repeat_cols.empty? || !sheet.print_repeat_rows.empty?
           range = ''
 
-          if !sheet._repeat_cols.empty? && !sheet._repeat_rows.empty?
-            range = sheet._repeat_cols + ',' + sheet._repeat_rows
+          if !sheet.print_repeat_cols.empty? && !sheet.print_repeat_rows.empty?
+            range = sheet.print_repeat_cols + ',' + sheet.print_repeat_rows
           else
-            range = sheet._repeat_cols + sheet._repeat_rows
+            range = sheet.print_repeat_cols + sheet.print_repeat_rows
           end
 
           # Store the defined names.
