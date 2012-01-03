@@ -164,7 +164,6 @@ module Writexlsx
       @print_style = PrintStyle.new
       
       @print_area    = ''
-      @hbreaks = []
       @vbreaks = []
       @print_scale = 100
 
@@ -3851,7 +3850,7 @@ module Writexlsx
     # per worksheet in line with an Excel internal limitation.
     #
     def set_h_pagebreaks(*args)
-      @hbreaks += args
+      @print_style.hbreaks += args
     end
 
     #
@@ -5506,7 +5505,7 @@ module Writexlsx
     # Write the <rowBreaks> element.
     #
     def write_row_breaks #:nodoc:
-      page_breaks = sort_pagebreaks(*(@hbreaks))
+      page_breaks = sort_pagebreaks(*(@print_style.hbreaks))
       count       = page_breaks.size
 
       return if page_breaks.empty?
