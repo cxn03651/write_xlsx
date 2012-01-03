@@ -106,7 +106,7 @@ module Writexlsx
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
       attr_accessor :repeat_rows, :repeat_cols, :print_area                   # :nodoc:
-      attr_accessor :hbreaks, :vbreaks, :print_scale                          # :nodoc:
+      attr_accessor :hbreaks, :vbreaks, :scale                                # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
 
       def initialize # :nodoc:
@@ -121,7 +121,7 @@ module Writexlsx
         @print_area    = ''
         @hbreaks = []
         @vbreaks = []
-        @print_scale = 100
+        @scale = 100
         @fit_page = false
         @fit_width  = nil
         @fit_height = nil
@@ -164,7 +164,6 @@ module Writexlsx
       @print_style = PrintStyle.new
       
       @print_area    = ''
-      @print_scale = 100
 
       @screen_gridlines = true
       @show_zeros = true
@@ -1360,29 +1359,38 @@ module Writexlsx
     # Set the scale factor of the printed page.
     # Scale factors in the range 10 <= scale <= 400 are valid:
     #
-    #     worksheet1.set_print_scale( 50)
-    #     worksheet2.set_print_scale( 75)
-    #     worksheet3.set_print_scale(300)
-    #     worksheet4.set_print_scale(400)
+    #     worksheet1.print_scale =  50
+    #     worksheet2.print_scale =  75
+    #     worksheet3.print_scale = 300
+    #     worksheet4.print_scale = 400
     #
-    # The default scale factor is 100. Note, set_print_scale() does not
+    # The default scale factor is 100. Note, print_scale=() does not
     # affect the scale of the visible page in Excel. For that you should
     # use set_zoom().
     #
     # Note also that although it is valid to use both fit_to_pages() and
-    # set_print_scale() on the same worksheet only one of these options
+    # print_scale=() on the same worksheet only one of these options
     # can be active at a time. The last method call made will set
     # the active option.
     #
-    def set_print_scale(scale = 100)
+    def print_scale=(scale = 100)
+      scale_val = scale.to_i
       # Confine the scale to Excel's range
-      scale = 100 if scale < 10 || scale > 400
+      scale_val = 100 if scale_val < 10 || scale_val > 400
 
       # Turn off "fit to page" option.
       @print_style.fit_page = false
 
-      @print_scale        = scale.to_i
+      @print_style.scale              = scale_val
       @print_style.page_setup_changed = true
+    end
+
+    #
+    # This method is deprecated. use print_scale=().
+    #
+    def set_print_scale(scale = 100)
+      put_deprecate_message("#{self}.set_print_scale")
+      self::print_scale = (scale)
     end
 
     #
@@ -5353,8 +5361,8 @@ module Writexlsx
       # Set paper size.
       attributes << 'paperSize' << @paper_size if @paper_size
 
-      # Set the print_scale
-      attributes << 'scale' << @print_scale if @print_scale != 100
+      # Set the scale
+      attributes << 'scale' << @print_style.scale if @print_style.scale != 100
 
       # Set the "Fit to page" properties.
       attributes << 'fitToWidth' << @print_style.fit_width if @print_style.fit_page && @print_style.fit_width != 1

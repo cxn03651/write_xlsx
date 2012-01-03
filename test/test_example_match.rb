@@ -1911,6 +1911,26 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(@expected_dir, @result_dir, xlsx)
   end
 
+  def test_print_scale
+    xlsx = 'print_scale.xlsx'
+    workbook  = WriteXLSX.new(xlsx)
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+
+    worksheet1.write( 0, 0, "print_scale(100)")
+    worksheet1.print_scale = 100
+
+    worksheet2.write( 0, 0, "print_scale(50)")
+    worksheet2.print_scale = 50
+
+    worksheet3.write( 0, 0, "print_scale(200)")
+    worksheet3.print_scale = 200
+
+    workbook.close
+    compare_xlsx(@expected_dir, @result_dir, xlsx)
+  end
+
   def test_properties
     xlsx = 'properties.xlsx'
     workbook  = WriteXLSX.new(xlsx)
