@@ -3273,22 +3273,8 @@ module Writexlsx
 
       # Convert date/times value if required.
       if param[:type] == 'date' || param[:type] == 'time'
-        if param[:value] =~ /T/
-          date_time = convert_date_time(param[:value])
-          if date_time
-            param[:value] = date_time
-          else
-            return -3
-          end
-        end
-        if param[:maximum] && param[:maximum] =~ /T/
-          date_time = convert_date_time(param[:maximum])
-          if date_time
-            param[:maximum] = date_time
-          else
-            return -3
-          end
-        end
+        return -3 unless convert_date_time_value(param, :value)
+        return -3 unless convert_date_time_value(param, :maximum)
       end
 
       # Set the formatting range.
@@ -3495,27 +3481,8 @@ module Writexlsx
 
       # Convert date/times value if required.
       if param[:validate] == 'date' || param[:validate] == 'time'
-        if param[:value] =~ /T/
-          date_time = convert_date_time(param[:value])
-          unless date_time
-            #                   carp "Invalid date/time value '$param->{value}' " .
-            #                        "in data_validation()"
-            return -3
-          else
-            param[:value] = date_time
-          end
-        end
-        if param[:maximum] && param[:maximum] =~ /T/
-          date_time = convert_date_time(param[:maximum])
-
-          unless date_time
-            #                   carp "Invalid date/time value '$param->{maximum}' " .
-            #                        "in data_validation()"
-            return -3
-          else
-            param[:maximum] = date_time
-          end
-        end
+        return -3 unless convert_date_time_value(param, :value)
+        return -3 unless convert_date_time_value(param, :maximum)
       end
 
       # Set some defaults if they haven't been defined by the user.
@@ -6388,6 +6355,16 @@ module Writexlsx
         raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
       end
       col
+    end
+
+    def convert_date_time_value(param, key)  # :nodoc:
+      if param[key] && param[key] =~ /T/
+        date_time = convert_date_time(param[key])
+        param[key] = date_time if date_time
+        date_time
+      else
+        true
+      end
     end
   end
 end
