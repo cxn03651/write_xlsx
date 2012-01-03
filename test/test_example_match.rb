@@ -900,6 +900,31 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(@expected_dir, @result_dir, xlsx)
   end
 
+  def test_fit_to_pages
+    xlsx = 'fit_to_pages.xlsx'
+    workbook  = WriteXLSX.new(xlsx)
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+    worksheet4 = workbook.add_worksheet
+
+
+    worksheet1.write( 0, 0, "fit_to_pages(1, 1)" )
+    worksheet1.fit_to_pages(1, 1)   # Fit to 1x1 pages
+
+    worksheet2.write( 0, 0, "fit_to_pages(2, 1)" )
+    worksheet2.fit_to_pages(2, 1)   # Fit to 2x1 pages
+
+    worksheet3.write( 0, 0, "fit_to_pages(1, 2)" )
+    worksheet3.fit_to_pages(1, 2)   # Fit to 1x2 pages
+
+    worksheet4.write( 0, 0, "fit_to_pages(1, 0)" )
+    worksheet4.fit_to_pages(1, 0)   # 1 page wide and as long as necessary
+
+    workbook.close
+    compare_xlsx(@expected_dir, @result_dir, xlsx)
+  end
+
   def test_headers
     xlsx = 'headers.xlsx'
     workbook = WriteXLSX.new(xlsx)

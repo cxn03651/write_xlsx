@@ -106,8 +106,8 @@ module Writexlsx
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
       attr_accessor :_repeat_rows, :_repeat_cols, :print_area                 # :nodoc:
-      attr_accessor :hbreaks, :vbreaks, :print_scale, :fit_page               # :nodoc:
-      
+      attr_accessor :hbreaks, :vbreaks, :print_scale                          # :nodoc:
+      attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
       def initialize # :nodoc:
         @margin_left = 0.7
         @margin_right = 0.7
@@ -122,6 +122,9 @@ module Writexlsx
         @vbreaks = []
         @print_scale = 100
         @fit_page = false
+        @fit_width  = nil
+        @fit_height = nil
+        @page_setup_changed = false
       end
       
       def attributes    # :nodoc:
@@ -166,7 +169,6 @@ module Writexlsx
       @hbreaks = []
       @vbreaks = []
       @print_scale = 100
-      @fit_page = false
 
       @screen_gridlines = true
       @show_zeros = true
@@ -782,7 +784,7 @@ module Writexlsx
     #
     def set_portrait
       @orientation        = true
-      @page_setup_changed = true
+      @print_style.page_setup_changed = true
     end
 
     #
@@ -790,7 +792,7 @@ module Writexlsx
     #
     def set_landscape
       @orientation         = false
-      @page_setup_changed  = true
+      @print_style.page_setup_changed  = true
     end
 
     #
@@ -882,7 +884,7 @@ module Writexlsx
     def set_paper(paper_size)
       if paper_size
         @paper_size         = paper_size
-        @page_setup_changed = true
+        @print_style.page_setup_changed = true
       end
     end
 
@@ -1374,10 +1376,10 @@ module Writexlsx
       scale = 100 if scale < 10 || scale > 400
 
       # Turn off "fit to page" option.
-      @fit_page = 0
+      @print_style.fit_page = false
 
       @print_scale        = scale.to_i
-      @page_setup_changed = 1
+      @print_style.page_setup_changed = true
     end
 
     #
@@ -1433,7 +1435,7 @@ module Writexlsx
     def print_across(page_order = true)
       if page_order
         @page_order         = true
-        @page_setup_changed = true
+        @print_style.page_setup_changed = true
       else
         @page_order = false
       end
@@ -3601,10 +3603,10 @@ module Writexlsx
     # are defined in the worksheet.
     #
     def fit_to_pages(width = 1, height = 1)
-      @fit_page           = 1
-      @fit_width          = width
-      @fit_height         = height
-      @page_setup_changed = 1
+      @print_style.fit_page   = true
+      @print_style.fit_width  = width
+      @print_style.fit_height  = height
+      @print_style.page_setup_changed = true
     end
 
     #
@@ -5352,9 +5354,9 @@ module Writexlsx
       attributes << 'scale' << @print_scale if @print_scale != 100
 
       # Set the "Fit to page" properties.
-      attributes << 'fitToWidth' << @fit_width if @fit_page && @fit_width != 1
+      attributes << 'fitToWidth' << @print_style.fit_width if @print_style.fit_page && @print_style.fit_width != 1
 
-      attributes << 'fitToHeight' << @fit_height if @fit_page && @fit_height != 1
+      attributes << 'fitToHeight' << @print_style.fit_height if @print_style.fit_page && @print_style.fit_height != 1
 
       # Set the page print direction.
       attributes << 'pageOrder' << "overThenDown" if @page_order
@@ -6197,11 +6199,7 @@ module Writexlsx
     end
 
     def fit_page? #:nodoc:
-      if @fit_page
-        @fit_page != 0
-      else
-        false
-      end
+      @print_style.fit_page
     end
 
     def filter_on? #:nodoc:
@@ -6273,7 +6271,7 @@ module Writexlsx
     end
 
     def page_setup_changed? #:nodoc:
-      !!@page_setup_changed
+      @print_style.page_setup_changed
     end
 
     def orientation? #:nodoc:
