@@ -5139,22 +5139,7 @@ module Writexlsx
 
       active_cell ||= nil
       sqref       ||= nil
-      # Set the active pane.
-      if row > 0 && col > 0
-        active_pane = 'bottomRight'
-        row_cell = xl_rowcol_to_cell(row, 0)
-        col_cell = xl_rowcol_to_cell(0, col)
-        @selections <<
-            [ 'topRight',    col_cell,    col_cell ] <<
-            [ 'bottomLeft',  row_cell,    row_cell ] <<
-            [ 'bottomRight', active_cell, sqref ]
-      elsif col > 0
-        active_pane = 'topRight'
-        @selections << [ 'topRight', active_cell, sqref ]
-      else
-        active_pane = 'bottomLeft'
-        @selections << [ 'bottomLeft', active_cell, sqref ]
-      end
+      active_pane = set_active_pane_and_cell_selections(row, col, row, col, active_cell, sqref)
 
       # Set the pane type.
       if type == 0
@@ -5211,24 +5196,7 @@ module Writexlsx
         active_cell = top_left_cell
         sqref       = top_left_cell
       end
-
-      # Set the Cell selections.
-      if row > 0 && col > 0
-        active_pane = 'bottomRight'
-        row_cell = xl_rowcol_to_cell(top_row, 0)
-        col_cell = xl_rowcol_to_cell(0, left_col)
-
-        @selections <<
-          [ 'topRight',    col_cell,    col_cell ] <<
-          [ 'bottomLeft',  row_cell,    row_cell ] <<
-          [ 'bottomRight', active_cell, sqref ]
-      elsif col > 0
-        active_pane = 'topRight'
-        @selections << [ 'topRight', active_cell, sqref ]
-      else
-        active_pane = 'bottomLeft'
-        @selections << [ 'bottomLeft', active_cell, sqref ]
-      end
+      active_pane = set_active_pane_and_cell_selections(row, col, top_row, left_col, active_cell, sqref)
 
       attributes = []
       (attributes << 'xSplit' << x_split) if x_split > 0
@@ -6299,6 +6267,26 @@ module Writexlsx
         'less than or equal to'       => 'lessThanOrEqual',
         '<='                          => 'lessThanOrEqual'
       }
+    end
+
+    def set_active_pane_and_cell_selections(row, col, top_row, left_col, active_cell, sqref) # :nodoc:
+      if row > 0 && col > 0
+        active_pane = 'bottomRight'
+        row_cell = xl_rowcol_to_cell(top_row, 0)
+        col_cell = xl_rowcol_to_cell(0, left_col)
+
+        @selections <<
+          [ 'topRight',    col_cell,    col_cell ] <<
+          [ 'bottomLeft',  row_cell,    row_cell ] <<
+          [ 'bottomRight', active_cell, sqref ]
+      elsif col > 0
+        active_pane = 'topRight'
+        @selections << [ 'topRight', active_cell, sqref ]
+      else
+        active_pane = 'bottomLeft'
+        @selections << [ 'bottomLeft', active_cell, sqref ]
+      end
+      active_pane
     end
   end
 end
