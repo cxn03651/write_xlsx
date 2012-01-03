@@ -10,7 +10,7 @@ class TestWriteColBreaks < Test::Unit::TestCase
   end
 
   def test_write_col_breaks_1
-    @worksheet.instance_variable_set(:@vbreaks, [1])
+    @worksheet.instance_variable_get(:@print_style).vbreaks = [1]
     @worksheet.__send__('write_col_breaks')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<colBreaks count="1" manualBreakCount="1"><brk id="1" max="1048575" man="1" /></colBreaks>'
@@ -18,7 +18,7 @@ class TestWriteColBreaks < Test::Unit::TestCase
   end
 
   def test_write_col_breaks_8_3_1_0
-    @worksheet.instance_variable_set(:@vbreaks, [8, 3, 1, 0])
+    @worksheet.instance_variable_get(:@print_style).vbreaks = [8, 3, 1, 0]
     @worksheet.__send__('write_col_breaks')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<colBreaks count="3" manualBreakCount="3"><brk id="1" max="1048575" man="1" /><brk id="3" max="1048575" man="1" /><brk id="8" max="1048575" man="1" /></colBreaks>'

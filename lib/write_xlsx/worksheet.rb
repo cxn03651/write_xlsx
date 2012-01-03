@@ -164,7 +164,6 @@ module Writexlsx
       @print_style = PrintStyle.new
       
       @print_area    = ''
-      @vbreaks = []
       @print_scale = 100
 
       @screen_gridlines = true
@@ -3875,7 +3874,7 @@ module Writexlsx
     # method it will override all manual page breaks.
     #
     def set_v_pagebreaks(*args)
-      @vbreaks += args
+      @print_style.vbreaks += args
     end
 
     #
@@ -5523,7 +5522,7 @@ module Writexlsx
     # Write the <colBreaks> element.
     #
     def write_col_breaks #:nodoc:
-      page_breaks = sort_pagebreaks(*(@vbreaks))
+      page_breaks = sort_pagebreaks(*(@print_style.vbreaks))
       count       = page_breaks.size
 
       return if page_breaks.empty?
