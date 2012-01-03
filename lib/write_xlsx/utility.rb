@@ -105,5 +105,9 @@ module Writexlsx
         Dir.rmdir(path)
       end
     end
+
+    def put_deprecate_message(method)
+      $stderr.puts("Warning: calling deprecated method #{method}. This method will be removed in a future release.")
+    end
   end
 end
