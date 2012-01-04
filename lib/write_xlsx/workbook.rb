@@ -397,7 +397,7 @@ module Writexlsx
     #
     # See the Format Class's rdoc for more details about Format properties and how to set them.
     #
-    def add_format(properties)
+    def add_format(properties = {})
       init_data = [
         @xf_format_indices,
         @dxf_format_indices,
