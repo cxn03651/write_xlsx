@@ -66,3 +66,6 @@ class WriteXLSX < Writexlsx::Workbook
     $KCODE = 'u'
   end
 end
+
+class WriteXLSXInsufficientArgumentError < StandardError
+end

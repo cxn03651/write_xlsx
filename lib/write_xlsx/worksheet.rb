@@ -1531,7 +1531,6 @@ module Writexlsx
     #
     # The write methods return:
     #     0 for success.
-    #    -1 for insufficient number of arguments.
     #    -2 for row or column out of bounds.
     #    -3 for string too long.
     #
@@ -1780,7 +1779,6 @@ module Writexlsx
     #
     # write_comment methods return:
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #
     # The write_comment() method is used to add a comment to a cell.
@@ -1956,11 +1954,8 @@ module Writexlsx
     #
     def write_comment(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      return -1 if args.size < 3                # Check the number of args
-
-      row, col = args
+      row, col, string, options = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, string].include?(nil)
 
       # Check that row and col are valid and store max and min values
       return -2 if check_dimensions(row, col) != 0
@@ -1968,10 +1963,10 @@ module Writexlsx
       @has_comments = true
       # Process the properties of the cell comment.
       if @comments[row]
-        @comments[row][col] = comment_params(*args)
+        @comments[row][col] = comment_params(row, col, string, options)
       else
         @comments[row] = {}
-        @comments[row][col] = comment_params(*args)
+        @comments[row][col] = comment_params(row, col, string, options)
       end
     end
 
@@ -1995,13 +1990,9 @@ module Writexlsx
     #
     def write_number(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row, col, num, xf = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, num].include?(nil)
 
-      return -1 if args.size < 3                # Check the number of args
-      row     = args[0]                         # Zero indexed row
-      col     = args[1]                         # Zero indexed column
-      num     = args[2]
-      xf      = args[3]                         # The cell format
       type    = 'n'
 
       # Check that row and col are valid and store max and min values
@@ -2019,11 +2010,8 @@ module Writexlsx
     # format is optional.
     #
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #           -3 : long string truncated to 32767 chars
-    #
-    # write_string methods return:
     #
     #     worksheet.write_string(0, 0, 'Your text here')
     #     worksheet.write_string('A2', 'or here')
@@ -2049,10 +2037,9 @@ module Writexlsx
     #
     def write_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row, col, str, xf = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
 
-      return -1 if args.size < 3    # Check the number of args
-      row, col, str, xf = args
       type = 's'                    # The data type
 
       # Check that row and col are valid and store max and min values
@@ -2073,7 +2060,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #    write_rich_string(row, column, format, string,  [,cell_format] )
+    #    write_rich_string(row, column, (string | format, string)+,  [,cell_format] )
     #
     # The write_rich_string() method is used to write strings with multiple formats.
     # The method receives string fragments prefixed by format objects. The final
@@ -2082,7 +2069,6 @@ module Writexlsx
     # write_rich_string methods return:
     #
     #   Returns  0 : normal termination.
-    #           -1 : insufficient number of arguments.
     #           -2 : row or column out of range.
     #           -3 : long string truncated to 32767 chars.
     #           -4 : 2 consecutive formats used.
@@ -2171,12 +2157,9 @@ module Writexlsx
     #
     def write_rich_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row, col, *rich_strings = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
-      return -1 if args.size < 3     # Check the number of args
-
-      row    = args.shift            # Zero indexed row.
-      col    = args.shift            # Zero indexed column.
       str    = ''
       xf     = nil
       type   = 's'                   # The data type.
@@ -2186,7 +2169,7 @@ module Writexlsx
       return -2 if check_dimensions(row, col) != 0
 
       # If the last arg is a format we use it as the cell format.
-      xf = args.pop if args[-1].respond_to?(:get_xf_index)
+      xf = rich_strings.pop if rich_strings[-1].respond_to?(:get_xf_index)
 
       # Create a temp XML::Writer object and use it to write the rich string
       # XML to a string.
@@ -2204,7 +2187,7 @@ module Writexlsx
       pos  = 0
 
       fragments = []
-      args.each do |token|
+      rich_strings.each do |token|
         if token.respond_to?(:get_xf_index)
           # Can't allow 2 formats in a row.
           return -4 if last == 'format' && pos > 0
@@ -2272,7 +2255,6 @@ module Writexlsx
     #
     # write_blank methods return:
     #   Returns  0 : normal termination (including no format)
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #
     # Excel differentiates between an "Empty" cell and a "Blank" cell.
@@ -2292,15 +2274,12 @@ module Writexlsx
     #
     def write_blank(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      # Check the number of args
-      return -1 if args.size < 2
+      row, col, xf = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
 
       # Don't write a blank cell unless it has a format
-      return 0 unless args[2]
+      return 0 unless xf
 
-      row, col, xf = args
       type = 'b'                    # The data type
 
       # Check that row and col are valid and store max and min values
@@ -2343,11 +2322,8 @@ module Writexlsx
     #
     def write_formula(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      return -1 if args.size < 3   # Check the number of args
-
-      row, col, formula, format, value = args
+      row, col, formula, format, value = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
 
       if formula =~ /^\{=.*\}$/
         return write_array_formula(row, col, row, col, formula, format, value)
@@ -2372,7 +2348,6 @@ module Writexlsx
     #
     # write_array_formula methods return:
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #
     # In Excel an array formula is a formula that performs a calculation
@@ -2415,16 +2390,14 @@ module Writexlsx
     #
     def write_array_formula(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row1, col1, row2, col2, formula, xf, value = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, formula].include?(nil)
 
-      return -1 if args.size < 5    # Check the number of args
-
-      row1, col1, row2, col2, formula, xf, value = args
       type = 'a'                    # The data type
 
       # Swap last row/col with first row/col as necessary
       row1, row2 = row2, row1 if row1 > row2
-      col1, col2 = col1, col2 if col1 > col2
+      col1, col2 = col2, col1 if col1 > col2
 
       # Check that row and col are valid and store max and min values
       return -2 if check_dimensions(row2, col2) != 0
@@ -2508,7 +2481,6 @@ module Writexlsx
     #
     # write_url methods return:
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #           -3 : long string truncated to 32767 chars
     #
@@ -2565,16 +2537,9 @@ module Writexlsx
     #
     def write_url(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row, col, url, xf, str, tip = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
-      return -1 if args.size < 3    # Check the number of args
-
-      # Reverse the order of $string and $format if necessary. We work on a copy
-      # in order to protect the callers args. We don't use "local @_" in case of
-      # perl50005 threads.
-      args[3], args[4] = args[4], args[3] if args[3].respond_to?(:get_xf_index)
-
-      row, col, url, str, xf, tip = args
       type      = 'l'                       # XML data type
       link_type = 1
 
@@ -2647,7 +2612,6 @@ module Writexlsx
     #
     # write_date_time methods return:
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #           -3 : Invalid date_time, written as string
     #
@@ -2689,11 +2653,9 @@ module Writexlsx
     #
     def write_date_time(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row, col, str, xf = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
 
-      return -1 if args.size < 3    # Check the number of args
-
-      row, col, str, xf = args
       type = 'n'                    # The data type
 
       # Check that row and col are valid and store max and min values
@@ -2749,10 +2711,9 @@ module Writexlsx
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      args = row_col_notation(args)
-      return -1 if args.size < 3
+      row, col, chart, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
-      row, col, chart, x_offset, y_offset, scale_x, scale_y = args
       x_offset ||= 0
       y_offset ||= 0
       scale_x  ||= 1
@@ -2811,10 +2772,9 @@ module Writexlsx
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      args = row_col_notation(args)
-      return -1 if args.size < 3
+      row, col, image, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
-      row, col, image, x_offset, y_offset, scale_x, scale_y = args
       x_offset ||= 0
       y_offset ||= 0
       scale_x  ||= 1
@@ -2842,13 +2802,16 @@ module Writexlsx
     # programs shouldn't use them.
     #
     def repeat_formula(*args)
-      args = row_col_notation(args)
-      return -1 if args.size < 2   # Check the number of args
-      row, col, formula, format, *pairs = args
+      # Check for a cell reference in A1 notation and substitute row and column.
+      row, col, formula, format, *pairs = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
+
       raise "Odd number of elements in pattern/replacement list" unless pairs.size % 2 == 0
       raise "Not a valid formula" unless formula.respond_to?(:to_ary)
+
       tokens  = formula.join("\t").split("\t")
       raise "No tokens in formula" if tokens.empty?
+
       value = nil
       if pairs[-2] == 'result'
         value = pairs.pop
@@ -3205,7 +3168,6 @@ module Writexlsx
     #
     # conditional_formatting methods return:
     #   Returns  0 : normal termination
-    #           -1 : insufficient number of arguments
     #           -2 : row or column out of range
     #           -3 : incorrect parameter.
     #
@@ -3228,17 +3190,13 @@ module Writexlsx
     #
     def conditional_formatting(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      row1, col1, row2, col2, param = row_col_notation(args)
+      if row2.respond_to?(:keys)
+        param = row2
+        row2, col2 = row1, col1
+      end
+      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
-      # Check for a valid number of args.
-      return -1 unless args.size == 3 || args.size == 5
-
-      # The final hash contains the validation parameters.
-      param = args.pop
-
-      # Make the last row/col the same as the first if not defined.
-      row1, col1, row2, col2 = args
-      row2, col2 = row1, col1 unless row2
 
       # Check that row and col are valid without storing the values.
       return -2 if check_dimensions(row1, col1, 1, 1) != 0
@@ -3350,21 +3308,13 @@ module Writexlsx
     # of the distro
     #
     def data_validation(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      # Check for a valid number of args.
-      return -1 if args.size != 5 && args.size != 3
-
-      # The final hashref contains the validation parameters.
-      param = args.pop
-
-      # Make the last row/col the same as the first if not defined.
-      row1, col1, row2, col2 = args
-      unless row2
-        row2 = row1
-        col2 = col1
+      # Check for a cell reference in A1 notation and substitute row and column.
+      row1, col1, row2, col2, param = row_col_notation(args)
+      if row2.respond_to?(:keys)
+        param = row2
+        row2, col2 = row1, col1
       end
+      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
       # Check that row and col are valid without storing the values.
       return -2 if check_dimensions(row1, col1, 1, 1) != 0
@@ -4565,7 +4515,8 @@ module Writexlsx
     # This method handles the additional optional parameters to write_comment() as
     # well as calculating the comment object position and vertices.
     #
-    def comment_params(row, col, string, options = {}) #:nodoc:
+    def comment_params(row, col, string, options) #:nodoc:
+      options ||= {}
       default_width  = 128
       default_height = 74
 
