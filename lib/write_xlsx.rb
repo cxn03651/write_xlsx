@@ -69,3 +69,6 @@ end
 
 class WriteXLSXInsufficientArgumentError < StandardError
 end
+
+class WriteXLSXDimensionError < StandardError
+end
