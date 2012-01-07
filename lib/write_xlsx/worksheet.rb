@@ -556,8 +556,6 @@ module Writexlsx
       # Check for a cell reference in A1 notation and substitute row and column
       if args[0] =~ /^\D/
         row1, firstcol, row2, lastcol, *data = substitute_cellref(*args)
-        args.shift        # remove row1
-        args[1..1] = []   # remove row2
       else
         firstcol, lastcol, *data = args
       end
