@@ -6018,10 +6018,10 @@ module Writexlsx
     end
 
     #
-    # Check that $row and $col are valid and store max and min values for use in
+    # Check that row and col are valid and store max and min values for use in
     # DIMENSIONS record. See, store_dimensions().
     #
-    # The $ignore_row/$ignore_col flags is used to indicate that we wish to
+    # The ignore_row/ignore_col flags is used to indicate that we wish to
     # perform the dimension check without storing the value.
     #
     # The ignore flags are use by set_row() and data_validate.
