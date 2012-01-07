@@ -579,8 +579,8 @@ module Writexlsx
       ignore_col = 0 if format.respond_to?(:get_xf_index) # Column has a format.
       ignore_col = 0 if width && hidden && hidden != 0    # Column has a width but is hidden
 
-      return -2 if check_dimensions(0, firstcol, ignore_row, ignore_col) != 0
-      return -2 if check_dimensions(0, lastcol,  ignore_row, ignore_col) != 0
+      check_dimensions_and_update_max_min_values(0, firstcol, ignore_row, ignore_col)
+      check_dimensions_and_update_max_min_values(0, lastcol,  ignore_row, ignore_col)
 
       # Set the limits for the outline levels (0 <= x <= 7).
       level = 0 unless level
@@ -1529,7 +1529,6 @@ module Writexlsx
     #
     # The write methods return:
     #     0 for success.
-    #    -2 for row or column out of bounds.
     #    -3 for string too long.
     #
     def write(*args)
@@ -1777,7 +1776,6 @@ module Writexlsx
     #
     # write_comment methods return:
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #
     # The write_comment() method is used to add a comment to a cell.
     # A cell comment is indicated in Excel by a small red triangle in the
@@ -1956,7 +1954,8 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [row, col, string].include?(nil)
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       @has_comments = true
       # Process the properties of the cell comment.
@@ -1994,7 +1993,8 @@ module Writexlsx
       type    = 'n'
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       store_data_to_table(row, col, [type, num, xf])
       0
@@ -2008,7 +2008,6 @@ module Writexlsx
     # format is optional.
     #
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #           -3 : long string truncated to 32767 chars
     #
     #     worksheet.write_string(0, 0, 'Your text here')
@@ -2041,7 +2040,8 @@ module Writexlsx
       type = 's'                    # The data type
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       # Check that the string is < 32767 chars
       str_error = 0
@@ -2067,7 +2067,6 @@ module Writexlsx
     # write_rich_string methods return:
     #
     #   Returns  0 : normal termination.
-    #           -2 : row or column out of range.
     #           -3 : long string truncated to 32767 chars.
     #           -4 : 2 consecutive formats used.
     #
@@ -2164,7 +2163,8 @@ module Writexlsx
       length = 0                     # String length.
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       # If the last arg is a format we use it as the cell format.
       xf = rich_strings.pop if rich_strings[-1].respond_to?(:get_xf_index)
@@ -2253,7 +2253,6 @@ module Writexlsx
     #
     # write_blank methods return:
     #   Returns  0 : normal termination (including no format)
-    #           -2 : row or column out of range
     #
     # Excel differentiates between an "Empty" cell and a "Blank" cell.
     # An "Empty" cell is a cell which doesn't contain data whilst a "Blank"
@@ -2281,7 +2280,8 @@ module Writexlsx
       type = 'b'                    # The data type
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       store_data_to_table(row, col, [type, nil, xf])
       0
@@ -2328,7 +2328,8 @@ module Writexlsx
       end
 
       # Check that row and col are valid and store max and min values
-      return -2 unless check_dimensions(row, col) == 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       formula.sub!(/^=/, '')
 
@@ -2346,7 +2347,6 @@ module Writexlsx
     #
     # write_array_formula methods return:
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #
     # In Excel an array formula is a formula that performs a calculation
     # on a set of values. It can return a single value or a range of values.
@@ -2398,7 +2398,8 @@ module Writexlsx
       col1, col2 = col2, col1 if col1 > col2
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row2, col2) != 0
+      check_dimensions(row2, col2)
+      store_row_col_max_min_values(row2, col2)
 
       # Define array range
       if row1 == row2 && col1 == col2
@@ -2479,7 +2480,6 @@ module Writexlsx
     #
     # write_url methods return:
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #           -3 : long string truncated to 32767 chars
     #
     # The format parameter is also optional, however, without a format
@@ -2564,7 +2564,8 @@ module Writexlsx
       str.sub!(/^mailto:/, '')
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       # Check that the string is < 32767 chars
       str_error = 0
@@ -2610,7 +2611,6 @@ module Writexlsx
     #
     # write_date_time methods return:
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #           -3 : Invalid date_time, written as string
     #
     # The write_date_time() method can be used to write a date or time
@@ -2657,7 +2657,8 @@ module Writexlsx
       type = 'n'                    # The data type
 
       # Check that row and col are valid and store max and min values
-      return -2 if check_dimensions(row, col) != 0
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
 
       str_error = 0
       date_time = convert_date_time(str)
@@ -3021,7 +3022,8 @@ module Writexlsx
       return if row.nil?
 
       # Check that row and col are valid and store max and min values.
-      return -2 if check_dimensions(row, 0) != 0
+      check_dimensions(row, 0)
+      store_row_col_max_min_values(row, 0)
 
       # If the height is 0 the row is hidden and the height is the default.
       if height == 0
@@ -3069,6 +3071,7 @@ module Writexlsx
 
       # Check that column number is valid and store the max value
       return if check_dimensions(rwLast, colLast) != 0
+      store_row_col_max_min_values(rwLast, colLast)
 
       # Store the merge range.
       @merge << [rwFirst, colFirst, rwLast, colLast]
@@ -3118,6 +3121,7 @@ module Writexlsx
 
       # Check that column number is valid and store the max value
       return if check_dimensions(row_last, col_last) != 0
+      store_row_col_max_min_values(row_last, col_last)
 
       # Store the merge range.
       @merge.push([row_first, col_first, row_last, col_last])
@@ -3166,7 +3170,6 @@ module Writexlsx
     #
     # conditional_formatting methods return:
     #   Returns  0 : normal termination
-    #           -2 : row or column out of range
     #           -3 : incorrect parameter.
     #
     # The conditional_format() method is used to add formatting to a cell
@@ -3197,8 +3200,8 @@ module Writexlsx
 
 
       # Check that row and col are valid without storing the values.
-      return -2 if check_dimensions(row1, col1, 1, 1) != 0
-      return -2 if check_dimensions(row2, col2, 1, 1) != 0
+      check_dimensions(row1, col1)
+      check_dimensions(row2, col2)
 
       # List of valid input parameters.
       valid_parameter = {
@@ -3315,8 +3318,8 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
       # Check that row and col are valid without storing the values.
-      return -2 if check_dimensions(row1, col1, 1, 1) != 0
-      return -2 if check_dimensions(row2, col2, 1, 1) != 0
+      check_dimensions(row1, col1)
+      check_dimensions(row2, col2)
 
       # Check that the last parameter is a hash list.
       unless param.respond_to?(:to_hash)
@@ -6026,24 +6029,34 @@ module Writexlsx
     #
     # The ignore flags are use by set_row() and data_validate.
     #
-    def check_dimensions(row, col, ignore_row = 0, ignore_col = 0)       #:nodoc:
-      return -2 unless row
-      return -2 if row >= @xls_rowmax
-
-      return -2 unless col
-      return -2 if col >= @xls_colmax
-
-      if ignore_row == 0
-        @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
-        @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
-      end
-
-      if ignore_col == 0
-        @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
-        @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
-      end
+    def check_dimensions_and_update_max_min_values(row, col, ignore_row = 0, ignore_col = 0)       #:nodoc:
+      check_dimensions(row, col)
+      store_row_max_min_values(row) if ignore_row == 0
+      store_col_max_min_values(col) if ignore_col == 0
 
       0
+    end
+
+    def check_dimensions(row, col)
+      if !row || row >= @xls_rowmax || !col || col >= @xls_colmax
+        raise WriteXLSXDimensionError
+      end
+      0
+    end
+
+    def store_row_col_max_min_values(row, col)
+      store_row_max_min_values(row)
+      store_col_max_min_values(col)
+    end
+
+    def store_row_max_min_values(row)
+      @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
+      @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
+    end
+    
+    def store_col_max_min_values(col)
+      @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
+      @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
     end
 
     #
