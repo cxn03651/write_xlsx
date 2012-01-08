@@ -3127,7 +3127,6 @@ module Writexlsx
     #
     # conditional_formatting methods return:
     #   Returns  0 : normal termination
-    #           -3 : incorrect parameter.
     #
     # The conditional_format() method is used to add formatting to a cell
     # or range of cells based on user defined criteria.
@@ -3915,7 +3914,7 @@ module Writexlsx
     # Convert the list of $format, $string tokens to pairs of ($format, $string)
     # except for the first $string fragment which doesn't require a default
     # formatting run. Use the default for strings without a leading format.
-    def rich_strings_fragments(rich_strings)
+    def rich_strings_fragments(rich_strings) # :nodoc:
       # Create a temp format with the default font for unformatted fragments.
       default = Format.new(0)
 
@@ -3950,24 +3949,27 @@ module Writexlsx
       [fragments, length]
     end
 
-    def check_conditional_formatting_parameters(param)
+    def check_conditional_formatting_parameters(param)  # :nodoc:
       # List of  valid validation types.
       valid_type = { 'cell' => 'cellIs' }
 
       # Check for valid input parameters.
-      return -3 unless (param.keys.uniq - [:type, :format, :criteria, :value, :minimum, :maximum]).empty?
-      return -3 unless param.has_key?(:type)
-      return -3 unless param.has_key?(:criteria)
-      return -3 unless valid_type.has_key?(param[:type].downcase)
-      return -3 unless valid_criteria_type.has_key?(param[:criteria].downcase)
+      unless (param.keys.uniq - [:type, :format, :criteria, :value, :minimum, :maximum]).empty? ||
+          param.has_key?(:type)                                   ||
+          param.has_key?(:criteria)                               ||
+          valid_type.has_key?(param[:type].downcase)              ||
+          valid_criteria_type.has_key?(param[:criteria].downcase)
+        raise WriteXLSXOptionParameterError
+      end
 
       param[:type] = valid_type[param[:type].downcase]
       param[:criteria] = valid_criteria_type[param[:criteria].downcase]
 
       # 'Between' and 'Not between' criteria require 2 values.
       if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        return -3 unless param.has_key?(:minimum)
-        return -3 unless param.has_key?(:maximum)
+        unless param.has_key?(:minimum) || param.has_key?(:maximum)
+          raise WriteXLSXOptionParameterError
+        end
       else
         param[:minimum] = nil
         param[:maximum] = nil
@@ -3975,8 +3977,9 @@ module Writexlsx
 
       # Convert date/times value if required.
       if param[:type] == 'date' || param[:type] == 'time'
-        return -3 unless convert_date_time_value(param, :value)
-        return -3 unless convert_date_time_value(param, :maximum)
+        unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
+          raise WriteXLSXOptionParameterError
+        end
       end
     end
 

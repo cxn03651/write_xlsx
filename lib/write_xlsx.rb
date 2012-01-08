@@ -72,3 +72,6 @@ end
 
 class WriteXLSXDimensionError < StandardError
 end
+
+class WriteXLSXOptionParameterError < StandardError
+end
