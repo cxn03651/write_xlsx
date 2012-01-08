@@ -2191,7 +2191,7 @@ module Writexlsx
       end
 
       # Add the XML string to the shared string table.
-      index = get_shared_string_index(writer.string)
+      index = shared_string_index(writer.string)
 
       store_data_to_table(row, col, [type, index, xf])
 
@@ -2532,7 +2532,7 @@ module Writexlsx
       end
 
       # Store the URL displayed text in the shared string table.
-      index = get_shared_string_index(str)
+      index = shared_string_index(str)
 
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
@@ -3217,12 +3217,6 @@ module Writexlsx
       # Check that row and col are valid without storing the values.
       check_dimensions(row1, col1)
       check_dimensions(row2, col2)
-
-      # Check that the last parameter is a hash list.
-      unless param.respond_to?(:to_hash)
-        #           carp "Last parameter '$param' in data_validation() must be a hash ref"
-        return -3
-      end
 
       # List of valid input parameters.
       valid_parameter = {
@@ -4429,21 +4423,6 @@ module Writexlsx
         pixels = 20
       end
       pixels
-    end
-
-    #
-    # Add a string to the shared string table, if it isn't already there, and
-    # return the string index.
-    #
-    def get_shared_string_index(str) #:nodoc:
-      # Add the string to the shared string table.
-      unless @workbook.str_table[str]
-        @workbook.str_table[str] = @workbook.str_unique
-        @workbook.str_unique += 1
-      end
-
-      @workbook.str_total += 1
-      index = @workbook.str_table[str]
     end
 
     #
