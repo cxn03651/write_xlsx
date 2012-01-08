@@ -3155,64 +3155,14 @@ module Writexlsx
       end
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
-
       # Check that row and col are valid without storing the values.
       check_dimensions(row1, col1)
       check_dimensions(row2, col2)
+      check_conditional_formatting_parameters(param)
 
-      # List of valid input parameters.
-      valid_parameter = {
-          :type     => 1,
-          :format   => 1,
-          :criteria => 1,
-          :value    => 1,
-          :minimum  => 1,
-          :maximum  => 1
-      }
-      # Check for valid input parameters.
-      param.keys.each {|key| return -3 unless valid_parameter.keys.include?(key) }
-      return -3 unless param.has_key?(:type)
-
-      # List of  valid validation types.
-      valid_type = { 'cell' => 'cellIs' }
-
-      # Check for valid validation types.
-      if valid_type.has_key?(param[:type].downcase)
-        param[:type] = valid_type[param[:type].downcase]
-      else
-        return -3
-      end
-
-      # 'criteria' is a required parameter.
-      return -3 unless param.has_key?(:criteria)
-
-      # List of valid criteria types.
-      criteria_type = valid_criteria_type
-
-      # Check for valid criteria types.
-      if criteria_type.has_key?(param[:criteria].downcase)
-        param[:criteria] = criteria_type[param[:criteria].downcase]
-      else
-        return -3
-      end
-
-      # 'Between' and 'Not between' criteria require 2 values.
-      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        return -3 unless param.has_key?(:minimum)
-        return -3 unless param.has_key?(:maximum)
-      else
-        param[:minimum] = nil
-        param[:maximum] = nil
-      end
-
-      # Convert date/times value if required.
-      if param[:type] == 'date' || param[:type] == 'time'
-        return -3 unless convert_date_time_value(param, :value)
-        return -3 unless convert_date_time_value(param, :maximum)
-      end
-
-      # Set the formatting range.
-      range = ''
+      param[:format] = param[:format].get_dxf_index if param[:format]
+      param[:priority] = @dxf_priority
+      @dxf_priority += 1
 
       # Swap last row/col for first row/col as necessary
       row1, row2 = row2, row1 if row1 > row2
@@ -3224,15 +3174,6 @@ module Writexlsx
       else
         range = xl_range(row1, row2, col1, col2)
       end
-
-      # Get the dxf format index.
-      if param[:format]
-        param[:format] = param[:format].get_dxf_index
-      end
-
-      # Set the priority based on the order of adding.
-      param[:priority] = @dxf_priority
-      @dxf_priority += 1
 
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
@@ -4007,6 +3948,36 @@ module Writexlsx
         pos += 1
       end
       [fragments, length]
+    end
+
+    def check_conditional_formatting_parameters(param)
+      # List of  valid validation types.
+      valid_type = { 'cell' => 'cellIs' }
+
+      # Check for valid input parameters.
+      return -3 unless (param.keys.uniq - [:type, :format, :criteria, :value, :minimum, :maximum]).empty?
+      return -3 unless param.has_key?(:type)
+      return -3 unless param.has_key?(:criteria)
+      return -3 unless valid_type.has_key?(param[:type].downcase)
+      return -3 unless valid_criteria_type.has_key?(param[:criteria].downcase)
+
+      param[:type] = valid_type[param[:type].downcase]
+      param[:criteria] = valid_criteria_type[param[:criteria].downcase]
+
+      # 'Between' and 'Not between' criteria require 2 values.
+      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
+        return -3 unless param.has_key?(:minimum)
+        return -3 unless param.has_key?(:maximum)
+      else
+        param[:minimum] = nil
+        param[:maximum] = nil
+      end
+
+      # Convert date/times value if required.
+      if param[:type] == 'date' || param[:type] == 'time'
+        return -3 unless convert_date_time_value(param, :value)
+        return -3 unless convert_date_time_value(param, :maximum)
+      end
     end
 
     #
