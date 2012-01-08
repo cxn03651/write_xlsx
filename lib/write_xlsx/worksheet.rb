@@ -2157,10 +2157,8 @@ module Writexlsx
       row, col, *rich_strings = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
-      str    = ''
       xf     = nil
       type   = 's'                   # The data type.
-      length = 0                     # String length.
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
@@ -2175,39 +2173,7 @@ module Writexlsx
 
       @rstring = writer
 
-      # Create a temp format with the default font for unformatted fragments.
-      default = Format.new(0)
-
-      # Convert the list of $format, $string tokens to pairs of ($format, $string)
-      # except for the first $string fragment which doesn't require a default
-      # formatting run. Use the default for strings without a leading format.
-      last = 'format'
-      pos  = 0
-
-      fragments = []
-      rich_strings.each do |token|
-        if token.respond_to?(:get_xf_index)
-          # Can't allow 2 formats in a row.
-          return -4 if last == 'format' && pos > 0
-
-          # Token is a format object. Add it to the fragment list.
-          fragments << token
-          last = 'format'
-        else
-          # Token is a string.
-          if last != 'format'
-            # If previous token wasn't a format add one before the string.
-            fragments << default << token
-          else
-            # If previous token was a format just add the string.
-            fragments << token
-          end
-
-          length += token.size    # Keep track of actual string length.
-          last = 'string'
-        end
-        pos += 1
-      end
+      fragments, length = rich_strings_fragments(rich_strings)
 
       # If the first token is a string start the <r> element.
       @rstring.start_tag('r') if !fragments[0].respond_to?(:get_xf_index)
@@ -4013,6 +3979,44 @@ module Writexlsx
     end
 
     private
+
+    # Convert the list of $format, $string tokens to pairs of ($format, $string)
+    # except for the first $string fragment which doesn't require a default
+    # formatting run. Use the default for strings without a leading format.
+    def rich_strings_fragments(rich_strings)
+      # Create a temp format with the default font for unformatted fragments.
+      default = Format.new(0)
+
+      length = 0                     # String length.
+      last = 'format'
+      pos  = 0
+
+      fragments = []
+      rich_strings.each do |token|
+        if token.respond_to?(:get_xf_index)
+          # Can't allow 2 formats in a row.
+          return -4 if last == 'format' && pos > 0
+
+          # Token is a format object. Add it to the fragment list.
+          fragments << token
+          last = 'format'
+        else
+          # Token is a string.
+          if last != 'format'
+            # If previous token wasn't a format add one before the string.
+            fragments << default << token
+          else
+            # If previous token was a format just add the string.
+            fragments << token
+          end
+
+          length += token.size    # Keep track of actual string length.
+          last = 'string'
+        end
+        pos += 1
+      end
+      [fragments, length]
+    end
 
     #
     # Extract the tokens from the filter expression. The tokens are mainly non-
