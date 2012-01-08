@@ -1303,12 +1303,8 @@ module Writexlsx
     #
     def print_area(*args)
       return @print_area if args.empty?
-      
-      args = substitute_cellref(args) if args[0] =~ /^\D/
-      # Check for a cell reference in A1 notation and substitute row and column
-      return if args.size != 4    # Require 4 parameters
-
-      row1, col1, row2, col2 = args
+      row1, col1, row2, col2 = row_col_notation(args)
+      return if [row1, col1, row2, col2].include?(nil)
 
       # Ignore max print area since this is the same as no print area for Excel.
       if row1 == 0 && col1 == 0 && row2 == @xls_rowmax - 1 && col2 == @xls_colmax - 1
