@@ -4900,11 +4900,7 @@ module Writexlsx
             write_row_element(row_num, span, *(@set_rows[row_num]))
           end
 
-          (@dim_colmin .. @dim_colmax).each do |col_num|
-            col_ref = @table[row_num][col_num]
-            write_cell(row_num, col_num, col_ref) if col_ref
-          end
-
+          write_cell_column_dimension(row_num)
           @writer.end_tag('row')
         else
           # Row attributes only.
@@ -4937,10 +4933,7 @@ module Writexlsx
           write_row(row_num, nil, @set_rows[row_num])
         end
 
-        (@dim_colmin .. @dim_colmax).each do |col_num|
-          col_ref = @table[row_num][col_num]
-          write_cell(row_num, col_num, col_ref) if col_ref
-        end
+        write_cell_column_dimension(row_num)
         @writer.end_tag('row')
       else
         # Row attributes or comments only.
@@ -4949,6 +4942,13 @@ module Writexlsx
 
       # Reset table.
       @table = []
+    end
+
+    def write_cell_column_dimension(row_num)  # :nodoc:
+      (@dim_colmin .. @dim_colmax).each do |col_num|
+        col_ref = @table[row_num][col_num]
+        write_cell(row_num, col_num, col_ref) if col_ref
+      end
     end
 
     #
