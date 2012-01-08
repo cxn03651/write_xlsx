@@ -633,33 +633,22 @@ module Writexlsx
     def set_selection(*args)
       return if args.empty?
 
-      args = row_col_notation(args)
+      row_first, col_first, row_last, col_last = row_col_notation(args)
+      active_cell = xl_rowcol_to_cell(row_first, col_first)
 
-      # There should be either 2 or 4 arguments.
-      case args.size
-      when 2
-        # Single cell selection.
-        active_cell = xl_rowcol_to_cell(args[0], args[1])
+      if row_last.nil?   # Single cell selection.
         sqref = active_cell
-      when 4
-        # Range selection.
-        active_cell = xl_rowcol_to_cell(args[0], args[1])
-
-        row_first, col_first, row_last, col_last = args
-
+      else               # Range selection.
         # Swap last row/col for first row/col as necessary
         row_first, row_last = row_last, row_first if row_first > row_last
         col_first, col_last = col_last, col_first if col_first > col_last
 
         # If the first and last cell are the same write a single cell.
-        if (row_first == row_last) && (col_first == col_last)
+        if row_first == row_last && col_first == col_last
           sqref = active_cell
         else
           sqref = xl_range(row_first, col_first, row_last, col_last)
         end
-      else
-        # User supplied wrong number or arguments.
-        return
       end
 
       # Selection isn't set for cell A1.
