@@ -2157,40 +2157,40 @@ module Writexlsx
       row, col, *rich_strings = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
-      xf     = nil
+      # If the last arg is a format we use it as the cell format.
+      if rich_strings[-1].respond_to?(:get_xf_index)
+        xf = rich_strings.pop
+      else
+        xf     = nil
+      end
       type   = 's'                   # The data type.
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # If the last arg is a format we use it as the cell format.
-      xf = rich_strings.pop if rich_strings[-1].respond_to?(:get_xf_index)
-
       # Create a temp XML::Writer object and use it to write the rich string
       # XML to a string.
       writer = Package::XMLWriterSimple.new
 
-      @rstring = writer
-
       fragments, length = rich_strings_fragments(rich_strings)
 
       # If the first token is a string start the <r> element.
-      @rstring.start_tag('r') if !fragments[0].respond_to?(:get_xf_index)
+      writer.start_tag('r') if !fragments[0].respond_to?(:get_xf_index)
 
       # Write the XML elements for the $format $string fragments.
       fragments.each do |token|
         if token.respond_to?(:get_xf_index)
           # Write the font run.
-          @rstring.start_tag('r')
-          write_font(token)
+          writer.start_tag('r')
+          write_font(writer, token)
         else
           # Write the string fragment part, with whitespace handling.
           attributes = []
 
           attributes << 'xml:space' << 'preserve' if token =~ /^\s/ || token =~ /\s$/
-          @rstring.data_element('t', token, attributes)
-          @rstring.end_tag('r')
+          writer.data_element('t', token, attributes)
+          writer.end_tag('r')
         end
       end
 
@@ -5783,49 +5783,49 @@ module Writexlsx
     #
     # Write the <font> element.
     #
-    def write_font(format) #:nodoc:
-      @rstring.start_tag('rPr')
+    def write_font(writer, format) #:nodoc:
+      writer.start_tag('rPr')
 
-      @rstring.empty_tag('b')       if !format.bold.nil? && format.bold != 0
-      @rstring.empty_tag('i')       if !format.italic.nil? &&format.italic != 0
-      @rstring.empty_tag('strike')  if !format.font_strikeout.nil? && format.font_strikeout != 0
-      @rstring.empty_tag('outline') if !format.font_outline.nil? && format.font_outline != 0
-      @rstring.empty_tag('shadow')  if !format.font_shadow && format.font_shadow != 0
+      writer.empty_tag('b')       if !format.bold.nil? && format.bold != 0
+      writer.empty_tag('i')       if !format.italic.nil? &&format.italic != 0
+      writer.empty_tag('strike')  if !format.font_strikeout.nil? && format.font_strikeout != 0
+      writer.empty_tag('outline') if !format.font_outline.nil? && format.font_outline != 0
+      writer.empty_tag('shadow')  if !format.font_shadow && format.font_shadow != 0
 
       # Handle the underline variants.
-      write_underline(format.underline) if !format.underline.nil? && format.underline != 0
+      write_underline(writer, format.underline) if !format.underline.nil? && format.underline != 0
 
-      write_vert_align('superscript') if format.font_script == 1
-      write_vert_align('subscript')   if format.font_script == 2
+      write_vert_align(writer, 'superscript') if format.font_script == 1
+      write_vert_align(writer, 'subscript')   if format.font_script == 2
 
-      @rstring.empty_tag('sz', ['val', format.size])
+      writer.empty_tag('sz', ['val', format.size])
 
       theme = format.theme
       color = format.color
       if !theme.nil? && theme != 0
-        write_color('theme', theme)
+        write_color(writer, 'theme', theme)
       elsif !color.nil? && color != 0
         color = get_palette_color(color)
 
-        write_color('rgb', color)
+        write_color(writer, 'rgb', color)
       else
-          write_color('theme', 1)
+        write_color(writer, 'theme', 1)
       end
 
-      @rstring.empty_tag('rFont',  ['val', format.font])
-      @rstring.empty_tag('family', ['val', format.font_family])
+      writer.empty_tag('rFont',  ['val', format.font])
+      writer.empty_tag('family', ['val', format.font_family])
 
       if format.font == 'Calibri' && format.hyperlink == 0
-        @rstring.empty_tag('scheme', ['val', format.font_scheme])
+        writer.empty_tag('scheme', ['val', format.font_scheme])
       end
 
-      @rstring.end_tag('rPr')
+      writer.end_tag('rPr')
     end
 
     #
     # Write the underline font element.
     #
-    def write_underline(underline) #:nodoc:
+    def write_underline(writer, underline) #:nodoc:
       # Handle the underline variants.
       if underline == 2
         attributes = [val, 'double']
@@ -5837,25 +5837,25 @@ module Writexlsx
         attributes = []    # Default to single underline.
       end
 
-      @rstring.empty_tag('u', attributes)
+      writer.empty_tag('u', attributes)
     end
 
     #
     # Write the <vertAlign> font sub-element.
     #
-    def write_vert_align(val) #:nodoc:
+    def write_vert_align(writer, val) #:nodoc:
       attributes = ['val', val]
 
-      @rstring.empty_tag('vertAlign', attributes)
+      writer.empty_tag('vertAlign', attributes)
     end
 
     #
     # Write the <color> element.
     #
-    def write_color(name, value) #:nodoc:
+    def write_color(writer, name, value) #:nodoc:
       attributes = [name, value]
 
-      @rstring.empty_tag('color', attributes)
+      writer.empty_tag('color', attributes)
     end
 
     #
