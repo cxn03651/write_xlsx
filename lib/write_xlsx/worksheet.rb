@@ -702,13 +702,12 @@ module Writexlsx
       return if args.empty?
 
       # Check for a cell reference in A1 notation and substitute row and column.
-      args = row_col_notation(args)
+      row, col, top_row, left_col, type = row_col_notation(args)
 
-      row      = args[0]
-      col      = args[1] || 0
-      top_row  = args[2] || row
-      left_col = args[3] || col
-      type     = args[4] || 0
+      col      ||= 0
+      top_row  ||= row
+      left_col ||= col
+      type     ||= 0
 
       @panes   = [row, col, top_row, left_col, type ]
     end
