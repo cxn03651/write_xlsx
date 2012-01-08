@@ -1505,9 +1505,7 @@ module Writexlsx
     #
     def write(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      token = args[2] || ''
+      token = row_col_notation(args)[2] || ''
 
       # Match an array ref.
       if token.respond_to?(:to_ary)
