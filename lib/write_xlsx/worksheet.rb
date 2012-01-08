@@ -1271,25 +1271,14 @@ module Writexlsx
     #
     def repeat_columns(*args)
       if args[0] =~ /^\D/
-        args = substitute_cellref(args)
-        # Returned values $row1 and $row2 aren't required here. Remove them.
-        args = [args[1], args[3]]
+        dummy, first_col, dummy, last_col = substitute_cellref(args)
+      else
+        first_col, last_col = args
       end
+      last_col ||= first_col
 
-      col_min = args[0]
-      col_max = args[1] || args[0]
-
-      # Convert to A notation.
-      col_min = xl_col_to_name(args[0], 1)
-      col_max = xl_col_to_name(args[1], 1)
-
-      area = col_min +  ':' + col_max
-
-      # Build up the print area range "=Sheet2!C1:C2"
-      sheetname = quote_sheetname(@name)
-      area = sheetname + "!" + area
-
-      @print_style.repeat_cols = area
+      area = "#{xl_col_to_name(first_col, 1)}:#{xl_col_to_name(last_col, 1)}"
+      @print_style.repeat_rows = "#{quote_sheetname(@name)}!#{area}"
     end
 
     def print_repeat_cols  # :nodoc:
