@@ -1529,7 +1529,6 @@ module Writexlsx
     #
     # The write methods return:
     #     0 for success.
-    #    -3 for string too long.
     #
     def write(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2008,7 +2007,6 @@ module Writexlsx
     # format is optional.
     #
     #   Returns  0 : normal termination
-    #           -3 : long string truncated to 32767 chars
     #
     #     worksheet.write_string(0, 0, 'Your text here')
     #     worksheet.write_string('A2', 'or here')
@@ -2047,7 +2045,6 @@ module Writexlsx
       str_error = 0
       if str.length > @xls_strmax
         str = str[0, @xls_strmax]
-        str_error = -3
       end
 
       index = shared_string_index(str)
@@ -2067,7 +2064,6 @@ module Writexlsx
     # write_rich_string methods return:
     #
     #   Returns  0 : normal termination.
-    #           -3 : long string truncated to 32767 chars.
     #           -4 : 2 consecutive formats used.
     #
     # For example to write the string "This is bold and this is italic"
@@ -2193,9 +2189,6 @@ module Writexlsx
           writer.end_tag('r')
         end
       end
-
-      # Check that the string is < 32767 chars.
-      return -3 if length > @xls_strmax
 
       # Add the XML string to the shared string table.
       index = get_shared_string_index(writer.string)
@@ -2446,7 +2439,6 @@ module Writexlsx
     #
     # write_url methods return:
     #   Returns  0 : normal termination
-    #           -3 : long string truncated to 32767 chars
     #
     # The format parameter is also optional, however, without a format
     # the link won't look like a format.
@@ -2537,7 +2529,6 @@ module Writexlsx
       str_error = 0
       if str.bytesize > @xls_strmax
         str = str[0, @xls_strmax]
-        str_error = -3
       end
 
       # Store the URL displayed text in the shared string table.
