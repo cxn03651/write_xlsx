@@ -3412,23 +3412,15 @@ module Writexlsx
     # for a more detailed example.
     #
     def autofilter(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      return if args.size != 4    # Require 4 parameters
-
-      row1, col1, row2, col2 = args
+      row1, col1, row2, col2 = row_col_notation(args)
+      return if [row1, col1, row2, col2].include?(nil)
 
       # Reverse max and min values if necessary.
       row1, row2 = row2, row1 if row2 < row1
       col1, col2 = col2, col1 if col2 < col1
 
-      # Build up the print area range "Sheet1!$A$1:$C$13".
-      area = convert_name_area(row1, col1, row2, col2)
-      ref = xl_range(row1, row2, col1, col2)
-
-      @autofilter_area = area
-      @autofilter_ref  = ref
+      @autofilter_area = convert_name_area(row1, col1, row2, col2)
+      @autofilter_ref  = xl_range(row1, row2, col1, col2)
       @filter_range    = [col1, col2]
     end
 
