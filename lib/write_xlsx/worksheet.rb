@@ -2955,33 +2955,28 @@ module Writexlsx
     # should be blank. All cells should contain the same format.
     #
     def merge_range(*args)
-      rwFirst, colFirst, rwLast, colLast, string, format, *extra_args = row_col_notation(args)
+      row_first, col_first, row_last, col_last, string, format, *extra_args = row_col_notation(args)
 
-      raise "Incorrect number of arguments" if [rwFirst, colFirst, rwLast, colLast, format].include?(nil)
-      raise "Fifth parameter must be a format object" unless format.kind_of?(Format)
-      raise "Can't merge single cell" if rwFirst == rwLast && colFirst == colLast
+      raise "Incorrect number of arguments" if [row_first, col_first, row_last, col_last, format].include?(nil)
+      raise "Fifth parameter must be a format object" unless format.respond_to?(:get_xf_index)
+      raise "Can't merge single cell" if row_first == row_last && col_first == col_last
 
       # Swap last row/col with first row/col as necessary
-      rwFirst,  rwLast  = rwLast,  rwFirst  if rwFirst > rwLast
-      colFirst, colLast = colLast, colFirst if colFirst > colLast
+      row_first,  row_last  = row_last,  row_first  if row_first > row_last
+      col_first, col_last = col_last, col_first if col_first > col_last
 
       # Check that column number is valid and store the max value
-      check_dimensions(rwLast, colLast)
-      store_row_col_max_min_values(rwLast, colLast)
+      check_dimensions(row_last, col_last)
+      store_row_col_max_min_values(row_last, col_last)
 
       # Store the merge range.
-      @merge << [rwFirst, colFirst, rwLast, colLast]
+      @merge << [row_first, col_first, row_last, col_last]
 
       # Write the first cell
-      write(rwFirst, colFirst, string, format, *extra_args)
+      write(row_first, col_first, string, format, *extra_args)
 
       # Pad out the rest of the area with formatted blank cells.
-      (rwFirst .. rwLast).each do |row|
-        (colFirst .. colLast).each do |col|
-          next if row == rwFirst && col == colFirst
-          write_blank(row, col, format)
-        end
-      end
+      write_formatted_blank_to_area(row_first, row_last, col_first, col_last, format)
     end
 
     #
@@ -3912,6 +3907,16 @@ module Writexlsx
       if param[:type] == 'date' || param[:type] == 'time'
         unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
           raise WriteXLSXOptionParameterError
+        end
+      end
+    end
+
+    # Pad out the rest of the area with formatted blank cells.
+    def write_formatted_blank_to_area(row_first, row_last, col_first, col_last, format)
+      (row_first .. row_last).each do |row|
+        (col_first .. col_last).each do |col|
+          next if row == row_first && col == col_first
+          write_blank(row, col, format)
         end
       end
     end
