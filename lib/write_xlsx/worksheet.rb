@@ -5349,38 +5349,37 @@ module Writexlsx
     # Write the <rowBreaks> element.
     #
     def write_row_breaks #:nodoc:
-      page_breaks = sort_pagebreaks(*(@print_style.hbreaks))
-      count       = page_breaks.size
-
-      return if page_breaks.empty?
-
-      attributes = ['count', count, 'manualBreakCount', count]
-
-      @writer.start_tag('rowBreaks', attributes)
-
-      page_breaks.each { |row_num| write_brk(row_num, 16383) }
-
-      @writer.end_tag('rowBreaks')
+      write_breaks('rowBreaks')
     end
 
     #
     # Write the <colBreaks> element.
     #
     def write_col_breaks #:nodoc:
-      page_breaks = sort_pagebreaks(*(@print_style.vbreaks))
-      count       = page_breaks.size
+      write_breaks('colBreaks')
+    end
+
+    def write_breaks(tag) # :nodoc:
+      case tag
+      when 'rowBreaks'
+        page_breaks = sort_pagebreaks(*(@print_style.hbreaks))
+        max = 16383
+      when 'colBreaks'
+        page_breaks = sort_pagebreaks(*(@print_style.vbreaks))
+        max = 1048575
+      else
+        raise "Invalid parameter '#{tag}' in write_breaks."
+      end
+      count = page_breaks.size
 
       return if page_breaks.empty?
 
       attributes = ['count', count, 'manualBreakCount', count]
 
-      @writer.start_tag('colBreaks', attributes)
-
-      page_breaks.each { |col_num| write_brk(col_num, 1048575) }
-
-      @writer.end_tag('colBreaks')
+      @writer.start_tag(tag, attributes)
+      page_breaks.each { |num| write_brk(num, max) }
+      @writer.end_tag(tag)
     end
-
     #
     # Write the <brk> element.
     #
