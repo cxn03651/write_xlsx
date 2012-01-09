@@ -2955,23 +2955,18 @@ module Writexlsx
     # should be blank. All cells should contain the same format.
     #
     def merge_range(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
+      rwFirst, colFirst, rwLast, colLast, string, format, *extra_args = row_col_notation(args)
 
-      raise "Incorrect number of arguments" if args.size < 6
-      raise "Fifth parameter must be a format object" unless args[5].kind_of?(Format)
-
-      rwFirst, colFirst, rwLast, colLast, string, format, *extra_args = args
-
-      # Excel doesn't allow a single cell to be merged
-      raise "Can't merge single cell" if rwFirst == rwLast and colFirst == colLast
+      raise "Incorrect number of arguments" if [rwFirst, colFirst, rwLast, colLast, format].include?(nil)
+      raise "Fifth parameter must be a format object" unless format.kind_of?(Format)
+      raise "Can't merge single cell" if rwFirst == rwLast && colFirst == colLast
 
       # Swap last row/col with first row/col as necessary
       rwFirst,  rwLast  = rwLast,  rwFirst  if rwFirst > rwLast
       colFirst, colLast = colLast, colFirst if colFirst > colLast
 
       # Check that column number is valid and store the max value
-      return if check_dimensions(rwLast, colLast) != 0
+      check_dimensions(rwLast, colLast)
       store_row_col_max_min_values(rwLast, colLast)
 
       # Store the merge range.
@@ -2983,7 +2978,7 @@ module Writexlsx
       # Pad out the rest of the area with formatted blank cells.
       (rwFirst .. rwLast).each do |row|
         (colFirst .. colLast).each do |col|
-          next if (row == rwFirst && col == colFirst)
+          next if row == rwFirst && col == colFirst
           write_blank(row, col, format)
         end
       end
