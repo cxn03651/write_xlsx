@@ -1634,8 +1634,6 @@ module Writexlsx
     # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
-    # Returns: the first encountered error value or zero for no errors
-    #
     # The write_col() method can be used to write a 1D or 2D array of data
     # in one go. This is useful for converting the results of a database
     # query into an Excel worksheet. You must pass a reference to the array
@@ -1703,26 +1701,14 @@ module Writexlsx
     # the distro.
     #
     def write_col(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      # Catch non array refs passed by user.
-      raise "Not an array ref in call to write_col()$!" unless args[2].respond_to?(:to_ary)
-
-      row, col, tokens, *options = args
-      error   = 0
-      ret = 0
+      row, col, tokens, *options = row_col_notation(args)
+      raise "Not an array ref in call to write_col()$!" unless tokens.respond_to?(:to_ary)
 
       tokens.each do |token|
         # write() will deal with any nested arrays
-        ret = write(row, col, token, *options)
-
-        # Return only the first error encountered, if any.
-        error = ret if error == 0 && ret > 0
+        write(row, col, token, *options)
         row += 1
       end
-
-      error
     end
 
     #
