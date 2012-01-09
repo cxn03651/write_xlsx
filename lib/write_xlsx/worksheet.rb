@@ -2983,27 +2983,15 @@ module Writexlsx
     # Same as merge_range() above except the type of write() is specified.
     #
     def merge_range_type(type, *args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      args = row_col_notation(args)
-
-      row_first = args.shift
-      col_first = args.shift
-      row_last  = args.shift
-      col_last  = args.shift
-
-      # Get the format. It can be in different positions for the different types.
-      if type == 'array_formula' || type == 'blank' || type == 'rich_string'
-        # The format is the last element.
-        format = args[-1]
+      case type
+      when 'array_formula', 'blank', 'rich_string'
+        row_first, col_first, row_last, col_last, *others = row_col_notation(args)
+        format = others.pop
       else
-        # Or else it is after the token.
-        format = args[1]
+        row_first, col_first, row_last, col_last, token, format, *others = row_col_notation(args)
       end
 
-      # Check that there is a format object.
       raise "Format object missing or in an incorrect position" unless format.respond_to?(:get_xf_index)
-
-      # Excel doesn't allow a single cell to be merged
       raise "Can't merge single cell" if row_first == row_last && col_first == col_last
 
       # Swap last row/col with first row/col as necessary
@@ -3011,40 +2999,40 @@ module Writexlsx
       col_first, col_last = col_last, col_first if col_first > col_last
 
       # Check that column number is valid and store the max value
-      return if check_dimensions(row_last, col_last) != 0
+      check_dimensions(row_last, col_last)
       store_row_col_max_min_values(row_last, col_last)
 
       # Store the merge range.
-      @merge.push([row_first, col_first, row_last, col_last])
+      @merge << [row_first, col_first, row_last, col_last]
 
       # Write the first cell
+      case type
+      when 'blank', 'rich_string', 'array_formula'
+        others << format
+      end
+
       if type == 'string'
-        write_string(row_first, col_first, *args)
+        write_string(row_first, col_first, token, format, *others)
       elsif type == 'number'
-        write_number(row_first, col_first, *args)
+        write_number(row_first, col_first, token, format, *others)
       elsif type == 'blank'
-        write_blank(row_first, col_first, *args)
+        write_blank(row_first, col_first, *others)
       elsif type == 'date_time'
-        write_date_time(row_first, col_first, *args)
+        write_date_time(row_first, col_first, token, format, *others)
       elsif type == 'rich_string'
-        write_rich_string(row_first, col_first, *args)
+        write_rich_string(row_first, col_first, *others)
       elsif type == 'url'
-        write_url(row_first, col_first, *args)
+        write_url(row_first, col_first, token, format, *others)
       elsif type == 'formula'
-        write_formula(row_first, col_first, *args)
+        write_formula(row_first, col_first, token, format, *others)
       elsif type == 'array_formula'
-        write_formula_array(row_first, col_first, *args)
+        write_formula_array(row_first, col_first, *others)
       else
         raise "Unknown type '#{type}'"
       end
 
       # Pad out the rest of the area with formatted blank cells.
-      (row_first .. row_last).each do |row|
-        (col_first .. col_last).each do |col|
-          next if row == row_first && col == col_first
-          write_blank(row, col, format)
-        end
-      end
+      write_formatted_blank_to_area(row_first, row_last, col_first, col_last, format)
     end
 
     #
