@@ -673,5 +673,11 @@ module Writexlsx
       return false if @font_shadow == 0
       true
     end
+
+    def underline?
+      return false unless @underline
+      return false if @underline == 0
+      true
+    end
   end
 end

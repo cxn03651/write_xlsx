@@ -5667,7 +5667,7 @@ module Writexlsx
       writer.empty_tag('shadow')  if format.shadow?
 
       # Handle the underline variants.
-      write_underline(writer, format.underline) if !format.underline.nil? && format.underline != 0
+      write_underline(writer, format.underline) if format.underline?
 
       write_vert_align(writer, 'superscript') if format.font_script == 1
       write_vert_align(writer, 'subscript')   if format.font_script == 2
