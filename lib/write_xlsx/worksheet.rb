@@ -4233,17 +4233,10 @@ module Writexlsx
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
-      while x1 >= size_col(col_start)
-        x1 -= size_col(col_start)
-        col_start += 1
-      end
+      x1, col_start = adjust_column_offset(x1, col_start)
 
       # Adjust start row for offsets that are greater than the row height.
-      while y1 >= size_row(row_start)
-        y1 -= size_row(row_start)
-        row_start += 1
-      end
-
+      y1, row_start = adjust_row_offset(y1, row_start)
 
       # Initialise end cell to the same as the start cell.
       col_end = col_start
@@ -4253,16 +4246,10 @@ module Writexlsx
       height += y1
 
       # Subtract the underlying cell widths to find the end cell of the object.
-      while width >= size_col(col_end)
-        width -= size_col(col_end)
-        col_end += 1
-      end
+      width, col_end = adjust_column_offset(width, col_end)
 
       # Subtract the underlying cell heights to find the end cell of the object.
-      while height >= size_row(row_end)
-        height -= size_row(row_end)
-        row_end += 1
-      end
+      height, row_end = adjust_row_offset(height, row_end)
 
       # The following is only required for positioning drawing/chart objects
       # and not comments. It is probably the result of a bug.
@@ -4276,6 +4263,22 @@ module Writexlsx
       y2 = height
 
       [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
+    end
+
+    def adjust_column_offset(x, column)
+      while x >= size_col(column)
+        x -= size_col(column)
+        column += 1
+      end
+      [x, column]
+    end
+
+    def adjust_row_offset(y, row)
+      while y >= size_row(row)
+        y -= size_row(row)
+        row += 1
+      end
+      [y, row]
     end
 
     #
