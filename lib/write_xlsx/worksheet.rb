@@ -4793,7 +4793,7 @@ module Writexlsx
 
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
         # Skip row if it doesn't contain row formatting or cell data.
-        next if !@set_rows[row_num] && !@table[row_num] && !@comments[row_num]
+        next if not_contain_formatting_or_data?(row_num)
 
         span_index = row_num / 16
         span       = @row_spans[span_index]
@@ -4828,7 +4828,7 @@ module Writexlsx
       @previous_row = current_row
 
       # Skip row if it doesn't contain row formatting, cell data or a comment.
-      return if !@set_rows[row_num] && !@table[row_num] && !@comments[row_num]
+      return not_contain_formatting_or_data?(row_num)
 
       # Write the cells if the row contains data.
       row_ref = @table[row_num]
@@ -4848,6 +4848,10 @@ module Writexlsx
 
       # Reset table.
       @table = []
+    end
+
+    def not_contain_formatting_or_data?(row_num) # :nodoc:
+      !@set_rows[row_num] && !@table[row_num] && !@comments[row_num]
     end
 
     def write_cell_column_dimension(row_num)  # :nodoc:
