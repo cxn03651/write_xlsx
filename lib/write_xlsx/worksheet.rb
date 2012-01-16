@@ -4212,28 +4212,23 @@ module Writexlsx
     #    width        # Width of object frame.
     #    height       # Height of object frame.
     def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false) #:nodoc:
-      x_abs = 0    # Absolute distance to left side of object.
-      y_abs = 0    # Absolute distance to top  side of object.
-
       # Calculate the absolute x offset of the top-left vertex.
       if @col_size_changed
-        (1 .. col_start).each {|col_id| x_abs += size_col(col_id) }
+        x_abs = (1 .. col_start).inject(0) {|sum, col| sum += size_col(col)}
       else
         # Optimisation for when the column widths haven't changed.
-        x_abs += 64 * col_start
+        x_abs = 64 * col_start
       end
-
       x_abs += x1
 
       # Calculate the absolute y offset of the top-left vertex.
       # Store the column change to allow optimisations.
       if @row_size_changed
-        (1 .. row_start).each {|row_id| y_abs += size_row(row_id) }
+        y_abs = (1 .. row_start).inject(0) {|sum, row| sum += size_row(row)}
       else
         # Optimisation for when the row heights haven't changed.
-        y_abs += 20 * row_start
+        y_abs = 20 * row_start
       end
-
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
