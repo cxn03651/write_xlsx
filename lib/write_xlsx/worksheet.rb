@@ -3178,29 +3178,13 @@ module Writexlsx
         return -3
       end
 
-      # List of  valid validation types.
-      valid_type = {
-        'any'             => 'none',
-        'any value'       => 'none',
-        'whole number'    => 'whole',
-        'whole'           => 'whole',
-        'integer'         => 'whole',
-        'decimal'         => 'decimal',
-        'list'            => 'list',
-        'date'            => 'date',
-        'time'            => 'time',
-        'text length'     => 'textLength',
-        'length'          => 'textLength',
-        'custom'          => 'custom'
-      }
-
       # Check for valid validation types.
-      unless valid_type.has_key?(param[:validate].downcase)
+      unless valid_validation_type.has_key?(param[:validate].downcase)
         #           carp "Unknown validation type '$param->{validate}' for parameter " .
         #                "'validate' in data_validation()"
         return -3
       else
-        param[:validate] = valid_type[param[:validate].downcase]
+        param[:validate] = valid_validation_type[param[:validate].downcase]
       end
 
       # No action is required for validation type 'any'.
@@ -3818,6 +3802,23 @@ module Writexlsx
     end
 
     private
+
+    def valid_validation_type
+      {
+        'any'             => 'none',
+        'any value'       => 'none',
+        'whole number'    => 'whole',
+        'whole'           => 'whole',
+        'integer'         => 'whole',
+        'decimal'         => 'decimal',
+        'list'            => 'list',
+        'date'            => 'date',
+        'time'            => 'time',
+        'text length'     => 'textLength',
+        'length'          => 'textLength',
+        'custom'          => 'custom'
+      }
+    end
 
     # Convert the list of $format, $string tokens to pairs of ($format, $string)
     # except for the first $string fragment which doesn't require a default
