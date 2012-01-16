@@ -159,7 +159,7 @@ module Writexlsx
   #
   class Format
     attr_reader :xf_index, :dxf_index, :num_format   # :nodoc:
-    attr_reader :font_shadow, :font_outline   # :nodoc:
+    attr_reader :font_shadow   # :nodoc:
     attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink   # :nodoc:
     attr_reader :diag_type, :diag_color, :font_only, :color, :color_indexed   # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color   # :nodoc:
@@ -660,6 +660,12 @@ module Writexlsx
     def strikeout?
       return false unless @font_strikeout
       return false if @font_strikeout == 0
+      true
+    end
+
+    def outline?
+      return false unless @font_outline
+      return false if @font_outline == 0
       true
     end
   end
