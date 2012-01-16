@@ -5656,7 +5656,7 @@ module Writexlsx
     def write_font(writer, format) #:nodoc:
       writer.start_tag('rPr')
 
-      writer.empty_tag('b')       if !format.bold.nil? && format.bold != 0
+      writer.empty_tag('b')       if format.bold?
       writer.empty_tag('i')       if !format.italic.nil? &&format.italic != 0
       writer.empty_tag('strike')  if !format.font_strikeout.nil? && format.font_strikeout != 0
       writer.empty_tag('outline') if !format.font_outline.nil? && format.font_outline != 0

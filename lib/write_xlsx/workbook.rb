@@ -1054,7 +1054,7 @@ module Writexlsx
       @dxf_formats.each do |format|
         # The only font properties that can change for a DXF format are: color,
         # bold, italic, underline and strikethrough.
-        if format.color || format.bold || format.italic || format.underline || format.font_strikeout
+        if format.color || format.bold? || format.italic || format.underline || format.font_strikeout
           format.has_dxf_font = 1
         end
       end
