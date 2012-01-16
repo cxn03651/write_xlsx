@@ -195,7 +195,7 @@ module Writexlsx
         write_extend   unless format.font_extend   == 0
 
         @writer.empty_tag('b')       if format.bold?
-        @writer.empty_tag('i')       unless format.italic         == 0
+        @writer.empty_tag('i')       if format.italic?
         @writer.empty_tag('strike')  unless format.font_strikeout == 0
         @writer.empty_tag('outline') unless format.font_outline   == 0
         @writer.empty_tag('shadow')  unless format.font_shadow    == 0
