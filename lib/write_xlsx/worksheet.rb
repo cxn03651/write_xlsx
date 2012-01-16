@@ -5660,7 +5660,7 @@ module Writexlsx
       writer.empty_tag('i')       if format.italic?
       writer.empty_tag('strike')  if format.strikeout?
       writer.empty_tag('outline') if format.outline?
-      writer.empty_tag('shadow')  if !format.font_shadow && format.font_shadow != 0
+      writer.empty_tag('shadow')  if format.shadow?
 
       # Handle the underline variants.
       write_underline(writer, format.underline) if !format.underline.nil? && format.underline != 0

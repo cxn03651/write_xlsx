@@ -198,7 +198,7 @@ module Writexlsx
         @writer.empty_tag('i')       if format.italic?
         @writer.empty_tag('strike')  if format.strikeout?
         @writer.empty_tag('outline') if format.outline?
-        @writer.empty_tag('shadow')  unless format.font_shadow    == 0
+        @writer.empty_tag('shadow')  if format.shadow?
 
         # Handle the underline variants.
         write_underline( format.underline ) unless format.underline == 0
