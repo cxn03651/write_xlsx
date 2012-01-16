@@ -3129,10 +3129,14 @@ module Writexlsx
     #
     def data_validation(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row1, col1, row2, col2, param = row_col_notation(args)
+      row1, col1, row2, col2, options = row_col_notation(args)
       if row2.respond_to?(:keys)
-        param = row2
+        param = row2.dup
         row2, col2 = row1, col1
+      elsif options.respond_to?(:keys)
+        param = options.dup
+      else
+        raise WriteXLSXInsufficientArgumentError
       end
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
@@ -3140,31 +3144,10 @@ module Writexlsx
       check_dimensions(row1, col1)
       check_dimensions(row2, col2)
 
-      # List of valid input parameters.
-      valid_parameter = {
-        :validate          => 1,
-        :criteria          => 1,
-        :value             => 1,
-        :source            => 1,
-        :minimum           => 1,
-        :maximum           => 1,
-        :ignore_blank      => 1,
-        :dropdown          => 1,
-        :show_input        => 1,
-        :input_title       => 1,
-        :input_message     => 1,
-        :show_error        => 1,
-        :error_title       => 1,
-        :error_message     => 1,
-        :error_type        => 1,
-        :other_cells       => 1
-      }
-
       # Check for valid input parameters.
       param.each_key do |param_key|
-        unless valid_parameter.has_key?(param_key)
-          #               carp "Unknown parameter '$param_key' in data_validation()"
-          return -3
+        unless valid_validation_parameter.include?(param_key)
+          raise WriteXLSXOptionParameterError, "Unknown parameter '#{param_key}' in data_validation()"
         end
       end
 
@@ -3172,17 +3155,15 @@ module Writexlsx
       param[:value] = param[:source]  if param[:source]
       param[:value] = param[:minimum] if param[:minimum]
 
-      # 'validate' is a required parameter.
+      # :validate is a required parameter.
       unless param.has_key?(:validate)
-        #           carp "Parameter 'validate' is required in data_validation()"
-        return -3
+        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
       end
 
       # Check for valid validation types.
       unless valid_validation_type.has_key?(param[:validate].downcase)
-        #           carp "Unknown validation type '$param->{validate}' for parameter " .
-        #                "'validate' in data_validation()"
-        return -3
+        raise WriteXLSXOptionParameterError,
+          "Unknown validation type '#{param[:validate]}' for parameter :validate in data_validation()"
       else
         param[:validate] = valid_validation_type[param[:validate].downcase]
       end
@@ -3803,7 +3784,29 @@ module Writexlsx
 
     private
 
-    def valid_validation_type
+    # List of valid input parameters.
+    def valid_validation_parameter
+      [
+        :validate,
+        :criteria,
+        :value,
+        :source,
+        :minimum,
+        :maximum,
+        :ignore_blank,
+        :dropdown,
+        :show_input,
+        :input_title,
+        :input_message,
+        :show_error,
+        :error_title,
+        :error_message,
+        :error_type,
+        :other_cells
+      ]
+    end
+
+    def valid_validation_type # :nodoc:
       {
         'any'             => 'none',
         'any value'       => 'none',
