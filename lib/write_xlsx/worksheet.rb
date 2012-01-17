@@ -2510,10 +2510,6 @@ module Writexlsx
     # Write a datetime string in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format as a
     # number representing an Excel date. $format is optional.
     #
-    # write_date_time methods return:
-    #   Returns  0 : normal termination
-    #           -3 : Invalid date_time, written as string
-    #
     # The write_date_time() method can be used to write a date or time
     # to the cell specified by row and column:
     #
@@ -3181,8 +3177,7 @@ module Writexlsx
 
       # 'criteria' is a required parameter.
       unless param.has_key?(:criteria)
-        #           carp "Parameter 'criteria' is required in data_validation()"
-        return -3
+        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
       end
 
       # List of valid criteria types.
@@ -3190,9 +3185,8 @@ module Writexlsx
 
       # Check for valid criteria types.
       unless criteria_type.has_key?(param[:criteria].downcase)
-        #           carp "Unknown criteria type '$param->{criteria}' for parameter " .
-        #                "'criteria' in data_validation()"
-        return -3
+        raise WriteXLSXOptionParameterError,
+          "Unknown criteria type '#{param[:criteria]}' for parameter :criteria in data_validation()"
       else
         param[:criteria] = criteria_type[param[:criteria].downcase]
       end
@@ -3200,9 +3194,8 @@ module Writexlsx
       # 'Between' and 'Not between' criteria require 2 values.
       if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
         unless param.has_key?(:maximum)
-          #               carp "Parameter 'maximum' is required in data_validation() " .
-          #                    "when using 'between' or 'not between' criteria"
-          return -3
+          raise WriteXLSXOptionParameterError,
+            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
         end
       else
         param[:maximum] = nil
@@ -3219,17 +3212,17 @@ module Writexlsx
       if not param.has_key?(:error_type)
         param[:error_type] = 0
       elsif not error_type.has_key?(param[:error_type].downcase)
-        #           carp "Unknown criteria type '$param->{error_type}' for parameter " .
-        #                "'error_type' in data_validation()"
-        return -3
+        raise WriteXLSXOptionParameterError,
+          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
       else
         param[:error_type] = error_type[param[:error_type].downcase]
       end
 
       # Convert date/times value if required.
       if param[:validate] == 'date' || param[:validate] == 'time'
-        return -3 unless convert_date_time_value(param, :value)
-        return -3 unless convert_date_time_value(param, :maximum)
+        unless convert_date_time_value(param, :value) && convert_date_time_value(param, :maximum)
+          raise WriteXLSXOptionParameterError, "Invalid date/time value."
+        end
       end
 
       # Set some defaults if they haven't been defined by the user.
