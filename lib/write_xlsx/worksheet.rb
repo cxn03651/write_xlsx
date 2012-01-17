@@ -5970,13 +5970,13 @@ module Writexlsx
     #
     def shared_string_index(str) #:nodoc:
       # Add the string to the shared string table.
-      unless @workbook.str_table[str]
-        @workbook.str_table[str] = @workbook.str_unique
+      unless @workbook.str_table(str)
+        @workbook.add_str_table(str, @workbook.str_unique)
         @workbook.str_unique += 1
       end
 
       @workbook.str_total += 1
-      @workbook.str_table[str]
+      @workbook.str_table(str)
     end
 
     #

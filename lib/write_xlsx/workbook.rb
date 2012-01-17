@@ -15,7 +15,7 @@ module Writexlsx
 
     include Writexlsx::Utility
 
-    attr_accessor :str_total, :str_unique, :str_table
+    attr_accessor :str_total, :str_unique
     attr_writer :firstsheet
     attr_reader :palette
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
@@ -629,6 +629,14 @@ module Writexlsx
     def date_1904? #:nodoc:
       @date_1904 ||= false
       !!@date_1904
+    end
+
+    def add_str_table(str, id)
+      @str_table[str] = id
+    end
+
+    def str_table(str)
+      @str_table[str]
     end
 
     private
