@@ -2007,9 +2007,6 @@ module Writexlsx
     #
     # write_rich_string methods return:
     #
-    #   Returns  0 : normal termination.
-    #           -4 : 2 consecutive formats used.
-    #
     # For example to write the string "This is bold and this is italic"
     # you would use the following:
     #
@@ -2138,8 +2135,6 @@ module Writexlsx
       index = shared_string_index(writer.string)
 
       store_data_to_table(row, col, [type, index, xf])
-
-      return 0
     end
 
     #
@@ -3830,8 +3825,7 @@ module Writexlsx
       fragments = []
       rich_strings.each do |token|
         if token.respond_to?(:get_xf_index)
-          # Can't allow 2 formats in a row.
-          return -4 if last == 'format' && pos > 0
+          raise AugumentError, "Can't allow 2 formats in a row" if last == 'format' && pos > 0
 
           # Token is a format object. Add it to the fragment list.
           fragments << token
