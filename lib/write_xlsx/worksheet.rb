@@ -3170,7 +3170,7 @@ module Writexlsx
 
       # No action is required for validation type 'any'.
       # TODO: we should perhaps store 'any' for message only validations.
-      return 0 if param[:validate] == 0
+      return if param[:validate] == 'none'
 
       # The list and custom validations don't have a criteria so we use a default
       # of 'between'.
