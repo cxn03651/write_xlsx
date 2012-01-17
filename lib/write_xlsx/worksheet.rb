@@ -2149,9 +2149,6 @@ module Writexlsx
     # a BLANK record unless a format is specified. This is mainly an optimisation
     # for the write_row() and write_col() methods.
     #
-    # write_blank methods return:
-    #   Returns  0 : normal termination (including no format)
-    #
     # Excel differentiates between an "Empty" cell and a "Blank" cell.
     # An "Empty" cell is a cell which doesn't contain data whilst a "Blank"
     # cell is a cell which doesn't contain data but does contain formatting.
@@ -2173,7 +2170,7 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
 
       # Don't write a blank cell unless it has a format
-      return 0 unless xf
+      return unless xf
 
       type = 'b'                    # The data type
 
@@ -2182,7 +2179,6 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       store_data_to_table(row, col, [type, nil, xf])
-      0
     end
 
     #
@@ -2232,7 +2228,6 @@ module Writexlsx
       formula.sub!(/^=/, '')
 
       store_data_to_table(row, col, ['f', formula, format, value])
-      0
     end
 
     #
@@ -2311,7 +2306,6 @@ module Writexlsx
       formula.sub!(/^=/, '')
 
       store_data_to_table(row1, col1, [type, formula, xf, range, value])
-      0
     end
 
     # The outline_settings() method is used to control the appearance of
@@ -2375,9 +2369,6 @@ module Writexlsx
     #
     # The hyperlink can be to a http, ftp, mail, internal sheet, or external
     # directory url.
-    #
-    # write_url methods return:
-    #   Returns  0 : normal termination
     #
     # The format parameter is also optional, however, without a format
     # the link won't look like a format.
