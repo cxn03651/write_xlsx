@@ -19,7 +19,6 @@ module Writexlsx
     attr_writer :firstsheet
     attr_reader :palette
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
-    attr_reader :xf_formats, :dxf_formats
     attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
     attr_reader :str_array, :doc_properties
     attr_reader :image_types, :images
@@ -637,6 +636,14 @@ module Writexlsx
 
     def str_table(str)
       @str_table[str]
+    end
+
+    def xf_formats
+      @xf_formats.dup
+    end
+
+    def dxf_formats
+      @dxf_formats.dup
     end
 
     private
