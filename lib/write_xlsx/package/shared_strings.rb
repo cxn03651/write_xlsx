@@ -8,6 +8,8 @@ module Writexlsx
 
       include Writexlsx::Utility
 
+      attr_writer :string_count, :unique_count
+
       def initialize
         @writer = Package::XMLWriterSimple.new
         @strings      = []
@@ -32,20 +34,6 @@ module Writexlsx
         @writer.end_tag('sst')
         @writer.crlf
         @writer.close
-      end
-
-      #
-      # Set the total sst string count.
-      #
-      def set_string_count(string_count)
-        @string_count = string_count
-      end
-
-      #
-      # Set the total of unique sst strings.
-      #
-      def set_unique_count(unique_count)
-        @unique_count = unique_count
       end
 
       #

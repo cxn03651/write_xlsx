@@ -5,8 +5,8 @@ require 'write_xlsx/package/shared_strings'
 class TestSharedStrings01 < Test::Unit::TestCase
   def test_shared_strings01
     @obj = Writexlsx::Package::SharedStrings.new
-    @obj.set_string_count(7)
-    @obj.set_unique_count(3)
+    @obj.string_count = 7
+    @obj.unique_count = 3
     @obj.add_strings(['neptune', 'mars', 'venus'])
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)

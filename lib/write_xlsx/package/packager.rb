@@ -200,8 +200,8 @@ module Writexlsx
 
         return unless total > 0
 
-        sst.set_string_count(total)
-        sst.set_unique_count(unique)
+        sst.string_count = total
+        sst.unique_count = unique
         sst.add_strings(sst_data)
 
         sst.set_xml_writer("#{@package_dir}/xl/sharedStrings.xml")
