@@ -25,7 +25,7 @@ module Writexlsx
         write_xml_declaration
 
         # Write the sst table.
-        write_sst(@string_count, @unique_count)
+        write_sst
 
         # Write the sst strings.
         write_sst_strings
@@ -52,15 +52,15 @@ module Writexlsx
       #
       # Write the <sst> element.
       #
-      def write_sst(count, unique_count)
+      def write_sst
         schema       = 'http://schemas.openxmlformats.org'
-        xmlns        = schema + '/spreadsheetml/2006/main'
 
-        attributes = [
-            'xmlns',       xmlns,
-            'count',       count,
-            'uniqueCount', unique_count
-        ]
+        attributes =
+          [
+           'xmlns',       schema + '/spreadsheetml/2006/main',
+           'count',       @string_count,
+           'uniqueCount', @unique_count
+          ]
 
         @writer.start_tag('sst', attributes)
       end
