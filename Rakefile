@@ -40,7 +40,7 @@ The WriteXLSX supports the following features:
 
 write_xlsx uses the same interface as writeexcel gem.
 
-documentation is not completed, but writeexcel’s documentation will help you. See writeexcel.web.fc2.com/
+documentation is not completed, but writeexcel’s documentation will help you. See http://writeexcel.web.fc2.com/
 
 And you can find many examples in this gem.
 EOS
