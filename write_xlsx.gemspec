@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Hideo NAKAMURA"]
   s.date = "2011-12-10"
-  s.description = "TODO: longer description of your gem"
+  s.description = "WriteXLSX is a rubygem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem."
   s.email = "cxn03651@msj.biglobe.ne.jp"
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -264,7 +264,7 @@ Gem::Specification.new do |s|
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
   s.rubygems_version = "1.8.10"
-  s.summary = "TODO: one-line summary of your gem"
+  s.summary = "WriteXLSX is a rubygem to create a new file in the Excel 2007+ XLSX format"
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
