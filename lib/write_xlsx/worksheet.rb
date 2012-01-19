@@ -6349,14 +6349,7 @@ module Writexlsx
     # return the string index.
     #
     def shared_string_index(str) #:nodoc:
-      # Add the string to the shared string table.
-      unless @workbook.str_table(str)
-        @workbook.add_str_table(str, @workbook.str_unique)
-        @workbook.str_unique += 1
-      end
-
-      @workbook.str_total += 1
-      @workbook.str_table(str)
+      @workbook.shared_string_index(str)
     end
 
     #

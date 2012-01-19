@@ -629,11 +629,18 @@ module Writexlsx
       !!@date_1904
     end
 
-    def add_str_table(str, id)
-      @str_table[str] = id
-    end
+    #
+    # Add a string to the shared string table, if it isn't already there, and
+    # return the string index.
+    #
+    def shared_string_index(str) #:nodoc:
+      # Add the string to the shared string table.
+      unless @str_table[str]
+        @str_table[str] = @str_unique
+        @str_unique += 1
+      end
 
-    def str_table(str)
+      @str_total += 1
       @str_table[str]
     end
 
