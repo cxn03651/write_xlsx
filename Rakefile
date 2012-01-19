@@ -17,8 +17,33 @@ Jeweler::Tasks.new do |gem|
   gem.name = "write_xlsx"
   gem.homepage = "http://github.com/cxn03651/write_xlsx"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format.}
+  gem.description = <<EOS
+write_xlsx s a gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem.
+The WriteXLSX supports the following features:
+  * Multiple worksheets
+  * Strings and numbers
+  * Unicode text
+  * Rich string formats
+  * Formulas (including array formats)
+  * cell formatting
+  * Embedded images
+  * Charts
+  * Autofilters
+  * Data validation
+  * Hyperlinks
+  * Defined names
+  * Grouping/Outlines
+  * Cell comments
+  * Panes
+  * Page set-up and printing options
+
+write_xlsx uses the same interface as writeexcel gem.
+
+documentation is not completed, but writeexcel’s documentation will help you. See writeexcel.web.fc2.com/
+
+And you can find many examples in this gem.
+EOS
   gem.email = "cxn03651@msj.biglobe.ne.jp"
   gem.authors = ["Hideo NAKAMURA"]
   # dependencies defined in Gemfile
