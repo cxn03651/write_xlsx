@@ -22,7 +22,6 @@ module Writexlsx
     attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
     attr_reader :str_array, :doc_properties
     attr_reader :image_types, :images
-    attr_reader :named_ranges
 
     #
     # A new Excel workbook is created using the new() constructor which accepts either a filename
