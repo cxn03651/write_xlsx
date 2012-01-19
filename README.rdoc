@@ -22,7 +22,11 @@ The WriteXLSX supports the following features:
 * Panes
 * Page set-up and printing options
 
-WriteXLSX uses the same interface as WriteExcel gem.
+write_xlsx uses the same interface as writeexcel gem.
+
+documentation is not completed, but writeexcel's documentation will help you. See http://writeexcel.web.fc2.com/
+
+And you can find many examples in this gem.
 
 == Synopsis
 
@@ -55,6 +59,9 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+
+2012-01-20 v0.0.1
+ initial release
 
 == Copyright
 Original Perl module was written by John McNamara(jmcnamara@cpan.org).
