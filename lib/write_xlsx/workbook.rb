@@ -644,11 +644,11 @@ module Writexlsx
       @str_table[str]
     end
 
-    def xf_formats
+    def xf_formats     # :nodoc:
       @xf_formats.dup
     end
 
-    def dxf_formats
+    def dxf_formats    # :nodoc:
       @dxf_formats.dup
     end
 
