@@ -194,15 +194,11 @@ module Writexlsx
 
         FileUtils.mkdir_p("#{@package_dir}/xl")
 
-        total    = @workbook.str_total
-        unique   = @workbook.str_unique
-        sst_data = @workbook.str_array
+        return unless @workbook.str_total > 0
 
-        return unless total > 0
-
-        sst.string_count = total
-        sst.unique_count = unique
-        sst.add_strings(sst_data)
+        sst.string_count = @workbook.str_total
+        sst.unique_count = @workbook.str_unique
+        sst.add_strings(@workbook.str_array)
 
         sst.set_xml_writer("#{@package_dir}/xl/sharedStrings.xml")
         sst.assemble_xml_file
