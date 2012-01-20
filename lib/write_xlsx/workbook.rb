@@ -15,9 +15,9 @@ module Writexlsx
 
     include Writexlsx::Utility
 
-    attr_accessor :str_total, :str_unique
+    attr_accessor :str_unique
     attr_writer :firstsheet
-    attr_reader :palette
+    attr_reader :palette, :str_total
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
     attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
     attr_reader :str_array, :doc_properties
