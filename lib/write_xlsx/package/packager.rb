@@ -190,15 +190,11 @@ module Writexlsx
       # Write the sharedStrings.xml file.
       #
       def write_shared_strings_file
-        sst  = Package::SharedStrings.new
+        sst  = @workbook.shared_strings
 
         FileUtils.mkdir_p("#{@package_dir}/xl")
 
-        return unless @workbook.str_total > 0
-
-        sst.string_count = @workbook.str_total
-        sst.unique_count = @workbook.str_unique
-        sst.add_strings(@workbook.str_array)
+        return if @workbook.shared_strings_empty?
 
         sst.set_xml_writer("#{@package_dir}/xl/sharedStrings.xml")
         sst.assemble_xml_file
@@ -288,7 +284,7 @@ module Writexlsx
         (1 .. @num_comment_files).each { |i| content.add_comment_name("comments#{i}") }
 
         # Add the sharedString rel if there is string data in the workbook.
-        content.add_shared_strings if @workbook.str_total > 0
+        content.add_shared_strings unless @workbook.shared_strings_empty?
 
         content.set_xml_writer("#{@package_dir}/[Content_Types].xml")
         content.assemble_xml_file
@@ -380,7 +376,7 @@ module Writexlsx
         rels.add_document_relationship('/styles', 'styles.xml')
 
         # Add the sharedString rel if there is string data in the workbook.
-        rels.add_document_relationship('/sharedStrings', 'sharedStrings.xml') if @workbook.str_total != 0
+        rels.add_document_relationship('/sharedStrings', 'sharedStrings.xml') unless @workbook.shared_strings_empty?
         rels.set_xml_writer("#{@package_dir}/xl/_rels/workbook.xml.rels")
         rels.assemble_xml_file
       end

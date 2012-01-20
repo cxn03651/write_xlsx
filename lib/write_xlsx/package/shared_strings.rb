@@ -8,13 +8,33 @@ module Writexlsx
 
       include Writexlsx::Utility
 
-      attr_writer :string_count, :unique_count
-
       def initialize
-        @writer = Package::XMLWriterSimple.new
-        @strings      = []
-        @string_count = 0
-        @unique_count = 0
+        @writer  = Package::XMLWriterSimple.new
+        @strings = [] # string table
+        @count   = {} # => count
+      end
+
+      def index(string)
+        add(string)
+        @strings.index(string)
+      end
+
+      def add(string)
+        str = string.dup
+        if @count[str]
+          @count[str] += 1
+        else
+          @strings << str
+          @count[str] = 1
+        end
+      end
+
+      def string(index)
+        @strings[index].dup
+      end
+
+      def empty?
+        @strings.empty?
       end
 
       def set_xml_writer(filename)
@@ -36,13 +56,6 @@ module Writexlsx
         @writer.close
       end
 
-      #
-      # Add the array ref of strings to be written.
-      #
-      def add_strings(strings)
-        @strings = strings
-      end
-
       private
 
       def write_xml_declaration
@@ -58,8 +71,8 @@ module Writexlsx
         attributes =
           [
            'xmlns',       schema + '/spreadsheetml/2006/main',
-           'count',       @string_count,
-           'uniqueCount', @unique_count
+           'count',       total_count,
+           'uniqueCount', unique_count
           ]
 
         @writer.start_tag('sst', attributes)
@@ -90,6 +103,14 @@ module Writexlsx
         end
 
         @writer.end_tag('si')
+      end
+
+      def total_count
+        @count.values.inject(0) { |sum, count| sum += count }
+      end
+
+      def unique_count
+        @strings.size
       end
     end
   end

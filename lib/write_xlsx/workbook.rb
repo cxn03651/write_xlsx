@@ -15,13 +15,13 @@ module Writexlsx
 
     include Writexlsx::Utility
 
-    attr_accessor :str_unique
     attr_writer :firstsheet
-    attr_reader :palette, :str_total
+    attr_reader :palette
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
     attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
-    attr_reader :str_array, :doc_properties
+    attr_reader :doc_properties
     attr_reader :image_types, :images
+    attr_reader :shared_strings
 
     #
     # A new Excel workbook is created using the new() constructor which accepts either a filename
@@ -101,10 +101,7 @@ module Writexlsx
       @images              = []
 
       # Structures for the shared strings data.
-      @str_total  = 0
-      @str_unique = 0
-      @str_table  = {}
-      @str_array  = []
+      @shared_strings = Package::SharedStrings.new
 
       add_format(default_formats.merge(:xf_index => 0))
       set_color_palette
@@ -634,14 +631,15 @@ module Writexlsx
     # return the string index.
     #
     def shared_string_index(str) #:nodoc:
-      # Add the string to the shared string table.
-      unless @str_table[str]
-        @str_table[str] = @str_unique
-        @str_unique += 1
-      end
+      @shared_strings.index(str)
+    end
 
-      @str_total += 1
-      @str_table[str]
+    def str_unique
+      @shared_strings.unique_count
+    end
+
+    def shared_strings_empty?
+      @shared_strings.empty?
     end
 
     def xf_formats     # :nodoc:
@@ -962,9 +960,6 @@ module Writexlsx
       # Set the active sheet.
       @worksheets.each { |sheet| sheet.activate if sheet.index == @activesheet }
 
-      # Convert the SST strings data structure.
-      prepare_sst_string_data
-
       # Prepare the worksheet cell comments.
       prepare_comments
 
@@ -989,19 +984,6 @@ module Writexlsx
       ZipFileUtils.zip("#{@tempdir}", @filename)
       IO.copy_stream(@filename, @fileobj) if @fileobj
       Writexlsx::Utility.delete_files(@tempdir)
-    end
-
-    #
-    # Convert the SST string data from a hash to an array.
-    #
-    def prepare_sst_string_data #:nodoc:
-      strings = []
-
-      @str_table.each_key { |key| strings[@str_table[key]] = key }
-
-      # The SST data could be very large, free some memory (maybe).
-      @str_table = nil
-      @str_array = strings
     end
 
     #
@@ -1343,7 +1325,7 @@ module Writexlsx
           # Convert shared string indexes to strings.
           data.collect! do |token|
             if token.kind_of?(Hash)
-              token = @str_array[token[:sst_id]]
+              token = @shared_strings.string(token[:sst_id])
 
               # Ignore rich strings for now. Deparse later if necessary.
               token = '' if token =~ %r!^<r>! && token =~ %r!</r>$!

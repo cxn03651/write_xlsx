@@ -5,9 +5,9 @@ require 'write_xlsx/package/shared_strings'
 class TestSharedStrings02 < Test::Unit::TestCase
   def test_shared_strings02
     @obj = Writexlsx::Package::SharedStrings.new
-    @obj.string_count = 3
-    @obj.unique_count = 3
-    @obj.add_strings(['abcdefg', '   abcdefg', 'abcdefg   '])
+    @obj.index('abcdefg')
+    @obj.index('   abcdefg')
+    @obj.index('abcdefg   ')
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(<<EOS
