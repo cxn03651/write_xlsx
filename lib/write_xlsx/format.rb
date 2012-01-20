@@ -131,7 +131,7 @@ module Writexlsx
   #
   # The default format is Arial 10 with all other properties off.
   #
-  # Each unique format in Excel::Writer::XLSX must have a corresponding Format
+  # Each unique format in WriteXLSX must have a corresponding Format
   # object. It isn't possible to use a Format with a write() method and then
   # redefine the Format for use at a later stage. This is because a Format
   # is applied to a cell not in its current state but in its final state.
