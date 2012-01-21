@@ -5084,7 +5084,7 @@ module Writexlsx
       level  = args[5] || 0     # Outline level.
       collapsed = args[6] || 0  # Outline level.
 
-      custom_width = 1
+      custom_width = true
       xf_index = 0
       xf_index = format.get_xf_index if format.respond_to?(:get_xf_index)
 
@@ -5092,13 +5092,13 @@ module Writexlsx
       if width.nil?
         if hidden == 0
           width        = 8.43
-          custom_width = 0
+          custom_width = false
         else
           width = 0
         end
       else
         # Width is defined but same as default.
-        custom_width = 0 if width == 8.43
+        custom_width = false if width == 8.43
       end
 
       # Convert column width from user units to character width.
@@ -5115,7 +5115,7 @@ module Writexlsx
 
       (attributes << 'style' << xf_index) if xf_index != 0
       (attributes << 'hidden' << 1)       if hidden != 0
-      (attributes << 'customWidth' << 1)  if custom_width != 0
+      (attributes << 'customWidth' << 1)  if custom_width
       (attributes << 'outlineLevel' << level) if level != 0
       (attributes << 'collapsed'    << 1) if collapsed != 0
 
