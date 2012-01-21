@@ -169,9 +169,6 @@ module Writexlsx
 
       @screen_gridlines = true
       @show_zeros = true
-      @xls_rowmax = RowMax
-      @xls_colmax = ColMax
-      @xls_strmax = StrMax
       @dim_rowmin = nil
       @dim_rowmax = nil
       @dim_colmin = nil
@@ -1307,7 +1304,7 @@ module Writexlsx
       return if [row1, col1, row2, col2].include?(nil)
 
       # Ignore max print area since this is the same as no print area for Excel.
-      if row1 == 0 && col1 == 0 && row2 == @xls_rowmax - 1 && col2 == @xls_colmax - 1
+      if row1 == 0 && col1 == 0 && row2 == RowMax - 1 && col2 == ColMax - 1
         return
       end
 
@@ -1987,8 +1984,8 @@ module Writexlsx
 
       # Check that the string is < 32767 chars
       str_error = 0
-      if str.length > @xls_strmax
-        str = str[0, @xls_strmax]
+      if str.length > StrMax
+        str = str[0, StrMax]
       end
 
       index = shared_string_index(str)
@@ -2457,8 +2454,8 @@ module Writexlsx
 
       # Check that the string is < 32767 chars
       str_error = 0
-      if str.bytesize > @xls_strmax
-        str = str[0, @xls_strmax]
+      if str.bytesize > StrMax
+        str = str[0, StrMax]
       end
 
       # Store the URL displayed text in the shared string table.
@@ -4453,7 +4450,7 @@ module Writexlsx
       # A range such as A:A is equivalent to A1:65536, so add rows as required
       when /\$?([A-Z]{1,3}):\$?([A-Z]{1,3})/
         row1, col1 =  cell_to_rowcol($1 + '1')
-        row2, col2 =  cell_to_rowcol($2 + @xls_rowmax.to_s)
+        row2, col2 =  cell_to_rowcol($2 + RowMax.to_s)
         return [row1, col1, row2, col2, *args]
       # Convert a cell range: 'A1:B7'
       when /\$?([A-Z]{1,3}\$?\d+):\$?([A-Z]{1,3}\$?\d+)/
@@ -4811,8 +4808,8 @@ module Writexlsx
       # generally fixed in relation to the parent cell. However there are
       # some edge cases for cells at the, er, edges.
       #
-      row_max = @xls_rowmax
-      col_max = @xls_colmax
+      row_max = RowMax
+      col_max = ColMax
 
       params[:start_row] ||= case row
         when 0
@@ -6273,7 +6270,7 @@ module Writexlsx
     end
 
     def check_dimensions(row, col)
-      if !row || row >= @xls_rowmax || !col || col >= @xls_colmax
+      if !row || row >= RowMax || !col || col >= ColMax
         raise WriteXLSXDimensionError
       end
       0
@@ -6370,11 +6367,11 @@ module Writexlsx
       row_char_2 = "$#{row_num_2 + 1}"
 
       # We need to handle some special cases that refer to rows or columns only.
-      if row_num_1 == 0 and row_num_2 == @xls_rowmax - 1
+      if row_num_1 == 0 and row_num_2 == RowMax - 1
         range1       = col_char_1
         range2       = col_char_2
         row_col_only = true
-      elsif col_num_1 == 0 and col_num_2 == @xls_colmax - 1
+      elsif col_num_1 == 0 and col_num_2 == ColMax - 1
         range1       = row_char_1
         range2       = row_char_2
         row_col_only = true
@@ -6553,7 +6550,7 @@ module Writexlsx
 
         # Convert col ref to a cell ref and then to a col number.
         dummy, col = substitute_cellref("#{col}1")
-        raise "Invalid column '#{col_letter}'" if col >= @xls_colmax
+        raise "Invalid column '#{col_letter}'" if col >= ColMax
       end
 
       col_first, col_last = @filter_range
