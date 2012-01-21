@@ -1882,7 +1882,7 @@ module Writexlsx
     # mouse over them.
     #
     # Note about row height and comments. If you specify the height of a
-    # row that contains a comment then Excel::Writer::XLSX will adjust the
+    # row that contains a comment then WriteXLSX will adjust the
     # height of the comment to maintain the default or user specified
     # dimensions. However, the height of a row can also be adjusted
     # automatically by Excel if the text wrap property is set or large

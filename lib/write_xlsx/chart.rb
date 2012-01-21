@@ -69,7 +69,7 @@ module Writexlsx
   # ==CHART FORMATTING
   #
   # The following chart formatting properties can be set for any chart object
-  # that they apply to (and that are supported by Excel::Writer::XLSX) such
+  # that they apply to (and that are supported by WriteXLSX) such
   # as chart lines, column fill areas, plot area borders, markers and other
   # chart elements documented above.
   #
@@ -570,7 +570,7 @@ module Writexlsx
     # You can add more than one series to a chart. In fact, some chart
     # types such as stock require it. The series numbering and order in
     # the Excel chart will be the same as the order in which that are added
-    # in Excel::Writer::XLSX.
+    # in WriteXLSX.
     #
     #     # Add the first series.
     #     chart.add_series(
