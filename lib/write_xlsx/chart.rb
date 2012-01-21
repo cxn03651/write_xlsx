@@ -3,7 +3,7 @@ require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
-  # ==SYNOPSIS 
+  # ==SYNOPSIS
   #
   # To create a simple Excel file with a chart using WriteXLSX:
   #
@@ -32,7 +32,7 @@ module Writexlsx
   #
   #     workbook.close
   #
-  # ==DESCRIPTION 
+  # ==DESCRIPTION
   #
   # The Chart module is an abstract base class for modules that implement
   # charts in WriteXLSX. The information below is applicable to all of
@@ -66,7 +66,7 @@ module Writexlsx
   # ===stock
   # Creates an Stock style chart. See Writexlsx::Chart::Stock.
   #
-  # ==CHART FORMATTING 
+  # ==CHART FORMATTING
   #
   # The following chart formatting properties can be set for any chart object
   # that they apply to (and that are supported by Excel::Writer::XLSX) such
@@ -1715,7 +1715,7 @@ module Writexlsx
       horiz    = @horiz_cat_axis
       x_axis   = @x_axis
       y_axis   = @y_axis
-      
+
       # Overwrite the default axis position with a user supplied value.
       position = x_axis[:_position] || position
 
@@ -1823,10 +1823,10 @@ module Writexlsx
 
       # Write the c:majorUnit element.
       write_c_major_unit(y_axis[:_major_unit])
-      
+
       # Write the c:minorUnit element.
       write_c_minor_unit(y_axis[:_minor_unit])
-      
+
       @writer.end_tag('c:valAx')
     end
 
@@ -1945,15 +1945,15 @@ module Writexlsx
 
       # Write the c:majorUnit element.
       write_c_major_unit(x_axis[:_major_unit])
-      
+
       # Write the c:majorTimeUnit element.
       if !x_axis[:_major_unit].nil?
         write_c_major_time_unit(x_axis[:_major_unit_type])
       end
-      
+
       # Write the c:minorUnit element.
       write_c_minor_unit(x_axis[:_minor_unit])
-      
+
       # Write the c:minorTimeUnit element.
       if !x_axis[:_minor_unit].nil?
         write_c_minor_time_unit(x_axis[:_minor_unit_type])
@@ -1967,7 +1967,7 @@ module Writexlsx
     #
     def write_scaling(reverse, min = nil, max = nil, log_base = nil) # :nodoc:
       @writer.start_tag('c:scaling')
-      
+
       # Write the c:logBase element.
       write_c_log_base(log_base)
 
@@ -1976,7 +1976,7 @@ module Writexlsx
 
       # Write the c:max element.
       write_c_max(max)
-      
+
       # Write the c:min element.
       write_c_min(min)
 
@@ -2001,7 +2001,7 @@ module Writexlsx
       return if val == 0 || val.nil?
 
       attributes = ['val', val]
-      
+
       @writer.empty_tag('c:logBase', attributes)
     end
 
@@ -2096,7 +2096,7 @@ module Writexlsx
     #
     def write_crosses(val) # :nodoc:
       val ||= 'autoZero'
-      
+
       attributes = ['val', val]
 
       @writer.empty_tag('c:crosses', attributes)

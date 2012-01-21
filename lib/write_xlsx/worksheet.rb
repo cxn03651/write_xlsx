@@ -147,7 +147,7 @@ module Writexlsx
     StrMax   = 32767    # :nodoc:
     Buffer   = 4096     # :nodoc:
 
-    attr_reader :index 
+    attr_reader :index
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
     attr_reader :vml_data_id, :vml_shape_id, :comments_array
@@ -164,7 +164,7 @@ module Writexlsx
       @filter_on = false
 
       @print_style = PrintStyle.new
-      
+
       @print_area    = ''
 
       @screen_gridlines = true
@@ -476,7 +476,7 @@ module Writexlsx
     # and last_col are optional.
     #
     # If set_column() is applied to a single column the value of first_col
-    # and last_col should be the same. In the case where $last_col is zero
+    # and last_col should be the same. In the case where last_col is zero
     # it is set to the same value as first_col.
     #
     # It is also possible, and generally clearer, to specify a column range
@@ -614,7 +614,7 @@ module Writexlsx
     #
     # This method can be used to specify which cell or cells are selected
     # in a worksheet. The most common requirement is to select a single cell,
-    # in which case $last_row and $last_col can be omitted. The active cell
+    # in which case last_row and last_col can be omitted. The active cell
     # within a selected range is determined by the order in which first and
     # last are specified. It is also possible to specify a cell or a range
     # using A1 notation. See the note about "Cell notation".
@@ -666,7 +666,7 @@ module Writexlsx
     # that the splitter bars are not visible. This is the same as the
     # Window->Freeze Panes menu command in Excel
     #
-    # The parameters $row and $col are used to specify the location of
+    # The parameters row and col are used to specify the location of
     # the split. It should be noted that the split is specified at the
     # top or left of a cell and that the method uses zero based indexing.
     # Therefore to freeze the first row of a worksheet it is necessary
@@ -674,7 +674,7 @@ module Writexlsx
     # This might lead you to think that you are using a 1 based index
     # but this is not the case.
     #
-    # You can set one of the $row and $col parameters as zero if you
+    # You can set one of the row and col parameters as zero if you
     # do not want either a vertical or horizontal split.
     #
     # Examples:
@@ -686,14 +686,14 @@ module Writexlsx
     #     worksheet.freeze_panes(1, 2)    # Freeze first row and first 2 columns
     #     worksheet.freeze_panes('C2')    # Same using A1 notation
     #
-    # The parameters $top_row and $left_col are optional. They are used
+    # The parameters top_row and left_col are optional. They are used
     # to specify the top-most or left-most visible row or column in the
     # scrolling region of the panes. For example to freeze the first row
     # and to have the scrolling region begin at row twenty:
     #
     #     worksheet.freeze_panes(1, 0, 20, 0)
     #
-    # You cannot use A1 notation for the $top_row and $left_col parameters.
+    # You cannot use A1 notation for the top_row and left_col parameters.
     #
     # See also the panes.pl program in the examples directory of the
     # distribution.
@@ -722,7 +722,7 @@ module Writexlsx
     # file format and isn't sufficient to describe all cases of split panes.
     # It should probably be something like:
     #
-    #     split_panes($y, $x, $top_row, $left_col, $offset_row, $offset_col)
+    #     split_panes(y, x, top_row, left_col, offset_row, offset_col)
     #
     # I'll look at changing this if it becomes an issue.
     #++
@@ -731,15 +731,15 @@ module Writexlsx
     # method in that the splits between the panes will be visible to the user
     # and each pane will have its own scroll bars.
     #
-    # The parameters $y and $x are used to specify the vertical and horizontal
-    # position of the split. The units for $y and $x are the same as those
+    # The parameters y and x are used to specify the vertical and horizontal
+    # position of the split. The units for y and x are the same as those
     # used by Excel to specify row height and column width. However, the
     # vertical and horizontal units are different from each other. Therefore
-    # you must specify the $y and $x parameters in terms of the row heights
+    # you must specify the y and x parameters in terms of the row heights
     # and column widths that you have set or the default values which are 15
     # for a row and 8.43 for a column.
     #
-    # You can set one of the $y and $x parameters as zero if you do not want
+    # You can set one of the y and x parameters as zero if you do not want
     # either a vertical or horizontal split. The parameters top_row and left_col
     # are optional. They are used to specify the top-most or left-most visible
     # row or column in the bottom-right pane.
@@ -1297,9 +1297,9 @@ module Writexlsx
     # be printed. All four parameters must be specified. You can also use
     # A1 notation, see the note about "Cell notation".
     #
-    #     $worksheet1->print_area( 'A1:H20' );    # Cells A1 to H20
-    #     $worksheet2->print_area( 0, 0, 19, 7 ); # The same
-    #     $worksheet2->print_area( 'A:H' );       # Columns A to H if rows have data
+    #     worksheet1.print_area( 'A1:H20' );    # Cells A1 to H20
+    #     worksheet2.print_area( 0, 0, 19, 7 ); # The same
+    #     worksheet2.print_area( 'A:H' );       # Columns A to H if rows have data
     #
     def print_area(*args)
       return @print_area if args.empty?
@@ -1321,7 +1321,7 @@ module Writexlsx
     def set_zoom(scale = 100)
       # Confine the scale to Excel's range
       if scale < 10 or scale > 400
-        # carp "Zoom factor $scale outside range: 10 <= zoom <= 400"
+        # carp "Zoom factor scale outside range: 10 <= zoom <= 400"
         scale = 100
       end
 
@@ -1489,7 +1489,7 @@ module Writexlsx
     #     format.set_color('red')
     #     format.set_align('center')
     #
-    #     worksheet.write(4, 0, 'Hello', $format)    # Formatted string
+    #     worksheet.write(4, 0, 'Hello', format)    # Formatted string
     #
     # The write() method will ignore empty strings or nil tokens unless a format
     # is also supplied. As such you needn't worry about special handling for
@@ -1864,14 +1864,14 @@ module Writexlsx
     # This option is used to change the x offset, in pixels, of a comment
     # within a cell:
     #
-    #     worksheet.write_comment('C3', $comment, :x_offset => 30)
+    #     worksheet.write_comment('C3', comment, :x_offset => 30)
     #
     # ===Option: y_offset
     #
     # This option is used to change the y offset, in pixels, of a comment
     # within a cell:
     #
-    #     worksheet.write_comment('C3', $comment, :x_offset => 30)
+    #     worksheet.write_comment('C3', comment, :x_offset => 30)
     #
     # You can apply as many of these options as you require.
     #
@@ -2115,7 +2115,7 @@ module Writexlsx
       # If the first token is a string start the <r> element.
       writer.start_tag('r') if !fragments[0].respond_to?(:get_xf_index)
 
-      # Write the XML elements for the $format $string fragments.
+      # Write the XML elements for the format string fragments.
       fragments.each do |token|
         if token.respond_to?(:get_xf_index)
           # Write the font run.
@@ -2494,7 +2494,7 @@ module Writexlsx
     #   write_date_time (row, col, date_string [ , format ] )
     #
     # Write a datetime string in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format as a
-    # number representing an Excel date. $format is optional.
+    # number representing an Excel date. format is optional.
     #
     # The write_date_time() method can be used to write a date or time
     # to the cell specified by row and column:
@@ -2508,7 +2508,7 @@ module Writexlsx
     # This conforms to an ISO8601 date but it should be noted that the
     # full range of ISO8601 formats are not supported.
     #
-    # The following variations on the $date_string parameter are permitted:
+    # The following variations on the date_string parameter are permitted:
     #
     #     yyyy-mm-ddThh:mm:ss.sss         # Standard format
     #     yyyy-mm-ddT                     # No time
@@ -2519,7 +2519,7 @@ module Writexlsx
     #
     # Note that the T is required in all cases.
     #
-    # A date should always have a $format, otherwise it will appear
+    # A date should always have a format, otherwise it will appear
     # as a number, see "DATES AND TIME IN EXCEL" and "CELL FORMATTING".
     # Here is a typical example:
     #
@@ -2632,7 +2632,7 @@ module Writexlsx
     # cell. This can be occasionally useful if you wish to align two or more
     # images relative to the same cell.
     #
-    # The parameters $scale_x and $scale_y can be used to scale the inserted
+    # The parameters scale_x and scale_y can be used to scale the inserted
     # image horizontally and vertically:
     #
     #     # Scale the inserted image: width x 2.0, height x 0.8
@@ -2712,7 +2712,7 @@ module Writexlsx
     end
 
     #
-    # convert_date_time($date_time_string)
+    # convert_date_time(date_time_string)
     #
     # The function takes a date and time in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format
     # and converts it to a decimal number representing a valid Excel date.
@@ -2852,14 +2852,14 @@ module Writexlsx
     # don't have a format. For example
     #
     #     worksheet.set_row(0, nil, format1)      # Set the format for row 1
-    #     worksheet.write('A1', 'Hello')          # Defaults to $format1
-    #     worksheet.write('B1', 'Hello', format2) # Keeps $format2
+    #     worksheet.write('A1', 'Hello')          # Defaults to format1
+    #     worksheet.write('B1', 'Hello', format2) # Keeps format2
     #
     # If you wish to define a row format in this way you should call the
     # method before any calls to write(). Calling it afterwards will overwrite
     # any format that was previously specified.
     #
-    # The $hidden parameter should be set to 1 if you wish to hide a row.
+    # The hidden parameter should be set to 1 if you wish to hide a row.
     # This can be used, for example, to hide intermediary steps in a
     # complicated calculation:
     #
@@ -2892,7 +2892,7 @@ module Writexlsx
     # programs in the examples directory of the distro.
     #
     # Excel allows up to 7 outline levels. Therefore the level parameter
-    # should be in the range 0 <= $level <= 7.
+    # should be in the range 0 <= level <= 7.
     #
     def set_row(*args)
       row = args[0]
@@ -2931,7 +2931,7 @@ module Writexlsx
     end
 
     #
-    # merge_range($first_row, $first_col, $last_row, $last_col, $string, $format)
+    # merge_range(first_row, first_col, last_row, last_col, string, format)
     #
     # Merge a range of cells. The first cell should contain the data and the others
     # should be blank. All cells should contain the same format.
@@ -3040,7 +3040,7 @@ module Writexlsx
     #             :type     => 'cell',
     #             :criteria => '>=',
     #             :value    => 50,
-    #             :format   => $format1
+    #             :format   => format1
     #         }
     #     )
     #
@@ -4182,8 +4182,8 @@ module Writexlsx
       }
     end
 
-    # Convert the list of $format, $string tokens to pairs of ($format, $string)
-    # except for the first $string fragment which doesn't require a default
+    # Convert the list of format, string tokens to pairs of (format, string)
+    # except for the first string fragment which doesn't require a default
     # formatting run. Use the default for strings without a leading format.
     def rich_strings_fragments(rich_strings) # :nodoc:
       # Create a temp format with the default font for unformatted fragments.
@@ -4544,18 +4544,18 @@ module Writexlsx
     #
     # Based on the width and height of the object we need to calculate 8 vars:
     #
-    #     $col_start, $row_start, $col_end, $row_end, $x1, $y1, $x2, $y2.
+    #     col_start, row_start, col_end, row_end, x1, y1, x2, y2.
     #
     # We also calculate the absolute x and y position of the top left vertex of
     # the object. This is required for images.
     #
-    #    $x_abs, $y_abs
+    #    x_abs, y_abs
     #
     # The width and height of the cells that the object occupies can be variable
     # and have to be taken into account.
     #
-    # The values of $col_start and $row_start are passed in from the calling
-    # function. The values of $col_end and $row_end are calculated by subtracting
+    # The values of col_start and row_start are passed in from the calling
+    # function. The values of col_end and row_end are calculated by subtracting
     # the width and height of the object from the width and height of the
     # underlying cells.
     #
@@ -5076,20 +5076,14 @@ module Writexlsx
     # Write the <col> element.
     #
     def write_col_info(*args) #:nodoc:
-      min = args[0] || 0
-      max = args[1] || 0
-      width = args[2]
-      format = args[3]
-      hidden = args[4] || 0
-      level = args[5] || 0
-      collapsed = args[6] || 0
-#          min          = $_[0] // 0    # First formatted column.
-#          max          = $_[1] // 0    # Last formatted column.
-#          width        = $_[2]         # Col width in user units.
-#          format       = $_[3]         # Format index.
-#          hidden       = $_[4] // 0    # Hidden flag.
-#          level        = $_[5] // 0    # Outline level.
-#          collapsed    = $_[6] // 0    # Outline level.
+      min    = args[0] || 0     # First formatted column.
+      max    = args[1] || 0     # Last formatted column.
+      width  = args[2]          # Col width in user units.
+      format = args[3]          # Format index.
+      hidden = args[4] || 0     # Hidden flag.
+      level  = args[5] || 0     # Outline level.
+      collapsed = args[6] || 0  # Outline level.
+
       custom_width = 1
       xf_index = 0
       xf_index = format.get_xf_index if format.respond_to?(:get_xf_index)
@@ -5263,15 +5257,15 @@ module Writexlsx
     # important where possible. The basic methodology is that the data of every
     # cell type is passed in as follows:
     #
-    #      [ $row, $col, $aref]
+    #      [ row, col, aref]
     #
-    # The aref, called $cell below, contains the following structure in all types:
+    # The aref, called cell below, contains the following structure in all types:
     #
-    #     [ $type, $token, $xf, @args ]
+    #     [ type, token, xf, @args ]
     #
-    # Where $type:  represents the cell type, such as string, number, formula, etc.
-    #       $token: is the actual data for the string, number, formula, etc.
-    #       $xf:    is the XF format object index.
+    # Where type:  represents the cell type, such as string, number, formula, etc.
+    #       token: is the actual data for the string, number, formula, etc.
+    #       xf:    is the XF format object index.
     #       @args:  additional args relevant to the specific data type.
     #
     def write_cell(row, col, cell) #:nodoc:
@@ -6288,7 +6282,7 @@ module Writexlsx
       @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
       @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
     end
-    
+
     def store_col_max_min_values(col)
       @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
       @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
@@ -6503,7 +6497,7 @@ module Writexlsx
     def print_across?
       @print_style.across
     end
-    
+
     # List of valid criteria types.
     def valid_criteria_type  # :nodoc:
       {

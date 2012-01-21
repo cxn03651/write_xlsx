@@ -2,7 +2,7 @@
 module Writexlsx
   module Utility
     #
-    # xl_rowcol_to_cell($row, $col, $row_absolute, $col_absolute)
+    # xl_rowcol_to_cell($row, col, row_absolute, col_absolute)
     #
     def xl_rowcol_to_cell(row, col, row_absolute = false, col_absolute = false)
       row += 1      # Change from 0-indexed to 1 indexed.
@@ -13,9 +13,9 @@ module Writexlsx
     end
 
     #
-    # Returns: ($row, $col, $row_absolute, $col_absolute)
+    # Returns: [row, col, row_absolute, col_absolute]
     #
-    # The $row_absolute and $col_absolute parameters aren't documented because they
+    # The row_absolute and col_absolute parameters aren't documented because they
     # mainly used internally and aren't very useful to the user.
     #
     def xl_cell_to_rowcol(cell)
@@ -93,7 +93,7 @@ module Writexlsx
     def xml_str
       @writer.string
     end
-    
+
     def self.delete_files(path)
       if FileTest.file?(path)
         File.delete(path)

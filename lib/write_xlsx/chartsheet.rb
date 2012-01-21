@@ -123,7 +123,7 @@ module Writexlsx
     #
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing = Drawing.new
-      @drawing = $drawing
+      @drawing = drawing
       @drawing.orientation = @orientation
 
       @external_drawing_links << [ '/drawing', '../drawings/drawing' << drawing_id << '.xml' ]
