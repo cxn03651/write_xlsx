@@ -4,6 +4,7 @@ module Writexlsx
     ROW_MAX  = 1048576  # :nodoc:
     COL_MAX  = 16384    # :nodoc:
     STR_MAX  = 32767    # :nodoc:
+    SHEETNAME_MAX = 31  # :nodoc:
 
     #
     # xl_rowcol_to_cell($row, $col, $row_absolute, $col_absolute)
