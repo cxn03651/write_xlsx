@@ -4430,68 +4430,6 @@ module Writexlsx
     end
 
     #
-    # Substitute an Excel cell reference in A1 notation for  zero based row and
-    # column values in an argument list.
-    #
-    # Ex: ("A4", "Hello") is converted to (3, 0, "Hello").
-    #
-    def substitute_cellref(cell, *args)       #:nodoc:
-      return [*args] if cell.respond_to?(:coerce) # Numeric
-
-      cell.upcase!
-
-      case cell
-      # Convert a column range: 'A:A' or 'B:G'.
-      # A range such as A:A is equivalent to A1:65536, so add rows as required
-      when /\$?([A-Z]{1,3}):\$?([A-Z]{1,3})/
-        row1, col1 =  cell_to_rowcol($1 + '1')
-        row2, col2 =  cell_to_rowcol($2 + ROW_MAX.to_s)
-        return [row1, col1, row2, col2, *args]
-      # Convert a cell range: 'A1:B7'
-      when /\$?([A-Z]{1,3}\$?\d+):\$?([A-Z]{1,3}\$?\d+)/
-        row1, col1 =  cell_to_rowcol($1)
-        row2, col2 =  cell_to_rowcol($2)
-        return [row1, col1, row2, col2, *args]
-      # Convert a cell reference: 'A1' or 'AD2000'
-      when /\$?([A-Z]{1,3}\$?\d+)/
-        row1, col1 =  cell_to_rowcol($1)
-        return [row1, col1, *args]
-      else
-        raise("Unknown cell reference #{cell}")
-      end
-    end
-
-    #
-    # Convert an Excel cell reference in A1 notation to a zero based row and column
-    # reference converts C1 to (0, 2).
-    #
-    # Returns: row, column
-    #
-    def cell_to_rowcol(cell)       #:nodoc:
-      cell =~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/
-      col_abs = $1 == '' ? 0 : 1
-      col     = $2
-      row_abs = $3 == '' ? 0 : 1
-      row     = $4.to_i
-
-      # Convert base26 column string to number
-      # All your Base are belong to us.
-      chars = col.split(//)
-      expn = 0
-      col = 0
-      chars.reverse.each do |char|
-        col += (char.ord - 'A'.ord + 1) * (26 ** expn)
-        expn += 1
-      end
-
-      # Convert 1-index to zero-index
-      row -= 1
-      col -= 1
-
-      [row, col, row_abs, col_abs]
-    end
-
-    #
     # This is an internal method that is used to filter elements of the array of
     # pagebreaks used in the _store_hbreak() and _store_vbreak() methods. It:
     #   1. Removes duplicate entries from the list.
