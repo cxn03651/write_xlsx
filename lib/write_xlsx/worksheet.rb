@@ -142,11 +142,6 @@ module Writexlsx
       end
     end
 
-    RowMax   = 1048576  # :nodoc:
-    ColMax   = 16384    # :nodoc:
-    StrMax   = 32767    # :nodoc:
-    Buffer   = 4096     # :nodoc:
-
     attr_reader :index
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
