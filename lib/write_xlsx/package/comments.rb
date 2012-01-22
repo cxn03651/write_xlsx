@@ -1,9 +1,59 @@
 # -*- coding: utf-8 -*-
+require 'write_xlsx/format'
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
+
+    class Comment
+
+      include Writexlsx::Utility
+
+      DEFAULT_COLOR  = 81  # what color ?
+      DEFAULT_WIDTH  = 128
+      DEFAULT_HEIGHT = 74
+
+      attr_accessor :author, :color, :start_cell, :start_col, :start_row, :visible
+      attr_accessor :width, :height, :x_offset, :x_scale, :y_offset, :y_scale
+
+      def initialize(row, col, string, rgb, options = {})
+        @string     = string[0, STR_MAX]
+        @author     = options[:author]
+        @color      = backgrount_color(options[:color] || DEFAULT_COLOR, rgb)
+        @start_cell = options[:start_cell]
+        @start_col  = options[:start_col]
+        @start_row  = options[:start_row]
+        @visible    = options[:visible]
+        @width      = options[:width]  || DEFAULT_WIDTH
+        @height     = options[:height] || DEFAULT_HEIGHT
+        @x_offset   = options[:x_offset]
+        @x_scale    = 1
+        @y_offset   = options[:y_offset]
+        @y_scale    = 1
+      end
+
+      def backgrount_color(color, rgb)
+        color_id = Format.get_color(color)
+
+        if color_id == 0
+          @color = '#ffffe1'
+        else
+          @color = "##{rgb_color(rgb)} [#{color_id}]\n"
+        end
+      end
+
+      # Minor modification to allow comparison testing. Change RGB colors
+      # from long format, ffcc00 to short format fc0 used by VML.
+      def rgb_color(rgb)
+        result = sprintf("%02x%02x%02x", *rgb)
+        if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
+          result = "#{$1}#{$2}#{$3}"
+        end
+        result
+      end
+    end
+
     class Comments
 
       include Writexlsx::Utility
