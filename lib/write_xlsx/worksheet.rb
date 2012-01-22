@@ -4746,18 +4746,15 @@ module Writexlsx
       # generally fixed in relation to the parent cell. However there are
       # some edge cases for cells at the, er, edges.
       #
-      row_max = ROW_MAX
-      col_max = COL_MAX
-
       params[:start_row] ||= case row
         when 0
           0
-        when row_max - 3
-          row_max - 7
-        when row_max - 2
-          row_max - 6
-        when row_max - 1
-          row_max - 5
+        when ROW_MAX - 3
+          ROW_MAX - 7
+        when ROW_MAX - 2
+          ROW_MAX - 6
+        when ROW_MAX - 1
+          ROW_MAX - 5
         else
           row - 1
       end
@@ -4765,27 +4762,27 @@ module Writexlsx
       params[:y_offset] ||= case row
         when 0
           2
-        when row_max - 3, row_max - 2
+        when ROW_MAX - 3, ROW_MAX - 2
           16
-        when row_max - 1
+        when ROW_MAX - 1
           14
         else
           10
       end
 
       params[:start_col] ||= case col
-        when col_max - 3
-          col_max - 6
-        when col_max - 2
-          col_max - 5
-        when col_max - 1
-          col_max - 4
+        when COL_MAX - 3
+          COL_MAX - 6
+        when COL_MAX - 2
+          COL_MAX - 5
+        when COL_MAX - 1
+          COL_MAX - 4
         else
           col + 1
       end
 
       params[:x_offset] ||= case col
-        when col_max - 3, col_max - 2, col_max - 1
+        when COL_MAX - 3, COL_MAX - 2, COL_MAX - 1
           49
         else
           15
