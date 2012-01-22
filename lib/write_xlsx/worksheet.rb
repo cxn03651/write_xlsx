@@ -2449,7 +2449,7 @@ module Writexlsx
 
       # Check that the string is < 32767 chars
       str_error = 0
-      if str.bytesize > STR_MAX
+      if str.length > STR_MAX
         str = str[0, STR_MAX]
       end
 

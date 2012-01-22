@@ -753,7 +753,7 @@ module Writexlsx
       end
 
       # Check that sheet name is <= 31. Excel limit.
-      raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.bytesize > SHEETNAME_MAX
+      raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
 
       # Check that sheetname doesn't contain any invalid characters
       if name =~ invalid_char
