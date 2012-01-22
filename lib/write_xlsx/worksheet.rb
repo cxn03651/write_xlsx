@@ -4135,6 +4135,16 @@ module Writexlsx
 
     private
 
+    # Minor modification to allow comparison testing. Change RGB colors
+    # from long format, ffcc00 to short format fc0 used by VML.
+    def rgb_color(rgb)
+      result = sprintf("%02x%02x%02x", *rgb)
+      if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
+        result = "#{$1}#{$2}#{$3}"
+      end
+      result
+    end
+
     # List of valid input parameters.
     def valid_validation_parameter
       [
@@ -4721,15 +4731,7 @@ module Writexlsx
         # Get the RGB color from the palette.
         rgb = @workbook.palette[color_id - 8]
 
-        # Minor modification to allow comparison testing. Change RGB colors
-        # from long format, ffcc00 to short format fc0 used by VML.
-        rgb_color = sprintf("%02x%02x%02x", *rgb)
-
-        if rgb_color =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
-          rgb_color = "#{$1}#{$2}#{$3}"
-        end
-
-        params[:color] = sprintf("#%s [%d]\n", rgb_color, color_id)
+        params[:color] = "##{rgb_color(rgb)} [#{color_id}]\n"
       end
 
       # Convert a cell reference to a row and column.
