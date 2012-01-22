@@ -14,23 +14,33 @@ module Writexlsx
       DEFAULT_WIDTH  = 128
       DEFAULT_HEIGHT = 74
 
-      attr_accessor :author, :color, :start_cell, :start_col, :start_row, :visible
-      attr_accessor :width, :height, :x_offset, :x_scale, :y_offset, :y_scale
+      attr_reader :row, :col, :string, :author, :visible, :color, :vertices
 
       def initialize(row, col, string, rgb, options = {})
+        @row        = row
+        @col        = col
         @string     = string[0, STR_MAX]
         @author     = options[:author]
         @color      = backgrount_color(options[:color] || DEFAULT_COLOR, rgb)
         @start_cell = options[:start_cell]
-        @start_col  = options[:start_col]
-        @start_row  = options[:start_row]
+        if @start_cell
+          @start_row, @start_col = substitute_cellref(@start_cell)
+        else
+          [ options[:start_row], options[:start_col] ]
+        end
+        @start_row  ||= default_start_row(row)
+        @start_col  ||= default_start_col(col)
         @visible    = options[:visible]
-        @width      = options[:width]  || DEFAULT_WIDTH
-        @height     = options[:height] || DEFAULT_HEIGHT
-        @x_offset   = options[:x_offset]
-        @x_scale    = 1
-        @y_offset   = options[:y_offset]
-        @y_scale    = 1
+        @x_offset   = options[:x_offset] || default_x_offset(col)
+        @y_offset   = options[:y_offset] || default_y_offset(row)
+        @x_scale    = options[:x_scale]  || 1
+        @y_scale    = options[:y_scale]  || 1
+        @width      = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
+        @height     = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+        @vertices   = position_object_pixels(
+                                             @start_col, @start_row, @x_offset, @y_offset,
+                                             @width, @height
+                                             ) << @width, @height
       end
 
       def backgrount_color(color, rgb)
@@ -51,6 +61,56 @@ module Writexlsx
           result = "#{$1}#{$2}#{$3}"
         end
         result
+      end
+
+      def default_start_row(row)
+        case row
+        when 0
+          0
+        when ROW_MAX - 3
+          ROW_MAX - 7
+        when ROW_MAX - 2
+          ROW_MAX - 6
+        when ROW_MAX - 1
+          ROW_MAX - 5
+        else
+          row - 1
+        end
+      end
+
+      def default_start_col(col)
+        case col
+        when COL_MAX - 3
+          COL_MAX - 6
+        when COL_MAX - 2
+          COL_MAX - 5
+        when COL_MAX - 1
+          COL_MAX - 4
+        else
+          col + 1
+        end
+      end
+
+      def default_x_offset(col)
+        case col
+        when COL_MAX - 3, COL_MAX - 2, COL_MAX - 1
+          49
+        else
+          15
+        end
+      end
+
+      def default_y_offset(row)
+        case row
+        when 0
+          2
+        when ROW_MAX - 3, ROW_MAX - 2
+          16
+        when ROW_MAX - 1
+          14
+        else
+          10
+        end
       end
     end
 
