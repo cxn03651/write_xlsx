@@ -4020,6 +4020,28 @@ module Writexlsx
     # and set the external links.
     #
     def prepare_comments(vml_data_id, vml_shape_id, comment_id) # :nodoc:
+      @comments_array = sorted_comments
+
+      @external_comment_links <<
+        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
+        ['/comments',   "../comments#{comment_id}.xml"]
+
+      count         = @comments_array.size
+      start_data_id = vml_data_id
+
+      # The VML o:idmap data id contains a comma separated range when there is
+      # more than one 1024 block of comments, like this: data="1,2".
+      (1 .. (count / 1024)).each do |i|
+        vml_data_id = "vml_data_id,#{start_data_id + i}"
+      end
+
+      @vml_data_id  = vml_data_id
+      @vml_shape_id = vml_shape_id
+
+      count
+    end
+
+    def sorted_comments
       comments = []
 
       # We sort the comments by row and column but that isn't strictly required.
@@ -4033,26 +4055,7 @@ module Writexlsx
           comments << @comments[row][col]
         end
       end
-
-      @comments_array = comments
-
-      @external_comment_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
-        ['/comments',   "../comments#{comment_id}.xml"]
-
-      count         = comments.size
-      start_data_id = vml_data_id
-
-      # The VML o:idmap data id contains a comma separated range when there is
-      # more than one 1024 block of comments, like this: data="1,2".
-      (1 .. (count / 1024)).each do |i|
-        vml_data_id = "vml_data_id,#{start_data_id + i}"
-      end
-
-      @vml_data_id  = vml_data_id
-      @vml_shape_id = vml_shape_id
-
-      count
+      comments
     end
 
     #
