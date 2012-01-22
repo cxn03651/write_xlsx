@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 module Writexlsx
-  # ==CELL FORMATTING 
+  # ==CELL FORMATTING
   #
   # This section describes the methods and properties that are available
   # for formatting cells in Excel. The properties of a cell that can be
