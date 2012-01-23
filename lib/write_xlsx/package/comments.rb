@@ -143,6 +143,10 @@ module Writexlsx
         @comments.empty?
       end
 
+      def size
+        sorted_comments.size
+      end
+
       def set_xml_writer(filename)
         @writer.set_xml_writer(filename)
       end
