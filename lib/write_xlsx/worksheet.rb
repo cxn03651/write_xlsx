@@ -1927,7 +1927,6 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       store_data_to_table(row, col, [type, num, xf])
-      0
     end
 
     #
@@ -1973,7 +1972,6 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       # Check that the string is < 32767 chars
-      str_error = 0
       if str.length > STR_MAX
         str = str[0, STR_MAX]
       end
@@ -1981,7 +1979,6 @@ module Writexlsx
       index = shared_string_index(str)
 
       store_data_to_table(row, col, [type, index, xf])
-      str_error
     end
 
     #
@@ -2443,7 +2440,6 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       # Check that the string is < 32767 chars
-      str_error = 0
       if str.length > STR_MAX
         str = str[0, STR_MAX]
       end
@@ -2472,8 +2468,6 @@ module Writexlsx
       end
 
       store_data_to_table(row, col, [type, index, xf, link_type, url, str, tip])
-
-      return str_error
     end
 
     #
@@ -2530,14 +2524,11 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      str_error = 0
       date_time = convert_date_time(str)
 
       # If the date isn't valid then write it as a string.
       return write_string(args) unless date_time
       store_data_to_table(row, col, [type, date_time, xf])
-
-      str_error
     end
 
     #
