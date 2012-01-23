@@ -163,8 +163,9 @@ module Writexlsx
       end
 
       def sorted_comments
-        comments = []
+        @sorted_comments if @sorted_comments
 
+        @sorted_comments = []
         # We sort the comments by row and column but that isn't strictly required.
         @comments.keys.sort.each do |row|
           @comments[row].keys.sort.each do |col|
@@ -173,10 +174,10 @@ module Writexlsx
 
             # Set comment author if not already user defined.
             @comments[row][col].author ||= @comments_author
-            comments << @comments[row][col]
+            @sorted_comments << @comments[row][col]
           end
         end
-        comments
+        @sorted_comments
       end
 
       def has_comment_in_row?(row)
