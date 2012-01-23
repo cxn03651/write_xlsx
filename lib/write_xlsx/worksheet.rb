@@ -145,8 +145,9 @@ module Writexlsx
     attr_reader :index
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
-    attr_reader :vml_data_id, :vml_shape_id
+    attr_reader :vml_data_id
     attr_reader :autofilter_area, :hidden
+    attr_accessor :vml_shape_id
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -4011,24 +4012,24 @@ module Writexlsx
     # Turn the HoH that stores the comments into an array for easier handling
     # and set the external links.
     #
-    def prepare_comments(vml_data_id, vml_shape_id, comment_id) # :nodoc:
-      @external_comment_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
-        ['/comments',   "../comments#{comment_id}.xml"]
-
+    def set_vml_data_id(vml_data_id) # :nodoc:
       count = @comments.sorted_comments.size
       start_data_id = vml_data_id
 
       # The VML o:idmap data id contains a comma separated range when there is
       # more than one 1024 block of comments, like this: data="1,2".
       (1 .. (count / 1024)).each do |i|
-        vml_data_id = "vml_data_id,#{start_data_id + i}"
+        vml_data_id = "#{vml_data_id},#{start_data_id + i}"
       end
-
-      @vml_data_id  = vml_data_id
-      @vml_shape_id = vml_shape_id
+      @vml_data_id = vml_data_id
 
       count
+    end
+
+    def set_external_comment_links(comment_id)
+      @external_comment_links <<
+        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
+        ['/comments',   "../comments#{comment_id}.xml"]
     end
 
     #

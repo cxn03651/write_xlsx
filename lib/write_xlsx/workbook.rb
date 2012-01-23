@@ -1253,7 +1253,9 @@ module Writexlsx
         next unless sheet.has_comments?
 
         comment_id += 1
-        comment_count = sheet.prepare_comments( vml_data_id, vml_shape_id, comment_id)
+        sheet.set_external_comment_links(comment_id)
+        sheet.set_vml_data_id(vml_data_id)
+        sheet.vml_shape_id = vml_shape_id
 
         # Each VML file should start with a shape id incremented by 1024.
         vml_data_id  +=    1 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
