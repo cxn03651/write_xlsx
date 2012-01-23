@@ -4959,8 +4959,7 @@ module Writexlsx
       return not_contain_formatting_or_data?(row_num)
 
       # Write the cells if the row contains data.
-      row_ref = @cell_data_table[row_num]
-      if row_ref
+      if @cell_data_table[row_num]
         if !@set_rows[row_num]
           write_row(row_num)
         else
@@ -4984,8 +4983,7 @@ module Writexlsx
 
     def write_cell_column_dimension(row_num)  # :nodoc:
       (@dim_colmin .. @dim_colmax).each do |col_num|
-        col_ref = @cell_data_table[row_num][col_num]
-        write_cell(row_num, col_num, col_ref) if col_ref
+        write_cell(row_num, col_num, @cell_data_table[row_num][col_num]) if @cell_data_table[row_num][col_num]
       end
     end
 
@@ -6077,11 +6075,9 @@ module Writexlsx
       span_max = 0
       spans = []
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
-        row_ref = @cell_data_table[row_num]
-        if row_ref
+        if @cell_data_table[row_num]
           (@dim_colmin .. @dim_colmax).each do |col_num|
-            col_ref = @cell_data_table[row_num][col_num]
-            if col_ref
+            if @cell_data_table[row_num][col_num]
               if !span_min
                 span_min = col_num
                 span_max = col_num
