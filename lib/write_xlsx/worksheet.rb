@@ -1894,7 +1894,7 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       # Process the properties of the cell comment.
-      @comments.add(Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options))
+      @comments.add(Package::Comment.new(@workbook, self, row, col, string, options))
     end
 
     #
