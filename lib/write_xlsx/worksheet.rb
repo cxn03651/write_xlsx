@@ -162,7 +162,7 @@ module Writexlsx
       @index = index
       @name = name
       @colinfo = []
-      @table = []
+      @cell_data_table = {}
       @filter_on = false
 
       @print_style = PrintStyle.new
@@ -4057,13 +4057,13 @@ module Writexlsx
       data = []
       (row_start .. row_end).each do |row_num|
         # Store nil if row doesn't exist.
-        if !@table[row_num]
+        if !@cell_data_table[row_num]
           data << nil
           next
         end
 
         (col_start .. col_end).each do |col_num|
-          if cell = @table[row_num][col_num]
+          if cell = @cell_data_table[row_num][col_num]
             type  = cell[0]
             token = cell[1]
 
@@ -4927,7 +4927,7 @@ module Writexlsx
         span       = @row_spans[span_index]
 
         # Write the cells if the row contains data.
-        if @table[row_num]
+        if @cell_data_table[row_num]
           if !@set_rows[row_num]
             write_row_element(row_num, span)
           else
@@ -4959,7 +4959,7 @@ module Writexlsx
       return not_contain_formatting_or_data?(row_num)
 
       # Write the cells if the row contains data.
-      row_ref = @table[row_num]
+      row_ref = @cell_data_table[row_num]
       if row_ref
         if !@set_rows[row_num]
           write_row(row_num)
@@ -4975,16 +4975,16 @@ module Writexlsx
       end
 
       # Reset table.
-      @table = []
+      @cell_data_table = {}
     end
 
     def not_contain_formatting_or_data?(row_num) # :nodoc:
-      !@set_rows[row_num] && !@table[row_num] && !@comments.has_comment_in_row?(row_num)
+      !@set_rows[row_num] && !@cell_data_table[row_num] && !@comments.has_comment_in_row?(row_num)
     end
 
     def write_cell_column_dimension(row_num)  # :nodoc:
       (@dim_colmin .. @dim_colmax).each do |col_num|
-        col_ref = @table[row_num][col_num]
+        col_ref = @cell_data_table[row_num][col_num]
         write_cell(row_num, col_num, col_ref) if col_ref
       end
     end
@@ -6009,11 +6009,11 @@ module Writexlsx
     end
 
     def store_data_to_table(row, col, data) #:nodoc:
-      if @table[row]
-        @table[row][col] = data
+      if @cell_data_table[row]
+        @cell_data_table[row][col] = data
       else
-        @table[row] = []
-        @table[row][col] = data
+        @cell_data_table[row] = {}
+        @cell_data_table[row][col] = data
       end
     end
 
@@ -6077,10 +6077,10 @@ module Writexlsx
       span_max = 0
       spans = []
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
-        row_ref = @table[row_num]
+        row_ref = @cell_data_table[row_num]
         if row_ref
           (@dim_colmin .. @dim_colmax).each do |col_num|
-            col_ref = @table[row_num][col_num]
+            col_ref = @cell_data_table[row_num][col_num]
             if col_ref
               if !span_min
                 span_min = col_num
