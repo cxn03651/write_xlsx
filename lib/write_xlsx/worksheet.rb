@@ -1936,8 +1936,6 @@ module Writexlsx
     # Write a string to the specified row and column (zero indexed).
     # format is optional.
     #
-    #   Returns  0 : normal termination
-    #
     #     worksheet.write_string(0, 0, 'Your text here')
     #     worksheet.write_string('A2', 'or here')
     #
@@ -2216,9 +2214,6 @@ module Writexlsx
     # Write an array formula to the specified row and column (zero indexed).
     #
     # format is optional.
-    #
-    # write_array_formula methods return:
-    #   Returns  0 : normal termination
     #
     # In Excel an array formula is a formula that performs a calculation
     # on a set of values. It can return a single value or a range of values.
@@ -2996,9 +2991,6 @@ module Writexlsx
     #
     #    conditional_formatting(row, col, {...})
     #    conditional_formatting(first_row, first_col, last_row, last_col, {...})
-    #
-    # conditional_formatting methods return:
-    #   Returns  0 : normal termination
     #
     # The conditional_format() method is used to add formatting to a cell
     # or range of cells based on user defined criteria.
