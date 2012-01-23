@@ -109,6 +109,7 @@ module Writexlsx
       attr_accessor :hbreaks, :vbreaks, :scale                                # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
       attr_accessor :across                                                   # :nodoc:
+      attr_writer   :orientation
 
       def initialize # :nodoc:
         @margin_left = 0.7
@@ -128,6 +129,7 @@ module Writexlsx
         @fit_height = nil
         @page_setup_changed = false
         @across = false
+        @orientation = true
       end
 
       def attributes    # :nodoc:
@@ -139,6 +141,10 @@ module Writexlsx
          'header', @margin_header,
          'footer', @margin_footer
         ]
+      end
+
+      def orientation?
+        !!@orientation
       end
     end
 
@@ -173,8 +179,6 @@ module Writexlsx
       @panes = []
 
       @tab_color  = 0
-
-      @orientation = true
 
       @set_cols = {}
       @set_rows = {}
@@ -758,7 +762,7 @@ module Writexlsx
     # need to call this method.
     #
     def set_portrait
-      @orientation        = true
+      @print_style.orientation        = true
       @print_style.page_setup_changed = true
     end
 
@@ -766,7 +770,7 @@ module Writexlsx
     # Set the page orientation as landscape.
     #
     def set_landscape
-      @orientation         = false
+      @print_style.orientation         = false
       @print_style.page_setup_changed  = true
     end
 
@@ -5352,7 +5356,7 @@ module Writexlsx
       attributes << 'pageOrder' << "overThenDown" if print_across?
 
       # Set page orientation.
-      if orientation?
+      if @print_style.orientation?
         attributes << 'orientation' << 'portrait'
       else
         attributes << 'orientation' << 'landscape'
@@ -6264,10 +6268,6 @@ module Writexlsx
 
     def page_setup_changed? #:nodoc:
       @print_style.page_setup_changed
-    end
-
-    def orientation? #:nodoc:
-      !!@orientation
     end
 
     def header_footer_changed? #:nodoc:
