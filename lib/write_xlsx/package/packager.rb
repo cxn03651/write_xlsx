@@ -177,12 +177,12 @@ module Writexlsx
           next unless worksheet.has_comments?
 
           FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
-          comment = Package::Comments.new
+          comments = Package::Comments.new
 
-          comment.set_xml_writer("#{@package_dir}/xl/comments#{index}.xml")
+          comments.set_xml_writer("#{@package_dir}/xl/comments#{index}.xml")
           index += 1
 
-          comment.assemble_xml_file(worksheet.comments_array)
+          comments.assemble_xml_file(worksheet.comments_array)
         end
       end
 
