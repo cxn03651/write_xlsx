@@ -194,37 +194,22 @@ module Writexlsx
       #
       def write_comment_list(comment_data)
         @writer.start_tag('commentList')
-
-        comment_data.each do |comment|
-          row    = comment.row
-          col    = comment.col
-          text   = comment.string
-          author = comment.author
-
-          # Look up the author id.
-          author_id = nil
-          author_id = @author_ids[author] if author
-
-          # Write the comment element.
-          write_comment(row, col, text, author_id)
-        end
-
+        comment_data.each { |comment| write_comment(comment) }
         @writer.end_tag( 'commentList' )
       end
 
       #
       # Write the <comment> element.
       #
-      def write_comment(row, col, text, author_id)
-        ref       = xl_rowcol_to_cell( row, col )
-        author_id ||= 0
-
+      def write_comment(comment)
+        ref       = xl_rowcol_to_cell( comment.row, comment.col )
         attributes = ['ref', ref]
 
-        (attributes << 'authorId' << author_id ) if author_id
+        author_id = (@author_ids[comment.author] if comment.author) || 0
+        attributes << 'authorId' << author_id
 
         @writer.start_tag('comment', attributes)
-        write_text(text)
+        write_text(comment.string)
         @writer.end_tag('comment')
       end
 
