@@ -3995,6 +3995,10 @@ module Writexlsx
       @comments_author = author if author
     end
 
+    def comments_count
+      @comments.size
+    end
+
     def has_comments? # :nodoc:
       !@comments.empty?
     end
