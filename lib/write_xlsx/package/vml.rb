@@ -167,19 +167,10 @@ module Writexlsx
         # Set the shape index.
         id = '_x0000_s' + id.to_s
 
-        # Get the comment parameters
-        row       = comment.row
-        col       = comment.col
-        string    = comment.string
-        author    = comment.author
-        visible   = comment.visible
-        fillcolor = comment.color
-        vertices  = comment.vertices
-
-        left, top, width, height = pixels_to_points(vertices)
+        left, top, width, height = pixels_to_points(comment.vertices)
 
         # Set the visibility.
-        visibility = 'visible' if visible != 0 && !visible.nil?
+        visibility = 'visible' if comment.visible != 0 && !comment.visible.nil?
 
         left_str    = float_to_str(left)
         top_str     = float_to_str(top)
@@ -207,7 +198,7 @@ module Writexlsx
             'id',          id,
             'type',        type,
             'style',       style,
-            'fillcolor',   fillcolor,
+            'fillcolor',   comment.color,
             'o:insetmode', insetmode
         ]
 
@@ -226,7 +217,7 @@ module Writexlsx
         write_textbox
 
         # Write the x:ClientData element.
-        write_client_data(row, col, visible, vertices)
+        write_client_data(comment)
 
         @writer.end_tag('v:shape')
       end
@@ -297,7 +288,7 @@ module Writexlsx
       #
       # Write the <x:ClientData> element.
       #
-      def write_client_data(row, col, visible, vertices)
+      def write_client_data(comment)
         object_type = 'Note'
 
         attributes = ['ObjectType', object_type]
@@ -311,19 +302,19 @@ module Writexlsx
         write_size_with_cells
 
         # Write the x:Anchor element.
-        write_anchor(vertices)
+        write_anchor(comment.vertices)
 
         # Write the x:AutoFill element.
         write_auto_fill
 
         # Write the x:Row element.
-        write_row(row)
+        write_row(comment.row)
 
         # Write the x:Column element.
-        write_column(col)
+        write_column(comment.col)
 
         # Write the x:Visible element.
-        write_visible if visible != 0 && !visible.nil?
+        write_visible if comment.visible != 0 && !comment.visible.nil?
 
         @writer.end_tag('x:ClientData')
       end
