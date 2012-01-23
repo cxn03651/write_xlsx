@@ -102,6 +102,31 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
+    class CellData   # :nodoc:
+      
+    end
+
+    class NumberCellData < CellData
+      def initialize(row, col, type, index, xf)
+        @row, @col, @type, @index, @xf = row, col, type, index, xf
+      end
+    end
+
+    class StringCellData < CellData
+    end
+
+    class FormulaCellData < CellData
+    end
+
+    class FormulaArrayCellData < CellData
+    end
+
+    class HyperlinkCellData < CellData
+    end
+
+    class BlankCellData < CellData
+    end
+
     class PrintStyle # :nodoc:
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
