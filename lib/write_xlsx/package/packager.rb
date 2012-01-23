@@ -157,14 +157,10 @@ module Writexlsx
           next unless worksheet.has_comments?
           FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
 
-          vml = Package::VML.new
+          vml = Package::Vml.new
           vml.set_xml_writer("#{@package_dir}/xl/drawings/vmlDrawing#{index}.vml")
           index += 1
-          vml.assemble_xml_file(
-            worksheet.vml_data_id,
-            worksheet.vml_shape_id,
-            worksheet.comments_array
-          )
+          vml.assemble_xml_file(worksheet)
         end
       end
 

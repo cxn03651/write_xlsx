@@ -5,7 +5,7 @@ require 'write_xlsx/package/vml'
 
 class TestWriteStroke < Test::Unit::TestCase
   def test_write_stroke
-    vml = Writexlsx::Package::VML.new
+    vml = Writexlsx::Package::Vml.new
     vml.__send__('write_stroke')
     result = vml.instance_variable_get(:@writer).string
     expected = '<v:stroke joinstyle="miter" />'

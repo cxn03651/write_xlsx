@@ -5,7 +5,7 @@ require 'write_xlsx/package/vml'
 
 class TestWriteMoveWithCells < Test::Unit::TestCase
   def test_write_move_with_cells
-    vml = Writexlsx::Package::VML.new
+    vml = Writexlsx::Package::Vml.new
     vml.__send__('write_move_with_cells')
     result = vml.instance_variable_get(:@writer).string
     expected = '<x:MoveWithCells />'

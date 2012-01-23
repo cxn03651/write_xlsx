@@ -4,7 +4,7 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
-    class VML
+    class Vml
 
       include Writexlsx::Utility
 
@@ -16,19 +16,20 @@ module Writexlsx
         @writer.set_xml_writer(filename)
       end
 
-      def assemble_xml_file(data_id, vml_shape_id, comments_data)
+      def assemble_xml_file(worksheet)
         return unless @writer
 
         write_xml_namespace
 
         # Write the o:shapelayout element.
-        write_shapelayout(data_id)
+        write_shapelayout(worksheet.vml_data_id)
 
         # Write the v:shapetype element.
         write_shapetype
 
         z_index = 1
-        comments_data.each do |comment|
+        vml_shape_id = worksheet.vml_shape_id
+        worksheet.comments_array.each do |comment|
           # Write the v:shape element.
           vml_shape_id += 1
           write_shape(vml_shape_id, z_index, comment)
