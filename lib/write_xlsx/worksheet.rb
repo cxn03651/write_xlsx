@@ -1277,10 +1277,6 @@ module Writexlsx
       @print_style.repeat_cols
     end
 
-    def print_area # :nodoc:
-      @print_area.dup
-    end
-
     #
     # :call-seq:
     #   print_area(first_row, first_col, last_row, last_col)
@@ -1294,7 +1290,7 @@ module Writexlsx
     #     worksheet2.print_area( 'A:H' );       # Columns A to H if rows have data
     #
     def print_area(*args)
-      return @print_area if args.empty?
+      return @print_area.dup if args.empty?
       row1, col1, row2, col2 = row_col_notation(args)
       return if [row1, col1, row2, col2].include?(nil)
 
@@ -1305,6 +1301,7 @@ module Writexlsx
 
       # Build up the print area range "=Sheet2!R1C1:R2C1"
       @print_area = convert_name_area(row1, col1, row2, col2)
+      @print_area.dup
     end
 
     #
