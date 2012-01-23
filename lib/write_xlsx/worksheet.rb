@@ -1971,12 +1971,7 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Check that the string is < 32767 chars
-      if str.length > STR_MAX
-        str = str[0, STR_MAX]
-      end
-
-      index = shared_string_index(str)
+      index = shared_string_index(str[0, STR_MAX])
 
       store_data_to_table(row, col, [type, index, xf])
     end
@@ -2439,13 +2434,8 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Check that the string is < 32767 chars
-      if str.length > STR_MAX
-        str = str[0, STR_MAX]
-      end
-
       # Store the URL displayed text in the shared string table.
-      index = shared_string_index(str)
+      index = shared_string_index(str[0, STR_MAX])
 
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
