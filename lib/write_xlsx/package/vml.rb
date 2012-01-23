@@ -168,13 +168,13 @@ module Writexlsx
         id = '_x0000_s' + id.to_s
 
         # Get the comment parameters
-        row       = comment[0]
-        col       = comment[1]
-        string    = comment[2]
-        author    = comment[3]
-        visible   = comment[4]
-        fillcolor = comment[5]
-        vertices  = comment[6]
+        row       = comment.row
+        col       = comment.col
+        string    = comment.string
+        author    = comment.author
+        visible   = comment.visible
+        fillcolor = comment.color
+        vertices  = comment.vertices
 
         left, top, width, height = pixels_to_points(vertices)
 

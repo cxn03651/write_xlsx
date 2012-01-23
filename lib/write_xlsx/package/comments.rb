@@ -14,17 +14,21 @@ module Writexlsx
       DEFAULT_WIDTH  = 128
       DEFAULT_HEIGHT = 74
 
-      attr_reader :row, :col, :string, :author, :visible, :color, :vertices
+      attr_reader :row, :col, :string, :color, :vertices
+      attr_accessor :author, :visible
 
-      def initialize(row, col, string, rgb, options = {})
+      def initialize(workbook, worksheet, row, col, string, options = {})
+        options ||= {}
+        @workbook   = workbook
+        @worksheet  = worksheet
         @row        = row
         @col        = col
         @string     = string[0, STR_MAX]
         @author     = options[:author]
-        @color      = backgrount_color(options[:color] || DEFAULT_COLOR, rgb)
+        @color      = backgrount_color(options[:color] || DEFAULT_COLOR)
         @start_cell = options[:start_cell]
-        if @start_cell
-          @start_row, @start_col = substitute_cellref(@start_cell)
+        @start_row, @start_col = if @start_cell
+          substitute_cellref(@start_cell)
         else
           [ options[:start_row], options[:start_col] ]
         end
@@ -37,18 +41,19 @@ module Writexlsx
         @y_scale    = options[:y_scale]  || 1
         @width      = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
         @height     = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
-        @vertices   = position_object_pixels(
+        @vertices   = @worksheet.position_object_pixels(
                                              @start_col, @start_row, @x_offset, @y_offset,
                                              @width, @height
-                                             ) << @width, @height
+                                             ) << [@width, @height]
       end
 
-      def backgrount_color(color, rgb)
+      def backgrount_color(color)
         color_id = Format.get_color(color)
 
         if color_id == 0
           @color = '#ffffe1'
         else
+          rgb = @workbook.palette[color_id - 8]
           @color = "##{rgb_color(rgb)} [#{color_id}]\n"
         end
       end
@@ -163,8 +168,7 @@ module Writexlsx
 
         @writer.start_tag('authors')
         comment_data.each do |comment|
-          author = comment[3] || ''
-
+          author = comment.author || ''
           if author && !@author_ids[author]
             # Store the author id.
             @author_ids[author] = author_count
@@ -192,10 +196,10 @@ module Writexlsx
         @writer.start_tag('commentList')
 
         comment_data.each do |comment|
-          row    = comment[0]
-          col    = comment[1]
-          text   = comment[2]
-          author = comment[3]
+          row    = comment.row
+          col    = comment.col
+          text   = comment.string
+          author = comment.author
 
           # Look up the author id.
           author_id = nil

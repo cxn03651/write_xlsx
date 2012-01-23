@@ -1895,10 +1895,10 @@ module Writexlsx
       @has_comments = true
       # Process the properties of the cell comment.
       if @comments[row]
-        @comments[row][col] = comment_params(row, col, string, options)
+        @comments[row][col] = Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options)
       else
         @comments[row] = {}
-        @comments[row][col] = comment_params(row, col, string, options)
+        @comments[row][col] = Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options)
       end
     end
 
@@ -4043,10 +4043,10 @@ module Writexlsx
       @comments.keys.sort.each do |row|
         @comments[row].keys.sort.each do |col|
           # Set comment visibility if required and not already user defined.
-          @comments[row][col][4] ||= 1 if @comments_visible
+          @comments[row][col].visible ||= 1 if @comments_visible
 
           # Set comment author if not already user defined.
-          @comments[row][col][3] ||= @comments_author
+          @comments[row][col].author ||= @comments_author
           comments << @comments[row][col]
         end
       end
@@ -4134,6 +4134,106 @@ module Writexlsx
       end
 
       return data
+    end
+
+    #
+    # Calculate the vertices that define the position of a graphical object within
+    # the worksheet in pixels.
+    #
+    #         +------------+------------+
+    #         |     A      |      B     |
+    #   +-----+------------+------------+
+    #   |     |(x1,y1)     |            |
+    #   |  1  |(A1)._______|______      |
+    #   |     |    |              |     |
+    #   |     |    |              |     |
+    #   +-----+----|    BITMAP    |-----+
+    #   |     |    |              |     |
+    #   |  2  |    |______________.     |
+    #   |     |            |        (B2)|
+    #   |     |            |     (x2,y2)|
+    #   +---- +------------+------------+
+    #
+    # Example of an object that covers some of the area from cell A1 to cell B2.
+    #
+    # Based on the width and height of the object we need to calculate 8 vars:
+    #
+    #     col_start, row_start, col_end, row_end, x1, y1, x2, y2.
+    #
+    # We also calculate the absolute x and y position of the top left vertex of
+    # the object. This is required for images.
+    #
+    #    x_abs, y_abs
+    #
+    # The width and height of the cells that the object occupies can be variable
+    # and have to be taken into account.
+    #
+    # The values of col_start and row_start are passed in from the calling
+    # function. The values of col_end and row_end are calculated by subtracting
+    # the width and height of the object from the width and height of the
+    # underlying cells.
+    #
+    #    col_start    # Col containing upper left corner of object.
+    #    x1           # Distance to left side of object.
+    #    row_start    # Row containing top left corner of object.
+    #    y1           # Distance to top of object.
+    #    col_end      # Col containing lower right corner of object.
+    #    x2           # Distance to right side of object.
+    #    row_end      # Row containing bottom right corner of object.
+    #    y2           # Distance to bottom of object.
+    #    width        # Width of object frame.
+    #    height       # Height of object frame.
+    def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false) #:nodoc:
+      # Calculate the absolute x offset of the top-left vertex.
+      if @col_size_changed
+        x_abs = (1 .. col_start).inject(0) {|sum, col| sum += size_col(col)}
+      else
+        # Optimisation for when the column widths haven't changed.
+        x_abs = 64 * col_start
+      end
+      x_abs += x1
+
+      # Calculate the absolute y offset of the top-left vertex.
+      # Store the column change to allow optimisations.
+      if @row_size_changed
+        y_abs = (1 .. row_start).inject(0) {|sum, row| sum += size_row(row)}
+      else
+        # Optimisation for when the row heights haven't changed.
+        y_abs = 20 * row_start
+      end
+      y_abs += y1
+
+      # Adjust start column for offsets that are greater than the col width.
+      x1, col_start = adjust_column_offset(x1, col_start)
+
+      # Adjust start row for offsets that are greater than the row height.
+      y1, row_start = adjust_row_offset(y1, row_start)
+
+      # Initialise end cell to the same as the start cell.
+      col_end = col_start
+      row_end = row_start
+
+      width  += x1
+      height += y1
+
+      # Subtract the underlying cell widths to find the end cell of the object.
+      width, col_end = adjust_column_offset(width, col_end)
+
+      # Subtract the underlying cell heights to find the end cell of the object.
+      height, row_end = adjust_row_offset(height, row_end)
+
+      # The following is only required for positioning drawing/chart objects
+      # and not comments. It is probably the result of a bug.
+      if is_drawing
+        col_end -= 1 if width == 0
+        row_end -= 1 if height == 0
+      end
+
+      # The end vertices are whatever is left from the width and height.
+      x2 = width
+      y2 = height
+
+      [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
     end
 
     private
@@ -4465,106 +4565,6 @@ module Writexlsx
       end
     end
 
-    #
-    # Calculate the vertices that define the position of a graphical object within
-    # the worksheet in pixels.
-    #
-    #         +------------+------------+
-    #         |     A      |      B     |
-    #   +-----+------------+------------+
-    #   |     |(x1,y1)     |            |
-    #   |  1  |(A1)._______|______      |
-    #   |     |    |              |     |
-    #   |     |    |              |     |
-    #   +-----+----|    BITMAP    |-----+
-    #   |     |    |              |     |
-    #   |  2  |    |______________.     |
-    #   |     |            |        (B2)|
-    #   |     |            |     (x2,y2)|
-    #   +---- +------------+------------+
-    #
-    # Example of an object that covers some of the area from cell A1 to cell B2.
-    #
-    # Based on the width and height of the object we need to calculate 8 vars:
-    #
-    #     col_start, row_start, col_end, row_end, x1, y1, x2, y2.
-    #
-    # We also calculate the absolute x and y position of the top left vertex of
-    # the object. This is required for images.
-    #
-    #    x_abs, y_abs
-    #
-    # The width and height of the cells that the object occupies can be variable
-    # and have to be taken into account.
-    #
-    # The values of col_start and row_start are passed in from the calling
-    # function. The values of col_end and row_end are calculated by subtracting
-    # the width and height of the object from the width and height of the
-    # underlying cells.
-    #
-    #    col_start    # Col containing upper left corner of object.
-    #    x1           # Distance to left side of object.
-    #    row_start    # Row containing top left corner of object.
-    #    y1           # Distance to top of object.
-    #    col_end      # Col containing lower right corner of object.
-    #    x2           # Distance to right side of object.
-    #    row_end      # Row containing bottom right corner of object.
-    #    y2           # Distance to bottom of object.
-    #    width        # Width of object frame.
-    #    height       # Height of object frame.
-    def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false) #:nodoc:
-      # Calculate the absolute x offset of the top-left vertex.
-      if @col_size_changed
-        x_abs = (1 .. col_start).inject(0) {|sum, col| sum += size_col(col)}
-      else
-        # Optimisation for when the column widths haven't changed.
-        x_abs = 64 * col_start
-      end
-      x_abs += x1
-
-      # Calculate the absolute y offset of the top-left vertex.
-      # Store the column change to allow optimisations.
-      if @row_size_changed
-        y_abs = (1 .. row_start).inject(0) {|sum, row| sum += size_row(row)}
-      else
-        # Optimisation for when the row heights haven't changed.
-        y_abs = 20 * row_start
-      end
-      y_abs += y1
-
-      # Adjust start column for offsets that are greater than the col width.
-      x1, col_start = adjust_column_offset(x1, col_start)
-
-      # Adjust start row for offsets that are greater than the row height.
-      y1, row_start = adjust_row_offset(y1, row_start)
-
-      # Initialise end cell to the same as the start cell.
-      col_end = col_start
-      row_end = row_start
-
-      width  += x1
-      height += y1
-
-      # Subtract the underlying cell widths to find the end cell of the object.
-      width, col_end = adjust_column_offset(width, col_end)
-
-      # Subtract the underlying cell heights to find the end cell of the object.
-      height, row_end = adjust_row_offset(height, row_end)
-
-      # The following is only required for positioning drawing/chart objects
-      # and not comments. It is probably the result of a bug.
-      if is_drawing
-        col_end -= 1 if width == 0
-        row_end -= 1 if height == 0
-      end
-
-      # The end vertices are whatever is left from the width and height.
-      x2 = width
-      y2 = height
-
-      [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
-    end
-
     def adjust_column_offset(x, column)
       while x >= size_col(column)
         x -= size_col(column)
@@ -4685,138 +4685,6 @@ module Writexlsx
       drawing.add_drawing_object(drawing_type, dimensions, width, height, name)
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
-    end
-
-    #
-    # This method handles the additional optional parameters to write_comment() as
-    # well as calculating the comment object position and vertices.
-    #
-    def comment_params(row, col, string, options) #:nodoc:
-      options ||= {}
-      default_width  = 128
-      default_height = 74
-
-      params = {
-        :author          => nil,
-        :color           => 81,
-        :start_cell      => nil,
-        :start_col       => nil,
-        :start_row       => nil,
-        :visible         => nil,
-        :width           => default_width,
-        :height          => default_height,
-        :x_offset        => nil,
-        :x_scale         => 1,
-        :y_offset        => nil,
-        :y_scale         => 1
-      }
-
-      # Overwrite the defaults with any user supplied values. Incorrect or
-      # misspelled parameters are silently ignored.
-      params.update(options)
-
-      # Ensure that a width and height have been set.
-      params[:width]  ||= default_width
-      params[:height] ||= default_height
-
-      # Limit the string to the max number of chars.
-      max_len = 32767
-
-      string = string[0, max_len] if string.length > max_len
-
-      # Set the comment background colour.
-      color    = params[:color]
-      color_id = Format.get_color(color)
-
-      if color_id == 0
-        params[:color] = '#ffffe1'
-      else
-        # Get the RGB color from the palette.
-        rgb = @workbook.palette[color_id - 8]
-
-        params[:color] = "##{rgb_color(rgb)} [#{color_id}]\n"
-      end
-
-      # Convert a cell reference to a row and column.
-      if params[:start_cell]
-        params[:start_row], params[:start_col] = substitute_cellref(params[:start_cell])
-      end
-
-      # Set the default start cell and offsets for the comment. These are
-      # generally fixed in relation to the parent cell. However there are
-      # some edge cases for cells at the, er, edges.
-      #
-      params[:start_row] ||= case row
-        when 0
-          0
-        when ROW_MAX - 3
-          ROW_MAX - 7
-        when ROW_MAX - 2
-          ROW_MAX - 6
-        when ROW_MAX - 1
-          ROW_MAX - 5
-        else
-          row - 1
-      end
-
-      params[:y_offset] ||= case row
-        when 0
-          2
-        when ROW_MAX - 3, ROW_MAX - 2
-          16
-        when ROW_MAX - 1
-          14
-        else
-          10
-      end
-
-      params[:start_col] ||= case col
-        when COL_MAX - 3
-          COL_MAX - 6
-        when COL_MAX - 2
-          COL_MAX - 5
-        when COL_MAX - 1
-          COL_MAX - 4
-        else
-          col + 1
-      end
-
-      params[:x_offset] ||= case col
-        when COL_MAX - 3, COL_MAX - 2, COL_MAX - 1
-          49
-        else
-          15
-      end
-
-      # Scale the size of the comment box if required.
-      params[:width] = params[:width] * params[:x_scale] if params[:x_scale]
-
-      params[:height] = params[:height] * params[:y_scale] if params[:y_scale]
-
-      # Round the dimensions to the nearest pixel.
-      params[:width]  = (0.5 + params[:width]).to_i
-      params[:height] = (0.5 + params[:height]).to_i
-
-      # Calculate the positions of comment object.
-      vertices = position_object_pixels(
-        params[:start_col], params[:start_row], params[:x_offset],
-        params[:y_offset],  params[:width],     params[:height]
-       )
-
-      # Add the width and height for VML.
-      vertices << [params[:width], params[:height]]
-
-      return [
-        row,
-        col,
-        string,
-
-        params[:author],
-        params[:visible],
-        params[:color],
-
-        vertices
-      ]
     end
 
     #

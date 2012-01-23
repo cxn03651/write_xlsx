@@ -4,8 +4,12 @@ require 'write_xlsx/package/comments'
 
 class TestComments01 < Test::Unit::TestCase
   def test_assemble_xml_file
+    workbook  = WriteXLSX.new(StringIO.new)
+    worksheet = workbook.add_worksheet
+    comment = Writexlsx::Package::Comment.new(workbook, worksheet, 1, 1, 'Some text', :author => 'John', :visible => nil)
+    comment.instance_variable_set(:@vertices, [2, 0, 4, 4, 143, 10, 128, 74])
     @obj = Writexlsx::Package::Comments.new
-    @obj.assemble_xml_file([[1, 1, 'Some text', 'John', nil, 81, [2, 0, 4, 4, 143, 10, 128, 74]]])
+    @obj.assemble_xml_file([comment])
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(<<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

@@ -5,8 +5,12 @@ require 'write_xlsx/package/vml'
 
 class TestWriteTextbox < Test::Unit::TestCase
   def test_write_textbox
+    workbook  = WriteXLSX.new(StringIO.new)
+    worksheet = workbook.add_worksheet
+    comment = Writexlsx::Package::Comment.new(workbook, worksheet, 1, 1, 'Some text', :author => 'John', :visible => nil)
+    comment.instance_variable_set(:@vertices, [2, 0, 15, 10, 4, 4, 15, 4, 143, 10, 128, 74])
     vml = Writexlsx::Package::VML.new
-    vml.assemble_xml_file(1, 1024, [ [ 1, 1, 'Some text', '', nil, '#ffffe1', [ 2, 0, 15, 10, 4, 4, 15, 4, 143, 10, 128, 74 ] ] ])
+    vml.assemble_xml_file(1, 1024, [ comment ])
     result = got_to_array(vml.instance_variable_get(:@writer).string)
     expected = expected_to_array(<<EOS
 <xml xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel">
