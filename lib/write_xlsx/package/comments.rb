@@ -123,27 +123,67 @@ module Writexlsx
 
       include Writexlsx::Utility
 
-      def initialize
+      def initialize(worksheet)
+        @worksheet = worksheet
         @writer = Package::XMLWriterSimple.new
         @author_ids = {}
+        @comments = {}
+      end
+
+      def add(comment)
+        if @comments[comment.row]
+          @comments[comment.row][comment.col] = comment
+        else
+          @comments[comment.row] = {}
+          @comments[comment.row][comment.col] = comment
+        end
+      end
+
+      def empty?
+        @comments.empty?
       end
 
       def set_xml_writer(filename)
         @writer.set_xml_writer(filename)
       end
 
-      def assemble_xml_file(comments_data)
+      def assemble_xml_file
         write_xml_declaration
         write_comments
-        write_authors(comments_data)
-        write_comment_list(comments_data)
+        write_authors(sorted_comments)
+        write_comment_list(sorted_comments)
 
         @writer.end_tag('comments')
         @writer.crlf
         @writer.close
       end
 
+      def sorted_comments
+        comments = []
+
+        # We sort the comments by row and column but that isn't strictly required.
+        @comments.keys.sort.each do |row|
+          @comments[row].keys.sort.each do |col|
+            # Set comment visibility if required and not already user defined.
+            @comments[row][col].visible ||= 1 if comments_visible?
+
+            # Set comment author if not already user defined.
+            @comments[row][col].author ||= @comments_author
+            comments << @comments[row][col]
+          end
+        end
+        comments
+      end
+
+      def has_comment_in_row?(row)
+        !!@comments[row]
+      end
+
       private
+
+      def comments_visible?
+        @worksheet.comments_visible?
+      end
 
       def write_xml_declaration
         @writer.xml_decl

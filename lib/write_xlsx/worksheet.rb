@@ -145,7 +145,7 @@ module Writexlsx
     attr_reader :index
     attr_reader :charts, :images, :drawing
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
-    attr_reader :vml_data_id, :vml_shape_id, :comments_array
+    attr_reader :vml_data_id, :vml_shape_id
     attr_reader :autofilter_area, :hidden
 
     def initialize(workbook, index, name) #:nodoc:
@@ -206,8 +206,7 @@ module Writexlsx
 
       @merge = []
 
-      @has_comments = false
-      @comments = {}
+      @comments = Package::Comments.new(self)
 
       @validations = []
 
@@ -1892,14 +1891,8 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      @has_comments = true
       # Process the properties of the cell comment.
-      if @comments[row]
-        @comments[row][col] = Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options)
-      else
-        @comments[row] = {}
-        @comments[row][col] = Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options)
-      end
+      @comments.add(Writexlsx::Package::Comment.new(@workbook, self, row, col, string, options))
     end
 
     #
@@ -4003,7 +3996,7 @@ module Writexlsx
     end
 
     def has_comments? # :nodoc:
-      !!@has_comments
+      !@comments.empty?
     end
 
     def is_chartsheet? # :nodoc:
@@ -4015,13 +4008,11 @@ module Writexlsx
     # and set the external links.
     #
     def prepare_comments(vml_data_id, vml_shape_id, comment_id) # :nodoc:
-      @comments_array = sorted_comments
-
       @external_comment_links <<
         ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
         ['/comments',   "../comments#{comment_id}.xml"]
 
-      count         = @comments_array.size
+      count = @comments.sorted_comments.size
       start_data_id = vml_data_id
 
       # The VML o:idmap data id contains a comma separated range when there is
@@ -4034,23 +4025,6 @@ module Writexlsx
       @vml_shape_id = vml_shape_id
 
       count
-    end
-
-    def sorted_comments
-      comments = []
-
-      # We sort the comments by row and column but that isn't strictly required.
-      @comments.keys.sort.each do |row|
-        @comments[row].keys.sort.each do |col|
-          # Set comment visibility if required and not already user defined.
-          @comments[row][col].visible ||= 1 if @comments_visible
-
-          # Set comment author if not already user defined.
-          @comments[row][col].author ||= @comments_author
-          comments << @comments[row][col]
-        end
-      end
-      comments
     end
 
     #
@@ -4234,6 +4208,22 @@ module Writexlsx
       y2 = height
 
       [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
+    end
+
+    def comments_visible?
+      !!@comments_visible
+    end
+
+    def comments_xml_writer=(file)
+      @comments.set_xml_writer(file)
+    end
+
+    def comments_assemble_xml_file
+      @comments.assemble_xml_file
+    end
+
+    def comments_array
+      @comments.sorted_comments
     end
 
     private
@@ -5002,7 +4992,7 @@ module Writexlsx
     end
 
     def not_contain_formatting_or_data?(row_num) # :nodoc:
-      !@set_rows[row_num] && !@table[row_num] && !@comments[row_num]
+      !@set_rows[row_num] && !@table[row_num] && !@comments.has_comment_in_row?(row_num)
     end
 
     def write_cell_column_dimension(row_num)  # :nodoc:
@@ -5794,7 +5784,7 @@ module Writexlsx
     # Write the <legacyDrawing> element.
     #
     def write_legacy_drawing #:nodoc:
-      return unless @has_comments
+      return unless has_comments?
 
       # Increment the relationship id for any drawings or comments.
       id = @hlink_count + 1

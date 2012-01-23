@@ -4,7 +4,7 @@ require 'write_xlsx/package/comments'
 
 class TestWriteTextT < Test::Unit::TestCase
   def setup
-    @comment = Writexlsx::Package::Comments.new
+    @comment = Writexlsx::Package::Comments.new(nil)
   end
 
   def test_write_text_t_with_center_space
