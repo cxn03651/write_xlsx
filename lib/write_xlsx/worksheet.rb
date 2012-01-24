@@ -103,28 +103,153 @@ module Writexlsx
     include Writexlsx::Utility
 
     class CellData   # :nodoc:
-      
+      include Writexlsx::Utility
+
+      attr_reader :row, :col, :token, :xf
+      attr_reader :result, :range, :link_type, :url, :tip
+
+      #
+      # Write the <cell> element. This is the innermost loop so efficiency is
+      # important where possible.
+      #
+      def write_cell(worksheet) #:nodoc:
+        xf_index = 0
+        xf_index = xf.get_xf_index if xf.respond_to?(:get_xf_index)
+
+        attributes = ['r', xl_rowcol_to_cell(row, col)]
+
+        # Add the cell format index.
+        if xf_index != 0
+          attributes << 's' << xf_index
+        elsif worksheet.set_rows[row] && worksheet.set_rows[row][1]
+          row_xf = worksheet.set_rows[row][1]
+          attributes << 's' << row_xf.get_xf_index
+        elsif worksheet.col_formats[col]
+          col_xf = worksheet.col_formats[col]
+          attributes << 's' << col_xf.get_xf_index
+        end
+        attributes
+      end
     end
 
     class NumberCellData < CellData
-      def initialize(row, col, type, index, xf)
-        @row, @col, @type, @index, @xf = row, col, type, index, xf
+      def initialize(row, col, num, xf)
+        @row, @col, @token, @xf = row, col, num, xf
+      end
+
+      def data
+        @token
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        worksheet.writer.start_tag('c', attributes)
+        worksheet.write_cell_value(token)
+        worksheet.writer.end_tag('c')
       end
     end
 
     class StringCellData < CellData
+      def initialize(row, col, index, xf)
+        @row, @col, @token, @xf = row, col, index, xf
+      end
+
+      def data
+        { :sst_id => token }
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        attributes << 't' << 's'
+        worksheet.writer.start_tag('c', attributes)
+        worksheet.write_cell_value(token)
+        worksheet.writer.end_tag('c')
+      end
     end
 
     class FormulaCellData < CellData
+      def initialize(row, col, formula, xf, result)
+        @row, @col, @token, @xf, @result = row, col, formula, xf, result
+      end
+
+      def data
+        @result || 0
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        worksheet.writer.start_tag('c', attributes)
+        worksheet.write_cell_formula(token)
+        worksheet.write_cell_value(result || 0)
+        worksheet.writer.end_tag('c')
+      end
     end
 
     class FormulaArrayCellData < CellData
+      def initialize(row, col, formula, xf, range, result)
+        @row, @col, @token, @xf, @range, @result = row, col, formula, xf, range, result
+      end
+
+      def data
+        @result || 0
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        worksheet.writer.start_tag('c', attributes)
+        worksheet.write_cell_array_formula(token, range)
+        worksheet.write_cell_value(result)
+        worksheet.writer.end_tag('c')
+      end
     end
 
     class HyperlinkCellData < CellData
+      def initialize(row, col, index, xf, link_type, url, str, tip)
+        @row, @col, @token, @xf, @link_type, @url, @str, @tip =
+          row, col, index, xf, link_type, url, str, tip
+      end
+
+      def data
+        { :sst_id => token }
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        attributes << 't' << 's'
+        worksheet.writer.start_tag('c', attributes)
+        worksheet.write_cell_value(token)
+        worksheet.writer.end_tag('c')
+
+        if link_type == 1
+          # External link with rel file relationship.
+          worksheet.hlink_count += 1
+          worksheet.hlink_refs <<
+            [
+             link_type,    row,     col,
+             worksheet.hlink_count, @str, @tip
+            ]
+
+          worksheet.external_hyper_links << [ '/hyperlink', @url, 'External' ]
+        elsif link_type
+          # External link with rel file relationship.
+          worksheet.hlink_refs << [link_type, row, col, @url, @str, @tip ]
+        end
+      end
     end
 
     class BlankCellData < CellData
+      def initialize(row, col, index, xf)
+        @row, @col, @xf = row, col, xf
+      end
+
+      def data
+        ''
+      end
+
+      def write_cell(worksheet)
+        attributes = super(worksheet)
+        worksheet.writer.empty_tag('c', attributes)
+      end
     end
 
     class PrintStyle # :nodoc:
@@ -178,7 +303,8 @@ module Writexlsx
     attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
     attr_reader :vml_data_id
     attr_reader :autofilter_area, :hidden
-    attr_accessor :vml_shape_id
+    attr_reader :writer, :set_rows, :col_formats
+    attr_accessor :vml_shape_id, :hlink_count, :hlink_refs
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -1951,7 +2077,7 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      store_data_to_table(row, col, [type, num, xf])
+      store_data_to_table(NumberCellData.new(row, col, num, xf))
     end
 
     #
@@ -1988,15 +2114,13 @@ module Writexlsx
       row, col, str, xf = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
 
-      type = 's'                    # The data type
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
       index = shared_string_index(str[0, STR_MAX])
 
-      store_data_to_table(row, col, [type, index, xf])
+      store_data_to_table(StringCellData.new(row, col, index, xf))
     end
 
     #
@@ -2136,7 +2260,7 @@ module Writexlsx
       # Add the XML string to the shared string table.
       index = shared_string_index(writer.string)
 
-      store_data_to_table(row, col, [type, index, xf])
+      store_data_to_table(StringCellData.new(row, col, index, xf))
     end
 
     #
@@ -2174,13 +2298,11 @@ module Writexlsx
       # Don't write a blank cell unless it has a format
       return unless xf
 
-      type = 'b'                    # The data type
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      store_data_to_table(row, col, [type, nil, xf])
+      store_data_to_table(BlankCellData.new(row, col,  nil, xf))
     end
 
     #
@@ -2229,7 +2351,7 @@ module Writexlsx
 
       formula.sub!(/^=/, '')
 
-      store_data_to_table(row, col, ['f', formula, format, value])
+      store_data_to_table(FormulaCellData.new(row, col, formula, format, value))
     end
 
     #
@@ -2283,8 +2405,6 @@ module Writexlsx
       row1, col1, row2, col2, formula, xf, value = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, formula].include?(nil)
 
-      type = 'a'                    # The data type
-
       # Swap last row/col with first row/col as necessary
       row1, row2 = row2, row1 if row1 > row2
       col1, col2 = col2, col1 if col1 > col2
@@ -2304,7 +2424,7 @@ module Writexlsx
       formula.sub!(/^\{(.*)\}$/, '\1')
       formula.sub!(/^=/, '')
 
-      store_data_to_table(row1, col1, [type, formula, xf, range, value])
+      store_data_to_table(FormulaArrayCellData.new(row1, col1, formula, xf, range, value))
     end
 
     # The outline_settings() method is used to control the appearance of
@@ -2477,7 +2597,7 @@ module Writexlsx
         link_type = 1
       end
 
-      store_data_to_table(row, col, [type, index, xf, link_type, url, str, tip])
+      store_data_to_table(HyperlinkCellData.new(row, col, index, xf, link_type, url, str, tip))
     end
 
     #
@@ -2528,8 +2648,6 @@ module Writexlsx
       row, col, str, xf = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
 
-      type = 'n'                    # The data type
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
@@ -2538,7 +2656,7 @@ module Writexlsx
 
       # If the date isn't valid then write it as a string.
       return write_string(args) unless date_time
-      store_data_to_table(row, col, [type, date_time, xf])
+      store_data_to_table(NumberCellData.new(row, col, date_time, xf))
     end
 
     #
@@ -4081,29 +4199,7 @@ module Writexlsx
 
         (col_start .. col_end).each do |col_num|
           if cell = @cell_data_table[row_num][col_num]
-            type  = cell[0]
-            token = cell[1]
-
-            data << case type
-            when 'n'
-              # Store a number.
-              token
-            when 's'
-              # Store a string.
-              {:sst_id => token}
-            when 'f'
-              # Store a formula.
-              cell[3] || 0
-            when 'a'
-              # Store an array formula.
-              cell[4] || 0
-            when 'l'
-              # Store the string part a hyperlink.
-              {:sst_id => token}
-            when 'b'
-              # Store a empty cell.
-              ''
-            end
+            data << cell.data
           else
             # Store nil if col doesn't exist.
             data << nil
@@ -4228,6 +4324,31 @@ module Writexlsx
 
     def comments_array
       @comments.sorted_comments
+    end
+
+    #
+    # Write the cell value <v> element.
+    #
+    def write_cell_value(value = '') #:nodoc:
+      value ||= ''
+      value = value.to_i if value == value.to_i
+      @writer.data_element('v', value)
+    end
+
+    #
+    # Write the cell formula <f> element.
+    #
+    def write_cell_formula(formula = '') #:nodoc:
+      @writer.data_element('f', formula)
+    end
+
+    #
+    # Write the cell array formula <f> element.
+    #
+    def write_cell_array_formula(formula, range) #:nodoc:
+      attributes = ['t', 'array', 'ref', range]
+
+      @writer.data_element('f', formula, attributes)
     end
 
     private
@@ -5000,7 +5121,7 @@ module Writexlsx
 
     def write_cell_column_dimension(row_num)  # :nodoc:
       (@dim_colmin .. @dim_colmax).each do |col_num|
-        write_cell(row_num, col_num, @cell_data_table[row_num][col_num]) if @cell_data_table[row_num][col_num]
+        @cell_data_table[row_num][col_num].write_cell(self) if @cell_data_table[row_num][col_num]
       end
     end
 
@@ -5042,121 +5163,6 @@ module Writexlsx
         new_args = args.dup
         new_args[7] = 1
         write_row_element(*new_args)
-    end
-
-    #
-    # Write the <cell> element. This is the innermost loop so efficiency is
-    # important where possible. The basic methodology is that the data of every
-    # cell type is passed in as follows:
-    #
-    #      [ row, col, aref]
-    #
-    # The aref, called cell below, contains the following structure in all types:
-    #
-    #     [ type, token, xf, @args ]
-    #
-    # Where type:  represents the cell type, such as string, number, formula, etc.
-    #       token: is the actual data for the string, number, formula, etc.
-    #       xf:    is the XF format object index.
-    #       @args:  additional args relevant to the specific data type.
-    #
-    def write_cell(row, col, cell) #:nodoc:
-      type, token, xf = cell
-
-      xf_index = 0
-      xf_index = xf.get_xf_index if xf.respond_to?(:get_xf_index)
-
-      range = xl_rowcol_to_cell(row, col)
-      attributes = ['r', range]
-
-      # Add the cell format index.
-      if xf_index != 0
-        attributes << 's' << xf_index
-      elsif @set_rows[row] && @set_rows[row][1]
-        row_xf = @set_rows[row][1]
-        attributes << 's' << row_xf.get_xf_index
-      elsif @col_formats[col]
-        col_xf = @col_formats[col]
-        attributes << 's' << col_xf.get_xf_index
-      end
-
-      # Write the various cell types.
-      case type
-      when 'n'
-        # Write a number.
-        @writer.start_tag('c', attributes)
-        write_cell_value(token)
-        @writer.end_tag('c')
-      when 's'
-        # Write a string.
-        attributes << 't' << 's'
-        @writer.start_tag('c', attributes)
-        write_cell_value(token)
-        @writer.end_tag('c')
-      when 'f'
-        # Write a formula.
-        @writer.start_tag('c', attributes)
-        write_cell_formula(token)
-        write_cell_value(cell[3] || 0)
-        @writer.end_tag('c')
-      when 'a'
-        # Write an array formula.
-        @writer.start_tag('c', attributes)
-        write_cell_array_formula(token, cell[3])
-        write_cell_value(cell[4])
-        @writer.end_tag('c')
-      when 'l'
-        link_type = cell[3]
-
-        # Write the string part a hyperlink.
-        attributes << 't' << 's'
-        @writer.start_tag('c', attributes)
-        write_cell_value(token)
-        @writer.end_tag('c')
-
-        if link_type == 1
-          # External link with rel file relationship.
-          @hlink_count += 1
-          @hlink_refs <<
-            [
-              link_type,    row,     col,
-              @hlink_count, cell[5], cell[6]
-            ]
-
-          @external_hyper_links << [ '/hyperlink', cell[4], 'External' ]
-        elsif link_type
-          # External link with rel file relationship.
-          @hlink_refs << [link_type, row, col, cell[4], cell[5], cell[6] ]
-        end
-      when 'b'
-        # Write a empty cell.
-        @writer.empty_tag('c', attributes)
-      end
-    end
-
-    #
-    # Write the cell value <v> element.
-    #
-    def write_cell_value(value = '') #:nodoc:
-      value ||= ''
-      value = value.to_i if value == value.to_i
-      @writer.data_element('v', value)
-    end
-
-    #
-    # Write the cell formula <f> element.
-    #
-    def write_cell_formula(formula = '') #:nodoc:
-      @writer.data_element('f', formula)
-    end
-
-    #
-    # Write the cell array formula <f> element.
-    #
-    def write_cell_array_formula(formula, range) #:nodoc:
-      attributes = ['t', 'array', 'ref', range]
-
-      @writer.data_element('f', formula, attributes)
     end
 
     #
@@ -6023,12 +6029,13 @@ module Writexlsx
       @writer.end_tag('cfRule')
     end
 
-    def store_data_to_table(row, col, data) #:nodoc:
+    def store_data_to_table(cell_data) #:nodoc:
+      row, col = cell_data.row, cell_data.col
       if @cell_data_table[row]
-        @cell_data_table[row][col] = data
+        @cell_data_table[row][col] = cell_data
       else
         @cell_data_table[row] = {}
-        @cell_data_table[row][col] = data
+        @cell_data_table[row][col] = cell_data
       end
     end
 
