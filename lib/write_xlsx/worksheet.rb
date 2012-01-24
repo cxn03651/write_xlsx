@@ -132,7 +132,7 @@ module Writexlsx
       end
     end
 
-    class NumberCellData < CellData
+    class NumberCellData < CellData # :nodoc:
       def initialize(row, col, num, xf)
         @row, @col, @token, @xf = row, col, num, xf
       end
@@ -149,7 +149,7 @@ module Writexlsx
       end
     end
 
-    class StringCellData < CellData
+    class StringCellData < CellData # :nodoc:
       def initialize(row, col, index, xf)
         @row, @col, @token, @xf = row, col, index, xf
       end
@@ -167,7 +167,7 @@ module Writexlsx
       end
     end
 
-    class FormulaCellData < CellData
+    class FormulaCellData < CellData # :nodoc:
       def initialize(row, col, formula, xf, result)
         @row, @col, @token, @xf, @result = row, col, formula, xf, result
       end
@@ -185,7 +185,7 @@ module Writexlsx
       end
     end
 
-    class FormulaArrayCellData < CellData
+    class FormulaArrayCellData < CellData # :nodoc:
       def initialize(row, col, formula, xf, range, result)
         @row, @col, @token, @xf, @range, @result = row, col, formula, xf, range, result
       end
@@ -203,7 +203,7 @@ module Writexlsx
       end
     end
 
-    class HyperlinkCellData < CellData
+    class HyperlinkCellData < CellData # :nodoc:
       def initialize(row, col, index, xf, link_type, url, str, tip)
         @row, @col, @token, @xf, @link_type, @url, @str, @tip =
           row, col, index, xf, link_type, url, str, tip
@@ -237,7 +237,7 @@ module Writexlsx
       end
     end
 
-    class BlankCellData < CellData
+    class BlankCellData < CellData # :nodoc:
       def initialize(row, col, index, xf)
         @row, @col, @xf = row, col, xf
       end
@@ -298,13 +298,14 @@ module Writexlsx
       end
     end
 
-    attr_reader :index
-    attr_reader :charts, :images, :drawing
-    attr_reader :external_hyper_links, :external_drawing_links, :external_comment_links, :drawing_links
-    attr_reader :vml_data_id
-    attr_reader :autofilter_area, :hidden
-    attr_reader :writer, :set_rows, :col_formats
-    attr_accessor :vml_shape_id, :hlink_count, :hlink_refs
+    attr_reader :index # :nodoc:
+    attr_reader :charts, :images, :drawing # :nodoc:
+    attr_reader :external_hyper_links, :external_drawing_links # :nodoc:
+    attr_reader :external_comment_links, :drawing_links # :nodoc:
+    attr_reader :vml_data_id # :nodoc:
+    attr_reader :autofilter_area # :nodoc:
+    attr_reader :writer, :set_rows, :col_formats # :nodoc:
+    attr_accessor :vml_shape_id, :hlink_count, :hlink_refs # :nodoc:
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -4113,7 +4114,7 @@ module Writexlsx
       @comments_author = author if author
     end
 
-    def comments_count
+    def comments_count # :nodoc:
       @comments.size
     end
 
@@ -4143,7 +4144,7 @@ module Writexlsx
       count
     end
 
-    def set_external_comment_links(comment_id)
+    def set_external_comment_links(comment_id) # :nodoc:
       @external_comment_links <<
         ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
         ['/comments',   "../comments#{comment_id}.xml"]
@@ -4185,7 +4186,7 @@ module Writexlsx
     # Return nils for data that doesn't exist since Excel can chart series
     # with data missing.
     #
-    def get_range_data(row_start, col_start, row_end, col_end)
+    def get_range_data(row_start, col_start, row_end, col_end) # :nodoc:
       # TODO. Check for worksheet limits.
 
       # Iterate through the table data.
@@ -4310,19 +4311,19 @@ module Writexlsx
       [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
     end
 
-    def comments_visible?
+    def comments_visible? # :nodoc:
       !!@comments_visible
     end
 
-    def comments_xml_writer=(file)
+    def comments_xml_writer=(file) # :nodoc:
       @comments.set_xml_writer(file)
     end
 
-    def comments_assemble_xml_file
+    def comments_assemble_xml_file # :nodoc:
       @comments.assemble_xml_file
     end
 
-    def comments_array
+    def comments_array # :nodoc:
       @comments.sorted_comments
     end
 
