@@ -3606,111 +3606,38 @@ module Writexlsx
       end
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
-      # Check that row and col are valid without storing the values.
       check_dimensions(row1, col1)
       check_dimensions(row2, col2)
 
-      # Check for valid input parameters.
-      param.each_key do |param_key|
-        unless valid_validation_parameter.include?(param_key)
-          raise WriteXLSXOptionParameterError, "Unknown parameter '#{param_key}' in data_validation()"
-        end
-      end
+      check_for_valid_input_params(param)
 
-      # Map alternative parameter names 'source' or 'minimum' to 'value'.
       param[:value] = param[:source]  if param[:source]
       param[:value] = param[:minimum] if param[:minimum]
 
-      # :validate is a required parameter.
-      unless param.has_key?(:validate)
-        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
-      end
-
-      # Check for valid validation types.
-      unless valid_validation_type.has_key?(param[:validate].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown validation type '#{param[:validate]}' for parameter :validate in data_validation()"
-      else
-        param[:validate] = valid_validation_type[param[:validate].downcase]
-      end
-
-      # No action is required for validation type 'any'.
-      # TODO: we should perhaps store 'any' for message only validations.
+      param[:validate] = valid_validation_type[param[:validate].downcase]
       return if param[:validate] == 'none'
-
-      # The list and custom validations don't have a criteria so we use a default
-      # of 'between'.
-      if param[:validate] == 'list' || param[:validate] == 'custom'
+      if ['list', 'custom'].include?(param[:validate])
         param[:criteria]  = 'between'
         param[:maximum]   = nil
       end
 
-      # 'criteria' is a required parameter.
-      unless param.has_key?(:criteria)
-        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
-      end
+      check_criteria_required(param)
+      check_valid_citeria_types(param)
+      param[:criteria] = valid_criteria_type[param[:criteria].downcase]
 
-      # List of valid criteria types.
-      criteria_type = valid_criteria_type
+      check_maximum_value_when_criteria_is_between_or_notbetween(param)
+      param[:error_type] = param.has_key?(:error_type) ? error_type[param[:error_type].downcase] : 0
 
-      # Check for valid criteria types.
-      unless criteria_type.has_key?(param[:criteria].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#{param[:criteria]}' for parameter :criteria in data_validation()"
-      else
-        param[:criteria] = criteria_type[param[:criteria].downcase]
-      end
+      convert_date_time_value_if_required(param)
+      set_some_defaults(param)
 
-      # 'Between' and 'Not between' criteria require 2 values.
-      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        unless param.has_key?(:maximum)
-          raise WriteXLSXOptionParameterError,
-            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
-        end
-      else
-        param[:maximum] = nil
-      end
-
-      # List of valid error dialog types.
-      error_type = {
-        'stop'        => 0,
-        'warning'     => 1,
-        'information' => 2
-      }
-
-      # Check for valid error dialog types.
-      if not param.has_key?(:error_type)
-        param[:error_type] = 0
-      elsif not error_type.has_key?(param[:error_type].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
-      else
-        param[:error_type] = error_type[param[:error_type].downcase]
-      end
-
-      # Convert date/times value if required.
-      if param[:validate] == 'date' || param[:validate] == 'time'
-        unless convert_date_time_value(param, :value) && convert_date_time_value(param, :maximum)
-          raise WriteXLSXOptionParameterError, "Invalid date/time value."
-        end
-      end
-
-      # Set some defaults if they haven't been defined by the user.
-      param[:ignore_blank]  = 1 unless param[:ignore_blank]
-      param[:dropdown]      = 1 unless param[:dropdown]
-      param[:show_input]    = 1 unless param[:show_input]
-      param[:show_error]    = 1 unless param[:show_error]
-
-      # These are the cells to which the validation is applied.
       param[:cells] = [[row1, col1, row2, col2]]
 
       # A (for now) undocumented parameter to pass additional cell ranges.
-      if param.has_key?(:other_cells)
-        param[:other_cells].each { |cells| param[:cells] << cells }
-      end
+      param[:other_cells].each { |cells| param[:cells] << cells } if param.has_key?(:other_cells)
 
       # Store the validation information until we close the worksheet.
-      @validations.push(param)
+      @validations << param
     end
 
     #
@@ -4353,6 +4280,68 @@ module Writexlsx
     end
 
     private
+
+    def check_for_valid_input_params(param)
+      param.each_key do |param_key|
+        unless valid_validation_parameter.include?(param_key)
+          raise WriteXLSXOptionParameterError, "Unknown parameter '#{param_key}' in data_validation()"
+        end
+      end
+      unless param.has_key?(:validate)
+        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
+      end
+      unless valid_validation_type.has_key?(param[:validate].downcase)
+        raise WriteXLSXOptionParameterError,
+        "Unknown validation type '#{param[:validate]}' for parameter :validate in data_validation()"
+      end
+      if param[:error_type] && !error_type.has_key?(param[:error_type].downcase)
+        raise WriteXLSXOptionParameterError,
+          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
+      end
+    end
+
+    def check_criteria_required(param)
+      unless param.has_key?(:criteria)
+        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
+      end
+    end
+
+    def check_valid_citeria_types(param)
+      unless valid_criteria_type.has_key?(param[:criteria].downcase)
+        raise WriteXLSXOptionParameterError,
+          "Unknown criteria type '#{param[:criteria]}' for parameter :criteria in data_validation()"
+      end
+    end
+
+    def check_maximum_value_when_criteria_is_between_or_notbetween(param)
+      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
+        unless param.has_key?(:maximum)
+          raise WriteXLSXOptionParameterError,
+            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
+        end
+      else
+        param[:maximum] = nil
+      end
+    end
+
+    def error_type
+      {'stop' => 0, 'warning' => 1, 'information' => 2}
+    end
+
+    def convert_date_time_value_if_required(param)
+      if param[:validate] == 'date' || param[:validate] == 'time'
+        unless convert_date_time_value(param, :value) && convert_date_time_value(param, :maximum)
+          raise WriteXLSXOptionParameterError, "Invalid date/time value."
+        end
+      end
+    end
+
+    def set_some_defaults(param)
+      param[:ignore_blank]  ||= 1
+      param[:dropdown]      ||= 1
+      param[:show_input]    ||= 1
+      param[:show_error]    ||= 1
+    end
 
     # Minor modification to allow comparison testing. Change RGB colors
     # from long format, ffcc00 to short format fc0 used by VML.
