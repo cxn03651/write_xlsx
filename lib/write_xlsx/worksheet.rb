@@ -843,7 +843,7 @@ module Writexlsx
     #
     # You cannot use A1 notation for the top_row and left_col parameters.
     #
-    # See also the panes.pl program in the examples directory of the
+    # See also the panes.rb program in the examples directory of the
     # distribution.
     #
     def freeze_panes(*args)
@@ -944,7 +944,7 @@ module Writexlsx
     #     worksheet1.set_tab_color('red')
     #     worksheet2.set_tab_color(0x0C)
     #
-    # See the tab_colors.pl program in the examples directory of the distro.
+    # See the tab_colors.rb program in the examples directory of the distro.
     #
     def set_tab_color(color)
       @tab_color = Colors.new.get_color(color)
@@ -3151,7 +3151,7 @@ module Writexlsx
     # This method contains a lot of parameters and is described in detail in
     # a separate section "CONDITIONAL FORMATTING IN EXCEL".
     #
-    # See also the conditional_format.pl program in the examples directory of the distro
+    # See also the conditional_format.rb program in the examples directory of the distro
     #
     def conditional_formatting(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -3590,7 +3590,7 @@ module Writexlsx
     #             :input_title   => 'Enter an integer:',
     #             :input_message => 'between 1 and 100',
     #         });
-    # See also the data_validate.pl program in the examples directory
+    # See also the data_validate.rb program in the examples directory
     # of the distro.
     #
     def data_validation(*args)
