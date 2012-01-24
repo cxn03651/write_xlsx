@@ -867,7 +867,7 @@ module Writexlsx
       str = @writer.start_tag('sheets')
       id_num = 1
       @worksheets.each do |sheet|
-        str << write_sheet(sheet.name, id_num, sheet.hidden)
+        str << write_sheet(sheet.name, id_num, sheet.hidden?)
         id_num += 1
       end
       str << @writer.end_tag('sheets')
