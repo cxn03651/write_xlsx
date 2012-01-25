@@ -206,7 +206,7 @@ module Writexlsx
     def assemble_xml_file  #:nodoc:
       return unless @writer
 
-      # Prepare format object for passing to Style.pm.
+      # Prepare format object for passing to Style.rb.
       prepare_format_properties
 
       write_xml_declaration
@@ -987,7 +987,7 @@ module Writexlsx
     end
 
     #
-    # Prepare all of the format properties prior to passing them to Styles.pm.
+    # Prepare all of the format properties prior to passing them to Styles.rb.
     #
     def prepare_format_properties #:nodoc:
       # Separate format objects into XF and DXF formats.
