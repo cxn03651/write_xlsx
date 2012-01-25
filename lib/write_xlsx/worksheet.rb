@@ -2544,6 +2544,7 @@ module Writexlsx
     def write_url(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, url, xf, str, tip = row_col_notation(args)
+      xf, str = str, xf if str.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
       type      = 'l'                       # XML data type
