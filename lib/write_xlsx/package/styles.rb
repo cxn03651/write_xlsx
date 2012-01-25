@@ -240,11 +240,11 @@ module Writexlsx
       def write_underline(underline)
         # Handle the underline variants.
         if underline == 2
-          attributes = [val, 'double']
+          attributes = ['val', 'double']
         elsif underline == 33
-          attributes = [val, 'singleAccounting']
+          attributes = ['val', 'singleAccounting']
         elsif underline == 34
-          attributes = [val, 'doubleAccounting']
+          attributes = ['val', 'doubleAccounting']
         else
           attributes = []    # Default to single underline.
         end
