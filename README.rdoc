@@ -60,6 +60,9 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
 
 == Recent change
 
+2012-01-25 v0.0.3
+ alignment format support. see examples/formats.rb
+
 2012-01-20 v0.0.1
  initial release
 
