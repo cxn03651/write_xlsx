@@ -5,12 +5,12 @@
 
 Gem::Specification.new do |s|
   s.name = "write_xlsx"
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Hideo NAKAMURA"]
-  s.date = "2012-01-19"
-  s.description = "write_xlsx s a gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem.\nThe WriteXLSX supports the following features:\n  * Multiple worksheets\n  * Strings and numbers\n  * Unicode text\n  * Rich string formats\n  * Formulas (including array formats)\n  * cell formatting\n  * Embedded images\n  * Charts\n  * Autofilters\n  * Data validation\n  * Hyperlinks\n  * Defined names\n  * Grouping/Outlines\n  * Cell comments\n  * Panes\n  * Page set-up and printing options\n\nwrite_xlsx uses the same interface as writeexcel gem.\n\ndocumentation is not completed, but writeexcel\u{2019}s documentation will help you. See writeexcel.web.fc2.com/\n\nAnd you can find many examples in this gem.\n"
+  s.date = "2012-01-25"
+  s.description = "write_xlsx s a gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem.\nThe WriteXLSX supports the following features:\n  * Multiple worksheets\n  * Strings and numbers\n  * Unicode text\n  * Rich string formats\n  * Formulas (including array formats)\n  * cell formatting\n  * Embedded images\n  * Charts\n  * Autofilters\n  * Data validation\n  * Hyperlinks\n  * Defined names\n  * Grouping/Outlines\n  * Cell comments\n  * Panes\n  * Page set-up and printing options\n\nwrite_xlsx uses the same interface as writeexcel gem.\n\ndocumentation is not completed, but writeexcel\u{2019}s documentation will help you. See http://writeexcel.web.fc2.com/\n\nAnd you can find many examples in this gem.\n"
   s.email = "cxn03651@msj.biglobe.ne.jp"
   s.extra_rdoc_files = [
     "LICENSE.txt",
@@ -42,6 +42,7 @@ Gem::Specification.new do |s|
     "examples/defined_name.rb",
     "examples/demo.rb",
     "examples/diag_border.rb",
+    "examples/formats.rb",
     "examples/headers.rb",
     "examples/hide_sheet.rb",
     "examples/hyperlink1.rb",
@@ -128,7 +129,6 @@ Gem::Specification.new do |s|
     "test/package/app/test_app01.rb",
     "test/package/app/test_app02.rb",
     "test/package/app/test_app03.rb",
-    "test/package/comments/test_comments01.rb",
     "test/package/comments/test_write_text_t.rb",
     "test/package/content_types/test_content_types.rb",
     "test/package/content_types/test_write_default.rb",
@@ -150,7 +150,6 @@ Gem::Specification.new do |s|
     "test/package/styles/test_styles_07.rb",
     "test/package/styles/test_styles_08.rb",
     "test/package/styles/test_styles_09.rb",
-    "test/package/vml/test_vml_01.rb",
     "test/package/vml/test_write_anchor.rb",
     "test/package/vml/test_write_auto_fill.rb",
     "test/package/vml/test_write_column.rb",
@@ -184,6 +183,7 @@ Gem::Specification.new do |s|
     "test/perl_output/demo.xlsx",
     "test/perl_output/diag_border.xlsx",
     "test/perl_output/fit_to_pages.xlsx",
+    "test/perl_output/formats.xlsx",
     "test/perl_output/headers.xlsx",
     "test/perl_output/hide_sheet.xlsx",
     "test/perl_output/hyperlink.xlsx",
