@@ -146,5 +146,17 @@ module Writexlsx
         raise("Unknown cell reference #{cell}")
       end
     end
+
+    def underline_attributes(underline)
+      if underline == 2
+        ['val', 'double']
+      elsif underline == 33
+        ['val', 'singleAccounting']
+      elsif underline == 34
+        ['val', 'doubleAccounting']
+      else
+        []    # Default to single underline.
+      end
+    end
   end
 end

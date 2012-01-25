@@ -238,17 +238,7 @@ module Writexlsx
       # Write the underline font element.
       #
       def write_underline(underline)
-        # Handle the underline variants.
-        if underline == 2
-          attributes = ['val', 'double']
-        elsif underline == 33
-          attributes = ['val', 'singleAccounting']
-        elsif underline == 34
-          attributes = ['val', 'doubleAccounting']
-        else
-          attributes = []    # Default to single underline.
-        end
-
+        attributes = underline_attributes(underline)
         @writer.empty_tag('u', attributes)
       end
 
