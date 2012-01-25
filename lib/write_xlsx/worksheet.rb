@@ -4991,8 +4991,7 @@ module Writexlsx
       collapsed = args[6] || 0  # Outline level.
 
       custom_width = true
-      xf_index = 0
-      xf_index = format.get_xf_index if format.respond_to?(:get_xf_index)
+      xf_index = format ? format.get_xf_index : 0
 
       # Set the Excel default col width.
       if width.nil?
@@ -5125,11 +5124,9 @@ module Writexlsx
       level     ||= 0
       collapsed ||= 0
       empty_row ||= 0
-      xf_index = 0
+      xf_index = format ? format.get_xf_index : 0
 
       attributes = ['r',  r + 1]
-
-      xf_index = format.get_xf_index if format
 
       (attributes << 'spans'        << spans) if spans
       (attributes << 's'            << xf_index) if xf_index != 0
