@@ -523,7 +523,7 @@ module Writexlsx
         attributes << 'applyNumberFormat' << 1 if format.num_format_index > 0
 
         # Add applyFont attribute if XF format uses a font element.
-        attributes << 'applyFont' << 1 if format.has_font != 0 && format.font_index > 0
+        attributes << 'applyFont' << 1 if format.font_index > 0
 
         # Add applyFill attribute if XF format uses a fill element.
         attributes << 'applyFill' << 1 if format.fill_index > 0
