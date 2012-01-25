@@ -974,7 +974,7 @@ class TestExampleMatch < Test::Unit::TestCase
 
       format3 = workbook.add_format(
                                     :color     => 'blue',
-                                    :underline => 1,
+                                    :underline => 1
                                     )
 
       worksheet.write(2, 0, 'This workbook demonstrates some of', format)
