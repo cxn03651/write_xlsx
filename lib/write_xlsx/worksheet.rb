@@ -724,7 +724,7 @@ module Writexlsx
       #       the column dimensions in certain cases.
       ignore_row = 1
       ignore_col = 1
-      ignore_col = 0 if format.respond_to?(:get_xf_index) # Column has a format.
+      ignore_col = 0 if format.respond_to?(:xf_index)     # Column has a format.
       ignore_col = 0 if width && hidden && hidden != 0    # Column has a width but is hidden
 
       check_dimensions_and_update_max_min_values(0, firstcol, ignore_row, ignore_col)
@@ -2220,10 +2220,10 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
       # If the last arg is a format we use it as the cell format.
-      if rich_strings[-1].respond_to?(:get_xf_index)
+      if rich_strings[-1].respond_to?(:xf_index)
         xf = rich_strings.pop
       else
-        xf     = nil
+        xf = nil
       end
 
       # Check that row and col are valid and store max and min values
@@ -2237,11 +2237,11 @@ module Writexlsx
       fragments, length = rich_strings_fragments(rich_strings)
 
       # If the first token is a string start the <r> element.
-      writer.start_tag('r') if !fragments[0].respond_to?(:get_xf_index)
+      writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
 
       # Write the XML elements for the format string fragments.
       fragments.each do |token|
-        if token.respond_to?(:get_xf_index)
+        if token.respond_to?(:xf_index)
           # Write the font run.
           writer.start_tag('r')
           write_font(writer, token)
@@ -3045,7 +3045,7 @@ module Writexlsx
       row_first, col_first, row_last, col_last, string, format, *extra_args = row_col_notation(args)
 
       raise "Incorrect number of arguments" if [row_first, col_first, row_last, col_last, format].include?(nil)
-      raise "Fifth parameter must be a format object" unless format.respond_to?(:get_xf_index)
+      raise "Fifth parameter must be a format object" unless format.respond_to?(:xf_index)
       raise "Can't merge single cell" if row_first == row_last && col_first == col_last
 
       # Swap last row/col with first row/col as necessary
@@ -3078,7 +3078,7 @@ module Writexlsx
         row_first, col_first, row_last, col_last, token, format, *others = row_col_notation(args)
       end
 
-      raise "Format object missing or in an incorrect position" unless format.respond_to?(:get_xf_index)
+      raise "Format object missing or in an incorrect position" unless format.respond_to?(:xf_index)
       raise "Can't merge single cell" if row_first == row_last && col_first == col_last
 
       # Swap last row/col with first row/col as necessary
@@ -4403,7 +4403,7 @@ module Writexlsx
 
       fragments = []
       rich_strings.each do |token|
-        if token.respond_to?(:get_xf_index)
+        if token.respond_to?(:xf_index)
           raise AugumentError, "Can't allow 2 formats in a row" if last == 'format' && pos > 0
 
           # Token is a format object. Add it to the fragment list.
