@@ -2340,16 +2340,14 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
 
       if formula =~ /^\{=.*\}$/
-        return write_array_formula(row, col, row, col, formula, format, value)
+        write_array_formula(row, col, row, col, formula, format, value)
+      else
+        check_dimensions(row, col)
+        store_row_col_max_min_values(row, col)
+        formula.sub!(/^=/, '')
+
+        store_data_to_table(FormulaCellData.new(row, col, formula, format, value))
       end
-
-      # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
-
-      formula.sub!(/^=/, '')
-
-      store_data_to_table(FormulaCellData.new(row, col, formula, format, value))
     end
 
     #
@@ -2652,9 +2650,12 @@ module Writexlsx
 
       date_time = convert_date_time(str)
 
-      # If the date isn't valid then write it as a string.
-      return write_string(args) unless date_time
-      store_data_to_table(NumberCellData.new(row, col, date_time, xf))
+      if date_time
+        store_data_to_table(NumberCellData.new(row, col, date_time, xf))
+      else
+        # If the date isn't valid then write it as a string.
+        write_string(args) unless date_time
+      end
     end
 
     #
