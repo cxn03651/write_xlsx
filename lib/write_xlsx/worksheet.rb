@@ -109,10 +109,10 @@ module Writexlsx
       attr_reader :result, :range, :link_type, :url, :tip
 
       #
-      # Write the <cell> element. This is the innermost loop so efficiency is
+      # attributes for the <cell> element. This is the innermost loop so efficiency is
       # important where possible.
       #
-      def write_cell(worksheet) #:nodoc:
+      def cell_attributes(worksheet) #:nodoc:
         xf_index = 0
         xf_index = xf.get_xf_index if xf.respond_to?(:get_xf_index)
 
@@ -142,7 +142,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         worksheet.writer.start_tag('c', attributes)
         worksheet.write_cell_value(token)
         worksheet.writer.end_tag('c')
@@ -159,7 +159,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         attributes << 't' << 's'
         worksheet.writer.start_tag('c', attributes)
         worksheet.write_cell_value(token)
@@ -177,7 +177,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         worksheet.writer.start_tag('c', attributes)
         worksheet.write_cell_formula(token)
         worksheet.write_cell_value(result || 0)
@@ -195,7 +195,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         worksheet.writer.start_tag('c', attributes)
         worksheet.write_cell_array_formula(token, range)
         worksheet.write_cell_value(result)
@@ -214,7 +214,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         attributes << 't' << 's'
         worksheet.writer.start_tag('c', attributes)
         worksheet.write_cell_value(token)
@@ -247,7 +247,7 @@ module Writexlsx
       end
 
       def write_cell(worksheet)
-        attributes = super(worksheet)
+        attributes = cell_attributes(worksheet)
         worksheet.writer.empty_tag('c', attributes)
       end
     end
