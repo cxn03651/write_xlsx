@@ -731,7 +731,7 @@ module Writexlsx
       check_dimensions_and_update_max_min_values(0, lastcol,  ignore_row, ignore_col)
 
       # Set the limits for the outline levels (0 <= x <= 7).
-      level = 0 unless level
+      level ||= 0
       level = 0 if level < 0
       level = 7 if level > 7
 
@@ -2555,7 +2555,7 @@ module Writexlsx
       end
 
       # The displayed string defaults to the url string.
-      str = url unless str
+      str ||= url
 
       # For external links change the directory separator from Unix to Dos.
       if link_type == 3
