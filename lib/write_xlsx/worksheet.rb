@@ -143,8 +143,7 @@ module Writexlsx
       end
 
       def write_cell
-        attributes = cell_attributes
-        @worksheet.writer.start_tag('c', attributes)
+        @worksheet.writer.start_tag('c', cell_attributes)
         @worksheet.write_cell_value(token)
         @worksheet.writer.end_tag('c')
       end
@@ -180,8 +179,7 @@ module Writexlsx
       end
 
       def write_cell
-        attributes = cell_attributes
-        @worksheet.writer.start_tag('c', attributes)
+        @worksheet.writer.start_tag('c', cell_attributes)
         @worksheet.write_cell_formula(token)
         @worksheet.write_cell_value(result || 0)
         @worksheet.writer.end_tag('c')
@@ -199,8 +197,7 @@ module Writexlsx
       end
 
       def write_cell
-        attributes = cell_attributes
-        @worksheet.writer.start_tag('c', attributes)
+        @worksheet.writer.start_tag('c', cell_attributes)
         @worksheet.write_cell_array_formula(token, range)
         @worksheet.write_cell_value(result)
         @worksheet.writer.end_tag('c')
@@ -253,8 +250,7 @@ module Writexlsx
       end
 
       def write_cell
-        attributes = cell_attributes
-        @worksheet.writer.empty_tag('c', attributes)
+        @worksheet.writer.empty_tag('c', cell_attributes)
       end
     end
 
