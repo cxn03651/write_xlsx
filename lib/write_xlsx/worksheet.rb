@@ -113,9 +113,7 @@ module Writexlsx
       # important where possible.
       #
       def cell_attributes #:nodoc:
-        xf_index = 0
-        xf_index = xf.get_xf_index if xf.respond_to?(:get_xf_index)
-
+        xf_index = xf ? xf.get_xf_index : 0
         attributes = ['r', xl_rowcol_to_cell(row, col)]
 
         # Add the cell format index.
