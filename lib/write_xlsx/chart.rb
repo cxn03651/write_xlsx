@@ -1772,62 +1772,17 @@ module Writexlsx
     # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
     #
     def write_val_axis(position = nil, hide_major_gridlines = nil) # :nodoc:
-      position ||= @val_axis_position
-      horiz      = @horiz_val_axis
-      x_axis     = @x_axis
-      y_axis     = @y_axis
-
-      # Overwrite the default axis position with a user supplied value.
-      position = y_axis[:_position] || position
-
-      @writer.start_tag('c:valAx')
-
-      write_axis_id(@axis_ids[1])
-
-      # Write the c:scaling element.
-      write_scaling(y_axis[:_reverse], y_axis[:_min], y_axis[:_max], y_axis[:_log_base])
-
-      # Write the c:axPos element.
-      write_axis_pos(position, x_axis[:_reverse])
-
-      # Write the c:majorGridlines element.
-      write_major_gridlines unless hide_major_gridlines
-
-      # Write the axis title elements.
-      if title = @y_axis[:_formula]
-        write_title_formula(title, @y_axis[:_data_id], horiz)
-      elsif title = @y_axis[:_name]
-        write_title_rich(title, horiz)
-      end
-
-      # Write the c:numberFormat element.
-      write_number_format
-
-      # Write the c:tickLblPos element.
-      write_tick_label_pos(y_axis[:_label_position])
-
-      # Write the c:crossAx element.
-      write_cross_axis(@axis_ids[0])
-
-      # Note, the category crossing comes from the value axis.
-      if x_axis[:crossing].nil? || x_axis[:_crossing] == 'max'
-        # Write the c:crosses element.
-        write_crosses(x_axis[:_crossing])
-      else
-        # Write the c:crossesAt element.
-        write_c_crosses_at(x_axis[:_crossing])
-      end
-
-      # Write the c:crossBetween element.
-      write_cross_between
-
-      # Write the c:majorUnit element.
-      write_c_major_unit(y_axis[:_major_unit])
-
-      # Write the c:minorUnit element.
-      write_c_minor_unit(y_axis[:_minor_unit])
-
-      @writer.end_tag('c:valAx')
+      params = {
+        :axis_position  => @y_axis[:_position],
+        :axis_id        => @axis_ids[1],
+        :scaling_axis   => @y_axis,
+        :axis_position_element => @x_axis[:_reverse],
+        :title_axis     => @y_axis,
+        :tick_label_pos => @y_axis[:_label_position],
+        :cross_axis     => @axis_ids[0],
+        :category_crossing => @x_axis[:_crossing]
+      }
+      write_val_axis_common(position, hide_major_gridlines, params)
     end
 
     #
@@ -1836,31 +1791,45 @@ module Writexlsx
     # Usually the X axis.
     #
     def write_cat_val_axis(position, hide_major_gridlines) # :nodoc:
+      params = {
+        :axis_position  => @x_axis[:_position],
+        :axis_id        => @axis_ids[0],
+        :scaling_axis   => @x_axis,
+        :axis_position_element => @y_axis[:_reverse],
+        :title_axis     => @x_axis,
+        :tick_label_pos => @x_axis[:_label_position],
+        :cross_axis     => @axis_ids[1],
+        :category_crossing => @y_axis[:_crossing]
+      }
+      write_val_axis_common(position, hide_major_gridlines, params)
+    end
+
+    def write_val_axis_common(position, hide_major_gridlines, params) # :nodoc:
       position ||= @val_axis_position
-      horiz                = @horiz_val_axis
-      x_axis               = @x_axis
-      y_axis               = @y_axis
+      horiz      = @horiz_val_axis
 
       # Overwrite the default axis position with a user supplied value.
-      position = x_axis[:_position] || position
+      position = params[:axis_position] || position
 
       @writer.start_tag('c:valAx')
 
-      write_axis_id(@axis_ids[0])
+      write_axis_id(params[:axis_id])
 
       # Write the c:scaling element.
-      write_scaling(x_axis[:_reverse], x_axis[:_min], x_axis[:_max], x_axis[:_log_base])
+      write_scaling(
+                    params[:scaling_axis][:_reverse], params[:scaling_axis][:_min],
+                    params[:scaling_axis][:_max], params[:scaling_axis][:_log_base])
 
       # Write the c:axPos element.
-      write_axis_pos(position, y_axis[:_reverse])
+      write_axis_pos(position, params[:axis_position_element])
 
       # Write the c:majorGridlines element.
       write_major_gridlines unless hide_major_gridlines
 
       # Write the axis title elements.
-      if title = @x_axis[:_formula]
+      if title = params[:title_axis][:_formula]
         write_title_formula(title, @y_axis[:_data_id], horiz)
-      elsif title = @x_axis[:_name]
+      elsif title = params[:title_axis][:_name]
         write_title_rich(title, horiz)
       end
 
@@ -1868,28 +1837,28 @@ module Writexlsx
       write_number_format
 
       # Write the c:tickLblPos element.
-      write_tick_label_pos(x_axis[:_label_position])
+      write_tick_label_pos(params[:tick_label_pos])
 
       # Write the c:crossAx element.
-      write_cross_axis(@axis_ids[1])
+      write_cross_axis(params[:cross_axis])
 
       # Note, the category crossing comes from the value axis.
-      if y_axis[:_clossing].nil? || y_axis[:_crossing] == 'max'
+      if params[:category_crossing].nil? || params[:category_crossing] == 'max'
         # Write the c:crosses element.
-        write_crosses(y_axis[:_crossing])
+        write_crosses(params[:category_crossing])
       else
         # Write the c:crossesAt element.
-        write_c_crosses_at(y_axis[:_crossing])
+        write_c_crosses_at(params[:category_crossing])
       end
 
       # Write the c:crossBetween element.
       write_cross_between
 
-      # Write the c:majorunit element.
-      write_c_major_unit(y_axis[:_major_unit])
+      # Write the c:majorUnit element.
+      write_c_major_unit(@y_axis[:_major_unit])
 
       # Write the c:minorUnit element.
-      write_c_minor_unit(y_axis[:_minor_unit])
+      write_c_minor_unit(@y_axis[:_minor_unit])
 
       @writer.end_tag('c:valAx')
     end
