@@ -4986,22 +4986,15 @@ module Writexlsx
       hidden = args[4] || 0     # Hidden flag.
       level  = args[5] || 0     # Outline level.
       collapsed = args[6] || 0  # Outline level.
-
-      custom_width = true
       xf_index = format ? format.get_xf_index : 0
 
-      # Set the Excel default col width.
+      custom_width = true
+      custom_width = false if width.nil? && hidden == 0
+      custom_width = false if width == 8.43
+
       if width.nil?
-        if hidden == 0
-          width        = 8.43
-          custom_width = false
-        else
-          width = 0
-        end
-      else
-        # Width is defined but same as default.
-        custom_width = false if width == 8.43
-      end
+        width = hidden == 0 ? 8.43 : 0
+       end
 
       # Convert column width from user units to character width.
       max_digit_width = 7.0    # For Calabri 11.
