@@ -949,8 +949,6 @@ module Writexlsx
     # Assemble worksheets into a workbook.
     #
     def store_workbook #:nodoc:
-      packager = Package::Packager.new
-
       # Add a default worksheet if non have been added.
       add_worksheet if @worksheets.empty?
 
@@ -960,19 +958,13 @@ module Writexlsx
       # Set the active sheet.
       @worksheets.each { |sheet| sheet.activate if sheet.index == @activesheet }
 
-      # Prepare the worksheet cell comments.
-      prepare_comments
-
-      # Set the defined names for the worksheets such as Print Titles.
-      prepare_defined_names
-
-      # Prepare the drawings, charts and images.
-      prepare_drawings
-
-      # Add cached data to charts.
-      add_chart_data
+      prepare_comments      # Prepare the worksheet cell comments.
+      prepare_defined_names # Set the defined names for the worksheets such as Print Titles.
+      prepare_drawings      # Prepare the drawings, charts and images.
+      add_chart_data        # Add cached data to charts.
 
       # Package the workbook.
+      packager = Package::Packager.new
       packager.add_workbook(self)
       packager.set_package_dir(@tempdir)
       packager.create_package
