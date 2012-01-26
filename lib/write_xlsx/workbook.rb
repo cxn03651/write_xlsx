@@ -1021,13 +1021,6 @@ module Writexlsx
     end
 
     #
-    # Set the default index for each format. This is mainly used for testing.
-    #
-    def set_default_xf_indices #:nodoc:
-      @formats.each { |format| format.get_xf_index }
-    end
-
-    #
     # Iterate through the XF Format objects and give them an index to non-default
     # font elements.
     #

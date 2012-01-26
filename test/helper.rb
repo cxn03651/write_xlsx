@@ -14,6 +14,15 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'write_xlsx'
 
+class Writexlsx::Workbook
+  #
+  # Set the default index for each format. This is mainly used for testing.
+  #
+  def set_default_xf_indices #:nodoc:
+    @formats.each { |format| format.get_xf_index }
+  end
+end
+
 class Test::Unit::TestCase
   def setup_dir_var
     @test_dir = File.dirname(__FILE__)
