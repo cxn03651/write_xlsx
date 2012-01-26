@@ -2072,8 +2072,6 @@ module Writexlsx
       row, col, num, xf = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, num].include?(nil)
 
-      type    = 'n'
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
@@ -2227,7 +2225,6 @@ module Writexlsx
       else
         xf     = nil
       end
-      type   = 's'                   # The data type.
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
@@ -2547,7 +2544,6 @@ module Writexlsx
       xf, str = str, xf if str.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
-      type      = 'l'                       # XML data type
       link_type = 1
 
       # Remove the URI scheme from internal links.
