@@ -84,18 +84,14 @@ module Writexlsx
       # Write the <dc:creator> element.
       #
       def write_dc_creator
-        data = @properties[:author] || ''
-
-        @writer.data_element('dc:creator', data)
+        write_base(:author, 'dc:creator', '')
       end
 
       #
       # Write the <cp:lastModifiedBy> element.
       #
       def write_cp_last_modified_by
-        data = @properties[:author] || ''
-
-        @writer.data_element('cp:lastModifiedBy', data)
+        write_base(:author, 'cp:lastModifiedBy', '')
       end
 
       #
@@ -130,66 +126,48 @@ module Writexlsx
       # Write the <dc:title> element.
       #
       def write_dc_title
-        data = @properties[:title]
-
-        return unless data
-
-        @writer.data_element('dc:title', data)
+        write_base(:title, 'dc:title')
       end
 
       #
       # Write the <dc:subject> element.
       #
       def write_dc_subject
-        data = @properties[:subject]
-
-        return unless data
-
-        @writer.data_element('dc:subject', data)
+        write_base(:subject, 'dc:subject')
       end
 
       #
       # Write the <cp:keywords> element.
       #
       def write_cp_keywords
-        data = @properties[:keywords]
-
-        return unless data
-
-        @writer.data_element('cp:keywords', data)
+        write_base(:keywords, 'cp:keywords')
       end
 
       #
       # Write the <dc:description> element.
       #
       def write_dc_description
-        data = @properties[:comments]
-
-        return unless data
-
-        @writer.data_element('dc:description', data)
+        write_base(:comments, 'dc:description')
       end
 
       #
       # Write the <cp:category> element.
       #
       def write_cp_category
-        data = @properties[:category]
-
-        return unless data
-
-        @writer.data_element('cp:category', data)
+        write_base(:category, 'cp:category')
       end
 
       #
       # Write the <cp:contentStatus> element.
       #
       def write_cp_content_status
-        data = @properties[:status]
+        write_base(:status, 'cp:contentStatus')
+      end
 
+      def write_base(key, tag, default = nil)
+        data = @properties[key] || default
         return unless data
-
-        @writer.data_element('cp:contentStatus', data)
+        @writer.data_element(tag, data)
       end
     end
   end
