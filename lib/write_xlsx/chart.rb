@@ -1636,11 +1636,13 @@ module Writexlsx
     # Write the <c:val> element.
     #
     def write_val(series) # :nodoc:
-      formula = series[:_values]
-      data_id = series[:_val_data_id]
+      write_val_base(series[:_values], series[:_val_data_id], 'c:val')
+    end
+
+    def write_val_base(formula, data_id, tag) # :nodoc:
       data    = @formula_data[data_id]
 
-      @writer.start_tag('c:val')
+      @writer.start_tag(tag)
 
       # Check the type of cached data.
       type = get_data_type(data)
@@ -1653,7 +1655,7 @@ module Writexlsx
         write_num_ref(formula, data, type)
       end
 
-      @writer.end_tag('c:val')
+      @writer.end_tag(tag)
     end
 
     #

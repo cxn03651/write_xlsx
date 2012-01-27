@@ -149,50 +149,14 @@ module Writexlsx
       # Write the <c:xVal> element.
       #
       def write_x_val(series)
-        formula = series[:_categories]
-        data_id = series[:_cat_data_id]
-        data    = @formula_data[data_id]
-
-        @writer.start_tag('c:xVal')
-
-        # Check the type of cached data.
-        type = get_data_type(data)
-
-        # TODO. Can a scatter plot have non-numeric data.
-
-        if type == 'str'
-          # Write the c:numRef element.
-          write_str_ref(formula, data, type)
-        else
-          # Write the c:numRef element.
-          write_num_ref(formula, data, type)
-        end
-
-        @writer.end_tag('c:xVal')
+        write_val_base(series[:_categories], series[:_cat_data_id], 'c:xVal')
       end
 
       #
       # Write the <c:yVal> element.
       #
       def write_y_val(series)
-        formula = series[:_values]
-        data_id = series[:_val_data_id]
-        data    = @formula_data[data_id]
-
-        @writer.start_tag('c:yVal')
-
-        # Check the type of cached data.
-        type = get_data_type(data)
-
-        if type == 'str'
-          # Write the c:numRef element.
-          write_str_ref(formula, data, type)
-        else
-          # Write the c:numRef element.
-          write_num_ref(formula, data, type)
-        end
-
-        @writer.end_tag('c:yVal')
+        write_val_base(series[:_values], series[:_val_data_id], 'c:yVal')
       end
 
       #
