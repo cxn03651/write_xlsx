@@ -2863,22 +2863,10 @@ module Writexlsx
     # Write the <c:numCache> element.
     #
     def write_num_cache(data) # :nodoc:
-      count = data.size
-
       @writer.start_tag('c:numCache')
-
-      # Write the c:formatCode element.
       write_format_code('General')
-
-      # Write the c:ptCount element.
-      write_pt_count(count)
-
-      (0 .. count - 1).each do |i|
-
-        # Write the c:pt element.
-        write_pt(i, data[i])
-      end
-
+      write_pt_count(data.size)
+      write_pts(data)
       @writer.end_tag('c:numCache')
     end
 
@@ -2886,20 +2874,14 @@ module Writexlsx
     # Write the <c:strCache> element.
     #
     def write_str_cache(data) # :nodoc:
-      count = data.size
-
       @writer.start_tag('c:strCache')
-
-      # Write the c:ptCount element.
-      write_pt_count(count)
-
-      (0 .. count - 1).each do |i|
-
-        # Write the c:pt element.
-        write_pt(i, data[i])
-      end
-
+      write_pt_count(data.size)
+      write_pts(data)
       @writer.end_tag('c:strCache')
+    end
+
+    def write_pts(data)
+      data.each_index { |i| write_pt(i, data[i])}
     end
 
     #
