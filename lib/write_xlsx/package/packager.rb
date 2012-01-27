@@ -120,31 +120,26 @@ module Writexlsx
       # Write the chart files.
       #
       def write_chart_files
-        return if @workbook.charts.empty?
-
-        FileUtils.mkdir_p("#{@package_dir}/xl/charts")
-
-        index = 1
-        @workbook.charts.each do |chart|
-          chart.set_xml_writer("#{@package_dir}/xl/charts/chart#{index}.xml")
-          index += 1
-          chart.assemble_xml_file
-        end
+        write_chart_or_drawing_files(@workbook.charts, 'chart')
       end
 
       #
       # Write the drawing files.
       #
       def write_drawing_files
-        return if @workbook.drawings.empty?
+        write_chart_or_drawing_files(@workbook.drawings, 'drawing')
+      end
 
-        FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
+      def write_chart_or_drawing_files(objects, filename)
+        return if objects.empty?
+
+        FileUtils.mkdir_p("#{@package_dir}/xl/#{filename}s")
 
         index = 1
-        @workbook.drawings.each do |drawing|
-          drawing.set_xml_writer("#{@package_dir}/xl/drawings/drawing#{index}.xml")
+        objects.each do |object|
+          object.set_xml_writer("#{@package_dir}/xl/#{filename}s/#{filename}#{index}.xml")
           index += 1
-          drawing.assemble_xml_file
+          object.assemble_xml_file
         end
       end
 
