@@ -632,38 +632,32 @@ module Writexlsx
     end
 
     def bold?
-      return false unless @bold
-      return false if @bold == 0
-      true
+      bool_both_ruby_and_perl?(@bold)
     end
 
     def italic?
-      return false unless @italic
-      return false if @italic == 0
-      true
+      bool_both_ruby_and_perl?(@italic)
     end
 
     def strikeout?
-      return false unless @font_strikeout
-      return false if @font_strikeout == 0
-      true
+      bool_both_ruby_and_perl?(@font_strikeout)
     end
 
     def outline?
-      return false unless @font_outline
-      return false if @font_outline == 0
-      true
+      bool_both_ruby_and_perl?(@font_outline)
     end
 
     def shadow?
-      return false unless @font_shadow
-      return false if @font_shadow == 0
-      true
+      bool_both_ruby_and_perl?(@font_shadow)
     end
 
     def underline?
-      return false unless @underline
-      return false if @underline == 0
+      bool_both_ruby_and_perl?(@underline)
+    end
+
+    def bool_both_ruby_and_perl?(val)
+      return false unless val
+      return false if val == 0
       true
     end
   end
