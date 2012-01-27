@@ -79,27 +79,7 @@ module Writexlsx
       # Write the series elements.
       #
       def write_series
-        # Write each series with subelements.
-        index = 0
-        @series.each do |series|
-          write_ser(index, series)
-          index += 1
-        end
-
-
-        # Write the c:marker element.
-        write_marker_value
-
-        # Write the c:overlap element.
-        write_overlap if @subtype =~ /stacked/
-
-        # Generate the axis ids.
-        add_axis_id
-        add_axis_id
-
-        # Write the c:axId element.
-        write_axis_id(@axis_ids[0])
-        write_axis_id(@axis_ids[1])
+        write_series_base {write_overlap if @subtype =~ /stacked/}
       end
 
 

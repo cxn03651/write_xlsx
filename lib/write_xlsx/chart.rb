@@ -1504,6 +1504,10 @@ module Writexlsx
     # Write the series elements.
     #
     def write_series # :nodoc:
+      write_series_base { nil }
+    end
+
+    def write_series_base
       # Write each series with subelements.
       index = 0
       @series.each do |series|
@@ -1513,6 +1517,10 @@ module Writexlsx
 
       # Write the c:marker element.
       write_marker_value
+
+      # Write the c:overlap element
+      # block given by Bar and Column
+      yield
 
       # Generate the axis ids.
       add_axis_id
