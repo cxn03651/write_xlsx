@@ -4341,16 +4341,6 @@ module Writexlsx
       param[:show_error]    ||= 1
     end
 
-    # Minor modification to allow comparison testing. Change RGB colors
-    # from long format, ffcc00 to short format fc0 used by VML.
-    def rgb_color(rgb)
-      result = sprintf("%02x%02x%02x", *rgb)
-      if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
-        result = "#{$1}#{$2}#{$3}"
-      end
-      result
-    end
-
     # List of valid input parameters.
     def valid_validation_parameter
       [
