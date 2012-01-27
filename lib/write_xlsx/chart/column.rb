@@ -42,32 +42,6 @@ module Writexlsx
         write_bar_chart
       end
 
-
-      ##############################################################################
-      #
-      # _write_bar_chart
-      #
-      # Write the <c:barChart> element.
-      #
-      def write_bar_chart
-        subtype = @subtype
-
-        subtype = 'percentStacked' if subtype == 'percent_stacked'
-
-        @writer.start_tag('c:barChart')
-
-        # Write the c:barDir element.
-        write_bar_dir
-
-        # Write the c:grouping element.
-        write_grouping(subtype)
-
-        # Write the series elements.
-        write_series
-
-        @writer.end_tag('c:barChart')
-      end
-
       #
       # Write the <c:barDir> element.
       #
