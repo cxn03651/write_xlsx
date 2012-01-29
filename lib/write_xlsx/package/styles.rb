@@ -172,16 +172,11 @@ module Writexlsx
       # Write the <fonts> element.
       #
       def write_fonts
-        count = @font_count
-
-        attributes = ['count', count]
-
-        @writer.start_tag('fonts', attributes)
-
-        # Write the font elements for format objects that have them.
-        @xf_formats.each { |format| write_font(format) unless format.has_font == 0 }
-
-        @writer.end_tag('fonts')
+        write_format_elements('fonts', @font_count) do
+          @xf_formats.each do |format|
+            write_font(format) unless format.has_font == 0
+          end
+        end
       end
 
       #
@@ -341,18 +336,21 @@ module Writexlsx
       # Write the <borders> element.
       #
       def write_borders
-        count = @border_count
+        write_format_elements('borders', @border_count) do
+          @xf_formats.each do |format|
+            write_border(format) unless format.has_border == 0
+          end
+        end
+      end
 
+      def write_format_elements(elements, count)
         attributes = ['count', count]
 
-        @writer.start_tag('borders', attributes)
+        @writer.start_tag(elements, attributes)
 
         # Write the border elements for format objects that have them.
-        @xf_formats.each do |format|
-          write_border(format) unless format.has_border == 0
-        end
-
-        @writer.end_tag('borders')
+        yield
+        @writer.end_tag(elements)
       end
 
       #
