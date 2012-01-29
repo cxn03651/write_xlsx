@@ -1026,12 +1026,12 @@ module Writexlsx
         if fonts[key]
           # Font has already been used.
           format.font_index = fonts[key]
-          format.has_font   = 0
+          format.has_font(false)
         else
           # This is a new font.
           fonts[key]        = index
           format.font_index = index
-          format.has_font   = 1
+          format.has_font
           index += 1
         end
       end

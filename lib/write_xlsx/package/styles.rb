@@ -174,7 +174,7 @@ module Writexlsx
       def write_fonts
         write_format_elements('fonts', @font_count) do
           @xf_formats.each do |format|
-            write_font(format) unless format.has_font == 0
+            write_font(format) if format.has_font?
           end
         end
       end
