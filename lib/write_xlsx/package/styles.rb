@@ -338,7 +338,7 @@ module Writexlsx
       def write_borders
         write_format_elements('borders', @border_count) do
           @xf_formats.each do |format|
-            write_border(format) unless format.has_border == 0
+            write_border(format) if format.has_border?
           end
         end
       end

@@ -1103,12 +1103,12 @@ module Writexlsx
         if borders[key]
           # Border has already been used.
           format.border_index = borders[key]
-          format.has_border   = 0
+          format.has_border(false)
         else
           # This is a new border.
           borders[key]        = index
           format.border_index = index
-          format.has_border   = 1
+          format.has_border
           index += 1
         end
       end

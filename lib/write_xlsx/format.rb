@@ -164,7 +164,7 @@ module Writexlsx
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color   # :nodoc:
     attr_reader :font_scheme   # :nodoc:
     attr_accessor :font_index, :has_font, :has_dxf_font, :has_dxf_fill, :has_dxf_border   # :nodoc:
-    attr_accessor :num_format_index, :border_index, :has_border   # :nodoc:
+    attr_accessor :num_format_index, :border_index   # :nodoc:
     attr_accessor :fill_index, :has_fill, :font_condense, :font_extend, :diag_border   # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern   # :nodoc:
 
@@ -216,7 +216,6 @@ module Writexlsx
       @fill_count     = 0
 
       @border_index   = 0
-      @has_border     = 0
       @has_dxf_border = 0
       @border_count   = 0
 
@@ -659,6 +658,14 @@ module Writexlsx
       return false unless val
       return false if val == 0
       true
+    end
+
+    def has_border(flag = true)
+      @has_border = flag
+    end
+
+    def has_border? # :nodoc:
+      @has_border
     end
   end
 end
