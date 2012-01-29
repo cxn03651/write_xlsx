@@ -163,7 +163,7 @@ module Writexlsx
     attr_reader :diag_type, :diag_color, :font_only, :color, :color_indexed   # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color   # :nodoc:
     attr_reader :font_scheme   # :nodoc:
-    attr_accessor :font_index, :has_dxf_font, :has_dxf_fill, :has_dxf_border   # :nodoc:
+    attr_accessor :font_index, :has_dxf_fill, :has_dxf_border   # :nodoc:
     attr_accessor :num_format_index, :border_index   # :nodoc:
     attr_accessor :fill_index, :has_fill, :font_condense, :font_extend, :diag_border   # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern   # :nodoc:
@@ -178,7 +178,6 @@ module Writexlsx
       @num_format     = 0
       @num_format_index = 0
       @font_index     = 0
-      @has_dxf_font   = 0
       @font           = 'Calibri'
       @size           = 11
       @bold           = 0
@@ -673,6 +672,14 @@ module Writexlsx
 
     def has_font?
       @has_font
+    end
+
+    def has_dxf_font(flag = true)
+      @has_dxf_font = flag
+    end
+
+    def has_dxf_font?
+      @has_dxf_font
     end
   end
 end

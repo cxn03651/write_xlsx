@@ -596,7 +596,7 @@ module Writexlsx
           # Write the font elements for format objects that have them.
           @dxf_formats.each do |format|
             @writer.start_tag('dxf')
-            write_font(format, 1) unless format.has_dxf_font == 0
+            write_font(format, 1) if format.has_dxf_font?
 
             if format.num_format_index != 0
               write_num_fmt(format.num_format_index, format.num_format)
