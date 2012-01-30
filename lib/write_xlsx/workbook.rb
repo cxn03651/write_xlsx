@@ -1118,7 +1118,7 @@ module Writexlsx
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
         key = format.get_border_key
-        format.has_dxf_border = 1 if key =~ /[^0:]/
+        format.has_dxf_border(true) if key =~ /[^0:]/
       end
     end
 
