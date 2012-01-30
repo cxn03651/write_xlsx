@@ -164,7 +164,7 @@ module Writexlsx
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color   # :nodoc:
     attr_reader :font_scheme   # :nodoc:
     attr_accessor :num_format_index, :border_index, :font_index   # :nodoc:
-    attr_accessor :fill_index, :has_fill, :font_condense, :font_extend, :diag_border   # :nodoc:
+    attr_accessor :fill_index, :font_condense, :font_extend, :diag_border   # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern   # :nodoc:
 
     def initialize(xf_format_indices = {}, dxf_format_indices = {}, params = {})   # :nodoc:
@@ -207,7 +207,6 @@ module Writexlsx
       @fg_color       = 0x00
       @bg_color       = 0x00
       @pattern        = 0
-      @has_fill       = 0
       @fill_index     = 0
       @fill_count     = 0
 
@@ -685,6 +684,14 @@ module Writexlsx
 
     def has_dxf_font?
       @has_dxf_font
+    end
+
+    def has_fill(flag)
+      @has_fill = flag
+    end
+
+    def has_fill?
+      @has_fill
     end
 
     def has_dxf_fill(flag)
