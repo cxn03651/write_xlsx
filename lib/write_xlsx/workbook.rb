@@ -1031,7 +1031,7 @@ module Writexlsx
           # This is a new font.
           fonts[key]        = index
           format.font_index = index
-          format.has_font
+          format.has_font(true)
           index += 1
         end
       end
@@ -1043,7 +1043,7 @@ module Writexlsx
         # The only font properties that can change for a DXF format are: color,
         # bold, italic, underline and strikethrough.
         if format.color || format.bold? || format.italic? || format.underline? || format.strikeout?
-          format.has_dxf_font
+          format.has_dxf_font(true)
         end
       end
     end
@@ -1108,7 +1108,7 @@ module Writexlsx
           # This is a new border.
           borders[key]        = index
           format.border_index = index
-          format.has_border
+          format.has_border(true)
           index += 1
         end
       end
@@ -1118,7 +1118,7 @@ module Writexlsx
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
         key = format.get_border_key
-        format.has_dxf_border if key =~ /[^0:]/
+        format.has_dxf_border(true) if key =~ /[^0:]/
       end
     end
 
@@ -1167,7 +1167,7 @@ module Writexlsx
           # This is a new fill.
           fills[key]        = index
           format.fill_index = index
-          format.has_fill
+          format.has_fill(true)
           index += 1
         end
       end
@@ -1176,7 +1176,7 @@ module Writexlsx
 
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
-        format.has_dxf_fill if format.pattern || format.bg_color || format.fg_color
+        format.has_dxf_fill(true) if format.pattern || format.bg_color || format.fg_color
       end
     end
 
