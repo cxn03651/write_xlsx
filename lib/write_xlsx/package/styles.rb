@@ -603,7 +603,7 @@ module Writexlsx
             end
 
             write_fill(format, 1)    if format.has_dxf_fill?
-            write_border(format, 1)  if format.has_dxf_border != 0
+            write_border(format, 1)  if format.has_dxf_border?
             @writer.end_tag('dxf')
           end
 
