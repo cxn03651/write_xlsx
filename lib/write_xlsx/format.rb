@@ -658,7 +658,7 @@ module Writexlsx
       true
     end
 
-    def has_border(flag = true)
+    def has_border(flag)
       @has_border = flag
     end
 
@@ -666,7 +666,7 @@ module Writexlsx
       @has_border
     end
 
-    def has_font(flag = true)
+    def has_font(flag)
       @has_font = flag
     end
 
@@ -674,7 +674,7 @@ module Writexlsx
       @has_font
     end
 
-    def has_dxf_font(flag = true)
+    def has_dxf_font(flag)
       @has_dxf_font = flag
     end
 
