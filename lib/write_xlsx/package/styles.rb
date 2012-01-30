@@ -262,7 +262,7 @@ module Writexlsx
 
         # Write the fill elements for format objects that have them.
         @xf_formats.each do |format|
-          write_fill(format) unless format.has_fill == 0
+          write_fill(format) if format.has_fill?
         end
 
         @writer.end_tag( 'fills' )

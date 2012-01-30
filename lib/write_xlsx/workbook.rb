@@ -1162,12 +1162,12 @@ module Writexlsx
         if fills[key]
           # Fill has already been used.
           format.fill_index = fills[key]
-          format.has_fill   = 0
+          format.has_fill(false)
         else
           # This is a new fill.
           fills[key]        = index
           format.fill_index = index
-          format.has_fill   = 1
+          format.has_fill
           index += 1
         end
       end
