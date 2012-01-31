@@ -1778,7 +1778,7 @@ module Writexlsx
       write_cross_axis(@axis_ids[1])
 
       # Note, the category crossing comes from the value axis.
-      if y_axis[:_crossing].nil? || y_axis[:_crossing] == 'max'
+      if nil_or_max?(y_axis[:_crossing])
         # Write the c:crosses element.
         write_crosses(y_axis[:_crossing])
       else
@@ -1875,7 +1875,7 @@ module Writexlsx
       write_cross_axis(params[:cross_axis])
 
       # Note, the category crossing comes from the value axis.
-      if params[:category_crossing].nil? || params[:category_crossing] == 'max'
+      if nil_or_max?(params[:category_crossing])
         # Write the c:crosses element.
         write_crosses(params[:category_crossing])
       else
@@ -1930,7 +1930,7 @@ module Writexlsx
       write_cross_axis(@axis_ids[1])
 
       # Note, the category crossing comes from the value axis.
-      if y_axis[:_crossing].nil? || y_axis[:_crossing] == 'max'
+      if nil_or_max?(y_axis[:_crossing])
         # Write the c:crossing element.
         write_crosses(y_axis[:_crossing])
       else
@@ -3005,6 +3005,10 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:invertIfNegative', attributes)
+    end
+
+    def nil_or_max?(val)
+      val.nil? || val == 'max'
     end
   end
 end
