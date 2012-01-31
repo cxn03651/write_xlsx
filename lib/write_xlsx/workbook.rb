@@ -1018,25 +1018,14 @@ module Writexlsx
     #
     def prepare_fonts #:nodoc:
       fonts = {}
-      index = 0
-
       @xf_formats.each do |format|
         key = format.get_font_key
-
-        if fonts[key]
-          # Font has already been used.
-          format.font_index = fonts[key]
-          format.has_font(false)
-        else
-          # This is a new font.
-          fonts[key]        = index
-          format.font_index = index
-          format.has_font(true)
-          index += 1
-        end
+        format.has_font(!fonts[key])
+        format.font_index = fonts[key] || fonts.size
+        fonts[key] ||= fonts.size
       end
 
-      @font_count = index
+      @font_count = fonts.size
 
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
