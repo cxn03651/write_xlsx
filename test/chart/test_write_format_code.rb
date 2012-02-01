@@ -9,7 +9,8 @@ class TestWriteFormatCode < Test::Unit::TestCase
 
   def test_write_format_code
     expected = '<c:formatCode>General</c:formatCode>'
-    result = @chart.__send__('write_format_code', 'General')
+    @chart.__send__('write_format_code', 'General')
+    result = @chart.instance_variable_get(:@writer).string
     assert_equal(expected, result)
   end
 end

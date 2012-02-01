@@ -71,11 +71,9 @@ module Writexlsx
       def write_relationships
         attributes = ['xmlns', Package_schema]
 
-        @writer.start_tag('Relationships', attributes)
-
-        @rels.each { |rel| write_relationship(*rel) }
-
-        @writer.end_tag('Relationships')
+        @writer.tag_elements('Relationships', attributes) do
+          @rels.each { |rel| write_relationship(*rel) }
+        end
       end
 
       #

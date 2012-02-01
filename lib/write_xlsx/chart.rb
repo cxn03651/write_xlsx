@@ -985,21 +985,16 @@ module Writexlsx
       #
       def write_bar_chart   # :nodoc:
         subtype = @subtype
-
         subtype = 'percentStacked' if subtype == 'percent_stacked'
 
-        @writer.start_tag('c:barChart')
-
-        # Write the c:barDir element.
-        write_bar_dir
-
-        # Write the c:grouping element.
-        write_grouping(subtype)
-
-        # Write the series elements.
-        write_series
-
-        @writer.end_tag('c:barChart')
+        @writer.tag_elements('c:barChart') do
+          # Write the c:barDir element.
+          write_bar_dir
+          # Write the c:grouping element.
+          write_grouping(subtype)
+          # Write the series elements.
+          write_series
+        end
       end
 
     private
@@ -1458,46 +1453,37 @@ module Writexlsx
     # Write the <c:chart> element.
     #
     def write_chart # :nodoc:
-      @writer.start_tag('c:chart')
+      @writer.tag_elements('c:chart') do
+        # Write the chart title elements.
+        if title = @title_formula
+          write_title_formula(title, @title_data_id)
+        elsif title = @title_name
+          write_title_rich(title)
+        end
 
-      # Write the chart title elements.
-      if title = @title_formula
-        write_title_formula(title, @title_data_id)
-      elsif title = @title_name
-        write_title_rich(title)
+        # Write the c:plotArea element.
+        write_plot_area
+        # Write the c:legend element.
+        write_legend
+        # Write the c:plotVisOnly element.
+        write_plot_vis_only
       end
-
-      # Write the c:plotArea element.
-      write_plot_area
-
-      # Write the c:legend element.
-      write_legend
-
-      # Write the c:plotVisOnly element.
-      write_plot_vis_only
-
-      @writer.end_tag('c:chart')
     end
 
     #
     # Write the <c:plotArea> element.
     #
     def write_plot_area # :nodoc:
-      @writer.start_tag('c:plotArea')
-
-      # Write the c:layout element.
-      write_layout
-
-      # Write the subclass chart type element.
-      write_chart_type
-
-      # Write the c:catAx element.
-      write_cat_axis
-
-      # Write the c:catAx element.
-      write_val_axis
-
-      @writer.end_tag('c:plotArea')
+      @writer.tag_elements('c:plotArea') do
+        # Write the c:layout element.
+        write_layout
+        # Write the subclass chart type element.
+        write_chart_type
+        # Write the c:catAx element.
+        write_cat_axis
+        # Write the c:catAx element.
+        write_val_axis
+      end
     end
 
     #
@@ -1557,39 +1543,28 @@ module Writexlsx
     # Write the <c:ser> element.
     #
     def write_ser(index, series) # :nodoc:
-      @writer.start_tag('c:ser')
-
-      # Write the c:idx element.
-      write_idx(index)
-
-      # Write the c:order element.
-      write_order(index)
-
-      # Write the series name.
-      write_series_name(series)
-
-      # Write the c:spPr element.
-      write_sp_pr(series)
-
-      # Write the c:marker element.
-      write_marker(series[:_marker])
-
-      # Write the c:invertIfNegative element.
-      write_c_invert_if_negative(series[:_invert_if_neg])
-
-      # Write the c:dLbls element.
-      write_d_lbls(series[:labels])
-
-      # Write the c:trendline element.
-      write_trendline(series[:trendline])
-
-      # Write the c:cat element.
-      write_cat(series)
-
-      # Write the c:val element.
-      write_val(series)
-
-      @writer.end_tag('c:ser')
+      @writer.tag_elements('c:ser') do
+        # Write the c:idx element.
+        write_idx(index)
+        # Write the c:order element.
+        write_order(index)
+        # Write the series name.
+        write_series_name(series)
+        # Write the c:spPr element.
+        write_sp_pr(series)
+        # Write the c:marker element.
+        write_marker(series[:_marker])
+        # Write the c:invertIfNegative element.
+        write_c_invert_if_negative(series[:_invert_if_neg])
+        # Write the c:dLbls element.
+        write_d_lbls(series[:labels])
+        # Write the c:trendline element.
+        write_trendline(series[:trendline])
+        # Write the c:cat element.
+        write_cat(series)
+        # Write the c:val element.
+        write_val(series)
+      end
     end
 
     #
@@ -1636,22 +1611,18 @@ module Writexlsx
 
       @has_category = 1
 
-      @writer.start_tag('c:cat')
-
-      # Check the type of cached data.
-      type = get_data_type(data)
-
-      if type == 'str'
-        @has_category = 0
-
-        # Write the c:numRef element.
-        write_str_ref(formula, data, type)
-      else
-        # Write the c:numRef element.
-        write_num_ref(formula, data, type)
+      @writer.tag_elements('c:cat') do
+        # Check the type of cached data.
+        type = get_data_type(data)
+        if type == 'str'
+          @has_category = 0
+          # Write the c:numRef element.
+          write_str_ref(formula, data, type)
+        else
+          # Write the c:numRef element.
+          write_num_ref(formula, data, type)
+        end
       end
-
-      @writer.end_tag('c:cat')
     end
 
     #
@@ -1664,60 +1635,51 @@ module Writexlsx
     def write_val_base(formula, data_id, tag) # :nodoc:
       data    = @formula_data[data_id]
 
-      @writer.start_tag(tag)
-
-      # Check the type of cached data.
-      type = get_data_type(data)
-
-      if type == 'str'
-        # Write the c:numRef element.
-        write_str_ref(formula, data, type)
-      else
-        # Write the c:numRef element.
-        write_num_ref(formula, data, type)
+      @writer.tag_elements(tag) do
+        # Check the type of cached data.
+        type = get_data_type(data)
+        if type == 'str'
+          # Write the c:numRef element.
+          write_str_ref(formula, data, type)
+        else
+          # Write the c:numRef element.
+          write_num_ref(formula, data, type)
+        end
       end
-
-      @writer.end_tag(tag)
     end
 
     #
     # Write the <c:numRef> element.
     #
     def write_num_ref(formula, data, type) # :nodoc:
-      @writer.start_tag('c:numRef')
-
-      # Write the c:f element.
-      write_series_formula(formula)
-
-      if type == 'num'
-        # Write the c:numCache element.
-        write_num_cache(data)
-      elsif type == 'str'
-        # Write the c:strCache element.
-        write_str_cache(data)
+      @writer.tag_elements('c:numRef') do
+        # Write the c:f element.
+        write_series_formula(formula)
+        if type == 'num'
+          # Write the c:numCache element.
+          write_num_cache(data)
+        elsif type == 'str'
+          # Write the c:strCache element.
+          write_str_cache(data)
+        end
       end
-
-      @writer.end_tag('c:numRef')
     end
 
     #
     # Write the <c:strRef> element.
     #
     def write_str_ref(formula, data, type) # :nodoc:
-      @writer.start_tag('c:strRef')
-
-      # Write the c:f element.
-      write_series_formula(formula)
-
-      if type == 'num'
-        # Write the c:numCache element.
-        write_num_cache(data)
-      elsif type == 'str'
-        # Write the c:strCache element.
-        write_str_cache(data)
+      @writer.tag_elements('c:strRef') do
+        # Write the c:f element.
+        write_series_formula(formula)
+        if type == 'num'
+          # Write the c:numCache element.
+          write_num_cache(data)
+        elsif type == 'str'
+          # Write the c:strCache element.
+          write_str_cache(data)
+        end
       end
-
-      @writer.end_tag('c:strRef')
     end
 
     #
@@ -1751,51 +1713,39 @@ module Writexlsx
       # Overwrite the default axis position with a user supplied value.
       position = x_axis[:_position] || position
 
-      @writer.start_tag('c:catAx')
-
-      write_axis_id(@axis_ids[0])
-
-      # Write the c:scaling element.
-      write_scaling(x_axis[:_reverse])
-
-      # Write the c:axPos element.
-      write_axis_pos(position, y_axis[:_reverse])
-
-      # Write the axis title elements.
-      if title = @x_axis[:_formula]
-        write_title_formula(title, @x_axis[:_data_id], horiz)
-      elsif title = @x_axis[:_name]
-        write_title_rich(title, horiz)
+      @writer.tag_elements('c:catAx') do
+        write_axis_id(@axis_ids[0])
+        # Write the c:scaling element.
+        write_scaling(x_axis[:_reverse])
+        # Write the c:axPos element.
+        write_axis_pos(position, y_axis[:_reverse])
+        # Write the axis title elements.
+        if title = @x_axis[:_formula]
+          write_title_formula(title, @x_axis[:_data_id], horiz)
+        elsif title = @x_axis[:_name]
+          write_title_rich(title, horiz)
+        end
+        # Write the c:numFmt element.
+        write_num_fmt
+        # Write the c:tickLblPos element.
+        write_tick_label_pos(x_axis[:_label_position])
+        # Write the c:crossAx element.
+        write_cross_axis(@axis_ids[1])
+        # Note, the category crossing comes from the value axis.
+        if nil_or_max?(y_axis[:_crossing])
+          # Write the c:crosses element.
+          write_crosses(y_axis[:_crossing])
+        else
+          # Write the c:crossesAt element.
+          write_c_crosses(y_axis[:_crossing])
+        end
+        # Write the c:auto element.
+        write_auto(1)
+        # Write the c:labelAlign element.
+        write_label_align('ctr')
+        # Write the c:labelOffset element.
+        write_label_offset(100)
       end
-
-      # Write the c:numFmt element.
-      write_num_fmt
-
-      # Write the c:tickLblPos element.
-      write_tick_label_pos(x_axis[:_label_position])
-
-      # Write the c:crossAx element.
-      write_cross_axis(@axis_ids[1])
-
-      # Note, the category crossing comes from the value axis.
-      if nil_or_max?(y_axis[:_crossing])
-        # Write the c:crosses element.
-        write_crosses(y_axis[:_crossing])
-      else
-        # Write the c:crossesAt element.
-        write_c_crosses(y_axis[:_crossing])
-      end
-
-      # Write the c:auto element.
-      write_auto(1)
-
-      # Write the c:labelAlign element.
-      write_label_align('ctr')
-
-      # Write the c:labelOffset element.
-      write_label_offset(100)
-
-      @writer.end_tag('c:catAx')
     end
 
     #
@@ -1843,56 +1793,43 @@ module Writexlsx
       # Overwrite the default axis position with a user supplied value.
       position = params[:axis_position] || position
 
-      @writer.start_tag('c:valAx')
-
-      write_axis_id(params[:axis_id])
-
-      # Write the c:scaling element.
-      write_scaling(
-                    params[:scaling_axis][:_reverse], params[:scaling_axis][:_min],
-                    params[:scaling_axis][:_max], params[:scaling_axis][:_log_base])
-
-      # Write the c:axPos element.
-      write_axis_pos(position, params[:axis_position_element])
-
-      # Write the c:majorGridlines element.
-      write_major_gridlines unless hide_major_gridlines
-
-      # Write the axis title elements.
-      if title = params[:title_axis][:_formula]
-        write_title_formula(title, @y_axis[:_data_id], horiz)
-      elsif title = params[:title_axis][:_name]
-        write_title_rich(title, horiz)
+      @writer.tag_elements('c:valAx') do
+        write_axis_id(params[:axis_id])
+        # Write the c:scaling element.
+        write_scaling(
+                      params[:scaling_axis][:_reverse], params[:scaling_axis][:_min],
+                      params[:scaling_axis][:_max], params[:scaling_axis][:_log_base])
+        # Write the c:axPos element.
+        write_axis_pos(position, params[:axis_position_element])
+        # Write the c:majorGridlines element.
+        write_major_gridlines unless hide_major_gridlines
+        # Write the axis title elements.
+        if title = params[:title_axis][:_formula]
+          write_title_formula(title, @y_axis[:_data_id], horiz)
+        elsif title = params[:title_axis][:_name]
+          write_title_rich(title, horiz)
+        end
+        # Write the c:numberFormat element.
+        write_number_format
+        # Write the c:tickLblPos element.
+        write_tick_label_pos(params[:tick_label_pos])
+        # Write the c:crossAx element.
+        write_cross_axis(params[:cross_axis])
+        # Note, the category crossing comes from the value axis.
+        if nil_or_max?(params[:category_crossing])
+          # Write the c:crosses element.
+          write_crosses(params[:category_crossing])
+        else
+          # Write the c:crossesAt element.
+          write_c_crosses_at(params[:category_crossing])
+        end
+        # Write the c:crossBetween element.
+        write_cross_between
+        # Write the c:majorUnit element.
+        write_c_major_unit(@y_axis[:_major_unit])
+        # Write the c:minorUnit element.
+        write_c_minor_unit(@y_axis[:_minor_unit])
       end
-
-      # Write the c:numberFormat element.
-      write_number_format
-
-      # Write the c:tickLblPos element.
-      write_tick_label_pos(params[:tick_label_pos])
-
-      # Write the c:crossAx element.
-      write_cross_axis(params[:cross_axis])
-
-      # Note, the category crossing comes from the value axis.
-      if nil_or_max?(params[:category_crossing])
-        # Write the c:crosses element.
-        write_crosses(params[:category_crossing])
-      else
-        # Write the c:crossesAt element.
-        write_c_crosses_at(params[:category_crossing])
-      end
-
-      # Write the c:crossBetween element.
-      write_cross_between
-
-      # Write the c:majorUnit element.
-      write_c_major_unit(@y_axis[:_major_unit])
-
-      # Write the c:minorUnit element.
-      write_c_minor_unit(@y_axis[:_minor_unit])
-
-      @writer.end_tag('c:valAx')
     end
 
     #
@@ -1903,85 +1840,65 @@ module Writexlsx
       x_axis    = @x_axis
       y_axis    = @y_axis
 
-      @writer.start_tag('c:dateAx')
-
-      write_axis_id(@axis_ids[0])
-
-      # Write the c:scaling element.
-      write_scaling(x_axis[:reverse], x_axis[:_min], x_axis[:_max], x_axis[:_log_base])
-
-      # Write the c:axPos element.
-      write_axis_pos(position, y_axis[:reverse])
-
-      # Write the axis title elements.
-      if title = x_axis[:_formula]
-        write_title_formula(title, x_axis[:_data_id])
-      elsif title = x_axis[:_name]
-        write_title_rich(title)
+      @writer.tag_elements('c:dateAx') do
+        write_axis_id(@axis_ids[0])
+        # Write the c:scaling element.
+        write_scaling(x_axis[:reverse], x_axis[:_min], x_axis[:_max], x_axis[:_log_base])
+        # Write the c:axPos element.
+        write_axis_pos(position, y_axis[:reverse])
+        # Write the axis title elements.
+        if title = x_axis[:_formula]
+          write_title_formula(title, x_axis[:_data_id])
+        elsif title = x_axis[:_name]
+          write_title_rich(title)
+        end
+        # Write the c:numFmt element.
+        write_num_fmt('dd/mm/yyyy')
+        # Write the c:tickLblPos element.
+        write_tick_label_pos(x_axis[:_label_position])
+        # Write the c:crossAx element.
+        write_cross_axis(@axis_ids[1])
+        # Note, the category crossing comes from the value axis.
+        if nil_or_max?(y_axis[:_crossing])
+          # Write the c:crossing element.
+          write_crosses(y_axis[:_crossing])
+        else
+          # Write the c:crossesAt element.
+          write_c_crosses_at(y_axis[:_crossing])
+        end
+        # Write the c:auto element.
+        write_auto(1)
+        # Write the c:labelOffset element.
+        write_label_offset(100)
+        # Write the c:majorUnit element.
+        write_c_major_unit(x_axis[:_major_unit])
+        # Write the c:majorTimeUnit element.
+        if !x_axis[:_major_unit].nil?
+          write_c_major_time_unit(x_axis[:_major_unit_type])
+        end
+        # Write the c:minorUnit element.
+        write_c_minor_unit(x_axis[:_minor_unit])
+        # Write the c:minorTimeUnit element.
+        if !x_axis[:_minor_unit].nil?
+          write_c_minor_time_unit(x_axis[:_minor_unit_type])
+        end
       end
-
-      # Write the c:numFmt element.
-      write_num_fmt('dd/mm/yyyy')
-
-      # Write the c:tickLblPos element.
-      write_tick_label_pos(x_axis[:_label_position])
-
-      # Write the c:crossAx element.
-      write_cross_axis(@axis_ids[1])
-
-      # Note, the category crossing comes from the value axis.
-      if nil_or_max?(y_axis[:_crossing])
-        # Write the c:crossing element.
-        write_crosses(y_axis[:_crossing])
-      else
-        # Write the c:crossesAt element.
-        write_c_crosses_at(y_axis[:_crossing])
-      end
-
-      # Write the c:auto element.
-      write_auto(1)
-
-      # Write the c:labelOffset element.
-      write_label_offset(100)
-
-      # Write the c:majorUnit element.
-      write_c_major_unit(x_axis[:_major_unit])
-
-      # Write the c:majorTimeUnit element.
-      if !x_axis[:_major_unit].nil?
-        write_c_major_time_unit(x_axis[:_major_unit_type])
-      end
-
-      # Write the c:minorUnit element.
-      write_c_minor_unit(x_axis[:_minor_unit])
-
-      # Write the c:minorTimeUnit element.
-      if !x_axis[:_minor_unit].nil?
-        write_c_minor_time_unit(x_axis[:_minor_unit_type])
-      end
-
-      @writer.end_tag('c:dateAx')
     end
 
     #
     # Write the <c:scaling> element.
     #
     def write_scaling(reverse, min = nil, max = nil, log_base = nil) # :nodoc:
-      @writer.start_tag('c:scaling')
-
-      # Write the c:logBase element.
-      write_c_log_base(log_base)
-
-      # Write the c:orientation element.
-      write_orientation(reverse)
-
-      # Write the c:max element.
-      write_c_max(max)
-
-      # Write the c:min element.
-      write_c_min(min)
-
-      @writer.end_tag('c:scaling')
+      @writer.tag_elements('c:scaling') do
+        # Write the c:logBase element.
+        write_c_log_base(log_base)
+        # Write the c:orientation element.
+        write_orientation(reverse)
+        # Write the c:max element.
+        write_c_max(max)
+        # Write the c:min element.
+        write_c_min(min)
+      end
     end
 
     #
@@ -2242,24 +2159,19 @@ module Writexlsx
 
       position = allowed[position]
 
-      @writer.start_tag('c:legend')
-
-      # Write the c:legendPos element.
-      write_legend_pos(position)
-
-      # Remove series labels from the legend.
-      @delete_series.each do |index|
-        # Write the c:legendEntry element.
-        write_legend_entry(index)
-      end if @delete_series
-
-      # Write the c:layout element.
-      write_layout
-
-      # Write the c:overlay element.
-      write_overlay if overlay
-
-      @writer.end_tag('c:legend')
+      @writer.tag_elements('c:legend') do
+        # Write the c:legendPos element.
+        write_legend_pos(position)
+        # Remove series labels from the legend.
+        @delete_series.each do |index|
+          # Write the c:legendEntry element.
+          write_legend_entry(index)
+        end if @delete_series
+        # Write the c:layout element.
+        write_layout
+        # Write the c:overlay element.
+        write_overlay if overlay
+      end
     end
 
     #
@@ -2275,15 +2187,12 @@ module Writexlsx
     # Write the <c:legendEntry> element.
     #
     def write_legend_entry(index) # :nodoc:
-      @writer.start_tag('c:legendEntry')
-
-      # Write the c:idx element.
-      write_idx(index)
-
-      # Write the c:delete element.
-      write_delete(1)
-
-      @writer.end_tag('c:legendEntry')
+      @writer.tag_elements('c:legendEntry') do
+        # Write the c:idx element.
+        write_idx(index)
+        # Write the c:delete element.
+        write_delete(1)
+      end
     end
 
     #
@@ -2312,18 +2221,14 @@ module Writexlsx
     # Write the <c:printSettings> element.
     #
     def write_print_settings # :nodoc:
-      @writer.start_tag('c:printSettings')
-
-      # Write the c:headerFooter element.
-      write_header_footer
-
-      # Write the c:pageMargins element.
-      write_page_margins
-
-      # Write the c:pageSetup element.
-      write_page_setup
-
-      @writer.end_tag('c:printSettings')
+      @writer.tag_elements('c:printSettings') do
+        # Write the c:headerFooter element.
+        write_header_footer
+        # Write the c:pageMargins element.
+        write_page_margins
+        # Write the c:pageSetup element.
+        write_page_setup
+      end
     end
 
     #
@@ -2367,57 +2272,40 @@ module Writexlsx
     # Write the <c:title> element for a rich string.
     #
     def write_title_rich(title, horiz = nil) # :nodoc:
-      @writer.start_tag('c:title')
-
-      # Write the c:tx element.
-      write_tx_rich(title, horiz)
-
-      # Write the c:layout element.
-      write_layout
-
-      @writer.end_tag('c:title')
+      @writer.tag_elements('c:title') do
+        # Write the c:tx element.
+        write_tx_rich(title, horiz)
+        # Write the c:layout element.
+        write_layout
+      end
     end
 
     #
     # Write the <c:title> element for a rich string.
     #
     def write_title_formula(title, data_id, horiz) # :nodoc:
-      @writer.start_tag('c:title')
-
-      # Write the c:tx element.
-      write_tx_formula(title, data_id)
-
-      # Write the c:layout element.
-      write_layout
-
-      # Write the c:txPr element.
-      write_tx_pr(horiz)
-
-      @writer.end_tag('c:title')
+      @writer.tag_elements('c:title') do
+        # Write the c:tx element.
+        write_tx_formula(title, data_id)
+        # Write the c:layout element.
+        write_layout
+        # Write the c:txPr element.
+        write_tx_pr(horiz)
+      end
     end
 
     #
     # Write the <c:tx> element.
     #
     def write_tx_rich(title, horiz) # :nodoc:
-      @writer.start_tag('c:tx')
-
-      # Write the c:rich element.
-      write_rich(title, horiz)
-
-      @writer.end_tag('c:tx')
+      @writer.tag_elements('c:tx') { write_rich(title, horiz) }
     end
 
     #
     # Write the <c:tx> element with a simple value such as for series names.
     #
     def write_tx_value(title) # :nodoc:
-      @writer.start_tag('c:tx')
-
-      # Write the c:v element.
-      write_v(title)
-
-      @writer.end_tag('c:tx')
+      @writer.tag_elements('c:tx') { write_v(title) }
     end
 
     #
@@ -2426,30 +2314,21 @@ module Writexlsx
     def write_tx_formula(title, data_id) # :nodoc:
       data = @formula_data[data_id] if data_id
 
-      @writer.start_tag('c:tx')
-
-      # Write the c:strRef element.
-      write_str_ref(title, data, 'str')
-
-      @writer.end_tag('c:tx')
+      @writer.tag_elements('c:tx') { write_str_ref(title, data, 'str') }
     end
 
     #
     # Write the <c:rich> element.
     #
     def write_rich(title, horiz) # :nodoc:
-      @writer.start_tag('c:rich')
-
-      # Write the a:bodyPr element.
-      write_a_body_pr(horiz)
-
-      # Write the a:lstStyle element.
-      write_a_lst_style
-
-      # Write the a:p element.
-      write_a_p_rich(title)
-
-      @writer.end_tag('c:rich')
+      @writer.tag_elements('c:rich') do
+        # Write the a:bodyPr element.
+        write_a_body_pr(horiz)
+        # Write the a:lstStyle element.
+        write_a_lst_style
+        # Write the a:p element.
+        write_a_p_rich(title)
+      end
     end
 
     #
@@ -2480,54 +2359,38 @@ module Writexlsx
     # Write the <a:p> element for rich string titles.
     #
     def write_a_p_rich(title) # :nodoc:
-      @writer.start_tag('a:p')
-
-      # Write the a:pPr element.
-      write_a_p_pr_rich
-
-      # Write the a:r element.
-      write_a_r(title)
-
-      @writer.end_tag('a:p')
+      @writer.tag_elements('a:p') do
+        # Write the a:pPr element.
+        write_a_p_pr_rich
+        # Write the a:r element.
+        write_a_r(title)
+      end
     end
 
     #
     # Write the <a:p> element for formula titles.
     #
     def write_a_p_formula(title) # :nodoc:
-      @writer.start_tag('a:p')
-
-      # Write the a:pPr element.
-      write_a_p_pr_formula
-
-      # Write the a:endParaRPr element.
-      write_a_end_para_rpr
-
-      @writer.end_tag('a:p')
+      @writer.tag_elements('a:p') do
+        # Write the a:pPr element.
+        write_a_p_pr_formula
+        # Write the a:endParaRPr element.
+        write_a_end_para_rpr
+      end
     end
 
     #
     # Write the <a:pPr> element for rich string titles.
     #
     def write_a_p_pr_rich # :nodoc:
-      @writer.start_tag('a:pPr')
-
-      # Write the a:defRPr element.
-      write_a_def_rpr
-
-      @writer.end_tag('a:pPr')
+      @writer.tag_elements('a:pPr') { write_a_def_rpr }
     end
 
     #
     # Write the <a:pPr> element for formula titles.
     #
     def write_a_p_pr_formula # :nodoc:
-      @writer.start_tag('a:pPr')
-
-      # Write the a:defRPr element.
-      write_a_def_rpr
-
-      @writer.end_tag('a:pPr')
+      @writer.tag_elements('a:pPr') { write_a_def_rpr }
     end
 
     #
@@ -2552,15 +2415,12 @@ module Writexlsx
     # Write the <a:r> element.
     #
     def write_a_r(title) # :nodoc:
-      @writer.start_tag('a:r')
-
-      # Write the a:rPr element.
-      write_a_r_pr
-
-      # Write the a:t element.
-      write_a_t(title)
-
-      @writer.end_tag('a:r')
+      @writer.tag_elements('a:r') do
+        # Write the a:rPr element.
+        write_a_r_pr
+        # Write the a:t element.
+        write_a_t(title)
+      end
     end
 
     #
@@ -2585,18 +2445,14 @@ module Writexlsx
     # Write the <c:txPr> element.
     #
     def write_tx_pr(horiz) # :nodoc:
-      @writer.start_tag('c:txPr')
-
-      # Write the a:bodyPr element.
-      write_a_body_pr(horiz)
-
-      # Write the a:lstStyle element.
-      write_a_lst_style
-
-      # Write the a:p element.
-      write_a_p_formula
-
-      @writer.end_tag('c:txPr')
+      @writer.tag_elements('c:txPr') do
+        # Write the a:bodyPr element.
+        write_a_body_pr(horiz)
+        # Write the a:lstStyle element.
+        write_a_lst_style
+        # Write the a:p element.
+        write_a_p_formula
+      end
     end
 
     #
@@ -2608,19 +2464,15 @@ module Writexlsx
       return if marker.nil? || marker == 0
       return if marker[:automatic] && marker[:automatic] != 0
 
-      @writer.start_tag('c:marker')
-
-      # Write the c:symbol element.
-      write_symbol(marker[:type])
-
-      # Write the c:size element.
-      size = marker[:size]
-      write_marker_size(size) if !size.nil? && size != 0
-
-      # Write the c:spPr element.
-      write_sp_pr(marker)
-
-      @writer.end_tag('c:marker')
+      @writer.tag_elements('c:marker') do
+        # Write the c:symbol element.
+        write_symbol(marker[:type])
+        # Write the c:size element.
+        size = marker[:size]
+        write_marker_size(size) if !size.nil? && size != 0
+        # Write the c:spPr element.
+        write_sp_pr(marker)
+      end
     end
 
     #
@@ -2661,15 +2513,12 @@ module Writexlsx
       return if (!series.has_key?(:_line) || series[:_line][:_defined].nil? || series[:_line][:_defined]== 0) &&
                 (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined]== 0)
 
-      @writer.start_tag('c:spPr')
-
-      # Write the a:solidFill element for solid charts such as pie and bar.
-      write_a_solid_fill(series[:_fill]) if series[:_fill] && series[:_fill][:_defined] != 0
-
-      # Write the a:ln element.
-      write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined]
-
-      @writer.end_tag('c:spPr')
+      @writer.tag_elements('c:spPr') do
+        # Write the a:solidFill element for solid charts such as pie and bar.
+        write_a_solid_fill(series[:_fill]) if series[:_fill] && series[:_fill][:_defined] != 0
+        # Write the a:ln element.
+        write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined]
+      end
     end
 
     #
@@ -2689,24 +2538,21 @@ module Writexlsx
         attributes = ['w', width]
       end
 
-      @writer.start_tag('a:ln', attributes)
-
-      # Write the line fill.
-      if !line[:none].nil? && line[:none] != 0
-        # Write the a:noFill element.
-        write_a_no_fill
-      else
-        # Write the a:solidFill element.
-        write_a_solid_fill(line)
+      @writer.tag_elements('a:ln', attributes) do
+        # Write the line fill.
+        if !line[:none].nil? && line[:none] != 0
+          # Write the a:noFill element.
+          write_a_no_fill
+        else
+          # Write the a:solidFill element.
+          write_a_solid_fill(line)
+        end
+        # Write the line/dash type.
+        if type = line[:dash_type]
+          # Write the a:prstDash element.
+          write_a_prst_dash(type)
+        end
       end
-
-      # Write the line/dash type.
-      if type = line[:dash_type]
-        # Write the a:prstDash element.
-        write_a_prst_dash(type)
-      end
-
-      @writer.end_tag('a:ln')
     end
 
     #
@@ -2720,16 +2566,14 @@ module Writexlsx
     # Write the <a:solidFill> element.
     #
     def write_a_solid_fill(line) # :nodoc:
-      @writer.start_tag('a:solidFill')
+      @writer.tag_elements('a:solidFill') do
+        if line[:color]
+          color = get_color(line[:color])
 
-      if line[:color]
-        color = get_color(line[:color])
-
-        # Write the a:srgbClr element.
-        write_a_srgb_clr(color)
+          # Write the a:srgbClr element.
+          write_a_srgb_clr(color)
+        end
       end
-
-      @writer.end_tag('a:solidFill')
     end
 
     #
@@ -2756,31 +2600,22 @@ module Writexlsx
     def write_trendline(trendline) # :nodoc:
       return unless trendline
 
-      @writer.start_tag('c:trendline')
-
-      # Write the c:name element.
-      write_name(trendline[name])
-
-      # Write the c:spPr element.
-      write_sp_pr(trendline)
-
-      # Write the c:trendlineType element.
-      write_trendline_type(trendline[type])
-
-      # Write the c:order element for polynomial trendlines.
-      write_trendline_order(trendline[order]) if trendline[type] == 'poly'
-
-      # Write the c:period element for moving average trendlines.
-      write_period(trendline[period]) if trendline[type] == 'movingAvg'
-
-
-      # Write the c:forward element.
-      write_forward(trendline[forward])
-
-      # Write the c:backward element.
-      write_backward(trendline[backward])
-
-      @writer.end_tag('c:trendline')
+      @writer.tag_elements('c:trendline') do
+        # Write the c:name element.
+        write_name(trendline[name])
+        # Write the c:spPr element.
+        write_sp_pr(trendline)
+        # Write the c:trendlineType element.
+        write_trendline_type(trendline[type])
+        # Write the c:order element for polynomial trendlines.
+        write_trendline_order(trendline[order]) if trendline[type] == 'poly'
+        # Write the c:period element for moving average trendlines.
+        write_period(trendline[period]) if trendline[type] == 'movingAvg'
+        # Write the c:forward element.
+        write_forward(trendline[forward])
+        # Write the c:backward element.
+        write_backward(trendline[backward])
+      end
     end
 
     #
@@ -2863,21 +2698,21 @@ module Writexlsx
     # Write the <c:numCache> element.
     #
     def write_num_cache(data) # :nodoc:
-      @writer.start_tag('c:numCache')
-      write_format_code('General')
-      write_pt_count(data.size)
-      write_pts(data)
-      @writer.end_tag('c:numCache')
+      @writer.tag_elements('c:numCache') do
+        write_format_code('General')
+        write_pt_count(data.size)
+        write_pts(data)
+      end
     end
 
     #
     # Write the <c:strCache> element.
     #
     def write_str_cache(data) # :nodoc:
-      @writer.start_tag('c:strCache')
-      write_pt_count(data.size)
-      write_pts(data)
-      @writer.end_tag('c:strCache')
+      @writer.tag_elements('c:strCache') do
+        write_pt_count(data.size)
+        write_pts(data)
+      end
     end
 
     def write_pts(data)
@@ -2908,12 +2743,7 @@ module Writexlsx
 
       attributes = ['idx', idx]
 
-      @writer.start_tag('c:pt', attributes)
-
-      # Write the c:v element.
-      write_v(value)
-
-      @writer.end_tag('c:pt')
+      @writer.tag_elements('c:pt', attributes) { write_v(value) }
     end
 
     #
@@ -2938,18 +2768,14 @@ module Writexlsx
     def write_d_lbls(labels) # :nodoc:
       return unless labels
 
-      @writer.start_tag('c:dLbls')
-
-      # Write the c:showVal element.
-      write_show_val if labels[value]
-
-      # Write the c:showCatName element.
-      write_show_cat_name if labels[category]
-
-      # Write the c:showSerName element.
-      write_show_ser_name if labels[series_name]
-
-      @writer.end_tag('c:dLbls')
+      @writer.tag_elements('c:dLbls') do
+        # Write the c:showVal element.
+        write_show_val if labels[value]
+        # Write the c:showCatName element.
+        write_show_cat_name if labels[category]
+        # Write the c:showSerName element.
+        write_show_ser_name if labels[series_name]
+      end
     end
 
     #

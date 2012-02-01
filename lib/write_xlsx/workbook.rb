@@ -844,7 +844,7 @@ module Writexlsx
     end
 
     def write_book_views #:nodoc:
-      @writer.start_tag('bookViews') << write_workbook_view << @writer.end_tag('bookViews')
+      @writer.tag_elements('bookViews') { write_workbook_view }
     end
 
     def write_workbook_view #:nodoc:
@@ -864,13 +864,13 @@ module Writexlsx
     end
 
     def write_sheets #:nodoc:
-      str = @writer.start_tag('sheets')
-      id_num = 1
-      @worksheets.each do |sheet|
-        str << write_sheet(sheet.name, id_num, sheet.hidden?)
-        id_num += 1
+      @writer.tag_elements('sheets') do
+        id_num = 1
+        @worksheets.each do |sheet|
+          write_sheet(sheet.name, id_num, sheet.hidden?)
+          id_num += 1
+        end
       end
-      str << @writer.end_tag('sheets')
     end
 
     def write_sheet(name, sheet_id, hidden = false) #:nodoc:
@@ -893,7 +893,7 @@ module Writexlsx
 
     def write_ext_lst #:nodoc:
       tag = 'extLst'
-      @writer.start_tag(tag) << write_ext << @writer.end_tag(tag)
+      @writer.tag_elements(tag) { write_ext }
     end
 
     def write_ext #:nodoc:
@@ -902,7 +902,7 @@ module Writexlsx
         'xmlns:mx', 'http://schemas.microsoft.com/office/mac/excel/2008/main',
         'uri', 'http://schemas.microsoft.com/office/mac/excel/2008/main'
       ]
-      @writer.start_tag(tag, attributes) << write_mx_arch_id << @writer.end_tag(tag)
+      @writer.tag_elements(tag, attributes) { write_mx_arch_id }
     end
 
     def write_mx_arch_id #:nodoc:
@@ -912,9 +912,9 @@ module Writexlsx
     def write_defined_names #:nodoc:
       return if @defined_names.nil? || @defined_names.empty?
       tag = 'definedNames'
-      str = @writer.start_tag(tag)
-      @defined_names.each { |defined_name| str << write_defined_name(defined_name) }
-      str << @writer.end_tag(tag)
+      @writer.tag_elements(tag) do
+        @defined_names.each { |defined_name| write_defined_name(defined_name) }
+      end
     end
 
     def write_defined_name(data) #:nodoc:

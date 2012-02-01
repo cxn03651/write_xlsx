@@ -44,10 +44,10 @@ EOS
   end
 
   def test_data_element_with_empty_attr
-    assert_equal(
-      "<foo>data</foo>",
-      @obj.data_element('foo', 'data')
-    )
+    expected = "<foo>data</foo>"
+    @obj.data_element('foo', 'data')
+    result = @obj.string
+    assert_equal(expected, result)
   end
 
   def test_data_element
@@ -55,9 +55,10 @@ EOS
       'name', '_xlnm.Print_Titles',
       'localSheetId', 0
     ]
-    assert_equal(
-      "<definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet1!$1:$1</definedName>",
-      @obj.data_element('definedName', 'Sheet1!$1:$1', attributes)
-    )
+    expected = 
+      "<definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet1!$1:$1</definedName>"
+    @obj.data_element('definedName', 'Sheet1!$1:$1', attributes)
+    result = @obj.string
+    assert_equal(expected, result)
   end
 end

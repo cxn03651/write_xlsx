@@ -88,68 +88,55 @@ module Writexlsx
       # Add attribute for images.
       attributes << :editAs << 'oneCell' if type == 2
 
-      @writer.start_tag('xdr:twoCellAnchor', attributes)
+      @writer.tag_elements('xdr:twoCellAnchor', attributes) do
+        # Write the xdr:from element.
+        write_from(col_from, row_from, col_from_offset, row_from_offset)
+        # Write the xdr:from element.
+        write_to(col_to, row_to, col_to_offset, row_to_offset)
 
-      # Write the xdr:from element.
-      write_from(col_from, row_from, col_from_offset, row_from_offset)
+        if type == 1
+          # Write the xdr:graphicFrame element for charts.
+          write_graphic_frame(index)
+        else
+          # Write the xdr:pic element.
+          write_pic(index, col_absolute, row_absolute, width, height, description)
+        end
 
-      # Write the xdr:from element.
-      write_to(col_to, row_to, col_to_offset, row_to_offset)
-
-      if type == 1
-        # Write the xdr:graphicFrame element for charts.
-        write_graphic_frame(index)
-      else
-        # Write the xdr:pic element.
-        write_pic(index, col_absolute, row_absolute, width, height, description)
+        # Write the xdr:clientData element.
+        write_client_data
       end
-
-      # Write the xdr:clientData element.
-      write_client_data
-
-      @writer.end_tag('xdr:twoCellAnchor')
     end
 
     #
     # Write the <xdr:from> element.
     #
     def write_from(col, row, col_offset, row_offset)
-      @writer.start_tag('xdr:from')
-
-      # Write the xdr:col element.
-      write_col(col)
-
-      # Write the xdr:colOff element.
-      write_col_off(col_offset)
-
-      # Write the xdr:row element.
-      write_row(row)
-
-      # Write the xdr:rowOff element.
-      write_row_off(row_offset)
-
-      @writer.end_tag('xdr:from')
+      @writer.tag_elements('xdr:from') do
+        # Write the xdr:col element.
+        write_col(col)
+        # Write the xdr:colOff element.
+        write_col_off(col_offset)
+        # Write the xdr:row element.
+        write_row(row)
+        # Write the xdr:rowOff element.
+        write_row_off(row_offset)
+      end
     end
 
     #
     # Write the <xdr:to> element.
     #
     def write_to(col, row, col_offset, row_offset)
-      @writer.start_tag('xdr:to')
-
-      # Write the xdr:col element.
-      write_col(col)
-
-      # Write the xdr:colOff element.
-      write_col_off(col_offset)
-
-      # Write the xdr:row element.
-      write_row(row)
-
-      # Write the xdr:rowOff element.
-      write_row_off(row_offset)
-
-      @writer.end_tag('xdr:to')
+      @writer.tag_elements('xdr:to') do
+        # Write the xdr:col element.
+        write_col(col)
+        # Write the xdr:colOff element.
+        write_col_off(col_offset)
+        # Write the xdr:row element.
+        write_row(row)
+        # Write the xdr:rowOff element.
+        write_row_off(row_offset)
+      end
     end
 
     #
@@ -190,33 +177,26 @@ module Writexlsx
 
       attributes = ['macro', macro]
 
-      @writer.start_tag('xdr:graphicFrame', attributes)
-
-      # Write the xdr:nvGraphicFramePr element.
-      write_nv_graphic_frame_pr(index)
-
-      # Write the xdr:xfrm element.
-      write_xfrm
-
-      # Write the a:graphic element.
-      write_atag_graphic(index)
-
-      @writer.end_tag('xdr:graphicFrame')
+      @writer.tag_elements('xdr:graphicFrame', attributes) do
+        # Write the xdr:nvGraphicFramePr element.
+        write_nv_graphic_frame_pr(index)
+        # Write the xdr:xfrm element.
+        write_xfrm
+        # Write the a:graphic element.
+        write_atag_graphic(index)
+      end
     end
 
     #
     # Write the <xdr:nvGraphicFramePr> element.
     #
     def write_nv_graphic_frame_pr(index)
-      @writer.start_tag('xdr:nvGraphicFramePr')
-
-      # Write the xdr:cNvPr element.
-      write_c_nv_pr( index + 1, "Chart #{index}" )
-
-      # Write the xdr:cNvGraphicFramePr element.
-      write_c_nv_graphic_frame_pr
-
-      @writer.end_tag('xdr:nvGraphicFramePr')
+      @writer.tag_elements('xdr:nvGraphicFramePr') do
+        # Write the xdr:cNvPr element.
+        write_c_nv_pr( index + 1, "Chart #{index}" )
+        # Write the xdr:cNvGraphicFramePr element.
+        write_c_nv_graphic_frame_pr
+      end
     end
 
     #
@@ -242,12 +222,10 @@ module Writexlsx
       if @embedded
         @writer.empty_tag('xdr:cNvGraphicFramePr')
       else
-        @writer.start_tag('xdr:cNvGraphicFramePr')
-
-        # Write the a:graphicFrameLocks element.
-        write_a_graphic_frame_locks
-
-        @writer.end_tag('xdr:cNvGraphicFramePr')
+        @writer.tag_elements('xdr:cNvGraphicFramePr') do
+          # Write the a:graphicFrameLocks element.
+          write_a_graphic_frame_locks
+        end
       end
     end
 
@@ -266,15 +244,12 @@ module Writexlsx
     # Write the <xdr:xfrm> element.
     #
     def write_xfrm
-      @writer.start_tag('xdr:xfrm')
-
-      # Write the xfrmOffset element.
-      write_xfrm_offset
-
-      # Write the xfrmOffset element.
-      write_xfrm_extension
-
-      @writer.end_tag('xdr:xfrm')
+      @writer.tag_elements('xdr:xfrm') do
+        # Write the xfrmOffset element.
+        write_xfrm_offset
+        # Write the xfrmOffset element.
+        write_xfrm_extension
+      end
     end
 
     #
@@ -311,12 +286,10 @@ module Writexlsx
     # Write the <a:graphic> element.
     #
     def write_atag_graphic(index)
-      @writer.start_tag('a:graphic')
-
-      # Write the a:graphicData element.
-      write_atag_graphic_data(index)
-
-      @writer.end_tag('a:graphic')
+      @writer.tag_elements('a:graphic') do
+        # Write the a:graphicData element.
+        write_atag_graphic_data(index)
+      end
     end
 
     #
@@ -327,12 +300,10 @@ module Writexlsx
 
       attributes = ['uri', uri]
 
-      @writer.start_tag('a:graphicData', attributes)
-
-      # Write the c:chart element.
-      write_c_chart("rId#{index}")
-
-      @writer.end_tag('a:graphicData')
+      @writer.tag_elements('a:graphicData', attributes) do
+        # Write the c:chart element.
+        write_c_chart("rId#{index}")
+      end
     end
 
     #
@@ -364,45 +335,36 @@ module Writexlsx
     # Write the <xdr:pic> element.
     #
     def write_pic(index, col_absolute, row_absolute, width, height, description)
-      @writer.start_tag('xdr:pic')
-
-      # Write the xdr:nvPicPr element.
-      write_nv_pic_pr(index, description)
-
-      # Write the xdr:blipFill element.
-      write_blip_fill(index)
-
-      # Write the xdr:spPr element.
-      write_sp_pr(col_absolute, row_absolute, width, height)
-
-      @writer.end_tag('xdr:pic')
+      @writer.tag_elements('xdr:pic') do
+        # Write the xdr:nvPicPr element.
+        write_nv_pic_pr(index, description)
+        # Write the xdr:blipFill element.
+        write_blip_fill(index)
+        # Write the xdr:spPr element.
+        write_sp_pr(col_absolute, row_absolute, width, height)
+      end
     end
 
     #
     # Write the <xdr:nvPicPr> element.
     #
     def write_nv_pic_pr(index, description)
-      @writer.start_tag('xdr:nvPicPr')
-
-      # Write the xdr:cNvPr element.
-      write_c_nv_pr( index + 1, "Picture #{index}", description )
-
-      # Write the xdr:cNvPicPr element.
-      write_c_nv_pic_pr
-
-      @writer.end_tag('xdr:nvPicPr')
+      @writer.tag_elements('xdr:nvPicPr') do
+        # Write the xdr:cNvPr element.
+        write_c_nv_pr( index + 1, "Picture #{index}", description )
+        # Write the xdr:cNvPicPr element.
+        write_c_nv_pic_pr
+      end
     end
 
     #
     # Write the <xdr:cNvPicPr> element.
     #
     def write_c_nv_pic_pr
-      @writer.start_tag('xdr:cNvPicPr')
-
-      # Write the a:picLocks element.
-      write_a_pic_locks
-
-      @writer.end_tag('xdr:cNvPicPr')
+      @writer.tag_elements('xdr:cNvPicPr') do
+        # Write the a:picLocks element.
+        write_a_pic_locks
+      end
     end
 
     #
@@ -420,15 +382,12 @@ module Writexlsx
     # Write the <xdr:blipFill> element.
     #
     def write_blip_fill(index)
-      @writer.start_tag('xdr:blipFill')
-
-      # Write the a:blip element.
-      write_a_blip(index)
-
-      # Write the a:stretch element.
-      write_a_stretch
-
-      @writer.end_tag('xdr:blipFill')
+      @writer.tag_elements('xdr:blipFill') do
+        # Write the a:blip element.
+        write_a_blip(index)
+        # Write the a:stretch element.
+        write_a_stretch
+      end
     end
 
     #
@@ -451,12 +410,10 @@ module Writexlsx
     # Write the <a:stretch> element.
     #
     def write_a_stretch
-      @writer.start_tag('a:stretch')
-
-      # Write the a:fillRect element.
-      write_a_fill_rect
-
-      @writer.end_tag('a:stretch')
+      @writer.tag_elements('a:stretch') do
+        # Write the a:fillRect element.
+        write_a_fill_rect
+      end
     end
 
     #
@@ -470,30 +427,24 @@ module Writexlsx
     # Write the <xdr:spPr> element.
     #
     def write_sp_pr(col_absolute, row_absolute, width, height)
-      @writer.start_tag('xdr:spPr')
-
-      # Write the a:xfrm element.
-      write_a_xfrm(col_absolute, row_absolute, width, height)
-
-      # Write the a:prstGeom element.
-      write_a_prst_geom
-
-      @writer.end_tag('xdr:spPr')
+      @writer.tag_elements('xdr:spPr') do
+        # Write the a:xfrm element.
+        write_a_xfrm(col_absolute, row_absolute, width, height)
+        # Write the a:prstGeom element.
+        write_a_prst_geom
+      end
     end
 
     #
     # Write the <a:xfrm> element.
     #
     def write_a_xfrm(col_absolute, row_absolute, width, height)
-      @writer.start_tag('a:xfrm')
-
-      # Write the a:off element.
-      write_a_off( col_absolute, row_absolute )
-
-      # Write the a:ext element.
-      write_a_ext( width, height )
-
-      @writer.end_tag('a:xfrm')
+      @writer.tag_elements('a:xfrm') do
+        # Write the a:off element.
+        write_a_off( col_absolute, row_absolute )
+        # Write the a:ext element.
+        write_a_ext( width, height )
+      end
     end
 
     #
@@ -529,12 +480,10 @@ module Writexlsx
 
       attributes = ['prst', prst]
 
-      @writer.start_tag('a:prstGeom', attributes)
-
-      # Write the a:avLst element.
-      write_a_av_lst
-
-      @writer.end_tag('a:prstGeom')
+      @writer.tag_elements('a:prstGeom', attributes) do
+        # Write the a:avLst element.
+        write_a_av_lst
+      end
     end
 
     #

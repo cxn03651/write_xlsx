@@ -43,18 +43,14 @@ module Writexlsx
       # Write the <c:pieChart> element.
       #
       def write_pie_chart
-        @writer.start_tag('c:pieChart')
-
-        # Write the c:varyColors element.
-        write_vary_colors
-
-        # Write the series elements.
-        write_series
-
-        # Write the c:firstSliceAng element.
-        write_first_slice_ang
-
-        @writer.end_tag('c:pieChart')
+        @writer.tag_elements('c:pieChart') do
+          # Write the c:varyColors element.
+          write_vary_colors
+          # Write the series elements.
+          write_series
+          # Write the c:firstSliceAng element.
+          write_first_slice_ang
+        end
       end
 
       #
@@ -64,15 +60,12 @@ module Writexlsx
       # Write the <c:plotArea> element.
       #
       def write_plot_area
-        @writer.start_tag('c:plotArea')
-
-        # Write the c:layout element.
-        write_layout
-
-        # Write the subclass chart type element.
-        write_chart_type
-
-        @writer.end_tag('c:plotArea')
+        @writer.tag_elements('c:plotArea') do
+          # Write the c:layout element.
+          write_layout
+          # Write the subclass chart type element.
+          write_chart_type
+        end
       end
 
       #
@@ -116,21 +109,16 @@ module Writexlsx
 
         position = allowed[position]
 
-        @writer.start_tag('c:legend')
-
-        # Write the c:legendPos element.
-        write_legend_pos(position)
-
-        # Write the c:layout element.
-        write_layout
-
-        # Write the c:overlay element.
-        write_overlay if overlay != 0
-
-        # Write the c:txPr element. Over-ridden.
-        write_tx_pr_legend
-
-        @writer.end_tag('c:legend')
+        @writer.tag_elements('c:legend') do
+          # Write the c:legendPos element.
+          write_legend_pos(position)
+          # Write the c:layout element.
+          write_layout
+          # Write the c:overlay element.
+          write_overlay if overlay != 0
+          # Write the c:txPr element. Over-ridden.
+          write_tx_pr_legend
+        end
       end
 
       #
@@ -139,33 +127,26 @@ module Writexlsx
       def write_tx_pr_legend
         horiz = 0
 
-        @writer.start_tag('c:txPr')
-
-        # Write the a:bodyPr element.
-        write_a_body_pr(horiz)
-
-        # Write the a:lstStyle element.
-        write_a_lst_style
-
-        # Write the a:p element.
-        write_a_p_legend
-
-        @writer.end_tag('c:txPr')
+        @writer.tag_elements('c:txPr') do
+          # Write the a:bodyPr element.
+          write_a_body_pr(horiz)
+          # Write the a:lstStyle element.
+          write_a_lst_style
+          # Write the a:p element.
+          write_a_p_legend
+        end
       end
 
       #
       # Write the <a:p> element for legends.
       #
       def write_a_p_legend
-        @writer.start_tag('a:p')
-
-        # Write the a:pPr element.
-        write_a_p_pr_legend
-
-        # Write the a:endParaRPr element.
-        write_a_end_para_rpr
-
-        @writer.end_tag('a:p')
+        @writer.tag_elements('a:p') do
+          # Write the a:pPr element.
+          write_a_p_pr_legend
+          # Write the a:endParaRPr element.
+          write_a_end_para_rpr
+        end
       end
 
       #
@@ -176,12 +157,10 @@ module Writexlsx
 
         attributes = ['rtl', rtl]
 
-        @writer.start_tag('a:pPr', attributes)
-
-        # Write the a:defRPr element.
-        write_a_def_rpr
-
-        @writer.end_tag('a:pPr')
+        @writer.tag_elements('a:pPr', attributes) do
+          # Write the a:defRPr element.
+          write_a_def_rpr
+        end
       end
 
       #

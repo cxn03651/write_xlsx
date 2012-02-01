@@ -85,12 +85,10 @@ module Writexlsx
 
         attributes = ['v:ext', ext]
 
-        @writer.start_tag('o:shapelayout', attributes)
-
-        # Write the o:idmap element.
-        write_idmap(data_id)
-
-        @writer.end_tag('o:shapelayout')
+        @writer.tag_elements('o:shapelayout', attributes) do
+          # Write the o:idmap element.
+          write_idmap(data_id)
+        end
       end
 
       #
@@ -123,15 +121,12 @@ module Writexlsx
             'path',      path
         ]
 
-        @writer.start_tag('v:shapetype', attributes)
-
-        # Write the v:stroke element.
-        write_stroke
-
-        # Write the v:path element.
-        write_path('t', 'rect')
-
-        @writer.end_tag('v:shapetype')
+        @writer.tag_elements('v:shapetype', attributes) do
+          # Write the v:stroke element.
+          write_stroke
+          # Write the v:path element.
+          write_path('t', 'rect')
+        end
       end
 
       #
@@ -203,24 +198,18 @@ module Writexlsx
             'o:insetmode', insetmode
         ]
 
-        @writer.start_tag('v:shape', attributes)
-
-        # Write the v:fill element.
-        write_fill
-
-        # Write the v:shadow element.
-        write_shadow
-
-        # Write the v:path element.
-        write_path(nil, 'none')
-
-        # Write the v:textbox element.
-        write_textbox
-
-        # Write the x:ClientData element.
-        write_client_data(comment)
-
-        @writer.end_tag('v:shape')
+        @writer.tag_elements('v:shape', attributes) do
+          # Write the v:fill element.
+          write_fill
+          # Write the v:shadow element.
+          write_shadow
+          # Write the v:path element.
+          write_path(nil, 'none')
+          # Write the v:textbox element.
+          write_textbox
+          # Write the x:ClientData element.
+          write_client_data(comment)
+        end
       end
 
       def float_to_str(float)
@@ -267,12 +256,10 @@ module Writexlsx
 
         attributes = ['style', style]
 
-        @writer.start_tag('v:textbox', attributes)
-
-        # Write the div element.
-        write_div
-
-        @writer.end_tag('v:textbox')
+        @writer.tag_elements('v:textbox', attributes) do
+          # Write the div element.
+          write_div
+        end
       end
 
       #
@@ -282,8 +269,7 @@ module Writexlsx
         style = 'text-align:left'
         attributes = ['style', style]
 
-        @writer.start_tag('div', attributes)
-        @writer.end_tag('div')
+        @writer.tag_elements('div', attributes) { }
       end
 
       #
@@ -294,30 +280,22 @@ module Writexlsx
 
         attributes = ['ObjectType', object_type]
 
-        @writer.start_tag('x:ClientData', attributes)
-
-        # Write the x:MoveWithCells element.
-        write_move_with_cells
-
-        # Write the x:SizeWithCells element.
-        write_size_with_cells
-
-        # Write the x:Anchor element.
-        write_anchor(comment.vertices)
-
-        # Write the x:AutoFill element.
-        write_auto_fill
-
-        # Write the x:Row element.
-        write_row(comment.row)
-
-        # Write the x:Column element.
-        write_column(comment.col)
-
-        # Write the x:Visible element.
-        write_visible if comment.visible != 0 && !comment.visible.nil?
-
-        @writer.end_tag('x:ClientData')
+        @writer.tag_elements('x:ClientData', attributes) do
+          # Write the x:MoveWithCells element.
+          write_move_with_cells
+          # Write the x:SizeWithCells element.
+          write_size_with_cells
+          # Write the x:Anchor element.
+          write_anchor(comment.vertices)
+          # Write the x:AutoFill element.
+          write_auto_fill
+          # Write the x:Row element.
+          write_row(comment.row)
+          # Write the x:Column element.
+          write_column(comment.col)
+          # Write the x:Visible element.
+          write_visible if comment.visible != 0 && !comment.visible.nil?
+        end
       end
 
       #

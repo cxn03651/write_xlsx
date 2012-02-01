@@ -161,10 +161,10 @@ module Writexlsx
       attributes << {'filterMode' => 1} if @filter_on
 
       if @fit_page || @tab_color
-        @writer.start_tag('sheetPr', attributes)
-        write_tab_color
-        write_page_set_up_pr
-        @writer.end_tag('sheetPr')
+        @writer.tag_elements('sheetPr', attributes) do
+          write_tab_color
+          write_page_set_up_pr
+        end
       else
         @writer.empty_tag('sheetPr', attributes)
       end

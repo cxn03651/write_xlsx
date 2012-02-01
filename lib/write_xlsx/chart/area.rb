@@ -37,15 +37,12 @@ module Writexlsx
       # Write the <c:areaChart> element.
       #
       def write_area_chart
-        @writer.start_tag('c:areaChart')
-
-        # Write the c:grouping element.
-        write_grouping('standard')
-
-        # Write the series elements.
-        write_series
-
-        @writer.end_tag('c:areaChart')
+        @writer.tag_elements('c:areaChart') do
+          # Write the c:grouping element.
+          write_grouping('standard')
+          # Write the series elements.
+          write_series
+        end
       end
     end
   end

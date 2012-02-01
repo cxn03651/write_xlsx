@@ -109,24 +109,19 @@ module Writexlsx
       # Write the <HeadingPairs> element.
       #
       def write_heading_pairs
-          @writer.start_tag('HeadingPairs')
-
+        @writer.tag_elements('HeadingPairs') do
           write_vt_vector('variant', @heading_pairs)
-
-          @writer.end_tag('HeadingPairs')
+        end
       end
 
       #
       # Write the <TitlesOfParts> element.
       #
       def write_titles_of_parts
-        @writer.start_tag('TitlesOfParts')
-        parts_data = []
-        @part_names.each { |part_name| parts_data.push(['lpstr', part_name]) }
-
-        write_vt_vector('lpstr', parts_data)
-
-        @writer.end_tag('TitlesOfParts')
+        @writer.tag_elements('TitlesOfParts') do
+          parts_data = @part_names.collect { |part_name| ['lpstr', part_name] }
+          write_vt_vector('lpstr', parts_data)
+        end
       end
 
       #
@@ -140,15 +135,15 @@ module Writexlsx
           'baseType', base_type
         ]
 
-        @writer.start_tag('vt:vector', attributes)
-
-        data.each do |a|
-          @writer.start_tag('vt:variant') if base_type == 'variant'
-          write_vt_data(*a)
-          @writer.end_tag('vt:variant')   if base_type == 'variant'
+        @writer.tag_elements('vt:vector', attributes) do
+          data.each do |a|
+            if base_type == 'variant'
+              @writer.tag_elements('vt:variant') { write_vt_data(*a) }
+            else
+              write_vt_data(*a)
+            end
+          end
         end
-
-        @writer.end_tag('vt:vector')
       end
 
       #

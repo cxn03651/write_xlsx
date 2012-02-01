@@ -211,20 +211,19 @@ module Writexlsx
       def write_authors(comment_data)
         author_count = 0
 
-        @writer.start_tag('authors')
-        comment_data.each do |comment|
-          author = comment.author || ''
-          if author && !@author_ids[author]
-            # Store the author id.
-            @author_ids[author] = author_count
-            author_count += 1
+        @writer.tag_elements('authors') do
+          comment_data.each do |comment|
+            author = comment.author || ''
+            if author && !@author_ids[author]
+              # Store the author id.
+              @author_ids[author] = author_count
+              author_count += 1
 
-            # Write the author element.
-            write_author(author)
+              # Write the author element.
+              write_author(author)
+            end
           end
         end
-
-        @writer.end_tag('authors')
       end
 
       #
@@ -238,9 +237,9 @@ module Writexlsx
       # Write the <commentList> element.
       #
       def write_comment_list(comment_data)
-        @writer.start_tag('commentList')
-        comment_data.each { |comment| write_comment(comment) }
-        @writer.end_tag( 'commentList' )
+        @writer.tag_elements('commentList') do
+          comment_data.each { |comment| write_comment(comment) }
+        end
       end
 
       #
@@ -253,36 +252,31 @@ module Writexlsx
         author_id = (@author_ids[comment.author] if comment.author) || 0
         attributes << 'authorId' << author_id
 
-        @writer.start_tag('comment', attributes)
-        write_text(comment.string)
-        @writer.end_tag('comment')
+        @writer.tag_elements('comment', attributes) do
+          write_text(comment.string)
+        end
       end
 
       #
       # Write the <text> element.
       #
       def write_text(text)
-        @writer.start_tag('text')
-
-        # Write the text r element.
-        write_text_r(text)
-
-        @writer.end_tag('text')
+        @writer.tag_elements('text') do
+          # Write the text r element.
+          write_text_r(text)
+        end
       end
 
       #
       # Write the <r> element.
       #
       def write_text_r(text)
-        @writer.start_tag('r')
-
-        # Write the rPr element.
-        write_r_pr
-
-        # Write the text r element.
-        write_text_t(text)
-
-        @writer.end_tag('r')
+        @writer.tag_elements('r') do
+          # Write the rPr element.
+          write_r_pr
+          # Write the text r element.
+          write_text_t(text)
+        end
       end
 
       #
@@ -300,21 +294,16 @@ module Writexlsx
       # Write the <rPr> element.
       #
       def write_r_pr
-        @writer.start_tag('rPr')
-
-        # Write the sz element.
-        write_sz
-
-        # Write the color element.
-        write_color
-
-        # Write the rFont element.
-        write_r_font
-
-        # Write the family element.
-        write_family
-
-        @writer.end_tag('rPr')
+        @writer.tag_elements('rPr') do
+          # Write the sz element.
+          write_sz
+          # Write the color element.
+          write_color
+          # Write the rFont element.
+          write_r_font
+          # Write the family element.
+          write_family
+        end
       end
 
       #
