@@ -1762,7 +1762,9 @@ module Writexlsx
         :title_axis     => @y_axis,
         :tick_label_pos => @y_axis[:_label_position],
         :cross_axis     => @axis_ids[0],
-        :category_crossing => @x_axis[:_crossing]
+        :category_crossing => @x_axis[:_crossing],
+        :major_unit     => @y_axis[:_major_unit],
+        :minor_unit     => @y_axis[:_minor_unit]
       }
       write_val_axis_common(position, hide_major_gridlines, params)
     end
@@ -1781,7 +1783,9 @@ module Writexlsx
         :title_axis     => @x_axis,
         :tick_label_pos => @x_axis[:_label_position],
         :cross_axis     => @axis_ids[1],
-        :category_crossing => @y_axis[:_crossing]
+        :category_crossing => @y_axis[:_crossing],
+        :major_unit     => @x_axis[:_major_unit],
+        :minor_unit     => @x_axis[:_minor_unit]
       }
       write_val_axis_common(position, hide_major_gridlines, params)
     end
@@ -1826,9 +1830,9 @@ module Writexlsx
         # Write the c:crossBetween element.
         write_cross_between
         # Write the c:majorUnit element.
-        write_c_major_unit(@y_axis[:_major_unit])
+        write_c_major_unit(params[:major_unit])
         # Write the c:minorUnit element.
-        write_c_minor_unit(@y_axis[:_minor_unit])
+        write_c_minor_unit(params[:minor_unit])
       end
     end
 
