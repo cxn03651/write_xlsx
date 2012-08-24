@@ -24,6 +24,9 @@ class Writexlsx::Workbook
 end
 
 class Test::Unit::TestCase
+  require 'rexml/document'
+  include REXML
+
   def setup_dir_var
     @test_dir = File.dirname(__FILE__)
     @expected_dir = File.join(@test_dir, 'expected_dir')
@@ -70,16 +73,12 @@ class Test::Unit::TestCase
   end
 
   def compare_file(expected, result, file)
-    ruby_19 do
-      assert_equal(got_to_array(IO.read(File.join(expected, file), :encoding => 'UTF-8')),
-                   got_to_array(IO.read(File.join(result, file),   :encoding => 'UTF-8')),
-                   "#{file} differs.")
-    end
-    ruby_18 do 
-      assert_equal(got_to_array(IO.read(File.join(expected, file))),
-                   got_to_array(IO.read(File.join(result, file))),
-                   "#{file} differs.")
-    end
+    expected_doc = ""
+    result_doc   = ""
+    Document.new(IO.read(File.join(expected, file))).write(expected_doc, 1)
+    Document.new(IO.read(File.join(result,   file))).write(result_doc,   1)
+
+    assert_equal(expected_doc, result_doc, "#{file} differs.")
   end
 
   def prepare_compare(expected, result, xlsx)
