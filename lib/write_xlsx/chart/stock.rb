@@ -43,12 +43,10 @@ module Writexlsx
         # Add default formatting to the series data.
         modify_series_formatting
 
-        @writer.start_tag('c:stockChart')
-
-        # Write the series elements.
-        write_series
-
-        @writer.end_tag('c:stockChart')
+        @writer.tag_elements('c:stockChart') do
+          # Write the series elements.
+          write_series
+        end
       end
 
       #
@@ -83,21 +81,16 @@ module Writexlsx
       # Write the <c:plotArea> element.
       #
       def write_plot_area
-        @writer.start_tag('c:plotArea')
-
-        # Write the c:layout element.
-        write_layout
-
-        # Write the subclass chart type element.
-        write_chart_type
-
-        # Write the c:dateAx element.
-        write_date_axis
-
-        # Write the c:catAx element.
-        write_val_axis
-
-        @writer.end_tag('c:plotArea')
+        @writer.tag_elements('c:plotArea') do 
+          # Write the c:layout element.
+          write_layout
+          # Write the subclass chart type element.
+          write_chart_type
+          # Write the c:dateAx element.
+          write_date_axis
+          # Write the c:catAx element.
+          write_val_axis
+        end
       end
 
       #

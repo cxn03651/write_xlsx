@@ -36,15 +36,12 @@ module Writexlsx
       # Write the <c:lineChart> element.
       #
       def write_line_chart
-        @writer.start_tag('c:lineChart')
-
-        # Write the c:grouping element.
-        write_grouping('standard')
-
-        # Write the series elements.
-        write_series
-
-        @writer.end_tag('c:lineChart')
+        @writer.tag_elements('c:lineChart') do
+          # Write the c:grouping element.
+          write_grouping('standard')
+          # Write the series elements.
+          write_series
+        end
       end
     end
   end

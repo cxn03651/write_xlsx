@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "write_xlsx"
-  s.version = "0.0.3"
+  s.version = "0.0.4"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Hideo NAKAMURA"]
-  s.date = "2012-01-25"
+  s.date = "2012-02-13"
   s.description = "write_xlsx s a gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem.\nThe WriteXLSX supports the following features:\n  * Multiple worksheets\n  * Strings and numbers\n  * Unicode text\n  * Rich string formats\n  * Formulas (including array formats)\n  * cell formatting\n  * Embedded images\n  * Charts\n  * Autofilters\n  * Data validation\n  * Hyperlinks\n  * Defined names\n  * Grouping/Outlines\n  * Cell comments\n  * Panes\n  * Page set-up and printing options\n\nwrite_xlsx uses the same interface as writeexcel gem.\n\ndocumentation is not completed, but writeexcel\u{2019}s documentation will help you. See http://writeexcel.web.fc2.com/\n\nAnd you can find many examples in this gem.\n"
   s.email = "cxn03651@msj.biglobe.ne.jp"
   s.extra_rdoc_files = [
@@ -174,6 +174,7 @@ Gem::Specification.new do |s|
     "test/perl_output/chart_line.xlsx",
     "test/perl_output/chart_pie.xlsx",
     "test/perl_output/chart_scatter.xlsx",
+    "test/perl_output/chart_scatter06.xlsx",
     "test/perl_output/chart_stock.xlsx",
     "test/perl_output/comments1.xlsx",
     "test/perl_output/comments2.xlsx",

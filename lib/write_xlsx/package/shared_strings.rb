@@ -93,16 +93,14 @@ module Writexlsx
 
         attributes << 'xml:space' << 'preserve' if string =~ /^[ \t]/ || string =~ /[ \t]$/
 
-        @writer.start_tag('si')
-
-        # Write any rich strings without further tags.
-        if string =~ %r{^<r>} && string =~ %r{</r>$}
-          @writer.io_write(string)
-        else
-          @writer.data_element('t', string, attributes)
+        @writer.tag_elements('si') do
+          # Write any rich strings without further tags.
+          if string =~ %r{^<r>} && string =~ %r{</r>$}
+            @writer.io_write(string)
+          else
+            @writer.data_element('t', string, attributes)
+          end
         end
-
-        @writer.end_tag('si')
       end
 
       def total_count

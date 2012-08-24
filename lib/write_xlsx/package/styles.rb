@@ -96,16 +96,14 @@ module Writexlsx
 
         attributes = ['count', count]
 
-        @writer.start_tag('numFmts', attributes)
-
-        # Write the numFmts elements.
-        @xf_formats.each do |format|
-          # Ignore built-in number formats, i.e., < 164.
-          next unless format.num_format_index >= 164
-          write_num_fmt(format.num_format_index, format.num_format)
+        @writer.tag_elements('numFmts', attributes) do
+          # Write the numFmts elements.
+          @xf_formats.each do |format|
+            # Ignore built-in number formats, i.e., < 164.
+            next unless format.num_format_index >= 164
+            write_num_fmt(format.num_format_index, format.num_format)
+          end
         end
-
-        @writer.end_tag('numFmts')
       end
 
       #
@@ -183,48 +181,46 @@ module Writexlsx
       # Write the <font> element.
       #
       def write_font(format, dxf_format = nil)
-        @writer.start_tag('font')
+        @writer.tag_elements('font') do
+          # The condense and extend elements are mainly used in dxf formats.
+          write_condense unless format.font_condense == 0
+          write_extend   unless format.font_extend   == 0
 
-        # The condense and extend elements are mainly used in dxf formats.
-        write_condense unless format.font_condense == 0
-        write_extend   unless format.font_extend   == 0
+          @writer.empty_tag('b')       if format.bold?
+          @writer.empty_tag('i')       if format.italic?
+          @writer.empty_tag('strike')  if format.strikeout?
+          @writer.empty_tag('outline') if format.outline?
+          @writer.empty_tag('shadow')  if format.shadow?
 
-        @writer.empty_tag('b')       if format.bold?
-        @writer.empty_tag('i')       if format.italic?
-        @writer.empty_tag('strike')  if format.strikeout?
-        @writer.empty_tag('outline') if format.outline?
-        @writer.empty_tag('shadow')  if format.shadow?
+          # Handle the underline variants.
+          write_underline( format.underline ) if format.underline?
 
-        # Handle the underline variants.
-        write_underline( format.underline ) if format.underline?
+          write_vert_align('superscript') if format.font_script == 1
+          write_vert_align('subscript')   if format.font_script == 2
 
-        write_vert_align('superscript') if format.font_script == 1
-        write_vert_align('subscript')   if format.font_script == 2
+          @writer.empty_tag('sz', ['val', format.size]) if !dxf_format
 
-        @writer.empty_tag('sz', ['val', format.size]) if !dxf_format
+          theme = format.theme
+          if theme != 0
+            write_color('theme', theme)
+          elsif format.color_indexed != 0
+            write_color('indexed', format.color_indexed)
+          elsif format.color != 0
+            color = get_palette_color(format.color)
+            write_color('rgb', color)
+          elsif !dxf_format
+            write_color('theme', 1)
+          end
 
-        theme = format.theme
-        if theme != 0
-          write_color('theme', theme)
-        elsif format.color_indexed != 0
-          write_color('indexed', format.color_indexed)
-        elsif format.color != 0
-          color = get_palette_color(format.color)
-          write_color('rgb', color)
-        elsif !dxf_format
-          write_color('theme', 1)
-        end
+          if !dxf_format
+            @writer.empty_tag('name',   ['val', format.font])
+            @writer.empty_tag('family', ['val', format.font_family])
 
-        if !dxf_format
-          @writer.empty_tag('name',   ['val', format.font])
-          @writer.empty_tag('family', ['val', format.font_family])
-
-          if format.font == 'Calibri' && format.hyperlink == 0
-            @writer.empty_tag('scheme', ['val', format.font_scheme])
+            if format.font == 'Calibri' && format.hyperlink == 0
+              @writer.empty_tag('scheme', ['val', format.font_scheme])
+            end
           end
         end
-
-        @writer.end_tag('font')
       end
 
       #
@@ -254,27 +250,25 @@ module Writexlsx
 
         attributes = ['count', count]
 
-        @writer.start_tag('fills', attributes)
+        @writer.tag_elements('fills', attributes) do
+          # Write the default fill element.
+          write_default_fill('none')
+          write_default_fill('gray125')
 
-        # Write the default fill element.
-        write_default_fill('none')
-        write_default_fill('gray125')
-
-        # Write the fill elements for format objects that have them.
-        @xf_formats.each do |format|
-          write_fill(format) if format.has_fill?
+          # Write the fill elements for format objects that have them.
+          @xf_formats.each do |format|
+            write_fill(format) if format.has_fill?
+          end
         end
-
-        @writer.end_tag( 'fills' )
       end
 
       #
       # Write the <fill> element for the default fills.
       #
       def write_default_fill(pattern_type)
-        @writer.start_tag('fill')
-        @writer.empty_tag('patternFill', ['patternType', pattern_type])
-        @writer.end_tag('fill')
+        @writer.tag_elements('fill') do
+          @writer.empty_tag('patternFill', ['patternType', pattern_type])
+        end
       end
 
       #
@@ -307,29 +301,28 @@ module Writexlsx
           gray0625
         )
 
-        @writer.start_tag('fill' )
+        @writer.tag_elements('fill' ) do
+          # The "none" pattern is handled differently for dxf formats.
+          if dxf_format && format.pattern <= 1
+            attributes = []
+          else
+            attributes = ['patternType', patterns[format.pattern]]
+          end
+          
+          @writer.tag_elements('patternFill', attributes) do
+            unless fg_color == 0
+              fg_color = get_palette_color(fg_color)
+              @writer.empty_tag('fgColor', ['rgb', fg_color])
+            end
 
-        # The "none" pattern is handled differently for dxf formats.
-        if dxf_format && format.pattern <= 1
-          @writer.start_tag('patternFill')
-        else
-          @writer.start_tag('patternFill', ['patternType', patterns[format.pattern]])
+            if bg_color != 0
+              bg_color = get_palette_color(bg_color)
+              @writer.empty_tag('bgColor', ['rgb', bg_color])
+            else
+              @writer.empty_tag('bgColor', ['indexed', 64]) if !dxf_format
+            end
+          end
         end
-
-        unless fg_color == 0
-          fg_color = get_palette_color(fg_color)
-          @writer.empty_tag('fgColor', ['rgb', fg_color])
-        end
-
-        if bg_color != 0
-          bg_color = get_palette_color(bg_color)
-          @writer.empty_tag('bgColor', ['rgb', bg_color])
-        else
-          @writer.empty_tag('bgColor', ['indexed', 64]) if !dxf_format
-        end
-
-        @writer.end_tag('patternFill')
-        @writer.end_tag('fill')
       end
 
       #
@@ -346,11 +339,10 @@ module Writexlsx
       def write_format_elements(elements, count)
         attributes = ['count', count]
 
-        @writer.start_tag(elements, attributes)
-
-        # Write the border elements for format objects that have them.
-        yield
-        @writer.end_tag(elements)
+        @writer.tag_elements(elements, attributes) do
+          # Write the border elements for format objects that have them.
+          yield
+        end
       end
 
       #
@@ -373,25 +365,23 @@ module Writexlsx
         format.diag_border = 1 if format.diag_type != 0 && format.diag_border == 0
 
         # Write the start border tag.
-        @writer.start_tag('border', attributes)
+        @writer.tag_elements('border', attributes) do
+          # Write the <border> sub elements.
+          write_sub_border('left',   format.left,   format.left_color)
+          write_sub_border('right',  format.right,  format.right_color)
+          write_sub_border('top',    format.top,    format.top_color)
+          write_sub_border('bottom', format.bottom, format.bottom_color)
 
-        # Write the <border> sub elements.
-        write_sub_border('left',   format.left,   format.left_color)
-        write_sub_border('right',  format.right,  format.right_color)
-        write_sub_border('top',    format.top,    format.top_color)
-        write_sub_border('bottom', format.bottom, format.bottom_color)
+          # Condition DXF formats don't allow diagonal borders
+          if !dxf_format
+            write_sub_border('diagonal', format.diag_border, format.diag_color)
+          end
 
-        # Condition DXF formats don't allow diagonal borders
-        if !dxf_format
-          write_sub_border('diagonal', format.diag_border, format.diag_color)
+          if dxf_format
+            write_sub_border('vertical')
+            write_sub_border('horizontal')
+          end
         end
-
-        if dxf_format
-          write_sub_border('vertical')
-          write_sub_border('horizontal')
-        end
-
-        @writer.end_tag('border')
       end
 
       #
@@ -422,16 +412,14 @@ module Writexlsx
 
         attributes = [:style, border_styles[style]]
 
-        @writer.start_tag(type, attributes)
-
-        if color != 0
-          color = get_palette_color(color)
-          @writer.empty_tag('color', ['rgb', color])
-        else
-          @writer.empty_tag('color', ['auto', 1])
+        @writer.tag_elements(type, attributes) do
+          if color != 0
+            color = get_palette_color(color)
+            @writer.empty_tag('color', ['rgb', color])
+          else
+            @writer.empty_tag('color', ['auto', 1])
+          end
         end
-
-        @writer.end_tag(type)
       end
 
       #
@@ -442,12 +430,10 @@ module Writexlsx
 
         attributes = ['count', count]
 
-        @writer.start_tag('cellStyleXfs', attributes)
-
-        # Write the style_xf element.
-        write_style_xf
-
-        @writer.end_tag('cellStyleXfs')
+        @writer.tag_elements('cellStyleXfs', attributes) do
+          # Write the style_xf element.
+          write_style_xf
+        end
       end
 
       #
@@ -464,12 +450,10 @@ module Writexlsx
 
         attributes = ['count', formats.size]
 
-        @writer.start_tag('cellXfs', attributes)
-
-        # Write the xf elements.
-        formats.each { |format| write_xf(format) }
-
-        @writer.end_tag('cellXfs')
+        @writer.tag_elements('cellXfs', attributes) do
+          # Write the xf elements.
+          formats.each { |format| write_xf(format) }
+        end
       end
 
       #
@@ -538,10 +522,10 @@ module Writexlsx
 
         # Write XF with sub-elements if required.
         if has_align || has_protect
-          @writer.start_tag('xf', attributes)
-          @writer.empty_tag('alignment',  align)      if has_align
-          @writer.empty_tag('protection', protection) if has_protect
-          @writer.end_tag('xf')
+          @writer.tag_elements('xf', attributes) do
+            @writer.empty_tag('alignment',  align)      if has_align
+            @writer.empty_tag('protection', protection) if has_protect
+          end
         else
           @writer.empty_tag('xf', attributes)
         end
@@ -555,12 +539,10 @@ module Writexlsx
 
         attributes = ['count', count]
 
-        @writer.start_tag('cellStyles', attributes)
-
-        # Write the cellStyle element.
-        write_cell_style
-
-        @writer.end_tag('cellStyles')
+        @writer.tag_elements('cellStyles', attributes) do
+          # Write the cellStyle element.
+          write_cell_style
+        end
       end
 
       #
@@ -591,23 +573,21 @@ module Writexlsx
         attributes = ['count', count]
 
         if !formats.empty?
-          @writer.start_tag('dxfs', attributes)
+          @writer.tag_elements('dxfs', attributes) do
+            # Write the font elements for format objects that have them.
+            @dxf_formats.each do |format|
+              @writer.tag_elements('dxf') do
+                write_font(format, 1) if format.has_dxf_font?
 
-          # Write the font elements for format objects that have them.
-          @dxf_formats.each do |format|
-            @writer.start_tag('dxf')
-            write_font(format, 1) if format.has_dxf_font?
+                if format.num_format_index != 0
+                  write_num_fmt(format.num_format_index, format.num_format)
+                end
 
-            if format.num_format_index != 0
-              write_num_fmt(format.num_format_index, format.num_format)
+                write_fill(format, 1)    if format.has_dxf_fill?
+                write_border(format, 1)  if format.has_dxf_border?
+              end
             end
-
-            write_fill(format, 1)    if format.has_dxf_fill?
-            write_border(format, 1)  if format.has_dxf_border?
-            @writer.end_tag('dxf')
           end
-
-          @writer.end_tag('dxfs')
         else
           @writer.empty_tag('dxfs', attributes)
         end
@@ -638,9 +618,9 @@ module Writexlsx
 
         return if @custom_colors.empty?
 
-        @writer.start_tag( 'colors' )
-        write_mru_colors(@custom_colors)
-        @writer.end_tag('colors')
+        @writer.tag_elements( 'colors' ) do
+          write_mru_colors(@custom_colors)
+        end
       end
 
       #
@@ -653,14 +633,12 @@ module Writexlsx
         count = custom_colors.size
         custom_colors = custom_colors[-10, 10] if count > 10
 
-        @writer.start_tag('mruColors')
-
-        # Write the custom colors in reverse order.
-        @custom_colors.reverse.each do |color|
-          write_color('rgb', color)
+        @writer.tag_elements('mruColors') do
+          # Write the custom colors in reverse order.
+          @custom_colors.reverse.each do |color|
+            write_color('rgb', color)
+          end
         end
-
-        @writer.end_tag('mruColors')
       end
 
       def write_xml_declaration

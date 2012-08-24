@@ -141,9 +141,9 @@ module Writexlsx
       end
 
       def write_cell
-        @worksheet.writer.start_tag('c', cell_attributes)
-        @worksheet.write_cell_value(token)
-        @worksheet.writer.end_tag('c')
+        @worksheet.writer.tag_elements('c', cell_attributes) do
+          @worksheet.write_cell_value(token)
+        end
       end
     end
 
@@ -160,9 +160,9 @@ module Writexlsx
       def write_cell
         attributes = cell_attributes
         attributes << 't' << 's'
-        @worksheet.writer.start_tag('c', attributes)
-        @worksheet.write_cell_value(token)
-        @worksheet.writer.end_tag('c')
+        @worksheet.writer.tag_elements('c', attributes) do
+          @worksheet.write_cell_value(token)
+        end
       end
     end
 
@@ -177,10 +177,10 @@ module Writexlsx
       end
 
       def write_cell
-        @worksheet.writer.start_tag('c', cell_attributes)
-        @worksheet.write_cell_formula(token)
-        @worksheet.write_cell_value(result || 0)
-        @worksheet.writer.end_tag('c')
+        @worksheet.writer.tag_elements('c', cell_attributes) do
+          @worksheet.write_cell_formula(token)
+          @worksheet.write_cell_value(result || 0)
+        end
       end
     end
 
@@ -195,10 +195,10 @@ module Writexlsx
       end
 
       def write_cell
-        @worksheet.writer.start_tag('c', cell_attributes)
-        @worksheet.write_cell_array_formula(token, range)
-        @worksheet.write_cell_value(result)
-        @worksheet.writer.end_tag('c')
+        @worksheet.writer.tag_elements('c', cell_attributes) do
+          @worksheet.write_cell_array_formula(token, range)
+          @worksheet.write_cell_value(result)
+        end
       end
     end
 
@@ -216,9 +216,9 @@ module Writexlsx
       def write_cell
         attributes = cell_attributes
         attributes << 't' << 's'
-        @worksheet.writer.start_tag('c', attributes)
-        @worksheet.write_cell_value(token)
-        @worksheet.writer.end_tag('c')
+        @worksheet.writer.tag_elements('c', attributes) do
+          @worksheet.write_cell_value(token)
+        end
 
         if link_type == 1
           # External link with rel file relationship.
@@ -4824,10 +4824,10 @@ module Writexlsx
       (attributes << 'filterMode' << 1) if filter_on?
 
       if fit_page? || tab_color?
-        @writer.start_tag('sheetPr', attributes)
-        write_tab_color
-        write_page_set_up_pr
-        @writer.end_tag('sheetPr')
+        @writer.tag_elements('sheetPr', attributes) do
+          write_tab_color
+          write_page_set_up_pr
+        end
       else
         @writer.empty_tag('sheetPr', attributes)
       end
@@ -4879,9 +4879,7 @@ module Writexlsx
     # Write the <sheetViews> element.
     #
     def write_sheet_views #:nodoc:
-      @writer.start_tag('sheetViews', [])
-      write_sheet_view
-      @writer.end_tag('sheetViews')
+      @writer.tag_elements('sheetViews', []) { write_sheet_view }
     end
 
     def write_sheet_view #:nodoc:
@@ -4913,10 +4911,10 @@ module Writexlsx
       if @panes.empty? && @selections.empty?
         @writer.empty_tag('sheetView', attributes)
       else
-        @writer.start_tag('sheetView', attributes)
-        write_panes
-        write_selections
-        @writer.end_tag('sheetView')
+        @writer.tag_elements('sheetView', attributes) do
+          write_panes
+          write_selections
+        end
       end
     end
 
@@ -4959,10 +4957,9 @@ module Writexlsx
       # Exit unless some column have been formatted.
       return if @colinfo.empty?
 
-      @writer.start_tag('cols')
-      @colinfo.each {|col_info| write_col_info(*col_info) }
-
-      @writer.end_tag('cols')
+      @writer.tag_elements('cols') do
+        @colinfo.each {|col_info| write_col_info(*col_info) }
+      end
     end
 
     #
@@ -5015,9 +5012,7 @@ module Writexlsx
         # If the dimensions aren't defined then there is no data to write.
         @writer.empty_tag('sheetData')
       else
-        @writer.start_tag('sheetData')
-        write_rows
-        @writer.end_tag('sheetData')
+        @writer.tag_elements('sheetData') { write_rows }
       end
     end
 
@@ -5339,9 +5334,7 @@ module Writexlsx
     # Write the <extLst> element.
     #
     def write_ext_lst #:nodoc:
-      @writer.start_tag('extLst')
-      write_ext
-      @writer.end_tag('extLst')
+      @writer.tag_elements('extLst') { write_ext }
     end
 
     #
@@ -5356,9 +5349,7 @@ module Writexlsx
         'uri',      uri
       ]
 
-      @writer.start_tag('ext', attributes)
-      write_mx_plv
-      @writer.end_tag('ext')
+      @writer.tag_elements('ext', attributes) { write_mx_plv }
     end
 
     #
@@ -5386,12 +5377,10 @@ module Writexlsx
 
       attributes = ['count', @merge.size]
 
-      @writer.start_tag('mergeCells', attributes)
-
-      # Write the mergeCell element.
-      @merge.each { |merged_range| write_merge_cell(merged_range) }
-
-      @writer.end_tag('mergeCells')
+      @writer.tag_elements('mergeCells', attributes) do
+        # Write the mergeCell element.
+        @merge.each { |merged_range| write_merge_cell(merged_range) }
+      end
     end
 
 
@@ -5440,10 +5429,10 @@ module Writexlsx
     def write_header_footer #:nodoc:
       return unless header_footer_changed?
 
-      @writer.start_tag('headerFooter')
-      write_odd_header if @header && @header != ''
-      write_odd_footer if @footer && @footer != ''
-      @writer.end_tag('headerFooter')
+      @writer.tag_elements('headerFooter') do
+        write_odd_header if @header && @header != ''
+        write_odd_footer if @footer && @footer != ''
+      end
     end
 
     #
@@ -5453,7 +5442,6 @@ module Writexlsx
       @writer.data_element('oddHeader', @header)
     end
 
-    # _write_odd_footer()
     #
     # Write the <oddFooter> element.
     #
@@ -5492,9 +5480,9 @@ module Writexlsx
 
       attributes = ['count', count, 'manualBreakCount', count]
 
-      @writer.start_tag(tag, attributes)
-      page_breaks.each { |num| write_brk(num, max) }
-      @writer.end_tag(tag)
+      @writer.tag_elements(tag, attributes) do
+        page_breaks.each { |num| write_brk(num, max) }
+      end
     end
     #
     # Write the <brk> element.
@@ -5519,9 +5507,9 @@ module Writexlsx
 
       if filter_on?
         # Autofilter defined active filters.
-        @writer.start_tag('autoFilter', attributes)
-        write_autofilters
-        @writer.end_tag('autoFilter')
+        @writer.tag_elements('autoFilter', attributes) do
+          write_autofilters
+        end
       else
         # Autofilter defined without active filters.
         @writer.empty_tag('autoFilter', attributes)
@@ -5553,16 +5541,15 @@ module Writexlsx
     def write_filter_column(col_id, type, *filters) #:nodoc:
       attributes = ['colId', col_id]
 
-      @writer.start_tag('filterColumn', attributes)
-      if type == 1
-        # Type == 1 is the new XLSX style filter.
-        write_filters(*filters)
-      else
-        # Type == 0 is the classic "custom" filter.
-        write_custom_filters(*filters)
+      @writer.tag_elements('filterColumn', attributes) do
+        if type == 1
+          # Type == 1 is the new XLSX style filter.
+          write_filters(*filters)
+        else
+          # Type == 0 is the classic "custom" filter.
+          write_custom_filters(*filters)
+        end
       end
-
-      @writer.end_tag('filterColumn')
     end
 
     #
@@ -5574,9 +5561,9 @@ module Writexlsx
         @writer.empty_tag('filters', ['blank', 1])
       else
         # General case.
-        @writer.start_tag('filters')
-        filters.each { |filter| write_filter(filter) }
-        @writer.end_tag('filters')
+        @writer.tag_elements('filters') do
+          filters.each { |filter| write_filter(filter) }
+        end
       end
     end
 
@@ -5594,9 +5581,7 @@ module Writexlsx
     def write_custom_filters(*tokens) #:nodoc:
       if tokens.size == 2
         # One filter expression only.
-        @writer.start_tag('customFilters')
-        write_custom_filter(*tokens)
-        @writer.end_tag('customFilters')
+        @writer.tag_elements('customFilters') { write_custom_filter(*tokens) }
       else
         # Two filter expressions.
 
@@ -5608,10 +5593,10 @@ module Writexlsx
         end
 
         # Write the two custom filters.
-        @writer.start_tag('customFilters', attributes)
-        write_custom_filter(tokens[0], tokens[1])
-        write_custom_filter(tokens[3], tokens[4])
-        @writer.end_tag('customFilters')
+        @writer.tag_elements('customFilters', attributes) do
+          write_custom_filter(tokens[0], tokens[1])
+          write_custom_filter(tokens[3], tokens[4])
+        end
       end
     end
 
@@ -5652,19 +5637,17 @@ module Writexlsx
     def write_hyperlinks #:nodoc:
       return if @hlink_refs.empty?
 
-      @writer.start_tag('hyperlinks')
+      @writer.tag_elements('hyperlinks') do
+        @hlink_refs.each do |aref|
+          type, *args = aref
 
-      @hlink_refs.each do |aref|
-        type, *args = aref
-
-        if type == 1
-          write_hyperlink_external(*args)
-        elsif type == 2
-          write_hyperlink_internal(*args)
+          if type == 1
+            write_hyperlink_external(*args)
+          elsif type == 2
+            write_hyperlink_internal(*args)
+          end
         end
       end
-
-      @writer.end_tag('hyperlinks')
     end
 
     #
@@ -5775,42 +5758,39 @@ module Writexlsx
     # Write the <font> element.
     #
     def write_font(writer, format) #:nodoc:
-      writer.start_tag('rPr')
+      writer.tag_elements('rPr') do
+        writer.empty_tag('b')       if format.bold?
+        writer.empty_tag('i')       if format.italic?
+        writer.empty_tag('strike')  if format.strikeout?
+        writer.empty_tag('outline') if format.outline?
+        writer.empty_tag('shadow')  if format.shadow?
 
-      writer.empty_tag('b')       if format.bold?
-      writer.empty_tag('i')       if format.italic?
-      writer.empty_tag('strike')  if format.strikeout?
-      writer.empty_tag('outline') if format.outline?
-      writer.empty_tag('shadow')  if format.shadow?
+        # Handle the underline variants.
+        write_underline(writer, format.underline) if format.underline?
 
-      # Handle the underline variants.
-      write_underline(writer, format.underline) if format.underline?
+        write_vert_align(writer, 'superscript') if format.font_script == 1
+        write_vert_align(writer, 'subscript')   if format.font_script == 2
 
-      write_vert_align(writer, 'superscript') if format.font_script == 1
-      write_vert_align(writer, 'subscript')   if format.font_script == 2
+        writer.empty_tag('sz', ['val', format.size])
 
-      writer.empty_tag('sz', ['val', format.size])
+        theme = format.theme
+        color = format.color
+        if !theme.nil? && theme != 0
+          write_color(writer, 'theme', theme)
+        elsif !color.nil? && color != 0
+          color = get_palette_color(color)
+          write_color(writer, 'rgb', color)
+        else
+          write_color(writer, 'theme', 1)
+        end
 
-      theme = format.theme
-      color = format.color
-      if !theme.nil? && theme != 0
-        write_color(writer, 'theme', theme)
-      elsif !color.nil? && color != 0
-        color = get_palette_color(color)
+        writer.empty_tag('rFont',  ['val', format.font])
+        writer.empty_tag('family', ['val', format.font_family])
 
-        write_color(writer, 'rgb', color)
-      else
-        write_color(writer, 'theme', 1)
+        if format.font == 'Calibri' && format.hyperlink == 0
+          writer.empty_tag('scheme', ['val', format.font_scheme])
+        end
       end
-
-      writer.empty_tag('rFont',  ['val', format.font])
-      writer.empty_tag('family', ['val', format.font_family])
-
-      if format.font == 'Calibri' && format.hyperlink == 0
-        writer.empty_tag('scheme', ['val', format.font_scheme])
-      end
-
-      writer.end_tag('rPr')
     end
 
     #
@@ -5847,9 +5827,9 @@ module Writexlsx
 
       attributes = ['count', @validations.size]
 
-      @writer.start_tag('dataValidations', attributes)
-      @validations.each { |validation| write_data_validation(validation) }
-      @writer.end_tag('dataValidations')
+      @writer.tag_elements('dataValidations', attributes) do
+        @validations.each { |validation| write_data_validation(validation) }
+      end
     end
 
     #
@@ -5899,15 +5879,12 @@ module Writexlsx
       attributes << 'prompt' << param[:input_message]    if param[:input_message]
       attributes << 'sqref' << sqref
 
-      @writer.start_tag('dataValidation', attributes)
-
-      # Write the formula1 element.
-      write_formula_1(param[:value])
-
-      # Write the formula2 element.
-      write_formula_2(param[:maximum]) if param[:maximum]
-
-      @writer.end_tag('dataValidation')
+      @writer.tag_elements('dataValidation', attributes) do
+        # Write the formula1 element.
+        write_formula_1(param[:value])
+        # Write the formula2 element.
+        write_formula_2(param[:maximum]) if param[:maximum]
+      end
     end
 
     #
@@ -5954,11 +5931,9 @@ module Writexlsx
     def write_conditional_formatting(range, params) #:nodoc:
       attributes = ['sqref', range]
 
-      @writer.start_tag('conditionalFormatting', attributes)
-
-      params.each { |param| write_cf_rule(param) }
-
-      @writer.end_tag('conditionalFormatting')
+      @writer.tag_elements('conditionalFormatting', attributes) do
+        params.each { |param| write_cf_rule(param) }
+      end
     end
 
     #
@@ -5973,18 +5948,16 @@ module Writexlsx
       attributes << 'priority' << param[:priority]
       attributes << 'operator' << param[:criteria]
 
-      @writer.start_tag('cfRule', attributes)
-
-      if param[:type] == 'cellIs'
-        if param[:minimum] && param[:maximum]
-          write_formula_tag(param[:minimum])
-          write_formula_tag(param[:maximum])
-        else
-          write_formula_tag(param[:value])
+      @writer.tag_elements('cfRule', attributes) do
+        if param[:type] == 'cellIs'
+          if param[:minimum] && param[:maximum]
+            write_formula_tag(param[:minimum])
+            write_formula_tag(param[:maximum])
+          else
+            write_formula_tag(param[:value])
+          end
         end
       end
-
-      @writer.end_tag('cfRule')
     end
 
     def store_data_to_table(cell_data) #:nodoc:

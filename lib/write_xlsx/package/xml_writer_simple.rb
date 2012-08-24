@@ -22,6 +22,12 @@ module Writexlsx
         io_write(str)
       end
 
+      def tag_elements(tag, attributes = [])
+        start_tag(tag, attributes)
+        yield
+        end_tag(tag)
+      end
+
       def start_tag(tag, attr = [])
         str = "<#{tag}#{key_vals(attr)}>"
         io_write(str)
@@ -38,9 +44,7 @@ module Writexlsx
       end
 
       def data_element(tag, data, attr = [])
-        str = start_tag(tag, attr)
-        str << io_write("#{characters(data)}")
-        str << end_tag(tag)
+        tag_elements(tag, attr) { io_write("#{characters(data)}") }
       end
 
       def characters(data)

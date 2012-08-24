@@ -60,6 +60,9 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
 
 == Recent change
 
+2012-02-14 v0.0.4
+ Fix for x-axis major/minor units in scatter charts.(CPAN_0.46)
+
 2012-01-25 v0.0.3
  alignment format support. see examples/formats.rb
 
