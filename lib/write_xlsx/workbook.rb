@@ -1018,7 +1018,6 @@ module Writexlsx
     #
     def prepare_fonts #:nodoc:
       fonts = {}
-      index = 0
 
       @xf_formats.each do |format|
         key = format.get_font_key
@@ -1029,14 +1028,13 @@ module Writexlsx
           format.has_font(false)
         else
           # This is a new font.
-          fonts[key]        = index
-          format.font_index = index
+          format.font_index = fonts.size
+          fonts[key]        = fonts.size
           format.has_font(true)
-          index += 1
         end
       end
 
-      @font_count = index
+      @font_count = fonts.size
 
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
@@ -1095,7 +1093,6 @@ module Writexlsx
     #
     def prepare_borders #:nodoc:
       borders = {}
-      index = 0
 
       @xf_formats.each do |format|
         key = format.get_border_key
@@ -1106,14 +1103,13 @@ module Writexlsx
           format.has_border(false)
         else
           # This is a new border.
-          borders[key]        = index
-          format.border_index = index
+          format.border_index = borders.size
+          borders[key]        = borders.size
           format.has_border(true)
-          index += 1
         end
       end
 
-      @border_count = index
+      @border_count = borders.size
 
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
