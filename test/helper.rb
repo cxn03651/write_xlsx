@@ -78,7 +78,7 @@ class Test::Unit::TestCase
     Document.new(IO.read(File.join(expected, file))).write(expected_doc, 1)
     Document.new(IO.read(File.join(result,   file))).write(result_doc,   1)
 
-    assert_equal(expected_doc, result_doc, "#{file} differs.")
+    assert_equal(expected_doc.gsub(/\r/, ''), result_doc.gsub(/\r/, ''), "#{file} differs.")
   end
 
   def prepare_compare(expected, result, xlsx)
