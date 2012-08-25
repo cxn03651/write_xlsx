@@ -97,6 +97,12 @@ module Writexlsx
       @doc_properties      = {}
       @local_time          = Time.now
       @num_comment_files   = 0
+      @optimization        = 0
+      @x_window            = 240
+      @y_window            = 15
+      @window_width        = 16095
+      @window_height       = 9660
+      @tab_ratio           = 500
       @image_types         = {}
       @images              = []
 
@@ -849,11 +855,14 @@ module Writexlsx
 
     def write_workbook_view #:nodoc:
       attributes = [
-        'xWindow',        240,
-        'yWindow',         15,
-        'windowWidth',  16095,
-        'windowHeight',  9660
-      ]
+        'xWindow',       @x_window,
+        'yWindow',       @y_window,
+        'windowWidth',   @window_width,
+        'windowHeight',  @window_height
+                   ]
+      if @tab_ratio != 500
+        attributes << 'tabRatio' << @tab_ratio
+      end
       if @firstsheet > 0
         attributes << 'firstSheet' << @firstsheet
       end
