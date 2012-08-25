@@ -9,3 +9,6 @@ group :development do
   gem "jeweler", "~> 1.6.4"
   gem "bundler"
 end
+group :test do
+  gem "rdoc"
+end
