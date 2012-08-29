@@ -6038,6 +6038,13 @@ module Writexlsx
             write_formula_tag(param[:value])
           end
         end
+      when 'aboveAverage'
+        attributes << 'aboveAverage' << 0 if param[:criteria] =~ /below/
+        attributes << 'equalAverage' << 1 if param[:criteria] =~ /equal/
+        if param[:criteria] =~ /([123]) std dev/
+          attributes << 'stdDev' << $~[1]
+        end
+        @writer.empty_tag('cfRule', attributes)
       when 'duplicateValues', 'uniqueValues'
         @writer.empty_tag('cfRule', attributes)
       end
