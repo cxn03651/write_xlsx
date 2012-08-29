@@ -3202,6 +3202,40 @@ module Writexlsx
         end
       end
 
+      # Special handling of time time_period criteria.
+      if param[:type] == 'timePeriod'
+        case param[:criteria]
+        when 'yesterday'
+            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()-1"
+        when 'today'
+            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()"
+        when 'tomorrow'
+            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()+1"
+        when 'last7Days'
+          param[:formula] =
+            "AND(TODAY()-FLOOR(#{start_cell},1)<=6,FLOOR(#{start_cell},1)<=TODAY())"
+        when 'lastWeek'
+            param[:formula] =
+              "AND(TODAY()-ROUNDDOWN(#{start_cell},0)>=(WEEKDAY(TODAY())),TODAY()-ROUNDDOWN(#{start_cell},0)<(WEEKDAY(TODAY())+7))"
+        when 'thisWeek'
+            param[:formula] =
+              "AND(TODAY()-ROUNDDOWN(#{start_cell},0)<=WEEKDAY(TODAY())-1,ROUNDDOWN(#{start_cell},0)-TODAY()<=7-WEEKDAY(TODAY()))"
+        when 'nextWeek'
+            param[:formula] =
+              "AND(ROUNDDOWN(#{start_cell},0)-TODAY()>(7-WEEKDAY(TODAY())),ROUNDDOWN(#{start_cell},0)-TODAY()<(15-WEEKDAY(TODAY())))"
+        when 'lastMonth'
+            param[:formula] =
+              "AND(MONTH(#{start_cell})=MONTH(TODAY())-1,OR(YEAR(#{start_cell})=YEAR(TODAY()),AND(MONTH(#{start_cell})=1,YEAR(A1)=YEAR(TODAY())-1)))"
+        when 'thisMonth'
+            param[:formula] =
+              "AND(MONTH(#{start_cell})=MONTH(TODAY()),YEAR(#{start_cell})=YEAR(TODAY()))"
+        when 'nextMonth'
+            param[:formula] =
+              "AND(MONTH(#{start_cell})=MONTH(TODAY())+1,OR(YEAR(#{start_cell})=YEAR(TODAY()),AND(MONTH(#{start_cell})=12,YEAR(#{start_cell})=YEAR(TODAY())+1)))"
+        else
+            raise "Invalid time_period criteria '#{param[:criteria]}' in conditional_formatting()"
+        end
+      end
 
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
@@ -6079,6 +6113,11 @@ module Writexlsx
       when 'containsText', 'notContainsText', 'beginsWith', 'endsWith'
         attributes << 'operator' << param[:criteria]
         attributes << 'text'     << param[:value]
+        @writer.tag_elements('cfRule', attributes) do
+          write_formula_tag(param[:formula])
+        end
+      when 'timePeriod'
+        attributes << 'timePeriod' << param[:criteria]
         @writer.tag_elements('cfRule', attributes) do
           write_formula_tag(param[:formula])
         end
