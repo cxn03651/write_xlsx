@@ -4418,25 +4418,25 @@ module Writexlsx
     end
 
     def check_conditional_formatting_parameters(param)  # :nodoc:
-      # List of  valid validation types.
-      valid_type = { 'cell' => 'cellIs' }
-
       # Check for valid input parameters.
-      unless (param.keys.uniq - [:type, :format, :criteria, :value, :minimum, :maximum]).empty? ||
-          param.has_key?(:type)                                   ||
-          param.has_key?(:criteria)                               ||
-          valid_type.has_key?(param[:type].downcase)              ||
-          valid_criteria_type.has_key?(param[:criteria].downcase)
-        raise WriteXLSXOptionParameterError
+      unless (param.keys.uniq - valid_parameter_for_conditional_formatting).empty? &&
+          param.has_key?(:type)                                   &&
+          valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
+        raise WriteXLSXOptionParameterError, "Invalid type : #{param[:type]}"
       end
 
-      param[:type] = valid_type[param[:type].downcase]
-      param[:criteria] = valid_criteria_type[param[:criteria].downcase]
+      param[:direction] = 'bottom' if param[:type] == 'bottom'
+      param[:type] = valid_type_for_conditional_formatting[param[:type].downcase]
+
+      # Check for valid criteria types.
+      if param.has_key?(:criteria) && valid_criteria_type_for_conditional_formatting.has_key?(param[:criteria].downcase)
+        param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase]
+      end
 
       # 'Between' and 'Not between' criteria require 2 values.
       if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
         unless param.has_key?(:minimum) || param.has_key?(:maximum)
-          raise WriteXLSXOptionParameterError
+          raise WriteXLSXOptionParameterError, "Invalid criteria : #{param[:criteria]}"
         end
       else
         param[:minimum] = nil
@@ -4451,6 +4451,86 @@ module Writexlsx
       end
     end
 
+    # List of valid input parameters for conditional_formatting.
+    def valid_parameter_for_conditional_formatting
+      [
+        :type,
+        :format,
+        :criteria,
+        :value,
+        :minimum,
+        :maximum,
+        :min_type,
+        :mid_type,
+        :max_type,
+        :min_value,
+        :mid_value,
+        :max_value,
+        :min_color,
+        :mid_color,
+        :max_color,
+        :bar_color
+      ]
+    end
+
+    # List of  valid validation types for conditional_formatting.
+    def valid_type_for_conditional_formatting
+      {
+        'cell'          => 'cellIs',
+        'date'          => 'date',
+        'time'          => 'time',
+        'average'       => 'aboveAverage',
+        'duplicate'     => 'duplicateValues',
+        'unique'        => 'uniqueValues',
+        'top'           => 'top10',
+        'bottom'        => 'top10',
+        'text'          => 'text',
+        'time_period'   => 'timePeriod',
+        'blanks'        => 'containsBlanks',
+        'no_blanks'     => 'notContainsBlanks',
+        'errors'        => 'containsErrors',
+        'no_errors'     => 'notContainsErrors',
+        '2_color_scale' => '2_color_scale',
+        '3_color_scale' => '3_color_scale',
+        'data_bar'      => 'dataBar',
+        'formula'       => 'expression'
+      }
+    end
+
+    # List of valid criteria types for conditional_formatting.
+    def valid_criteria_type_for_conditional_formatting
+      {
+        'between'                  => 'between',
+        'not between'              => 'notBetween',
+        'equal to'                 => 'equal',
+        '='                        => 'equal',
+        '=='                       => 'equal',
+        'not equal to'             => 'notEqual',
+        '!='                       => 'notEqual',
+        '<>'                       => 'notEqual',
+        'greater than'             => 'greaterThan',
+        '>'                        => 'greaterThan',
+        'less than'                => 'lessThan',
+        '<'                        => 'lessThan',
+        'greater than or equal to' => 'greaterThanOrEqual',
+        '>='                       => 'greaterThanOrEqual',
+        'less than or equal to'    => 'lessThanOrEqual',
+        '<='                       => 'lessThanOrEqual',
+        'containing'               => 'containsText',
+        'not containing'           => 'notContains',
+        'begins with'              => 'beginsWith',
+        'ends with'                => 'endsWith',
+        'yesterday'                => 'yesterday',
+        'today'                    => 'today',
+        'last 7 days'              => 'last7Days',
+        'last week'                => 'lastWeek',
+        'this week'                => 'thisWeek',
+        'next week'                => 'nextWeek',
+        'last month'               => 'lastMonth',
+        'this month'               => 'thisMonth',
+        'next month'               => 'nextMonth'
+      }
+    end
     # Pad out the rest of the area with formatted blank cells.
     def write_formatted_blank_to_area(row_first, row_last, col_first, col_last, format)
       (row_first .. row_last).each do |row|
@@ -5946,10 +6026,11 @@ module Writexlsx
         attributes << 'dxfId' << param[:format]
       end
       attributes << 'priority' << param[:priority]
-      attributes << 'operator' << param[:criteria]
 
-      @writer.tag_elements('cfRule', attributes) do
-        if param[:type] == 'cellIs'
+      case param[:type]
+      when 'cellIs'
+        attributes << 'operator' << param[:criteria]
+        @writer.tag_elements('cfRule', attributes) do
           if param[:minimum] && param[:maximum]
             write_formula_tag(param[:minimum])
             write_formula_tag(param[:maximum])
@@ -5957,6 +6038,8 @@ module Writexlsx
             write_formula_tag(param[:value])
           end
         end
+      when 'duplicateValues', 'uniqueValues'
+        @writer.empty_tag('cfRule', attributes)
       end
     end
 

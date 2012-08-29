@@ -294,10 +294,15 @@ class TestWriteMethods < Test::Unit::TestCase
       :value    => 5,
       :format   => $red_format
     }
-
     assert_nothing_raised do
       @worksheet.conditional_formatting(0, 0, param)
     end
+    param = {
+      :type     => 'cell',
+      :criteria => 'greater than',
+      :value    => 5,
+      :format   => $red_format
+    }
     assert_nothing_raised do
       @worksheet.conditional_formatting(0, 0, 1, 1, param)
     end
