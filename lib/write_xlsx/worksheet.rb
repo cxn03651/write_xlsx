@@ -3176,9 +3176,32 @@ module Writexlsx
       # If the first and last cell are the same write a single cell.
       if row1 == row2 && col1 == col2
         range = xl_rowcol_to_cell(row1, col1)
+        start_cell = range
       else
         range = xl_range(row1, row2, col1, col2)
+        start_cell = xl_rowcol_to_cell(row1, col1)
       end
+
+      # Special handling of text criteria.
+      if param[:type] = 'text'
+        case param[:criteria]
+        when 'containsText'
+          param[:type]    = 'containsText';
+          param[:formula] = %Q!NOT(ISERROR(SEARCH("#{param[:value]}",#{start_cell})))!
+        when 'notContains'
+          param[:type]    = 'notContainsText';
+          param[:formula] = %Q!ISERROR(SEARCH("#{param[:value]}",#{start_cell}))!
+        when 'beginsWith'
+          param[:type] = 'beginsWith'
+          param[:formula] = %Q!LEFT(#{start_cell},1)="#{param[:value]}"!
+        when 'endsWith'
+          param[:type] = 'endsWith'
+          param[:formula] = %Q!RIGHT(#{start_cell},1)="#{param[:value]}"!
+        else
+          raise "Invalid text criteria '#{param[:criteria]} in conditional_formatting()"
+        end
+      end
+
 
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
@@ -6053,6 +6076,12 @@ module Writexlsx
         @writer.empty_tag('cfRule', attributes)
       when 'duplicateValues', 'uniqueValues'
         @writer.empty_tag('cfRule', attributes)
+      when 'containsText', 'notContainsText', 'beginsWith', 'endsWith'
+        attributes << 'operator' << param[:criteria]
+        attributes << 'text'     << param[:value]
+        @writer.tag_elements('cfRule', attributes) do
+          write_formula_tag(param[:formula])
+        end
       end
     end
 
