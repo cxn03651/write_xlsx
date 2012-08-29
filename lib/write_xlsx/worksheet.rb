@@ -6045,6 +6045,12 @@ module Writexlsx
           attributes << 'stdDev' << $~[1]
         end
         @writer.empty_tag('cfRule', attributes)
+      when 'top10'
+        attributes << 'percent' << 1 if param[:criteria] == '%'
+        attributes << 'bottom'  << 1 if param[:direction]
+        rank = param[:value] || 10
+        attributes << 'rank'    << rank
+        @writer.empty_tag('cfRule', attributes)
       when 'duplicateValues', 'uniqueValues'
         @writer.empty_tag('cfRule', attributes)
       end
