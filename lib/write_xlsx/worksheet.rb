@@ -3183,7 +3183,7 @@ module Writexlsx
       end
 
       # Special handling of text criteria.
-      if param[:type] = 'text'
+      if param[:type] == 'text'
         case param[:criteria]
         when 'containsText'
           param[:type]    = 'containsText';
