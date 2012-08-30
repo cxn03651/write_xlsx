@@ -3237,6 +3237,18 @@ module Writexlsx
         end
       end
 
+      # Special handling of blanks/error types.
+      case param[:type]
+      when 'containsBlanks'
+        param[:formula] = "LEN(TRIM(#{start_cell}))=0"
+      when 'notContainsBlanks'
+        param[:formula] = "LEN(TRIM(#{start_cell}))>0"
+      when 'containsErrors'
+        param[:formula] = "ISERROR(#{start_cell})"
+      when 'notContainsErrors'
+        param[:formula] = "NOT(ISERROR(#{start_cell}))"
+      end
+
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
       @cond_formats[range] << param
@@ -6118,6 +6130,10 @@ module Writexlsx
         end
       when 'timePeriod'
         attributes << 'timePeriod' << param[:criteria]
+        @writer.tag_elements('cfRule', attributes) do
+          write_formula_tag(param[:formula])
+        end
+      when 'containsBlanks', 'notContainsBlanks', 'containsErrors', 'notContainsErrors'
         @writer.tag_elements('cfRule', attributes) do
           write_formula_tag(param[:formula])
         end
