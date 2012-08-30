@@ -4502,6 +4502,35 @@ module Writexlsx
         param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase]
       end
 
+      # Convert date/times value if required.
+      if %w[date time cellIs].include?(param[:type])
+        param[:type] = 'cellIs'
+        if param[:value] =~ /T/
+            date_time = convert_date_time(param[:value])
+            if date_time
+              param[:value] = date_time
+            else
+                raise "Invalid date/time value '#{param[:value]}' in conditional_formatting()"
+            end
+        end
+        if param[:minimum] =~ /T/
+            date_time = convert_date_time(param[minimum])
+            if date_time
+              param[:minimum] = date_time
+            else
+              raise "Invalid date/time value '#{param[:minumum]}' in conditional_formatting()"
+            end
+        end
+        if param[:maximum] =~ /T/
+          date_time = convert_date_time(param[:maximum])
+          if date_time
+            param[:maximum] = date_time
+          else
+            raise "Invalid date/time value '#{param[:maximum]}' in conditional_formatting()"
+          end
+        end
+      end
+
       # 'Between' and 'Not between' criteria require 2 values.
       if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
         unless param.has_key?(:minimum) || param.has_key?(:maximum)
