@@ -4514,7 +4514,7 @@ module Writexlsx
             end
         end
         if param[:minimum] =~ /T/
-            date_time = convert_date_time(param[minimum])
+            date_time = convert_date_time(param[:minimum])
             if date_time
               param[:minimum] = date_time
             else
