@@ -89,6 +89,22 @@ class Test::Unit::TestCase
   def prepare_xlsx(dir, xlsx)
     Dir.mkdir(dir)
     system("unzip -q #{xlsx} -d #{dir}")
+    remove_dates_user_specific_data_from_core_xml(dir)
+    remove_printer_settings_from_pagesetup_elements(dir)
+  end
+
+  def remove_dates_user_specific_data_from_core_xml(dir)
+    filename = File.join(dir, "docProps/core.xml")
+    return unless File.exist?(filename)
+
+    xml = IO.read(filename)
+    xml.gsub!(/John/, '')
+    xml.gsub!(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
+    open(filename, "w") {|f| f.write(xml)}
+  end
+
+  def remove_printer_settings_from_pagesetup_elements(dir)
+
   end
 
   def files(dir)
