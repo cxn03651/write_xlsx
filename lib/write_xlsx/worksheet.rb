@@ -3153,6 +3153,10 @@ module Writexlsx
     #
     def conditional_formatting(*args)
       # Check for a cell reference in A1 notation and substitute row and column
+      if args[0] =~ /^\D/
+        # Check for a user defined multiple range like B3:K6,B8:K11.
+        user_range = args[0].gsub(/\s*,\s*/, ' ').gsub(/\$/, '') if args[0] =~ /,/
+      end
       row1, col1, row2, col2, param = row_col_notation(args)
       if row2.respond_to?(:keys)
         param = row2
@@ -3164,10 +3168,6 @@ module Writexlsx
       check_dimensions(row1, col1)
       check_dimensions(row2, col2)
       check_conditional_formatting_parameters(param)
-
-      param[:format] = param[:format].get_dxf_index if param[:format]
-      param[:priority] = @dxf_priority
-      @dxf_priority += 1
 
       # Swap last row/col for first row/col as necessary
       row1, row2 = row2, row1 if row1 > row2
@@ -3181,6 +3181,13 @@ module Writexlsx
         range = xl_range(row1, row2, col1, col2)
         start_cell = xl_rowcol_to_cell(row1, col1)
       end
+
+      # Override with user defined multiple range if provided.
+      range = user_range if user_range
+
+      param[:format] = param[:format].get_dxf_index if param[:format]
+      param[:priority] = @dxf_priority
+      @dxf_priority += 1
 
       # Special handling of text criteria.
       if param[:type] == 'text'
