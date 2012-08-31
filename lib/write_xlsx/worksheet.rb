@@ -3247,10 +3247,7 @@ module Writexlsx
         param[:formula] = "ISERROR(#{start_cell})"
       when 'notContainsErrors'
         param[:formula] = "NOT(ISERROR(#{start_cell}))"
-      end
-
-      # Special handling for 2 color scale.
-      if param[:type] == '2_color_scale'
+      when '2_color_scale'
         param[:type] = 'colorScale'
 
         # Color scales don't use any additional formatting.
@@ -3269,6 +3266,25 @@ module Writexlsx
 
         param[:max_color] = get_palette_color( param[:max_color] )
         param[:min_color] = get_palette_color( param[:min_color] )
+      when '3_color_scale'
+        param[:type] = 'colorScale'
+
+        # Color scales don't use any additional formatting.
+        param[:format] = nil
+
+        param[:min_type]  ||= 'min'
+        param[:mid_type]  ||= 'percentile'
+        param[:max_type]  ||= 'max'
+        param[:min_value] ||= 0
+        param[:mid_value] ||= 50
+        param[:max_value] ||= 0
+        param[:min_color] ||= '#F8696B'
+        param[:mid_color] ||= '#FFEB84'
+        param[:max_color] ||= '#63BE7B'
+
+        param[:max_color] = get_palette_color(param[:max_color])
+        param[:mid_color] = get_palette_color(param[:mid_color])
+        param[:min_color] = get_palette_color(param[:min_color])
       end
 
       # Store the validation information until we close the worksheet.
