@@ -3249,6 +3249,28 @@ module Writexlsx
         param[:formula] = "NOT(ISERROR(#{start_cell}))"
       end
 
+      # Special handling for 2 color scale.
+      if param[:type] == '2_color_scale'
+        param[:type] = 'colorScale'
+
+        # Color scales don't use any additional formatting.
+        param[:format] = nil
+
+        # Turn off 3 color parameters.
+        param[:mid_type]  = nil
+        param[:mid_color] = nil
+
+        param[:min_type]  ||= 'min'
+        param[:max_type]  ||= 'max'
+        param[:min_value] ||= 0
+        param[:max_value] ||= 0
+        param[:min_color] ||= '#FF7128'
+        param[:max_color] ||= '#FFEF9C'
+
+        param[:max_color] = get_palette_color( param[:max_color] )
+        param[:min_color] = get_palette_color( param[:min_color] )
+      end
+
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
       @cond_formats[range] << param
@@ -4803,6 +4825,10 @@ module Writexlsx
     # based on the default or user defined values in the Workbook palette.
     #
     def get_palette_color(index) #:nodoc:
+      if index =~ /^#([0-9A-F]{6})$/i
+        return "FF#{$~[1]}"
+      end
+
       # Adjust the colour index.
       index -= 8
 
@@ -6094,6 +6120,32 @@ module Writexlsx
     end
 
     #
+    # Write the <colorScale> element.
+    #
+    def write_color_scale(param)
+      @writer.tag_elements('colorScale') do
+        write_cfvo(param[:min_type], param[:min_value])
+        write_cfvo(param[:mid_type], param[:mid_value]) if param[:mid_type]
+        write_cfvo(param[:max_type], param[:max_value])
+        write_color(@writer, 'rgb', param[:min_color])
+        write_color(@writer, 'rgb', param[:mid_color])  if param[:mid_color]
+        write_color(@writer, 'rgb', param[:max_color])
+      end
+    end
+
+    #
+    # Write the <cfvo> element.
+    #
+    def write_cfvo(type, val)
+      attributes = [
+                    'type', type,
+                    'val',  val
+                    ]
+
+      @writer.empty_tag('cfvo', attributes)
+    end
+
+    #
     # Write the Worksheet conditional formats.
     #
     def write_conditional_formats #:nodoc:
@@ -6165,6 +6217,10 @@ module Writexlsx
       when 'containsBlanks', 'notContainsBlanks', 'containsErrors', 'notContainsErrors'
         @writer.tag_elements('cfRule', attributes) do
           write_formula_tag(param[:formula])
+        end
+      when 'colorScale'
+        @writer.tag_elements('cfRule', attributes) do
+          write_color_scale(param)
         end
       end
     end
