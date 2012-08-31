@@ -3285,6 +3285,17 @@ module Writexlsx
         param[:max_color] = get_palette_color(param[:max_color])
         param[:mid_color] = get_palette_color(param[:mid_color])
         param[:min_color] = get_palette_color(param[:min_color])
+      when 'dataBar'
+        # Color scales don't use any additional formatting.
+        param[:format] = nil
+
+        param[:min_type]  ||= 'min'
+        param[:max_type]  ||= 'max'
+        param[:min_value] ||= 0
+        param[:max_value] ||= 0
+        param[:bar_color] ||= '#638EC6'
+
+        param[:bar_color] = get_palette_color(param[:bar_color])
       end
 
       # Store the validation information until we close the worksheet.
@@ -6132,6 +6143,7 @@ module Writexlsx
     # in Perl module : _write_formula()
     #
     def write_formula_tag(data) #:nodoc:
+      data = data.sub(/^=/, '') if data.respond_to?(:sub)
       @writer.data_element('formula', data)
     end
 
@@ -6146,6 +6158,18 @@ module Writexlsx
         write_color(@writer, 'rgb', param[:min_color])
         write_color(@writer, 'rgb', param[:mid_color])  if param[:mid_color]
         write_color(@writer, 'rgb', param[:max_color])
+      end
+    end
+
+    #
+    # Write the <dataBar> element.
+    #
+    def write_data_bar(param)
+      @writer.tag_elements('dataBar') do
+        write_cfvo(param[:min_type], param[:min_value])
+        write_cfvo(param[:max_type], param[:max_value])
+
+        write_color(@writer, 'rgb', param[:bar_color])
       end
     end
 
@@ -6237,6 +6261,14 @@ module Writexlsx
       when 'colorScale'
         @writer.tag_elements('cfRule', attributes) do
           write_color_scale(param)
+        end
+      when 'dataBar'
+        @writer.tag_elements('cfRule', attributes) do
+          write_data_bar(param)
+        end
+      when 'expression'
+        @writer.tag_elements('cfRule', attributes) do
+          write_formula_tag(param[:criteria])
         end
       end
     end
