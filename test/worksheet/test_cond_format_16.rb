@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestCondFormat14 < Test::Unit::TestCase
+class TestCondFormat16 < Test::Unit::TestCase
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
@@ -34,7 +34,10 @@ class TestCondFormat14 < Test::Unit::TestCase
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type     => 'data_bar'
+                                        :type      => '3_color_scale',
+                                        :min_color => '#C5D9F1',
+                                        :mid_color => '#8DB4E3',
+                                        :max_color => '#538ED5'
                                       }
                                       )
 
@@ -117,12 +120,15 @@ class TestCondFormat14 < Test::Unit::TestCase
     </row>
   </sheetData>
   <conditionalFormatting sqref="A1:A12">
-    <cfRule type="dataBar" priority="1">
-      <dataBar>
+    <cfRule type="colorScale" priority="1">
+      <colorScale>
         <cfvo type="min" val="0"/>
+        <cfvo type="percentile" val="50"/>
         <cfvo type="max" val="0"/>
-        <color rgb="FF638EC6"/>
-      </dataBar>
+        <color rgb="FFC5D9F1"/>
+        <color rgb="FF8DB4E3"/>
+        <color rgb="FF538ED5"/>
+      </colorScale>
     </cfRule>
   </conditionalFormatting>
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
