@@ -91,7 +91,16 @@ class Test::Unit::TestCase
       end
 
       # Ignore test specific XML elements for defined filenames.
+      if ignore_elements && ignore_elements[exp_members[i].name]
+        regex = Regexp.new(ignore_elements[exp_members[i].name].
+                           collect {|tag| "#{tag} [^>]+>"}.
+                           join('|')
+                           )
+        exp_xml_str = exp_xml_str.gsub(regex, '')
+        got_xml_str = got_xml_str.gsub(regex, '')
+      end
 
+      # Comparison of the XML elements in each file.
       case exp_members[i].name
       when '[Content_Types].xml', /.rels$/
         # Reorder the XML elements in the XLSX relationship files.
@@ -101,7 +110,6 @@ class Test::Unit::TestCase
                      "#{exp_members[i].name} differ."
                      )
       else
-        # Comparison of the XML elements in each file.
         assert_equal(
                      exp_xml_str.gsub(/ *[\r\n]+ */, ''),
                      got_xml_str.gsub(/ *[\r\n]+ */, ''),
