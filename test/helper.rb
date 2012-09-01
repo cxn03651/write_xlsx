@@ -24,9 +24,6 @@ class Writexlsx::Workbook
 end
 
 class Test::Unit::TestCase
-  require 'rexml/document'
-  include REXML
-
   def setup_dir_var
     @test_dir = File.dirname(__FILE__)
     @perl_output  = File.join(@test_dir, 'perl_output')
@@ -43,8 +40,7 @@ class Test::Unit::TestCase
   end
 
   def got_to_array(xml_str)
-    str = xml_str.gsub(/[\r\n]/, '')
-    str.gsub(/>[ \t\r\n]*</, ">\t<").split(/\t/)
+    xml_str.gsub(/[\r\n]/, '').gsub(/>[ \t]*</, ">\t<").split("\t")
   end
 
   def entrys(xlsx)
@@ -53,7 +49,11 @@ class Test::Unit::TestCase
     result
   end
 
-  def compare_xlsx(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil)
+  def compare_xlsx_for_regression(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil)
+    compare_xlsx(exp_filename, got_filename, ignore_members, ignore_elements, true)
+  end
+
+  def compare_xlsx(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil, regression = false)
     # The zip "members" are the files in the XLSX container.
     got_members = entrys(got_filename).sort_by {|member| member.name}
     exp_members = entrys(exp_filename).sort_by {|member| member.name}
@@ -72,57 +72,53 @@ class Test::Unit::TestCase
 
     # Compare each file in the XLSX containers.
     exp_members.each_index do |i|
-      got_xml_str = ""
-      exp_xml_str = ""
-      Document.new(got_members[i].get_input_stream.read).write(got_xml_str, 1)
-      Document.new(exp_members[i].get_input_stream.read).write(exp_xml_str, 1)
+      got_xml_str = got_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
+      exp_xml_str = exp_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
 
       # Remove dates and user specific data from the core.xml data.
       if exp_members[i].name == 'docProps/core.xml'
-        exp_xml_str = got_xml_str.gsub(/John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
-        got_xml_str = exp_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+        if regression
+          exp_xml_str = exp_xml_str.gsub(/John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+        else
+          exp_xml_str = exp_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+        end
+        got_xml_str = got_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
       end
 
       if exp_members[i].name =~ %r!xl/worksheets/sheet\d.xml!
-        exp_xml_str = exp_xml_str.sub(/horizontalDpi="200" /, '').sub(/verticalDpi="200""/, '')
-        if exp_xml_str =~ /(<pageSetup.* )r:id="rId1"/
-          exp_xml_str.sub(/(<pageSetup.* )r:id="rId1"/, $~[1])
-        end
+        exp_xml_str = exp_xml_str.
+          sub(/horizontalDpi="200" /, '').
+          sub(/verticalDpi="200""/, '').
+          sub(/(<pageSetup.* )r:id="rId1"/, '\1')
       end
+
+      got_xml = got_to_array(got_xml_str)
+      exp_xml = got_to_array(exp_xml_str)
 
       # Ignore test specific XML elements for defined filenames.
       if ignore_elements && ignore_elements[exp_members[i].name]
-        regex = Regexp.new(ignore_elements[exp_members[i].name].
-                           collect {|tag| "#{tag} [^>]+>"}.
-                           join('|')
-                           )
-        exp_xml_str = exp_xml_str.gsub(regex, '')
-        got_xml_str = got_xml_str.gsub(regex, '')
+        str = ignore_elements[exp_members[i].name].join('|')
+        regex = Regexp.new(str)
+
+        got_xml = got_xml.reject { |s| s =~ regex }
+        exp_xml = exp_xml.reject { |s| s =~ regex }
+      end
+
+      # Reorder the XML elements in the XLSX relationship files.
+      case exp_members[i].name
+      when '[Content_Types].xml', /.rels$/
+        got_xml = sort_rel_file_data(got_xml)
+        exp_xml = sort_rel_file_data(exp_xml)
       end
 
       # Comparison of the XML elements in each file.
-      case exp_members[i].name
-      when '[Content_Types].xml', /.rels$/
-        # Reorder the XML elements in the XLSX relationship files.
-        assert_equal(
-                     sort_rel_file_data(got_xml_str),
-                     sort_rel_file_data(exp_xml_str),
-                     "#{exp_members[i].name} differ."
-                     )
-      else
-        assert_equal(
-                     exp_xml_str.gsub(/ *[\r\n]+ */, ''),
-                     got_xml_str.gsub(/ *[\r\n]+ */, ''),
-                     "#{exp_members[i].name} differs."
-                     )
-      end
+      assert_equal(exp_xml, got_xml, "#{exp_members[i].name} differs.")
     end
   end
 
-  def sort_rel_file_data(xml_str)
-    array = got_to_array(xml_str.gsub(/ *[\r\n] */, ''))
-    header = array.shift
-    tail   = array.pop
-    array.sort.unshift(header) << tail
+  def sort_rel_file_data(xml_array)
+    header = xml_array.shift
+    tail   = xml_array.pop
+    xml_array.sort.unshift(header).push(tail)
   end
 end
