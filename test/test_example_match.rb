@@ -5,16 +5,16 @@ require 'write_xlsx'
 class TestExampleMatch < Test::Unit::TestCase
   def setup
     setup_dir_var
-    Writexlsx::Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
-    Writexlsx::Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
-    raise "cannot create test working directory." if File.exist?(@expected_dir) || File.exist?(@result_dir)
-    @obj = Writexlsx::Package::XMLWriterSimple.new
+  end
+
+  def teardown
+    File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
   def test_a_simple
-    xlsx = 'a_simple.xlsx'
+    @xlsx = 'a_simple.xlsx'
     # Create a new workbook called simple.xls and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # The general syntax is write(row, column, token). Note that row and
@@ -43,12 +43,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write(10, 0, 'http://www.ruby-lang.org/', hyperlink_format)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_array_formula
-    xlsx = 'array_formula.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'array_formula.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Write some test data.
@@ -65,12 +65,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write_array_formula('A5:A7', '{=TREND(C5:C7,B5:B7)}')
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_area
-    xlsx = 'chart_area.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_area.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -115,12 +115,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_bar
-    xlsx = 'chart_bar.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_bar.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -165,12 +165,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_column
-    xlsx = 'chart_column.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_column.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -215,12 +215,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_line
-    xlsx = 'chart_line.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_line.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -265,12 +265,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_pie
-    xlsx = 'chart_pie.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_pie.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -305,12 +305,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('C2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_scatter
-    xlsx = 'chart_scatter.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_scatter.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -355,12 +355,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_stock
-    xlsx = 'chart_stock.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_stock.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet   = workbook.add_worksheet
     bold        = workbook.add_format(:bold => 1)
     date_format = workbook.add_format(:num_format => 'dd/mm/yyyy')
@@ -411,12 +411,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_conditional_format
-    xlsx = 'conditional_format.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'conditional_format.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
 
     # Light red fill with dark red text.
@@ -477,12 +477,12 @@ class TestExampleMatch < Test::Unit::TestCase
                                       )
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_data_validate
-    xlsx = 'data_validate.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'data_validate.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Add a format for the header cells.
@@ -744,12 +744,12 @@ class TestExampleMatch < Test::Unit::TestCase
                               })
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_defined_name
-    xlsx = 'defined_name.xlsx'
-    workbook   = WriteXLSX.new(xlsx)
+    @xlsx = 'defined_name.xlsx'
+    workbook   = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -771,12 +771,12 @@ class TestExampleMatch < Test::Unit::TestCase
     end
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_demo
-    xlsx = 'demo.xlsx'
-    workbook   = WriteXLSX.new(xlsx)
+    @xlsx = 'demo.xlsx'
+    workbook   = WriteXLSX.new(@xlsx)
     worksheet  = workbook.add_worksheet('Demo')
     worksheet2 = workbook.add_worksheet('Another sheet')
     worksheet3 = workbook.add_worksheet('And another')
@@ -872,12 +872,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write('A19', "Multiple worksheets")
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_diag_border
-    xlsx = 'diag_border.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'diag_border.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet()
 
 
@@ -897,12 +897,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write('B12', 'Text', format4)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_fit_to_pages
-    xlsx = 'fit_to_pages.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'fit_to_pages.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -922,12 +922,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet4.fit_to_pages(1, 0)   # 1 page wide and as long as necessary
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_formats
-    xlsx = 'formats.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'formats.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
 
     # Some common formats
     center = workbook.add_format(:align => 'center')
@@ -1404,12 +1404,12 @@ class TestExampleMatch < Test::Unit::TestCase
     alignment(workbook, center, heading, colors)
     misc(workbook, center, heading, colors)
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_headers
-    xlsx = 'headers.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'headers.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
     preview  = 'Select Print Preview to see the header and footer'
 
 
@@ -1486,12 +1486,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet5.write('A1', preview)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_hide_sheet
-    xlsx = 'hide_sheet.xlsx'
-    workbook   = WriteXLSX.new(xlsx)
+    @xlsx = 'hide_sheet.xlsx'
+    workbook   = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -1508,13 +1508,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet3.write(0, 0, 'Sheet2 is hidden')
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_hyperlink
-    xlsx = 'hyperlink.xlsx'
+    @xlsx = 'hyperlink.xlsx'
     # Create a new workbook and add a worksheet
-    workbook = WriteXLSX.new(xlsx)
+    workbook = WriteXLSX.new(@xlsx)
 
     worksheet = workbook.add_worksheet('Hyperlinks')
 
@@ -1555,12 +1555,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write_string('A11', 'http://www.perl.com/')
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_indent
-    xlsx = 'indent.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'indent.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
 
     worksheet = workbook.add_worksheet
     indent1   = workbook.add_format(:indent => 1)
@@ -1572,13 +1572,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write('A2', "This text is indented 2 levels", indent2)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_outline
-    xlsx = 'outline.xlsx'
+    @xlsx = 'outline.xlsx'
     # Create a new workbook and add some worksheets
-    workbook   = WriteXLSX.new(xlsx)
+    workbook   = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet('Outlined Rows')
     worksheet2 = workbook.add_worksheet('Collapsed Rows')
     worksheet3 = workbook.add_worksheet('Outline Columns')
@@ -1760,13 +1760,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet4.set_row(12, nil, nil, nil, 1)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge1
-    xlsx = 'merge1.xlsx'
+    @xlsx = 'merge1.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -1781,13 +1781,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write_blank(2, 2, format)
     worksheet.write_blank(2, 3, format)
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge2
     # Create a new workbook and add a worksheet
-    xlsx = 'merge2.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'merge2.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -1812,45 +1812,14 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write_blank(2, 2, format)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge3
-    xlsx = 'merge2.xlsx'
-    # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
-    worksheet = workbook.add_worksheet
-
-    # Increase the cell size of the merged cells to highlight the formatting.
-    worksheet.set_column(1, 2, 30)
-    worksheet.set_row(2, 40)
-
-    # Create a merged format
-    format = workbook.add_format(
-                                 :center_across => 1,
-                                 :bold          => 1,
-                                 :size          => 15,
-                                 :pattern       => 1,
-                                 :border        => 6,
-                                 :color         => 'white',
-                                 :fg_color      => 'green',
-                                 :border_color  => 'yellow',
-                                 :align         => 'vcenter'
-                                 )
-
-    # Only one cell should contain text, the others should be blank.
-    worksheet.write(2, 1, "Center across selection", format)
-    worksheet.write_blank(2, 2, format)
-
-    workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
-  end
-
-  def test_merge3
-    xlsx = 'merge3.xlsx'
+    @xlsx = 'merge3.xlsx'
 
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new('merge3.xlsx')
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet()
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -1876,13 +1845,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.merge_range('B7:D8', 'http://www.perl.com', format)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge4
-    xlsx = 'merge4.xlsx'
+    @xlsx = 'merge4.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -1946,13 +1915,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.merge_range('B11:D12', 'Justified: ' << 'so on and ' * 18, format4)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge5
-    xlsx = 'merge5.xlsx'
+    @xlsx = 'merge5.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2005,13 +1974,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.merge_range( 'F4:F9', 'Rotation -90°', format3 )
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_merge6
-    xlsx = 'merge6.xlsx'
+    @xlsx = 'merge6.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(xlsx)
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2043,24 +2012,24 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.merge_range('B6:D7', "UTF-8: A Unicode smiley #{smiley}", format)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_comments1
-    xlsx = 'comments1.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'comments1.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     worksheet.write('A1', 'Hello')
     worksheet.write_comment('A1', 'This is a comment')
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_comments2
-    xlsx = 'comments2.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'comments2.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
 
     text_wrap  = workbook.add_format( :text_wrap => 1, :valign => 'top' )
     worksheet1 = workbook.add_worksheet
@@ -2390,12 +2359,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet8.write_comment( 'C6', comment )
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_print_scale
-    xlsx = 'print_scale.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'print_scale.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -2410,12 +2379,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet3.print_scale = 200
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_properties
-    xlsx = 'properties.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'properties.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     workbook.set_properties(
@@ -2434,12 +2403,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write('A1', "Select 'Office Button -> Prepare -> Properties' to see the file properties.")
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_protection
-    xlsx = 'protection.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'protection.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     # Create some format objects
@@ -2467,12 +2436,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write('A6', 'to remove the worksheet protection.')
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_rich_strings
-    xlsx = 'rich_strings.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'rich_strings.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
     worksheet.set_column('A:A', 30)
@@ -2499,12 +2468,12 @@ class TestExampleMatch < Test::Unit::TestCase
         italic, 'j = k', superc, '(n-1)', center)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_right_to_left
-    xlsx = 'right_to_left.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'right_to_left.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -2513,12 +2482,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet1.write(0, 0, 'Hello')    #  A1, B1, C1, ...
     worksheet2.write(0, 0, 'Hello')    # ..., C1, B1, A1
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_tab_colors
-    xlsx = 'tab_colors.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'tab_colors.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
 
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
@@ -2531,12 +2500,12 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet4.set_tab_color(0x35)    # Orange
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_autofilter
-    xlsx = 'autofilter.xlsx'
-    workbook = WriteXLSX.new(xlsx)
+    @xlsx = 'autofilter.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
 
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
@@ -2702,12 +2671,12 @@ class TestExampleMatch < Test::Unit::TestCase
     end
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def test_chart_scatter06
-    xlsx = 'chart_scatter06.xlsx'
-    workbook  = WriteXLSX.new(xlsx)
+    @xlsx = 'chart_scatter06.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'scatter', :embedded => 1)
 
@@ -2739,7 +2708,7 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx(@expected_dir, @result_dir, xlsx)
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
   def autofilter_data

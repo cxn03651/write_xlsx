@@ -29,9 +29,8 @@ class Test::Unit::TestCase
 
   def setup_dir_var
     @test_dir = File.dirname(__FILE__)
-    @expected_dir = File.join(@test_dir, 'expected_dir')
-    @result_dir   = File.join(@test_dir, 'result_dir')
     @perl_output  = File.join(@test_dir, 'perl_output')
+    @regression_output  = File.join(@test_dir, 'regression', 'xlsx_files')
   end
 
   def expected_to_array(lines)
@@ -48,74 +47,74 @@ class Test::Unit::TestCase
     str.gsub(/>[ \t\r\n]*</, ">\t<").split(/\t/)
   end
 
-  def compare_xlsx(expected, result, xlsx)
-    begin
-      prepare_compare(expected, result, xlsx)
-      expected_files = files(expected)
-      result_files   = files(result)
+  def entrys(xlsx)
+    result = []
+    Zip::ZipFile.foreach(xlsx) { |entry| result << entry }
+    result
+  end
 
-      not_exists = expected_files - result_files
-      assert(not_exists.empty?, "These files does not exist: #{not_exists.to_s}")
+  def compare_xlsx(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil)
+    # The zip "members" are the files in the XLSX container.
+    got_members = entrys(got_filename).sort_by {|member| member.name}
+    exp_members = entrys(exp_filename).sort_by {|member| member.name}
 
-      additional_exist = result_files - expected_files
-      assert(additional_exist.empty?, "These files must not exist: #{additional_exist.to_s}")
+    # Ignore some test specific filenames.
+    if ignore_members
+      got_members.reject! {|member| ignore_members.include?(member.name) }
+      exp_members.reject! {|member| ignore_members.include?(member.name) }
+    end
 
-      compare_files(expected, result)
-    ensure
-      cleanup(xlsx)
+    # Check that each XLSX container has the same file members.
+    assert_equal(
+                 exp_members.collect {|member| member.name},
+                 got_members.collect {|member| member.name},
+                 "file members differs.")
+
+    # Compare each file in the XLSX containers.
+    exp_members.each_index do |i|
+      got_xml_str = ""
+      exp_xml_str = ""
+      Document.new(got_members[i].get_input_stream.read).write(got_xml_str, 1)
+      Document.new(exp_members[i].get_input_stream.read).write(exp_xml_str, 1)
+
+      # Remove dates and user specific data from the core.xml data.
+      if exp_members[i].name == 'docProps/core.xml'
+        exp_xml_str = got_xml_str.gsub(/John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+        got_xml_str = exp_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+      end
+
+      if exp_members[i].name =~ %r!xl/worksheets/sheet\d.xml!
+        exp_xml_str = exp_xml_str.sub(/horizontalDpi="200" /, '').sub(/verticalDpi="200""/, '')
+        if exp_xml_str =~ /(<pageSetup.* )r:id="rId1"/
+          exp_xml_str.sub(/(<pageSetup.* )r:id="rId1"/, $~[1])
+        end
+      end
+
+      # Ignore test specific XML elements for defined filenames.
+
+      case exp_members[i].name
+      when '[Content_Types].xml', /.rels$/
+        # Reorder the XML elements in the XLSX relationship files.
+        assert_equal(
+                     sort_rel_file_data(got_xml_str),
+                     sort_rel_file_data(exp_xml_str),
+                     "#{exp_members[i].name} differ."
+                     )
+      else
+        # Comparison of the XML elements in each file.
+        assert_equal(
+                     exp_xml_str.gsub(/ *[\r\n]+ */, ''),
+                     got_xml_str.gsub(/ *[\r\n]+ */, ''),
+                     "#{exp_members[i].name} differs."
+                     )
+      end
     end
   end
 
-  def compare_files(expected, result)
-    files(expected).each do |file|
-      compare_file(expected, result, file)
-    end
-  end
-
-  def compare_file(expected, result, file)
-    expected_doc = ""
-    result_doc   = ""
-    Document.new(IO.read(File.join(expected, file))).write(expected_doc, 1)
-    Document.new(IO.read(File.join(result,   file))).write(result_doc,   1)
-
-    assert_equal(expected_doc.gsub(/\r/, ''), result_doc.gsub(/\r/, ''), "#{file} differs.")
-  end
-
-  def prepare_compare(expected, result, xlsx)
-    prepare_xlsx(expected, File.join(@perl_output, xlsx))
-    prepare_xlsx(result, xlsx)
-  end
-
-  def prepare_xlsx(dir, xlsx)
-    Dir.mkdir(dir)
-    system("unzip -q #{xlsx} -d #{dir}")
-    remove_dates_user_specific_data_from_core_xml(dir)
-    remove_printer_settings_from_pagesetup_elements(dir)
-  end
-
-  def remove_dates_user_specific_data_from_core_xml(dir)
-    filename = File.join(dir, "docProps/core.xml")
-    return unless File.exist?(filename)
-
-    xml = IO.read(filename)
-    xml.gsub!(/John/, '')
-    xml.gsub!(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
-    open(filename, "w") {|f| f.write(xml)}
-  end
-
-  def remove_printer_settings_from_pagesetup_elements(dir)
-
-  end
-
-  def files(dir)
-    Dir.glob(File.join(dir, "**/*")).select { |f| File.file?(f) }.
-                                     reject { |f| File.basename(f) =~ /(core|theme1)\.xml/ }.
-                                     collect { |f| f.sub(Regexp.new("^#{dir}"), '') }
-  end
-
-  def cleanup(xlsx)
-    Writexlsx::Utility.delete_files(xlsx)          if File.exist?(xlsx)
-    Writexlsx::Utility.delete_files(@expected_dir) if File.exist?(@expected_dir)
-    Writexlsx::Utility.delete_files(@result_dir)   if File.exist?(@result_dir)
+  def sort_rel_file_data(xml_str)
+    array = got_to_array(xml_str.gsub(/ *[\r\n] */, ''))
+    header = array.shift
+    tail   = array.pop
+    array.sort.unshift(header) << tail
   end
 end
