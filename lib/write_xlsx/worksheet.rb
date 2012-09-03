@@ -315,7 +315,6 @@ module Writexlsx
       @name = name
       @colinfo = []
       @cell_data_table = {}
-      @filter_on = false
 
       @print_style = PrintStyle.new
 
