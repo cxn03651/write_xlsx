@@ -1181,7 +1181,7 @@ module Writexlsx
 
       # For the DXF formats we only need to check if the properties have changed.
       @dxf_formats.each do |format|
-        format.has_dxf_fill(true) if format.pattern || format.bg_color || format.fg_color
+        format.has_dxf_fill(true) if format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
       end
     end
 
