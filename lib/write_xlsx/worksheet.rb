@@ -6450,19 +6450,11 @@ module Writexlsx
     end
 
     def filter_on? #:nodoc:
-      if @filter_on
-        @filter_on != 0
-      else
-        false
-      end
+      @filter_on && @filter_on != 0
     end
 
     def tab_color? #:nodoc:
-      if @tab_color
-        @tab_color != 0
-      else
-        false
-      end
+      @tab_color && @tab_color != 0
     end
 
     def zoom_scale_normal? #:nodoc:
