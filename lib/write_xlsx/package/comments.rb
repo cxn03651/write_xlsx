@@ -130,6 +130,10 @@ module Writexlsx
         @comments = {}
       end
 
+      def [](row)
+        @comments[row]
+      end
+
       def add(comment)
         if @comments[comment.row]
           @comments[comment.row][comment.col] = comment
@@ -173,7 +177,7 @@ module Writexlsx
             @comments[row][col].visible ||= 1 if comments_visible?
 
             # Set comment author if not already user defined.
-            @comments[row][col].author ||= @comments_author
+            @comments[row][col].author ||= @worksheet.comments_author
             @sorted_comments << @comments[row][col]
           end
         end

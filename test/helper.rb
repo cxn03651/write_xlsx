@@ -43,6 +43,22 @@ class Test::Unit::TestCase
     xml_str.gsub(/[\r\n]/, '').gsub(/>[ \t]*</, ">\t<").split("\t")
   end
 
+  def vml_str_to_array(vml_str)
+    ret = ''
+    vml_str.split(/[\r\n]+/).each do |vml|
+      str = vml.sub(/^\s+/, '').     # Remove leading whitespace.
+        sub(/\s+$/, '').             # Remove trailing whitespace.
+        gsub(/\'/, '"').             # Convert VMLs attribute quotes.
+        gsub(/([^ ])\/>$/, '\1 />'). # Add space before element end like XML::Writer.
+        sub(/"$/, '" ').        # Add space between attributes.
+        sub(/>$/, ">\n").       # Add newline after element end.
+        gsub(/></, ">\n<")      # Split multiple elements.
+      str.chomp! if str == "<x:Anchor>\n" # Put all of Anchor on one line.
+      ret += str
+    end
+    ret.split(/\n/)
+  end
+
   def entrys(xlsx)
     result = []
     Zip::ZipFile.foreach(xlsx) { |entry| result << entry }
@@ -92,8 +108,13 @@ class Test::Unit::TestCase
           sub(/(<pageSetup.* )r:id="rId1"/, '\1')
       end
 
-      got_xml = got_to_array(got_xml_str)
-      exp_xml = got_to_array(exp_xml_str)
+      if exp_members[i].name =~ /.vml$/
+        got_xml = got_to_array(got_xml_str)
+        exp_xml = vml_str_to_array(exp_xml_str)
+      else
+        got_xml = got_to_array(got_xml_str)
+        exp_xml = got_to_array(exp_xml_str)
+      end
 
       # Ignore test specific XML elements for defined filenames.
       if ignore_elements && ignore_elements[exp_members[i].name]

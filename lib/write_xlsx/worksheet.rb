@@ -306,6 +306,7 @@ module Writexlsx
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
     attr_accessor :vml_shape_id, :hlink_count, :hlink_refs # :nodoc:
+    attr_reader :comments_author # :nodoc:
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -5276,6 +5277,8 @@ module Writexlsx
 
           write_cell_column_dimension(row_num)
           @writer.end_tag('row')
+        elsif @comments[row_num]
+          write_empty_row(row_num, span, *(@set_rows[row_num]))
         else
           # Row attributes only.
           write_empty_row(row_num, nil, *(@set_rows[row_num]))
@@ -6348,10 +6351,26 @@ module Writexlsx
       span_min = nil
       span_max = 0
       spans = []
+
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
         if @cell_data_table[row_num]
           (@dim_colmin .. @dim_colmax).each do |col_num|
             if @cell_data_table[row_num][col_num]
+              if !span_min
+                span_min = col_num
+                span_max = col_num
+              else
+                span_min = col_num if col_num < span_min
+                span_max = col_num if col_num > span_max
+              end
+            end
+          end
+        end
+
+        # Calculate spans for comments.
+        if @comments[row_num]
+          (@dim_colmin .. @dim_colmax).each do |col_num|
+            if @comments[row_num][col_num]
               if !span_min
                 span_min = col_num
                 span_max = col_num
