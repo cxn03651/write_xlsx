@@ -624,6 +624,10 @@ module Writexlsx
       eval s
     end
 
+    def color?
+      bool_both_ruby_and_perl?(@color)
+    end
+
     def bold?
       bool_both_ruby_and_perl?(@bold)
     end

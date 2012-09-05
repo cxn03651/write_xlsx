@@ -308,7 +308,7 @@ module Writexlsx
           else
             attributes = ['patternType', patterns[format.pattern]]
           end
-          
+
           @writer.tag_elements('patternFill', attributes) do
             unless fg_color == 0
               fg_color = get_palette_color(fg_color)
