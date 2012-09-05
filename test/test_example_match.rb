@@ -2369,13 +2369,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
 
-    worksheet1.write( 0, 0, "print_scale(100)")
+    worksheet1.write(0, 0, "print_scale(100)")
     worksheet1.print_scale = 100
 
-    worksheet2.write( 0, 0, "print_scale(50)")
+    worksheet2.write(0, 0, "print_scale(50)")
     worksheet2.print_scale = 50
 
-    worksheet3.write( 0, 0, "print_scale(200)")
+    worksheet3.write(0, 0, "print_scale(200)")
     worksheet3.print_scale = 200
 
     workbook.close
@@ -2514,7 +2514,7 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet5 = workbook.add_worksheet
     worksheet6 = workbook.add_worksheet
 
-    bold = workbook.add_format( :bold => 1 )
+    bold = workbook.add_format(:bold => 1 )
 
     # Extract the data embedded at the end of this file.
     data_array = autofilter_data.split("\n")
@@ -2524,9 +2524,9 @@ class TestExampleMatch < Test::Unit::TestCase
 
     # Set up several sheets with the same data.
     workbook.worksheets.each do |worksheet|
-      worksheet.set_column( 'A:D', 12 )
-      worksheet.set_row( 0, 20, bold )
-      worksheet.write( 'A1', headings )
+      worksheet.set_column('A:D', 12 )
+      worksheet.set_row(0, 20, bold )
+      worksheet.write('A1', headings )
     end
 
 
@@ -2535,8 +2535,8 @@ class TestExampleMatch < Test::Unit::TestCase
     # Example 1. Autofilter without conditions.
     #
 
-    worksheet1.autofilter( 'A1:D51' )
-    worksheet1.write( 'A2', [ data ] )
+    worksheet1.autofilter('A1:D51' )
+    worksheet1.write('A2', [ data ] )
 
     ###############################################################################
     #
@@ -2545,12 +2545,12 @@ class TestExampleMatch < Test::Unit::TestCase
     #
 
     # The range in this example is the same as above but in row-column notation.
-    worksheet2.autofilter( 0, 0, 50, 3 )
+    worksheet2.autofilter(0, 0, 50, 3 )
 
     # The placeholder "Region" in the filter is ignored and can be any string
     # that adds clarity to the expression.
     #
-    worksheet2.filter_column( 0, 'Region eq East' )
+    worksheet2.filter_column(0, 'Region eq East' )
 
     #
     # Hide the rows that don't match the filter criteria.
@@ -2571,9 +2571,9 @@ class TestExampleMatch < Test::Unit::TestCase
     # Example 3. Autofilter with a dual filter condition in one of the columns.
     #
 
-    worksheet3.autofilter( 'A1:D51' )
+    worksheet3.autofilter('A1:D51' )
 
-    worksheet3.filter_column( 'A', 'x eq East or x eq South' )
+    worksheet3.filter_column('A', 'x eq East or x eq South' )
 
     #
     # Hide the rows that don't match the filter criteria.
