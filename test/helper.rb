@@ -40,7 +40,10 @@ class Test::Unit::TestCase
   end
 
   def got_to_array(xml_str)
-    xml_str.gsub(/[\r\n]/, '').gsub(/>[ \t]*</, ">\t<").split("\t")
+    xml_str.gsub(/[\r\n]/, '').
+      gsub(/ +\/>/, ' />').
+      gsub(/>[ \t]*</, ">\t<").
+      split("\t")
   end
 
   def vml_str_to_array(vml_str)
@@ -104,8 +107,9 @@ class Test::Unit::TestCase
       if exp_members[i].name =~ %r!xl/worksheets/sheet\d.xml!
         exp_xml_str = exp_xml_str.
           sub(/horizontalDpi="200" /, '').
-          sub(/verticalDpi="200""/, '').
-          sub(/(<pageSetup.* )r:id="rId1"/, '\1')
+          sub(/verticalDpi="200" /, '').
+          sub(/(<pageSetup.* )r:id="rId1"/, '\1').
+          sub(/ +\/>/, ' />')
       end
 
       if exp_members[i].name =~ /.vml$/
