@@ -20,13 +20,12 @@ class TestRegressionRowColFormat09 < Test::Unit::TestCase
 
     workbook.set_default_xf_indices
 
-    worksheet.set_row(0, nil, bold)
-    worksheet.set_column('A:A', nil, italic)
+    worksheet.set_row(4, nil, bold)
+    worksheet.set_column('C:C', nil, italic)
 
-    worksheet.write('A1', 'Foo', mixed)
-    worksheet.write('B1', 'Foo')
-    worksheet.write('A2', 'Foo')
-    worksheet.write('B2', 'Foo')
+    worksheet.write('C1', 'Foo')
+    worksheet.write('A5', 'Foo')
+    worksheet.write('C5', 'Foo', mixed)
 
     workbook.close
     compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
