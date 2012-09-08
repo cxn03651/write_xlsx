@@ -2539,7 +2539,7 @@ module Writexlsx
     def write_url(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, url, xf, str, tip = row_col_notation(args)
-      xf, str = str, xf if str.respond_to?(:xf_index)
+      xf, str = str, xf if str.respond_to?(:xf_index) || !xf.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
       link_type = 1
@@ -2555,7 +2555,7 @@ module Writexlsx
       end
 
       # The displayed string defaults to the url string.
-      str ||= url
+      str ||= url.dup
 
       # For external links change the directory separator from Unix to Dos.
       if link_type == 3
@@ -2586,8 +2586,7 @@ module Writexlsx
         url, str = url.split(/#/)
 
         # Add the file:/// URI to the url if non-local.
-#            url = "file:///#{url}" if url =~ m{[\\/]} && url !~ m{^\.\.}
-
+        url = "file:///#{url}" if url =~ %r![\\/]! && url !~ %r!^\.\.!
 
         # Treat as a default external link now that the data has been modified.
         link_type = 1
