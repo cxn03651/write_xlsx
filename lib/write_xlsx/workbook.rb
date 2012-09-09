@@ -105,6 +105,7 @@ module Writexlsx
       @tab_ratio           = 500
       @image_types         = {}
       @images              = []
+      @images_seen         = {}
 
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
@@ -1457,6 +1458,63 @@ module Writexlsx
       end
 
       sheet_index
+    end
+
+    #
+    # Extract information from the image file such as dimension, type, filename,
+    # and extension. Also keep track of previously seen images to optimise out
+    # any duplicates.
+    #
+    def get_image_properties(filename)
+      previous_images = []
+      image_id = 1;
+      if @images_seen[filename]
+        # We've processed this file already.
+        index = images_seen[filename] - 1
+
+        # Increase image reference count.
+        image_data[index][0] += 1
+      else
+        # Open the image file and import the data.
+        data = File.binread(filename)
+        if data.unpack('x A3')[0] == 'PNG'
+          # Test for PNGs.
+          type, width, height = process_png(data)
+          image_types[:png] = 1
+        elsif data.unpack('n') == 0xFFD8 &&
+            (data.unpack('x6 A4')[0] == 'JFIF' || data.unpack('x6 A4')[0] == 'Exif')
+          # Test for JFIF and Exif JPEGs.
+          type, width, height = process_jpg(data, filename)
+          @image_types[:jpeg] = 1
+        elsif data.unpack('A2')[0] == 'BM'
+          # Test for BMPs.
+          type, width, height = process_bmp(data, filename)
+          @image_types[:bmp] = 1
+        else
+          # TODO. Add Image::Size to support other types.
+          raise "Unsupported image format for file: #{filename}\n"
+        end
+
+        @images << [ filename, type]
+
+        # Also store new data for use in duplicate images.
+        previous_images << [image_id, type, width, height]
+        @images_seen[filename] = image_id
+        image_id += 1
+      end
+
+      [image_id, type, width, height, File.basename(filename)]
+    end
+
+    #
+    # Extract width and height information from a PNG file.
+    #
+    def process_png(data)
+      type   = 'png'
+      width  = data[16, 4].unpack("N")[0]
+      height = data[20, 4].unpack("N")[0]
+
+      [type, width, height]
     end
   end
 end

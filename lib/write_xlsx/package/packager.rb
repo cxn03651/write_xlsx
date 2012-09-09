@@ -487,7 +487,7 @@ module Writexlsx
           filename  = image[0]
           extension = ".#{image[1]}"
 
-          copy( filename, "#{@package_dir}/xl/media/image#{index}#{extension}")
+          FileUtils.cp(filename, "#{@package_dir}/xl/media/image#{index}#{extension}")
           index += 1
         end
       end

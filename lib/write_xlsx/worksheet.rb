@@ -2759,7 +2759,7 @@ module Writexlsx
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
       row, col, image, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
+      raise WriteXLSXInsufficientArgumentError if [row, col, image].include?(nil)
 
       x_offset ||= 0
       y_offset ||= 0
@@ -4997,8 +4997,8 @@ module Writexlsx
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
       # Convert from pixels to emus.
-      width  = int(0.5 + (width * 9_525))
-      height = int(0.5 + (height * 9_525))
+      width  = (0.5 + (width  * 9_525)).to_i
+      height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
       if !drawing?
@@ -5016,6 +5016,7 @@ module Writexlsx
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
+    public :prepare_image
 
     #
     # Based on the algorithm provided by Daniel Rentz of OpenOffice.
