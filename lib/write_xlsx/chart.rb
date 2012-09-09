@@ -2109,7 +2109,8 @@ module Writexlsx
     #
     # Write the <c:majorTimeUnit> element.
     #
-    def write_c_major_time_unit(val = 'days') # :nodoc:
+    def write_c_major_time_unit(val) # :nodoc:
+      val ||= 'days'
       attributes = ['val', val]
 
       @writer.empty_tag('c:majorTimeUnit', attributes)
@@ -2118,7 +2119,8 @@ module Writexlsx
     #
     # Write the <c:minorTimeUnit> element.
     #
-    def write_c_minor_time_unit(val = 'days') # :nodoc:
+    def write_c_minor_time_unit(val) # :nodoc:
+      val ||= 'days'
       attributes = ['val', val]
 
       @writer.empty_tag('c:minorTimeUnit', attributes)
@@ -2819,7 +2821,7 @@ module Writexlsx
     def write_c_invert_if_negative(invert = nil) # :nodoc:
       val    = 1
 
-      return unless invert
+      return unless invert && invert != 0
 
       attributes = ['val', val]
 
