@@ -1481,7 +1481,7 @@ module Writexlsx
           # Test for PNGs.
           type, width, height = process_png(data)
           image_types[:png] = 1
-        elsif data.unpack('n') == 0xFFD8 &&
+        elsif data.unpack('n')[0] == 0xFFD8 &&
             (data.unpack('x6 A4')[0] == 'JFIF' || data.unpack('x6 A4')[0] == 'Exif')
           # Test for JFIF and Exif JPEGs.
           type, width, height = process_jpg(data, filename)
@@ -1514,6 +1514,54 @@ module Writexlsx
       width  = data[16, 4].unpack("N")[0]
       height = data[20, 4].unpack("N")[0]
 
+      [type, width, height]
+    end
+
+    def process_jpg(data, filename)
+      type     = 'jpeg'
+      offset = 2
+      data_length = data.bytesize
+
+      # Search through the image data to find the 0xFFC0 marker. The height and
+      # width are contained in the data for that sub element.
+      while offset < data_length
+        marker  = data[offset,   2].unpack("n")[0]
+        length  = data[offset+2, 2].unpack("n")[0]
+
+        if marker == 0xFFC0 || marker == 0xFFC2
+          height = data[offset+5, 2].unpack("n")[0]
+          width  = data[offset+7, 2].unpack("n")[0]
+          break
+        end
+
+        offset += length + 2
+        break if marker == 0xFFDA
+      end
+
+      raise "#{filename}: no size data found in jpeg image.\n" unless height
+      [type, width, height]
+    end
+
+    # Extract width and height information from a BMP file.
+    def process_bmp(data, filename)       #:nodoc:
+      type     = 'bmp'
+
+      # Check that the file is big enough to be a bitmap.
+      raise "#{filename} doesn't contain enough data." if data.bytesize <= 0x36
+
+      # Read the bitmap width and height. Verify the sizes.
+      width, height = data.unpack("x18 V2")
+      raise "#{filename}: largest image width #{width} supported is 65k." if width > 0xFFFF
+      raise "#{filename}: largest image height supported is 65k." if height > 0xFFFF
+
+      # Read the bitmap planes and bpp data. Verify them.
+      planes, bitcount = data.unpack("x26 v2")
+      raise "#{filename} isn't a 24bit true color bitmap." unless bitcount == 24
+      raise "#{filename}: only 1 plane supported in bitmap image." unless planes == 1
+
+      # Read the bitmap compression. Verify compression.
+      compression = data.unpack("x30 V")[0]
+      raise "#{filename}: compression not supported in bitmap image." unless compression == 0
       [type, width, height]
     end
   end
