@@ -2278,7 +2278,7 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, data_id, horiz) # :nodoc:
+    def write_title_formula(title, data_id, horiz = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
         write_tx_formula(title, data_id)
@@ -2365,7 +2365,7 @@ module Writexlsx
     #
     # Write the <a:p> element for formula titles.
     #
-    def write_a_p_formula(title) # :nodoc:
+    def write_a_p_formula # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
         write_a_p_pr_formula
