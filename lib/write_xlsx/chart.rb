@@ -441,7 +441,7 @@ module Writexlsx
       @id                = ''
       @style_id          = 2
       @axis_ids          = []
-      @has_category      = 0
+      @has_category      = false
       @requires_category = 0
       @legend_position   = 'right'
       @cat_axis_position = 'b'
@@ -1609,13 +1609,13 @@ module Writexlsx
       # Ignore <c:cat> elements for charts without category values.
       return unless formula
 
-      @has_category = 1
+      @has_category = true
 
       @writer.tag_elements('c:cat') do
         # Check the type of cached data.
         type = get_data_type(data)
         if type == 'str'
-          @has_category = 0
+          @has_category = false
           # Write the c:numRef element.
           write_str_ref(formula, data, type)
         else
