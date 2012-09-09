@@ -1906,17 +1906,6 @@ module Writexlsx
     end
 
     #
-    # Write the <c:orientation> element.
-    #
-    def write_orientation(reverse = nil) # :nodoc:
-      val     = reverse ? 'maxMin' : 'minMax'
-
-      attributes = ['val', val]
-
-      @writer.empty_tag('c:orientation', attributes)
-    end
-
-    #
     # Write the <c:logBase> element.
     #
     def write_c_log_base(val) # :nodoc:
@@ -1930,8 +1919,8 @@ module Writexlsx
     #
     # Write the <c:orientation> element.
     #
-    def write_orientation(reverse = 'maxMin') # :nodoc:
-      val = 'minMax'
+    def write_orientation(reverse = nil) # :nodoc:
+      val     = reverse && reverse != 0 ? 'maxMin' : 'minMax'
 
       attributes = ['val', val]
 
