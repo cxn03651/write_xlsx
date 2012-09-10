@@ -35,8 +35,8 @@ module Writexlsx
     class Scatter < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
         @subtype        = 'marker_only'
         @cross_between  = 'midCat'
         @horiz_val_axis = 0

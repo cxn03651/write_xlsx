@@ -52,7 +52,7 @@ module Writexlsx
       #
       # Add worksheet relationship to sheet.rels xml files.
       #
-      def add_worksheet_relationship(type, target, target_mode)
+      def add_worksheet_relationship(type, target, target_mode = nil)
         type   = Document_schema + type
         target = target
 

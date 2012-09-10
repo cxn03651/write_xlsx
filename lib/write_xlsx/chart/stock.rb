@@ -24,8 +24,8 @@ module Writexlsx
     class Stock < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
       end
 
       #
@@ -81,7 +81,7 @@ module Writexlsx
       # Write the <c:plotArea> element.
       #
       def write_plot_area
-        @writer.tag_elements('c:plotArea') do 
+        @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
           write_layout
           # Write the subclass chart type element.

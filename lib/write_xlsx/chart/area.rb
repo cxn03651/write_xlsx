@@ -20,8 +20,8 @@ module Writexlsx
     class Area < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
         @cross_between = 'midCat'
       end
 

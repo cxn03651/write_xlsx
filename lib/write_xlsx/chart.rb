@@ -439,29 +439,29 @@ module Writexlsx
     #
     # Factory method for returning chart objects based on their class type.
     #
-    def self.factory(chart_subclass) # :nodoc:
+    def self.factory(chart_subclass, subtype = nil) # :nodoc:
       case chart_subclass.downcase.capitalize
       when 'Area'
         require 'write_xlsx/chart/area'
-        Chart::Area.new
+        Chart::Area.new(subtype)
       when 'Bar'
         require 'write_xlsx/chart/bar'
-        Chart::Bar.new
+        Chart::Bar.new(subtype)
       when 'Column'
         require 'write_xlsx/chart/column'
-        Chart::Column.new
+        Chart::Column.new(subtype)
       when 'Line'
         require 'write_xlsx/chart/line'
-        Chart::Line.new
+        Chart::Line.new(subtype)
       when 'Pie'
         require 'write_xlsx/chart/pie'
-        Chart::Pie.new
+        Chart::Pie.new(subtype)
       when 'Scatter'
         require 'write_xlsx/chart/scatter'
-        Chart::Scatter.new
+        Chart::Scatter.new(subtype)
       when 'Stock'
         require 'write_xlsx/chart/stock'
-        Chart::Stock.new
+        Chart::Stock.new(subtype)
       end
     end
 
@@ -518,7 +518,7 @@ module Writexlsx
       write_chart
 
       # Write the c:printSettings element.
-      write_print_settings if @embedded
+      write_print_settings if @embedded && @embedded != 0
 
       # Close the worksheet tag.
       @writer.end_tag( 'c:chartSpace')

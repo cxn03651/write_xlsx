@@ -2707,8 +2707,8 @@ module Writexlsx
       scale_x  ||= 1
       scale_y  ||= 1
 
-      raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart)
-      raise "Not a embedded style Chart object in insert_chart()" if chart.embedded == 0
+      raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
+      raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
       @charts << [row, col, chart, x_offset, y_offset, scale_x, scale_y]
     end

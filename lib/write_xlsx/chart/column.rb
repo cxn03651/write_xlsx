@@ -28,8 +28,8 @@ module Writexlsx
     class Column < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
         @subtype = 'clustered'
         @horiz_val_axis = 0
       end

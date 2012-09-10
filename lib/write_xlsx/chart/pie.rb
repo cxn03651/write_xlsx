@@ -26,8 +26,8 @@ module Writexlsx
     class Pie < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
         @vary_data_color = 1
       end
 
