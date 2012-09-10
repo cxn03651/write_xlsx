@@ -19,9 +19,9 @@ module Writexlsx
     class Bar < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
-        @subtype = 'clustered'
+      def initialize(subtype)
+        super(subtype)
+        @subtype = subtype || 'clustered'
         @cat_axis_position = 'l'
         @val_axis_position = 'b'
         @horiz_val_axis    = 0

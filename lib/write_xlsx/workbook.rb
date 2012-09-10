@@ -2,6 +2,7 @@
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
 require 'write_xlsx/worksheet'
+require 'write_xlsx/chartsheet'
 require 'write_xlsx/format'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart'
@@ -357,15 +358,15 @@ module Writexlsx
       embedded = params[:embedded] || 0
 
       # Check the worksheet name for non-embedded charts.
-      name = check_sheetname(params[:name], 1) unless embedded
+      name = check_sheetname(params[:name], 1) if embedded == 0
 
-      chart = Chart.factory(type)
+      chart = Chart.factory(type, params[:subtype])
 
       # Get an incremental id to use for axes ids.
       chart.id = @charts.size
 
       # If the chart isn't embedded let the workbook control it.
-      if embedded
+      if embedded && embedded != 0
         # Set index to 0 so that the activate() and set_first_sheet() methods
         # point back to the first worksheet if used for embedded charts.
         chart.index = 0
@@ -375,12 +376,12 @@ module Writexlsx
 
         return chart
       else
-        chartsheet = Chartsheet.new(self, name, index)
+        chartsheet = Chartsheet.new(self, index, name)
         chart.palette = @palette
         chartsheet.chart   = chart
         chartsheet.drawing = Drawing.new
-        @worksheets.index = chartsheet
-        @sheetnames.index = name
+        @worksheets[index] = chartsheet
+        @sheetnames[index] = name
 
         @charts << chart
 

@@ -3,7 +3,7 @@ require 'write_xlsx/package/xml_writer_simple.rb'
 
 module Writexlsx
   class Drawing
-    attr_writer :embedded
+    attr_writer :embedded, :orientation
 
     def initialize
       @writer = Package::XMLWriterSimple.new
@@ -108,6 +108,37 @@ module Writexlsx
     end
 
     #
+    # Write the <xdr:absoluteAnchor> element.
+    #
+    def write_absolute_anchor(index)
+      @writer.start_tag('xdr:absoluteAnchor')
+
+      # Different co-ordinates for horizonatal (= 0) and vertical (= 1).
+      if !@orientation || @orientation == 0
+
+        # Write the xdr:pos element.
+        write_pos(0, 0)
+
+        # Write the xdr:ext element.
+        write_ext(9308969, 6078325)
+      else
+        # Write the xdr:pos element.
+        write_pos(0, -47625)
+
+        # Write the xdr:ext element.
+        write_ext(6162675, 6124575)
+      end
+
+      # Write the xdr:graphicFrame element.
+      write_graphic_frame(index)
+
+      # Write the xdr:clientData element.
+      write_client_data
+
+      @writer.end_tag('xdr:absoluteAnchor')
+    end
+
+      #
     # Write the <xdr:from> element.
     #
     def write_from(col, row, col_offset, row_offset)
@@ -167,6 +198,30 @@ module Writexlsx
     #
     def write_row_off(data)
       @writer.data_element('xdr:rowOff', data)
+    end
+
+    #
+    # Write the <xdr:pos> element.
+    #
+    def write_pos(x, y)
+      attributes = [
+                    'x', x,
+                    'y', y
+                   ]
+
+      @writer.empty_tag('xdr:pos', attributes)
+    end
+
+    #
+    # Write the <xdr:ext> element.
+    #
+    def write_ext(cx, cy)
+      attributes = [
+                    'cx', cx,
+                    'cy', cy
+                   ]
+
+      @writer.empty_tag('xdr:ext', attributes)
     end
 
     #

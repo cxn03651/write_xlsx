@@ -15,6 +15,8 @@ module Writexlsx
   class Chartsheet < Worksheet
     include Writexlsx::Utility
 
+    attr_writer :chart, :drawing
+
     def initialize(workbook, index, name)
       super
       @drawing = 1
@@ -30,7 +32,7 @@ module Writexlsx
     #
     def assemble_xml_file # :nodoc:
       return unless @writer
-      write_xml_declaration
+      @writer.xml_decl
 
       # Write the root chartsheet element.
       write_chartsheet
@@ -64,7 +66,7 @@ module Writexlsx
 
       # Close the XML writer object and filehandle.
       @writer.crlf
-      @writer.getOutput->close
+      @writer.close
     end
 
     def protect(password = '', options = {})
@@ -116,8 +118,6 @@ module Writexlsx
       @chart.set_style(*args)
     end
 
-    private
-
     #
     # Set up chart/drawings.
     #
@@ -126,10 +126,12 @@ module Writexlsx
       @drawing = drawing
       @drawing.orientation = @orientation
 
-      @external_drawing_links << [ '/drawing', '../drawings/drawing' << drawing_id << '.xml' ]
+      @external_drawing_links << [ '/drawing', "../drawings/drawing#{drawing_id}.xml" ]
 
-      @drawing_links << [ '/chart', '../charts/chart' << chart_id << '.xml' ]
+      @drawing_links << [ '/chart', "../charts/chart#{chart_id}.xml"]
     end
+
+    private
 
     #
     # Write the <chartsheet> element. This is the root element of Chartsheet.
@@ -154,13 +156,13 @@ module Writexlsx
     #
     # Write the <sheetPr> element for Sheet level properties.
     #
-    def _write_sheet_pr # :nodoc:
+    def write_sheet_pr # :nodoc:
 
       attributes = []
 
-      attributes << {'filterMode' => 1} if @filter_on
+      attributes << {'filterMode' => 1} if (@filter_on && @filter_on != 0)
 
-      if @fit_page || @tab_color
+      if (@fit_page && @fit_page != 0) || (@tab_color && @tab_color != 0)
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
           write_page_set_up_pr

@@ -215,7 +215,7 @@ module Writexlsx
         # Add the Chartsheet parts.
         @workbook.worksheets.each do |worksheet|
           next unless worksheet.is_chartsheet?
-          app.add_part_name(worksheet.get_name)
+          app.add_part_name(worksheet.name)
         end
 
         # Add the Named Range heading pairs.
@@ -420,16 +420,17 @@ module Writexlsx
       #
       def write_chartsheet_rels_files
         existing_rels_dir = false
-
+        index = 0
         @workbook.worksheets.each do |worksheet|
           next unless worksheet.is_chartsheet?
+          index += 1
 
           external_links = worksheet.external_drawing_links
 
           next if external_links.empty?
 
           # Create the chartsheet .rels dir if required.
-          if existing_rels_dir
+          if !existing_rels_dir
             FileUtils.mkdir_p("#{@package_dir}/xl/chartsheets/_rels")
             existing_rels_dir = true
           end
@@ -437,12 +438,12 @@ module Writexlsx
           rels = Package::Relationships.new
 
           external_links.each do |link_data|
-            rels.add_worksheet_relationship(link_data)
+            rels.add_worksheet_relationship(*link_data)
           end
 
           # Create the .rels file such as /xl/chartsheets/_rels/sheet1.xml.rels.
           rels.set_xml_writer(
-              "#{@package_dir}/xl/chartsheets/_rels/sheet#{worksheet.index}.xml.rels")
+              "#{@package_dir}/xl/chartsheets/_rels/sheet#{index}.xml.rels")
           rels.assemble_xml_file
         end
       end
@@ -467,7 +468,7 @@ module Writexlsx
 
           # Create the .rels file such as /xl/drawings/_rels/sheet1.xml.rels.
           rels.set_xml_writer(
-            "#{@package_dir}/xl/drawings/_rels/drawing#{index}.xml.rels")
+                              "#{@package_dir}/xl/drawings/_rels/drawing#{index}.xml.rels")
           rels.assemble_xml_file
         end
       end

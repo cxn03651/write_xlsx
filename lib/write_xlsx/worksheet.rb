@@ -2235,6 +2235,8 @@ module Writexlsx
       writer = Package::XMLWriterSimple.new
 
       fragments, length = rich_strings_fragments(rich_strings)
+      # can't allow 2 formats in a row
+      return -4 unless fragments
 
       # If the first token is a string start the <r> element.
       writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
@@ -2705,8 +2707,8 @@ module Writexlsx
       scale_x  ||= 1
       scale_y  ||= 1
 
-      raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart)
-      raise "Not a embedded style Chart object in insert_chart()" if chart.embedded == 0
+      raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
+      raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
       @charts << [row, col, chart, x_offset, y_offset, scale_x, scale_y]
     end
@@ -4518,7 +4520,8 @@ module Writexlsx
       fragments = []
       rich_strings.each do |token|
         if token.respond_to?(:xf_index)
-          raise AugumentError, "Can't allow 2 formats in a row" if last == 'format' && pos > 0
+          # Can't allow 2 formats in a row
+          return nil if last == 'format' && pos > 0
 
           # Token is a format object. Add it to the fragment list.
           fragments << token

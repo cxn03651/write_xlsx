@@ -368,31 +368,66 @@ module Writexlsx
   #
   # The following properties can be set for data_labels formats in a chart.
   #
-  #     value
-  #     category
-  #     series_name
+  #     :value
+  #     :category
+  #     :series_name
+  #     :position
+  #     :leader_lines
+  #     :percentage
+  #
   # The value property turns on the Value data label for a series.
   #
   #     chart.add_series(
   #         :values      => '=Sheet1!$B$1:$B$5',
-  #         :data_labels => { value => 1 }
+  #         :data_labels => { :value => 1 }
   #     )
   # The category property turns on the Category Name data label for a series.
   #
   #     chart.add_series(
   #         :values      => '=Sheet1!$B$1:$B$5',
-  #         :data_labels => { category => 1 }
+  #         :data_labels => { :category => 1 }
   #     )
   # The series_name property turns on the Series Name data label for a series.
   #
   #     chart.add_series(
   #         :values      => '=Sheet1!$B$1:$B$5',
-  #         :data_labels => { series_name => 1 }
+  #         :data_labels => { :series_name => 1 }
   #     )
-  # Other formatting options
+  # The C<position> property is used to position the data label for a series.
   #
-  # Other formatting options will be added in time. If there is a feature that
-  # you would like to see included drop me a line.
+  #     chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { :value => 1, :position => 'center' }
+  #     )
+  #
+  # Valid positions are:
+  #
+  #     :center
+  #     :right
+  #     :left
+  #     :top
+  #     :bottom
+  #     :above           # Same as top
+  #     :below           # Same as bottom
+  #     :inside_end      # Pie chart mainly.
+  #     :outside_end     # Pie chart mainly.
+  #     :best_fit        # Pie chart mainly.
+  #
+  # The C<percentage> property is used to turn on the I<Percentage>
+  # for the data label for a series. It is mainly used for pie charts.
+  #
+  #    chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { :percentage => 1 }
+  #    )
+  #
+  # The C<leader_lines> property is used to turn on  I<Leader Lines>
+  # for the data label for a series. It is mainly used for pie charts.
+  #
+  #    chart.add_series(
+  #         :values      => '=Sheet1!$B$1:$B$5',
+  #         :data_labels => { :value => 1, :leader_lines => 1 }
+  #    )
   #
   class Chart
     include Writexlsx::Utility
@@ -404,29 +439,29 @@ module Writexlsx
     #
     # Factory method for returning chart objects based on their class type.
     #
-    def self.factory(chart_subclass) # :nodoc:
+    def self.factory(chart_subclass, subtype = nil) # :nodoc:
       case chart_subclass.downcase.capitalize
       when 'Area'
         require 'write_xlsx/chart/area'
-        Chart::Area.new
+        Chart::Area.new(subtype)
       when 'Bar'
         require 'write_xlsx/chart/bar'
-        Chart::Bar.new
+        Chart::Bar.new(subtype)
       when 'Column'
         require 'write_xlsx/chart/column'
-        Chart::Column.new
+        Chart::Column.new(subtype)
       when 'Line'
         require 'write_xlsx/chart/line'
-        Chart::Line.new
+        Chart::Line.new(subtype)
       when 'Pie'
         require 'write_xlsx/chart/pie'
-        Chart::Pie.new
+        Chart::Pie.new(subtype)
       when 'Scatter'
         require 'write_xlsx/chart/scatter'
-        Chart::Scatter.new
+        Chart::Scatter.new(subtype)
       when 'Stock'
         require 'write_xlsx/chart/stock'
-        Chart::Stock.new
+        Chart::Stock.new(subtype)
       end
     end
 
@@ -483,7 +518,7 @@ module Writexlsx
       write_chart
 
       # Write the c:printSettings element.
-      write_print_settings if @embedded
+      write_print_settings if @embedded && @embedded != 0
 
       # Close the worksheet tag.
       @writer.end_tag( 'c:chartSpace')
@@ -1353,6 +1388,29 @@ module Writexlsx
     #
     def get_labels_properties(labels) # :nodoc:
       return nil unless labels
+
+      # Map user defined label positions to Excel positions.
+      if position = labels[:position]
+
+        positions = {
+            :center      => 'ctr',
+            :right       => 'r',
+            :left        => 'l',
+            :top         => 't',
+            :above       => 't',
+            :bottom      => 'b',
+            :below       => 'b',
+            :inside_end  => 'inEnd',
+            :outside_end => 'outEnd',
+            :best_fit    => 'bestFit'
+        }
+
+        if positions[position]
+          labels[:position] = positions[position]
+        else
+          raise "Unknown label position '#{position}'"
+        end
+      end
 
       return labels
     end
@@ -2764,12 +2822,18 @@ module Writexlsx
       return unless labels
 
       @writer.tag_elements('c:dLbls') do
+        # Write the c:dLblPos element.
+        write_d_lbl_pos(labels[:position]) if labels[:position]
         # Write the c:showVal element.
-        write_show_val if labels[value]
+        write_show_val if labels[:value]
         # Write the c:showCatName element.
-        write_show_cat_name if labels[category]
+        write_show_cat_name if labels[:category]
         # Write the c:showSerName element.
-        write_show_ser_name if labels[series_name]
+        write_show_ser_name if labels[:series_name]
+        # Write the c:showPercent element.
+        write_show_percent if labels[:percentage]
+        # Write the c:showLeaderLines element.
+        write_show_leader_lines if labels[:leader_lines]
       end
     end
 
@@ -2804,6 +2868,46 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:showSerName', attributes)
+    end
+
+    #
+    # Write the <c:showPercent> element.
+    #
+    def write_show_percent
+      val  = 1
+
+      attributes = ['val' => val]
+
+      @writer.empty_tag('c:showPercent', attributes)
+    end
+
+    #
+    # Write the <c:showLeaderLines> element.
+    #
+    def write_show_leader_lines
+      val  = 1
+
+      attributes = ['val' => $val]
+
+      @writer.empty_tag('c:showLeaderLines', attributes)
+    end
+
+    #
+    # Write the <c:dLblPos> element.
+    #
+    def write_d_lbl_pos(val)
+      attributes = ['val' => val]
+
+      @writer.empty_tag('c:dLblPos', attributes)
+    end
+
+    #
+    # Write the <c:delete> element.
+    #
+    def write_delete(val)
+      attributes = ['val' => $val]
+
+      @writer.empty_tag('c:delete', @attributes)
     end
 
     #

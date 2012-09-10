@@ -19,8 +19,8 @@ module Writexlsx
     class Line < self
       include Writexlsx::Utility
 
-      def initialize
-        super(self.class)
+      def initialize(subtype)
+        super(subtype)
         @default_marker = {:type => 'none'}
       end
 
