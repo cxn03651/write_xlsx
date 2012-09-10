@@ -439,8 +439,8 @@ module Writexlsx
     #
     # Factory method for returning chart objects based on their class type.
     #
-    def self.factory(chart_subclass, subtype = nil) # :nodoc:
-      case chart_subclass.downcase.capitalize
+    def self.factory(current_subclass, subtype = nil) # :nodoc:
+      case current_subclass.downcase.capitalize
       when 'Area'
         require 'write_xlsx/chart/area'
         Chart::Area.new(subtype)
