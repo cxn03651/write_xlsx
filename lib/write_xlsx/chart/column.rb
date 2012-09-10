@@ -30,7 +30,7 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @subtype = 'clustered'
+        @subtype = subtype || 'clustered'
         @horiz_val_axis = 0
       end
 
