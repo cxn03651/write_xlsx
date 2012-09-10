@@ -1795,7 +1795,7 @@ module Writexlsx
           write_crosses(y_axis[:_crossing])
         else
           # Write the c:crossesAt element.
-          write_c_crosses(y_axis[:_crossing])
+          write_c_crosses_at(y_axis[:_crossing])
         end
         # Write the c:auto element.
         write_auto(1)
