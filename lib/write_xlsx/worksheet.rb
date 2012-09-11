@@ -3792,7 +3792,7 @@ module Writexlsx
     # is true, i.e. only the printed gridlines are hidden.
     #
     def hide_gridlines(option = 1)
-      if option == 0
+      if option == 0 || !option
         @print_gridlines       = true    # 1 = display, 0 = hide
         @screen_gridlines      = true
         @print_options_changed = true
