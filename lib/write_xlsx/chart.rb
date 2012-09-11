@@ -1149,7 +1149,7 @@ module Writexlsx
       # Convert a HTML style #RRGGBB color.
       if color and color =~ /^#[0-9a-fA-F]{6}$/
         color = color.sub(/^#/, '')
-        return color.upperca
+        return color.upcase
       end
 
       index = Format.get_color(color)
@@ -1317,26 +1317,26 @@ module Writexlsx
       }
 
       # Check for valid types.
-      marker_type = marker[type]
+      marker_type = marker[:type]
 
       if marker_type
-        marker[automatic] = 1 if marker_type == 'automatic'
+        marker[:automatic] = 1 if marker_type == 'automatic'
 
-        if types[marker_type]
-          marker[type] = types[marker_type]
+        if types[marker_type] || types[marker_type.to_sym]
+          marker[:type] = types[marker_type]
         else
           raise "Unknown marker type '#{marker_type}'\n"
         end
       end
 
       # Set the line properties for the marker..
-      line = get_line_properties(marker[line])
+      line = get_line_properties(marker[:line])
 
       # Allow 'border' as a synonym for 'line'.
-      line = get_line_properties(marker[border]) if marker[border]
+      line = get_line_properties(marker[:border]) if marker[:border]
 
       # Set the fill properties for the marker.
-      fill = get_fill_properties(marker[fill])
+      fill = get_fill_properties(marker[:fill])
 
       marker[:_line] = line
       marker[:_fill] = fill
@@ -2563,14 +2563,14 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      return if (!series.has_key?(:_line) || series[:_line][:_defined].nil? || series[:_line][:_defined]== 0) &&
-                (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined]== 0)
+      return if (!series.has_key?(:_line) || series[:_line][:_defined].nil? || series[:_line][:_defined] == 0) &&
+                (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined] == 0)
 
       @writer.tag_elements('c:spPr') do
         # Write the a:solidFill element for solid charts such as pie and bar.
         write_a_solid_fill(series[:_fill]) if series[:_fill] && series[:_fill][:_defined] != 0
         # Write the a:ln element.
-        write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined]
+        write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined] != 0
       end
     end
 
