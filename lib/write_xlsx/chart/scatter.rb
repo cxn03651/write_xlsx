@@ -37,7 +37,7 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @subtype        = 'marker_only'
+        @subtype        = subtype || 'marker_only'
         @cross_between  = 'midCat'
         @horiz_val_axis = 0
       end
@@ -51,7 +51,7 @@ module Writexlsx
       end
 
       #
-      # Write the <c:pieChart> element.
+      # Write the <c:scatterChart> element.
       #
       def write_scatter_chart
         style   = 'lineMarker'
