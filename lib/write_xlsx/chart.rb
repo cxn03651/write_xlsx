@@ -1405,8 +1405,8 @@ module Writexlsx
             :best_fit    => 'bestFit'
         }
 
-        if positions[position]
-          labels[:position] = positions[position]
+        if positions[position.to_sym]
+          labels[:position] = positions[position.to_sym]
         else
           raise "Unknown label position '#{position}'"
         end
@@ -2876,7 +2876,7 @@ module Writexlsx
     def write_show_percent
       val  = 1
 
-      attributes = ['val' => val]
+      attributes = ['val', val]
 
       @writer.empty_tag('c:showPercent', attributes)
     end
@@ -2887,7 +2887,7 @@ module Writexlsx
     def write_show_leader_lines
       val  = 1
 
-      attributes = ['val' => $val]
+      attributes = ['val', val]
 
       @writer.empty_tag('c:showLeaderLines', attributes)
     end
@@ -2896,7 +2896,7 @@ module Writexlsx
     # Write the <c:dLblPos> element.
     #
     def write_d_lbl_pos(val)
-      attributes = ['val' => val]
+      attributes = ['val', val]
 
       @writer.empty_tag('c:dLblPos', attributes)
     end
@@ -2905,7 +2905,7 @@ module Writexlsx
     # Write the <c:delete> element.
     #
     def write_delete(val)
-      attributes = ['val' => $val]
+      attributes = ['val', val]
 
       @writer.empty_tag('c:delete', @attributes)
     end
