@@ -1270,8 +1270,8 @@ module Writexlsx
       dash_type = line[:dash_type]
 
       if dash_type
-        if dash_types[dash_type]
-          line[dash_type] = dash_types[dash_type]
+        if dash_types[dash_type.to_sym]
+          line[:dash_type] = dash_types[dash_type.to_sym]
         else
           raise "Unknown dash type '#{dash_type}'\n"
         end
