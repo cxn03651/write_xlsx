@@ -5060,11 +5060,11 @@ module Writexlsx
     # Write the <sheetPr> element for Sheet level properties.
     #
     def write_sheet_pr #:nodoc:
-      return if !fit_page? && !filter_on? && !tab_color?
+      return if !fit_page? && !filter_on? && !tab_color? && !outline_changed?
       attributes = []
       (attributes << 'filterMode' << 1) if filter_on?
 
-      if fit_page? || tab_color?
+      if fit_page? || tab_color? || outline_changed?
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
           write_outline_pr
@@ -5942,7 +5942,7 @@ module Writexlsx
     def write_outline_pr
       attributes = []
 
-      return if @outline_changed == 0
+      return unless outline_changed?
 
       attributes << "applyStyles"  << 1 if @outline_style != 0
       attributes << "summaryBelow" << 0 if @outline_below == 0
@@ -6497,6 +6497,10 @@ module Writexlsx
 
     def tab_color? #:nodoc:
       @tab_color && @tab_color != 0
+    end
+
+    def outline_changed?
+      @outline_changed && @outline_changed != 0
     end
 
     def zoom_scale_normal? #:nodoc:
