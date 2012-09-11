@@ -1424,14 +1424,14 @@ module Writexlsx
     #
     def repeat_columns(*args)
       if args[0] =~ /^\D/
-        dummy, first_col, dummy, last_col = substitute_cellref(args)
+        dummy, first_col, dummy, last_col = substitute_cellref(*args)
       else
         first_col, last_col = args
       end
       last_col ||= first_col
 
       area = "#{xl_col_to_name(first_col, 1)}:#{xl_col_to_name(last_col, 1)}"
-      @print_style.repeat_rows = "#{quote_sheetname(@name)}!#{area}"
+      @print_style.repeat_cols = "#{quote_sheetname(@name)}!#{area}"
     end
 
     def print_repeat_cols  # :nodoc:
