@@ -4097,7 +4097,10 @@ module Writexlsx
     # per worksheet in line with an Excel internal limitation.
     #
     def set_h_pagebreaks(*args)
-      @print_style.hbreaks += args
+      breaks = args.collect do |brk|
+        brk.respond_to?(:to_a) ? brk.to_a : brk
+      end.flatten
+      @print_style.hbreaks += breaks
     end
 
     #
