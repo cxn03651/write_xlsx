@@ -37,7 +37,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
   end
 
   def test_write_page_setup_with_set_paper
-    @worksheet.set_paper(9)
+    @worksheet.paper = 9
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetup paperSize="9" orientation="portrait" />'

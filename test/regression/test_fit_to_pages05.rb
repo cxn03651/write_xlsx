@@ -16,7 +16,7 @@ class TestRegressionFitToPages05 < Test::Unit::TestCase
     worksheet = workbook.add_worksheet
 
     worksheet.fit_to_pages(1, 0)
-    worksheet.set_paper(9)
+    worksheet.paper = 9
 
     worksheet.write('A1', 'Foo')
 
