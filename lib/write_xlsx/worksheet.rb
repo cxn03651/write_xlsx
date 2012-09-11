@@ -1012,11 +1012,16 @@ module Writexlsx
     # If you do not specify a paper type the worksheet will print using
     # the printer's default paper.
     #
-    def set_paper(paper_size)
+    def paper=(paper_size)
       if paper_size
         @paper_size         = paper_size
         @print_style.page_setup_changed = true
       end
+    end
+
+    def set_paper(paper_size)
+      put_deprecate_message("#{self}.set_paper")
+      self::paper = paper_size
     end
 
     #
