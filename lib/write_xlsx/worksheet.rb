@@ -1457,7 +1457,6 @@ module Writexlsx
 
       # Build up the print area range "=Sheet2!R1C1:R2C1"
       @print_area = convert_name_area(row1, col1, row2, col2)
-      @print_area.dup
     end
 
     #
