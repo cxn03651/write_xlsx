@@ -3786,14 +3786,14 @@ module Writexlsx
     # If you don't supply an argument or use nil the default option
     # is true, i.e. only the printed gridlines are hidden.
     #
-    def hide_gridlines(option = true)
-      if option == true
-        @print_gridlines  = false
-        @screen_gridlines = true
-      elsif !option
+    def hide_gridlines(option = 1)
+      if option == 0
         @print_gridlines       = true    # 1 = display, 0 = hide
         @screen_gridlines      = true
         @print_options_changed = true
+      elsif option == 1
+        @print_gridlines  = false
+        @screen_gridlines = true
       else
         @print_gridlines  = false
         @screen_gridlines = false
