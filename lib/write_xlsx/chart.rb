@@ -1322,8 +1322,8 @@ module Writexlsx
       if marker_type
         marker[:automatic] = 1 if marker_type == 'automatic'
 
-        if types[marker_type] || types[marker_type.to_sym]
-          marker[:type] = types[marker_type]
+        if types[marker_type.to_sym]
+          marker[:type] = types[marker_type.to_sym]
         else
           raise "Unknown marker type '#{marker_type}'\n"
         end
@@ -1360,22 +1360,22 @@ module Writexlsx
       }
 
       # Check the trendline type.
-      trend_type = trendline[type]
+      trend_type = trendline[:type]
 
-      if types[trend_type]
-        trendline[type] = types[trend_type]
+      if types[trend_type.to_sym]
+        trendline[:type] = types[trend_type.to_sym]
       else
         raise "Unknown trendline type '#{trend_type}'\n"
       end
 
       # Set the line properties for the trendline..
-      line = get_line_properties(trendline[line])
+      line = get_line_properties(trendline[:line])
 
       # Allow 'border' as a synonym for 'line'.
-      line = get_line_properties(trendline[border]) if trendline[border]
+      line = get_line_properties(trendline[:border]) if trendline[:border]
 
       # Set the fill properties for the trendline.
-      fill = get_fill_properties(trendline[fill])
+      fill = get_fill_properties(trendline[:fill])
 
       trendline[:_line] = line
       trendline[:_fill] = fill
@@ -1615,9 +1615,9 @@ module Writexlsx
         # Write the c:invertIfNegative element.
         write_c_invert_if_negative(series[:_invert_if_neg])
         # Write the c:dLbls element.
-        write_d_lbls(series[:labels])
+        write_d_lbls(series[:_labels])
         # Write the c:trendline element.
-        write_trendline(series[:trendline])
+        write_trendline(series[:_trendline])
         # Write the c:cat element.
         write_cat(series)
         # Write the c:val element.
@@ -2655,19 +2655,19 @@ module Writexlsx
 
       @writer.tag_elements('c:trendline') do
         # Write the c:name element.
-        write_name(trendline[name])
+        write_name(trendline[:name])
         # Write the c:spPr element.
         write_sp_pr(trendline)
         # Write the c:trendlineType element.
-        write_trendline_type(trendline[type])
+        write_trendline_type(trendline[:type])
         # Write the c:order element for polynomial trendlines.
-        write_trendline_order(trendline[order]) if trendline[type] == 'poly'
+        write_trendline_order(trendline[:order]) if trendline[:type] == 'poly'
         # Write the c:period element for moving average trendlines.
-        write_period(trendline[period]) if trendline[type] == 'movingAvg'
+        write_period(trendline[:period]) if trendline[:type] == 'movingAvg'
         # Write the c:forward element.
-        write_forward(trendline[forward])
+        write_forward(trendline[:forward])
         # Write the c:backward element.
-        write_backward(trendline[backward])
+        write_backward(trendline[:backward])
       end
     end
 
