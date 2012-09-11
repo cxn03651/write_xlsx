@@ -5067,6 +5067,7 @@ module Writexlsx
       if fit_page? || tab_color?
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
+          write_outline_pr
           write_page_set_up_pr
         end
       else
@@ -5136,6 +5137,9 @@ module Writexlsx
 
       # Show that the sheet tab is selected.
       attributes << 'tabSelected' << 1 if @selected
+
+      # Turn outlines off. Also required in the outlinePr element.
+      attributes << "showOutlineSymbols" << 0 if @outline_on
 
       # Set the page view/layout mode if required.
       # TODO. Add pageBreakPreview mode when requested.
@@ -5930,6 +5934,22 @@ module Writexlsx
 
       attributes = ['rgb', get_palette_color(@tab_color)]
       @writer.empty_tag('tabColor', attributes)
+    end
+
+    #
+    # Write the <outlinePr> element.
+    #
+    def write_outline_pr
+      attributes = []
+
+      return if @outline_changed == 0
+
+      attributes << "applyStyles"  << 1 if @outline_style != 0
+      attributes << "summaryBelow" << 0 if @outline_below == 0
+      attributes << "summaryRight" << 0 if @outline_right == 0
+      attributes << "showOutlineSymbols" << 0 if @outline_on == 0
+
+      @writer.empty_tag('outlinePr', attributes)
     end
 
     #
