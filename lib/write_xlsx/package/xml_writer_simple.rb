@@ -44,11 +44,11 @@ module Writexlsx
       end
 
       def data_element(tag, data, attr = [])
-        tag_elements(tag, attr) { io_write("#{characters(data)}") }
+        tag_elements(tag, attr) { io_write("#{escape_xml_chars(data)}") }
       end
 
       def characters(data)
-        escape_xml_chars(data)
+        io_write(escape_xml_chars(data))
       end
 
       def crlf
