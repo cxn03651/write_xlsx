@@ -488,6 +488,7 @@ module Writexlsx
       @protection        = 0
       @x_axis            = {}
       @y_axis            = {}
+      @chart_name        = ''
 
       set_default_properties
     end
@@ -1015,22 +1016,26 @@ module Writexlsx
 
     end
 
-      #
-      # Write the <c:barChart> element.
-      #
-      def write_bar_chart   # :nodoc:
-        subtype = @subtype
-        subtype = 'percentStacked' if subtype == 'percent_stacked'
+    #
+    # Write the <c:barChart> element.
+    #
+    def write_bar_chart   # :nodoc:
+      subtype = @subtype
+      subtype = 'percentStacked' if subtype == 'percent_stacked'
 
-        @writer.tag_elements('c:barChart') do
-          # Write the c:barDir element.
-          write_bar_dir
-          # Write the c:grouping element.
-          write_grouping(subtype)
-          # Write the series elements.
-          write_series
-        end
+      @writer.tag_elements('c:barChart') do
+        # Write the c:barDir element.
+        write_bar_dir
+        # Write the c:grouping element.
+        write_grouping(subtype)
+        # Write the series elements.
+        write_series
       end
+    end
+
+    def name
+      @chart_name
+    end
 
     private
 

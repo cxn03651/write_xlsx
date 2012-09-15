@@ -348,6 +348,7 @@ module Writexlsx
       @row_sizes = {}
       @col_formats = {}
 
+      @last_shape_id          = 1
       @hlink_count            = 0
       @hlink_refs             = []
       @external_hyper_links   = []
@@ -356,6 +357,8 @@ module Writexlsx
       @drawing_links          = []
       @charts                 = []
       @images                 = []
+      @shapes                 = []
+      @shape_hash             = {}
 
       @zoom = 100
       @outline_row_level = 0
@@ -2718,6 +2721,17 @@ module Writexlsx
     end
 
     #
+    # Sort the worksheet charts into the order that they were created in rather
+    # than the insertion order. This is ensure that the chart and drawing objects
+    # written in the same order. The chart id is used to sort back into creation
+    # order.
+    #
+    def sort_charts
+      return if @charts.size < 2
+      @charts = @charts.sort {|a, b| a[2][:_id] <=> b[2][:_id]}
+    end
+
+    #
     # :call-seq:
     #   insert_image(row, column, filename [ , x, y, scale_x, scale_y ] )
     #
@@ -4223,10 +4237,13 @@ module Writexlsx
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
+      # Set the chart name for the embedded object if it has been specified.
+      name = chart.name
+
       # Create a Drawing object to use with worksheet unless one already exists.
       if !drawing?
         drawing = Drawing.new
-        drawing.add_drawing_object(drawing_type, dimensions)
+        drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name)
         drawing.embedded = 1
 
         @drawing = drawing
@@ -4945,6 +4962,44 @@ module Writexlsx
     end
 
     #
+    # Calculate the vertices that define the position of a shape object within
+    # the worksheet in EMUs.  Save the vertices with the object.
+    #
+    # The vertices are expressed as English Metric Units (EMUs). There are 12,700
+    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
+    #
+    def position_shape_emus(shape)
+      col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
+        position_object_pixels(
+                               shape[:column_start],
+                               shape[:row_start],
+                               shape[:x_offset],
+                               shape[:y_offset],
+                               shape[:width] * shape[:scale_x],
+                               shape[:height] * shape[:scale_y],
+                               shape[:drawing]
+                               )
+
+      # Now that x2/y2 have been calculated with a potentially negative
+      # width/height we use the absolute value and convert to EMUs.
+      shape[:width_emu]  = (shape[:width]  * 9_525).abs
+      shape[:height_emu] = (shape[:height] * 9_525).abs
+
+      shape[:column_start] = col_start.to_i
+      shape[:row_start]    = row_start.to_i
+      shape[:column_end]   = col_end.to_i
+      shape[:row_end]      = row_end.to_i
+
+      # Convert the pixel values to EMUs. See above.
+      shape[:x1]    = (x1 * 9_525).to_i
+      shape[:y1]    = (y1 * 9_525).to_i
+      shape[:x2]    = (x2 * 9_525).to_i
+      shape[:y2]    = (y2 * 9_525).to_i
+      shape[:x_abs] = (x_abs * 9_525).to_i
+      shape[:y_abs] = (y_abs * 9_525).to_i
+    end
+
+    #
     # Convert the width of a cell from user's units to pixels. Excel rounds the
     # column width to the nearest pixel. If the width hasn't been set by the user
     # we use the default value. If the column is hidden it has a value of zero.
@@ -5027,6 +5082,201 @@ module Writexlsx
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
     public :prepare_image
+
+    #
+    # Insert a shape into the worksheet.
+    #
+    def insert_shape(*args)
+      # Check for a cell reference in A1 notation and substitute row and column.
+      row_start, column_start, shape, x_offset, y_offset, scale_x, scale_y =
+        row_col_notation(args)
+      if [row_start, column_start, shape].include?(nil)
+        raise "Insufficient arguments in insert_shape()"
+      end
+
+      # Set the shape properties
+      shape[:row_start]    = row_start
+      shape[:column_start] = column_start
+      shape[:x_offset]     = x_offset || 0
+      shape[:y_offset]     = y_offset || 0
+
+      # Override shape scale if supplied as an argument. Otherwise, use the
+      # existing shape scale factors.
+      shape[:scale_x] = scale_x if scale_x
+      shape[:scale_y] = scale_y if scale_y
+
+      # Assign a shape ID.
+      while true
+        id = shape[:_id] || 0
+        used = @shape_hash[id]
+
+        # Test if shape ID is already used. Otherwise assign a new one.
+        if !used && id != 0
+          break
+        else
+          @last_shape_id += 1
+          shape[:_id] = @last_shape_id
+        end
+      end
+
+      # For connectors change x/y coords based on location of connected shapes.
+      auto_locate_connectors(shape)
+
+      shape[:element] = @shapes.size + 1
+
+      # Allow lookup of entry into shape array by shape ID.
+      @shape_hash[shape[:_id]] = shape[:element]
+
+      # Create link to Worksheet color palette.
+      shape[:palette] = @palette
+
+      if shape[:stencil]
+        # Insert a copy of the shape, not a reference so that the shape is
+        # used as a stencil. Previously stamped copies don't get modified
+        # if the stencil is modified.
+        insert = shape.dup
+        auto_locate_connectors(insert)
+
+        @shapes << insert
+        insert
+      else
+        # For connectors change x/y coords based on location of connected shapes.
+        auto_locate_connectors(shape)
+
+        # Insert a link to the shape on the list of shapes. Connection to
+        # the parent shape is maintained.
+        @shapes << shape
+        return shape
+      end
+    end
+    public :insert_shape
+
+    #
+    # Set up drawing shapes
+    #
+    def prepare_shape(index, drawing_id)
+      shape = @shapes[index]
+      drawing_type = 3
+
+      # Create a Drawing object to use with worksheet unless one already exists.
+      unless drawing?
+        @drawing = Drawing.new
+        @drawing.embedded = 1
+        @external_drawing_links << ['/drawing', '../drawings/drawing', "#{drawing_id}.xml"]
+      end
+
+      # Validate the he shape against various rules.
+      validate_shape(shape, index)
+      position_shape_emus(shape)
+
+      dimensions = [
+                    shape[:column_start], shape[:row_start],
+                    shape[:x1],           shape[:y1],
+                    shape[:column_end],   shape[:row_end],
+                    shape[:x2],           shape[:y2],
+                    shape[:x_abs],        shape[:y_abs],
+                    shape[:width_emu],    shape[:height_emu]
+                   ]
+
+      drawing.add_drawing_object(drawing_type, dimensions, shape[:name], shape)
+    end
+
+    #
+    # Re-size connector shapes if they are connected to other shapes.
+    #
+    def auto_locate_connectors(shape)
+      # Valid connector shapes.
+      connector_shapes = {
+        :straightConnector => 1,
+        :Connector         => 1,
+        :bentConnector     => 1,
+        :curvedConnector   => 1,
+        :line              => 1
+      }
+
+      shape_base = shape[:type].chop
+      shape[:connect] = connector_shapes[shape_base] ? 1 : 0
+      return unless shape[:connect] == 0
+
+      # Both ends have to be connected to size it.
+      return if shape[:start] == 0 and shape[:end] == 0
+
+      # Both ends need to provide info about where to connect.
+      return if shape[:start_side] == 0 and shape[:end_side] == 0
+
+      sid = shape[:start]
+      eid = shape[:end]
+
+      slink_id = @shape_hash[sid] || 0
+      sls      = @shapes.fetch(slink_id, Hash.new(0))
+      elink_id = @shape_hash[eid] || 0
+      els      = @shapes.fetch(elink_id, Hash.new(0))
+
+      # Assume shape connections are to the middle of an object, and
+      # not a corner (for now).
+      connect_type = shape[:start_side] + shape[:end_side]
+      smidx        = sls[:x_offset] + sls[:width] / 2
+      emidx        = els[:x_offset] + els[:width] / 2
+      smidy        = sls[:y_offset] + sls[:height] / 2
+      emidy        = els[:y_offset] + els[:height] / 2
+      netx         = (smidx - emidx).abs
+      nety         = (smidy - emidy).abs
+
+      if connect_type == 'bt'
+        sy = sls[:y_offset] + sls[:height]
+        ey = els[:y_offset]
+
+        shape[:width] = (emidx = smidx).to_i.abs
+        shape[:x_offset] = [smidx, emidx].min.to_i
+        shape[:height] =
+          (els[:y_offset] - (sls[:y_offset] + sls[:height])).to_i
+        shape[:y_offset] =
+          [sls[:y_offset] + sls[:height], els[:y_offset]].min.to_i
+        shape[:flip_h] = smidx < emidx ? 1 : 0
+        shape[:rotation] = 90
+
+        if (sy > ey) && (smidx < emidx) ? 1 : 0
+          shape[:flip_v] = 1
+
+          # Create 3 adjustments for an end shape vertically above a
+          # start shape. Adjustments count from the upper left object.
+          if shape[:adjustments] < 0
+            shape[:adjustments] = [-10, 50, 110]
+          end
+          shape[:type] = 'bentConnector5'
+        end
+      elsif connect_type == 'rl'
+        shape[:widht] =
+          (els[:x_offset] - (sls[:x_offset] - sls[:width]).to_i).abs
+        shape[:height] = (emidy - smidy).to_i.abs
+        shape[:x_offset] =
+          [sls[:x_offset] + sls[:width], els[:x_offset]].min
+        shape[:y_offset] = [smidy, emidy].min
+        shape[:flip_v] = smidy > emidy
+
+        if smidx > emidx
+          # Create 3 adjustments for an end shape to the left of a
+          # start shape.
+          if shape[:adjustments] < 0
+            shape[:adjustments] = [-10, 50, 110]
+          end
+          shape[:type] = 'bentConnector5'
+        end
+      end
+    end
+
+    #
+    # Check shape attributes to ensure they are valid.
+    #
+    def validate_shape(shape, index)
+      unless %w[l ctr r just].include?(shape[:align])
+        raise "Shape #{index} (#{shape[:type]}) alignment (#{shape[:align]}) not in ['l', 'ctr', 'r', 'just']\n"
+      end
+
+      unless %w[t ctr b].include?(shape[:valign])
+        raise "Shape #{index} (#{shape[:type]}) vertical alignment (#{shape[:valign]}) not in ['t', 'ctr', 'v']\n"
+      end
+    end
 
     #
     # Based on the algorithm provided by Daniel Rentz of OpenOffice.
