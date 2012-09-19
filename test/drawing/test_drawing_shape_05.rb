@@ -14,7 +14,7 @@ class DrawingShape05 < Test::Unit::TestCase
 
   def test_drawing_shape_05
     shape = Writexlsx::Shape.new
-    shape[:_id]      = 1000
+    shape[:id]      = 1000
     shape[:flip_v]   = 1
     shape[:flip_h]   = 1
     shape[:rotation] = 90

@@ -13,7 +13,7 @@ class DrawingShape04 < Test::Unit::TestCase
   end
 
   def test_drawing_shape_04
-    shape = Writexlsx::Shape.new(:text => 'test', :_id => 1000)
+    shape = Writexlsx::Shape.new(:text => 'test', :id => 1000)
 
     # Mock up the color palette.
     shape[:palette][0] = [0x00, 0x00, 0x00, 0x00]

@@ -5107,7 +5107,7 @@ module Writexlsx
 
       # Assign a shape ID.
       while true
-        id = shape[:_id] || 0
+        id = shape[:id] || 0
         used = @shape_hash[id]
 
         # Test if shape ID is already used. Otherwise assign a new one.
@@ -5115,7 +5115,7 @@ module Writexlsx
           break
         else
           @last_shape_id += 1
-          shape[:_id] = @last_shape_id
+          shape[:id] = @last_shape_id
         end
       end
 
@@ -5125,7 +5125,7 @@ module Writexlsx
       shape[:element] = @shapes.size + 1
 
       # Allow lookup of entry into shape array by shape ID.
-      @shape_hash[shape[:_id]] = shape[:element]
+      @shape_hash[shape[:id]] = shape[:element]
 
       # Create link to Worksheet color palette.
       shape[:palette] = @workbook.palette

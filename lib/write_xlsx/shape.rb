@@ -31,7 +31,7 @@ module Writexlsx
       @editAs = ''
 
       # Auto-incremented, unless supplied by user.
-      @_id = 0
+      @id = 0
 
       # Shape text (usually centered on shape geometry).
       @text = 0

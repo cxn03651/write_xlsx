@@ -436,7 +436,7 @@ module Writexlsx
       @writer.tag_elements('xdr:nvCxnSpPr') do
 
         shape[:name] = [shape[:type], index].join(' ') unless shape[:name]
-        write_c_nv_pr(shape[:_id], shape[:name])
+        write_c_nv_pr(shape[:id], shape[:name])
 
         @writer.tag_elements('xdr:cNvCxnSpPr') do
 
@@ -464,7 +464,7 @@ module Writexlsx
 
       @writer.tag_elements('xdr:nvSpPr') do
         shape_name = "#{shape[:type]} #{index}"
-        write_c_nv_pr(shape[:_id], shape_name)
+        write_c_nv_pr(shape[:id], shape_name)
         attributes = ['txBox', 1] if shape[:tx_box] != 0
         @writer.tag_elements('xdr:cNvSpPr', attributes) do
           attributes = [:noChangeArrowheads, '1']
