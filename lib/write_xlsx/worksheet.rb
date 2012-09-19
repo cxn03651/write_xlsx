@@ -299,7 +299,7 @@ module Writexlsx
     end
 
     attr_reader :index # :nodoc:
-    attr_reader :charts, :images, :drawing # :nodoc:
+    attr_reader :charts, :images, :shapes, :drawing # :nodoc:
     attr_reader :external_hyper_links, :external_drawing_links # :nodoc:
     attr_reader :external_comment_links, :drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
@@ -2728,7 +2728,7 @@ module Writexlsx
     #
     def sort_charts
       return if @charts.size < 2
-      @charts = @charts.sort {|a, b| a[2][:_id] <=> b[2][:_id]}
+      @charts = @charts.sort {|a, b| a[2].id <=> b[2].id}
     end
 
     #
@@ -4250,7 +4250,7 @@ module Writexlsx
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml" ]
       else
-        @drawing.add_drawing_object(drawing_type, dimensions)
+        @drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name)
       end
       @drawing_links << ['/chart', "../charts/chart#{chart_id}.xml"]
     end
@@ -4374,7 +4374,7 @@ module Writexlsx
 
       # The following is only required for positioning drawing/chart objects
       # and not comments. It is probably the result of a bug.
-      if is_drawing
+      if is_drawing && is_drawing != 0
         col_end -= 1 if width == 0
         row_end -= 1 if height == 0
       end
@@ -5128,7 +5128,7 @@ module Writexlsx
       @shape_hash[shape[:_id]] = shape[:element]
 
       # Create link to Worksheet color palette.
-      shape[:palette] = @palette
+      shape[:palette] = @workbook.palette
 
       if shape[:stencil]
         # Insert a copy of the shape, not a reference so that the shape is
@@ -5180,6 +5180,7 @@ module Writexlsx
 
       drawing.add_drawing_object(drawing_type, dimensions, shape[:name], shape)
     end
+    public :prepare_shape
 
     #
     # Re-size connector shapes if they are connected to other shapes.
@@ -5240,7 +5241,7 @@ module Writexlsx
 
           # Create 3 adjustments for an end shape vertically above a
           # start shape. Adjustments count from the upper left object.
-          if shape[:adjustments] < 0
+          if shape[:adjustments].empty?
             shape[:adjustments] = [-10, 50, 110]
           end
           shape[:type] = 'bentConnector5'

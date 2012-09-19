@@ -127,11 +127,16 @@ module Writexlsx
       properties.each do |key, value|
         # Strip leading "-" from Tk style properties e.g. -color => 'red'.
         k = key.to_s.sub(/^-/, '')
-        if value.respond_to?(:coerce)
+        self.instance_variable_set("@#{key}", value)
+=begin
+           if key.to_s == 'format'
+          @format = value
+        elsif value.respond_to?(:coerce)
           eval "@#{k} = #{value}"
         else
           eval "@#{k} = %!#{value}!"
         end
+=end
       end
     end
 

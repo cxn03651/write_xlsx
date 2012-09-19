@@ -4,6 +4,7 @@ require 'write_xlsx/package/packager'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
 require 'write_xlsx/format'
+require 'write_xlsx/shape'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart'
 require 'write_xlsx/zip_file_utils'
@@ -367,6 +368,8 @@ module Writexlsx
 
       # If the chart isn't embedded let the workbook control it.
       if embedded && embedded != 0
+        chart.name = params[:name] if params[:name]
+
         # Set index to 0 so that the activate() and set_first_sheet() methods
         # point back to the first worksheet if used for embedded charts.
         chart.index = 0
@@ -412,6 +415,18 @@ module Writexlsx
       @formats.push(format)    # Store format reference
 
       format
+    end
+
+    #
+    # Add a new shape to the Excel workbook.
+    #
+    def add_shape(properties)
+      shape = Shape.new(properties)
+      shape[:palette] = @palette
+
+      @shapes ||= []
+      @shapes << shape  #Store shape reference.
+      shape
     end
 
     #
@@ -1418,7 +1433,10 @@ module Writexlsx
       @worksheets.each do |sheet|
         chart_count = sheet.charts.size
         image_count = sheet.images.size
-        next if chart_count + image_count == 0
+        shape_count = sheet.shapes.size
+        next if chart_count + image_count + shape_count == 0
+
+        sheet.sort_charts
 
         drawing_id += 1
 
@@ -1435,6 +1453,10 @@ module Writexlsx
           image_ref_id += 1
 
           sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type)
+        end
+
+        (0..shape_count - 1).each do |index|
+          sheet.prepare_shape(index, drawing_id)
         end
 
         drawing = sheet.drawing

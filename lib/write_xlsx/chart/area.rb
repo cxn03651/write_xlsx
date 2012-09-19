@@ -22,6 +22,7 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
+        @subtype = subtype || 'standard'
         @cross_between = 'midCat'
       end
 
@@ -37,12 +38,35 @@ module Writexlsx
       # Write the <c:areaChart> element.
       #
       def write_area_chart
+        if @subtype == 'percent_stacked'
+          subtype = 'percentStacked'
+        else
+          subtype = @subtype
+        end
         @writer.tag_elements('c:areaChart') do
           # Write the c:grouping element.
-          write_grouping('standard')
+          write_grouping(subtype)
           # Write the series elements.
           write_series
         end
+      end
+
+      #
+      # Over-ridden to add % format. TODO. This will be refactored back up to the
+      # SUPER class later.
+      #
+      # Write the <C:numFmt> element.
+      #
+      def write_number_format(format_code = nil)
+        source_linked = 1
+        format_code = 'General' if !format_code || format_code.empty?
+        format_code = '0%' if @subtype == 'percent_stacked'
+
+        attributes = [
+                      'formatCode',   format_code,
+                      'sourceLinked', source_linked
+                     ]
+        @writer.empty_tag('c:numFmt', attributes)
       end
     end
   end

@@ -484,7 +484,8 @@ module Writexlsx
         write_blip_fill(index)
 
         # Pictures are rectangle shapes by default.
-        shape = {:type => 'rect'}
+        shape = Shape.new
+        shape[:type] = 'rect'
 
         # Write the xdr:spPr element.
         write_sp_pr(col_absolute, row_absolute, width, height, shape)
@@ -657,7 +658,6 @@ module Writexlsx
     # Write the <a:prstGeom> element.
     #
     def write_a_prst_geom(shape = {})
-
       attributes = []
       attributes << 'prst' << shape[:type] if shape[:type]
 
@@ -769,8 +769,8 @@ module Writexlsx
 
             bold      = shape[:format][:bold]      || 0
             italic    = shape[:format][:italic]    || 0
-            underline = shape[:format][:underline] ? 'sng' : 'none'
-            strike    = shape[:format][:font_strikeout] ? 'Strike' : 'noStrike'
+            underline = shape[:format][:underline] && shape[:format][:underline] != 0 ? 'sng' : 'none'
+            strike    = shape[:format][:font_strikeout] && shape[:format][:font_strikeout] != 0 ? 'Strike' : 'noStrike'
 
             attributes = [
                           :lang,     "en-US",

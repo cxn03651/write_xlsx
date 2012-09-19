@@ -432,7 +432,7 @@ module Writexlsx
   class Chart
     include Writexlsx::Utility
 
-    attr_accessor :id   # :nodoc:
+    attr_accessor :id, :name   # :nodoc:
     attr_writer :index, :palette   # :nodoc:
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
 
@@ -488,7 +488,7 @@ module Writexlsx
       @protection        = 0
       @x_axis            = {}
       @y_axis            = {}
-      @chart_name        = ''
+      @name              = ''
 
       set_default_properties
     end
@@ -1031,10 +1031,6 @@ module Writexlsx
         # Write the series elements.
         write_series
       end
-    end
-
-    def name
-      @chart_name
     end
 
     private

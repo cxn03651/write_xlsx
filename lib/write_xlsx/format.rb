@@ -167,6 +167,8 @@ module Writexlsx
     attr_accessor :fill_index, :font_condense, :font_extend, :diag_border   # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern   # :nodoc:
 
+    attr_reader :rotation, :bold, :italic, :font_strikeout
+
     def initialize(xf_format_indices = {}, dxf_format_indices = {}, params = {})   # :nodoc:
       @xf_format_indices = xf_format_indices
       @dxf_format_indices = dxf_format_indices
@@ -704,6 +706,10 @@ module Writexlsx
 
     def has_dxf_fill?
       @has_dxf_fill
+    end
+
+    def [](attr)
+      self.instance_variable_get("@#{attr}")
     end
   end
 end

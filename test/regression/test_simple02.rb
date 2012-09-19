@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestSimple02 < Test::Unit::TestCase
+class TestRegressionSimple02 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
