@@ -5197,7 +5197,7 @@ module Writexlsx
 
       shape_base = shape[:type].chop
       shape[:connect] = connector_shapes[shape_base] ? 1 : 0
-      return unless shape[:connect] == 0
+      return if shape[:connect] == 0
 
       # Both ends have to be connected to size it.
       return if shape[:start] == 0 and shape[:end] == 0
