@@ -5194,7 +5194,7 @@ module Writexlsx
         :line              => 1
       }
 
-      shape_base = shape[:type].chop
+      shape_base = shape[:type].chop.to_sym # Remove the number of segments from end of type.
       shape[:connect] = connector_shapes[shape_base] ? 1 : 0
       return if shape[:connect] == 0
 
