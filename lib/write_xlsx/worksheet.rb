@@ -5119,10 +5119,7 @@ module Writexlsx
         end
       end
 
-      # For connectors change x/y coords based on location of connected shapes.
-      auto_locate_connectors(shape)
-
-      shape[:element] = @shapes.size + 1
+      shape[:element] = @shapes.size
 
       # Allow lookup of entry into shape array by shape ID.
       @shape_hash[shape[:id]] = shape[:element]
@@ -5135,6 +5132,8 @@ module Writexlsx
         # used as a stencil. Previously stamped copies don't get modified
         # if the stencil is modified.
         insert = shape.dup
+
+        # For connectors change x/y coords based on location of connected shapes.
         auto_locate_connectors(insert)
 
         @shapes << insert
@@ -5227,7 +5226,7 @@ module Writexlsx
         sy = sls[:y_offset] + sls[:height]
         ey = els[:y_offset]
 
-        shape[:width] = (emidx = smidx).to_i.abs
+        shape[:width] = (emidx - smidx).to_i.abs
         shape[:x_offset] = [smidx, emidx].min.to_i
         shape[:height] =
           (els[:y_offset] - (sls[:y_offset] + sls[:height])).to_i
@@ -5236,7 +5235,7 @@ module Writexlsx
         shape[:flip_h] = smidx < emidx ? 1 : 0
         shape[:rotation] = 90
 
-        if (sy > ey) && (smidx < emidx) ? 1 : 0
+        if sy > ey
           shape[:flip_v] = 1
 
           # Create 3 adjustments for an end shape vertically above a
