@@ -5161,7 +5161,7 @@ module Writexlsx
       unless drawing?
         @drawing = Drawing.new
         @drawing.embedded = 1
-        @external_drawing_links << ['/drawing', '../drawings/drawing', "#{drawing_id}.xml"]
+        @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
       end
 
       # Validate the he shape against various rules.
