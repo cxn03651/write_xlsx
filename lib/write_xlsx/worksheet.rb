@@ -5246,18 +5246,20 @@ module Writexlsx
           shape[:type] = 'bentConnector5'
         end
       elsif connect_type == 'rl'
-        shape[:widht] =
-          (els[:x_offset] - (sls[:x_offset] - sls[:width]).to_i).abs
+        shape[:width] =
+          (els[:x_offset] - (sls[:x_offset] + sls[:width])).to_i.abs
         shape[:height] = (emidy - smidy).to_i.abs
         shape[:x_offset] =
           [sls[:x_offset] + sls[:width], els[:x_offset]].min
         shape[:y_offset] = [smidy, emidy].min
-        shape[:flip_v] = smidy > emidy
+
+        shape[:flip_h] = 1 if smidx < emidx && smidy > emidy
+        shape[:flip_v] = 1 if smidy > emidy && smidy < emidy
 
         if smidx > emidx
           # Create 3 adjustments for an end shape to the left of a
           # start shape.
-          if shape[:adjustments] < 0
+          if shape[:adjustments].empty?
             shape[:adjustments] = [-10, 50, 110]
           end
           shape[:type] = 'bentConnector5'
