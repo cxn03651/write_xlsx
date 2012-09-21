@@ -5254,7 +5254,7 @@ module Writexlsx
         shape[:y_offset] = [smidy, emidy].min
 
         shape[:flip_h] = 1 if smidx < emidx && smidy > emidy
-        shape[:flip_v] = 1 if smidy > emidy && smidy < emidy
+        shape[:flip_h] = 1 if smidx > emidx && smidy < emidy
 
         if smidx > emidx
           # Create 3 adjustments for an end shape to the left of a
