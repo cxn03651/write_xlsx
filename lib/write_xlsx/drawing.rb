@@ -671,8 +671,15 @@ module Writexlsx
     # Write the <a:avLst> element.
     #
     def write_a_av_lst(shape = {})
-      adjustments = shape[:adjustments] || []
-      if adjustments && !adjustments.empty?
+      if shape[:adjustments].respond_to?(:empty?)
+        adjustments = shape[:adjustments]
+      elsif shape[:adjustments].respond_to?(:coerce)
+        adjustments = [shape[:adjustments]]
+      elsif !shape[:adjustments]
+        adjustments = []
+      end
+
+      if adjustments.respond_to?(:empty?) && !adjustments.empty?
         @writer.tag_elements('a:avLst') do
           i = 0
           adjustments.each do |adj|
