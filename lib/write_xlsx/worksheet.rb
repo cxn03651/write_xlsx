@@ -4982,8 +4982,8 @@ module Writexlsx
 
       # Now that x2/y2 have been calculated with a potentially negative
       # width/height we use the absolute value and convert to EMUs.
-      shape[:width_emu]  = (shape[:width]  * 9_525).abs
-      shape[:height_emu] = (shape[:height] * 9_525).abs
+      shape[:width_emu]  = (shape[:width]  * 9_525).abs.to_i
+      shape[:height_emu] = (shape[:height] * 9_525).abs.to_i
 
       shape[:column_start] = col_start.to_i
       shape[:row_start]    = row_start.to_i
