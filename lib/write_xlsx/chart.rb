@@ -1390,20 +1390,22 @@ module Writexlsx
     def get_labels_properties(labels) # :nodoc:
       return nil unless labels
 
-      # Map user defined label positions to Excel positions.
-      if position = labels[:position]
-
+      position = labels[:position]
+      if position.nil? || position.empty?
+        labels.delete(:position)
+      else
+        # Map user defined label positions to Excel positions.
         positions = {
-            :center      => 'ctr',
-            :right       => 'r',
-            :left        => 'l',
-            :top         => 't',
-            :above       => 't',
-            :bottom      => 'b',
-            :below       => 'b',
-            :inside_end  => 'inEnd',
-            :outside_end => 'outEnd',
-            :best_fit    => 'bestFit'
+          :center      => 'ctr',
+          :right       => 'r',
+          :left        => 'l',
+          :top         => 't',
+          :above       => 't',
+          :bottom      => 'b',
+          :below       => 'b',
+          :inside_end  => 'inEnd',
+          :outside_end => 'outEnd',
+          :best_fit    => 'bestFit'
         }
 
         if positions[position.to_sym]
@@ -1413,7 +1415,7 @@ module Writexlsx
         end
       end
 
-      return labels
+      labels
     end
 
     #
