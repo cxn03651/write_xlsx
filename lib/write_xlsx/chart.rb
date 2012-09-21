@@ -489,6 +489,8 @@ module Writexlsx
       @x_axis            = {}
       @y_axis            = {}
       @name              = ''
+      @show_blanks       = 'gap'
+      @show_hidden_data  = false
 
       set_default_properties
     end
@@ -989,6 +991,36 @@ module Writexlsx
     def set_style(style_id = 2)
       style_id = 2 if style_id < 0 || style_id > 42
       @style_id = style_id
+    end
+
+    #
+    # Set the option for displaying blank data in a chart. The default is 'gap'.
+    #
+    # The show_blanks_as method controls how blank data is displayed in a chart.
+    #
+    #    chart.show_blanks_as('span')
+    #
+    # The available options are:
+    #
+    #        gap    # Blank data is show as a gap. The default.
+    #        zero   # Blank data is displayed as zero.
+    #        span   # Blank data is connected with a line.
+    #
+    def show_blanks_as(option)
+      return unless option
+
+      unless [:gap, :zero, :span].include?(option)
+        raise "Unknown show_blanks_as() option '#{option}'\n"
+      end
+
+      @show_blanks = option
+    end
+
+    #
+    # Display data in hidden rows or columns on the chart.
+    #
+    def show_hidden_data
+      @show_hidden_data = true
     end
 
     #
@@ -1528,7 +1560,24 @@ module Writexlsx
         write_legend
         # Write the c:plotVisOnly element.
         write_plot_vis_only
+
+        # Write the c:dispBlanksAs element.
+        write_disp_blanks_as
       end
+    end
+
+    #
+    # Write the <c:dispBlanksAs> element.
+    #
+    def write_disp_blanks_as
+      val = @show_blanks
+
+      # Ignore the default value.
+      return if val == 'gap'
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:dispBlanksAs', attributes)
     end
 
     #
@@ -2267,6 +2316,9 @@ module Writexlsx
     #
     def write_plot_vis_only # :nodoc:
       val  = 1
+
+      # Ignore this element if we are plitting hidden data.
+      return if @show_hidden_data
 
       attributes = ['val', val]
 

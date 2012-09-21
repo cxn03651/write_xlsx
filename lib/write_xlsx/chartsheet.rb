@@ -118,6 +118,14 @@ module Writexlsx
       @chart.set_style(*args)
     end
 
+    def show_blanks_as(*args)
+      @chart.set_blanks_as(*args)
+    end
+
+    def show_hidden_data(*args)
+      @chart.show_hidden_data(*args)
+    end
+
     #
     # Set up chart/drawings.
     #
