@@ -5229,7 +5229,7 @@ module Writexlsx
         shape[:width] = (emidx - smidx).to_i.abs
         shape[:x_offset] = [smidx, emidx].min.to_i
         shape[:height] =
-          (els[:y_offset] - (sls[:y_offset] + sls[:height])).to_i
+          (els[:y_offset] - (sls[:y_offset] + sls[:height])).to_i.abs
         shape[:y_offset] =
           [sls[:y_offset] + sls[:height], els[:y_offset]].min.to_i
         shape[:flip_h] = smidx < emidx ? 1 : 0
