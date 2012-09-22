@@ -279,6 +279,13 @@ module Writexlsx
         bg_color   = format.bg_color
         fg_color   = format.fg_color
 
+        # Colors for dxf formats are handled differently from normal formats since
+        # the normal format reverses the meaning of BG and FG for solid fills.
+        if dxf_format && dxf_format != 0
+          bg_color = format.dxf_bg_color
+          fg_color = format.dxf_fg_color
+        end
+
         patterns = %w(
           none
           solid
@@ -310,12 +317,12 @@ module Writexlsx
           end
 
           @writer.tag_elements('patternFill', attributes) do
-            unless fg_color == 0
+            if fg_color && fg_color != 0
               fg_color = get_palette_color(fg_color)
               @writer.empty_tag('fgColor', ['rgb', fg_color])
             end
 
-            if bg_color != 0
+            if bg_color && bg_color != 0
               bg_color = get_palette_color(bg_color)
               @writer.empty_tag('bgColor', ['rgb', bg_color])
             else

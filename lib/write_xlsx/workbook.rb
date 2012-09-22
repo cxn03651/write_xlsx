@@ -1159,6 +1159,15 @@ module Writexlsx
       fills['0:0:0']  = 0
       fills['17:0:0'] = 1
 
+      # Store the DXF colors separately since them may be reversed below.
+      @dxf_formats.each do |format|
+        if  format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
+          format.has_dxf_fill(true)
+          format.dxf_bg_color = format.bg_color
+          format.dxf_fg_color = format.fg_color
+        end
+      end
+
       @xf_formats.each do |format|
         # The following logical statements jointly take care of special cases
         # in relation to cell colours and patterns:
@@ -1168,13 +1177,17 @@ module Writexlsx
         #    a pattern they probably wanted a solid fill, so we fill in the
         #    defaults.
         #
-        if format.pattern <= 1 && format.bg_color != 0 && format.fg_color == 0
+        if format.pattern == 1 && format.bg_color.to_i != 0 && format.fg_color.to_i != 0
+          format.fg_color, format.bg_color = format.bg_color, format.fg_color
+        end
+
+        if format.pattern <= 1 && format.bg_color.to_i != 0 && format.fg_color.to_i == 0
           format.fg_color = format.bg_color
           format.bg_color = 0
           format.pattern  = 1
         end
 
-        if format.pattern <= 1 && format.bg_color == 0 && format.fg_color != 0
+        if format.pattern <= 1 && format.bg_color.to_i == 0 && format.fg_color.to_i != 0
           format.bg_color = 0
           format.pattern  = 1
         end
@@ -1195,11 +1208,6 @@ module Writexlsx
       end
 
       @fill_count = index
-
-      # For the DXF formats we only need to check if the properties have changed.
-      @dxf_formats.each do |format|
-        format.has_dxf_fill(true) if format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
-      end
     end
 
     #
