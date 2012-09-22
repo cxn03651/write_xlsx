@@ -119,7 +119,7 @@ module Writexlsx
     end
 
     def show_blanks_as(*args)
-      @chart.set_blanks_as(*args)
+      @chart.show_blanks_as(*args)
     end
 
     def show_hidden_data(*args)
