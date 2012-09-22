@@ -1009,7 +1009,7 @@ module Writexlsx
     def show_blanks_as(option)
       return unless option
 
-      unless [:gap, :zero, :span].include?(option)
+      unless [:gap, :zero, :span].include?(option.to_sym)
         raise "Unknown show_blanks_as() option '#{option}'\n"
       end
 
