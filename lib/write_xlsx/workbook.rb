@@ -1177,17 +1177,17 @@ module Writexlsx
         #    a pattern they probably wanted a solid fill, so we fill in the
         #    defaults.
         #
-        if format.pattern == 1 && format.bg_color.to_i != 0 && format.fg_color.to_i != 0
+        if format.pattern == 1 && ne_0?(format.bg_color) && ne_0?(format.fg_color)
           format.fg_color, format.bg_color = format.bg_color, format.fg_color
         end
 
-        if format.pattern <= 1 && format.bg_color.to_i != 0 && format.fg_color.to_i == 0
+        if format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
           format.fg_color = format.bg_color
           format.bg_color = 0
           format.pattern  = 1
         end
 
-        if format.pattern <= 1 && format.bg_color.to_i == 0 && format.fg_color.to_i != 0
+        if format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
           format.bg_color = 0
           format.pattern  = 1
         end
@@ -1208,6 +1208,16 @@ module Writexlsx
       end
 
       @fill_count = index
+    end
+
+    def eq_0?(val)
+      return true if val.respond_to?(:coerce) && val == 0
+      return true if val == '0'
+      false
+    end
+
+    def ne_0?(val)
+      !eq_0?(val)
     end
 
     #
