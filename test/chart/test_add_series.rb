@@ -21,7 +21,9 @@ class TestAddSeries < Test::Unit::TestCase
       :_marker        => nil,
       :_trendline     => nil,
       :_labels        => nil,
-      :_invert_if_neg => nil
+      :_invert_if_neg => nil,
+      :_x2_axis       => nil,
+      :_y2_axis       => nil
     }
 
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
@@ -45,7 +47,9 @@ class TestAddSeries < Test::Unit::TestCase
                   :_marker       => nil,
                   :_trendline    => nil,
                   :_labels        => nil,
-                  :_invert_if_neg => nil
+                  :_invert_if_neg => nil,
+                  :_x2_axis       => nil,
+                  :_y2_axis       => nil
                 }
                ]
 
@@ -74,7 +78,9 @@ class TestAddSeries < Test::Unit::TestCase
                   :_marker       => nil,
                   :_trendline    => nil,
                   :_labels       => nil,
-                  :_invert_if_neg => nil
+                  :_invert_if_neg => nil,
+                  :_x2_axis       => nil,
+                  :_y2_axis       => nil
                 }
                ]
 
@@ -98,7 +104,9 @@ class TestAddSeries < Test::Unit::TestCase
       :_marker       => nil,
       :_trendline    => nil,
       :_labels       => nil,
-      :_invert_if_neg => nil
+      :_invert_if_neg => nil,
+      :_x2_axis       => nil,
+      :_y2_axis       => nil
     }
 
     @chart.add_series(
