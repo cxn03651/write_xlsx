@@ -3345,7 +3345,7 @@ module Writexlsx
     #
     def add_table(*args)
       user_range = ''
-      my @col_formats
+      col_formats = []
 =begin
       # We would need to order the write statements very carefully within this
       # function to support optimisation mode. Disable add_table() when it is
@@ -3362,8 +3362,8 @@ module Writexlsx
       raise "Not enough parameters to add_table()" if [row1, col1, row2, col2].include?(nil)
 
       # Check that row and col are valid without storing the values.
-      check_dimensions( row1, col1, 1, 1 )
-      check_dimensions( row2, col2, 1, 1 )
+      check_dimensions_and_update_max_min_values(row1, col1, 1, 1)
+      check_dimensions_and_update_max_min_values(row2, col2, 1, 1)
 
       # The final hashref contains the validation parameters.
       param ||= {}
@@ -3391,9 +3391,10 @@ module Writexlsx
       end
 
       # Table count is a member of Workbook, global to all Worksheet.
-      @table_count += 1
+      @workbook.table_count += 1
       table = {}
-      table[:id] = @table_count
+      table[:_columns] = []
+      table[:id] = @workbook.table_count
 
       # Turn on Excel's defaults.
       param[:banded_rows] ||= 1
@@ -3401,12 +3402,12 @@ module Writexlsx
       param[:autofilter]  ||= 1
 
       # Set the table options.
-      table[:_show_first_col]   = param[:first_column]   ? 1 : 0
-      table[:_show_last_col]    = param[:last_column]    ? 1 : 0
-      table[:_show_row_stripes] = param[:banded_rows]    ? 1 : 0
-      table[:_show_col_stripes] = param[:banded_columns] ? 1 : 0
-      table[:_header_row_count] = param[:header_row]     ? 1 : 0
-      table[:_totals_row_shown] = param[:total_row]      ? 1 : 0
+      table[:_show_first_col]   = param[:first_column]   && param[:first_column] != 0   ? 1 : 0
+      table[:_show_last_col]    = param[:last_column]    && param[:last_column] != 0 ? 1 : 0
+      table[:_show_row_stripes] = param[:banded_rows]    && param[:banded_rows] != 0 ? 1 : 0
+      table[:_show_col_stripes] = param[:banded_columns] && param[:banded_columns] != 0 ? 1 : 0
+      table[:_header_row_count] = param[:header_row]     && param[:header_row] != 0 ? 1 : 0
+      table[:_totals_row_shown] = param[:total_row]      && param[:total_row] != 0 ? 1 : 0
 
       # Set the table name.
       if param[:name]
@@ -3432,7 +3433,7 @@ module Writexlsx
       # Set the data range rows (without the header and footer).
       first_data_row = row1
       last_data_row  = row2
-      first_data_row += 1 if param[:header_row]
+      first_data_row += 1 if param[:header_row] != 0
       last_data_row  -= 1 if param[:total_row]
 
       # Set the table and autofilter ranges.
@@ -3440,10 +3441,12 @@ module Writexlsx
       table[:_a_range] = xl_range(row1, last_data_row, col1, col2)
 
       # If the header row if off the default is to turn autofilter off.
-      param[:autofilter] = 0 unless param[:header_row]
+      param[:autofilter] = 0 if param[:header_row] == 0
 
       # Set the autofilter range.
-      table[:_autofilter] = table[:_a_range] if param[:autofilter]
+      if param[:autofilter] && param[:autofilter] != 0
+        table[:_autofilter] = table[:_a_range]
+      end
 
       # Add the table columns.
       col_id = 1
@@ -3463,14 +3466,16 @@ module Writexlsx
           # Check if there are user defined values for this column.
           if user_data = param[:columns][col_id - 1]
             # Map user defined values to internal values.
-            col_data[:_name] = user_data[:header] if user_data[:header]
+            if user_data[:header] && !user_data[:header].empty?
+              col_data[:_name] = user_data[:header]
+            end
             # Handle the column formula.
             if user_data[:formula]
               formula = user_data[:formula]
               # Remove the leading = from formula.
               formula.sub!(/^=/, '')
               # Covert Excel 2010 "@" ref to 2007 "#This Row".
-              formula.gsub!(/@/,'[#This Row]')
+              formula.gsub!(/@/,'[#This Row],')
 
               col_data[:_formula] = formula
 
@@ -4673,7 +4678,7 @@ module Writexlsx
 
       if subtotals[function.to_sym]
         func_num = subtotals[function.to_sym]
-        formula = qq{SUBTOTAL(func_num,[col_name])}
+        formula = %Q{SUBTOTAL(#{func_num},[#{col_name}])}
       else
         raise "Unsupported function '#{function}' in add_table()"
       end
@@ -6869,7 +6874,7 @@ module Writexlsx
 
     #
     # Check that row and col are valid and store max and min values for use in
-    # DIMENSIONS record. See, store_dimensions().
+    # other methods/elements.
     #
     # The ignore_row/ignore_col flags is used to indicate that we wish to
     # perform the dimension check without storing the value.
