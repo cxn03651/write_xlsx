@@ -37,9 +37,9 @@ module Writexlsx
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params)
         # Write the c:barChart element.
-        write_bar_chart
+        write_bar_chart(params)
       end
 
       #
@@ -51,16 +51,6 @@ module Writexlsx
         attributes = ['val', val]
 
         @writer.empty_tag('c:barDir', attributes)
-      end
-
-
-      #
-      # Over-ridden to add c:overlap.
-      #
-      # Write the series elements.
-      #
-      def write_series
-        write_series_base {write_overlap if @subtype =~ /stacked/}
       end
 
       #

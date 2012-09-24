@@ -23,7 +23,7 @@ module Writexlsx
     attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
     attr_reader :doc_properties
     attr_reader :image_types, :images
-    attr_reader :shared_strings
+    attr_reader :shared_strings, :table_count
 
     #
     # A new Excel workbook is created using the new() constructor which accepts either a filename
@@ -105,6 +105,7 @@ module Writexlsx
       @window_width        = 16095
       @window_height       = 9660
       @tab_ratio           = 500
+      @table_count         = 0
       @image_types         = {}
       @images              = []
       @images_seen         = {}
@@ -1278,6 +1279,7 @@ module Writexlsx
         next unless sheet.has_comments?
 
         comment_id += 1
+        sheet.set_external_vml_links(comment_id)
         sheet.set_external_comment_links(comment_id)
         sheet.set_vml_data_id(vml_data_id)
         sheet.vml_shape_id = vml_shape_id

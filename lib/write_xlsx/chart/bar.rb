@@ -26,17 +26,26 @@ module Writexlsx
         @val_axis_position = 'b'
         @horiz_val_axis    = 0
         @horiz_cat_axis    = 1
+        @show_crosses      = false
       end
 
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
-        # Reverse X and Y axes for Bar charts.
-        @x_axis, @y_axis = @y_axis, @x_axis
+      def write_chart_type(params)
+        if params[:primary_axes] != 0
+          ## Reverse X and Y axes for Bar charts.
+          @y_axis, @x_axis = @x_axis, @y_axis
+          if !@y_axis[:_major_gridlines]
+            @y_axis[:_major_gridlines] = {:show => 1}
+          end
+          if @y2_axis[:_position] == 'r'
+            @y2_axis[:_position] = 't'
+          end
+        end
 
         # Write the c:barChart element.
-        write_bar_chart
+        write_bar_chart(params)
       end
 
       #
@@ -49,16 +58,6 @@ module Writexlsx
 
         @writer.empty_tag('c:barDir', attributes)
       end
-
-      #
-      # Over-ridden to add c:overlap.
-      #
-      # Write the series elements.
-      #
-      def write_series
-        write_series_base {write_overlap if @subtype =~ /stacked/}
-      end
-
 
       #
       # Over-ridden to add % format. TODO. This will be refactored back up to the

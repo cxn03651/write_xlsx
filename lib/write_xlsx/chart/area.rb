@@ -24,20 +24,29 @@ module Writexlsx
         super(subtype)
         @subtype = subtype || 'standard'
         @cross_between = 'midCat'
+        @show_crosses  = false
       end
 
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params)
         # Write the c:areaChart element.
-        write_area_chart
+        write_area_chart(params)
       end
 
       #
       # Write the <c:areaChart> element.
       #
-      def write_area_chart
+      def write_area_chart(params)
+        if params[:primary_axes] != 0
+          series = get_primary_axes_series
+        else
+          series = get_secondary_axes_series
+        end
+
+        return if series.empty?
+
         if @subtype == 'percent_stacked'
           subtype = 'percentStacked'
         else
@@ -47,7 +56,13 @@ module Writexlsx
           # Write the c:grouping element.
           write_grouping(subtype)
           # Write the series elements.
-          write_series
+          series.each {|s| write_series(s)}
+
+          # Write the c:marker element.
+          write_marker_value
+
+          # Write the c:axId elements
+          write_axis_ids(params)
         end
       end
 

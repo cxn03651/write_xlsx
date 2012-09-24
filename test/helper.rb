@@ -97,7 +97,7 @@ class Test::Unit::TestCase
       # Remove dates and user specific data from the core.xml data.
       if exp_members[i].name == 'docProps/core.xml'
         if regression
-          exp_xml_str = exp_xml_str.gsub(/John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
+          exp_xml_str = exp_xml_str.gsub(/ ?John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
         else
           exp_xml_str = exp_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
         end

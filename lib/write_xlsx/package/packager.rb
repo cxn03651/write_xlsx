@@ -8,6 +8,7 @@ require 'write_xlsx/package/core'
 require 'write_xlsx/package/relationships'
 require 'write_xlsx/package/shared_strings'
 require 'write_xlsx/package/styles'
+require 'write_xlsx/package/table'
 require 'write_xlsx/package/theme'
 require 'write_xlsx/package/vml'
 
@@ -25,6 +26,7 @@ module Writexlsx
         @chartsheet_count = 0
         @chart_count      = 0
         @drawing_count    = 0
+        @table_count      = 0
         @named_ranges     = []
       end
 
@@ -63,6 +65,7 @@ module Writexlsx
         write_drawing_files
         write_vml_files
         write_comment_files
+        write_table_files
         write_shared_strings_file
         write_app_file
         write_core_file
@@ -271,6 +274,8 @@ module Writexlsx
 
         content.add_vml_name if @num_comment_files > 0
 
+        (1 .. @table_count).each { |i| content.add_table_name("table#{i}") }
+
         (1 .. @num_comment_files).each { |i| content.add_comment_name("comments#{i}") }
 
         # Add the sharedString rel if there is string data in the workbook.
@@ -323,6 +328,31 @@ module Writexlsx
 
         rels.set_xml_writer("#{@package_dir}/xl/theme/theme1.xml")
         rels.assemble_xml_file
+      end
+
+      #
+      # Write the table files.
+      #
+      def write_table_files
+        dir = @package_dir
+
+        index = 1
+        @workbook.worksheets.each do |worksheet|
+          table_props = worksheet.tables
+
+          next if table_props.empty?
+
+          FileUtils.mkdir_p("#{dir}/xl/tables")
+
+          table_props.each do |table_prop|
+            table = Package::Table.new
+
+            table.set_xml_writer("#{dir}/xl/tables/table#{index}.xml")
+            table.set_properties(table_prop)
+            table.assemble_xml_file
+            @table_count += 1
+          end
+        end
       end
 
       #
@@ -387,6 +417,8 @@ module Writexlsx
           external_links = [
             worksheet.external_hyper_links,
             worksheet.external_drawing_links,
+            worksheet.external_vml_links,
+            worksheet.external_table_links,
             worksheet.external_comment_links
           ].select {|a| a != []}
 

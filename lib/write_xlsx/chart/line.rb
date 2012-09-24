@@ -27,20 +27,34 @@ module Writexlsx
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params)
         # Write the c:barChart element.
-        write_line_chart
+        write_line_chart(params)
       end
 
       #
       # Write the <c:lineChart> element.
       #
-      def write_line_chart
+      def write_line_chart(params)
+        if params[:primary_axes] != 0
+          series = get_primary_axes_series
+        else
+          series = get_secondary_axes_series
+        end
+
+        return if series.empty?
+
         @writer.tag_elements('c:lineChart') do
           # Write the c:grouping element.
           write_grouping('standard')
           # Write the series elements.
-          write_series
+          series.each {|s| write_series(s)}
+
+          # Write the c:marker element.
+          write_marker_value
+
+          # Write the c:axId elements
+          write_axis_ids(params)
         end
       end
     end
