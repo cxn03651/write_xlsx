@@ -1517,19 +1517,17 @@ module Writexlsx
     # Returns series which use the primary axes.
     #
     def get_primary_axes_series
-      primary_axes_series = []
-      @series.each {|s| primary_axes_series << s unless s[:_y2_axis]}
-      primary_axes_series
+      @series.reject {|s| s[:_y2_axis]}
     end
+    alias :primary_axes_series :get_primary_axes_series
 
     #
     # Returns series which use the secondary axes.
     #
     def get_secondary_axes_series
-      secondary_axes_series = []
-      @series.each {|s| secondary_axes_series << s if s[:_y2_axis]}
-      secondary_axes_series
+      @series.select {|s| s[:_y2_axis]}
     end
+    alias :secondary_axes_series :get_secondary_axes_series
 
     #
     # Add a unique ids for primary or secondary axis.
