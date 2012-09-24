@@ -39,12 +39,7 @@ module Writexlsx
       # Write the <c:areaChart> element.
       #
       def write_area_chart(params)
-        if params[:primary_axes] != 0
-          series = get_primary_axes_series
-        else
-          series = get_secondary_axes_series
-        end
-
+        series = axes_series(params)
         return if series.empty?
 
         if @subtype == 'percent_stacked'

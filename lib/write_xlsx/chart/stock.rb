@@ -42,12 +42,7 @@ module Writexlsx
       # Overridden to add hi_low_lines(). TODO. Refactor up into the SUPER class
       #
       def write_stock_chart(params)
-        if params[:primary_axes] != 0
-          series = get_primary_axes_series
-        else
-          series = get_secondary_axes_series
-        end
-
+        series = axes_series(params)
         return if series.empty?
 
         # Add default formatting to the series data.

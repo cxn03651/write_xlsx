@@ -1096,12 +1096,7 @@ module Writexlsx
     # Write the <c:barChart> element.
     #
     def write_bar_chart(params)   # :nodoc:
-      if params[:primary_axes] != 0
-        series = get_primary_axes_series
-      else
-        series = get_secondary_axes_series
-      end
-
+      series = axes_series(params)
       return if series.empty?
 
       subtype = @subtype
@@ -1127,6 +1122,17 @@ module Writexlsx
     end
 
     private
+
+    #
+    # retun primary/secondary series by :primary_axes flag
+    #
+    def axes_series(params)
+      if params[:primary_axes] != 0
+        primary_axes_series
+      else
+        secondary_axes_series
+      end
+    end
 
     #
     # Convert user defined axis values into private hash values.
