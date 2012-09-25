@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartColumn02 < Test::Unit::TestCase
+class TestRegressionChartColumn03 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,11 +10,11 @@ class TestRegressionChartColumn02 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_chart_column02
-    @xlsx = 'chart_column02.xlsx'
+  def test_chart_column03
+    @xlsx = 'chart_column03.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'column', :subtype => 'stacked', :embedded => 1)
+    chart     = workbook.add_chart(:type => 'column', :subtype => 'percent_stacked', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [49388544, 69387008])
