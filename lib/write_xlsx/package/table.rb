@@ -13,6 +13,10 @@ module Writexlsx
         @properties = {}
       end
 
+      def set_xml_writer(filename)
+        @writer.set_xml_writer(filename)
+      end
+
       #
       # Assemble and writes the XML file.
       #
@@ -33,6 +37,13 @@ module Writexlsx
         # Close the XML writer object and filehandle.
         @writer.crlf
         @writer.close
+      end
+
+      #
+      # Set the document properties.
+      #
+      def set_properties(properties)
+        @properties = properties
       end
 
       private
