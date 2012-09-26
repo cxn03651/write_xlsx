@@ -350,6 +350,7 @@ module Writexlsx
             table.set_xml_writer("#{dir}/xl/tables/table#{index}.xml")
             table.set_properties(table_prop)
             table.assemble_xml_file
+            index += 1
             @table_count += 1
           end
         end
