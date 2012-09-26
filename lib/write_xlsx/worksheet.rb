@@ -3535,8 +3535,9 @@ module Writexlsx
 
         i = 0    # For indexing the row data.
         (first_data_row..last_data_row).each do |row|
-          j = 0    # For indexing the col data.
+          next unless data[i]
 
+          j = 0    # For indexing the col data.
           (col1..col2).each do |col|
             token = data[i][j]
             write(row, col, token, col_formats[j]) if token
@@ -5749,6 +5750,7 @@ module Writexlsx
       padding         = 5.0
       if width && width > 0
         width = ((width * max_digit_width + padding) / max_digit_width * 256).to_i/256.0
+        width = width.to_i if width.to_s =~ /\.0+$/
       end
       attributes = [
           'min',   min + 1,
