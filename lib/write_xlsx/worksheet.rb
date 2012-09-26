@@ -3523,7 +3523,7 @@ module Writexlsx
         table[:_columns] << col_data
 
         # Write the column headers to the worksheet.
-        if param[:header_row]
+        if param[:header_row] != 0
           write_string(row1, col_num, col_data[:_name])
         end
 
