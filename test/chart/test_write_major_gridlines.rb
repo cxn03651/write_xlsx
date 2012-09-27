@@ -9,7 +9,7 @@ class TestWriteMajorGridlines < Test::Unit::TestCase
 
   def test_write_major_gridlines
     expected = '<c:majorGridlines />'
-    result = @chart.__send__('write_major_gridlines')
+    result = @chart.__send__('write_major_gridlines', {:visible => 1})
     assert_equal(expected, result)
   end
 end

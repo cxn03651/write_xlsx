@@ -222,11 +222,11 @@ module Writexlsx
 
         if link_type == 1
           # External link with rel file relationship.
-          @worksheet.hlink_count += 1
+          @worksheet.rel_count += 1
           @worksheet.hlink_refs <<
             [
              link_type,    row,     col,
-             @worksheet.hlink_count, @str, @tip
+             @worksheet.rel_count, @str, @tip
             ]
 
           @worksheet.external_hyper_links << [ '/hyperlink', @url, 'External' ]
@@ -299,13 +299,14 @@ module Writexlsx
     end
 
     attr_reader :index # :nodoc:
-    attr_reader :charts, :images, :shapes, :drawing # :nodoc:
+    attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
     attr_reader :external_hyper_links, :external_drawing_links # :nodoc:
+    attr_reader :external_vml_links, :external_table_links # :nodoc:
     attr_reader :external_comment_links, :drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
-    attr_accessor :vml_shape_id, :hlink_count, :hlink_refs # :nodoc:
+    attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
     attr_reader :comments_author # :nodoc:
 
     def initialize(workbook, index, name) #:nodoc:
@@ -349,14 +350,17 @@ module Writexlsx
       @col_formats = {}
 
       @last_shape_id          = 1
-      @hlink_count            = 0
+      @rel_count              = 0
       @hlink_refs             = []
       @external_hyper_links   = []
       @external_drawing_links = []
       @external_comment_links = []
+      @external_vml_links     = []
+      @external_table_links   = []
       @drawing_links          = []
       @charts                 = []
       @images                 = []
+      @tables                 = []
       @shapes                 = []
       @shape_hash             = {}
 
@@ -401,6 +405,7 @@ module Writexlsx
       write_col_breaks
       write_drawings
       write_legacy_drawing
+      write_table_parts
       # write_ext_lst
       @writer.end_tag('worksheet')
       @writer.crlf
@@ -2591,11 +2596,17 @@ module Writexlsx
         # External Workbook links need to be modified into the right format.
         # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
         # We need the part to the left of the # as the URL and the part to
-        # the right as the "location" string (if it exists)
+        # the right as the "location" string (if it exists).
         url, str = url.split(/#/)
 
         # Add the file:/// URI to the url if non-local.
-        url = "file:///#{url}" if url =~ %r![\\/]! && url !~ %r!^\.\.!
+        if url =~ %r![:]! ||        # Windows style "C:/" link.
+            url =~ %r!^\\\\!        # Network share.
+          url = "file:///#{url}"
+        end
+
+        # Convert a ./dir/file.xlsx link to dir/file.xlsx.
+        url = url.sub(%r!^.\\!, '')
 
         # Treat as a default external link now that the data has been modified.
         link_type = 1
@@ -3327,6 +3338,222 @@ module Writexlsx
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
       @cond_formats[range] << param
+    end
+
+    #
+    # Add an Excel table to a worksheet.
+    #
+    def add_table(*args)
+      user_range = ''
+      col_formats = []
+=begin
+      # We would need to order the write statements very carefully within this
+      # function to support optimisation mode. Disable add_table() when it is
+      # on for now.
+      if @optimization
+        carp "add_table() isn't supported when set_optimization() is on"
+        return -1
+      end
+=end
+      # Check for a cell reference in A1 notation and substitute row and column
+      row1, col1, row2, col2, param = row_col_notation(args)
+
+      # Check for a valid number of args.
+      raise "Not enough parameters to add_table()" if [row1, col1, row2, col2].include?(nil)
+
+      # Check that row and col are valid without storing the values.
+      check_dimensions_and_update_max_min_values(row1, col1, 1, 1)
+      check_dimensions_and_update_max_min_values(row2, col2, 1, 1)
+
+      # The final hashref contains the validation parameters.
+      param ||= {}
+
+      # List of valid input parameters.
+      valid_parameter = {
+        :autofilter     => 1,
+        :banded_columns => 1,
+        :banded_rows    => 1,
+        :columns        => 1,
+        :data           => 1,
+        :first_column   => 1,
+        :header_row     => 1,
+        :last_column    => 1,
+        :name           => 1,
+        :style          => 1,
+        :total_row      => 1
+      }
+
+      # Check for valid input parameters.
+      param.each_key do |param_key|
+        unless valid_parameter[param_key]
+          raise "Unknown parameter '#{param_key}' in add_table()"
+        end
+      end
+
+      # Table count is a member of Workbook, global to all Worksheet.
+      @workbook.table_count += 1
+      table = {}
+      table[:_columns] = []
+      table[:id] = @workbook.table_count
+
+      # Turn on Excel's defaults.
+      param[:banded_rows] ||= 1
+      param[:header_row]  ||= 1
+      param[:autofilter]  ||= 1
+
+      # Set the table options.
+      table[:_show_first_col]   = param[:first_column]   && param[:first_column] != 0   ? 1 : 0
+      table[:_show_last_col]    = param[:last_column]    && param[:last_column] != 0 ? 1 : 0
+      table[:_show_row_stripes] = param[:banded_rows]    && param[:banded_rows] != 0 ? 1 : 0
+      table[:_show_col_stripes] = param[:banded_columns] && param[:banded_columns] != 0 ? 1 : 0
+      table[:_header_row_count] = param[:header_row]     && param[:header_row] != 0 ? 1 : 0
+      table[:_totals_row_shown] = param[:total_row]      && param[:total_row] != 0 ? 1 : 0
+
+      # Set the table name.
+      if param[:name]
+        table[:_name] = param[:name]
+      else
+        # Set a default name.
+        table[:_name] = "Table#{table[:id]}"
+      end
+
+      # Set the table style.
+      if param[:style]
+        table[:_style] = param[:style]
+        # Remove whitespace from style name.
+        table[:_style].gsub!(/\s/, '')
+      else
+        table[:_style] = "TableStyleMedium9"
+      end
+
+      # Swap last row/col for first row/col as necessary.
+      row1, row2 = row2, row1 if row1 > row2
+      col1, col2 = col2, col1 if col1 > col2
+
+      # Set the data range rows (without the header and footer).
+      first_data_row = row1
+      last_data_row  = row2
+      first_data_row += 1 if param[:header_row] != 0
+      last_data_row  -= 1 if param[:total_row]
+
+      # Set the table and autofilter ranges.
+      table[:_range]   = xl_range(row1, row2,          col1, col2)
+      table[:_a_range] = xl_range(row1, last_data_row, col1, col2)
+
+      # If the header row if off the default is to turn autofilter off.
+      param[:autofilter] = 0 if param[:header_row] == 0
+
+      # Set the autofilter range.
+      if param[:autofilter] && param[:autofilter] != 0
+        table[:_autofilter] = table[:_a_range]
+      end
+
+      # Add the table columns.
+      col_id = 1
+      (col1..col2).each do |col_num|
+        # Set up the default column data.
+        col_data = {
+            :_id             => col_id,
+            :_name           => "Column#{col_id}",
+            :_total_string   => '',
+            :_total_function => '',
+            :_formula        => '',
+            :_format         => nil
+        }
+
+        # Overwrite the defaults with any use defined values.
+        if param[:columns]
+          # Check if there are user defined values for this column.
+          if user_data = param[:columns][col_id - 1]
+            # Map user defined values to internal values.
+            if user_data[:header] && !user_data[:header].empty?
+              col_data[:_name] = user_data[:header]
+            end
+            # Handle the column formula.
+            if user_data[:formula]
+              formula = user_data[:formula]
+              # Remove the leading = from formula.
+              formula.sub!(/^=/, '')
+              # Covert Excel 2010 "@" ref to 2007 "#This Row".
+              formula.gsub!(/@/,'[#This Row],')
+
+              col_data[:_formula] = formula
+
+              (first_data_row..last_data_row).each do |row|
+                write_formula(row, col_num, formula, user_data[:format])
+              end
+            end
+
+            # Handle the function for the total row.
+            if user_data[:total_function]
+              function = user_data[:total_function]
+
+              # Massage the function name.
+              function = function.downcase
+              function.gsub!(/_/, '')
+              function.gsub!(/\s/,'')
+
+              function = 'countNums' if function == 'countnums'
+              function = 'stdDev'    if function == 'stddev'
+
+              col_data[:_total_function] = function
+
+              formula = table_function_to_formula(function, col_data[:_name])
+              write_formula(row2, col_num, formula, user_data[:format])
+            elsif user_data[:total_string]
+              # Total label only (not a function).
+              total_string = user_data[:total_string]
+              col_data[:_total_string] = total_string
+
+              write_string(row2, col_num, total_string, user_data[:format])
+            end
+
+            # Get the dxf format index.
+            if user_data[:format]
+              col_data[:_format] = user_data[:format].get_dxf_index
+            end
+
+            # Store the column format for writing the cell data.
+            # It doesn't matter if it is undefined.
+            col_formats[col_id - 1] = user_data[:format]
+          end
+        end
+
+        # Store the column data.
+        table[:_columns] << col_data
+
+        # Write the column headers to the worksheet.
+        if param[:header_row] != 0
+          write_string(row1, col_num, col_data[:_name])
+        end
+
+        col_id += 1
+      end    # Table columns.
+
+      # Write the cell data if supplied.
+      if data = param[:data]
+
+        i = 0    # For indexing the row data.
+        (first_data_row..last_data_row).each do |row|
+          next unless data[i]
+
+          j = 0    # For indexing the col data.
+          (col1..col2).each do |col|
+            token = data[i][j]
+            write(row, col, token, col_formats[j]) if token
+            j += 1
+          end
+          i += 1
+        end
+      end
+
+      # Store the table data.
+      @tables << table
+
+      # Store the link used for the rels file.
+      @external_table_links << ['/table', "../tables/table#{table[:id]}.xml"]
+
+      return table
     end
 
     #
@@ -4216,9 +4443,13 @@ module Writexlsx
       count
     end
 
+    def set_external_vml_links(comment_id) # :nodoc:
+      @external_vml_links <<
+        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
+    end
+
     def set_external_comment_links(comment_id) # :nodoc:
       @external_comment_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"] <<
         ['/comments',   "../comments#{comment_id}.xml"]
     end
 
@@ -4428,6 +4659,33 @@ module Writexlsx
     end
 
     private
+
+    #
+    # Convert a table total function to a worksheet formula.
+    #
+    def table_function_to_formula(function, col_name)
+      formula  = ''
+
+      subtotals = {
+        :average   => 101,
+        :countNums => 102,
+        :count     => 103,
+        :max       => 104,
+        :min       => 105,
+        :stdDev    => 107,
+        :sum       => 109,
+        :var       => 110
+      }
+
+      if subtotals[function.to_sym]
+        func_num = subtotals[function.to_sym]
+        formula = %Q{SUBTOTAL(#{func_num},[#{col_name}])}
+      else
+        raise "Unsupported function '#{function}' in add_table()"
+      end
+
+      return formula
+    end
 
     def check_for_valid_input_params(param)
       param.each_key do |param_key|
@@ -5492,6 +5750,7 @@ module Writexlsx
       padding         = 5.0
       if width && width > 0
         width = ((width * max_digit_width + padding) / max_digit_width * 256).to_i/256.0
+        width = width.to_i if width.to_s =~ /\.0+$/
       end
       attributes = [
           'min',   min + 1,
@@ -6247,7 +6506,9 @@ module Writexlsx
     # Write the <drawing> elements.
     #
     def write_drawings #:nodoc:
-      write_drawing(@hlink_count + 1) if drawing?
+      return unless drawing?
+      @rel_count += 1
+      write_drawing(@rel_count)
     end
 
     #
@@ -6268,8 +6529,8 @@ module Writexlsx
       return unless has_comments?
 
       # Increment the relationship id for any drawings or comments.
-      id = @hlink_count + 1
-      id += 1 if @drawing
+      @rel_count += 1
+      id = @rel_count
 
       attributes = ['r:id', "rId#{id}"]
 
@@ -6339,6 +6600,36 @@ module Writexlsx
       attributes = [name, value]
 
       writer.empty_tag('color', attributes)
+    end
+
+    #
+    # Write the <tableParts> element.
+    #
+    def write_table_parts
+      # Return if worksheet doesn't contain any tables.
+      return if @tables.empty?
+
+      attributes = ['count', @tables.size]
+
+      @writer.tag_elements('tableParts', attributes) do
+
+        @tables.each do |table|
+          # Write the tablePart element.
+          @rel_count += 1
+          write_table_part(@rel_count)
+        end
+      end
+    end
+
+    #
+    # Write the <tablePart> element.
+    #
+    def write_table_part(id)
+      r_id = "rId#{id}"
+
+      attributes = ['r:id', r_id]
+
+      @writer.empty_tag('tablePart', attributes)
     end
 
     #
@@ -6585,7 +6876,7 @@ module Writexlsx
 
     #
     # Check that row and col are valid and store max and min values for use in
-    # DIMENSIONS record. See, store_dimensions().
+    # other methods/elements.
     #
     # The ignore_row/ignore_col flags is used to indicate that we wish to
     # perform the dimension check without storing the value.

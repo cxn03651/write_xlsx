@@ -98,6 +98,14 @@ module Writexlsx
       @chart.set_y_axis(*args)
     end
 
+    def set_x2_axis(*args)
+      @chart.set_x2_axis(*args)
+    end
+
+    def set_y2_axis(*args)
+      @chart.set_y2_axis(*args)
+    end
+
     def set_title(*args)
       @chart.set_title(*args)
     end

@@ -240,6 +240,22 @@ module Writexlsx
     end
 
     #
+    # Copy the attributes of another Format object.
+    #
+    def copy(other)
+      reserve = [
+                 :xf_index,
+                 :dxf_index,
+                 :xf_format_indices,
+                 :xdf_format_indices,
+                 :palette
+                ]
+      (instance_variables - reserve).each do |v|
+        instance_variable_set(v, other.instance_variable_get(v))
+      end
+    end
+
+    #
     # :call-seq:
     #    set_format_properties( :bold => 1 [, :color => 'red'..] )
     #    set_format_properties( font [, shade, ..])
@@ -619,12 +635,8 @@ module Writexlsx
       else                            # for "set_xxx" methods
         value = args[0].nil? ? 1 : args[0]
       end
-      if value.respond_to?(:to_str) || !value.respond_to?(:+)
-        s = %Q!#{attribute} = "#{value.to_s}"!
-      else
-        s = %Q!#{attribute} =   #{value.to_s}!
-      end
-      eval s
+
+      instance_variable_set(attribute, value)
     end
 
     def color?

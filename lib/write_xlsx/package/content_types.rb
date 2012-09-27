@@ -127,6 +127,16 @@ module Writexlsx
         types.each_key { |type| add_default(type, "image/#{type}") }
       end
 
+      #
+      # Add the name of a table to the ContentTypes overrides.
+      #
+      def add_table_name(table_name)
+        add_override(
+                     "/xl/tables/#{table_name}.xml",
+                     "#{App_document}spreadsheetml.table+xml"
+                     )
+      end
+
       private
 
       def write_xml_declaration

@@ -26,70 +26,81 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
+        @show_crosses = false
       end
 
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params)
         # Write the c:areaChart element.
-        write_stock_chart
+        write_stock_chart(params)
       end
 
       #
       # Write the <c:stockChart> element.
+      # Overridden to add hi_low_lines(). TODO. Refactor up into the SUPER class
       #
-      def write_stock_chart
+      def write_stock_chart(params)
+        series = axes_series(params)
+        return if series.empty?
+
         # Add default formatting to the series data.
         modify_series_formatting
 
         @writer.tag_elements('c:stockChart') do
           # Write the series elements.
-          write_series
+          @series.each {|s| write_series(s)}
+
+          # Write the c:hiLowLines element.
+          write_hi_low_lines if params[:primary_axes]
+
+          # Write the c:marker element.
+          write_marker_value
+
+          # Write the c:axId elements
+          write_axis_ids(params)
         end
       end
 
       #
-      # Over-ridden to add hi_low_lines(). TODO. Refactor up into the SUPER class.
-      #
-      # Write the series elements.
-      #
-      def write_series
-        # Write each series with subelements.
-        index = 0
-        @series.each do |series|
-          write_ser(index, series)
-          index += 1
-        end
-
-        # Write the c:hiLowLines element.
-        write_hi_low_lines
-
-        # Write the c:marker element.
-        write_marker_value
-
-        # Generate the axis ids.
-        add_axis_id
-        add_axis_id
-
-        # Write the c:axId element.
-        write_axis_id(@axis_ids[0])
-        write_axis_id(@axis_ids[1])
-      end
-
-      #
-      # Write the <c:plotArea> element.
+      # Overridden to use write_date_axis() instead of write_cat_axis().
       #
       def write_plot_area
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
           write_layout
-          # Write the subclass chart type element.
-          write_chart_type
-          # Write the c:dateAx element.
-          write_date_axis
-          # Write the c:catAx element.
-          write_val_axis
+
+          # TODO: (for JMCNAMARA todo ;)
+          # foreach my $chart_type (@chart_types)
+
+          # Write the subclass chart type elements for primary and secondary axes
+          write_chart_type(:primary_axes => 1)
+          write_chart_type(:primary_axes => 0)
+
+          # Write the c:dateAx elements for series using primary axes
+          write_date_axis(
+                          :x_axis   => @x_axis,
+                          :y_axis   => @y_axis,
+                          :axis_ids => @axis_ids
+                          )
+          write_val_axis(
+                         :x_axis   => @x_axis,
+                         :y_axis   => @y_axis,
+                         :axis_ids => @axis_ids
+                         )
+
+          # Write c:valAx and c:catAx elements for series using secondary axes
+          write_val_axis(
+                         :x_axis   => @x2_axis,
+                         :y_axis   => @y2_axis,
+                         :axis_ids => @axis2_ids
+                         )
+          write_date_axis(
+                          :x_axis   => @x2_axis,
+                          :y_axis   => @y2_axis,
+                          :axis_ids => @axis2_ids
+                          )
         end
       end
 

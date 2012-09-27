@@ -34,20 +34,21 @@ module Writexlsx
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params = {})
         # Write the c:areaChart element.
         write_pie_chart
       end
 
       #
-      # Write the <c:pieChart> element.
+      # Write the <c:pieChart> element. Over-ridden method to remove axis_id code
+      # since pie charts don't require val and vat axes.
       #
       def write_pie_chart
         @writer.tag_elements('c:pieChart') do
           # Write the c:varyColors element.
           write_vary_colors
           # Write the series elements.
-          write_series
+          @series.each {|s| write_series(s)}
           # Write the c:firstSliceAng element.
           write_first_slice_ang
         end
@@ -69,28 +70,13 @@ module Writexlsx
       end
 
       #
-      # Over-ridden method to remove axis_id code since Pie charts  don't require
-      # val and cat axes.
-      #
-      # Write the series elements.
-      #
-      def write_series
-        # Write each series with subelements.
-        index = 0
-        @series.each do |series|
-          write_ser(index, series)
-          index += 1
-        end
-      end
-
-      #
       # Over-ridden method to add <c:txPr> to legend.
       #
       # Write the <c:legend> element.
       #
       def write_legend
         position = @legend_position
-        overlay = 0
+        overlay  = 0
 
         if position =~ /^overlay_/
           positon.sub!(/^overlay_/, '')

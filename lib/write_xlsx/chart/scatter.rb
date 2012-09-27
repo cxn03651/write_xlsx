@@ -37,23 +37,27 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @subtype        = subtype || 'marker_only'
-        @cross_between  = 'midCat'
-        @horiz_val_axis = 0
+        @subtype           = subtype || 'marker_only'
+        @cross_between     = 'midCat'
+        @horiz_val_axis    = 0
+        @val_axis_position = 'b'
       end
 
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type
+      def write_chart_type(params)
         # Write the c:areaChart element.
-        write_scatter_chart
+        write_scatter_chart(params)
       end
 
       #
       # Write the <c:scatterChart> element.
       #
-      def write_scatter_chart
+      def write_scatter_chart(params)
+        series = axes_series(params)
+        return if series.empty?
+
         style   = 'lineMarker'
         subtype = @subtype
 
@@ -72,7 +76,13 @@ module Writexlsx
           # Write the c:scatterStyle element.
           write_scatter_style(style)
           # Write the series elements.
-          write_series
+          @series.each {|s| write_series(s)}
+
+          # Write the c:marker element.
+          write_marker_value
+
+          # Write the c:axId elements
+          write_axis_ids(params)
         end
       end
 
@@ -81,7 +91,10 @@ module Writexlsx
       #
       # Write the <c:ser> element.
       #
-      def write_ser(index, series)
+      def write_ser(series)
+        index = @series_index
+        @series_index += 1
+
         @writer.tag_elements('c:ser') do
           # Write the c:idx element.
           write_idx(index)
@@ -116,14 +129,42 @@ module Writexlsx
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
           write_layout
-          # Write the subclass chart type element.
-          write_chart_type
-          # Write the c:catAx element.
-          write_cat_val_axis('b', 1)
-          # Write the c:catAx element.
-          @horiz_val_axis = 1
 
-          write_val_axis('l')
+          # Write the subclass chart type elements for primary and secondary axes
+          write_chart_type(:primary_axes => 1)
+          write_chart_type(:primary_axes => 0)
+
+          # Write c:catAx and c:valAx elements for series using primary axes
+          write_cat_val_axis(
+                             :x_axis   => @x_axis,
+                             :y_axis   => @y_axis,
+                             :axis_ids => @axis_ids,
+                             :position => 'b'
+                             )
+          tmp = @horiz_val_axis
+          @horiz_val_axis = 1
+          write_val_axis(
+                         :x_axis   => @x_axis,
+                         :y_axis   => @y_axis,
+                         :axis_ids => @axis_ids,
+                         :position => 'l'
+                         )
+          @horiz_val_axis = tmp
+
+          # Write c:valAx and c:catAx elements for series using secondary axes
+          write_cat_val_axis(
+                             :x_axis   => @x2_axis,
+                             :y_axis   => @y2_axis,
+                             :axis_ids => @axis2_ids,
+                             :position => 'b'
+                             )
+          @horiz_val_axis = 1
+          write_val_axis(
+                         :x_axis   => @x2_axis,
+                         :y_axis   => @y2_axis,
+                         :axis_ids => @axis2_ids,
+                         :position => 'l'
+                         )
         end
       end
 
@@ -138,7 +179,16 @@ module Writexlsx
       # Write the <c:yVal> element.
       #
       def write_y_val(series)
-        write_val_base(series[:_values], series[:_val_data_id], 'c:yVal')
+        formula = series[:_values]
+        data_id = series[:_val_data_id]
+        data    = @formula_data[data_id]
+
+        @writer.tag_elements('c:yVal') do
+          # Unlike Cat axes data should only be numeric
+
+          # Write the c:numRef element.
+          write_num_ref(formula, data, 'num')
+        end
       end
 
       #
