@@ -635,12 +635,8 @@ module Writexlsx
       else                            # for "set_xxx" methods
         value = args[0].nil? ? 1 : args[0]
       end
-      if value.respond_to?(:to_str) || !value.respond_to?(:+)
-        s = %Q!#{attribute} = "#{value.to_s}"!
-      else
-        s = %Q!#{attribute} =   #{value.to_s}!
-      end
-      eval s
+
+      instance_variable_set(attribute, value)
     end
 
     def color?
