@@ -93,13 +93,11 @@ module Writexlsx
 
         attributes << 'xml:space' << 'preserve' if string =~ /^[ \t]/ || string =~ /[ \t]$/
 
-        @writer.tag_elements('si') do
-          # Write any rich strings without further tags.
-          if string =~ %r{^<r>} && string =~ %r{</r>$}
-            @writer.io_write(string)
-          else
-            @writer.data_element('t', string, attributes)
-          end
+        # Write any rich strings without further tags.
+        if string =~ %r{^<r>} && string =~ %r{</r>$}
+          @writer.si_rich_element(string)
+        else
+          @writer.si_element(string, attributes)
         end
       end
 

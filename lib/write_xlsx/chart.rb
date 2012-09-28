@@ -1157,8 +1157,8 @@ module Writexlsx
         :_crossing        => params[:crossing],
         :_position        => params[:position],
         :_label_position  => params[:label_position],
-        :_major_gridlines => params[:_major_gridlines] || {:visible => 1},
-        :_visible         => params[:_visible] ? params[:visible] : 1
+        :_major_gridlines => params[:major_gridlines] || {:visible => 1},
+        :_visible         => params[:visible] ? params[:visible] : 1
       }
 
       # Only use the first letter of bottom, top, left or right.
@@ -1962,7 +1962,7 @@ module Writexlsx
         # Write the c:scaling element.
         write_scaling(x_axis[:_reverse])
 
-        write_delete(1) unless x_axis[:_visible]
+        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
@@ -2023,7 +2023,7 @@ module Writexlsx
         write_scaling(y_axis[:_reverse], y_axis[:_min],
                       y_axis[:_max], y_axis[:_log_base])
 
-        write_delete(1) unless y_axis[:_visible]
+        write_delete(1) if y_axis[:_visible].nil? || y_axis[:_visible] == 0
 
         # Write the c:axPos element.
         write_axis_pos(position, x_axis[:_reverse])
@@ -2093,7 +2093,7 @@ module Writexlsx
                       x_axis[:_max], x_axis[:_log_base]
                       )
 
-        write_delete(1) unless x_axis[:_visible]
+        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
@@ -2411,7 +2411,7 @@ module Writexlsx
     # Write the <c:majorGridlines> element.
     #
     def write_major_gridlines(options = {}) # :nodoc:
-      return unless options[:visible]
+      return if options[:visible].nil? || options[:visible] == 0
 
       @writer.empty_tag('c:majorGridlines')
     end
@@ -2872,8 +2872,16 @@ module Writexlsx
                 (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined] == 0)
 
       @writer.tag_elements('c:spPr') do
-        # Write the a:solidFill element for solid charts such as pie and bar.
-        write_a_solid_fill(series[:_fill]) if series[:_fill] && series[:_fill][:_defined] != 0
+        # Write the fill elements for solid charts such as pie and bar.
+        if series[:_fill] && series[:_fill][:_defined] != 0
+          if series[:_fill][:none] && series[:_fill][:none] != 0
+            # Write the a:noFill element.
+            write_a_no_fill
+          else
+            # Write the a:solidFill element.
+            write_a_solid_fill(series[:_fill])
+          end
+        end
         # Write the a:ln element.
         write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined] != 0
       end

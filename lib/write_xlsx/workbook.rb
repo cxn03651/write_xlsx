@@ -910,7 +910,7 @@ module Writexlsx
         attributes << 'state' << 'hidden'
       end
       attributes << 'r:id' << "rId#{sheet_id}"
-      @writer.empty_tag('sheet', attributes)
+      @writer.empty_tag_encoded('sheet', attributes)
     end
 
     def write_calc_pr #:nodoc:
@@ -1342,8 +1342,11 @@ module Writexlsx
           # Skip if we couldn't parse the formula.
           next unless sheetname
 
-          # Skip if the name is unknown. Probably should throw exception.
-          next unless worksheets[sheetname]
+          # Raise if the name is unknown since it indicates a user error in
+          # a chart series formula.
+          unless worksheets[sheetname]
+            raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n"
+          end
 
           # Find the worksheet object based on the sheet name.
           worksheet = worksheets[sheetname]

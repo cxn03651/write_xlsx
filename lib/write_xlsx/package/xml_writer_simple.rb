@@ -43,8 +43,27 @@ module Writexlsx
         io_write(str)
       end
 
+      def empty_tag_encoded(tag, attr = [])
+        str = "<#{tag}#{key_vals(attr)} />"
+        io_write(str)
+      end
+
       def data_element(tag, data, attr = [])
         tag_elements(tag, attr) { io_write("#{escape_xml_chars(data)}") }
+      end
+
+      #
+      # Optimised tag writer ?  for shared strings <si> elements.
+      #
+      def si_element(data, attr)
+        tag_elements('si') { data_element('t', data, attr) }
+      end
+
+      #
+      # Optimised tag writer for shared strings <si> rich string elements.
+      #
+      def si_rich_element(data)
+        io_write("<si>#{data}</si>")
       end
 
       def characters(data)
@@ -84,8 +103,10 @@ module Writexlsx
 
       def escape_xml_chars(str = '')
         if str =~ /[&<>"]/
-          str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;').gsub(/"/, '&quot;')
-        else
+          str.gsub(/&/, '&amp;').
+            gsub(/</, '&lt;').
+            gsub(/>/, '&gt;')
+         else
           str
         end
       end

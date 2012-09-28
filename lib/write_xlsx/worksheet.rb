@@ -177,10 +177,20 @@ module Writexlsx
       end
 
       def write_cell
+        attributes = cell_attributes
+        if @result &&  !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
+          attributes << 't' << 'str'
+        end
+        @worksheet.writer.tag_elements('c', attributes) do
+          @worksheet.write_cell_formula(token)
+          @worksheet.write_cell_value(result || 0)
+        end
+=begin
         @worksheet.writer.tag_elements('c', cell_attributes) do
           @worksheet.write_cell_formula(token)
           @worksheet.write_cell_value(result || 0)
         end
+=end
       end
     end
 
@@ -351,6 +361,7 @@ module Writexlsx
 
       @last_shape_id          = 1
       @rel_count              = 0
+      @hlink_count            = 0
       @hlink_refs             = []
       @external_hyper_links   = []
       @external_drawing_links = []
@@ -2435,6 +2446,14 @@ module Writexlsx
       formula.sub!(/^=/, '')
 
       store_data_to_table(FormulaArrayCellData.new(self, row1, col1, formula, xf, range, value))
+
+      # Pad out the rest of the area with formatted zeroes.
+      (row1..row2).each do |row|
+        (col1..col2).each do |col|
+          next if row == row1 && col == col1
+          write_number(row, col, 0, xf)
+        end
+      end
     end
 
     # The outline_settings() method is used to control the appearance of
@@ -2590,6 +2609,9 @@ module Writexlsx
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
       if link_type == 1
+        # Substiture white space in url.
+        url = url.sub(/[\s\x00]/, '%20')
+
         # Ordinary URL style external links don't have a "location" string.
         str = nil
       elsif link_type == 3
@@ -2610,6 +2632,18 @@ module Writexlsx
 
         # Treat as a default external link now that the data has been modified.
         link_type = 1
+      end
+
+      # Excel limits escaped URL to 255 characters.
+      if url.bytesize > 255
+        raise "URL '#{url}' > 255 characters, it exceeds Excel's limit for URLS."
+      end
+
+      # Check the limit of URLS per worksheet.
+      @hlink_count += 1
+
+      if @hlink_count > 65_530
+        raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
       store_data_to_table(HyperlinkCellData.new(self, row, col, index, xf, link_type, url, str, tip))
