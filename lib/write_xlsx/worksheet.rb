@@ -3073,9 +3073,12 @@ module Writexlsx
 
       return if row.nil?
 
+      # Use min col in check_dimensions. Default to 0 if undefined.
+      min_col = @dim_colmin || 0
+
       # Check that row and col are valid and store max and min values.
-      check_dimensions(row, 0)
-      store_row_col_max_min_values(row, 0)
+      check_dimensions(row, min_col)
+      store_row_col_max_min_values(row, min_col)
 
       # If the height is 0 the row is hidden and the height is the default.
       if height == 0
@@ -6330,7 +6333,8 @@ module Writexlsx
         tokens = @filter_cols[col]
         type   = @filter_type[col]
 
-        write_filter_column(col, type, *tokens)
+        # Filters are relative to first column in the autofilter.
+        write_filter_column(col - col1, type, *tokens)
       end
     end
 
