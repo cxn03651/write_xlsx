@@ -68,7 +68,7 @@ class TestWriteDataValidation01 < Test::Unit::TestCase
     )
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A4"><formula1>&quot;open,high,close&quot;</formula1></dataValidation></dataValidations>'
+    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A4"><formula1>"open,high,close"</formula1></dataValidation></dataValidations>'
     assert_equal(expected, result)
   end
 

@@ -299,7 +299,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
     )
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>&quot;a,bb,ccc&quot;</formula1></dataValidation></dataValidations>'
+    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>"a,bb,ccc"</formula1></dataValidation></dataValidations>'
     assert_equal(expected, result)
   end
 
@@ -311,7 +311,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
     )
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showDropDown="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>&quot;a,bb,ccc&quot;</formula1></dataValidation></dataValidations>'
+    expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showDropDown="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>"a,bb,ccc"</formula1></dataValidation></dataValidations>'
     assert_equal(expected, result)
   end
 

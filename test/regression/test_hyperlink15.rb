@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionHyperlink15 < Test::Unit::TestCase
+class TestRegressionHyperlink16 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,12 +10,12 @@ class TestRegressionHyperlink15 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_hyperlink15
-    @xlsx = 'hyperlink15.xlsx'
+  def test_hyperlink16
+    @xlsx = 'hyperlink16.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
-    worksheet.write_url('B2', 'external:subdir/blank.xlsx')
+    worksheet.write_url('B2', 'external:./subdir/blank.xlsx')
 
     workbook.close
     compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,

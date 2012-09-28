@@ -97,16 +97,16 @@ class TestCondFormat07 < Test::Unit::TestCase
   </sheetData>
   <conditionalFormatting sqref="A1:A4">
     <cfRule type="containsText" priority="1" operator="containsText" text="foo">
-      <formula>NOT(ISERROR(SEARCH(&quot;foo&quot;,A1)))</formula>
+      <formula>NOT(ISERROR(SEARCH("foo",A1)))</formula>
     </cfRule>
     <cfRule type="notContainsText" priority="2" operator="notContains" text="foo">
-      <formula>ISERROR(SEARCH(&quot;foo&quot;,A1))</formula>
+      <formula>ISERROR(SEARCH("foo",A1))</formula>
     </cfRule>
     <cfRule type="beginsWith" priority="3" operator="beginsWith" text="b">
-      <formula>LEFT(A1,1)=&quot;b&quot;</formula>
+      <formula>LEFT(A1,1)="b"</formula>
     </cfRule>
     <cfRule type="endsWith" priority="4" operator="endsWith" text="b">
-      <formula>RIGHT(A1,1)=&quot;b&quot;</formula>
+      <formula>RIGHT(A1,1)="b"</formula>
     </cfRule>
   </conditionalFormatting>
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
