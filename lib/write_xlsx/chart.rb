@@ -1096,7 +1096,11 @@ module Writexlsx
     # Write the <c:barChart> element.
     #
     def write_bar_chart(params)   # :nodoc:
-      series = axes_series(params)
+      if params[:primary_axes] == 1
+        series = get_primary_axes_series
+      else
+        series = get_secondary_axes_series
+      end
       return if series.empty?
 
       subtype = @subtype
@@ -1979,7 +1983,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || x_axis[:_visible]
+        if @show_crosses || (x_axis[:_visible] && x_axis[:_visible] != 0)
           # Note, the category crossing comes from the value axis.
           if nil_or_max?(y_axis[:_crossing])
             # Write the c:crosses element.
@@ -2004,7 +2008,6 @@ module Writexlsx
     # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
     #
     def write_val_axis(params) # :nodoc:
-#      position = nil, hide_major_gridlines = nil) # :nodoc:
       x_axis   = params[:x_axis]
       y_axis   = params[:y_axis]
       axis_ids = params[:axis_ids]
