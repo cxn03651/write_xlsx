@@ -55,7 +55,11 @@ module Writexlsx
       # Write the <c:scatterChart> element.
       #
       def write_scatter_chart(params)
-        series = axes_series(params)
+        if params[:primary_axes] == 1
+          series = get_primary_axes_series
+        else
+          series = get_secondary_axes_series
+        end
         return if series.empty?
 
         style   = 'lineMarker'
@@ -76,7 +80,7 @@ module Writexlsx
           # Write the c:scatterStyle element.
           write_scatter_style(style)
           # Write the series elements.
-          @series.each {|s| write_series(s)}
+          series.each {|s| write_series(s)}
 
           # Write the c:marker element.
           write_marker_value

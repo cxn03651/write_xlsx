@@ -2205,6 +2205,8 @@ module Writexlsx
                       x_axis[:_reverse], x_axis[:_min],
                       x_axis[:_max], x_axis[:_log_base]
                       )
+        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
+
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:reverse])
         # Write the axis title elements.
@@ -2220,7 +2222,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || x_axis[:_visible]
+        if @show_crosses || (x_axis[:_visible] && x_axis[:_visible] != 0)
           # Note, the category crossing comes from the value axis.
           if nil_or_max?(y_axis[:_crossing])
             # Write the c:crossing element.
@@ -3231,15 +3233,6 @@ module Writexlsx
       attributes = ['val', val]
 
       @writer.empty_tag('c:dLblPos', attributes)
-    end
-
-    #
-    # Write the <c:delete> element.
-    #
-    def write_delete(val)
-      attributes = ['val', val]
-
-      @writer.empty_tag('c:delete', @attributes)
     end
 
     #

@@ -42,7 +42,11 @@ module Writexlsx
       # Overridden to add hi_low_lines(). TODO. Refactor up into the SUPER class
       #
       def write_stock_chart(params)
-        series = axes_series(params)
+        if params[:primary_axes] == 1
+          series = get_primary_axes_series
+        else
+          series = get_secondary_axes_series
+        end
         return if series.empty?
 
         # Add default formatting to the series data.
@@ -50,10 +54,10 @@ module Writexlsx
 
         @writer.tag_elements('c:stockChart') do
           # Write the series elements.
-          @series.each {|s| write_series(s)}
+          series.each {|s| write_series(s)}
 
           # Write the c:hiLowLines element.
-          write_hi_low_lines if params[:primary_axes]
+          write_hi_low_lines if params[:primary_axes] == 1
 
           # Write the c:marker element.
           write_marker_value
