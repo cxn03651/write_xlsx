@@ -176,7 +176,23 @@ module Writexlsx
       # Write the <c:xVal> element.
       #
       def write_x_val(series)
-        write_val_base(series[:_categories], series[:_cat_data_id], 'c:xVal')
+        formula = series[:_categories]
+        data_id = series[:_cat_data_id]
+        data    = @formula_data[data_id]
+
+        @writer.tag_elements('c:xVal') do
+          # Check the type of cached data.
+          type = get_data_type(data)
+
+          # TODO. Can a scatter plot have non-numeric data.
+
+          if type == 'str'
+            # Write the c:numRef element.
+            write_str_ref(formula, data, type)
+          else
+            write_num_ref(formula, data, type)
+          end
+        end
       end
 
       #

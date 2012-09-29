@@ -433,7 +433,7 @@ module Writexlsx
     include Writexlsx::Utility
 
     attr_accessor :id, :name   # :nodoc:
-    attr_writer :index, :palette   # :nodoc:
+    attr_writer :index, :palette, :protection   # :nodoc:
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
 
     #
@@ -1845,7 +1845,7 @@ module Writexlsx
         type = get_data_type(data)
         if type == 'str'
           @has_category = false
-          # Write the c:numRef element.
+          # Write the c:strRef element.
           write_str_ref(formula, data, type)
         else
           # Write the c:numRef element.

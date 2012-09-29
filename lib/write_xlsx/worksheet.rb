@@ -269,7 +269,7 @@ module Writexlsx
       attr_accessor :hbreaks, :vbreaks, :scale                                # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
       attr_accessor :across                                                   # :nodoc:
-      attr_writer   :orientation
+      attr_accessor :orientation  # :nodoc:
 
       def initialize # :nodoc:
         @margin_left = 0.7
@@ -6516,26 +6516,26 @@ module Writexlsx
 
       attributes = []
       attributes << "password"         << @protect[:password] if @protect[:password]
-      attributes << "sheet"            << 1 if @protect[:sheet]
-      attributes << "content"          << 1 if @protect[:content]
-      attributes << "objects"          << 1 if !@protect[:objects]
-      attributes << "scenarios"        << 1 if !@protect[:scenarios]
-      attributes << "formatCells"      << 0 if @protect[:format_cells]
-      attributes << "formatColumns"    << 0 if @protect[:format_columns]
-      attributes << "formatRows"       << 0 if @protect[:format_rows]
-      attributes << "insertColumns"    << 0 if @protect[:insert_columns]
-      attributes << "insertRows"       << 0 if @protect[:insert_rows]
-      attributes << "insertHyperlinks" << 0 if @protect[:insert_hyperlinks]
-      attributes << "deleteColumns"    << 0 if @protect[:delete_columns]
-      attributes << "deleteRows"       << 0 if @protect[:delete_rows]
+      attributes << "sheet"            << 1 if @protect[:sheet] && @protect[:sheet] != 0
+      attributes << "content"          << 1 if @protect[:content] && @protect[:content] != 0
+      attributes << "objects"          << 1 unless @protect[:objects] && @protect[:objects] != 0
+      attributes << "scenarios"        << 1 unless @protect[:scenarios] && @protect[:scenarios] != 0
+      attributes << "formatCells"      << 0 if @protect[:format_cells] && @protect[:format_cells] != 0
+      attributes << "formatColumns"    << 0 if @protect[:format_columns] && @protect[:format_row] != 0
+      attributes << "formatRows"       << 0 if @protect[:format_rows] && @protect[:format_rows] != 0
+      attributes << "insertColumns"    << 0 if @protect[:insert_columns] && @protect[:insert_columns] != 0
+      attributes << "insertRows"       << 0 if @protect[:insert_rows] && @protect[:insert_rows] != 0
+      attributes << "insertHyperlinks" << 0 if @protect[:insert_hyperlinks] && @protect[:insert_hyperlinks] != 0
+      attributes << "deleteColumns"    << 0 if @protect[:delete_columns] && @protect[:delete_columns] != 0
+      attributes << "deleteRows"       << 0 if @protect[:delete_rows] && @protect[:delete_rows] != 0
 
-      attributes << "selectLockedCells" << 1 if !@protect[:select_locked_cells]
+      attributes << "selectLockedCells" << 1 unless @protect[:select_locked_cells] && @protect[:select_locked_cells] != 0
 
-      attributes << "sort"        << 0 if @protect[:sort]
-      attributes << "autoFilter"  << 0 if @protect[:autofilter]
-      attributes << "pivotTables" << 0 if @protect[:pivot_tables]
+      attributes << "sort"        << 0 if @protect[:sort] && @protect[:sort] != 0
+      attributes << "autoFilter"  << 0 if @protect[:autofilter] && @protect[:autofilter] != 0
+      attributes << "pivotTables" << 0 if @protect[:pivot_tables] && @protect[:pivot_tables] != 0
 
-      attributes << "selectUnlockedCells" << 1 if !@protect[:select_unlocked_cells]
+      attributes << "selectUnlockedCells" << 1 unless @protect[:select_unlocked_cells] && @protect[:select_unlocked_cells] != 0
 
       @writer.empty_tag('sheetProtection', attributes)
     end
@@ -7092,7 +7092,7 @@ module Writexlsx
     end
 
     def zoom_scale_normal? #:nodoc:
-      !!@zoom_scale_normal
+      @zoom_scale_normal && @zoom_scale_normal != 0
     end
 
     def page_view? #:nodoc:
