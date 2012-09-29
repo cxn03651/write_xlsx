@@ -89,15 +89,43 @@ module Writexlsx
       # Write the <si> element.
       #
       def write_si(string)
+        string = string.dup
         attributes = []
 
-        attributes << 'xml:space' << 'preserve' if string =~ /^[ \t]/ || string =~ /[ \t]$/
+        # Excel escapes control characters with _xHHHH_ and also escapes any
+        # literal strings of that type by encoding the leading underscore. So
+        # "\0" -> _x0000_ and "_x0000_" -> _x005F_x0000_.
+        # The following substitutions deal with those cases.
+
+        # Escape the escape.
+        string = string.gsub(/(_x[0-9a-fA-F]{4}_)/, '_x005F\1')
+
+        # Convert control character to the _xHHHH_ escape.
+        string = string.gsub(
+                             /([\x00-\x08\x0B-\x1F])/,
+                             sprintf("_x%04X_", $1.ord)
+                             ) if string =~ /([\x00-\x08\x0B-\x1F])/
+
+        # Convert character to \xC2\xxx or \xC3\xxx
+        string = add_c2_c3(string) if 0x80 <= string.ord && string.ord <= 0xFF
+
+        # Add attribute to preserve leading or trailing whitespace.
+        attributes << 'xml:space' << 'preserve' if string =~ /\A\s|\s\Z/
 
         # Write any rich strings without further tags.
         if string =~ %r{^<r>} && string =~ %r{</r>$}
           @writer.si_rich_element(string)
         else
           @writer.si_element(string, attributes)
+        end
+      end
+
+      def add_c2_c3(string)
+        num = string.ord
+        if 0x80 <= num && num < 0xC0
+          0xC2.chr + num.chr
+        else
+          0xC3.chr + (num - 0x40).chr
         end
       end
 
