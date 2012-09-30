@@ -1075,21 +1075,7 @@ module Writexlsx
 
       # TODO. We may be able to remove this after refactoring.
 
-      @chartarea = {
-        :_visible          => 1,
-        :_fg_color_index   => 0x4E,
-        :_fg_color_rgb     => 0xFFFFFF,
-        :_bg_color_index   => 0x4D,
-        :_bg_color_rgb     => 0x000000,
-        :_area_pattern     => 0x0001,
-        :_area_options     => 0x0001,
-        :_line_pattern     => 0x0000,
-        :_line_weight      => 0x0000,
-        :_line_color_index => 0x4D,
-        :_line_color_rgb   => 0x000000,
-        :_line_options     => 0x0009
-      }
-
+      @chartarea = default_chartarea_property_for_embedded
     end
 
     #
@@ -1545,7 +1531,17 @@ module Writexlsx
     # Setup the default properties for a chart.
     #
     def set_default_properties # :nodoc:
-      @chartarea = {
+      @chartarea = default_chartarea_property
+      @plotarea  = default_plotarea_property
+      set_x_axis
+      set_y_axis
+
+      set_x2_axis
+      set_y2_axis
+    end
+
+    def default_chartarea_property
+      {
         :_visible          => 0,
         :_fg_color_index   => 0x4E,
         :_fg_color_rgb     => 0xFFFFFF,
@@ -1559,8 +1555,22 @@ module Writexlsx
         :_line_color_rgb   => 0x000000,
         :_line_options     => 0x0008
       }
+    end
 
-      @plotarea = {
+    def default_chartarea_property_for_embedded
+      default_chartarea_property.
+        merge(
+              :_visible => 1,
+              :_area_pattern => 0x0001,
+              :_area_options => 0x0001,
+              :_line_pattern => 0x0000,
+              :_line_weight  => 0x0000,
+              :_line_options => 0x0009
+              )
+    end
+
+    def default_plotarea_property
+      {
         :_visible          => 1,
         :_fg_color_index   => 0x16,
         :_fg_color_rgb     => 0xC0C0C0,
@@ -1574,12 +1584,6 @@ module Writexlsx
         :_line_color_rgb   => 0x808080,
         :_line_options     => 0x0000
       }
-
-      set_x_axis
-      set_y_axis
-
-      set_x2_axis
-      set_y2_axis
     end
 
     #
