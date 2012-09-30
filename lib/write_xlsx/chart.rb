@@ -1678,7 +1678,11 @@ module Writexlsx
     #
     # Write the <c:plotArea> element.
     #
-    def write_plot_area # :nodoc:
+    def write_plot_area   # :nodoc:
+      write_plot_area_base
+    end
+
+    def write_plot_area_base(type = nil) # :nodoc:
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
         write_layout
@@ -1687,28 +1691,30 @@ module Writexlsx
         write_chart_type(:primary_axes => 0)
 
         # Write the c:catAx elements for series using primary axes.
-        write_cat_axis(
-                       :x_axis   => @x_axis,
-                       :y_axis   => @y_axis,
-                       :axis_ids => @axis_ids
-                       )
-        write_val_axis(
-                       :x_axis   => @x_axis,
-                       :y_axis   => @y_axis,
-                       :axis_ids => @axis_ids
-                       )
+        params = {
+          :x_axis   => @x_axis,
+          :y_axis   => @y_axis,
+          :axis_ids => @axis_ids
+        }
+        write_cat_or_date_axis(params, type)
+        write_val_axis(params)
 
         # Write c:valAx and c:catAx elements for series using secondary axes.
-        write_val_axis(
-                       :x_axis   => @x2_axis,
-                       :y_axis   => @y2_axis,
-                       :axis_ids => @axis2_ids
-                       )
-        write_cat_axis(
-                       :x_axis   => @x2_axis,
-                       :y_axis   => @y2_axis,
-                       :axis_ids => @axis2_ids
-                       )
+        params = {
+          :x_axis   => @x2_axis,
+          :y_axis   => @y2_axis,
+          :axis_ids => @axis2_ids
+        }
+        write_val_axis(params)
+        write_cat_or_date_axis(params, type)
+      end
+    end
+
+    def write_cat_or_date_axis(params, type)
+      if type == :stock
+        write_date_axis(params)
+      else
+        write_cat_axis(params)
       end
     end
 
