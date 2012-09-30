@@ -6165,16 +6165,20 @@ module Writexlsx
     # Write the <mergeCells> element.
     #
     def write_merge_cells #:nodoc:
-      return if @merge.empty?
-
-      attributes = ['count', @merge.size]
-
-      @writer.tag_elements('mergeCells', attributes) do
-        # Write the mergeCell element.
+      write_some_elements('mergeCells', @merge) do
         @merge.each { |merged_range| write_merge_cell(merged_range) }
       end
     end
 
+    def write_some_elements(tag, container)
+      return if container.empty?
+
+      attributes = ['count', container.size]
+
+      @writer.tag_elements(tag, attributes) do
+        yield
+      end
+    end
 
     #
     # Write the <mergeCell> element.
@@ -6664,11 +6668,7 @@ module Writexlsx
     # Write the <dataValidations> element.
     #
     def write_data_validations #:nodoc:
-      return if @validations.empty?
-
-      attributes = ['count', @validations.size]
-
-      @writer.tag_elements('dataValidations', attributes) do
+      write_some_elements('dataValidations', @validations) do
         @validations.each { |validation| write_data_validation(validation) }
       end
     end
