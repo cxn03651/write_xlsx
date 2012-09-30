@@ -1108,20 +1108,7 @@ module Writexlsx
     def prepare_borders #:nodoc:
       borders = {}
 
-      @xf_formats.each do |format|
-        key = format.get_border_key
-
-        if borders[key]
-          # Border has already been used.
-          format.border_index = borders[key]
-          format.has_border(false)
-        else
-          # This is a new border.
-          format.border_index = borders.size
-          borders[key]        = borders.size
-          format.has_border(true)
-        end
-      end
+      @xf_formats.each { |format| format.set_border_info(borders) }
 
       @border_count = borders.size
 

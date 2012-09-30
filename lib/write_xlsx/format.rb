@@ -638,6 +638,21 @@ module Writexlsx
       end
     end
 
+    def set_border_info(borders)
+      key = get_border_key
+
+      if borders[key]
+        # Border has already been used.
+        @border_index = borders[key]
+        @has_border   = false
+      else
+        # This is a new border.
+        @border_index = borders.size
+        borders[key]  = borders.size
+        @has_border   = true
+      end
+    end
+
     def method_missing(name, *args)  # :nodoc:
       method = "#{name}"
 
