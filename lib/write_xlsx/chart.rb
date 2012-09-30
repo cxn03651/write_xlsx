@@ -1096,7 +1096,7 @@ module Writexlsx
     # Write the <c:barChart> element.
     #
     def write_bar_chart(params)   # :nodoc:
-      if params[:primary_axes] == 1
+      if ptrue?(params[:primary_axes])
         series = get_primary_axes_series
       else
         series = get_secondary_axes_series
@@ -1966,7 +1966,7 @@ module Writexlsx
         # Write the c:scaling element.
         write_scaling(x_axis[:_reverse])
 
-        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
+        write_delete(1) unless ptrue?(x_axis[:_visible])
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
@@ -1983,7 +1983,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || (x_axis[:_visible] && x_axis[:_visible] != 0)
+        if @show_crosses || ptrue?(x_axis[:_visible])
           # Note, the category crossing comes from the value axis.
           if nil_or_max?(y_axis[:_crossing])
             # Write the c:crosses element.
@@ -2026,7 +2026,7 @@ module Writexlsx
         write_scaling(y_axis[:_reverse], y_axis[:_min],
                       y_axis[:_max], y_axis[:_log_base])
 
-        write_delete(1) if y_axis[:_visible].nil? || y_axis[:_visible] == 0
+        write_delete(1) unless ptrue?(y_axis[:_visible])
 
         # Write the c:axPos element.
         write_axis_pos(position, x_axis[:_reverse])
@@ -2096,7 +2096,7 @@ module Writexlsx
                       x_axis[:_max], x_axis[:_log_base]
                       )
 
-        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
+        write_delete(1) unless ptrue?(x_axis[:_visible])
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
@@ -2205,7 +2205,7 @@ module Writexlsx
                       x_axis[:_reverse], x_axis[:_min],
                       x_axis[:_max], x_axis[:_log_base]
                       )
-        write_delete(1) if x_axis[:_visible].nil? || x_axis[:_visible] == 0
+        write_delete(1) unless ptrue?(x_axis[:_visible])
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:reverse])
@@ -2222,7 +2222,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || (x_axis[:_visible] && x_axis[:_visible] != 0)
+        if @show_crosses || ptrue?(x_axis[:_visible])
           # Note, the category crossing comes from the value axis.
           if nil_or_max?(y_axis[:_crossing])
             # Write the c:crossing element.
@@ -2272,7 +2272,7 @@ module Writexlsx
     # Write the <c:logBase> element.
     #
     def write_c_log_base(val) # :nodoc:
-      return if val == 0 || val.nil?
+      return unless ptrue?(val)
 
       attributes = ['val', val]
 
@@ -2283,7 +2283,7 @@ module Writexlsx
     # Write the <c:orientation> element.
     #
     def write_orientation(reverse = nil) # :nodoc:
-      val     = reverse && reverse != 0 ? 'maxMin' : 'minMax'
+      val     = ptrue?(reverse) ? 'maxMin' : 'minMax'
 
       attributes = ['val', val]
 
@@ -2416,7 +2416,7 @@ module Writexlsx
     # Write the <c:majorGridlines> element.
     #
     def write_major_gridlines(options = {}) # :nodoc:
-      return if options[:visible].nil? || options[:visible] == 0
+      return unless ptrue?(options[:visible])
 
       @writer.empty_tag('c:majorGridlines')
     end
@@ -2706,7 +2706,7 @@ module Writexlsx
                     'vert', vert
                    ]
 
-      attributes = [] if !horiz || horiz == 0
+      attributes = [] unless ptrue?(horiz)
 
       @writer.empty_tag('a:bodyPr', attributes)
     end
@@ -2824,15 +2824,15 @@ module Writexlsx
     def write_marker(marker = nil) # :nodoc:
       marker ||= @default_marker
 
-      return if marker.nil? || marker == 0
-      return if marker[:automatic] && marker[:automatic] != 0
+      return unless ptrue?(marker)
+      return if ptrue?(marker[:automatic])
 
       @writer.tag_elements('c:marker') do
         # Write the c:symbol element.
         write_symbol(marker[:type])
         # Write the c:size element.
         size = marker[:size]
-        write_marker_size(size) if !size.nil? && size != 0
+        write_marker_size(size) if ptrue?(size)
         # Write the c:spPr element.
         write_sp_pr(marker)
       end
@@ -2873,13 +2873,13 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      return if (!series.has_key?(:_line) || series[:_line][:_defined].nil? || series[:_line][:_defined] == 0) &&
-                (!series.has_key?(:_fill) || series[:_fill][:_defined].nil? || series[:_fill][:_defined] == 0)
+      return if (!series.has_key?(:_line) || !ptrue?(series[:_line][:_defined])) &&
+                (!series.has_key?(:_fill) || !ptrue?(series[:_fill][:_defined]))
 
       @writer.tag_elements('c:spPr') do
         # Write the fill elements for solid charts such as pie and bar.
         if series[:_fill] && series[:_fill][:_defined] != 0
-          if series[:_fill][:none] && series[:_fill][:none] != 0
+          if ptrue?(series[:_fill][:none])
             # Write the a:noFill element.
             write_a_no_fill
           else
@@ -2911,7 +2911,7 @@ module Writexlsx
 
       @writer.tag_elements('a:ln', attributes) do
         # Write the line fill.
-        if !line[:none].nil? && line[:none] != 0
+        if ptrue?(line[:none])
           # Write the a:noFill element.
           write_a_no_fill
         else

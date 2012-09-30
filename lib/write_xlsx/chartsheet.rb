@@ -176,9 +176,9 @@ module Writexlsx
 
       attributes = []
 
-      attributes << {'filterMode' => 1} if (@filter_on && @filter_on != 0)
+      attributes << {'filterMode' => 1} if ptrue?(@filter_on)
 
-      if (@fit_page && @fit_page != 0) || (@tab_color && @tab_color != 0)
+      if ptrue?(@fit_page) || ptrue?(@tab_color)
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
           write_page_set_up_pr
