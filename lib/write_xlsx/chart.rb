@@ -1874,10 +1874,10 @@ module Writexlsx
     end
 
     #
-    # Write the <c:numRef> element.
+    # Write the <c:numRef> or <c:strRef> element.
     #
-    def write_num_ref(formula, data, type) # :nodoc:
-      @writer.tag_elements('c:numRef') do
+    def write_num_or_str_ref(tag, formula, data, type) # :nodoc:
+      @writer.tag_elements(tag) do
         # Write the c:f element.
         write_series_formula(formula)
         if type == 'num'
@@ -1891,20 +1891,17 @@ module Writexlsx
     end
 
     #
+    # Write the <c:numRef> element.
+    #
+    def write_num_ref(formula, data, type) # :nodoc:
+      write_num_or_str_ref('c:numRef', formula, data, type)
+    end
+
+    #
     # Write the <c:strRef> element.
     #
     def write_str_ref(formula, data, type) # :nodoc:
-      @writer.tag_elements('c:strRef') do
-        # Write the c:f element.
-        write_series_formula(formula)
-        if type == 'num'
-          # Write the c:numCache element.
-          write_num_cache(data)
-        elsif type == 'str'
-          # Write the c:strCache element.
-          write_str_cache(data)
-        end
-      end
+      write_num_or_str_ref('c:strRef', formula, data, type)
     end
 
     #
