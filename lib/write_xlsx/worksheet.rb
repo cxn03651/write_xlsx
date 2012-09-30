@@ -4882,30 +4882,10 @@ module Writexlsx
       # Convert date/times value if required.
       if %w[date time cellIs].include?(param[:type])
         param[:type] = 'cellIs'
-        if param[:value] =~ /T/
-            date_time = convert_date_time(param[:value])
-            if date_time
-              param[:value] = date_time
-            else
-                raise "Invalid date/time value '#{param[:value]}' in conditional_formatting()"
-            end
-        end
-        if param[:minimum] =~ /T/
-            date_time = convert_date_time(param[:minimum])
-            if date_time
-              param[:minimum] = date_time
-            else
-              raise "Invalid date/time value '#{param[:minumum]}' in conditional_formatting()"
-            end
-        end
-        if param[:maximum] =~ /T/
-          date_time = convert_date_time(param[:maximum])
-          if date_time
-            param[:maximum] = date_time
-          else
-            raise "Invalid date/time value '#{param[:maximum]}' in conditional_formatting()"
-          end
-        end
+
+        param[:value]   = convert_date_time_if_required(param[:value])
+        param[:minimum] = convert_date_time_if_required(param[:minimum])
+        param[:maximum] = convert_date_time_if_required(param[:maximum])
       end
 
       # 'Between' and 'Not between' criteria require 2 values.
@@ -4923,6 +4903,16 @@ module Writexlsx
         unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
           raise WriteXLSXOptionParameterError
         end
+      end
+    end
+
+    def convert_date_time_if_required(val)
+      if val =~ /T/
+        date_time = convert_date_time(val)
+        raise "Invalid date/time value '#{val}' in conditional_formatting()" unless date_time
+        date_time
+      else
+        val
       end
     end
 
