@@ -1990,14 +1990,7 @@ module Writexlsx
         write_cross_axis(axis_ids[1])
 
         if @show_crosses || ptrue?(x_axis[:_visible])
-          # Note, the category crossing comes from the value axis.
-          if nil_or_max?(y_axis[:_crossing])
-            # Write the c:crosses element.
-            write_crosses(y_axis[:_crossing])
-          else
-            # Write the c:crossesAt element.
-            write_c_crosses_at(y_axis[:_crossing])
-          end
+          write_crossing(y_axis[:_crossing])
         end
         # Write the c:auto element.
         write_auto(1)
@@ -2056,14 +2049,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[0])
 
-        # Note, the category crossing comes from the value axis.
-        if nil_or_max?(x_axis[:_crossing])
-          # Write the c:crosses element.
-          write_crosses(x_axis[:_crossing])
-        else
-          # Write the c:crossesAt element.
-          write_c_crosses_at(x_axis[:_crossing])
-        end
+        write_crossing(x_axis[:_crossing])
 
         # Write the c:crossBetween element.
         write_cross_between
@@ -2123,14 +2109,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        # Note, the category crossing comes from the value axis.
-        if nil_or_max?(y_axis[:_crossing])
-          # Write the c:crosses element.
-          write_crosses(y_axis[:_crossing])
-        else
-          # Write the c:crossesAt element.
-          write_c_crosses_at(y_axis[:_crossing])
-        end
+        write_crossing(y_axis[:_crossing])
 
         # Write the c:crossBetween element.
         write_cross_between
@@ -2172,14 +2151,9 @@ module Writexlsx
         write_tick_label_pos(params[:tick_label_pos])
         # Write the c:crossAx element.
         write_cross_axis(params[:cross_axis])
-        # Note, the category crossing comes from the value axis.
-        if nil_or_max?(params[:category_crossing])
-          # Write the c:crosses element.
-          write_crosses(params[:category_crossing])
-        else
-          # Write the c:crossesAt element.
-          write_c_crosses_at(params[:category_crossing])
-        end
+
+        write_crossing(params[:category_crossing])
+
         # Write the c:crossBetween element.
         write_cross_between
         # Write the c:majorUnit element.
@@ -2229,14 +2203,7 @@ module Writexlsx
         write_cross_axis(axis_ids[1])
 
         if @show_crosses || ptrue?(x_axis[:_visible])
-          # Note, the category crossing comes from the value axis.
-          if nil_or_max?(y_axis[:_crossing])
-            # Write the c:crossing element.
-            write_crosses(y_axis[:_crossing])
-          else
-            # Write the c:crossesAt element.
-            write_c_crosses_at(y_axis[:_crossing])
-          end
+          write_crossing(y_axis[:_crossing])
         end
 
         # Write the c:auto element.
@@ -2255,6 +2222,17 @@ module Writexlsx
         if !x_axis[:_minor_unit].nil?
           write_c_minor_time_unit(x_axis[:_minor_unit_type])
         end
+      end
+    end
+
+    def write_crossing(crossing)
+      # Note, the category crossing comes from the value axis.
+      if nil_or_max?(crossing)
+        # Write the c:crosses element.
+        write_crosses(crossing)
+      else
+        # Write the c:crossesAt element.
+        write_c_crosses_at(crossing)
       end
     end
 
