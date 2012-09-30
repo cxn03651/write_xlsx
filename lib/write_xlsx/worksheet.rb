@@ -6955,32 +6955,12 @@ module Writexlsx
 
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
         if @cell_data_table[row_num]
-          (@dim_colmin .. @dim_colmax).each do |col_num|
-            if @cell_data_table[row_num][col_num]
-              if !span_min
-                span_min = col_num
-                span_max = col_num
-              else
-                span_min = col_num if col_num < span_min
-                span_max = col_num if col_num > span_max
-              end
-            end
-          end
+          span_min, span_max = calc_spans(@cell_data_table, row_num, span_min, span_max)
         end
 
         # Calculate spans for comments.
         if @comments[row_num]
-          (@dim_colmin .. @dim_colmax).each do |col_num|
-            if @comments[row_num][col_num]
-              if !span_min
-                span_min = col_num
-                span_max = col_num
-              else
-                span_min = col_num if col_num < span_min
-                span_max = col_num if col_num > span_max
-              end
-            end
-          end
+          span_min, span_max = calc_spans(@comments, row_num, span_min, span_max)
         end
 
         if ((row_num + 1) % 16 == 0) || (row_num == @dim_rowmax)
@@ -6995,6 +6975,21 @@ module Writexlsx
       end
 
       @row_spans = spans
+    end
+
+    def calc_spans(data, row_num, span_min, span_max)
+      (@dim_colmin .. @dim_colmax).each do |col_num|
+        if data[row_num][col_num]
+          if !span_min
+            span_min = col_num
+            span_max = col_num
+          else
+            span_min = col_num if col_num < span_min
+            span_max = col_num if col_num > span_max
+          end
+        end
+      end
+      [span_min, span_max]
     end
 
     def xf(format) #:nodoc:
