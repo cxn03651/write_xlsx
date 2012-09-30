@@ -1376,11 +1376,7 @@ module Writexlsx
       dash_type = line[:dash_type]
 
       if dash_type
-        if dash_types[dash_type.to_sym]
-          line[:dash_type] = dash_types[dash_type.to_sym]
-        else
-          raise "Unknown dash type '#{dash_type}'\n"
-        end
+        line[:dash_type] = value_or_raise(dash_types, dash_type, 'dash type')
       end
 
       line[:_defined] = 1
@@ -1427,12 +1423,7 @@ module Writexlsx
 
       if marker_type
         marker[:automatic] = 1 if marker_type == 'automatic'
-
-        if types[marker_type.to_sym]
-          marker[:type] = types[marker_type.to_sym]
-        else
-          raise "Unknown marker type '#{marker_type}'\n"
-        end
+        marker[:type] = value_or_raise(types, marker_type, 'maker type')
       end
 
       # Set the line properties for the marker..
@@ -1468,11 +1459,7 @@ module Writexlsx
       # Check the trendline type.
       trend_type = trendline[:type]
 
-      if types[trend_type.to_sym]
-        trendline[:type] = types[trend_type.to_sym]
-      else
-        raise "Unknown trendline type '#{trend_type}'\n"
-      end
+      trendline[:type] = value_or_raise(types, trend_type, 'trendline type')
 
       # Set the line properties for the trendline..
       line = get_line_properties(trendline[:line])
@@ -1513,14 +1500,15 @@ module Writexlsx
           :best_fit    => 'bestFit'
         }
 
-        if positions[position.to_sym]
-          labels[:position] = positions[position.to_sym]
-        else
-          raise "Unknown label position '#{position}'"
-        end
+        labels[:position] = value_or_raise(positions, position, 'label position')
       end
 
       labels
+    end
+
+    def value_or_raise(hash, key, msg)
+      raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
+      hash[key.to_sym]
     end
 
     #
