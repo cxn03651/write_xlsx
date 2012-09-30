@@ -1046,20 +1046,7 @@ module Writexlsx
     def prepare_fonts #:nodoc:
       fonts = {}
 
-      @xf_formats.each do |format|
-        key = format.get_font_key
-
-        if fonts[key]
-          # Font has already been used.
-          format.font_index = fonts[key]
-          format.has_font(false)
-        else
-          # This is a new font.
-          format.font_index = fonts.size
-          fonts[key]        = fonts.size
-          format.has_font(true)
-        end
-      end
+      @xf_formats.each { |format| format.set_font_info(fonts) }
 
       @font_count = fonts.size
 

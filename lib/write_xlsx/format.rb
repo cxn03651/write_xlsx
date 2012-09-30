@@ -623,6 +623,21 @@ module Writexlsx
       set_align('top')
     end
 
+    def set_font_info(fonts)
+      key = get_font_key
+
+      if fonts[key]
+        # Font has already been used.
+        @font_index = fonts[key]
+        @has_font   = false
+      else
+        # This is a new font.
+        @font_index = fonts.size
+        fonts[key]  = fonts.size
+        @has_font   = true
+      end
+    end
+
     def method_missing(name, *args)  # :nodoc:
       method = "#{name}"
 
