@@ -511,25 +511,23 @@ module Writexlsx
       @writer.xml_decl
 
       # Write the c:chartSpace element.
-      write_chart_space
+      write_chart_space do
 
-      # Write the c:lang element.
-      write_lang
+        # Write the c:lang element.
+        write_lang
 
-      # Write the c:style element.
-      write_style
+        # Write the c:style element.
+        write_style
 
-      # Write the c:protection element.
-      write_protection
+        # Write the c:protection element.
+        write_protection
 
-      # Write the c:chart element.
-      write_chart
+        # Write the c:chart element.
+        write_chart
 
-      # Write the c:printSettings element.
-      write_print_settings if @embedded && @embedded != 0
-
-      # Close the worksheet tag.
-      @writer.end_tag( 'c:chartSpace')
+        # Write the c:printSettings element.
+        write_print_settings if @embedded && @embedded != 0
+      end
 
       # Close the XML writer object and filehandle.
       @writer.crlf
@@ -1590,18 +1588,23 @@ module Writexlsx
     # Write the <c:chartSpace> element.
     #
     def write_chart_space # :nodoc:
+      @writer.tag_elements('c:chartSpace', chart_space_attributes) do
+        yield
+      end
+    end
+
+    # for <c:chartSpace> element.
+    def chart_space_attributes # :nodoc:
       schema  = 'http://schemas.openxmlformats.org/'
       xmlns_c = schema + 'drawingml/2006/chart'
       xmlns_a = schema + 'drawingml/2006/main'
       xmlns_r = schema + 'officeDocument/2006/relationships'
 
-      attributes = [
-                    'xmlns:c', xmlns_c,
-                    'xmlns:a', xmlns_a,
-                    'xmlns:r', xmlns_r
-                   ]
-
-      @writer.start_tag('c:chartSpace', attributes)
+      [
+       'xmlns:c', xmlns_c,
+       'xmlns:a', xmlns_a,
+       'xmlns:r', xmlns_r
+      ]
     end
 
     #
