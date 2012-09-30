@@ -19,24 +19,22 @@ module Writexlsx
       def assemble_xml_file(worksheet)
         return unless @writer
 
-        write_xml_namespace
+        write_xml_namespace do
+          # Write the o:shapelayout element.
+          write_shapelayout(worksheet.vml_data_id)
 
-        # Write the o:shapelayout element.
-        write_shapelayout(worksheet.vml_data_id)
+          # Write the v:shapetype element.
+          write_shapetype
 
-        # Write the v:shapetype element.
-        write_shapetype
-
-        z_index = 1
-        vml_shape_id = worksheet.vml_shape_id
-        worksheet.comments_array.each do |comment|
-          # Write the v:shape element.
-          vml_shape_id += 1
-          write_shape(vml_shape_id, z_index, comment)
-          z_index += 1
+          z_index = 1
+          vml_shape_id = worksheet.vml_shape_id
+          worksheet.comments_array.each do |comment|
+            # Write the v:shape element.
+            vml_shape_id += 1
+            write_shape(vml_shape_id, z_index, comment)
+            z_index += 1
+          end
         end
-
-        @writer.end_tag('xml')
         @writer.crlf
         @writer.close
       end
@@ -63,18 +61,23 @@ module Writexlsx
       # Write the <xml> element. This is the root element of VML.
       #
       def write_xml_namespace
+        @writer.tag_elements('xml', xml_attributes) do
+          yield
+        end
+      end
+
+      # for <xml> elements.
+      def xml_attributes
         schema  = 'urn:schemas-microsoft-com:'
         xmlns   = schema + 'vml'
         xmlns_o = schema + 'office:office'
         xmlns_x = schema + 'office:excel'
 
-        attributes = [
-          'xmlns:v', xmlns,
-          'xmlns:o', xmlns_o,
-          'xmlns:x', xmlns_x
+        [
+         'xmlns:v', xmlns,
+         'xmlns:o', xmlns_o,
+         'xmlns:x', xmlns_x
         ]
-
-        @writer.start_tag('xml', attributes)
       end
 
       #
