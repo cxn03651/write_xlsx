@@ -2010,8 +2010,7 @@ module Writexlsx
         write_axis_id(axis_ids[1])
 
         # Write the c:scaling element.
-        write_scaling(y_axis[:_reverse], y_axis[:_min],
-                      y_axis[:_max], y_axis[:_log_base])
+        write_scaling_with_param(y_axis)
 
         write_delete(1) unless ptrue?(y_axis[:_visible])
 
@@ -2071,10 +2070,7 @@ module Writexlsx
         write_axis_id(axis_ids[0])
 
         # Write the c:scaling element.
-        write_scaling(
-                      x_axis[:_reverse], x_axis[:_min],
-                      x_axis[:_max], x_axis[:_log_base]
-                      )
+        write_scaling_with_param(x_axis)
 
         write_delete(1) unless ptrue?(x_axis[:_visible])
 
@@ -2120,9 +2116,8 @@ module Writexlsx
       @writer.tag_elements('c:valAx') do
         write_axis_id(params[:axis_id])
         # Write the c:scaling element.
-        write_scaling(
-                      params[:scaling_axis][:_reverse], params[:scaling_axis][:_min],
-                      params[:scaling_axis][:_max], params[:scaling_axis][:_log_base])
+        write_scaling_with_param(params[:scaling_axis])
+
         # Write the c:axPos element.
         write_axis_pos(position, params[:axis_position_element])
         # Write the c:majorGridlines element.
@@ -2169,10 +2164,8 @@ module Writexlsx
       @writer.tag_elements('c:dateAx') do
         write_axis_id(axis_ids[0])
         # Write the c:scaling element.
-        write_scaling(
-                      x_axis[:_reverse], x_axis[:_min],
-                      x_axis[:_max], x_axis[:_log_base]
-                      )
+        write_scaling_with_param(x_axis)
+
         write_delete(1) unless ptrue?(x_axis[:_visible])
 
         # Write the c:axPos element.
@@ -2224,6 +2217,14 @@ module Writexlsx
       end
     end
 
+    def write_scaling_with_param(param)
+      write_scaling(
+                    param[:_reverse],
+                    param[:_min],
+                    param[:_max],
+                    param[:_log_base]
+                    )
+    end
     #
     # Write the <c:scaling> element.
     #
