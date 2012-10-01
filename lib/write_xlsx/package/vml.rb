@@ -69,14 +69,10 @@ module Writexlsx
       # for <xml> elements.
       def xml_attributes
         schema  = 'urn:schemas-microsoft-com:'
-        xmlns   = schema + 'vml'
-        xmlns_o = schema + 'office:office'
-        xmlns_x = schema + 'office:excel'
-
         [
-         'xmlns:v', xmlns,
-         'xmlns:o', xmlns_o,
-         'xmlns:x', xmlns_x
+         'xmlns:v', "#{schema}vml",
+         'xmlns:o', "#{schema}office:office",
+         'xmlns:x', "#{schema}office:excel"
         ]
       end
 

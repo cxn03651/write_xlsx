@@ -1596,14 +1596,10 @@ module Writexlsx
     # for <c:chartSpace> element.
     def chart_space_attributes # :nodoc:
       schema  = 'http://schemas.openxmlformats.org/'
-      xmlns_c = schema + 'drawingml/2006/chart'
-      xmlns_a = schema + 'drawingml/2006/main'
-      xmlns_r = schema + 'officeDocument/2006/relationships'
-
       [
-       'xmlns:c', xmlns_c,
-       'xmlns:a', xmlns_a,
-       'xmlns:r', xmlns_r
+       'xmlns:c', "#{schema}drawingml/2006/chart",
+       'xmlns:a', "#{schema}drawingml/2006/main",
+       'xmlns:r', "#{schema}officeDocument/2006/relationships"
       ]
     end
 
