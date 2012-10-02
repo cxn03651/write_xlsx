@@ -1154,15 +1154,11 @@ module Writexlsx
         #
         if format.pattern == 1 && ne_0?(format.bg_color) && ne_0?(format.fg_color)
           format.fg_color, format.bg_color = format.bg_color, format.fg_color
-        end
-
-        if format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
+        elsif format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
           format.fg_color = format.bg_color
           format.bg_color = 0
           format.pattern  = 1
-        end
-
-        if format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
+        elsif format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
           format.bg_color = 0
           format.pattern  = 1
         end
