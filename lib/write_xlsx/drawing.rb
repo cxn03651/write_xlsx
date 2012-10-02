@@ -67,12 +67,9 @@ module Writexlsx
     #
     def write_drawing_workspace
       schema    = 'http://schemas.openxmlformats.org/drawingml/'
-      xmlns_xdr = "#{schema}2006/spreadsheetDrawing"
-      xmlns_a   = "#{schema}2006/main"
-
       attributes = [
-          'xmlns:xdr', xmlns_xdr,
-          'xmlns:a',   xmlns_a
+          'xmlns:xdr', "#{schema}2006/spreadsheetDrawing",
+          'xmlns:a',    "#{schema}2006/main"
       ]
 
       @writer.start_tag('xdr:wsDr', attributes)

@@ -67,12 +67,9 @@ module Writexlsx
       #
       def write_properties
         schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
-        xmlns    = "#{schema}extended-properties"
-        xmlns_vt = "#{schema}docPropsVTypes"
-
         attributes = [
-            'xmlns',     xmlns,
-            'xmlns:vt',  xmlns_vt
+            'xmlns',     "#{schema}extended-properties",
+            'xmlns:vt',  "#{schema}docPropsVTypes"
         ]
 
         @writer.start_tag('Properties', attributes)
