@@ -71,41 +71,7 @@ module Writexlsx
       # Overridden to use write_date_axis() instead of write_cat_axis().
       #
       def write_plot_area
-        @writer.tag_elements('c:plotArea') do
-          # Write the c:layout element.
-          write_layout
-
-          # TODO: (for JMCNAMARA todo ;)
-          # foreach my $chart_type (@chart_types)
-
-          # Write the subclass chart type elements for primary and secondary axes
-          write_chart_type(:primary_axes => 1)
-          write_chart_type(:primary_axes => 0)
-
-          # Write the c:dateAx elements for series using primary axes
-          write_date_axis(
-                          :x_axis   => @x_axis,
-                          :y_axis   => @y_axis,
-                          :axis_ids => @axis_ids
-                          )
-          write_val_axis(
-                         :x_axis   => @x_axis,
-                         :y_axis   => @y_axis,
-                         :axis_ids => @axis_ids
-                         )
-
-          # Write c:valAx and c:catAx elements for series using secondary axes
-          write_val_axis(
-                         :x_axis   => @x2_axis,
-                         :y_axis   => @y2_axis,
-                         :axis_ids => @axis2_ids
-                         )
-          write_date_axis(
-                          :x_axis   => @x2_axis,
-                          :y_axis   => @y2_axis,
-                          :axis_ids => @axis2_ids
-                          )
-        end
+        write_plot_area_base(:stock)
       end
 
       #

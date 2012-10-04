@@ -731,7 +731,7 @@ module Writexlsx
       return unless firstcol && lastcol && !data.empty?
 
       # Assume second column is the same as first if 0. Avoids KB918419 bug.
-      lastcol = firstcol if lastcol == 0
+      lastcol = firstcol unless ptrue?(lastcol)
 
       # Ensure 2nd col is larger than first. Also for KB918419 bug.
       firstcol, lastcol = lastcol, firstcol if firstcol > lastcol
@@ -743,8 +743,8 @@ module Writexlsx
       #       the column dimensions in certain cases.
       ignore_row = 1
       ignore_col = 1
-      ignore_col = 0 if format.respond_to?(:xf_index)     # Column has a format.
-      ignore_col = 0 if width && hidden && hidden != 0    # Column has a width but is hidden
+      ignore_col = 0 if format.respond_to?(:xf_index)   # Column has a format.
+      ignore_col = 0 if width && ptrue?(hidden)         # Column has a width but is hidden
 
       check_dimensions_and_update_max_min_values(0, firstcol, ignore_row, ignore_col)
       check_dimensions_and_update_max_min_values(0, lastcol,  ignore_row, ignore_col)
@@ -765,7 +765,7 @@ module Writexlsx
       # Store the col sizes for use when calculating image vertices taking
       # hidden columns into account. Also store the column formats.
       width  ||= 0                        # Ensure width isn't nil.
-      width = 0 if hidden && hidden != 0  # Set width to zero if col is hidden
+      width = 0 if ptrue?(hidden)         # Set width to zero if col is hidden
 
       (firstcol .. lastcol).each do |col|
         @col_sizes[col]   = width
@@ -3439,12 +3439,12 @@ module Writexlsx
       param[:autofilter]  ||= 1
 
       # Set the table options.
-      table[:_show_first_col]   = param[:first_column]   && param[:first_column] != 0   ? 1 : 0
-      table[:_show_last_col]    = param[:last_column]    && param[:last_column] != 0 ? 1 : 0
-      table[:_show_row_stripes] = param[:banded_rows]    && param[:banded_rows] != 0 ? 1 : 0
-      table[:_show_col_stripes] = param[:banded_columns] && param[:banded_columns] != 0 ? 1 : 0
-      table[:_header_row_count] = param[:header_row]     && param[:header_row] != 0 ? 1 : 0
-      table[:_totals_row_shown] = param[:total_row]      && param[:total_row] != 0 ? 1 : 0
+      table[:_show_first_col]   = ptrue?(param[:first_column])   ? 1 : 0
+      table[:_show_last_col]    = ptrue?(param[:last_column])    ? 1 : 0
+      table[:_show_row_stripes] = ptrue?(param[:banded_rows])    ? 1 : 0
+      table[:_show_col_stripes] = ptrue?(param[:banded_columns]) ? 1 : 0
+      table[:_header_row_count] = ptrue?(param[:header_row])     ? 1 : 0
+      table[:_totals_row_shown] = ptrue?(param[:total_row])      ? 1 : 0
 
       # Set the table name.
       if param[:name]
@@ -4642,7 +4642,7 @@ module Writexlsx
 
       # The following is only required for positioning drawing/chart objects
       # and not comments. It is probably the result of a bug.
-      if is_drawing && is_drawing != 0
+      if ptrue?(is_drawing)
         col_end -= 1 if width == 0
         row_end -= 1 if height == 0
       end
@@ -4882,30 +4882,10 @@ module Writexlsx
       # Convert date/times value if required.
       if %w[date time cellIs].include?(param[:type])
         param[:type] = 'cellIs'
-        if param[:value] =~ /T/
-            date_time = convert_date_time(param[:value])
-            if date_time
-              param[:value] = date_time
-            else
-                raise "Invalid date/time value '#{param[:value]}' in conditional_formatting()"
-            end
-        end
-        if param[:minimum] =~ /T/
-            date_time = convert_date_time(param[:minimum])
-            if date_time
-              param[:minimum] = date_time
-            else
-              raise "Invalid date/time value '#{param[:minumum]}' in conditional_formatting()"
-            end
-        end
-        if param[:maximum] =~ /T/
-          date_time = convert_date_time(param[:maximum])
-          if date_time
-            param[:maximum] = date_time
-          else
-            raise "Invalid date/time value '#{param[:maximum]}' in conditional_formatting()"
-          end
-        end
+
+        param[:value]   = convert_date_time_if_required(param[:value])
+        param[:minimum] = convert_date_time_if_required(param[:minimum])
+        param[:maximum] = convert_date_time_if_required(param[:maximum])
       end
 
       # 'Between' and 'Not between' criteria require 2 values.
@@ -4923,6 +4903,16 @@ module Writexlsx
         unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
           raise WriteXLSXOptionParameterError
         end
+      end
+    end
+
+    def convert_date_time_if_required(val)
+      if val =~ /T/
+        date_time = convert_date_time(val)
+        raise "Invalid date/time value '#{val}' in conditional_formatting()" unless date_time
+        date_time
+      else
+        val
       end
     end
 
@@ -5494,10 +5484,10 @@ module Writexlsx
       return if shape[:connect] == 0
 
       # Both ends have to be connected to size it.
-      return if shape[:start] == 0 and shape[:end] == 0
+      return if shape[:start] == 0 && shape[:end] == 0
 
       # Both ends need to provide info about where to connect.
-      return if shape[:start_side] == 0 and shape[:end_side] == 0
+      return if shape[:start_side] == 0 && shape[:end_side] == 0
 
       sid = shape[:start]
       eid = shape[:end]
@@ -5909,12 +5899,12 @@ module Writexlsx
       (attributes << 's'            << xf_index) if xf_index != 0
       (attributes << 'customFormat' << 1    ) if format
       (attributes << 'ht'           << height) if height != 15
-      (attributes << 'hidden'       << 1    ) if !!hidden && hidden != 0
+      (attributes << 'hidden'       << 1    ) if ptrue?(hidden)
       (attributes << 'customHeight' << 1    ) if height != 15
-      (attributes << 'outlineLevel' << level) if !!level && level != 0
-      (attributes << 'collapsed'    << 1    ) if !!collapsed && collapsed != 0
+      (attributes << 'outlineLevel' << level) if ptrue?(level)
+      (attributes << 'collapsed'    << 1    ) if ptrue?(collapsed)
 
-      if empty_row && empty_row != 0
+      if ptrue?(empty_row)
         @writer.empty_tag('row', attributes)
       else
         @writer.start_tag('row', attributes)
@@ -6175,16 +6165,20 @@ module Writexlsx
     # Write the <mergeCells> element.
     #
     def write_merge_cells #:nodoc:
-      return if @merge.empty?
-
-      attributes = ['count', @merge.size]
-
-      @writer.tag_elements('mergeCells', attributes) do
-        # Write the mergeCell element.
+      write_some_elements('mergeCells', @merge) do
         @merge.each { |merged_range| write_merge_cell(merged_range) }
       end
     end
 
+    def write_some_elements(tag, container)
+      return if container.empty?
+
+      attributes = ['count', container.size]
+
+      @writer.tag_elements(tag, attributes) do
+        yield
+      end
+    end
 
     #
     # Write the <mergeCell> element.
@@ -6515,27 +6509,27 @@ module Writexlsx
       return unless protect?
 
       attributes = []
-      attributes << "password"         << @protect[:password] if @protect[:password]
-      attributes << "sheet"            << 1 if @protect[:sheet] && @protect[:sheet] != 0
-      attributes << "content"          << 1 if @protect[:content] && @protect[:content] != 0
-      attributes << "objects"          << 1 unless @protect[:objects] && @protect[:objects] != 0
-      attributes << "scenarios"        << 1 unless @protect[:scenarios] && @protect[:scenarios] != 0
-      attributes << "formatCells"      << 0 if @protect[:format_cells] && @protect[:format_cells] != 0
-      attributes << "formatColumns"    << 0 if @protect[:format_columns] && @protect[:format_row] != 0
-      attributes << "formatRows"       << 0 if @protect[:format_rows] && @protect[:format_rows] != 0
-      attributes << "insertColumns"    << 0 if @protect[:insert_columns] && @protect[:insert_columns] != 0
-      attributes << "insertRows"       << 0 if @protect[:insert_rows] && @protect[:insert_rows] != 0
-      attributes << "insertHyperlinks" << 0 if @protect[:insert_hyperlinks] && @protect[:insert_hyperlinks] != 0
-      attributes << "deleteColumns"    << 0 if @protect[:delete_columns] && @protect[:delete_columns] != 0
-      attributes << "deleteRows"       << 0 if @protect[:delete_rows] && @protect[:delete_rows] != 0
+      attributes << "password"         << @protect[:password] if ptrue?(@protect[:password])
+      attributes << "sheet"            << 1 if ptrue?(@protect[:sheet])
+      attributes << "content"          << 1 if ptrue?(@protect[:content])
+      attributes << "objects"          << 1 unless ptrue?(@protect[:objects])
+      attributes << "scenarios"        << 1 unless ptrue?(@protect[:scenarios])
+      attributes << "formatCells"      << 0 if ptrue?(@protect[:format_cells])
+      attributes << "formatColumns"    << 0 if ptrue?(@protect[:format_columns])
+      attributes << "formatRows"       << 0 if ptrue?(@protect[:format_rows])
+      attributes << "insertColumns"    << 0 if ptrue?(@protect[:insert_columns])
+      attributes << "insertRows"       << 0 if ptrue?(@protect[:insert_rows])
+      attributes << "insertHyperlinks" << 0 if ptrue?(@protect[:insert_hyperlinks])
+      attributes << "deleteColumns"    << 0 if ptrue?(@protect[:delete_columns])
+      attributes << "deleteRows"       << 0 if ptrue?(@protect[:delete_rows])
 
-      attributes << "selectLockedCells" << 1 unless @protect[:select_locked_cells] && @protect[:select_locked_cells] != 0
+      attributes << "selectLockedCells" << 1 unless ptrue?(@protect[:select_locked_cells])
 
-      attributes << "sort"        << 0 if @protect[:sort] && @protect[:sort] != 0
-      attributes << "autoFilter"  << 0 if @protect[:autofilter] && @protect[:autofilter] != 0
-      attributes << "pivotTables" << 0 if @protect[:pivot_tables] && @protect[:pivot_tables] != 0
+      attributes << "sort"        << 0 if ptrue?(@protect[:sort])
+      attributes << "autoFilter"  << 0 if ptrue?(@protect[:autofilter])
+      attributes << "pivotTables" << 0 if ptrue?(@protect[:pivot_tables])
 
-      attributes << "selectUnlockedCells" << 1 unless @protect[:select_unlocked_cells] && @protect[:select_unlocked_cells] != 0
+      attributes << "selectUnlockedCells" << 1 unless ptrue?(@protect[:select_unlocked_cells])
 
       @writer.empty_tag('sheetProtection', attributes)
     end
@@ -6596,9 +6590,9 @@ module Writexlsx
 
         theme = format.theme
         color = format.color
-        if !theme.nil? && theme != 0
+        if ptrue?(theme)
           write_color(writer, 'theme', theme)
-        elsif !color.nil? && color != 0
+        elsif ptrue?(color)
           color = get_palette_color(color)
           write_color(writer, 'rgb', color)
         else
@@ -6674,11 +6668,7 @@ module Writexlsx
     # Write the <dataValidations> element.
     #
     def write_data_validations #:nodoc:
-      return if @validations.empty?
-
-      attributes = ['count', @validations.size]
-
-      @writer.tag_elements('dataValidations', attributes) do
+      write_some_elements('dataValidations', @validations) do
         @validations.each { |validation| write_data_validation(validation) }
       end
     end
@@ -6965,32 +6955,12 @@ module Writexlsx
 
       (@dim_rowmin .. @dim_rowmax).each do |row_num|
         if @cell_data_table[row_num]
-          (@dim_colmin .. @dim_colmax).each do |col_num|
-            if @cell_data_table[row_num][col_num]
-              if !span_min
-                span_min = col_num
-                span_max = col_num
-              else
-                span_min = col_num if col_num < span_min
-                span_max = col_num if col_num > span_max
-              end
-            end
-          end
+          span_min, span_max = calc_spans(@cell_data_table, row_num, span_min, span_max)
         end
 
         # Calculate spans for comments.
         if @comments[row_num]
-          (@dim_colmin .. @dim_colmax).each do |col_num|
-            if @comments[row_num][col_num]
-              if !span_min
-                span_min = col_num
-                span_max = col_num
-              else
-                span_min = col_num if col_num < span_min
-                span_max = col_num if col_num > span_max
-              end
-            end
-          end
+          span_min, span_max = calc_spans(@comments, row_num, span_min, span_max)
         end
 
         if ((row_num + 1) % 16 == 0) || (row_num == @dim_rowmax)
@@ -7005,6 +6975,21 @@ module Writexlsx
       end
 
       @row_spans = spans
+    end
+
+    def calc_spans(data, row_num, span_min, span_max)
+      (@dim_colmin .. @dim_colmax).each do |col_num|
+        if data[row_num][col_num]
+          if !span_min
+            span_min = col_num
+            span_max = col_num
+          else
+            span_min = col_num if col_num < span_min
+            span_max = col_num if col_num > span_max
+          end
+        end
+      end
+      [span_min, span_max]
     end
 
     def xf(format) #:nodoc:
@@ -7080,19 +7065,19 @@ module Writexlsx
     end
 
     def filter_on? #:nodoc:
-      @filter_on && @filter_on != 0
+      ptrue?(@filter_on)
     end
 
     def tab_color? #:nodoc:
-      @tab_color && @tab_color != 0
+      ptrue?(@tab_color)
     end
 
     def outline_changed?
-      @outline_changed && @outline_changed != 0
+      ptrue?(@outline_changed)
     end
 
     def zoom_scale_normal? #:nodoc:
-      @zoom_scale_normal && @zoom_scale_normal != 0
+      ptrue?(@zoom_scale_normal)
     end
 
     def page_view? #:nodoc:

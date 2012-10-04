@@ -189,7 +189,7 @@ module Writexlsx
       unless sheets.empty?
         raise "set_1904() must be called before add_worksheet()"
       end
-      @date_1904 = (!mode || mode == 0) ? false : true
+      @date_1904 = ptrue?(mode)
     end
 
     def get_1904
@@ -360,7 +360,7 @@ module Writexlsx
       embedded = params[:embedded] || 0
 
       # Check the worksheet name for non-embedded charts.
-      name = check_sheetname(params[:name], 1) if embedded == 0
+      name = check_sheetname(params[:name], 1) unless ptrue?(embedded)
 
       chart = Chart.factory(type, params[:subtype])
 
@@ -368,7 +368,7 @@ module Writexlsx
       chart.id = @charts.size
 
       # If the chart isn't embedded let the workbook control it.
-      if embedded && embedded != 0
+      if ptrue?(embedded)
         chart.name = params[:name] if params[:name]
 
         # Set index to 0 so that the activate() and set_first_sheet() methods
@@ -1046,20 +1046,7 @@ module Writexlsx
     def prepare_fonts #:nodoc:
       fonts = {}
 
-      @xf_formats.each do |format|
-        key = format.get_font_key
-
-        if fonts[key]
-          # Font has already been used.
-          format.font_index = fonts[key]
-          format.has_font(false)
-        else
-          # This is a new font.
-          format.font_index = fonts.size
-          fonts[key]        = fonts.size
-          format.has_font(true)
-        end
-      end
+      @xf_formats.each { |format| format.set_font_info(fonts) }
 
       @font_count = fonts.size
 
@@ -1107,7 +1094,7 @@ module Writexlsx
           index += 1
 
           # Only increase font count for XF formats (not for DXF formats).
-          num_format_count += 1 if format.xf_index && format.xf_index != 0
+          num_format_count += 1 if ptrue?(format.xf_index)
         end
       end
 
@@ -1121,20 +1108,7 @@ module Writexlsx
     def prepare_borders #:nodoc:
       borders = {}
 
-      @xf_formats.each do |format|
-        key = format.get_border_key
-
-        if borders[key]
-          # Border has already been used.
-          format.border_index = borders[key]
-          format.has_border(false)
-        else
-          # This is a new border.
-          format.border_index = borders.size
-          borders[key]        = borders.size
-          format.has_border(true)
-        end
-      end
+      @xf_formats.each { |format| format.set_border_info(borders) }
 
       @border_count = borders.size
 
@@ -1180,15 +1154,11 @@ module Writexlsx
         #
         if format.pattern == 1 && ne_0?(format.bg_color) && ne_0?(format.fg_color)
           format.fg_color, format.bg_color = format.bg_color, format.fg_color
-        end
-
-        if format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
+        elsif format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
           format.fg_color = format.bg_color
           format.bg_color = 0
           format.pattern  = 1
-        end
-
-        if format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
+        elsif format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
           format.bg_color = 0
           format.pattern  = 1
         end
@@ -1212,9 +1182,7 @@ module Writexlsx
     end
 
     def eq_0?(val)
-      return true if val.respond_to?(:coerce) && val == 0
-      return true if val == '0'
-      false
+      ptrue?(val) ? false : true
     end
 
     def ne_0?(val)

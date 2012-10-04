@@ -433,9 +433,7 @@ module Writexlsx
       # Write the <cellStyleXfs> element.
       #
       def write_cell_style_xfs
-        count = 1
-
-        attributes = ['count', count]
+        attributes = ['count', 1]
 
         @writer.tag_elements('cellStyleXfs', attributes) do
           # Write the style_xf element.
@@ -542,9 +540,7 @@ module Writexlsx
       # Write the <cellStyles> element.
       #
       def write_cell_styles
-        count = 1
-
-        attributes = ['count', count]
+        attributes = ['count', 1]
 
         @writer.tag_elements('cellStyles', attributes) do
           # Write the cellStyle element.

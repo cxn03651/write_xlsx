@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require 'write_xlsx/utility'
+
 module Writexlsx
   # ==CELL FORMATTING
   #
@@ -158,6 +160,8 @@ module Writexlsx
   #     format1.set_bold( 0 )    # Turns bold off
   #
   class Format
+    include Writexlsx::Utility
+
     attr_reader :xf_index, :dxf_index, :num_format   # :nodoc:
     attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink   # :nodoc:
     attr_reader :diag_type, :diag_color, :font_only, :color, :color_indexed   # :nodoc:
@@ -358,14 +362,14 @@ module Writexlsx
     def get_protection_properties
       attributes = []
 
-      attributes << 'locked' << 0 if     @locked == 0
-      attributes << 'hidden' << 1 unless @hidden == 0
+      attributes << 'locked' << 0 unless ptrue?(@locked)
+      attributes << 'hidden' << 1 if     ptrue?(@hidden)
 
       attributes.empty? ? nil : attributes
     end
 
     def set_bold(bold = 1)
-      @bold = (bold && bold != 0) ? 1 : 0
+      @bold = ptrue?(bold) ? 1 : 0
     end
 
     def inspect
@@ -619,6 +623,36 @@ module Writexlsx
       set_align('top')
     end
 
+    def set_font_info(fonts)
+      key = get_font_key
+
+      if fonts[key]
+        # Font has already been used.
+        @font_index = fonts[key]
+        @has_font   = false
+      else
+        # This is a new font.
+        @font_index = fonts.size
+        fonts[key]  = fonts.size
+        @has_font   = true
+      end
+    end
+
+    def set_border_info(borders)
+      key = get_border_key
+
+      if borders[key]
+        # Border has already been used.
+        @border_index = borders[key]
+        @has_border   = false
+      else
+        # This is a new border.
+        @border_index = borders.size
+        borders[key]  = borders.size
+        @has_border   = true
+      end
+    end
+
     def method_missing(name, *args)  # :nodoc:
       method = "#{name}"
 
@@ -640,37 +674,31 @@ module Writexlsx
     end
 
     def color?
-      bool_both_ruby_and_perl?(@color)
+      ptrue?(@color)
     end
 
     def bold?
-      bool_both_ruby_and_perl?(@bold)
+      ptrue?(@bold)
     end
 
     def italic?
-      bool_both_ruby_and_perl?(@italic)
+      ptrue?(@italic)
     end
 
     def strikeout?
-      bool_both_ruby_and_perl?(@font_strikeout)
+      ptrue?(@font_strikeout)
     end
 
     def outline?
-      bool_both_ruby_and_perl?(@font_outline)
+      ptrue?(@font_outline)
     end
 
     def shadow?
-      bool_both_ruby_and_perl?(@font_shadow)
+      ptrue?(@font_shadow)
     end
 
     def underline?
-      bool_both_ruby_and_perl?(@underline)
-    end
-
-    def bool_both_ruby_and_perl?(val)
-      return false unless val
-      return false if val == 0
-      true
+      ptrue?(@underline)
     end
 
     def has_border(flag)

@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
-require 'write_xlsx/package/xml_writer_simple.rb'
+require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
+    include Writexlsx::Utility
+
     attr_writer :embedded, :orientation
 
     def initialize
@@ -64,12 +67,9 @@ module Writexlsx
     #
     def write_drawing_workspace
       schema    = 'http://schemas.openxmlformats.org/drawingml/'
-      xmlns_xdr = "#{schema}2006/spreadsheetDrawing"
-      xmlns_a   = "#{schema}2006/main"
-
       attributes = [
-          'xmlns:xdr', xmlns_xdr,
-          'xmlns:a',   xmlns_a
+          'xmlns:xdr', "#{schema}2006/spreadsheetDrawing",
+          'xmlns:a',    "#{schema}2006/main"
       ]
 
       @writer.start_tag('xdr:wsDr', attributes)
@@ -122,7 +122,7 @@ module Writexlsx
       @writer.start_tag('xdr:absoluteAnchor')
 
       # Different co-ordinates for horizonatal (= 0) and vertical (= 1).
-      if !@orientation || @orientation == 0
+      if !ptrue?(@orientation)
 
         # Write the xdr:pos element.
         write_pos(0, 0)
@@ -618,8 +618,8 @@ module Writexlsx
       rotation *= 60000
 
       attributes << 'rot' << rotation if rotation != 0
-      attributes << 'flipH' << 1      if shape[:flip_h] && shape[:flip_h] != 0
-      attributes << 'flipV' << 1      if shape[:flip_v] && shape[:flip_v] != 0
+      attributes << 'flipH' << 1      if ptrue?(shape[:flip_h])
+      attributes << 'flipV' << 1      if ptrue?(shape[:flip_v])
 
       @writer.tag_elements('a:xfrm', attributes) do
         # Write the a:off element.
@@ -776,8 +776,8 @@ module Writexlsx
 
             bold      = shape[:format][:bold]      || 0
             italic    = shape[:format][:italic]    || 0
-            underline = shape[:format][:underline] && shape[:format][:underline] != 0 ? 'sng' : 'none'
-            strike    = shape[:format][:font_strikeout] && shape[:format][:font_strikeout] != 0 ? 'Strike' : 'noStrike'
+            underline = ptrue?(shape[:format][:underline]) ? 'sng' : 'none'
+            strike    = ptrue?(shape[:format][:font_strikeout]) ? 'Strike' : 'noStrike'
 
             attributes = [
                           :lang,     "en-US",

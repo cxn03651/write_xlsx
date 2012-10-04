@@ -6,6 +6,8 @@ require 'write_xlsx/utility'
 module Writexlsx
   module Package
     class Table
+      include Writexlsx::Utility
+
       attr_writer :properties
 
       def initialize
@@ -89,11 +91,11 @@ module Writexlsx
                       'ref',         ref
                      ]
 
-        if header_row_count.nil? || header_row_count == 0
+        unless ptrue?(header_row_count)
           attributes << 'headerRowCount' << 0
         end
 
-        if totals_row_shown && totals_row_shown != 0
+        if ptrue?(totals_row_shown)
           attributes << 'totalsRowCount' << 1
         else
           attributes << 'totalsRowShown' << 0
@@ -107,7 +109,7 @@ module Writexlsx
       def write_auto_filter
         autofilter = @properties[:_autofilter]
 
-        return if autofilter.nil? || autofilter == 0
+        return unless ptrue?(autofilter)
 
         attributes = ['ref', autofilter]
 
@@ -138,9 +140,9 @@ module Writexlsx
                       'name', col_data[:_name]
                      ]
 
-        if col_data[:_total_string] && col_data[:_total_string] != ''
+        if ptrue?(col_data[:_total_string])
           attributes << :totalsRowLabel << col_data[:_total_string]
-        elsif col_data[:_total_function] && col_data[:_total_function] != ''
+        elsif ptrue?(col_data[:_total_function])
           attributes << :totalsRowFunction << col_data[:_total_function]
         end
 
@@ -148,7 +150,7 @@ module Writexlsx
           attributes << :dataDxfId << col_data[:_format]
         end
 
-        if col_data[:_formula] && col_data[:_formula] != ''
+        if ptrue?(col_data[:_formula])
           @writer.tag_elements('tableColumn', attributes) do
             # Write the calculatedColumnFormula element.
             write_calculated_column_formula(col_data[:_formula])

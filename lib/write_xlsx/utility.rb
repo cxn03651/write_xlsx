@@ -158,5 +158,16 @@ module Writexlsx
         []    # Default to single underline.
       end
     end
+
+    #
+    # return perl's boolean result
+    #
+    def ptrue?(value)
+      if [false, nil, 0, "0", "", [], {}].include?(value)
+        false
+      else
+        true
+      end
+    end
   end
 end
