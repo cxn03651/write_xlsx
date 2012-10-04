@@ -2707,7 +2707,7 @@ module Writexlsx
         store_data_to_table(NumberCellData.new(self, row, col, date_time, xf))
       else
         # If the date isn't valid then write it as a string.
-        write_string(args) unless date_time
+        write_string(*args)
       end
     end
 
@@ -2998,7 +2998,13 @@ module Writexlsx
       # Adjust for Excel erroneously treating 1900 as a leap year.
       days += 1 if !date_1904? and days > 59
 
-      days + seconds
+      date_time = sprintf("%0.10f", days + seconds)
+      date_time = date_time.sub(/\.?0+$/, '') if date_time =~ /\./
+      if date_time =~ /\./
+        date_time.to_f
+      else
+        date_time.to_i
+      end
     end
 
     #
