@@ -2997,7 +2997,210 @@ EOS
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
-  def later_test_shape_all
+  def test_shape5
+    @xlsx = 'shape5.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    s1 = workbook.add_shape(
+      :type   => 'ellipse',
+      :width  => 60,
+      :height => 60
+                                 )
+    worksheet.insert_shape('A1', s1, 50, 50)
+
+    s2 = workbook.add_shape(
+      :type   => 'plus',
+      :width  => 20,
+      :height => 20
+                                 )
+    worksheet.insert_shape('A1', s2, 250, 200)
+
+    # Create a connector to link the two shapes.
+    cxn_shape = workbook.add_shape(:type => 'bentConnector3')
+
+    # Link the start of the connector to the right side.
+    cxn_shape[:start]       = s1[:id]
+    cxn_shape[:start_index] = 4  # 4th connection pt, clockwise from top(0).
+    cxn_shape[:start_side]  = 'b' # r)ight or b)ottom.
+
+    # Link the end of the connector to the left side.
+    cxn_shape[:end]         = s2[:id]
+    cxn_shape[:end_index]   = 0  # clockwise from top(0).
+    cxn_shape[:end_side]    = 't' # t)op.
+
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_shape6
+    @xlsx = 'shape6.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    s1 = workbook.add_shape(
+      :type   => 'chevron',
+      :width  => 60,
+      :height => 60
+                                 )
+    worksheet.insert_shape('A1', s1, 50, 50)
+
+    s2 = workbook.add_shape(
+      :type   => 'pentagon',
+      :width  => 20,
+      :height => 20
+                                 )
+    worksheet.insert_shape('A1', s2, 250, 200)
+
+    # Create a connector to link the two shapes.
+    cxn_shape = workbook.add_shape(:type => 'curvedConnector3')
+
+    # Link the start of the connector to the right side.
+    cxn_shape[:start]       = s1[:id]
+    cxn_shape[:start_index] = 2  # 2nd connection pt, clockwise from top(0).
+    cxn_shape[:start_side]  = 'r' # r)ight or b)ottom.
+
+    # Link the end of the connector to the left side.
+    cxn_shape[:end]         = s2[:id]
+    cxn_shape[:end_index]   = 4  # 4th connection pt, clockwise from top(0).
+    cxn_shape[:end_side]    = 'l' # l)eft or t)op.
+
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_shape7
+    @xlsx = 'shape7.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    # Add a circle, with centered text. c is for circle, not center.
+    cw = 60
+    ch = 60
+    cx = 210
+    cy = 190
+
+    ellipse = workbook.add_shape(
+      :type   => 'ellipse',
+      :id     => 2,
+      :text   => "Hello\nWorld",
+      :width  => cw,
+      :height => ch
+                                 )
+    worksheet.insert_shape('A1', ellipse, cx, cy)
+
+    # Add a plus sign at 4 different positions around the circle.
+    pw = 20
+    ph = 20
+    px = 120
+    py = 250
+
+    plus = workbook.add_shape(
+      :type   => 'plus',
+      :id     => 3,
+      :width  => pw,
+      :height => ph
+                                 )
+
+    p1 = worksheet.insert_shape('A1', plus, 350, 350)
+    p2 = worksheet.insert_shape('A1', plus, 150, 350)
+    p3 = worksheet.insert_shape('A1', plus, 350, 150)
+    plus[:adjustments] = 35  # change shape of plus symbol.
+    p4 = worksheet.insert_shape('A1', plus, 150, 150)
+
+    cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
+
+    cxn_shape[:start]       = ellipse[:id]
+    cxn_shape[:start_index] = 4   # 4th connection pt, clockwise from top(0).
+    cxn_shape[:start_side]  = 'b' # r)ight or b)ottom.
+
+    cxn_shape[:end]         = p1[:id]
+    cxn_shape[:end_index]   = 0
+    cxn_shape[:end_side]    = 't' # l)eft or t)op.
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p2[:id]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p3[:id]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p4[:id]
+    cxn_shape[:adjustments] = [-50, 45, 120]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_shape8
+    @xlsx = 'shape8.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    # Add a circle, with centered text. c is for circle, not center.
+    cw = 60
+    ch = 60
+    cx = 210
+    cy = 190
+
+    ellipse = workbook.add_shape(
+      :type   => 'ellipse',
+      :id     => 2,
+      :text   => "Hello\nWorld",
+      :width  => cw,
+      :height => ch
+                                 )
+    worksheet.insert_shape('A1', ellipse, cx, cy)
+
+    # Add a plus sign at 4 different positionos around the circle.
+    pw = 20
+    ph = 20
+    px = 120
+    py = 250
+
+    plus = workbook.add_shape(
+      :type   => 'plus',
+      :id     => 3,
+      :width  => pw,
+      :height => ph
+                                 )
+
+    p1 = worksheet.insert_shape('A1', plus, 350, 150)
+    p2 = worksheet.insert_shape('A1', plus, 350, 350)
+    p3 = worksheet.insert_shape('A1', plus, 150, 350)
+    p4 = worksheet.insert_shape('A1', plus, 150, 150)
+
+    cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
+
+    cxn_shape[:start]       = ellipse[:id]
+    cxn_shape[:start_index] = 2   # 2nd connection pt, clockwise from top(0).
+    cxn_shape[:start_side]  = 'r' # r)ight or b)ottom.
+
+    cxn_shape[:end]         = p1[:id]
+    cxn_shape[:end_index]   = 3   # 3rd connection point on plus, right side
+    cxn_shape[:end_side]    = 'l' # l)eft or t)op.
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p2[:id]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p3[:id]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    cxn_shape[:end]  = p4[:id]
+    cxn_shape[:adjustments] = [-50, 45, 120]
+    worksheet.insert_shape('A1', cxn_shape, 0, 0)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_shape_all
     @xlsx = 'shape_all.xlsx'
     workbook = WriteXLSX.new(@xlsx)
     worksheet  = nil
@@ -3005,7 +3208,7 @@ EOS
     row        = 0
 
     shapes_list.each_line do |line|
-      line.chomp
+      line = line.chomp
       next unless line =~ /^\w/    # Skip blank lines and comments.
 
       sheet, name = line.split(/\t/)
