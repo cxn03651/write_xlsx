@@ -68,6 +68,270 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
+  def test_autofilter
+    @xlsx = 'autofilter.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
+
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+    worksheet4 = workbook.add_worksheet
+    worksheet5 = workbook.add_worksheet
+    worksheet6 = workbook.add_worksheet
+
+    bold = workbook.add_format(:bold => 1 )
+
+    # Extract the data embedded at the end of this file.
+    data_array = autofilter_data.split("\n")
+    headings = data_array.shift.split
+    data = []
+    data_array.each { |line| data << line.split }
+
+    # Set up several sheets with the same data.
+    workbook.worksheets.each do |worksheet|
+      worksheet.set_column('A:D', 12 )
+      worksheet.set_row(0, 20, bold )
+      worksheet.write('A1', headings )
+    end
+
+
+    ###############################################################################
+    #
+    # Example 1. Autofilter without conditions.
+    #
+
+    worksheet1.autofilter('A1:D51' )
+    worksheet1.write('A2', [ data ] )
+
+    ###############################################################################
+    #
+    #
+    # Example 2. Autofilter with a filter condition in the first column.
+    #
+
+    # The range in this example is the same as above but in row-column notation.
+    worksheet2.autofilter(0, 0, 50, 3 )
+
+    # The placeholder "Region" in the filter is ignored and can be any string
+    # that adds clarity to the expression.
+    #
+    worksheet2.filter_column(0, 'Region eq East' )
+
+    #
+    # Hide the rows that don't match the filter criteria.
+    #
+    row = 1
+
+    data.each do |row_data|
+      region = row_data[0]
+
+      worksheet2.set_row(row, nil, nil, 1) unless region == 'East'
+      worksheet2.write(row, 0, row_data)
+      row += 1
+    end
+
+    ###############################################################################
+    #
+    #
+    # Example 3. Autofilter with a dual filter condition in one of the columns.
+    #
+
+    worksheet3.autofilter('A1:D51' )
+
+    worksheet3.filter_column('A', 'x eq East or x eq South' )
+
+    #
+    # Hide the rows that don't match the filter criteria.
+    #
+    row = 1
+
+    data.each do |row_data|
+      region = row_data[0]
+
+      worksheet3.set_row(row, nil, nil, 1) unless region == 'East' || region == 'South'
+      worksheet3.write(row, 0,row_data)
+      row += 1
+    end
+
+
+    ###############################################################################
+    #
+    #
+    # Example 4. Autofilter with filter conditions in two columns.
+    #
+
+    worksheet4.autofilter('A1:D51')
+
+    worksheet4.filter_column('A', 'x eq East')
+    worksheet4.filter_column('C', 'x > 3000 and x < 8000')
+
+    #
+    # Hide the rows that don't match the filter criteria.
+    #
+    row = 1
+
+    data.each do |row_data|
+      region = row_data[0]
+      volume = row_data[2]
+
+      unless region == 'East' && volume.to_i > 3000 && volume.to_i < 8000
+        # Hide row.
+        worksheet4.set_row(row, nil, nil, 1)
+      end
+
+      worksheet4.write(row, 0, row_data)
+      row += 1
+    end
+
+
+    ###############################################################################
+    #
+    #
+    # Example 5. Autofilter with filter for blanks.
+    #
+
+    # Create a blank cell in our test data.
+    data[5][0] = ''
+
+    worksheet5.autofilter('A1:D51')
+    worksheet5.filter_column('A', 'x eq Blanks')
+
+    #
+    # Hide the rows that don't match the filter criteria.
+    #
+    row = 1
+
+    data.each do |row_data|
+      region = row_data[0]
+
+      worksheet5.set_row(row, nil, nil, 1) unless region == ''
+
+      worksheet5.write(row, 0, row_data)
+      row += 1
+    end
+
+
+    ###############################################################################
+    #
+    #
+    # Example 6. Autofilter with filter for non-blanks.
+    #
+
+
+    worksheet6.autofilter('A1:D51')
+    worksheet6.filter_column('A', 'x eq NonBlanks')
+
+    #
+    # Hide the rows that don't match the filter criteria.
+    #
+    row = 1
+
+    data.each do |row_data|
+      region = row_data[0]
+
+      worksheet6.set_row(row, nil, nil, 1) unless region != ''
+
+      worksheet6.write(row, 0, row_data)
+      row += 1
+    end
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_chart_scatter06
+    @xlsx = 'chart_scatter06.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+    chart     = workbook.add_chart(:type => 'scatter', :embedded => 1)
+
+    # For testing, copy the randomly generated axis ids in the target xlsx file.
+    chart.instance_variable_set(:@axis_ids, [57708544, 44297600])
+
+    data = [
+            [ 1, 2, 3, 4,  5 ],
+            [ 2, 4, 6, 8,  10 ],
+            [ 3, 6, 9, 12, 15 ]
+
+           ]
+
+    worksheet.write('A1', data)
+
+    chart.add_series(
+                     :categories => '=Sheet1!$A$1:$A$5',
+                     :values     => '=Sheet1!$B$1:$B$5'
+                    )
+
+    chart.add_series(
+                     :categories => '=Sheet1!$A$1:$A$5',
+                     :values     => '=Sheet1!$C$1:$C$5'
+                    )
+
+    chart.set_x_axis(:minor_unit => 1, :major_unit => 3)
+    chart.set_y_axis(:minor_unit => 2, :major_unit => 4)
+
+    worksheet.insert_chart('E9', chart)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def autofilter_data
+<<EOS
+    Region    Item      Volume    Month
+    East      Apple     9000      July
+    East      Apple     5000      July
+    South     Orange    9000      September
+    North     Apple     2000      November
+    West      Apple     9000      November
+    South     Pear      7000      October
+    North     Pear      9000      August
+    West      Orange    1000      December
+    West      Grape     1000      November
+    South     Pear      10000     April
+    West      Grape     6000      January
+    South     Orange    3000      May
+    North     Apple     3000      December
+    South     Apple     7000      February
+    West      Grape     1000      December
+    East      Grape     8000      February
+    South     Grape     10000     June
+    West      Pear      7000      December
+    South     Apple     2000      October
+    East      Grape     7000      December
+    North     Grape     6000      April
+    East      Pear      8000      February
+    North     Apple     7000      August
+    North     Orange    7000      July
+    North     Apple     6000      June
+    South     Grape     8000      September
+    West      Apple     3000      October
+    South     Orange    10000     November
+    West      Grape     4000      July
+    North     Orange    5000      August
+    East      Orange    1000      November
+    East      Orange    4000      October
+    North     Grape     5000      August
+    East      Apple     1000      December
+    South     Apple     10000     March
+    East      Grape     7000      October
+    West      Grape     1000      September
+    East      Grape     10000     October
+    South     Orange    8000      March
+    North     Apple     4000      July
+    South     Orange    5000      July
+    West      Apple     4000      June
+    East      Apple     5000      April
+    North     Pear      3000      August
+    East      Grape     9000      November
+    North     Orange    8000      October
+    East      Apple     10000     June
+    South     Pear      1000      December
+    North     Grape     10000     July
+    East      Grape     6000      February
+EOS
+  end
+
   def test_chart_area
     @xlsx = 'chart_area.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
@@ -455,6 +719,353 @@ class TestExampleMatch < Test::Unit::TestCase
 
     # Insert the chart into the worksheet (with an offset).
     worksheet.insert_chart('D2', chart, 25, 10)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_comments1
+    @xlsx = 'comments1.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    worksheet.write('A1', 'Hello')
+    worksheet.write_comment('A1', 'This is a comment')
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
+  def test_comments2
+    @xlsx = 'comments2.xlsx'
+    workbook  = WriteXLSX.new(@xlsx)
+
+    text_wrap  = workbook.add_format( :text_wrap => 1, :valign => 'top' )
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+    worksheet4 = workbook.add_worksheet
+    worksheet5 = workbook.add_worksheet
+    worksheet6 = workbook.add_worksheet
+    worksheet7 = workbook.add_worksheet
+    worksheet8 = workbook.add_worksheet
+
+
+    # Variables that we will use in each example.
+    cell_text = ''
+    comment   = ''
+
+
+    ###############################################################################
+    #
+    # Example 1. Demonstrates a simple cell comments without formatting.
+    #            comments.
+    #
+
+    # Set up some formatting.
+    worksheet1.set_column( 'C:C', 25 )
+    worksheet1.set_row( 2, 50 )
+    worksheet1.set_row( 5, 50 )
+
+
+    # Simple ascii string.
+    cell_text = 'Hold the mouse over this cell to see the comment.'
+
+    comment = 'This is a comment.'
+
+    worksheet1.write( 'C3', cell_text, text_wrap )
+    worksheet1.write_comment( 'C3', comment )
+
+    cell_text = 'This is a UTF-8 string.'
+    comment   = '☺'
+
+    worksheet1.write( 'C6', cell_text, text_wrap )
+    worksheet1.write_comment( 'C6', comment )
+
+
+
+    ###############################################################################
+    #
+    # Example 2. Demonstrates visible and hidden comments.
+    #
+
+    # Set up some formatting.
+    worksheet2.set_column( 'C:C', 25 )
+    worksheet2.set_row( 2, 50 )
+    worksheet2.set_row( 5, 50 )
+
+
+    cell_text = 'This cell comment is visible.'
+
+    comment = 'Hello.'
+
+    worksheet2.write( 'C3', cell_text, text_wrap )
+    worksheet2.write_comment( 'C3', comment, :visible => 1 )
+
+
+    cell_text = "This cell comment isn't visible (the default)."
+
+    comment = 'Hello.'
+
+    worksheet2.write( 'C6', cell_text, text_wrap )
+    worksheet2.write_comment( 'C6', comment )
+
+
+    ###############################################################################
+    #
+    # Example 3. Demonstrates visible and hidden comments set at the worksheet
+    #            level.
+    #
+
+    # Set up some formatting.
+    worksheet3.set_column( 'C:C', 25 )
+    worksheet3.set_row( 2, 50 )
+    worksheet3.set_row( 5, 50 )
+    worksheet3.set_row( 8, 50 )
+
+    # Make all comments on the worksheet visible.
+    worksheet3.show_comments
+
+    cell_text = 'This cell comment is visible, explicitly.'
+
+    comment = 'Hello.'
+
+    worksheet3.write( 'C3', cell_text, text_wrap )
+    worksheet3.write_comment( 'C3', comment, :visible => 1 )
+
+
+    cell_text =
+      'This cell comment is also visible because we used show_comments().'
+
+    comment = 'Hello.'
+
+    worksheet3.write( 'C6', cell_text, text_wrap )
+    worksheet3.write_comment( 'C6', comment )
+
+
+    cell_text = 'However, we can still override it locally.'
+
+    comment = 'Hello.'
+
+    worksheet3.write( 'C9', cell_text, text_wrap )
+    worksheet3.write_comment( 'C9', comment, :visible => 0 )
+
+
+    ###############################################################################
+    #
+    # Example 4. Demonstrates changes to the comment box dimensions.
+    #
+
+    # Set up some formatting.
+    worksheet4.set_column( 'C:C', 25 )
+    worksheet4.set_row( 2,  50 )
+    worksheet4.set_row( 5,  50 )
+    worksheet4.set_row( 8,  50 )
+    worksheet4.set_row( 15, 50 )
+
+    worksheet4.show_comments
+
+    cell_text = 'This cell comment is default size.'
+
+    comment = 'Hello.'
+
+    worksheet4.write( 'C3', cell_text, text_wrap )
+    worksheet4.write_comment( 'C3', comment )
+
+
+    cell_text = 'This cell comment is twice as wide.'
+
+    comment = 'Hello.'
+
+    worksheet4.write( 'C6', cell_text, text_wrap )
+    worksheet4.write_comment( 'C6', comment, :x_scale => 2 )
+
+
+    cell_text = 'This cell comment is twice as high.'
+
+    comment = 'Hello.'
+
+    worksheet4.write( 'C9', cell_text, text_wrap )
+    worksheet4.write_comment( 'C9', comment, :y_scale => 2 )
+
+
+    cell_text = 'This cell comment is scaled in both directions.'
+
+    comment = 'Hello.'
+
+    worksheet4.write( 'C16', cell_text, text_wrap )
+    worksheet4.write_comment( 'C16', comment, :x_scale => 1.2, :y_scale => 0.8 )
+
+
+    cell_text = 'This cell comment has width and height specified in pixels.'
+
+    comment = 'Hello.'
+
+    worksheet4.write( 'C19', cell_text, text_wrap )
+    worksheet4.write_comment( 'C19', comment, :width => 200, :height => 20 )
+
+
+    ###############################################################################
+    #
+    # Example 5. Demonstrates changes to the cell comment position.
+    #
+
+    worksheet5.set_column( 'C:C', 25 )
+    worksheet5.set_row( 2,  50 )
+    worksheet5.set_row( 5,  50 )
+    worksheet5.set_row( 8,  50 )
+    worksheet5.set_row( 11, 50 )
+
+    worksheet5.show_comments
+
+    cell_text = 'This cell comment is in the default position.'
+
+    comment = 'Hello.'
+
+    worksheet5.write( 'C3', cell_text, text_wrap )
+    worksheet5.write_comment( 'C3', comment )
+
+
+    cell_text = 'This cell comment has been moved to another cell.'
+
+    comment = 'Hello.'
+
+    worksheet5.write( 'C6', cell_text, text_wrap )
+    worksheet5.write_comment( 'C6', comment, :start_cell => 'E4' )
+
+
+    cell_text = 'This cell comment has been moved to another cell.'
+
+    comment = 'Hello.'
+
+    worksheet5.write( 'C9', cell_text, text_wrap )
+    worksheet5.write_comment( 'C9', comment, :start_row => 8, :start_col => 4 )
+
+
+    cell_text = 'This cell comment has been shifted within its default cell.'
+
+    comment = 'Hello.'
+
+    worksheet5.write( 'C12', cell_text, text_wrap )
+    worksheet5.write_comment( 'C12', comment, :x_offset => 30, :y_offset => 12 )
+
+
+    ###############################################################################
+    #
+    # Example 6. Demonstrates changes to the comment background colour.
+    #
+
+    worksheet6.set_column( 'C:C', 25 )
+    worksheet6.set_row( 2, 50 )
+    worksheet6.set_row( 5, 50 )
+    worksheet6.set_row( 8, 50 )
+
+    worksheet6.show_comments
+
+    cell_text = 'This cell comment has a different colour.'
+
+    comment = 'Hello.'
+
+    worksheet6.write( 'C3', cell_text, text_wrap )
+    worksheet6.write_comment( 'C3', comment, :color => 'green' )
+
+
+    cell_text = 'This cell comment has the default colour.'
+
+    comment = 'Hello.'
+
+    worksheet6.write( 'C6', cell_text, text_wrap )
+    worksheet6.write_comment( 'C6', comment )
+
+
+    cell_text = 'This cell comment has a different colour.'
+
+    comment = 'Hello.'
+
+    worksheet6.write( 'C9', cell_text, text_wrap )
+    worksheet6.write_comment( 'C9', comment, :color => 0x35 )
+
+
+    ###############################################################################
+    #
+    # Example 7. Demonstrates how to set the cell comment author.
+    #
+
+    worksheet7.set_column( 'C:C', 30 )
+    worksheet7.set_row( 2,  50 )
+    worksheet7.set_row( 5,  50 )
+    worksheet7.set_row( 8,  50 )
+
+    author = ''
+    cell   = 'C3'
+
+    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
+      "by #{author}' (blank) in the status bar at the bottom"
+
+    comment = 'Hello.'
+
+    worksheet7.write( cell, cell_text, text_wrap )
+    worksheet7.write_comment( cell, comment )
+
+
+    author    = 'Ruby'
+    cell      = 'C6'
+    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
+      "by #{author}' in the status bar at the bottom"
+
+    comment = 'Hello.'
+
+    worksheet7.write( cell, cell_text, text_wrap )
+    worksheet7.write_comment( cell, comment, :author => author )
+
+
+    author    = '€'
+    cell      = 'C9'
+    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
+      "by #{author}' in the status bar at the bottom"
+    comment = 'Hello.'
+
+    worksheet7.write( cell, cell_text, text_wrap )
+    worksheet7.write_comment( cell, comment, :author => author )
+
+
+
+
+    ###############################################################################
+    #
+    # Example 8. Demonstrates the need to explicitly set the row height.
+    #
+
+    # Set up some formatting.
+    worksheet8.set_column( 'C:C', 25 )
+    worksheet8.set_row( 2, 80 )
+
+    worksheet8.show_comments
+
+
+    cell_text =
+      'The height of this row has been adjusted explicitly using ' +
+      'set_row(). The size of the comment box is adjusted ' +
+      'accordingly by WriteXLSX.'
+
+    comment = 'Hello.'
+
+    worksheet8.write( 'C3', cell_text, text_wrap )
+    worksheet8.write_comment( 'C3', comment )
+
+
+    cell_text =
+      'The height of this row has been adjusted by Excel due to the ' +
+      'text wrap property being set. Unfortunately this means that ' +
+      'the height of the row is unknown to WriteXLSX at ' +
+      "run time and thus the comment box is stretched as well.\n\n" +
+      'Use set_row() to specify the row height explicitly to avoid ' +
+      'this problem.'
+
+    comment = 'Hello.'
+
+    worksheet8.write( 'C6', cell_text, text_wrap )
+    worksheet8.write_comment( 'C6', comment )
 
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
@@ -1621,194 +2232,6 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
-  def test_outline
-    @xlsx = 'outline.xlsx'
-    # Create a new workbook and add some worksheets
-    workbook   = WriteXLSX.new(@xlsx)
-    worksheet1 = workbook.add_worksheet('Outlined Rows')
-    worksheet2 = workbook.add_worksheet('Collapsed Rows')
-    worksheet3 = workbook.add_worksheet('Outline Columns')
-    worksheet4 = workbook.add_worksheet('Outline levels')
-
-    # Add a general format
-    bold = workbook.add_format(:bold => 1)
-
-
-    ###############################################################################
-    #
-    # Example 1: Create a worksheet with outlined rows. It also includes SUBTOTAL()
-    # functions so that it looks like the type of automatic outlines that are
-    # generated when you use the Excel Data.SubTotals menu item.
-    #
-
-
-    # For outlines the important parameters are $hidden and $level. Rows with the
-    # same $level are grouped together. The group will be collapsed if $hidden is
-    # non-zero. $height and $XF are assigned default values if they are nil.
-    #
-    # The syntax is: set_row($row, $height, $XF, $hidden, $level, $collapsed)
-    #
-    worksheet1.set_row(1, nil, nil, 0, 2)
-    worksheet1.set_row(2, nil, nil, 0, 2)
-    worksheet1.set_row(3, nil, nil, 0, 2)
-    worksheet1.set_row(4, nil, nil, 0, 2)
-    worksheet1.set_row(5, nil, nil, 0, 1)
-
-    worksheet1.set_row(6,  nil, nil, 0, 2)
-    worksheet1.set_row(7,  nil, nil, 0, 2)
-    worksheet1.set_row(8,  nil, nil, 0, 2)
-    worksheet1.set_row(9,  nil, nil, 0, 2)
-    worksheet1.set_row(10, nil, nil, 0, 1)
-
-
-    # Add a column format for clarity
-    worksheet1.set_column('A:A', 20)
-
-    # Add the data, labels and formulas
-    worksheet1.write('A1', 'Region', bold)
-    worksheet1.write('A2', 'North')
-    worksheet1.write('A3', 'North')
-    worksheet1.write('A4', 'North')
-    worksheet1.write('A5', 'North')
-    worksheet1.write('A6', 'North Total', bold)
-
-    worksheet1.write('B1', 'Sales', bold)
-    worksheet1.write('B2', 1000)
-    worksheet1.write('B3', 1200)
-    worksheet1.write('B4', 900)
-    worksheet1.write('B5', 1200)
-    worksheet1.write('B6', '=SUBTOTAL(9,B2:B5)', bold)
-
-    worksheet1.write('A7',  'South')
-    worksheet1.write('A8',  'South')
-    worksheet1.write('A9',  'South')
-    worksheet1.write('A10', 'South')
-    worksheet1.write('A11', 'South Total', bold)
-
-    worksheet1.write('B7',  400)
-    worksheet1.write('B8',  600)
-    worksheet1.write('B9',  500)
-    worksheet1.write('B10', 600)
-    worksheet1.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
-
-    worksheet1.write('A12', 'Grand Total',         bold)
-    worksheet1.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
-
-
-    ###############################################################################
-    #
-    # Example 2: Create a worksheet with outlined rows. This is the same as the
-    # previous example except that the rows are collapsed.
-    # Note: We need to indicate the row that contains the collapsed symbol '+'
-    # with the optional parameter, $collapsed.
-
-    # The group will be collapsed if $hidden is non-zero.
-    # The syntax is: set_row($row, $height, $XF, $hidden, $level, $collapsed)
-    #
-    worksheet2.set_row(1, nil, nil, 1, 2)
-    worksheet2.set_row(2, nil, nil, 1, 2)
-    worksheet2.set_row(3, nil, nil, 1, 2)
-    worksheet2.set_row(4, nil, nil, 1, 2)
-    worksheet2.set_row(5, nil, nil, 1, 1)
-
-    worksheet2.set_row(6,  nil, nil, 1, 2)
-    worksheet2.set_row(7,  nil, nil, 1, 2)
-    worksheet2.set_row(8,  nil, nil, 1, 2)
-    worksheet2.set_row(9,  nil, nil, 1, 2)
-    worksheet2.set_row(10, nil, nil, 1, 1)
-    worksheet2.set_row(11, nil, nil, 0, 0, 1)
-
-
-    # Add a column format for clarity
-    worksheet2.set_column('A:A', 20)
-
-    # Add the data, labels and formulas
-    worksheet2.write('A1', 'Region', bold)
-    worksheet2.write('A2', 'North')
-    worksheet2.write('A3', 'North')
-    worksheet2.write('A4', 'North')
-    worksheet2.write('A5', 'North')
-    worksheet2.write('A6', 'North Total', bold)
-
-    worksheet2.write('B1', 'Sales', bold)
-    worksheet2.write('B2', 1000)
-    worksheet2.write('B3', 1200)
-    worksheet2.write('B4', 900)
-    worksheet2.write('B5', 1200)
-    worksheet2.write('B6', '=SUBTOTAL(9,B2:B5)', bold)
-
-    worksheet2.write('A7',  'South')
-    worksheet2.write('A8',  'South')
-    worksheet2.write('A9',  'South')
-    worksheet2.write('A10', 'South')
-    worksheet2.write('A11', 'South Total', bold)
-
-    worksheet2.write('B7',  400)
-    worksheet2.write('B8',  600)
-    worksheet2.write('B9',  500)
-    worksheet2.write('B10', 600)
-    worksheet2.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
-
-    worksheet2.write('A12', 'Grand Total',         bold)
-    worksheet2.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
-
-
-    ###############################################################################
-    #
-    # Example 3: Create a worksheet with outlined columns.
-    #
-    data = [
-            [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total' ],
-            [ 'North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)' ],
-            [ 'South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)' ],
-            [ 'East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)' ],
-            [ 'West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)' ],
-           ]
-
-    # Add bold format to the first row
-    worksheet3.set_row(0, nil, bold)
-
-    # Syntax: set_column($col1, $col2, $width, $XF, $hidden, $level, $collapsed)
-    worksheet3.set_column('A:A', 10, bold)
-    worksheet3.set_column('B:G', 5, nil, 0, 1)
-    worksheet3.set_column('H:H', 10)
-
-    # Write the data and a formula
-    worksheet3.write_col('A1', data)
-    worksheet3.write('H6', '=SUM(H2:H5)', bold)
-
-
-    ###############################################################################
-    #
-    # Example 4: Show all possible outline levels.
-    #
-    levels = [
-              "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
-              "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
-              "Level 1"
-             ]
-
-
-    worksheet4.write_col('A1', levels)
-
-    worksheet4.set_row(0,  nil, nil, nil, 1)
-    worksheet4.set_row(1,  nil, nil, nil, 2)
-    worksheet4.set_row(2,  nil, nil, nil, 3)
-    worksheet4.set_row(3,  nil, nil, nil, 4)
-    worksheet4.set_row(4,  nil, nil, nil, 5)
-    worksheet4.set_row(5,  nil, nil, nil, 6)
-    worksheet4.set_row(6,  nil, nil, nil, 7)
-    worksheet4.set_row(7,  nil, nil, nil, 6)
-    worksheet4.set_row(8,  nil, nil, nil, 5)
-    worksheet4.set_row(9,  nil, nil, nil, 4)
-    worksheet4.set_row(10, nil, nil, nil, 3)
-    worksheet4.set_row(11, nil, nil, nil, 2)
-    worksheet4.set_row(12, nil, nil, nil, 1)
-
-    workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
   def test_merge1
     @xlsx = 'merge1.xlsx'
     # Create a new workbook and add a worksheet
@@ -2061,348 +2484,189 @@ class TestExampleMatch < Test::Unit::TestCase
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
-  def test_comments1
-    @xlsx = 'comments1.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
-    worksheet = workbook.add_worksheet
+  def test_outline
+    @xlsx = 'outline.xlsx'
+    # Create a new workbook and add some worksheets
+    workbook   = WriteXLSX.new(@xlsx)
+    worksheet1 = workbook.add_worksheet('Outlined Rows')
+    worksheet2 = workbook.add_worksheet('Collapsed Rows')
+    worksheet3 = workbook.add_worksheet('Outline Columns')
+    worksheet4 = workbook.add_worksheet('Outline levels')
 
-    worksheet.write('A1', 'Hello')
-    worksheet.write_comment('A1', 'This is a comment')
-
-    workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
-  def test_comments2
-    @xlsx = 'comments2.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
-
-    text_wrap  = workbook.add_format( :text_wrap => 1, :valign => 'top' )
-    worksheet1 = workbook.add_worksheet
-    worksheet2 = workbook.add_worksheet
-    worksheet3 = workbook.add_worksheet
-    worksheet4 = workbook.add_worksheet
-    worksheet5 = workbook.add_worksheet
-    worksheet6 = workbook.add_worksheet
-    worksheet7 = workbook.add_worksheet
-    worksheet8 = workbook.add_worksheet
-
-
-    # Variables that we will use in each example.
-    cell_text = ''
-    comment   = ''
+    # Add a general format
+    bold = workbook.add_format(:bold => 1)
 
 
     ###############################################################################
     #
-    # Example 1. Demonstrates a simple cell comments without formatting.
-    #            comments.
+    # Example 1: Create a worksheet with outlined rows. It also includes SUBTOTAL()
+    # functions so that it looks like the type of automatic outlines that are
+    # generated when you use the Excel Data.SubTotals menu item.
     #
 
-    # Set up some formatting.
-    worksheet1.set_column( 'C:C', 25 )
-    worksheet1.set_row( 2, 50 )
-    worksheet1.set_row( 5, 50 )
+
+    # For outlines the important parameters are $hidden and $level. Rows with the
+    # same $level are grouped together. The group will be collapsed if $hidden is
+    # non-zero. $height and $XF are assigned default values if they are nil.
+    #
+    # The syntax is: set_row($row, $height, $XF, $hidden, $level, $collapsed)
+    #
+    worksheet1.set_row(1, nil, nil, 0, 2)
+    worksheet1.set_row(2, nil, nil, 0, 2)
+    worksheet1.set_row(3, nil, nil, 0, 2)
+    worksheet1.set_row(4, nil, nil, 0, 2)
+    worksheet1.set_row(5, nil, nil, 0, 1)
+
+    worksheet1.set_row(6,  nil, nil, 0, 2)
+    worksheet1.set_row(7,  nil, nil, 0, 2)
+    worksheet1.set_row(8,  nil, nil, 0, 2)
+    worksheet1.set_row(9,  nil, nil, 0, 2)
+    worksheet1.set_row(10, nil, nil, 0, 1)
 
 
-    # Simple ascii string.
-    cell_text = 'Hold the mouse over this cell to see the comment.'
+    # Add a column format for clarity
+    worksheet1.set_column('A:A', 20)
 
-    comment = 'This is a comment.'
+    # Add the data, labels and formulas
+    worksheet1.write('A1', 'Region', bold)
+    worksheet1.write('A2', 'North')
+    worksheet1.write('A3', 'North')
+    worksheet1.write('A4', 'North')
+    worksheet1.write('A5', 'North')
+    worksheet1.write('A6', 'North Total', bold)
 
-    worksheet1.write( 'C3', cell_text, text_wrap )
-    worksheet1.write_comment( 'C3', comment )
+    worksheet1.write('B1', 'Sales', bold)
+    worksheet1.write('B2', 1000)
+    worksheet1.write('B3', 1200)
+    worksheet1.write('B4', 900)
+    worksheet1.write('B5', 1200)
+    worksheet1.write('B6', '=SUBTOTAL(9,B2:B5)', bold)
 
-    cell_text = 'This is a UTF-8 string.'
-    comment   = '☺'
+    worksheet1.write('A7',  'South')
+    worksheet1.write('A8',  'South')
+    worksheet1.write('A9',  'South')
+    worksheet1.write('A10', 'South')
+    worksheet1.write('A11', 'South Total', bold)
 
-    worksheet1.write( 'C6', cell_text, text_wrap )
-    worksheet1.write_comment( 'C6', comment )
+    worksheet1.write('B7',  400)
+    worksheet1.write('B8',  600)
+    worksheet1.write('B9',  500)
+    worksheet1.write('B10', 600)
+    worksheet1.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
 
+    worksheet1.write('A12', 'Grand Total',         bold)
+    worksheet1.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
 
 
     ###############################################################################
     #
-    # Example 2. Demonstrates visible and hidden comments.
+    # Example 2: Create a worksheet with outlined rows. This is the same as the
+    # previous example except that the rows are collapsed.
+    # Note: We need to indicate the row that contains the collapsed symbol '+'
+    # with the optional parameter, $collapsed.
+
+    # The group will be collapsed if $hidden is non-zero.
+    # The syntax is: set_row($row, $height, $XF, $hidden, $level, $collapsed)
     #
+    worksheet2.set_row(1, nil, nil, 1, 2)
+    worksheet2.set_row(2, nil, nil, 1, 2)
+    worksheet2.set_row(3, nil, nil, 1, 2)
+    worksheet2.set_row(4, nil, nil, 1, 2)
+    worksheet2.set_row(5, nil, nil, 1, 1)
 
-    # Set up some formatting.
-    worksheet2.set_column( 'C:C', 25 )
-    worksheet2.set_row( 2, 50 )
-    worksheet2.set_row( 5, 50 )
+    worksheet2.set_row(6,  nil, nil, 1, 2)
+    worksheet2.set_row(7,  nil, nil, 1, 2)
+    worksheet2.set_row(8,  nil, nil, 1, 2)
+    worksheet2.set_row(9,  nil, nil, 1, 2)
+    worksheet2.set_row(10, nil, nil, 1, 1)
+    worksheet2.set_row(11, nil, nil, 0, 0, 1)
 
 
-    cell_text = 'This cell comment is visible.'
+    # Add a column format for clarity
+    worksheet2.set_column('A:A', 20)
 
-    comment = 'Hello.'
+    # Add the data, labels and formulas
+    worksheet2.write('A1', 'Region', bold)
+    worksheet2.write('A2', 'North')
+    worksheet2.write('A3', 'North')
+    worksheet2.write('A4', 'North')
+    worksheet2.write('A5', 'North')
+    worksheet2.write('A6', 'North Total', bold)
 
-    worksheet2.write( 'C3', cell_text, text_wrap )
-    worksheet2.write_comment( 'C3', comment, :visible => 1 )
+    worksheet2.write('B1', 'Sales', bold)
+    worksheet2.write('B2', 1000)
+    worksheet2.write('B3', 1200)
+    worksheet2.write('B4', 900)
+    worksheet2.write('B5', 1200)
+    worksheet2.write('B6', '=SUBTOTAL(9,B2:B5)', bold)
 
+    worksheet2.write('A7',  'South')
+    worksheet2.write('A8',  'South')
+    worksheet2.write('A9',  'South')
+    worksheet2.write('A10', 'South')
+    worksheet2.write('A11', 'South Total', bold)
 
-    cell_text = "This cell comment isn't visible (the default)."
+    worksheet2.write('B7',  400)
+    worksheet2.write('B8',  600)
+    worksheet2.write('B9',  500)
+    worksheet2.write('B10', 600)
+    worksheet2.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
 
-    comment = 'Hello.'
-
-    worksheet2.write( 'C6', cell_text, text_wrap )
-    worksheet2.write_comment( 'C6', comment )
+    worksheet2.write('A12', 'Grand Total',         bold)
+    worksheet2.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
 
 
     ###############################################################################
     #
-    # Example 3. Demonstrates visible and hidden comments set at the worksheet
-    #            level.
+    # Example 3: Create a worksheet with outlined columns.
     #
+    data = [
+            [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total' ],
+            [ 'North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)' ],
+            [ 'South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)' ],
+            [ 'East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)' ],
+            [ 'West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)' ],
+           ]
 
-    # Set up some formatting.
-    worksheet3.set_column( 'C:C', 25 )
-    worksheet3.set_row( 2, 50 )
-    worksheet3.set_row( 5, 50 )
-    worksheet3.set_row( 8, 50 )
+    # Add bold format to the first row
+    worksheet3.set_row(0, nil, bold)
 
-    # Make all comments on the worksheet visible.
-    worksheet3.show_comments
+    # Syntax: set_column($col1, $col2, $width, $XF, $hidden, $level, $collapsed)
+    worksheet3.set_column('A:A', 10, bold)
+    worksheet3.set_column('B:G', 5, nil, 0, 1)
+    worksheet3.set_column('H:H', 10)
 
-    cell_text = 'This cell comment is visible, explicitly.'
-
-    comment = 'Hello.'
-
-    worksheet3.write( 'C3', cell_text, text_wrap )
-    worksheet3.write_comment( 'C3', comment, :visible => 1 )
-
-
-    cell_text =
-      'This cell comment is also visible because we used show_comments().'
-
-    comment = 'Hello.'
-
-    worksheet3.write( 'C6', cell_text, text_wrap )
-    worksheet3.write_comment( 'C6', comment )
-
-
-    cell_text = 'However, we can still override it locally.'
-
-    comment = 'Hello.'
-
-    worksheet3.write( 'C9', cell_text, text_wrap )
-    worksheet3.write_comment( 'C9', comment, :visible => 0 )
+    # Write the data and a formula
+    worksheet3.write_col('A1', data)
+    worksheet3.write('H6', '=SUM(H2:H5)', bold)
 
 
     ###############################################################################
     #
-    # Example 4. Demonstrates changes to the comment box dimensions.
+    # Example 4: Show all possible outline levels.
     #
-
-    # Set up some formatting.
-    worksheet4.set_column( 'C:C', 25 )
-    worksheet4.set_row( 2,  50 )
-    worksheet4.set_row( 5,  50 )
-    worksheet4.set_row( 8,  50 )
-    worksheet4.set_row( 15, 50 )
-
-    worksheet4.show_comments
-
-    cell_text = 'This cell comment is default size.'
-
-    comment = 'Hello.'
-
-    worksheet4.write( 'C3', cell_text, text_wrap )
-    worksheet4.write_comment( 'C3', comment )
-
-
-    cell_text = 'This cell comment is twice as wide.'
-
-    comment = 'Hello.'
-
-    worksheet4.write( 'C6', cell_text, text_wrap )
-    worksheet4.write_comment( 'C6', comment, :x_scale => 2 )
-
-
-    cell_text = 'This cell comment is twice as high.'
-
-    comment = 'Hello.'
-
-    worksheet4.write( 'C9', cell_text, text_wrap )
-    worksheet4.write_comment( 'C9', comment, :y_scale => 2 )
-
-
-    cell_text = 'This cell comment is scaled in both directions.'
-
-    comment = 'Hello.'
-
-    worksheet4.write( 'C16', cell_text, text_wrap )
-    worksheet4.write_comment( 'C16', comment, :x_scale => 1.2, :y_scale => 0.8 )
-
-
-    cell_text = 'This cell comment has width and height specified in pixels.'
-
-    comment = 'Hello.'
-
-    worksheet4.write( 'C19', cell_text, text_wrap )
-    worksheet4.write_comment( 'C19', comment, :width => 200, :height => 20 )
-
-
-    ###############################################################################
-    #
-    # Example 5. Demonstrates changes to the cell comment position.
-    #
-
-    worksheet5.set_column( 'C:C', 25 )
-    worksheet5.set_row( 2,  50 )
-    worksheet5.set_row( 5,  50 )
-    worksheet5.set_row( 8,  50 )
-    worksheet5.set_row( 11, 50 )
-
-    worksheet5.show_comments
-
-    cell_text = 'This cell comment is in the default position.'
-
-    comment = 'Hello.'
-
-    worksheet5.write( 'C3', cell_text, text_wrap )
-    worksheet5.write_comment( 'C3', comment )
-
-
-    cell_text = 'This cell comment has been moved to another cell.'
-
-    comment = 'Hello.'
-
-    worksheet5.write( 'C6', cell_text, text_wrap )
-    worksheet5.write_comment( 'C6', comment, :start_cell => 'E4' )
-
-
-    cell_text = 'This cell comment has been moved to another cell.'
-
-    comment = 'Hello.'
-
-    worksheet5.write( 'C9', cell_text, text_wrap )
-    worksheet5.write_comment( 'C9', comment, :start_row => 8, :start_col => 4 )
-
-
-    cell_text = 'This cell comment has been shifted within its default cell.'
-
-    comment = 'Hello.'
-
-    worksheet5.write( 'C12', cell_text, text_wrap )
-    worksheet5.write_comment( 'C12', comment, :x_offset => 30, :y_offset => 12 )
-
-
-    ###############################################################################
-    #
-    # Example 6. Demonstrates changes to the comment background colour.
-    #
-
-    worksheet6.set_column( 'C:C', 25 )
-    worksheet6.set_row( 2, 50 )
-    worksheet6.set_row( 5, 50 )
-    worksheet6.set_row( 8, 50 )
-
-    worksheet6.show_comments
-
-    cell_text = 'This cell comment has a different colour.'
-
-    comment = 'Hello.'
-
-    worksheet6.write( 'C3', cell_text, text_wrap )
-    worksheet6.write_comment( 'C3', comment, :color => 'green' )
-
-
-    cell_text = 'This cell comment has the default colour.'
-
-    comment = 'Hello.'
-
-    worksheet6.write( 'C6', cell_text, text_wrap )
-    worksheet6.write_comment( 'C6', comment )
-
-
-    cell_text = 'This cell comment has a different colour.'
-
-    comment = 'Hello.'
-
-    worksheet6.write( 'C9', cell_text, text_wrap )
-    worksheet6.write_comment( 'C9', comment, :color => 0x35 )
-
-
-    ###############################################################################
-    #
-    # Example 7. Demonstrates how to set the cell comment author.
-    #
-
-    worksheet7.set_column( 'C:C', 30 )
-    worksheet7.set_row( 2,  50 )
-    worksheet7.set_row( 5,  50 )
-    worksheet7.set_row( 8,  50 )
-
-    author = ''
-    cell   = 'C3'
-
-    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' (blank) in the status bar at the bottom"
-
-    comment = 'Hello.'
-
-    worksheet7.write( cell, cell_text, text_wrap )
-    worksheet7.write_comment( cell, comment )
-
-
-    author    = 'Ruby'
-    cell      = 'C6'
-    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' in the status bar at the bottom"
-
-    comment = 'Hello.'
-
-    worksheet7.write( cell, cell_text, text_wrap )
-    worksheet7.write_comment( cell, comment, :author => author )
-
-
-    author    = '€'
-    cell      = 'C9'
-    cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' in the status bar at the bottom"
-    comment = 'Hello.'
-
-    worksheet7.write( cell, cell_text, text_wrap )
-    worksheet7.write_comment( cell, comment, :author => author )
-
-
-
-
-    ###############################################################################
-    #
-    # Example 8. Demonstrates the need to explicitly set the row height.
-    #
-
-    # Set up some formatting.
-    worksheet8.set_column( 'C:C', 25 )
-    worksheet8.set_row( 2, 80 )
-
-    worksheet8.show_comments
-
-
-    cell_text =
-      'The height of this row has been adjusted explicitly using ' +
-      'set_row(). The size of the comment box is adjusted ' +
-      'accordingly by WriteXLSX.'
-
-    comment = 'Hello.'
-
-    worksheet8.write( 'C3', cell_text, text_wrap )
-    worksheet8.write_comment( 'C3', comment )
-
-
-    cell_text =
-      'The height of this row has been adjusted by Excel due to the ' +
-      'text wrap property being set. Unfortunately this means that ' +
-      'the height of the row is unknown to WriteXLSX at ' +
-      "run time and thus the comment box is stretched as well.\n\n" +
-      'Use set_row() to specify the row height explicitly to avoid ' +
-      'this problem.'
-
-    comment = 'Hello.'
-
-    worksheet8.write( 'C6', cell_text, text_wrap )
-    worksheet8.write_comment( 'C6', comment )
+    levels = [
+              "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
+              "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
+              "Level 1"
+             ]
+
+
+    worksheet4.write_col('A1', levels)
+
+    worksheet4.set_row(0,  nil, nil, nil, 1)
+    worksheet4.set_row(1,  nil, nil, nil, 2)
+    worksheet4.set_row(2,  nil, nil, nil, 3)
+    worksheet4.set_row(3,  nil, nil, nil, 4)
+    worksheet4.set_row(4,  nil, nil, nil, 5)
+    worksheet4.set_row(5,  nil, nil, nil, 6)
+    worksheet4.set_row(6,  nil, nil, nil, 7)
+    worksheet4.set_row(7,  nil, nil, nil, 6)
+    worksheet4.set_row(8,  nil, nil, nil, 5)
+    worksheet4.set_row(9,  nil, nil, nil, 4)
+    worksheet4.set_row(10, nil, nil, nil, 3)
+    worksheet4.set_row(11, nil, nil, nil, 2)
+    worksheet4.set_row(12, nil, nil, nil, 1)
 
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
@@ -2627,288 +2891,6 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet2.write(0, 0, 'Hello')    # ..., C1, B1, A1
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
-  def test_tab_colors
-    @xlsx = 'tab_colors.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
-
-    worksheet1 = workbook.add_worksheet
-    worksheet2 = workbook.add_worksheet
-    worksheet3 = workbook.add_worksheet
-    worksheet4 = workbook.add_worksheet
-
-    # Worksheet1 will have the default tab colour.
-    worksheet2.set_tab_color('red')
-    worksheet3.set_tab_color('green')
-    worksheet4.set_tab_color(0x35)    # Orange
-
-    workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
-  def test_autofilter
-    @xlsx = 'autofilter.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
-
-    worksheet1 = workbook.add_worksheet
-    worksheet2 = workbook.add_worksheet
-    worksheet3 = workbook.add_worksheet
-    worksheet4 = workbook.add_worksheet
-    worksheet5 = workbook.add_worksheet
-    worksheet6 = workbook.add_worksheet
-
-    bold = workbook.add_format(:bold => 1 )
-
-    # Extract the data embedded at the end of this file.
-    data_array = autofilter_data.split("\n")
-    headings = data_array.shift.split
-    data = []
-    data_array.each { |line| data << line.split }
-
-    # Set up several sheets with the same data.
-    workbook.worksheets.each do |worksheet|
-      worksheet.set_column('A:D', 12 )
-      worksheet.set_row(0, 20, bold )
-      worksheet.write('A1', headings )
-    end
-
-
-    ###############################################################################
-    #
-    # Example 1. Autofilter without conditions.
-    #
-
-    worksheet1.autofilter('A1:D51' )
-    worksheet1.write('A2', [ data ] )
-
-    ###############################################################################
-    #
-    #
-    # Example 2. Autofilter with a filter condition in the first column.
-    #
-
-    # The range in this example is the same as above but in row-column notation.
-    worksheet2.autofilter(0, 0, 50, 3 )
-
-    # The placeholder "Region" in the filter is ignored and can be any string
-    # that adds clarity to the expression.
-    #
-    worksheet2.filter_column(0, 'Region eq East' )
-
-    #
-    # Hide the rows that don't match the filter criteria.
-    #
-    row = 1
-
-    data.each do |row_data|
-      region = row_data[0]
-
-      worksheet2.set_row(row, nil, nil, 1) unless region == 'East'
-      worksheet2.write(row, 0, row_data)
-      row += 1
-    end
-
-    ###############################################################################
-    #
-    #
-    # Example 3. Autofilter with a dual filter condition in one of the columns.
-    #
-
-    worksheet3.autofilter('A1:D51' )
-
-    worksheet3.filter_column('A', 'x eq East or x eq South' )
-
-    #
-    # Hide the rows that don't match the filter criteria.
-    #
-    row = 1
-
-    data.each do |row_data|
-      region = row_data[0]
-
-      worksheet3.set_row(row, nil, nil, 1) unless region == 'East' || region == 'South'
-      worksheet3.write(row, 0,row_data)
-      row += 1
-    end
-
-
-    ###############################################################################
-    #
-    #
-    # Example 4. Autofilter with filter conditions in two columns.
-    #
-
-    worksheet4.autofilter('A1:D51')
-
-    worksheet4.filter_column('A', 'x eq East')
-    worksheet4.filter_column('C', 'x > 3000 and x < 8000')
-
-    #
-    # Hide the rows that don't match the filter criteria.
-    #
-    row = 1
-
-    data.each do |row_data|
-      region = row_data[0]
-      volume = row_data[2]
-
-      unless region == 'East' && volume.to_i > 3000 && volume.to_i < 8000
-        # Hide row.
-        worksheet4.set_row(row, nil, nil, 1)
-      end
-
-      worksheet4.write(row, 0, row_data)
-      row += 1
-    end
-
-
-    ###############################################################################
-    #
-    #
-    # Example 5. Autofilter with filter for blanks.
-    #
-
-    # Create a blank cell in our test data.
-    data[5][0] = ''
-
-    worksheet5.autofilter('A1:D51')
-    worksheet5.filter_column('A', 'x eq Blanks')
-
-    #
-    # Hide the rows that don't match the filter criteria.
-    #
-    row = 1
-
-    data.each do |row_data|
-      region = row_data[0]
-
-      worksheet5.set_row(row, nil, nil, 1) unless region == ''
-
-      worksheet5.write(row, 0, row_data)
-      row += 1
-    end
-
-
-    ###############################################################################
-    #
-    #
-    # Example 6. Autofilter with filter for non-blanks.
-    #
-
-
-    worksheet6.autofilter('A1:D51')
-    worksheet6.filter_column('A', 'x eq NonBlanks')
-
-    #
-    # Hide the rows that don't match the filter criteria.
-    #
-    row = 1
-
-    data.each do |row_data|
-      region = row_data[0]
-
-      worksheet6.set_row(row, nil, nil, 1) unless region != ''
-
-      worksheet6.write(row, 0, row_data)
-      row += 1
-    end
-
-    workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
-  def test_chart_scatter06
-    @xlsx = 'chart_scatter06.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
-    worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'scatter', :embedded => 1)
-
-    # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [57708544, 44297600])
-
-    data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-
-           ]
-
-    worksheet.write('A1', data)
-
-    chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5'
-                    )
-
-    chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5'
-                    )
-
-    chart.set_x_axis(:minor_unit => 1, :major_unit => 3)
-    chart.set_y_axis(:minor_unit => 2, :major_unit => 4)
-
-    worksheet.insert_chart('E9', chart)
-
-    workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
-  end
-
-  def autofilter_data
-<<EOS
-    Region    Item      Volume    Month
-    East      Apple     9000      July
-    East      Apple     5000      July
-    South     Orange    9000      September
-    North     Apple     2000      November
-    West      Apple     9000      November
-    South     Pear      7000      October
-    North     Pear      9000      August
-    West      Orange    1000      December
-    West      Grape     1000      November
-    South     Pear      10000     April
-    West      Grape     6000      January
-    South     Orange    3000      May
-    North     Apple     3000      December
-    South     Apple     7000      February
-    West      Grape     1000      December
-    East      Grape     8000      February
-    South     Grape     10000     June
-    West      Pear      7000      December
-    South     Apple     2000      October
-    East      Grape     7000      December
-    North     Grape     6000      April
-    East      Pear      8000      February
-    North     Apple     7000      August
-    North     Orange    7000      July
-    North     Apple     6000      June
-    South     Grape     8000      September
-    West      Apple     3000      October
-    South     Orange    10000     November
-    West      Grape     4000      July
-    North     Orange    5000      August
-    East      Orange    1000      November
-    East      Orange    4000      October
-    North     Grape     5000      August
-    East      Apple     1000      December
-    South     Apple     10000     March
-    East      Grape     7000      October
-    West      Grape     1000      September
-    East      Grape     10000     October
-    South     Orange    8000      March
-    North     Apple     4000      July
-    South     Orange    5000      July
-    West      Apple     4000      June
-    East      Apple     5000      April
-    North     Pear      3000      August
-    East      Grape     9000      November
-    North     Orange    8000      October
-    East      Apple     10000     June
-    South     Pear      1000      December
-    North     Grape     10000     July
-    East      Grape     6000      February
-EOS
   end
 
   def test_shape1
@@ -3471,5 +3453,23 @@ Tabs	cornerTabs
 Tabs	plaqueTabs
 Tabs	squareTabs
 EOS
+  end
+
+  def test_tab_colors
+    @xlsx = 'tab_colors.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
+
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    worksheet3 = workbook.add_worksheet
+    worksheet4 = workbook.add_worksheet
+
+    # Worksheet1 will have the default tab colour.
+    worksheet2.set_tab_color('red')
+    worksheet3.set_tab_color('green')
+    worksheet4.set_tab_color(0x35)    # Orange
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 end
