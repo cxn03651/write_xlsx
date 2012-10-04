@@ -5412,7 +5412,7 @@ module Writexlsx
       # Create link to Worksheet color palette.
       shape[:palette] = @workbook.palette
 
-      if shape[:stencil] != 0
+      if ptrue?(shape[:stencil])
         # Insert a copy of the shape, not a reference so that the shape is
         # used as a stencil. Previously stamped copies don't get modified
         # if the stencil is modified.

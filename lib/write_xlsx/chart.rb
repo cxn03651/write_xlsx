@@ -1521,8 +1521,11 @@ module Writexlsx
       id1 = sprintf('5%03d%04d', chart_id, axis_count)
       id2 = sprintf('5%03d%04d', chart_id, axis_count + 1)
 
-      @axis_ids  << id1 << id2 if params[:primary_axes]
-      @axis2_ids << id1 << id2 if !params[:primary_axes]
+      if ptrue?(params[:primary_axes])
+        @axis_ids  << id1 << id2
+      else
+        @axis2_ids << id1 << id2
+      end
     end
 
     #
@@ -1965,9 +1968,9 @@ module Writexlsx
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
         # Write the axis title elements.
-        if title = @x_axis[:_formula]
+        if title = x_axis[:_formula]
           write_title_formula(title, @x_axis[:_data_id], horiz)
-        elsif title = @x_axis[:_name]
+        elsif title = x_axis[:_name]
           write_title_rich(title, horiz)
         end
         # Write the c:numFmt element.
