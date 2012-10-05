@@ -1195,7 +1195,7 @@ module Writexlsx
       @worksheets.first.select if @activesheet == 0
 
       # Set the active sheet.
-      @worksheets.each { |sheet| sheet.activate if sheet.index == @activesheet }
+      @worksheets[@activesheet].activate
 
       prepare_comments      # Prepare the worksheet cell comments.
       prepare_defined_names # Set the defined names for the worksheets such as Print Titles.
