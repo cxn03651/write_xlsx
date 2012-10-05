@@ -352,48 +352,36 @@ module Writexlsx
     # directory of the distro.
     #
     def add_chart(params = {})
-      name     = ''
-      index    = @worksheets.size
-
       # Type must be specified so we can create the required chart instance.
       type = params[:type]
       raise "Must define chart type in add_chart()" unless type
 
-      # Ensure that the chart defaults to non embedded.
-      embedded = params[:embedded] || 0
-
-      # Check the worksheet name for non-embedded charts.
-      name = check_sheetname(params[:name], 1) unless ptrue?(embedded)
-
       chart = Chart.factory(type, params[:subtype])
+      chart.palette = @palette
 
       # Get an incremental id to use for axes ids.
       chart.id = @charts.size
 
       # If the chart isn't embedded let the workbook control it.
-      if ptrue?(embedded)
+      if ptrue?(params[:embedded])
         chart.name = params[:name] if params[:name]
 
         # Set index to 0 so that the activate() and set_first_sheet() methods
         # point back to the first worksheet if used for embedded charts.
         chart.index = 0
-        chart.palette = @palette
         chart.set_embedded_config_data
-        @charts << chart
-
-        return chart
       else
+        # Check the worksheet name for non-embedded charts.
+        name       = check_sheetname(params[:name], 1)
+        index      = @worksheets.size
         chartsheet = Chartsheet.new(self, index, name)
-        chart.palette = @palette
         chartsheet.chart   = chart
         chartsheet.drawing = Drawing.new
         @worksheets[index] = chartsheet
         @sheetnames[index] = name
-
-        @charts << chart
-
-        return chartsheet
       end
+      @charts << chart
+      ptrue?(params[:embedded]) ? chart : chartsheet
     end
 
     #
