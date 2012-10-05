@@ -4751,8 +4751,6 @@ module Writexlsx
     # Convert a table total function to a worksheet formula.
     #
     def table_function_to_formula(function, col_name)
-      formula  = ''
-
       subtotals = {
         :average   => 101,
         :countNums => 102,
@@ -4764,14 +4762,10 @@ module Writexlsx
         :var       => 110
       }
 
-      if subtotals[function.to_sym]
-        func_num = subtotals[function.to_sym]
-        formula = %Q{SUBTOTAL(#{func_num},[#{col_name}])}
-      else
+      unless func_num = subtotals[function.to_sym]
         raise "Unsupported function '#{function}' in add_table()"
       end
-
-      return formula
+      "SUBTOTAL(#{func_num},[#{col_name}])"
     end
 
     def check_for_valid_input_params(param)
