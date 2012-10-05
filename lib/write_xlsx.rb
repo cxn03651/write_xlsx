@@ -3,7 +3,7 @@
 require 'write_xlsx/workbook'
 
 #
-# write_xlsx is gem to create a new file in the Excel 2007+ XLSX format,
+# write is gem to create a new file in the Excel 2007+ XLSX format,
 # and you can use the same interface as writeexcel gem.
 # write_xlsx is converted from Perl’s module github.com/jmcnamara/excel-writer-xlsx .
 #
@@ -20,6 +20,8 @@ require 'write_xlsx/workbook'
 #    Charts
 #    Autofilters
 #    Data validation
+#    Conditional formatting
+#    Tables
 #    Hyperlinks
 #    Defined names
 #    Grouping/Outlines
@@ -55,7 +57,29 @@ require 'write_xlsx/workbook'
 #   # Write a number and a formula using A1 notation
 #   worksheet.write('A3', 1.2345)
 #   worksheet.write('A4', '=SIN(PI()/4)')
+#
 #   workbook.close
+#
+# == Description
+#
+# The WriteXLSX gem can be used to create an Excel file in the 2007+ XLSX
+# format.
+#
+# The XLSX format is the Office Open XML(OOXML) format used by Excel 2007
+# and later.
+#
+# Multiple worksheets can be added to a workbook and formatting can be applied
+# to cells. Text, numbers and formulas can be written to the cells.
+#
+# This module cannot, as yet, be used to write to an exsisting Excel XLSX file.
+#
+# == WriteXLSX and WriteExcel
+#
+# WriteXLSX uses the same interface as the WriteExcel gem which produces an
+# Excel file in binary XLS format.
+#
+# WriteXLSX supports all the features of WriteExcel and in some cases has more
+# functionally.
 #
 # == Other Methods
 #

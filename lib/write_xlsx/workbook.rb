@@ -26,8 +26,8 @@ module Writexlsx
     attr_reader :shared_strings
     attr_accessor :table_count
     #
-    # A new Excel workbook is created using the new() constructor which accepts either a filename
-    # or a IO object as a parameter.
+    # A new Excel workbook is created using the new() constructor
+    # which accepts either a filename or an IO object as a parameter.
     # The following example creates a new Excel file based on a filename:
     #
     #   workbook  = WriteXLSX.new('filename.xlsx')
@@ -42,15 +42,16 @@ module Writexlsx
     #   workbook3 = WriteXLSX.new("c:\\tmp\\filename.xlsx")
     #   workbook4 = WriteXLSX.new('c:\tmp\filename.xlsx')
     #
-    # The last two examples demonstrates how to create a file on DOS or Windows where it is
-    # necessary to either escape the directory separator \ or to use single quotes to ensure
-    # that it isn't interpolated.
+    # The last two examples demonstrates how to create a file on DOS or Windows
+    # where it is necessary to either escape the directory separator \
+    # or to use single quotes to ensure that it isn't interpolated.
     #
-    # It is recommended that the filename uses the extension .xlsx rather than .xls since
-    # the latter causes an Excel warning when used with the XLSX format.
+    # It is recommended that the filename uses the extension .xlsx
+    # rather than .xls since the latter causes an Excel warning
+    # when used with the XLSX format.
     #
-    # The new() constructor returns a WriteXLSX object that you can use to add worksheets and
-    # store data.
+    # The new() constructor returns a WriteXLSX object that you can use to
+    # add worksheets and store data.
     #
     # You can also pass a valid IO object to the new() constructor.
     #
@@ -284,7 +285,7 @@ module Writexlsx
     #
     # This method is use to create a new chart either as a standalone worksheet
     # (the default) or as an embeddable object that can be inserted into
-    # a worksheet via the insert_chart() Worksheet method.
+    # a worksheet via the Worksheet#insert_chart method.
     #
     #     chart = workbook.add_chart(:type => 'column')
     #
@@ -297,7 +298,8 @@ module Writexlsx
     #
     # :type
     #
-    # This is a required parameter. It defines the type of chart that will be created.
+    # This is a required parameter.
+    # It defines the type of chart that will be created.
     #
     #     chart = workbook.add_chart(:type => 'line')
     #
@@ -325,15 +327,16 @@ module Writexlsx
     #
     # Set the name for the chart sheet. The name property is optional and
     # if it isn't supplied will default to Chart1 .. n. The name must be
-    # a valid Excel worksheet name. See add_worksheet for more details on
-    # valid sheet names. The name property can be omitted for embedded charts.
+    # a valid Excel worksheet name. See add_worksheet
+    # for more details on valid sheet names. The name property can be
+    # omitted for embedded charts.
     #
     #     chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
     #
     # :embedded
     #
     # Specifies that the Chart object will be inserted in a worksheet
-    # via the insert_chart Worksheet method. It is an error to try insert
+    # via the Worksheet#insert_chart method. It is an error to try insert
     # a Chart that doesn't have this flag set.
     #
     #     chart = workbook.add_chart(:type => 'line', :embedded => 1)
@@ -419,7 +422,178 @@ module Writexlsx
     end
 
     #
-    # Add a new shape to the Excel workbook.
+    # The add_shape() method can be used to create new shapes that may be
+    # inserted into a worksheet.
+    #
+    # You can either define the properties at creation time via a hash of
+    # property values or later via method calls.
+    #
+    #   # Set properties at creation.
+    #   plus  = workbook.add_shape(
+    #             :type   => 'plus',
+    #             :id     => 3,
+    #             :width  => pw,
+    #             :height => ph
+    #           )
+    #
+    #   # Default rectangle shape. Set properties later.
+    #   rect  = workbook.add_shape
+    #
+    # See also the shape*.rb programs in the examples directory of the distro.
+    #
+    # === Shape Properties
+    #
+    # Any shape property can be queried or modified by [] like hash.
+    #
+    #   ellipse = workbook.add_shape(properties)
+    #   ellipse[:type] = 'cross'    # No longer an ellipse !
+    #   type = ellipse[:type]       # Find out what it really is.
+    #
+    # The properties of a shape object that can be defined via add_shape are
+    # shown below.
+    #
+    # ====:name
+    #
+    # Defines the name of the shape. This is an optional property and the shape
+    # will be given a default name if not supplied. The name is generally only
+    # used by Excel Macros to refer to the object.
+    #
+    # ====:type
+    #
+    # Defines the type of the object such as :rect, :ellipse OR :triangle.
+    #
+    #   ellipse = workbook.add_shape(:type => :ellipse)
+    #
+    # The default type is :rect.
+    #
+    # The full list of available shapes is shown below.
+    #
+    # See also the shape_all.rb program in the examples directory of the distro.
+    # It creates an example workbook with all supported shapes labelled with
+    # their shape names.
+    #
+    # ===== Basic Shapes
+    #
+    #    blockArc              can            chevron       cube          decagon
+    #    diamond               dodecagon      donut         ellipse       funnel
+    #    gear6                 gear9          heart         heptagon      hexagon
+    #    homePlate             lightningBolt  line          lineInv       moon
+    #    nonIsoscelesTrapezoid noSmoking      octagon       parallelogram pentagon
+    #    pie                   pieWedge       plaque        rect          round1Rect
+    #    round2DiagRect        round2SameRect roundRect     rtTriangle    smileyFace
+    #    snip1Rect             snip2DiagRect  snip2SameRect snipRoundRect star10
+    #    star12                star16         star24        star32        star4
+    #    star5                 star6          star7         star8         sun
+    #    teardrop              trapezoid      triangle
+    #
+    # ===== Arrow Shapes
+    #
+    #    bentArrow        bentUpArrow       circularArrow     curvedDownArrow
+    #    curvedLeftArrow  curvedRightArrow  curvedUpArrow     downArrow
+    #    leftArrow        leftCircularArrow leftRightArrow    leftRightCircularArrow
+    #    leftRightUpArrow leftUpArrow       notchedRightArrow quadArrow
+    #    rightArrow       stripedRightArrow swooshArrow       upArrow
+    #    upDownArrow      uturnArrow
+    #
+    # ===== Connector Shapes
+    #
+    #    bentConnector2   bentConnector3   bentConnector4
+    #    bentConnector5   curvedConnector2 curvedConnector3
+    #    curvedConnector4 curvedConnector5 straightConnector1
+    #
+    # ===== Callout Shapes
+    #
+    #    accentBorderCallout1  accentBorderCallout2  accentBorderCallout3
+    #    accentCallout1        accentCallout2        accentCallout3
+    #    borderCallout1        borderCallout2        borderCallout3
+    #    callout1              callout2              callout3
+    #    cloudCallout          downArrowCallout      leftArrowCallout
+    #    leftRightArrowCallout quadArrowCallout      rightArrowCallout
+    #    upArrowCallout        upDownArrowCallout    wedgeEllipseCallout
+    #    wedgeRectCallout      wedgeRoundRectCallout
+    #
+    # ===== Flow Chart Shapes
+    #
+    #    flowChartAlternateProcess  flowChartCollate        flowChartConnector
+    #    flowChartDecision          flowChartDelay          flowChartDisplay
+    #    flowChartDocument          flowChartExtract        flowChartInputOutput
+    #    flowChartInternalStorage   flowChartMagneticDisk   flowChartMagneticDrum
+    #    flowChartMagneticTape      flowChartManualInput    flowChartManualOperation
+    #    flowChartMerge             flowChartMultidocument  flowChartOfflineStorage
+    #    flowChartOffpageConnector  flowChartOnlineStorage  flowChartOr
+    #    flowChartPredefinedProcess flowChartPreparation    flowChartProcess
+    #    flowChartPunchedCard       flowChartPunchedTape    flowChartSort
+    #    flowChartSummingJunction   flowChartTerminator
+    #
+    # ===== Action Shapes
+    #
+    #    actionButtonBackPrevious actionButtonBeginning actionButtonBlank
+    #    actionButtonDocument     actionButtonEnd       actionButtonForwardNext
+    #    actionButtonHelp         actionButtonHome      actionButtonInformation
+    #    actionButtonMovie        actionButtonReturn    actionButtonSound
+    #
+    # ===== Chart Shapes
+    #
+    # Not to be confused with Excel Charts.
+    #
+    #    chartPlus chartStar chartX
+    #
+    # ===== Math Shapes
+    #
+    #    mathDivide mathEqual mathMinus mathMultiply mathNotEqual mathPlus
+    #
+    # ===== Starts and Banners
+    #
+    #    arc            bevel          bracePair  bracketPair chord
+    #    cloud          corner         diagStripe doubleWave  ellipseRibbon
+    #    ellipseRibbon2 foldedCorner   frame      halfFrame   horizontalScroll
+    #    irregularSeal1 irregularSeal2 leftBrace  leftBracket leftRightRibbon
+    #    plus           ribbon         ribbon2    rightBrace  rightBracket
+    #    verticalScroll wave
+    #
+    # ===== Tab Shapes
+    #
+    #    cornerTabs plaqueTabs squareTabs
+    #
+    # ==== :text
+    #
+    # This property is used to make the shape act like a text box.
+    #
+    #    rect = workbook.add_shape(:type => 'rect', :text => "Hello \nWorld")
+    #
+    # The Text is super-imposed over the shape. The text can be wrapped using
+    # the newline character \n.
+    #
+    # ==== :id
+    #
+    # Identification number for internal identification. This number will be
+    # auto-assigned, if not assigned, or if it is a duplicate.
+    #
+    # ==== :format
+    #
+    # Workbook format for decorating the shape horizontally and/or vertically.
+    #
+    # ==== :rotation
+    #
+    # Shape rotation, in degrees, from 0 to 360
+    #
+    # ==== :line, :fill
+    #
+    # Shape color for the outline and fill.
+    # Colors may be specified  as a color index, or in RGB format, i.e. AA00FF.
+    #
+    # ==== :link_type
+    #
+    # Line type for shape outline. The default is solid.
+    # The list of possible values is:
+    #
+    #    dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot, solid
+    #
+    # ==== :valign, :align
+    #
+    # Text alignment within the shape.
+    #
+    # Vertical alignment can be:
     #
     def add_shape(properties)
       shape = Shape.new(properties)
