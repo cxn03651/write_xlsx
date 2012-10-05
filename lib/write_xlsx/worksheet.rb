@@ -185,12 +185,6 @@ module Writexlsx
           @worksheet.write_cell_formula(token)
           @worksheet.write_cell_value(result || 0)
         end
-=begin
-        @worksheet.writer.tag_elements('c', cell_attributes) do
-          @worksheet.write_cell_formula(token)
-          @worksheet.write_cell_value(result || 0)
-        end
-=end
       end
     end
 
