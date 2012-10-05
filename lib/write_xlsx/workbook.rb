@@ -595,6 +595,55 @@ module Writexlsx
     #
     # Vertical alignment can be:
     #
+    #    Setting     Meaning
+    #    =======     =======
+    #    t           Top
+    #    ctr         Centre
+    #    b           Bottom    def add_shape(properties)
+    #
+    # The default is to center both horizontally and vertically.
+    #
+    # ==== :scale_x, :scale_y
+    #
+    #
+    # Scale factor in x and y dimension, for scaling the shape width and height. The default value is 1.
+    #
+    # Scaling may be set on the shape object or via insert_shape().
+    #
+    # ==== :adjustments
+    #
+    # Adjustment of shape vertices. Most shapes do not use this. For some
+    # shapes, there is a single adjustment to modify the geometry.
+    # For instance, the plus shape has one adjustment to control the width
+    # of the spokes.
+    #
+    # Connectors can have a number of adjustments to control the shape
+    # routing. Typically, a connector will have 3 to 5 handles for routing
+    # the shape. The adjustment is in percent of the distance from the
+    # starting shape to the ending shape, alternating between the x and y
+    # dimension. Adjustments may be negative, to route the shape away
+    # from the endpoint.
+    #
+    # ==== :stencil
+    #
+    # Shapes work in stencil mode by default. That is, once a shape is
+    # inserted, its connection is separated from its master.
+    # The master shape may be modified after an instance is inserted,
+    # and only subsequent insertions will show the modifications.
+    #
+    # This is helpful for Org charts, where an employee shape may be
+    # created once, and then the text of the shape is modified for each
+    # employee.
+    #
+    # The insert_shape() method returns a reference to the inserted
+    # shape (the child).
+    #
+    # Stencil mode can be turned off, allowing for shape(s) to be
+    # modified after insertion. In this case the insert_shape() method
+    # returns a reference to the inserted shape (the master).
+    # This is not very useful for inserting multiple shapes,
+    # since the x/y coordinates also gets modified.
+    #
     def add_shape(properties)
       shape = Shape.new(properties)
       shape[:palette] = @palette
@@ -608,10 +657,10 @@ module Writexlsx
     # Create a defined name in Excel. We handle global/workbook level names and
     # local/worksheet names.
     #
-    # This method is used to defined a name that can be used to represent a value,
-    # a single cell or a range of cells in a workbook.
+    # This method is used to defined a name that can be used to represent
+    # a value, a single cell or a range of cells in a workbook.
     #
-    #   For example to set a global/workbook name:
+    # For example to set a global/workbook name:
     #
     #   # Global/workbook names.
     #   workbook.define_name('Exchange_rate', '=0.96')
@@ -622,7 +671,8 @@ module Writexlsx
     #
     #   # Local/worksheet name.
     #   workbook.define_name('Sheet2!Sales',  '=Sheet2!$G$1:$G$10')
-    #   If the sheet name contains spaces or special characters
+    #
+    # If the sheet name contains spaces or special characters
     # you must enclose it in single quotes like in Excel:
     #
     #   workbook.define_name("'New Data'!Sales",  '=Sheet2!$G$1:$G$10')
@@ -671,7 +721,8 @@ module Writexlsx
     # The set_properties method can be used to set the document properties
     # of the Excel file created by WriteXLSX. These properties are visible
     # when you use the Office Button -> Prepare -> Properties option in Excel
-    # and are also available to external applications that read or index windows files.
+    # and are also available to external applications that read or index windows
+    # files.
     #
     # The properties should be passed in hash format as follows:
     #
@@ -693,7 +744,8 @@ module Writexlsx
     #     :comments
     #     :status
     #
-    # See also the properties.rb program in the examples directory of the distro.
+    # See also the properties.rb program in the examples directory
+    # of the distro.
     #
     def set_properties(params)
       # Ignore if no args were passed.
@@ -731,7 +783,8 @@ module Writexlsx
     # The set_custom_color() method can be used to override one of the built-in
     # palette values with a more suitable colour.
     #
-    # The value for _index_ should be in the range 8..63, see "COLOURS IN EXCEL".
+    # The value for _index_ should be in the range 8..63,
+    # see "COLOURS IN EXCEL".
     #
     # The default named colours use the following indices:
     #
