@@ -372,7 +372,7 @@ module Writexlsx
         chart.set_embedded_config_data
       else
         # Check the worksheet name for non-embedded charts.
-        name       = check_sheetname(params[:name], 1)
+        name       = check_chart_sheetname(params[:name])
         index      = @worksheets.size
         chartsheet = Chartsheet.new(self, index, name)
         chartsheet.chart   = chart
@@ -970,46 +970,49 @@ module Writexlsx
     # Check for valid worksheet names. We check the length, if it contains any
     # invalid characters and if the name is unique in the workbook.
     #
-    def check_sheetname(name, chart = nil) #:nodoc:
-      name  ||= ''
-      invalid_char = /[\[\]:*?\/\\]/
-
+    def check_sheetname(name) #:nodoc:
       # Increment the Sheet/Chart number used for default sheet names below.
-      if chart
-        @chartname_count += 1
-      else
-        @sheetname_count += 1
-      end
+      @sheetname_count += 1
 
       # Supply default Sheet/Chart name if none has been defined.
-      if name == ''
-        if chart
-          name = "#{@chart_name}#{@chartname_count}"
-        else
-          name = "#{@sheet_name}#{@sheetname_count}"
-        end
+      if name.nil? || name == ''
+        name = "#{@sheet_name}#{@sheetname_count}"
       end
+      check_valid_sheetname(name)
+      name
+    end
 
+    def check_chart_sheetname(name)
+      @chartname_count += 1
+      if name.nil? || name == ''
+        name = "#{@chart_name}#{@chartname_count}"
+      end
+      check_valid_sheetname(name)
+      name
+    end
+
+    def check_valid_sheetname(name)
       # Check that sheet name is <= 31. Excel limit.
       raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
 
       # Check that sheetname doesn't contain any invalid characters
+      invalid_char = /[\[\]:*?\/\\]/
       if name =~ invalid_char
         raise 'Invalid character []:*?/\\ in worksheet name: ' + name
       end
 
       # Check that the worksheet name doesn't already exist since this is a fatal
       # error in Excel 97. The check must also exclude case insensitive matches.
-      @worksheets.each do |worksheet|
-        name_a = name
-        name_b = worksheet.name
-
-        if name_a.downcase == name_b.downcase
-          raise "Worksheet name '#{name}', with case ignored, is already used."
-        end
+      unless is_sheetname_uniq?(name)
+        raise "Worksheet name '#{name}', with case ignored, is already used."
       end
+    end
 
-      name
+    def is_sheetname_uniq?(name)
+      @worksheets.each do |worksheet|
+        return false if name.downcase == worksheet.name.downcase
+      end
+      true
     end
 
     #
