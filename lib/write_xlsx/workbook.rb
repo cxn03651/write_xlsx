@@ -1505,7 +1505,7 @@ module Writexlsx
         chart.formula_ids.each do |range, id|
           # Skip if the series has user defined data.
           if chart.formula_data[id]
-            if !seen_ranges.has_key?(range) || seen_ranges[range]
+            if !seen_ranges.has_key?(range) || !seen_ranges[range]
               data = chart.formula_data[id]
               seen_ranges[range] = data
             end
