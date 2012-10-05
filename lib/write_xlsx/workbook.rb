@@ -1505,15 +1505,10 @@ module Writexlsx
         chart.formula_ids.each do |range, id|
           # Skip if the series has user defined data.
           if chart.formula_data[id]
-            if !seen_ranges.has_key?(range) || !seen_ranges[range]
-              data = chart.formula_data[id]
-              seen_ranges[range] = data
-            end
+            seen_ranges[range] = chart.formula_data[id] unless seen_ranges[range]
             next
-          end
-
           # Check to see if the data is already cached locally.
-          if seen_ranges.has_key?(range)
+          elsif seen_ranges[range]
             chart.formula_data[id] = seen_ranges[range]
             next
           end
