@@ -376,7 +376,6 @@ module Writexlsx
         index      = @worksheets.size
         chartsheet = Chartsheet.new(self, index, name)
         chartsheet.chart   = chart
-        chartsheet.drawing = Drawing.new
         @worksheets[index] = chartsheet
         @sheetnames[index] = name
       end

@@ -15,11 +15,11 @@ module Writexlsx
   class Chartsheet < Worksheet
     include Writexlsx::Utility
 
-    attr_writer :chart, :drawing
+    attr_writer :chart
 
     def initialize(workbook, index, name)
       super
-      @drawing           = 1
+      @drawing           = Drawing.new
       @is_chartsheet     = true
       @chart             = nil
       @charts            = [1]
