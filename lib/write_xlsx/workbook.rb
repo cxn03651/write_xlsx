@@ -125,7 +125,7 @@ module Writexlsx
       # In case close() is called twice, by user and by DESTROY.
       return if @fileclosed
 
-      @fileclosed = 1
+      @fileclosed = true
       store_workbook
     end
 
