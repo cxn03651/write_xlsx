@@ -1530,31 +1530,30 @@ module Writexlsx
             raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n"
           end
 
-          # Find the worksheet object based on the sheet name.
-          worksheet = worksheets[sheetname]
-
-          # Get the data from the worksheet table.
-          data = worksheet.get_range_data(*cells)
-
-          # Convert shared string indexes to strings.
-          data.collect! do |token|
-            if token.kind_of?(Hash)
-              token = @shared_strings.string(token[:sst_id])
-
-              # Ignore rich strings for now. Deparse later if necessary.
-              token = '' if token =~ %r!^<r>! && token =~ %r!</r>$!
-            end
-            token
-          end
-
           # Add the data to the chart.
-          chart.formula_data[id] = data
-
-          # Store range data locally to avoid lookup if seen again.
-          seen_ranges[range] = data
+          # And store range data locally to avoid lookup if seen agein.
+          chart.formula_data[id] =
+            seen_ranges[range] = chart_data(worksheets[sheetname], cells)
         end
       end
     end
+
+    def chart_data(worksheet, cells)
+      # Get the data from the worksheet table.
+      data = worksheet.get_range_data(*cells)
+
+      # Convert shared string indexes to strings.
+      data.collect do |token|
+        if token.kind_of?(Hash)
+          token = @shared_strings.string(token[:sst_id])
+
+          # Ignore rich strings for now. Deparse later if necessary.
+          token = '' if token =~ %r!^<r>! && token =~ %r!</r>$!
+        end
+        token
+      end
+    end
+    private :chart_data
 
     #
     # Sort internal and user defined names in the same order as used by Excel.
