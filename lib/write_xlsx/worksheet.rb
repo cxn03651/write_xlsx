@@ -32,9 +32,11 @@ module Writexlsx
   #     set_comments_author
   #     insert_image
   #     insert_chart
+  #     insert_shape
   #     data_validation
-  #     conditional_format
-  #     get_name
+  #     conditional_formatting
+  #     add_table
+  #     name
   #     activate
   #     select
   #     hide
@@ -62,8 +64,8 @@ module Writexlsx
   # Row-column notation and A1 notation.
   #
   # Row-column notation uses a zero based index for both row and column
-  # while A1 notation uses the standard Excel alphanumeric sequence of column letter
-  # and 1-based row. For example:
+  # while A1 notation uses the standard Excel alphanumeric sequence of column
+  # letter and 1-based row. For example:
   #
   #     (0, 0)      # The top left cell in row-column notation.
   #     ('A1')      # The top left cell in A1 notation.
@@ -71,7 +73,8 @@ module Writexlsx
   #     (1999, 29)  # Row-column notation.
   #     ('AD2000')  # The same cell in A1 notation.
   #
-  # Row-column notation is useful if you are referring to cells programmatically:
+  # Row-column notation is useful if you are referring to cells
+  # programmatically:
   #
   #     (0..9).each do |i|
   #       worksheet.write(i, 0, 'Hello')    # Cells A1 to A10
@@ -98,6 +101,44 @@ module Writexlsx
   # For simplicity, the parameter lists for the worksheet method calls in the
   # following sections are given in terms of row-column notation. In all cases
   # it is also possible to use A1 notation.
+  #
+  # == PAGE SET-UP METHODS
+  #
+  # Page set-up methods affect the way that a worksheet looks
+  # when it is printed. They control features such as page headers and footers
+  # and margins. These methods are really just standard worksheet methods.
+  # They are documented here in a separate section for the sake of clarity.
+  #
+  # The following methods are available for page set-up:
+  #
+  #   set_landscape()
+  #   set_portrait()
+  #   set_page_view()
+  #   set_paper()
+  #   center_horizontally()
+  #   center_vertically()
+  #   set_margins()
+  #   set_header()
+  #   set_footer()
+  #   repeat_rows()
+  #   repeat_columns()
+  #   hide_gridlines()
+  #   print_row_col_headers()
+  #   print_area()
+  #   print_across()
+  #   fit_to_pages()
+  #   set_start_page()
+  #   set_print_scale()
+  #   set_h_pagebreaks()
+  #   set_v_pagebreaks()
+  # A common requirement when working with WriteXLSX is to apply the same
+  # page set-up features to all of the worksheets in a workbook. To do this
+  # you can use the sheets() method of the workbook class to access the array
+  # of worksheets in a workbook:
+  #
+  #   workbook.sheets.each do |worksheet|
+  #     worksheet.set_landscape
+  #   end
   #
   class Worksheet
     include Writexlsx::Utility
@@ -3380,6 +3421,16 @@ module Writexlsx
     #
     # Add an Excel table to a worksheet.
     #
+    # The add_table() method is used to group a range of cells into
+    # an Excel Table.
+    #
+    #   worksheet.add_table('B3:F7', { ... } )
+    #
+    # This method contains a lot of parameters and is described
+    # in detail in a separate section "TABLES IN EXCEL".
+    #
+    # See also the tables.pl program in the examples directory of the distro
+    #
     def add_table(*args)
       user_range = ''
       col_formats = []
@@ -5371,6 +5422,36 @@ module Writexlsx
     #
     # Insert a shape into the worksheet.
     #
+    # This method can be used to insert a Shape object into a worksheet.
+    # The Shape must be created by the add_shape() Workbook method.
+    #
+    #   shape = workbook.add_shape(:name => 'My Shape', :type => 'plus')
+    #
+    #   # Configure the shape.
+    #   shape.set_text('foo')
+    #   ...
+    #
+    #   # Insert the shape into the a worksheet.
+    #   worksheet.insert_shape('E2', shape)
+    #
+    # See add_shape() for details on how to create the Shape object
+    # and Excel::Writer::XLSX::Shape for details on how to configure it.
+    #
+    # The x, y, scale_x and scale_y parameters are optional.
+    #
+    # The parameters x and y can be used to specify an offset
+    # from the top left hand corner of the cell specified by row and col.
+    # The offset values are in pixels.
+    #
+    #   worksheet1.insert_shape('E2', chart, 3, 3)
+    #
+    # The parameters scale_x and scale_y can be used to scale the
+    # inserted shape horizontally and vertically:
+    #
+    #   # Scale the width by 120% and the height by 150%
+    #   worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
+    # See also the shape*.pl programs in the examples directory of the distro.
+    #
     def insert_shape(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
       row_start, column_start, shape, x_offset, y_offset, scale_x, scale_y =
@@ -6807,6 +6888,23 @@ module Writexlsx
 
     #
     # Write the <conditionalFormatting> element.
+    #
+    # The conditional_formatting() method is used to add formatting
+    # to a cell or range of cells based on user defined criteria.
+    #
+    #   worksheet.conditional_formatting('A1:J10',
+    #       {
+    #         :type     => 'cell',
+    #         :criteria => '>=',
+    #         :value    => 50,
+    #         :format   => format1
+    #       }
+    #   )
+    # This method contains a lot of parameters and is described
+    # in detail in a separate section "CONDITIONAL FORMATTING IN EXCEL".
+    #
+    # See also the conditional_format.rb program in the examples directory
+    # of the distro
     #
     def write_conditional_formatting(range, params) #:nodoc:
       attributes = ['sqref', range]

@@ -1,6 +1,6 @@
 = write_xlsx
 
-gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem. write_xlsx is converted from Perl's module https://github.com/jmcnamara/excel-writer-xlsx .
+gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem. write_xlsx is converted from Perl's module Excel::Writer::XLSX-0.51, https://github.com/jmcnamara/excel-writer-xlsx .
 
 == Description
 
@@ -15,6 +15,9 @@ The WriteXLSX supports the following features:
 * Charts
 * Autofilters
 * Data validation
+* Conditional formatting
+* Tables
+* Shapes
 * Hyperlinks
 * Defined names
 * Grouping/Outlines
@@ -24,14 +27,10 @@ The WriteXLSX supports the following features:
 
 write_xlsx uses the same interface as writeexcel gem.
 
-documentation is not completed, but writeexcel's documentation will help you. See http://writeexcel.web.fc2.com/
-
-And you can find many examples in this gem.
-
 == Synopsis
 
-To write a string, a formatted string, a number and a formula to the first worksheet
-in an Excel XMLX spreadsheet called ruby.xlsx:
+To write a string, a formatted string, a number and a formula to
+the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 
   require 'rubygems'
   require 'write_xlsx'
@@ -42,7 +41,7 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
   # Add a worksheet
   worksheet = workbook.add_worksheet
 
-  #  Add and define a format
+  # Add and define a format
   format = workbook.add_format # Add a format
   format.set_bold
   format.set_color('red')
@@ -56,9 +55,13 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
   # Write a number and a formula using A1 notation
   worksheet.write('A3', 1.2345)
   worksheet.write('A4', '=SIN(PI()/4)')
+
   workbook.close
 
 == Recent change
+
+2012-10-12 v0.51.0
+ Impliment Shape, Table as welll as Excel::Write::XLSX-0.51
 
 2012-02-14 v0.0.4
  Fix for x-axis major/minor units in scatter charts.(CPAN_0.46)
@@ -72,11 +75,12 @@ in an Excel XMLX spreadsheet called ruby.xlsx:
 == Copyright
 Original Perl module was written by John McNamara(jmcnamara@cpan.org).
 
-Converted to ruby by Hideo NAKAMURA(cxn03651@msj.biglobe.ne.jp) Copyright (c) 2012 HIDEO NAKAMURA. See LICENSE.txt for further details.
+Converted to ruby by Hideo NAKAMURA(cxn03651@msj.biglobe.ne.jp)
+Copyright (c) 2012 HIDEO NAKAMURA. See LICENSE.txt for further details.
 
 == Contributing to write_xlsx
 
-* repsitory: http://github.com/cxn03651/write_xlsx 
+* repsitory: http://github.com/cxn03651/write_xlsx
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
@@ -84,5 +88,3 @@ Converted to ruby by Hideo NAKAMURA(cxn03651@msj.biglobe.ne.jp) Copyright (c) 20
 * Commit and push until you are happy with your contribution
 * Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
 * Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
-
-
