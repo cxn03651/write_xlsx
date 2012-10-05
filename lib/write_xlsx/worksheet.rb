@@ -3429,7 +3429,7 @@ module Writexlsx
     # This method contains a lot of parameters and is described
     # in detail in a separate section "TABLES IN EXCEL".
     #
-    # See also the tables.pl program in the examples directory of the distro
+    # See also the tables.rb program in the examples directory of the distro
     #
     def add_table(*args)
       col_formats = []
