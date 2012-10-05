@@ -678,25 +678,22 @@ module Writexlsx
         name        = $2
         sheet_index = get_sheet_index(sheetname)
       else
-        sheet_index =-1   # Use -1 to indicate global names.
+        sheet_index = -1   # Use -1 to indicate global names.
       end
 
       # Warn if the sheet index wasn't found.
       if !sheet_index
        raise "Unknown sheet name #{sheetname} in defined_name()\n"
-       return -1
       end
 
       # Warn if the sheet name contains invalid chars as defined by Excel help.
       if name !~ %r!^[a-zA-Z_\\][a-zA-Z_.]+!
        raise "Invalid characters in name '#{name}' used in defined_name()\n"
-       return -1
       end
 
       # Warn if the sheet name looks like a cell name.
       if name =~ %r(^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$)
         raise "Invalid name '#{name}' looks like a cell name in defined_name()\n"
-        return -1
       end
 
       @defined_names.push([ name, sheet_index, formula])
