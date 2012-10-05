@@ -272,13 +272,10 @@ module Writexlsx
     # sheetname for more than one worksheet.
     #
     def add_worksheet(name = '')
-      index = @worksheets.size
       name  = check_sheetname(name)
-
-      worksheet = Worksheet.new(self, index, name)
-      @worksheets[index] = worksheet
-      @sheetnames[index] = name
-
+      worksheet = Worksheet.new(self, @worksheets.size, name)
+      @worksheets << worksheet
+      @sheetnames << name
       worksheet
     end
 
