@@ -1540,12 +1540,17 @@ module Writexlsx
       # Convert shared string indexes to strings.
       data.collect do |token|
         if token.kind_of?(Hash)
-          token = @shared_strings.string(token[:sst_id])
+          string = @shared_strings.string(token[:sst_id])
 
           # Ignore rich strings for now. Deparse later if necessary.
-          token = '' if token =~ %r!^<r>! && token =~ %r!</r>$!
+          if string =~ %r!^<r>! && string =~ %r!</r>$!
+            ''
+          else
+            string
+          end
+        else
+          token
         end
-        token
       end
     end
     private :chart_data
