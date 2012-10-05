@@ -3432,7 +3432,6 @@ module Writexlsx
     # See also the tables.pl program in the examples directory of the distro
     #
     def add_table(*args)
-      user_range = ''
       col_formats = []
 =begin
       # We would need to order the write statements very carefully within this
