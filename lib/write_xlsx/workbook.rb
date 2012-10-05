@@ -1618,9 +1618,9 @@ module Writexlsx
           # Match Print_Area and Print_Titles xlnm types.
           if name =~ /^_xlnm\.(.*)$/
             xlnm_type = $1
-            name = sheet_name + '!' + xlnm_type
+            name = "#{sheet_name}!#{xlnm_type}"
           elsif index != -1
-            name = sheet_name + '!' + name
+            name = "#{sheet_name}!#{name}"
           end
 
           named_ranges << name
