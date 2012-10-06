@@ -3643,6 +3643,15 @@ module Writexlsx
       return table
     end
 
+    def check_parameter(params, valid_keys, method)
+      invalids = params.keys - valid_keys
+      unless invalids.empty?
+        raise WriteXLSXOptionParameterError,
+          "Unknown parameter '#{invalids.join(', ')}' in #{method}."
+      end
+      true
+    end
+
     #
     # :call-seq:
     #   data_validation(cell_or_cell_range, options)
