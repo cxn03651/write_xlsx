@@ -4775,11 +4775,8 @@ module Writexlsx
     end
 
     def check_for_valid_input_params(param)
-      param.each_key do |param_key|
-        unless valid_validation_parameter.include?(param_key)
-          raise WriteXLSXOptionParameterError, "Unknown parameter '#{param_key}' in data_validation()"
-        end
-      end
+      check_parameter(param, valid_validation_parameter, 'data_validation')
+
       unless param.has_key?(:validate)
         raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
       end
