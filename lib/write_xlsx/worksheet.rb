@@ -632,8 +632,16 @@ module Writexlsx
     #     worksheet.protect('drowssap', { :insert_rows => true } )
     #
     def protect(password = nil, options = {})
-      # Default values for objects that can be protected.
-      defaults = {
+      check_parameter(options, protect_default_settings.keys, 'protect')
+      @protect = protect_default_settings.merge(options)
+
+      # Set the password after the user defined values.
+      @protect[:password] =
+        sprintf("%X", encode_password(password)) if password && password != ''
+    end
+
+    def protect_default_settings  # :nodoc:
+      {
         :sheet                 => true,
         :content               => false,
         :objects               => false,
@@ -650,24 +658,10 @@ module Writexlsx
         :sort                  => false,
         :autofilter            => false,
         :pivot_tables          => false,
-        :select_unlocked_cells => true,
+        :select_unlocked_cells => true
       }
-
-      # Overwrite the defaults with user specified values.
-      options.each do |k, v|
-        if defaults.has_key?(k)
-          defaults[k] = options[k]
-        else
-          raise "Unknown protection object: #{k}\n"
-        end
-      end
-
-      # Set the password after the user defined values.
-      defaults[:password] =
-        sprintf("%X", encode_password(password)) if password && password != ''
-
-      @protect = defaults
     end
+    private :protect_default_settings
 
     #
     # :call-seq:
