@@ -3455,27 +3455,7 @@ module Writexlsx
       # The final hashref contains the validation parameters.
       param ||= {}
 
-      # List of valid input parameters.
-      valid_parameter = {
-        :autofilter     => 1,
-        :banded_columns => 1,
-        :banded_rows    => 1,
-        :columns        => 1,
-        :data           => 1,
-        :first_column   => 1,
-        :header_row     => 1,
-        :last_column    => 1,
-        :name           => 1,
-        :style          => 1,
-        :total_row      => 1
-      }
-
-      # Check for valid input parameters.
-      param.each_key do |param_key|
-        unless valid_parameter[param_key]
-          raise "Unknown parameter '#{param_key}' in add_table()"
-        end
-      end
+      check_parameter(param, valid_table_parameter, 'add_table')
 
       # Table count is a member of Workbook, global to all Worksheet.
       @workbook.table_count += 1
@@ -3650,6 +3630,23 @@ module Writexlsx
           "Unknown parameter '#{invalids.join(', ')}' in #{method}."
       end
       true
+    end
+
+    # List of valid input parameters.
+    def valid_table_parameter
+      [
+        :autofilter,
+        :banded_columns,
+        :banded_rows,
+        :columns,
+        :data,
+        :first_column,
+        :header_row,
+        :last_column,
+        :name,
+        :style,
+       :total_row
+       ]
     end
 
     #
