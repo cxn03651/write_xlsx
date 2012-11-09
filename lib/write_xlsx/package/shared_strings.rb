@@ -82,7 +82,7 @@ module Writexlsx
       # Write the sst string elements.
       #
       def write_sst_strings
-        @strings.each { |string| write_si(string) }
+        @strings.each { |string| write_si(string.empty? ? " " : string) }
       end
 
       #
