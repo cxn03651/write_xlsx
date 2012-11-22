@@ -13,4 +13,10 @@ class TestWriteSi < Test::Unit::TestCase
     expected = '<si><t>neptune</t></si>'
     assert_equal(expected, result)
   end
+
+  def test_write_si_with_empty_string
+    assert_nothing_raised do
+      @obj.__send__('write_si', '')
+    end
+  end
 end
