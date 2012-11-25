@@ -107,7 +107,9 @@ module Writexlsx
                              ) if string =~ /([\x00-\x08\x0B-\x1F])/
 
         # Convert character to \xC2\xxx or \xC3\xxx
-        string = add_c2_c3(string) if 0x80 <= string.ord && string.ord <= 0xFF
+        unless string.empty?
+          string = add_c2_c3(string) if 0x80 <= string.ord && string.ord <= 0xFF
+        end
 
         # Add attribute to preserve leading or trailing whitespace.
         attributes << 'xml:space' << 'preserve' if string =~ /\A\s|\s\Z/
