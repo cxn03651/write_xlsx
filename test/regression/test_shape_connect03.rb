@@ -73,6 +73,6 @@ class TestRegressionShapeConnect03 < Test::Unit::TestCase
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,)
+    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
   end
 end

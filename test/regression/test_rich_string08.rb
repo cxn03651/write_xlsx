@@ -24,6 +24,6 @@ class TestRegressionRichString08 < Test::Unit::TestCase
     worksheet.write_rich_string('A3', 'ab', bold, 'cd', 'efg', format)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,)
+    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
   end
 end
