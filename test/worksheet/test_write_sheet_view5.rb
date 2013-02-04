@@ -14,7 +14,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('A1')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -23,7 +23,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('A2')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -32,7 +32,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('B1')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="B1" sqref="B1" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="B1" sqref="B1"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -41,7 +41,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('D3')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -50,7 +50,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('D3:F4')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3:F4" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3:F4"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -59,7 +59,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('F4:D3')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="F4" sqref="D3:F4" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="F4" sqref="D3:F4"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -68,7 +68,7 @@ class TestWriteSheetView5 < Test::Unit::TestCase
     @worksheet.set_selection('A2:A2')
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 end

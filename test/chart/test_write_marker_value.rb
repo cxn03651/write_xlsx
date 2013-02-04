@@ -8,7 +8,7 @@ class TestWriteMarkerValue < Test::Unit::TestCase
   end
 
   def test_write_marker_value
-    expected = '<c:marker val="1" />'
+    expected = '<c:marker val="1"/>'
     @chart.instance_variable_set(:@default_marker, 'none')
     result = @chart.__send__('write_marker_value')
     assert_equal(expected, result)

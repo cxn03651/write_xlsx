@@ -8,7 +8,7 @@ class TestWriteMoveWithCells < Test::Unit::TestCase
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_move_with_cells')
     result = vml.instance_variable_get(:@writer).string
-    expected = '<x:MoveWithCells />'
+    expected = '<x:MoveWithCells/>'
     assert_equal(expected, result)
   end
 end

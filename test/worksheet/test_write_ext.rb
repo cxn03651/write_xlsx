@@ -12,7 +12,7 @@ class TestWriteExt < Test::Unit::TestCase
   def test_write_ext
     @worksheet.__send__('write_ext')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<ext xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" uri="http://schemas.microsoft.com/office/mac/excel/2008/main"><mx:PLV Mode="1" OnePage="0" WScale="0" /></ext>'
+    expected = '<ext xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" uri="http://schemas.microsoft.com/office/mac/excel/2008/main"><mx:PLV Mode="1" OnePage="0" WScale="0"/></ext>'
     assert_equal(expected, result)
   end
 end

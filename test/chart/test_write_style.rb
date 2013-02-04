@@ -8,7 +8,7 @@ class TestWriteStyle < Test::Unit::TestCase
   end
 
   def test_write_style_1
-    expected = '<c:style val="1" />'
+    expected = '<c:style val="1"/>'
     @chart.set_style(1)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string

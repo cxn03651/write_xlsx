@@ -8,7 +8,7 @@ class TestWriteLabelOffset < Test::Unit::TestCase
   end
 
   def test_write_label_offset
-    expected = '<c:lblOffset val="100" />'
+    expected = '<c:lblOffset val="100"/>'
     result = @chart.__send__('write_label_offset', 100)
     assert_equal(expected, result)
   end

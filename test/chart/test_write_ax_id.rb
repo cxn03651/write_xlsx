@@ -8,7 +8,7 @@ class TestWriteAxId < Test::Unit::TestCase
   end
 
   def test_write_axis_id
-    expected = '<c:axId val="53850880" />'
+    expected = '<c:axId val="53850880"/>'
     result = @chart.__send__('write_axis_id', 53850880)
     assert_equal(expected, result)
   end

@@ -8,7 +8,7 @@ class TestWriteOrder < Test::Unit::TestCase
   end
 
   def test_write_order
-    expected = '<c:order val="0" />'
+    expected = '<c:order val="0"/>'
     result = @chart.__send__('write_order', 0)
     assert_equal(expected, result)
   end

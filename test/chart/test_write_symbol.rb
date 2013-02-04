@@ -8,7 +8,7 @@ class TestWriteSymbol < Test::Unit::TestCase
   end
 
   def test_write_symbol
-    expected = '<c:symbol val="none" />'
+    expected = '<c:symbol val="none"/>'
     @chart.__send__('write_symbol', 'none')
     result = @chart.instance_variable_get(:@writer).string
     assert_equal(expected, result)

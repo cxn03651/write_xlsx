@@ -63,7 +63,7 @@ class TestWriteRow < Test::Unit::TestCase
   def test_write_empty_row_12_nil_24_nil_1
     @worksheet.__send__('write_empty_row', 12, nil, 24, nil, 1)
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<row r="13" ht="24" hidden="1" customHeight="1" />'
+    expected = '<row r="13" ht="24" hidden="1" customHeight="1"/>'
     assert_equal(expected, result)
   end
 end

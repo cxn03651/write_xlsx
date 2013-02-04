@@ -8,7 +8,7 @@ class TestWriteSizeWithCells < Test::Unit::TestCase
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_size_with_cells')
     result = vml.instance_variable_get(:@writer).string
-    expected = '<x:SizeWithCells />'
+    expected = '<x:SizeWithCells/>'
     assert_equal(expected, result)
   end
 end

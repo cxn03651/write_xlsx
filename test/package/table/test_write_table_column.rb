@@ -4,7 +4,7 @@ require 'write_xlsx/package/table'
 
 class TestTableWriteTableColumn < Test::Unit::TestCase
   def test_table_write_table_column
-    expected = '<tableColumn id="1" name="Column1" />'
+    expected = '<tableColumn id="1" name="Column1"/>'
 
     table = Writexlsx::Package::Table.new
     table.__send__(:write_table_column, {:_name => 'Column1', :_id => 1})

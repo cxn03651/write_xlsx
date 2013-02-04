@@ -8,7 +8,7 @@ class TestWriteFill < Test::Unit::TestCase
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_fill')
     result = vml.instance_variable_get(:@writer).string
-    expected = '<v:fill color2="#ffffe1" />'
+    expected = '<v:fill color2="#ffffe1"/>'
     assert_equal(expected, result)
   end
 end

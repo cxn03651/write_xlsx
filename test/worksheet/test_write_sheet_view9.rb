@@ -15,7 +15,7 @@ class TestWriteSheetView9 < Test::Unit::TestCase
     @worksheet.split_panes(15, 0, 20, 0)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="600" topLeftCell="A21" activePane="bottomLeft" /><selection pane="bottomLeft" activeCell="A2" sqref="A2" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="600" topLeftCell="A21" activePane="bottomLeft"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -25,7 +25,7 @@ class TestWriteSheetView9 < Test::Unit::TestCase
     @worksheet.split_panes(15, 0, 20, 0)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="600" topLeftCell="A21" activePane="bottomLeft" /><selection pane="bottomLeft" activeCell="A21" sqref="A21" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="600" topLeftCell="A21" activePane="bottomLeft"/><selection pane="bottomLeft" activeCell="A21" sqref="A21"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -35,7 +35,7 @@ class TestWriteSheetView9 < Test::Unit::TestCase
     @worksheet.split_panes(0, 8.43, 0, 4)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="1350" topLeftCell="E1" activePane="topRight" /><selection pane="topRight" activeCell="B1" sqref="B1" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="1350" topLeftCell="E1" activePane="topRight"/><selection pane="topRight" activeCell="B1" sqref="B1"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -45,7 +45,7 @@ class TestWriteSheetView9 < Test::Unit::TestCase
     @worksheet.split_panes(0, 8.43, 0, 4)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="1350" topLeftCell="E1" activePane="topRight" /><selection pane="topRight" activeCell="E1" sqref="E1" /></sheetView></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="1350" topLeftCell="E1" activePane="topRight"/><selection pane="topRight" activeCell="E1" sqref="E1"/></sheetView></sheetViews>'
     assert_equal(expected, result)
   end
 end

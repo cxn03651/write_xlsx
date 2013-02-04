@@ -15,13 +15,13 @@ class TestXMLWriterSimple < Test::Unit::TestCase
   end
 
   def test_empty_tag
-    assert_equal('<foo />', @obj.empty_tag('foo'))
+    assert_equal('<foo/>', @obj.empty_tag('foo'))
   end
 
   def test_empty_tag_with_xml_decl
     expected = <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<foo />
+<foo/>
 EOS
     assert_equal(expected, @obj.xml_decl << @obj.empty_tag('foo') << "\n")
   end
@@ -32,7 +32,7 @@ EOS
 
   def test_attribute
     assert_equal(
-      "<foo x=\"1&gt;2\" />", @obj.empty_tag("foo", ['x', '1>2'])
+      "<foo x=\"1&gt;2\"/>", @obj.empty_tag("foo", ['x', '1>2'])
     )
   end
 
@@ -55,7 +55,7 @@ EOS
       'name', '_xlnm.Print_Titles',
       'localSheetId', 0
     ]
-    expected = 
+    expected =
       "<definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet1!$1:$1</definedName>"
     @obj.data_element('definedName', 'Sheet1!$1:$1', attributes)
     result = @obj.string

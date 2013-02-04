@@ -8,7 +8,7 @@ class TestWriteNumFmt < Test::Unit::TestCase
   end
 
   def test_write_num_fmt
-    expected = '<c:numFmt formatCode="General" sourceLinked="1" />'
+    expected = '<c:numFmt formatCode="General" sourceLinked="1"/>'
     @chart.instance_variable_set(:@has_category, 1)
     result = @chart.__send__('write_num_fmt')
     assert_equal(expected, result)

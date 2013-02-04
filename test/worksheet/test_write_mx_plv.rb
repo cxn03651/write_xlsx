@@ -13,7 +13,7 @@ class TestWriteMxPlv < Test::Unit::TestCase
   def test_write_mx_plv
     @worksheet.__send__('write_mx_plv')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<mx:PLV Mode="1" OnePage="0" WScale="0" />'
+    expected = '<mx:PLV Mode="1" OnePage="0" WScale="0"/>'
     assert_equal(expected, result)
   end
 end

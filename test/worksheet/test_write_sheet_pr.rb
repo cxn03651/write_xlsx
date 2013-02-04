@@ -13,7 +13,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
     @worksheet.instance_variable_get(:@print_style).fit_page = true
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetPr><pageSetUpPr fitToPage="1" /></sheetPr>'
+    expected = '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
     assert_equal(expected, result)
   end
 
@@ -21,7 +21,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
     @worksheet.set_tab_color('red')
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetPr><tabColor rgb="FFFF0000" /></sheetPr>'
+    expected = '<sheetPr><tabColor rgb="FFFF0000"/></sheetPr>'
     assert_equal(expected, result)
   end
 
@@ -30,7 +30,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
     @worksheet.set_tab_color('red')
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetPr><tabColor rgb="FFFF0000" /><pageSetUpPr fitToPage="1" /></sheetPr>'
+    expected = '<sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr>'
     assert_equal(expected, result)
   end
 end

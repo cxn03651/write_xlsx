@@ -12,7 +12,7 @@ class TestWriteSheetView < Test::Unit::TestCase
   def test_write_sheet_view_tab_not_selected
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView workbookViewId="0" />'
+    expected = '<sheetView workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 
@@ -20,7 +20,7 @@ class TestWriteSheetView < Test::Unit::TestCase
     @worksheet.select
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView tabSelected="1" workbookViewId="0" />'
+    expected = '<sheetView tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 
@@ -29,7 +29,7 @@ class TestWriteSheetView < Test::Unit::TestCase
     @worksheet.hide_gridlines
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView tabSelected="1" workbookViewId="0" />'
+    expected = '<sheetView tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 
@@ -38,7 +38,7 @@ class TestWriteSheetView < Test::Unit::TestCase
     @worksheet.hide_gridlines(true)
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0" />'
+    expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 
@@ -47,7 +47,7 @@ class TestWriteSheetView < Test::Unit::TestCase
     @worksheet.hide_gridlines(false)
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView tabSelected="1" workbookViewId="0" />'
+    expected = '<sheetView tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 
@@ -56,7 +56,7 @@ class TestWriteSheetView < Test::Unit::TestCase
     @worksheet.hide_gridlines(2)
     @worksheet.__send__('write_sheet_view')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0" />'
+    expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
 end

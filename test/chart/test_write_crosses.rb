@@ -8,7 +8,7 @@ class TestWriteCrosses < Test::Unit::TestCase
   end
 
   def test_write_crosses
-    expected = '<c:crosses val="autoZero" />'
+    expected = '<c:crosses val="autoZero"/>'
     result = @chart.__send__('write_crosses', 'autoZero')
     assert_equal(expected, result)
   end

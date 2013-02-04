@@ -33,7 +33,7 @@ class Test::Unit::TestCase
   def expected_to_array(lines)
     array = []
     lines.each_line do |line|
-      str = line.chomp.sub(%r!/>$!, ' />').sub(/^\s+/, '')
+      str = line.chomp.sub(/^\s+/, '')
       array << str unless str == ''
     end
     array

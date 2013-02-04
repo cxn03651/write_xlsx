@@ -24,7 +24,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
     @worksheet.set_landscape
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<pageSetup orientation="landscape" />'
+    expected = '<pageSetup orientation="landscape"/>'
     assert_equal(expected, result)
   end
 
@@ -32,7 +32,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
     @worksheet.set_portrait
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<pageSetup orientation="portrait" />'
+    expected = '<pageSetup orientation="portrait"/>'
     assert_equal(expected, result)
   end
 
@@ -40,7 +40,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
     @worksheet.paper = 9
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<pageSetup paperSize="9" orientation="portrait" />'
+    expected = '<pageSetup paperSize="9" orientation="portrait"/>'
     assert_equal(expected, result)
   end
 
@@ -48,7 +48,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
     @worksheet.print_across
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<pageSetup pageOrder="overThenDown" orientation="portrait" />'
+    expected = '<pageSetup pageOrder="overThenDown" orientation="portrait"/>'
     assert_equal(expected, result)
   end
 end

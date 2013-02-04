@@ -8,7 +8,7 @@ class TestWriteCrossAx < Test::Unit::TestCase
   end
 
   def test_write_cross_axis
-    expected = '<c:crossAx val="82642816" />'
+    expected = '<c:crossAx val="82642816"/>'
     result = @chart.__send__('write_cross_axis', 82642816)
     assert_equal(expected, result)
   end

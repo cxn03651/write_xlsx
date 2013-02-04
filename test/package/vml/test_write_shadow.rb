@@ -8,7 +8,7 @@ class TestWriteShadow < Test::Unit::TestCase
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_shadow')
     result = vml.instance_variable_get(:@writer).string
-    expected = '<v:shadow on="t" color="black" obscured="t" />'
+    expected = '<v:shadow on="t" color="black" obscured="t"/>'
     assert_equal(expected, result)
   end
 end

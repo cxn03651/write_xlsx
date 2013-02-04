@@ -8,7 +8,7 @@ class TestWriteLegend < Test::Unit::TestCase
   end
 
   def test_write_legend
-    expected = '<c:legend><c:legendPos val="r" /><c:layout /></c:legend>'
+    expected = '<c:legend><c:legendPos val="r"/><c:layout/></c:legend>'
     @chart.__send__('write_legend')
     result = @chart.instance_variable_get(:@writer).string
     assert_equal(expected, result)

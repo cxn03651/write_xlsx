@@ -21,7 +21,7 @@ class TestWritePrintOptions < Test::Unit::TestCase
     @worksheet.center_horizontally
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions horizontalCentered="1" />'
+    expected = '<printOptions horizontalCentered="1"/>'
     assert_equal(expected, result)
   end
 
@@ -29,7 +29,7 @@ class TestWritePrintOptions < Test::Unit::TestCase
     @worksheet.center_vertically
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions verticalCentered="1" />'
+    expected = '<printOptions verticalCentered="1"/>'
     assert_equal(expected, result)
   end
 
@@ -38,7 +38,7 @@ class TestWritePrintOptions < Test::Unit::TestCase
     @worksheet.center_vertically
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions horizontalCentered="1" verticalCentered="1" />'
+    expected = '<printOptions horizontalCentered="1" verticalCentered="1"/>'
     assert_equal(expected, result)
   end
 
@@ -54,7 +54,7 @@ class TestWritePrintOptions < Test::Unit::TestCase
     @worksheet.hide_gridlines(false)
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions gridLines="1" />'
+    expected = '<printOptions gridLines="1"/>'
     assert_equal(expected, result)
   end
 =begin
@@ -70,7 +70,7 @@ class TestWritePrintOptions < Test::Unit::TestCase
     @worksheet.hide_gridlines(false)
     @worksheet.__send__('write_print_options', 2)
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions gridLines="1" />'
+    expected = '<printOptions gridLines="1"/>'
     assert_equal(expected, result)
   end
 =end

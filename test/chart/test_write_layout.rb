@@ -8,7 +8,7 @@ class TestWriteLayout < Test::Unit::TestCase
   end
 
   def test_write_idx
-    expected = '<c:layout />'
+    expected = '<c:layout/>'
     result = @chart.__send__('write_layout')
     assert_equal(expected, result)
   end

@@ -8,7 +8,7 @@ class TestWriteExt < Test::Unit::TestCase
   end
 
   def test_write_ext
-    expected = '<xdr:ext cx="9308969" cy="6078325" />'
+    expected = '<xdr:ext cx="9308969" cy="6078325"/>'
 
     @drawing.__send__(:write_ext, 9308969, 6078325)
     result = @drawing.instance_variable_get(:@writer).string

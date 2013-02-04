@@ -12,7 +12,7 @@ class TestWriteFilter < Test::Unit::TestCase
   def test_write_filter
     @worksheet.__send__('write_filter', 'East')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<filter val="East" />'
+    expected = '<filter val="East"/>'
     assert_equal(expected, result)
   end
 end

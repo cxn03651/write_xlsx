@@ -8,7 +8,7 @@ class TestWriteLang < Test::Unit::TestCase
   end
 
   def test_write_lang
-    expected = '<c:lang val="en-US" />'
+    expected = '<c:lang val="en-US"/>'
     result = @chart.__send__('write_lang')
     assert_equal(expected, result)
   end

@@ -13,7 +13,7 @@ class TestWriteLegacyDrawing < Test::Unit::TestCase
     @worksheet.write_comment('A1', 'comment')
     @worksheet.__send__('write_legacy_drawing')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<legacyDrawing r:id="rId1" />'
+    expected = '<legacyDrawing r:id="rId1"/>'
     assert_equal(expected, result)
   end
 end

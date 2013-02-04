@@ -8,7 +8,7 @@ class TestWriteXfrmOffset < Test::Unit::TestCase
   end
 
   def test_write_xfrm_offset
-    expected = '<a:off x="0" y="0" />'
+    expected = '<a:off x="0" y="0"/>'
 
     @drawing.__send__(:write_xfrm_offset)
     result = @drawing.instance_variable_get(:@writer).string

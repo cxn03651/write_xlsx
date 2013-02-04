@@ -8,7 +8,7 @@ class TestWriteXfrmExtension < Test::Unit::TestCase
   end
 
   def test_write_xfrm_extension
-    expected = '<a:ext cx="0" cy="0" />'
+    expected = '<a:ext cx="0" cy="0"/>'
 
     @drawing.__send__(:write_xfrm_extension)
     result = @drawing.instance_variable_get(:@writer).string

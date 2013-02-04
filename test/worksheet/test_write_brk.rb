@@ -12,7 +12,7 @@ class TestWriteBrk < Test::Unit::TestCase
   def test_write_brk
     @worksheet.__send__('write_brk', 1, 16383)
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<brk id="1" max="16383" man="1" />'
+    expected = '<brk id="1" max="16383" man="1"/>'
     assert_equal(expected, result)
   end
 end

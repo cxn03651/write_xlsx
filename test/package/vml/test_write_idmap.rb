@@ -8,7 +8,7 @@ class TestWriteIdmap < Test::Unit::TestCase
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_idmap', 1)
     result = vml.instance_variable_get(:@writer).string
-    expected = '<o:idmap v:ext="edit" data="1" />'
+    expected = '<o:idmap v:ext="edit" data="1"/>'
     assert_equal(expected, result)
   end
 end

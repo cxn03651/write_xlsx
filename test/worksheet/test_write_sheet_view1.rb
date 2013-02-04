@@ -13,7 +13,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.select
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -22,7 +22,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.set_zoom(100)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -31,7 +31,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.set_zoom(200)
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" zoomScale="200" zoomScaleNormal="200" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" zoomScale="200" zoomScaleNormal="200" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -40,7 +40,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.right_to_left
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView rightToLeft="1" tabSelected="1" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView rightToLeft="1" tabSelected="1" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -49,7 +49,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.hide_zero
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView showZeros="0" tabSelected="1" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView showZeros="0" tabSelected="1" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 
@@ -58,7 +58,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
     @worksheet.set_page_view
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetViews><sheetView tabSelected="1" view="pageLayout" workbookViewId="0" /></sheetViews>'
+    expected = '<sheetViews><sheetView tabSelected="1" view="pageLayout" workbookViewId="0"/></sheetViews>'
     assert_equal(expected, result)
   end
 end

@@ -12,7 +12,7 @@ class TestWriteDimension < Test::Unit::TestCase
   def test_write_dimension_with_no_dimension_set
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<dimension ref="A1" />'
+    expected = '<dimension ref="A1"/>'
     assert_equal(expected, result)
   end
 
@@ -21,7 +21,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -30,7 +30,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -39,7 +39,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -48,7 +48,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -58,7 +58,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write('B2', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -68,7 +68,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write('A1', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -78,7 +78,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write('H11', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 
@@ -88,7 +88,7 @@ class TestWriteDimension < Test::Unit::TestCase
     @worksheet.write('XFD1048576', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}" />!
+    expected = %Q!<dimension ref="#{cell}"/>!
     assert_equal(expected, result)
   end
 end

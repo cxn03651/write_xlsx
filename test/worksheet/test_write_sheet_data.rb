@@ -12,7 +12,7 @@ class TestWriteSheetData < Test::Unit::TestCase
   def test_write_sheet_data
     @worksheet.__send__('write_sheet_data')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetData />'
+    expected = '<sheetData/>'
     assert_equal(expected, result)
   end
 end

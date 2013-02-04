@@ -39,12 +39,12 @@ module Writexlsx
       end
 
       def empty_tag(tag, attr = [])
-        str = "<#{tag}#{key_vals(attr)} />"
+        str = "<#{tag}#{key_vals(attr)}/>"
         io_write(str)
       end
 
       def empty_tag_encoded(tag, attr = [])
-        str = "<#{tag}#{key_vals(attr)} />"
+        str = "<#{tag}#{key_vals(attr)}/>"
         io_write(str)
       end
 

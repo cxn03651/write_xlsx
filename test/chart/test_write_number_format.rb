@@ -8,7 +8,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
   end
 
   def test_write_number_format
-    expected = '<c:numFmt formatCode="General" sourceLinked="1" />'
+    expected = '<c:numFmt formatCode="General" sourceLinked="1"/>'
     result = @chart.__send__('write_number_format')
     assert_equal(expected, result)
   end

@@ -8,7 +8,7 @@ class TestWriteLabelAlign < Test::Unit::TestCase
   end
 
   def test_write_label_align
-    expected = '<c:lblAlgn val="ctr" />'
+    expected = '<c:lblAlgn val="ctr"/>'
     result = @chart.__send__('write_label_align', 'ctr')
     assert_equal(expected, result)
   end

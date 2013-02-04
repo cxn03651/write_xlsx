@@ -8,7 +8,7 @@ class TestWriteCNvPr < Test::Unit::TestCase
   end
 
   def test_write_c_nv_pr
-    expected = '<xdr:cNvPr id="2" name="Chart 1" />'
+    expected = '<xdr:cNvPr id="2" name="Chart 1"/>'
 
     @drawing.__send__(:write_c_nv_pr, 2, 'Chart 1')
     result = @drawing.instance_variable_get(:@writer).string

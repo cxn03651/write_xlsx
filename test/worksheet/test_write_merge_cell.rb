@@ -12,7 +12,7 @@ class TestWriteMergeCell < Test::Unit::TestCase
   def test_write_merge_cell
     @worksheet.__send__('write_merge_cell', [ 2, 1, 2, 2 ])
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<mergeCell ref="B3:C3" />'
+    expected = '<mergeCell ref="B3:C3"/>'
     assert_equal(expected, result)
   end
 end

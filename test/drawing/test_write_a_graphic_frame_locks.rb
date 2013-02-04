@@ -8,7 +8,7 @@ class TestWriteAGraphicFrameLocks < Test::Unit::TestCase
   end
 
   def test_write_a_graphic_frame_locks
-    expected = '<a:graphicFrameLocks noGrp="1" />'
+    expected = '<a:graphicFrameLocks noGrp="1"/>'
 
     @drawing.__send__(:write_a_graphic_frame_locks)
     result = @drawing.instance_variable_get(:@writer).string

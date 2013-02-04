@@ -8,7 +8,7 @@ class TestWriteTickLabelPos < Test::Unit::TestCase
   end
 
   def test_write_tick_label_pos
-    expected = '<c:tickLblPos val="nextTo" />'
+    expected = '<c:tickLblPos val="nextTo"/>'
     @chart.__send__('write_tick_label_pos', 'nextTo')
     result = @chart.instance_variable_get(:@writer).string
     assert_equal(expected, result)

@@ -8,7 +8,7 @@ class TestWritePlotVisOnly < Test::Unit::TestCase
   end
 
   def test_write_plot_vis_only
-    expected = '<c:plotVisOnly val="1" />'
+    expected = '<c:plotVisOnly val="1"/>'
     result = @chart.__send__('write_plot_vis_only')
     assert_equal(expected, result)
   end

@@ -8,7 +8,7 @@ class TestWritePos < Test::Unit::TestCase
   end
 
   def test_write_pos
-    expected = '<xdr:pos x="0" y="0" />'
+    expected = '<xdr:pos x="0" y="0"/>'
 
     @drawing.__send__(:write_pos, 0, 0)
     result = @drawing.instance_variable_get(:@writer).string

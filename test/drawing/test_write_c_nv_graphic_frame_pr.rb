@@ -8,7 +8,7 @@ class TestWriteCNvGraphicFramePr < Test::Unit::TestCase
   end
 
   def test_write_c_nv_graphic_frame_pr_01
-    expected = '<xdr:cNvGraphicFramePr />'
+    expected = '<xdr:cNvGraphicFramePr/>'
 
     @drawing.instance_variable_set(:@embedded, 1)
     @drawing.__send__(:write_c_nv_graphic_frame_pr)
@@ -18,7 +18,7 @@ class TestWriteCNvGraphicFramePr < Test::Unit::TestCase
   end
 
   def test_write_c_nv_graphic_frame_pr_02
-    expected = '<xdr:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1" /></xdr:cNvGraphicFramePr>'
+    expected = '<xdr:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></xdr:cNvGraphicFramePr>'
 
     @drawing.__send__(:write_c_nv_graphic_frame_pr)
     result = @drawing.instance_variable_get(:@writer).string
