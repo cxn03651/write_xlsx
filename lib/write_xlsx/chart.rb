@@ -857,6 +857,9 @@ module Writexlsx
       @title_name    = name
       @title_formula = name_formula
       @title_data_id = data_id
+
+      # Set the font properties if present.
+      @title_font = convert_font_args(params[:font])
     end
 
     #
@@ -1152,7 +1155,34 @@ module Writexlsx
       # Only use the first letter of bottom, top, left or right.
       axis[:_position] = axis[:_position].downcase[0, 1] if axis[:_position]
 
+      # Set the font properties if present.
+      axis[:_number_font] = convert_font_args(params[:number_font])
+      axis[:_label_font]  = convert_font_args(params[:label_font])
+
       axis
+    end
+
+    #
+    # Convert user defined font values into private hash values.
+    #
+    def convert_font_args(params)
+      return unless params
+      font = {
+        :_name         => params[:name],
+        :_color        => params[:color],
+        :_size         => params[:size],
+        :_bold         => params[:bold],
+        :_italic       => params[:italic],
+        :_underline    => params[:underline],
+        :_pitch_family => params[:pitch_family],
+        :_charset      => params[:charset],
+        :_baseline     => params[:baseline] || 0
+      }
+
+      # Convert font size units.
+      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
+
+      font
     end
 
     #
@@ -1529,6 +1559,35 @@ module Writexlsx
     end
 
     #
+    # Get the font style attributes from a font hash.
+    #
+    def get_font_style_attributes(font)
+      return [] unless font
+
+      attributes = []
+      attributes << 'sz' << font[:_size]      if ptrue?(font[:_size])
+      attributes << 'b'  << font[:_bold]      if font[:_bold]
+      attributes << 'i'  << font[:_italic]    if font[:_italic]
+      attributes << 'u'  << 'sng'             if font[:_underline]
+
+      attributes << 'baseline' << font[:_baseline]
+      attributes
+    end
+
+    #
+    # Get the font latin attributes from a font hash.
+    #
+    def get_font_latin_attributes(font)
+      return [] unless font
+
+      attributes = []
+      attributes << 'typeface' << font[:_name] if ptrue?(font[:_name])
+      attributes << 'pitchFamily' << font[:_pitch_family] if font[:_pitch_family]
+      attributes << 'charset' << font[:_charset] if font[:_charset]
+
+      attributes
+    end
+    #
     # Setup the default properties for a chart.
     #
     def set_default_properties # :nodoc:
@@ -1638,9 +1697,9 @@ module Writexlsx
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
         if title = @title_formula
-          write_title_formula(title, @title_data_id)
+          write_title_formula(title, @title_data_id, nil, @title_font)
         elsif title = @title_name
-          write_title_rich(title)
+          write_title_rich(title, nil, @title_font)
         end
 
         # Write the c:plotArea element.
@@ -1969,14 +2028,18 @@ module Writexlsx
         write_axis_pos(position, y_axis[:_reverse])
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, @x_axis[:_data_id], horiz)
+          write_title_formula(title, @x_axis[:_data_id], horiz, @x_axis[:_label_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title, horiz)
+          write_title_rich(title, horiz, @x_axis[:_label_font])
         end
         # Write the c:numFmt element.
         write_num_fmt
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
+
+        # Write the axis font elements.
+        write_axis_font(x_axis[:_number_font])
+
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
@@ -2025,9 +2088,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if title = y_axis[:_formula]
-          write_title_formula(title, y_axis[:_data_id], horiz)
+          write_title_formula(title, y_axis[:_data_id], horiz, y_axis[:_label_font])
         elsif title = y_axis[:_name]
-          write_title_rich(title, horiz)
+          write_title_rich(title, horiz, y_axis[:_label_font])
         end
 
         # Write the c:numberFormat element.
@@ -2035,6 +2098,9 @@ module Writexlsx
 
         # Write the tickLblPos element.
         write_tick_label_pos(y_axis[:_label_position])
+
+        # Write the axis font elements.
+        write_axis_font(y_axis[:_number_font])
 
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[0])
@@ -2082,9 +2148,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, y_axis[:_data_id], horiz)
+          write_title_formula(title, y_axis[:_data_id], horiz, x_axis[:_label_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title, horiz)
+          write_title_rich(title, horiz, x_axis[:_label_font])
         end
 
         # Write the c:numberFormat element.
@@ -2092,6 +2158,9 @@ module Writexlsx
 
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
+
+        # Write the axis font elements.
+        write_axis_font(x_axis[:_number_font])
 
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
@@ -2175,14 +2244,16 @@ module Writexlsx
         write_axis_pos(position, y_axis[:reverse])
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, x_axis[:_data_id])
+          write_title_formula(title, x_axis[:_data_id], nil, x_axis[:_label_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title)
+          write_title_rich(title, nil, x_axis[:_label_font])
         end
         # Write the c:numFmt element.
         write_num_fmt('dd/mm/yyyy')
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
+        # Write the font elements.
+        write_axis_font(x_axis[:_number_font])
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
@@ -2610,10 +2681,10 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, horiz = nil) # :nodoc:
+    def write_title_rich(title, horiz = nil, font = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
-        write_tx_rich(title, horiz)
+        write_tx_rich(title, horiz, font)
         # Write the c:layout element.
         write_layout
       end
@@ -2622,22 +2693,22 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, data_id, horiz = nil) # :nodoc:
+    def write_title_formula(title, data_id, horiz = nil, font = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
         write_tx_formula(title, data_id)
         # Write the c:layout element.
         write_layout
         # Write the c:txPr element.
-        write_tx_pr(horiz)
+        write_tx_pr(horiz, font)
       end
     end
 
     #
     # Write the <c:tx> element.
     #
-    def write_tx_rich(title, horiz) # :nodoc:
-      @writer.tag_elements('c:tx') { write_rich(title, horiz) }
+    def write_tx_rich(title, horiz, font = nil) # :nodoc:
+      @writer.tag_elements('c:tx') { write_rich(title, horiz, font) }
     end
 
     #
@@ -2659,14 +2730,14 @@ module Writexlsx
     #
     # Write the <c:rich> element.
     #
-    def write_rich(title, horiz) # :nodoc:
+    def write_rich(title, horiz, font) # :nodoc:
       @writer.tag_elements('c:rich') do
         # Write the a:bodyPr element.
         write_a_body_pr(horiz)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
-        write_a_p_rich(title)
+        write_a_p_rich(title, font)
       end
     end
 
@@ -2697,22 +2768,22 @@ module Writexlsx
     #
     # Write the <a:p> element for rich string titles.
     #
-    def write_a_p_rich(title) # :nodoc:
+    def write_a_p_rich(title, font) # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
-        write_a_p_pr_rich
+        write_a_p_pr_rich(font)
         # Write the a:r element.
-        write_a_r(title)
+        write_a_r(title, font)
       end
     end
 
     #
     # Write the <a:p> element for formula titles.
     #
-    def write_a_p_formula # :nodoc:
+    def write_a_p_formula(font = nil) # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
-        write_a_p_pr_formula
+        write_a_p_pr_formula(font)
         # Write the a:endParaRPr element.
         write_a_end_para_rpr
       end
@@ -2721,22 +2792,37 @@ module Writexlsx
     #
     # Write the <a:pPr> element for rich string titles.
     #
-    def write_a_p_pr_rich # :nodoc:
-      @writer.tag_elements('a:pPr') { write_a_def_rpr }
+    def write_a_p_pr_rich(font) # :nodoc:
+      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
     end
 
     #
     # Write the <a:pPr> element for formula titles.
     #
-    def write_a_p_pr_formula # :nodoc:
-      @writer.tag_elements('a:pPr') { write_a_def_rpr }
+    def write_a_p_pr_formula(font) # :nodoc:
+      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
     end
 
     #
     # Write the <a:defRPr> element.
     #
-    def write_a_def_rpr # :nodoc:
-      @writer.empty_tag('a:defRPr')
+    def write_a_def_rpr(font = nil) # :nodoc:
+      style_attributes = get_font_style_attributes(font)
+      latin_attributes = get_font_latin_attributes(font)
+      has_color = ptrue?(font) && ptrue?(font[:_color])
+
+      if !latin_attributes.empty? || has_color
+        @writer.tag_elements('a:defRPr', style_attributes) do
+          if has_color
+            write_a_solid_fill(:color => font[:_color])
+          end
+          if !latin_attributes.empty?
+            write_a_latin(latin_attributes)
+          end
+        end
+      else
+        @writer.empty_tag('a:defRPr', style_attributes)
+      end
     end
 
     #
@@ -2753,10 +2839,10 @@ module Writexlsx
     #
     # Write the <a:r> element.
     #
-    def write_a_r(title) # :nodoc:
+    def write_a_r(title, font) # :nodoc:
       @writer.tag_elements('a:r') do
         # Write the a:rPr element.
-        write_a_r_pr
+        write_a_r_pr(font)
         # Write the a:t element.
         write_a_t(title)
       end
@@ -2765,12 +2851,28 @@ module Writexlsx
     #
     # Write the <a:rPr> element.
     #
-    def write_a_r_pr # :nodoc:
+    def write_a_r_pr(font) # :nodoc:
       lang = 'en-US'
 
-      attributes = ['lang', lang]
+      style_attributes = get_font_style_attributes(font)
+      latin_attributes = get_font_latin_attributes(font)
+      has_color = ptrue?(font) && ptrue?(font[:_color])
 
-      @writer.empty_tag('a:rPr', attributes)
+      # Add the lang type to the attributes.
+      style_attributes.unshift(lang).unshift('lang')
+
+      if !latin_attributes.empty? || has_color
+        @writer.tag_elements('a:rPr', style_attributes) do
+          if has_color
+            write_a_solid_fill(:color => font[:_color])
+          end
+          if !latin_attributes.empty?
+            write_a_latin(latin_attributes)
+          end
+        end
+      else
+        @writer.empty_tag('a:rPr', style_attributes)
+      end
     end
 
     #
@@ -2783,14 +2885,14 @@ module Writexlsx
     #
     # Write the <c:txPr> element.
     #
-    def write_tx_pr(horiz) # :nodoc:
+    def write_tx_pr(horiz, font) # :nodoc:
       @writer.tag_elements('c:txPr') do
         # Write the a:bodyPr element.
         write_a_body_pr(horiz)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
-        write_a_p_formula
+        write_a_p_formula(font)
       end
     end
 
@@ -3233,7 +3335,30 @@ module Writexlsx
       @writer.empty_tag('c:invertIfNegative', attributes)
     end
 
-    def nil_or_max?(val)
+    #
+    # Write the axis font elements.
+    #
+    def write_axis_font(font) # :nodoc:
+      return unless font
+
+      @writer.tag_elements('c:txPr') do
+        @writer.empty_tag('a:bodyPr')
+        write_a_lst_style
+        @writer.tag_elements('a:p') do
+          write_a_p_pr_rich(font)
+          write_a_end_para_rpr
+        end
+      end
+    end
+
+    #
+    # Write the <a:latin> element.
+    #
+    def write_a_latin(args)  # :nodoc:
+      @writer.empty_tag('a:latin', args)
+    end
+
+    def nil_or_max?(val)  # :nodoc:
       val.nil? || val == 'max'
     end
   end
