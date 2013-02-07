@@ -27,6 +27,25 @@ module Writexlsx
         @horiz_val_axis    = 0
         @horiz_cat_axis    = 1
         @show_crosses      = false
+
+        # Override and reset the default axis values.
+        if @x_axis[:_defaults]
+          @x_axis[:_defaults][:major_gridlines] = { :visible => 1 }
+        else
+          @x_axis[:_defaults] = { :major_gridlines => { :visible => 1 } }
+        end
+        if @y_axis[:_defaults]
+          @y_axis[:_defaults][:major_gridlines] = { :visible => 0 }
+        else
+          @y_axis[:_defaults] = { :major_gridlines => { :visible => 0 } }
+        end
+
+        if @subtype == 'percent_stacked'
+            @x_axis[:_defaults][:num_format] = '0%'
+        end
+
+        set_x_axis
+        set_y_axis
       end
 
       #
@@ -34,11 +53,8 @@ module Writexlsx
       #
       def write_chart_type(params)
         if params[:primary_axes] != 0
-          ## Reverse X and Y axes for Bar charts.
+          # Reverse X and Y axes for Bar charts.
           @y_axis, @x_axis = @x_axis, @y_axis
-          if !@y_axis[:_major_gridlines]
-            @y_axis[:_major_gridlines] = {:show => 1}
-          end
           if @y2_axis[:_position] == 'r'
             @y2_axis[:_position] = 't'
           end
@@ -57,25 +73,6 @@ module Writexlsx
         attributes = ['val', val]
 
         @writer.empty_tag('c:barDir', attributes)
-      end
-
-      #
-      # Over-ridden to add % format. TODO. This will be refactored back up to the
-      # SUPER class later.
-      #
-      # Write the <c:numFmt> element.
-      #
-      def write_number_format(format_code = 'General')
-        source_linked = 1
-
-        format_code = '0%' if @subtype == 'percent_stacked'
-
-        attributes = [
-                      'formatCode',   format_code,
-                      'sourceLinked', source_linked
-                     ]
-
-        @writer.empty_tag('c:numFmt', attributes)
       end
     end
   end

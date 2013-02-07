@@ -27,6 +27,12 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @show_crosses = false
+
+        # Override and reset the default axis values.
+        @x_axis[:_defaults][:num_format] = 'dd/mm/yyyy'
+        @x2_axis[:_defaults][:num_format] = 'dd/mm/yyyy'
+        set_x_axis
+        set_x2_axis
       end
 
       #

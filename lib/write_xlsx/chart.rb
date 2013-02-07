@@ -456,6 +456,9 @@ module Writexlsx
       when 'Pie'
         require 'write_xlsx/chart/pie'
         Chart::Pie.new(subtype)
+      when 'Radar'
+        require 'write_xlsx/chart/radar'
+        Chart::Radar.new(subtype)
       when 'Scatter'
         require 'write_xlsx/chart/scatter'
         Chart::Scatter.new(subtype)
@@ -478,7 +481,7 @@ module Writexlsx
       @style_id          = 2
       @axis_ids          = []
       @axis2_ids         = []
-      @has_category      = false
+      @cat_has_num_fmt   = false
       @requires_category = 0
       @legend_position   = 'right'
       @cat_axis_position = 'b'
@@ -790,7 +793,7 @@ module Writexlsx
     #     )
     #
     def set_x_axis(params = {})
-      @x_axis = convert_axis_args(params)
+      @x_axis = convert_axis_args(@x_axis, params)
     end
 
     #
@@ -800,42 +803,23 @@ module Writexlsx
     # The properties that can be set are the same as for set_x_axis,
     #
     def set_y_axis(params = {})
-      @y_axis =
-        convert_axis_args(
-                          {:major_gridlines => {:visible => 1}}.
-                          merge(params)
-                          )
+      @y_axis = convert_axis_args(@y_axis, params)
     end
 
     #
     # Set the properties of the secondary X-axis.
     #
     def set_x2_axis(params = {})
-      @x2_axis =
-        convert_axis_args(
-                          {
-                            :label_position => 'none',
-                            :crossing       => 'max',
-                            :visible        => 0
-                          }.
-                          merge(params)
-                          )
+      @x2_axis = convert_axis_args(@x2_axis, params)
     end
 
     #
     # Set the properties of the secondary Y-axis.
     #
     def set_y2_axis(params = {})
-      @y2_axis =
-        convert_axis_args(
-                          {
-                            :major_gridlines => {:visible => 0},
-                            :position        => 'r',
-                            :visible         => 1
-                          }.
-                          merge(params)
-                          )
+      @y2_axis = convert_axis_args(@y2_axis, params)
     end
+
     #
     # Set the properties of the chart title.
     #
@@ -859,7 +843,7 @@ module Writexlsx
       @title_data_id = data_id
 
       # Set the font properties if present.
-      @title_font = convert_font_args(params[:font])
+      @title_font = convert_font_args(params[:name_font])
     end
 
     #
@@ -1128,36 +1112,44 @@ module Writexlsx
     #
     # Convert user defined axis values into private hash values.
     #
-    def convert_axis_args(params) # :nodoc:
-      name, name_formula = process_names(params[:name], params[:name_formula])
+    def convert_axis_args(axis, params) # :nodoc:
+      arg = (axis[:_defaults] || {}).merge(params)
+      name, name_formula = process_names(arg[:name], arg[:name_formula])
 
-      data_id = get_data_id(name_formula, params[:data])
+      data_id = get_data_id(name_formula, arg[:data])
 
       axis = {
-        :_name            => name,
-        :_formula         => name_formula,
-        :_data_id         => data_id,
-        :_reverse         => params[:reverse],
-        :_min             => params[:min],
-        :_max             => params[:max],
-        :_minor_unit      => params[:minor_unit],
-        :_major_unit      => params[:major_unit],
-        :_minor_unit_type => params[:minor_unit_type],
-        :_major_unit_type => params[:major_unit_type],
-        :_log_base        => params[:log_base],
-        :_crossing        => params[:crossing],
-        :_position        => params[:position],
-        :_label_position  => params[:label_position],
-        :_major_gridlines => params[:major_gridlines] || {:visible => 1},
-        :_visible         => params[:visible] ? params[:visible] : 1
+        :_defaults          => axis[:_defaults],
+        :_name              => name,
+        :_formula           => name_formula,
+        :_data_id           => data_id,
+        :_reverse           => arg[:reverse],
+        :_min               => arg[:min],
+        :_max               => arg[:max],
+        :_minor_unit        => arg[:minor_unit],
+        :_major_unit        => arg[:major_unit],
+        :_minor_unit_type   => arg[:minor_unit_type],
+        :_major_unit_type   => arg[:major_unit_type],
+        :_log_base          => arg[:log_base],
+        :_crossing          => arg[:crossing],
+        :_position          => arg[:position],
+        :_label_position    => arg[:label_position],
+        :_num_format        => arg[:num_format],
+        :_num_format_linked => arg[:num_format_linked],
+        :_visible           => arg[:visible] || 1
       }
+
+      # Map major_gridlines properties.
+      if arg[:major_gridlines] && ptrue?(arg[:major_gridlines][:visible])
+        axis[:_major_gridlines] = { :_visible => arg[:major_gridlines][:visible] }
+      end
 
       # Only use the first letter of bottom, top, left or right.
       axis[:_position] = axis[:_position].downcase[0, 1] if axis[:_position]
 
       # Set the font properties if present.
-      axis[:_number_font] = convert_font_args(params[:number_font])
-      axis[:_label_font]  = convert_font_args(params[:label_font])
+      axis[:_num_font] = convert_font_args(arg[:num_font])
+      axis[:_name_font]  = convert_font_args(arg[:name_font])
 
       axis
     end
@@ -1593,6 +1585,32 @@ module Writexlsx
     def set_default_properties # :nodoc:
       @chartarea = default_chartarea_property
       @plotarea  = default_plotarea_property
+
+      # Set the default axis properties.
+      @x_axis[:_defaults] = {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 0 }
+      }
+
+      @y_axis[:_defaults] = {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 1 }
+      }
+
+      @x2_axis[:_defaults] = {
+        :num_format     => 'General',
+        :label_position => 'none',
+        :crossing       => 'max',
+        :visible        => 0
+      }
+
+      @y2_axis[:_defaults] = {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 0 },
+        :position        => 'right',
+        :visible         => 1
+      }
+
       set_x_axis
       set_y_axis
 
@@ -1897,16 +1915,15 @@ module Writexlsx
       # Ignore <c:cat> elements for charts without category values.
       return unless formula
 
-      @has_category = true
-
       @writer.tag_elements('c:cat') do
         # Check the type of cached data.
         type = get_data_type(data)
         if type == 'str'
-          @has_category = false
+          @cat_has_num_fmt = false
           # Write the c:strRef element.
           write_str_ref(formula, data, type)
         else
+          @cat_has_num_fmt = true
           # Write the c:numRef element.
           write_num_ref(formula, data, type)
         end
@@ -2026,19 +2043,28 @@ module Writexlsx
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
+
+        # Write the c:majorGridlines element.
+        write_major_gridlines(x_axis[:_major_gridlines])
+
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, @x_axis[:_data_id], horiz, @x_axis[:_label_font])
+          write_title_formula(title, @x_axis[:_data_id], horiz, @x_axis[:_name_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title, horiz, @x_axis[:_label_font])
+          write_title_rich(title, horiz, x_axis[:_name_font])
         end
+
         # Write the c:numFmt element.
-        write_num_fmt
+        write_cat_number_format(x_axis)
+
+        # Write the c:majorTickMark element.
+        write_major_tick_mark(x_axis[:_major_tick_mark])
+
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
 
         # Write the axis font elements.
-        write_axis_font(x_axis[:_number_font])
+        write_axis_font(x_axis[:_num_font])
 
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
@@ -2088,19 +2114,22 @@ module Writexlsx
 
         # Write the axis title elements.
         if title = y_axis[:_formula]
-          write_title_formula(title, y_axis[:_data_id], horiz, y_axis[:_label_font])
+          write_title_formula(title, y_axis[:_data_id], horiz, y_axis[:_name_font])
         elsif title = y_axis[:_name]
-          write_title_rich(title, horiz, y_axis[:_label_font])
+          write_title_rich(title, horiz, y_axis[:_name_font])
         end
 
         # Write the c:numberFormat element.
-        write_number_format
+        write_number_format(y_axis)
+
+        # Write the c:majorTickMark element.
+        write_major_tick_mark(y_axis[:_major_tick_mark])
 
         # Write the tickLblPos element.
         write_tick_label_pos(y_axis[:_label_position])
 
         # Write the axis font elements.
-        write_axis_font(y_axis[:_number_font])
+        write_axis_font(y_axis[:_num_font])
 
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[0])
@@ -2148,19 +2177,22 @@ module Writexlsx
 
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, y_axis[:_data_id], horiz, x_axis[:_label_font])
+          write_title_formula(title, y_axis[:_data_id], horiz, x_axis[:_name_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title, horiz, x_axis[:_label_font])
+          write_title_rich(title, horiz, x_axis[:_name_font])
         end
 
         # Write the c:numberFormat element.
-        write_number_format
+        write_number_format(x_axis)
+
+        # Write the c:majorTickMark element.
+        write_major_tick_mark(x_axis[:_major_tick_mark])
 
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
 
         # Write the axis font elements.
-        write_axis_font(x_axis[:_number_font])
+        write_axis_font(x_axis[:_num_font])
 
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
@@ -2244,16 +2276,19 @@ module Writexlsx
         write_axis_pos(position, y_axis[:reverse])
         # Write the axis title elements.
         if title = x_axis[:_formula]
-          write_title_formula(title, x_axis[:_data_id], nil, x_axis[:_label_font])
+          write_title_formula(title, x_axis[:_data_id], nil, x_axis[:_name_font])
         elsif title = x_axis[:_name]
-          write_title_rich(title, nil, x_axis[:_label_font])
+          write_title_rich(title, nil, x_axis[:_name_font])
         end
         # Write the c:numFmt element.
-        write_num_fmt('dd/mm/yyyy')
+        write_number_format(x_axis)
+        # Write the c:majorTickMark element.
+        write_major_tick_mark(x_axis[:_major_tick_mark])
+
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis[:_label_position])
         # Write the font elements.
-        write_axis_font(x_axis[:_number_font])
+        write_axis_font(x_axis[:_num_font])
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
@@ -2374,14 +2409,24 @@ module Writexlsx
     end
 
     #
-    # Write the <c:numFmt> element.
+    # Write the <c:numberFormat> element. Note: It is assumed that if a user
+    # defined number format is supplied (i.e., non-default) then the sourceLinked
+    # attribute is 0. The user can override this if required.
     #
-    def write_num_fmt(format_code = nil) # :nodoc:
-      format_code ||= 'General'
+
+    def write_number_format(axis) # :nodoc:
+      format_code = axis[:_num_format]
       source_linked = 1
 
-      # These elements are only required for charts with categories.
-      return unless @has_category
+      # Check if a user defined number format has been set.
+      if axis[:_defaults] && format_code != axis[:_defaults][:num_format]
+        source_linked = 0
+      end
+
+      # User override of sourceLinked.
+      if ptrue?(axis[:_num_format_linked])
+        source_linked = 1
+      end
 
       attributes = [
                     'formatCode',   format_code,
@@ -2389,6 +2434,50 @@ module Writexlsx
                    ]
 
       @writer.empty_tag('c:numFmt', attributes)
+    end
+
+    #
+    # Write the <c:numFmt> element. Special case handler for category axes which
+    # don't always have a number format.
+    #
+    def write_cat_number_format(axis)
+      format_code    = axis[:_num_format]
+      source_linked  = 1
+      default_format = true
+
+      # Check if a user defined number format has been set.
+      if axis[:_defaults] && format_code != axis[:_defaults][:num_format]
+        source_linked  = 0
+        default_format = false
+      end
+
+      # User override of linkedSource.
+      if axis[:_num_format_linked]
+        source_linked = 1
+      end
+
+      # Skip if cat doesn't have a num format (unless it is non-default).
+      if !@cat_has_num_fmt && default_format
+        return ''
+      end
+
+      attributes = [
+                    'formatCode',   format_code,
+                    'sourceLinked', source_linked,
+                   ]
+
+      @writer.empty_tag('c:numFmt', attributes)
+    end
+
+    #
+    # Write the <c:majorTickMark> element.
+    #
+    def write_major_tick_mark(val)
+      return unless ptrue?(val)
+
+      attributes = ['val', val]
+
+      @writer.empty_tag('c:majorTickMark', attributes)
     end
 
     #
@@ -2462,27 +2551,11 @@ module Writexlsx
     #
     # Write the <c:majorGridlines> element.
     #
-    def write_major_gridlines(options = {}) # :nodoc:
-      return unless ptrue?(options[:visible])
+    def write_major_gridlines(gridlines) # :nodoc:
+      return unless gridlines
+      return unless ptrue?(gridlines[:_visible])
 
       @writer.empty_tag('c:majorGridlines')
-    end
-
-    #
-    # Write the <c:numberFormat> element.
-    #
-    # TODO. Merge/replace with _write_num_fmt.
-    #
-    def write_number_format # :nodoc:
-      format_code   = 'General'
-      source_linked = 1
-
-      attributes = [
-                    'formatCode',   format_code,
-                    'sourceLinked', source_linked
-                   ]
-
-      @writer.empty_tag('c:numFmt', attributes)
     end
 
     #
@@ -2619,7 +2692,7 @@ module Writexlsx
     def write_plot_vis_only # :nodoc:
       val  = 1
 
-      # Ignore this element if we are plitting hidden data.
+      # Ignore this element if we are plotting hidden data.
       return if @show_hidden_data
 
       attributes = ['val', val]

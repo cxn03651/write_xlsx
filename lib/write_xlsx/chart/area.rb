@@ -25,6 +25,13 @@ module Writexlsx
         @subtype = subtype || 'standard'
         @cross_between = 'midCat'
         @show_crosses  = false
+
+        # Override and reset the default axis values.
+        if @subtype == 'percent_stacked'
+          @y_axis[:_defaults][:num_format] = '0%'
+        end
+
+        set_y_axis
       end
 
       #
@@ -59,24 +66,6 @@ module Writexlsx
           # Write the c:axId elements
           write_axis_ids(params)
         end
-      end
-
-      #
-      # Over-ridden to add % format. TODO. This will be refactored back up to the
-      # SUPER class later.
-      #
-      # Write the <C:numFmt> element.
-      #
-      def write_number_format(format_code = nil)
-        source_linked = 1
-        format_code = 'General' if !format_code || format_code.empty?
-        format_code = '0%' if @subtype == 'percent_stacked'
-
-        attributes = [
-                      'formatCode',   format_code,
-                      'sourceLinked', source_linked
-                     ]
-        @writer.empty_tag('c:numFmt', attributes)
       end
     end
   end

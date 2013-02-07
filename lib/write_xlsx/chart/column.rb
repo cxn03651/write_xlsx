@@ -32,6 +32,13 @@ module Writexlsx
         super(subtype)
         @subtype = subtype || 'clustered'
         @horiz_val_axis = 0
+
+        # Override and reset the default axis values.
+        if @subtype == 'percent_stacked'
+          @y_axis[:_defaults][:num_format] = '0%'
+        end
+
+        set_y_axis
       end
 
       #
@@ -51,26 +58,6 @@ module Writexlsx
         attributes = ['val', val]
 
         @writer.empty_tag('c:barDir', attributes)
-      end
-
-      #
-      # Over-ridden to add % format. TODO. This will be refactored back up to the
-      # SUPER class later.
-      #
-      # Write the <c:numFmt> element.
-      #
-      def write_number_format(format_code = nil)
-        format_code   ||= 'General'
-        source_linked = 1
-
-        format_code = '0%' if @subtype == 'percent_stacked'
-
-        attributes = [
-                      'formatCode',   format_code,
-                      'sourceLinked', source_linked
-                     ]
-
-        @writer.empty_tag('c:numFmt', attributes)
       end
     end
   end
