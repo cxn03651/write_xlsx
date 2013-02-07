@@ -60,6 +60,11 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 
 == Recent change
 
+2013-02-07 v0.54.0
+ Added font manipulation to Charts.
+ Added number formats to Chart axes.
+ Added Radar Charts.
+
 2012-11-30 v0.51.0
  Impliment Shape, Table as welll as Excel::Write::XLSX-0.51
 
