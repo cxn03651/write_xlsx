@@ -32,44 +32,44 @@ class TestRegressionChartFont06 < Test::Unit::TestCase
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     chart.set_title(
-                    :name => 'Title',
-                    :font => {
+                    :name      => 'Title',
+                    :name_font => {
                       :name         => 'Calibri',
                       :pitch_family => 34,
                       :charset      => 0,
-                      :color        => '#FFFF00'
+                      :color        => 'yellow'
                     }
                     )
 
     chart.set_x_axis(
-                     :name         => 'XXX',
-                     :number_font  => {
-                       :name => 'Arial',
-                       :pitch_family => 34,
-                       :charset => 0,
-                       :color    => '#00B0F0'
-                     },
-                     :label_font  => {
+                     :name       => 'XXX',
+                     :name_font  => {
                        :name         => 'Courier New',
                        :pitch_family => 49,
                        :charset      => 0,
                        :color        => '#92D050'
-                     }
+                     },
+                     :num_font  => {
+                       :name         => 'Arial',
+                       :pitch_family => 34,
+                       :charset      => 0,
+                       :color        => '#00B0F0'
+                     },
                      )
 
     chart.set_y_axis(
-                     :name        => 'YYY',
-                     :number_font => {
+                     :name      => 'YYY',
+                     :name_font => {
+                       :name         => 'Century',
+                       :pitch_family => 18,
+                       :charset      => 0,
+                       :color        => 'red'
+                     },
+                     :num_font => {
                        :bold      => 1,
                        :italic    => 1,
                        :underline => 1,
                        :color     => '#7030A0',
-                     },
-                     :label_font => {
-                       :name         => 'Century',
-                       :pitch_family => 18,
-                       :charset      => 0,
-                       :color        => '#FF0000'
                      }
                      )
 

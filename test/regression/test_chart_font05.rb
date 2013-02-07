@@ -34,13 +34,13 @@ class TestRegressionChartFont05 < Test::Unit::TestCase
     chart.set_title(:name => 'Title')
 
     chart.set_x_axis(
-                     :name         => 'XXX',
-                     :number_font  => { :name => 'Arial', :pitch_family => 34, :charset => 0 }
+                     :name      => 'XXX',
+                     :num_font  => { :name => 'Arial', :pitch_family => 34, :charset => 0 }
                      )
 
     chart.set_y_axis(
-                     :name        => 'YYY',
-                     :number_font  => { :bold => 1, :italic => 1, :underline => 1 }
+                     :name      => 'YYY',
+                     :num_font  => { :bold => 1, :italic => 1, :underline => 1 }
                      )
 
     worksheet.insert_chart('E9', chart)

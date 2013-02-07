@@ -34,15 +34,15 @@ class TestRegressionChartFont02 < Test::Unit::TestCase
     chart.set_title(:name => 'Title')
 
     chart.set_x_axis(
-                     :name     => 'XXX',
-                     :number_font => { :size => 11, :bold => 1, :italic => 1 },
-                     :label_font  => { :bold => 0, :italic => 1 }
+                     :name      => 'XXX',
+                     :name_font => { :bold => 0, :italic => 1 },
+                     :num_font  => { :size => 11, :bold => 1, :italic => 1 }
                      )
 
     chart.set_y_axis(
-                     :name     => 'YYY',
-                     :number_font => { :size => 9, :bold => 0, :italic => 1 },
-                     :label_font  => { :bold => 1, :italic => 1 }
+                     :name      => 'YYY',
+                     :name_font => { :bold => 1, :italic => 1 },
+                     :num_font  => { :size => 9, :bold => 0, :italic => 1 },
                      )
 
     worksheet.insert_chart('E9', chart)
