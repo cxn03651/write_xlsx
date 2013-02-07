@@ -46,7 +46,7 @@ chart.set_legend(:position => 'right')
 # Add a chart title and some axis labels.
 chart.set_title(:name => 'Survey results')
 chart.set_x_axis(:name => 'Days')
-chart.set_y_axis(:name => 'Population', :major_gridlines => {:show => 0})
+chart.set_y_axis(:name => 'Population', :major_gridlines => {:visible => 0})
 chart.set_y2_axis(:name => 'Laser wounds')
 
 # Insert the chart into the worksheet (with an offset).
