@@ -58,13 +58,16 @@ module Writexlsx
   # Creates a Line style chart. See Writexlsx::Chart::Line.
   #
   # ===pie
-  # Creates an Pie style chart. See Writexlsx::Chart::Pie.
+  # Creates a Pie style chart. See Writexlsx::Chart::Pie.
   #
   # ===scatter
-  # Creates an Scatter style chart. See Writexlsx::Chart::Scatter.
+  # Creates a Scatter style chart. See Writexlsx::Chart::Scatter.
   #
   # ===stock
-  # Creates an Stock style chart. See Writexlsx::Chart::Stock.
+  # Creates a Stock style chart. See Writexlsx::Chart::Stock.
+  #
+  # ===radar
+  # Creates a Radar style chart. See Writexlsx::Chart::Radar.
   #
   # ==CHART FORMATTING
   #
