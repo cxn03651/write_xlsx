@@ -358,9 +358,6 @@ module Writexlsx
       chart = Chart.factory(type, params[:subtype])
       chart.palette = @palette
 
-      # Get an incremental id to use for axes ids.
-      chart.id = @charts.size
-
       # If the chart isn't embedded let the workbook control it.
       if ptrue?(embedded)
         chart.name = name if name
@@ -1638,8 +1635,6 @@ module Writexlsx
         shape_count = sheet.shapes.size
         next if chart_count + image_count + shape_count == 0
 
-        sheet.sort_charts
-
         drawing_id += 1
 
         (0 .. chart_count - 1).each do |index|
@@ -1664,6 +1659,10 @@ module Writexlsx
         drawing = sheet.drawing
         @drawings << drawing
       end
+
+      # Sort the workbook charts references into the order that the were
+      # written from the worksheets above.
+      @charts = @charts.sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
     end

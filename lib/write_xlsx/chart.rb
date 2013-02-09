@@ -2178,6 +2178,9 @@ module Writexlsx
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:_reverse])
 
+        # Write the c:majorGridlines element.
+        write_major_gridlines(x_axis[:_major_gridlines])
+
         # Write the axis title elements.
         if title = x_axis[:_formula]
           write_title_formula(title, y_axis[:_data_id], horiz, x_axis[:_name_font])
@@ -2277,6 +2280,10 @@ module Writexlsx
 
         # Write the c:axPos element.
         write_axis_pos(position, y_axis[:reverse])
+
+        # Write the c:majorGridlines element.
+        write_major_gridlines(x_axis[:_major_gridlines])
+
         # Write the axis title elements.
         if title = x_axis[:_formula]
           write_title_formula(title, x_axis[:_data_id], nil, x_axis[:_name_font])

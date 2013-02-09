@@ -138,6 +138,8 @@ module Writexlsx
     # Set up chart/drawings.
     #
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
+      @chart.id = chart_id - 1
+
       drawing = Drawing.new
       @drawing = drawing
       @drawing.orientation = @print_style.orientation

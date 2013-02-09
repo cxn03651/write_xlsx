@@ -2798,17 +2798,6 @@ module Writexlsx
     end
 
     #
-    # Sort the worksheet charts into the order that they were created in rather
-    # than the insertion order. This is ensure that the chart and drawing objects
-    # written in the same order. The chart id is used to sort back into creation
-    # order.
-    #
-    def sort_charts
-      return if @charts.size < 2
-      @charts = @charts.sort {|a, b| a[2].id <=> b[2].id}
-    end
-
-    #
     # :call-seq:
     #   insert_image(row, column, filename [ , x, y, scale_x, scale_y ] )
     #
@@ -4652,6 +4641,7 @@ module Writexlsx
       drawing_type = 1
 
       row, col, chart, x_offset, y_offset, scale_x, scale_y  = @charts[index]
+      chart.id = chart_id - 1
       scale_x ||= 0
       scale_y ||= 0
 

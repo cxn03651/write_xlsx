@@ -49,7 +49,7 @@ module Writexlsx
       end
 
       def data_element(tag, data, attr = [])
-        tag_elements(tag, attr) { io_write("#{escape_xml_chars(data)}") }
+        tag_elements(tag, attr) { io_write("#{escape_data(data)}") }
       end
 
       #
@@ -67,7 +67,7 @@ module Writexlsx
       end
 
       def characters(data)
-        io_write(escape_xml_chars(data))
+        io_write(escape_data(data))
       end
 
       def crlf
@@ -96,17 +96,27 @@ module Writexlsx
       def key_vals(attr)
         array = []
         (0 .. attr.size-1).step(2) do |i|
-          array << key_val(attr[i], escape_xml_chars(attr[i+1]))
+          array << key_val(attr[i], escape_attributes(attr[i+1]))
         end
         array.join('')
       end
 
-      def escape_xml_chars(str = '')
+      def escape_attributes(str = '')
+        return str if !(str =~ /["&<>]/)
+
+        str.
+          gsub(/&/, "&amp;").
+          gsub(/"/, "&quot;").
+          gsub(/</, "&lt;").
+          gsub(/>/, "&gt;")
+      end
+
+      def escape_data(str = '')
         if str =~ /[&<>"]/
           str.gsub(/&/, '&amp;').
             gsub(/</, '&lt;').
             gsub(/>/, '&gt;')
-         else
+        else
           str
         end
       end
