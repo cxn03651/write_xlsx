@@ -46,8 +46,8 @@ class TestChartName03 < Test::Unit::TestCase
     chart2.add_series(:values => '=Sheet1!$B$1:$B$5')
     chart2.add_series(:values => '=Sheet1!$C$1:$C$5')
 
-    worksheet.insert_chart('E24', chart2)
     worksheet.insert_chart('E9',  chart1)
+    worksheet.insert_chart('E24', chart2)
 
     workbook.close
     compare_xlsx_for_regression(
