@@ -112,6 +112,12 @@ class Test::Unit::TestCase
           sub(/ +\/>/, ' />')
       end
 
+      # Remove Chart pageMargin dimensions which are almost always different.
+      if exp_members[i].name =~ %r!xl/charts/chart\d.xml!
+        exp_xml_str = exp_xml_str.sub(/<c:pageMargins[^>]*>/, '<c:pageMargins/>')
+        got_xml_str = got_xml_str.sub(/<c:pageMargins[^>]*>/, '<c:pageMargins/>')
+      end
+
       if exp_members[i].name =~ /.vml$/
         got_xml = got_to_array(got_xml_str)
         exp_xml = vml_str_to_array(exp_xml_str)
