@@ -8,17 +8,18 @@ The WriteXLSX supports the following features:
 * Multiple worksheets
 * Strings and numbers
 * Unicode text
-* Rich string formats
+* Cell formatting
 * Formulas (including array formats)
-* cell formatting
-* Embedded images
+* Images
 * Charts
 * Autofilters
 * Data validation
 * Conditional formatting
 * Tables
 * Shapes
+* Sparklines
 * Hyperlinks
+* Rich string formats
 * Defined names
 * Grouping/Outlines
 * Cell comments
