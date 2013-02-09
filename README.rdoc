@@ -60,6 +60,9 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 
 == Recent change
 
+2013-02-09 v0.55.0
+ Added Sparklines.
+
 2013-02-07 v0.54.0
  Added font manipulation to Charts.
  Added number formats to Chart axes.
