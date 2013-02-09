@@ -27,6 +27,20 @@ The WriteXLSX supports the following features:
 
 write_xlsx uses the same interface as writeexcel gem.
 
+== Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'writeexcel'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install writeexcel
+
 == Synopsis
 
 To write a string, a formatted string, a number and a formula to
