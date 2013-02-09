@@ -3630,7 +3630,7 @@ module Writexlsx
     private :valid_table_parameter
 
     #
-    # add_sparkline
+    # Add sparklines to the worksheet.
     #
     def add_sparkline(param)
       sparkline = {}
