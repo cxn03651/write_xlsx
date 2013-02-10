@@ -74,6 +74,9 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-10 v0.57.0
+ Add major and minor axis chart gridline formatting.
+
 2013-02-09 v0.56.0
  Fix for issue where chart creation order had to be the same as the insertion order or charts would be out of sync.
  Fixed issue where gridlines didn't work in Scatter and Stock charts.
