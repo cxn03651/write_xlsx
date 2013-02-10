@@ -74,6 +74,9 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-10 v0.58.0
+ Added chart area and plot area formatting.
+
 2013-02-10 v0.57.0
  Add major and minor axis chart gridline formatting.
 
