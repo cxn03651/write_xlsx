@@ -494,6 +494,8 @@ module Writexlsx
       @horiz_cat_axis    = 0
       @horiz_val_axis    = 1
       @protection        = 0
+      @chartarea         = {}
+      @plotarea          = {}
       @x_axis            = {}
       @y_axis            = {}
       @x2_axis           = {}
@@ -530,6 +532,9 @@ module Writexlsx
 
         # Write the c:chart element.
         write_chart
+
+        # Write the c:spPr element for the chartarea formatting.
+        write_sp_pr(@chartarea)
 
         # Write the c:printSettings element.
         write_print_settings if @embedded && @embedded != 0
@@ -897,9 +902,8 @@ module Writexlsx
     # set_style() method.
     #
     def set_plotarea(params)
-
-      # TODO. Need to refactor for XLSX format.
-      return
+      # Convert the user defined properties to internal properties.
+      @plotarea = get_area_properties(params)
     end
 
     #
@@ -913,8 +917,8 @@ module Writexlsx
     # set_style() method.
     #
     def set_chartarea(params)
-      # TODO. Need to refactor for XLSX format.
-      return
+      # Convert the user defined properties to internal properties.
+      @chartarea = get_area_properties(params)
     end
 
     #
@@ -1202,6 +1206,58 @@ module Writexlsx
     end
 
     #
+    # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
+    #
+    def get_swe_line_pattern(val)
+      value   = val.downcase
+      default = 'solid'
+
+      patterns = {
+        0              => 'solid',
+        1              => 'dash',
+        2              => 'dot',
+        3              => 'dash_dot',
+        4              => 'long_dash_dot_dot',
+        5              => 'none',
+        6              => 'solid',
+        7              => 'solid',
+        8              => 'solid',
+        'solid'        => 'solid',
+        'dash'         => 'dash',
+        'dot'          => 'dot',
+        'dash-dot'     => 'dash_dot',
+        'dash-dot-dot' => 'long_dash_dot_dot',
+        'none'         => 'none',
+        'dark-gray'    => 'solid',
+        'medium-gray'  => 'solid',
+        'light-gray'   => 'solid'
+      }
+
+      patterns[value] || default
+    end
+
+    #
+    # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
+    #
+    def get_swe_line_weight(val)
+      value   = val.downcase
+      default = 1
+
+      weights = {
+        1          => 0.25,
+        2          => 1,
+        3          => 2,
+        4          => 3,
+        'hairline' => 0.25,
+        'narrow'   => 1,
+        'medium'   => 2,
+        'wide'     => 3
+      }
+
+      weights[value] || default
+    end
+
+    #
     # Convert user defined line properties to the structure required internally.
     #
     def get_line_properties(line) # :nodoc:
@@ -1366,6 +1422,51 @@ module Writexlsx
       end
 
       labels
+    end
+
+    #
+    # Convert user defined area properties to the structure required internally.
+    #
+    def get_area_properties(arg)  # :nodoc:
+      area = {}
+
+      # Map deprecated Spreadsheet::WriteExcel fill colour.
+      arg[:fill] = { :color => arg[:color] } if arg[:color]
+
+      # Map deprecated Spreadsheet::WriteExcel line_weight.
+      if arg[:line_weight]
+        width = get_swe_line_weight(arg[:line_weight])
+        arg[:border] = { :width => width }
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line_pattern.
+      if arg[:line_pattern]
+        pattern = get_swe_line_pattern(arg[:line_pattern])
+        if pattern == 'none'
+          arg[:border] = { :none => 1 }
+        else
+          arg[:border][:dash_type] = pattern
+        end
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line colour.
+      arg[:border][:color] = arg[:line_color] if arg[:line_color]
+
+      # Handle Excel::Writer::XLSX style properties.
+
+      # Set the line properties for the chartarea.
+      line = get_line_properties(arg[:line])
+
+      # Allow 'border' as a synonym for 'line'.
+      line = get_line_properties(arg[:border]) if (arg[:border])
+
+      # Set the fill properties for the chartarea.
+      fill = get_fill_properties(arg[:fill])
+
+      area[:_line] = line
+      area[:_fill] = fill
+
+      return area
     end
 
     def value_or_raise(hash, key, msg)
@@ -1631,6 +1732,9 @@ module Writexlsx
         }
         write_val_axis(params)
         write_cat_or_date_axis(params, type)
+
+        # Write the c:spPr element for the plotarea formatting.
+        write_sp_pr(@plotarea)
       end
     end
 
@@ -2935,7 +3039,7 @@ module Writexlsx
           end
         end
         # Write the a:ln element.
-        write_a_ln(series[:_line]) if series[:_line] && series[:_line][:_defined] != 0
+        write_a_ln(series[:_line]) if series[:_line] && ptrue?(series[:_line][:_defined])
       end
     end
 

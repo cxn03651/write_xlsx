@@ -169,6 +169,9 @@ module Writexlsx
                          :axis_ids => @axis2_ids,
                          :position => 'l'
                          )
+
+          # Write the c:spPr element for the plotarea formatting.
+          write_sp_pr(@plotarea)
         end
       end
 
