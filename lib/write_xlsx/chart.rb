@@ -718,6 +718,9 @@ module Writexlsx
     #     :reverse
     #     :log_base
     #     :label_position
+    #     :major_gridlines
+    #     :minor_gridlines
+    #     :visible
     #
     # These are explained below. Some properties are only applicable to value
     # or category axes, as indicated. See "Value and Category Axes" for an
@@ -897,52 +900,6 @@ module Writexlsx
 
       # TODO. Need to refactor for XLSX format.
       return
-
-      return if params.empty?
-
-      area = @plotarea
-
-      # Set the plotarea visibility.
-      if params[:visible]
-        area[:_visible] = params[:visible]
-        return unless area[:_visible]
-      end
-
-      # TODO. could move this out of if statement.
-      area[:_bg_color_index] = 0x08
-
-      # Set the chart background colour.
-      if params[:color]
-        index, rgb = get_color_indices(params[:color])
-        if index
-          area[:_fg_color_index] = index
-          area[:_fg_color_rgb]   = rgb
-          area[:_bg_color_index] = 0x08
-          area[:_bg_color_rgb]   = 0x000000
-        end
-
-      end
-
-      # Set the border line colour.
-      if params[:line_color]
-        index, rgb = get_color_indices(params[:line_color])
-        if index
-          area[:_line_color_index] = index
-          area[:_line_color_rgb]   = rgb
-        end
-      end
-
-      # Set the border line pattern.
-      if params[:line_pattern]
-        pattern = get_line_pattern(params[:line_pattern])
-        area[:_line_pattern] = pattern
-      end
-
-      # Set the border line weight.
-      if params[:line_weight]
-        weight = get_line_weight(params[:line_weight])
-        area[:_line_weight] = weight
-      end
     end
 
     #
@@ -958,58 +915,6 @@ module Writexlsx
     def set_chartarea(params)
       # TODO. Need to refactor for XLSX format.
       return
-
-      return if params.empty?
-
-      area = @chartarea
-
-      # Embedded automatic line weight has a different default value.
-      area[:_line_weight] = 0xFFFF if @embedded
-
-      # Set the chart background colour.
-      if params[:color]
-        index, rgb = get_color_indices(params[:color])
-        if index
-          area[:_fg_color_index] = index
-          area[:_fg_color_rgb]   = rgb
-          area[:_bg_color_index] = 0x08
-          area[:_bg_color_rgb]   = 0x000000
-          area[:_area_pattern]   = 1
-          area[:_area_options]   = 0x0000 if @embedded
-          area[:_visible]        = 1
-        end
-      end
-
-      # Set the border line colour.
-      if params[:line_color]
-        index, rgb = get_color_indices(params[:line_color])
-        if index
-          area[:_line_color_index] = index
-          area[:_line_color_rgb]   = rgb
-          area[:_line_pattern]     = 0x00
-          area[:_line_options]     = 0x0000
-          area[:_visible]          = 1
-        end
-      end
-
-      # Set the border line pattern.
-      if params[:line_pattern]
-        pattern = get_line_pattern(params[:line_pattern])
-        area[:_line_pattern]     = pattern
-        area[:_line_options]     = 0x0000
-        area[:_line_color_index] = 0x4F unless params[:line_color]
-        area[:_visible]          = 1
-      end
-
-      # Set the border line weight.
-      if params[:line_weight]
-        weight = get_line_weight(params[:line_weight])
-        area[:_line_weight]      = weight
-        area[:_line_options]     = 0x0000
-        area[:_line_pattern]     = 0x00 unless params[:line_pattern]
-        area[:_line_color_index] = 0x4F unless params[:line_color]
-        area[:_visible]          = 1
-      end
     end
 
     #
@@ -1060,10 +965,6 @@ module Writexlsx
     #
     def set_embedded_config_data
       @embedded = 1
-
-      # TODO. We may be able to remove this after refactoring.
-
-      @chartarea = default_chartarea_property_for_embedded
     end
 
     #
@@ -1144,7 +1045,12 @@ module Writexlsx
 
       # Map major_gridlines properties.
       if arg[:major_gridlines] && ptrue?(arg[:major_gridlines][:visible])
-        axis[:_major_gridlines] = { :_visible => arg[:major_gridlines][:visible] }
+        axis[:_major_gridlines] = get_gridline_properties(arg[:major_gridlines])
+      end
+
+      # Map minor_gridlines properties.
+      if arg[:minor_gridlines] && ptrue?(arg[:minor_gridlines][:visible])
+        axis[:_minor_gridlines] = get_gridline_properties(arg[:minor_gridlines])
       end
 
       # Only use the first letter of bottom, top, left or right.
@@ -1296,72 +1202,6 @@ module Writexlsx
     end
 
     #
-    # Get the Excel chart index for line pattern that corresponds to the user
-    # defined value.
-    #
-    def get_line_pattern(value) # :nodoc:
-      value = value.downcase
-      default = 0
-
-      patterns = {
-        0              => 5,
-        1              => 0,
-        2              => 1,
-        3              => 2,
-        4              => 3,
-        5              => 4,
-        6              => 7,
-        7              => 6,
-        8              => 8,
-        'solid'        => 0,
-        'dash'         => 1,
-        'dot'          => 2,
-        'dash-dot'     => 3,
-        'dash-dot-dot' => 4,
-        'none'         => 5,
-        'dark-gray'    => 6,
-        'medium-gray'  => 7,
-        'light-gray'   => 8
-      }
-
-      if patterns.has_key(:value)
-        pattern = patterns[:value]
-      else
-        pattern = default
-      end
-
-      pattern
-    end
-
-    #
-    # Get the Excel chart index for line weight that corresponds to the user
-    # defined value.
-    #
-    def get_line_weight(value) # :nodoc:
-      value = value.downcase
-      default = 0
-
-      weights = {
-        1          => -1,
-        2          => 0,
-        3          => 1,
-        4          => 2,
-        'hairline' => -1,
-        'narrow'   => 0,
-        'medium'   => 1,
-        'wide'     => 2
-      }
-
-      if weights[:value]
-        weight = weights[:value]
-      else
-        weight = default
-      end
-
-      weight
-    end
-
-    #
     # Convert user defined line properties to the structure required internally.
     #
     def get_line_properties(line) # :nodoc:
@@ -1486,6 +1326,19 @@ module Writexlsx
     end
 
     #
+    # Convert user defined gridline properties to the structure required internally.
+    #
+    def get_gridline_properties(args)
+      # Set the visible property for the gridline.
+      gridline = { :_visible => args[:visible] }
+
+      # Set the line properties for the gridline.
+      gridline[:_line] = get_line_properties(args[:line])
+
+      gridline
+    end
+
+    #
     # Convert user defined labels properties to the structure required internally.
     #
     def get_labels_properties(labels) # :nodoc:
@@ -1586,9 +1439,6 @@ module Writexlsx
     # Setup the default properties for a chart.
     #
     def set_default_properties # :nodoc:
-      @chartarea = default_chartarea_property
-      @plotarea  = default_plotarea_property
-
       # Set the default axis properties.
       @x_axis[:_defaults] = {
         :num_format      => 'General',
@@ -2050,6 +1900,9 @@ module Writexlsx
         # Write the c:majorGridlines element.
         write_major_gridlines(x_axis[:_major_gridlines])
 
+        # Write the c:minorGridlines element.
+        write_minor_gridlines(x_axis[:_minor_gridlines])
+
         # Write the axis title elements.
         if title = x_axis[:_formula]
           write_title_formula(title, @x_axis[:_data_id], horiz, @x_axis[:_name_font])
@@ -2114,6 +1967,9 @@ module Writexlsx
 
         # Write the c:majorGridlines element.
         write_major_gridlines(y_axis[:_major_gridlines])
+
+        # Write the c:minorGridlines element.
+        write_minor_gridlines(y_axis[:_minor_gridlines])
 
         # Write the axis title elements.
         if title = y_axis[:_formula]
@@ -2180,6 +2036,9 @@ module Writexlsx
 
         # Write the c:majorGridlines element.
         write_major_gridlines(x_axis[:_major_gridlines])
+
+        # Write the c:minorGridlines element.
+        write_minor_gridlines(x_axis[:_minor_gridlines])
 
         # Write the axis title elements.
         if title = x_axis[:_formula]
@@ -2283,6 +2142,9 @@ module Writexlsx
 
         # Write the c:majorGridlines element.
         write_major_gridlines(x_axis[:_major_gridlines])
+
+        # Write the c:minorGridlines element.
+        write_minor_gridlines(x_axis[:_minor_gridlines])
 
         # Write the axis title elements.
         if title = x_axis[:_formula]
@@ -2565,7 +2427,31 @@ module Writexlsx
       return unless gridlines
       return unless ptrue?(gridlines[:_visible])
 
-      @writer.empty_tag('c:majorGridlines')
+      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
+        @writer.tag_elements('c:majorGridlines') do
+          # Write the c:spPr element.
+          write_sp_pr(gridlines)
+        end
+      else
+        @writer.empty_tag('c:majorGridlines')
+      end
+    end
+
+    #
+    # Write the <c:minorGridlines> element.
+    #
+    def write_minor_gridlines(gridlines)  # :nodoc:
+      return unless gridlines
+      return unless ptrue?(gridlines[:_visible])
+
+      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
+        @writer.tag_elements('c:minorGridlines') do
+          # Write the c:spPr element.
+          write_sp_pr(gridlines)
+        end
+      else
+        @writer.empty_tag('c:minorGridlines')
+      end
     end
 
     #
@@ -3075,7 +2961,7 @@ module Writexlsx
         if ptrue?(line[:none])
           # Write the a:noFill element.
           write_a_no_fill
-        else
+        elsif ptrue?(line[:color])
           # Write the a:solidFill element.
           write_a_solid_fill(line)
         end
