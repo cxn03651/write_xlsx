@@ -3240,10 +3240,11 @@ module Writexlsx
     #         }
     #     )
     #
-    # This method contains a lot of parameters and is described in detail in
-    # a separate section "CONDITIONAL FORMATTING IN EXCEL".
+    # See also the conditional_format.rb program in the examples directory of the distro.
     #
-    # See also the conditional_format.rb program in the examples directory of the distro
+    # This method contains a lot of parameters and is described in detail in
+    # the next section.
+    #
     #
     def conditional_formatting(*args)
       # Check for a cell reference in A1 notation and substitute row and column
