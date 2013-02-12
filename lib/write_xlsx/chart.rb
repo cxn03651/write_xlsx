@@ -2111,7 +2111,8 @@ module Writexlsx
     end
 
     #
-    # Write the <c:valAx> element. This is for the second valAx in scatter plots.
+    # Write the <c:valAx> element.
+    # This is for the second valAx in scatter plots.
     #
     # Usually the X axis.
     #
