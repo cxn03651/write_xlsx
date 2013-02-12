@@ -5,6 +5,7 @@ require 'write_xlsx/format'
 require 'write_xlsx/drawing'
 require 'write_xlsx/compatibility'
 require 'write_xlsx/utility'
+require 'write_xlsx/package/conditional_format'
 require 'tempfile'
 
 module Writexlsx
@@ -3404,7 +3405,7 @@ module Writexlsx
 
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
-      @cond_formats[range] << param
+      @cond_formats[range] << Package::ConditionalFormat.new(range, param)
     end
 
     #
@@ -7606,11 +7607,11 @@ module Writexlsx
     # See also the conditional_format.rb program in the examples directory
     # of the distro
     #
-    def write_conditional_formatting(range, params) #:nodoc:
+    def write_conditional_formatting(range, cond_formats) #:nodoc:
       attributes = ['sqref', range]
 
       @writer.tag_elements('conditionalFormatting', attributes) do
-        params.each { |param| write_cf_rule(param) }
+        cond_formats.each { |format| write_cf_rule(format.param) }
       end
     end
 
