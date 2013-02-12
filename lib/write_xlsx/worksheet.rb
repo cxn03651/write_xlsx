@@ -3405,7 +3405,7 @@ module Writexlsx
 
       # Store the validation information until we close the worksheet.
       @cond_formats[range] ||= []
-      @cond_formats[range] << Package::ConditionalFormat.new(range, param)
+      @cond_formats[range] << Package::ConditionalFormat.factory(writer, range, param)
     end
 
     #
@@ -6786,15 +6786,6 @@ module Writexlsx
     end
 
     #
-    # Write the <color> element.
-    #
-    def write_color(writer, name, value) #:nodoc:
-      attributes = [name, value]
-
-      writer.empty_tag('color', attributes)
-    end
-
-    #
     # Write the <tableParts> element.
     #
     def write_table_parts
@@ -7532,59 +7523,13 @@ module Writexlsx
       @writer.data_element('formula2', formula)
     end
 
-    # in Perl module : _write_formula()
-    #
-    def write_formula_tag(data) #:nodoc:
-      data = data.sub(/^=/, '') if data.respond_to?(:sub)
-      @writer.data_element('formula', data)
-    end
-
-    #
-    # Write the <colorScale> element.
-    #
-    def write_color_scale(param)
-      @writer.tag_elements('colorScale') do
-        write_cfvo(param[:min_type], param[:min_value])
-        write_cfvo(param[:mid_type], param[:mid_value]) if param[:mid_type]
-        write_cfvo(param[:max_type], param[:max_value])
-        write_color(@writer, 'rgb', param[:min_color])
-        write_color(@writer, 'rgb', param[:mid_color])  if param[:mid_color]
-        write_color(@writer, 'rgb', param[:max_color])
-      end
-    end
-
-    #
-    # Write the <dataBar> element.
-    #
-    def write_data_bar(param)
-      @writer.tag_elements('dataBar') do
-        write_cfvo(param[:min_type], param[:min_value])
-        write_cfvo(param[:max_type], param[:max_value])
-
-        write_color(@writer, 'rgb', param[:bar_color])
-      end
-    end
-
-    #
-    # Write the <cfvo> element.
-    #
-    def write_cfvo(type, val)
-      attributes = [
-                    'type', type,
-                    'val',  val
-                    ]
-
-      @writer.empty_tag('cfvo', attributes)
-    end
-
     #
     # Write the Worksheet conditional formats.
     #
-    def write_conditional_formats #:nodoc:
-      ranges = @cond_formats.keys.sort
-      return if ranges.empty?
-
-      ranges.each { |range| write_conditional_formatting(range, @cond_formats[range]) }
+    def write_conditional_formats  #:nodoc:
+      @cond_formats.keys.sort.each do |range|
+        write_conditional_formatting(range, @cond_formats[range])
+      end
     end
 
     #
@@ -7611,74 +7556,7 @@ module Writexlsx
       attributes = ['sqref', range]
 
       @writer.tag_elements('conditionalFormatting', attributes) do
-        cond_formats.each { |format| write_cf_rule(format.param) }
-      end
-    end
-
-    #
-    # Write the <cfRule> element.
-    #
-    def write_cf_rule(param) #:nodoc:
-      attributes = ['type' , param[:type]]
-
-      if param[:format]
-        attributes << 'dxfId' << param[:format]
-      end
-      attributes << 'priority' << param[:priority]
-
-      case param[:type]
-      when 'cellIs'
-        attributes << 'operator' << param[:criteria]
-        @writer.tag_elements('cfRule', attributes) do
-          if param[:minimum] && param[:maximum]
-            write_formula_tag(param[:minimum])
-            write_formula_tag(param[:maximum])
-          else
-            write_formula_tag(param[:value])
-          end
-        end
-      when 'aboveAverage'
-        attributes << 'aboveAverage' << 0 if param[:criteria] =~ /below/
-        attributes << 'equalAverage' << 1 if param[:criteria] =~ /equal/
-        if param[:criteria] =~ /([123]) std dev/
-          attributes << 'stdDev' << $~[1]
-        end
-        @writer.empty_tag('cfRule', attributes)
-      when 'top10'
-        attributes << 'percent' << 1 if param[:criteria] == '%'
-        attributes << 'bottom'  << 1 if param[:direction]
-        rank = param[:value] || 10
-        attributes << 'rank'    << rank
-        @writer.empty_tag('cfRule', attributes)
-      when 'duplicateValues', 'uniqueValues'
-        @writer.empty_tag('cfRule', attributes)
-      when 'containsText', 'notContainsText', 'beginsWith', 'endsWith'
-        attributes << 'operator' << param[:criteria]
-        attributes << 'text'     << param[:value]
-        @writer.tag_elements('cfRule', attributes) do
-          write_formula_tag(param[:formula])
-        end
-      when 'timePeriod'
-        attributes << 'timePeriod' << param[:criteria]
-        @writer.tag_elements('cfRule', attributes) do
-          write_formula_tag(param[:formula])
-        end
-      when 'containsBlanks', 'notContainsBlanks', 'containsErrors', 'notContainsErrors'
-        @writer.tag_elements('cfRule', attributes) do
-          write_formula_tag(param[:formula])
-        end
-      when 'colorScale'
-        @writer.tag_elements('cfRule', attributes) do
-          write_color_scale(param)
-        end
-      when 'dataBar'
-        @writer.tag_elements('cfRule', attributes) do
-          write_data_bar(param)
-        end
-      when 'expression'
-        @writer.tag_elements('cfRule', attributes) do
-          write_formula_tag(param[:criteria])
-        end
+        cond_formats.each { |cond_format| cond_format.write_cf_rule }
       end
     end
 

@@ -160,6 +160,15 @@ module Writexlsx
     end
 
     #
+    # Write the <color> element.
+    #
+    def write_color(writer, name, value) #:nodoc:
+      attributes = [name, value]
+
+      writer.empty_tag('color', attributes)
+    end
+
+    #
     # return perl's boolean result
     #
     def ptrue?(value)
