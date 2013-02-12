@@ -3632,6 +3632,25 @@ module Writexlsx
     #
     # Add sparklines to the worksheet.
     #
+    # The add_sparkline worksheet method is used to add sparklines to a cell or a range of cells.
+    #
+    #    worksheet.add_sparkline(
+    #      {
+    #        :location => 'F2',
+    #        :range    => 'Sheet1!A2:E2',
+    #        :type     => 'column',
+    #        :style    => 12
+    #      }
+    #    )
+    #
+    # See also the sparklines1.rb and sparklines2.rb example programs in the examples directory of the distro.
+    #
+    # Note: Sparklines are a feature of Excel 2010+ only.
+    # You can write them to an XLSX file that can be read by Excel 2007 but they won't be displayed.
+    #
+    # Sparklines are a feature of Excel 2010+ which allows you to add small charts to worksheet cells.
+    # These are useful for showing visual trends in data in a compact format.
+    #
     def add_sparkline(param)
       sparkline = {}
 
