@@ -2528,33 +2528,27 @@ module Writexlsx
     # Write the <c:majorGridlines> element.
     #
     def write_major_gridlines(gridlines) # :nodoc:
-      return unless gridlines
-      return unless ptrue?(gridlines[:_visible])
-
-      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
-        @writer.tag_elements('c:majorGridlines') do
-          # Write the c:spPr element.
-          write_sp_pr(gridlines)
-        end
-      else
-        @writer.empty_tag('c:majorGridlines')
-      end
+      write_gridlines_common(gridlines, 'c:majorGridlines')
     end
 
     #
     # Write the <c:minorGridlines> element.
     #
     def write_minor_gridlines(gridlines)  # :nodoc:
+      write_gridlines_common(gridlines, 'c:minorGridlines')
+    end
+
+    def write_gridlines_common(gridlines, tag)  # :nodoc:
       return unless gridlines
       return unless ptrue?(gridlines[:_visible])
 
       if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
-        @writer.tag_elements('c:minorGridlines') do
+        @writer.tag_elements(tag) do
           # Write the c:spPr element.
           write_sp_pr(gridlines)
         end
       else
-        @writer.empty_tag('c:minorGridlines')
+        @writer.empty_tag(tag)
       end
     end
 
