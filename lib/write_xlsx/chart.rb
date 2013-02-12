@@ -2874,22 +2874,10 @@ module Writexlsx
     # Write the <a:defRPr> element.
     #
     def write_a_def_rpr(font = nil) # :nodoc:
-      style_attributes = get_font_style_attributes(font)
-      latin_attributes = get_font_latin_attributes(font)
-      has_color = ptrue?(font) && ptrue?(font[:_color])
-
-      if !latin_attributes.empty? || has_color
-        @writer.tag_elements('a:defRPr', style_attributes) do
-          if has_color
-            write_a_solid_fill(:color => font[:_color])
-          end
-          if !latin_attributes.empty?
-            write_a_latin(latin_attributes)
-          end
-        end
-      else
-        @writer.empty_tag('a:defRPr', style_attributes)
-      end
+      write_def_rpr_r_pr_common(
+                                font,
+                                get_font_style_attributes(font),
+                                'a:defRPr')
     end
 
     #
@@ -2919,17 +2907,19 @@ module Writexlsx
     # Write the <a:rPr> element.
     #
     def write_a_r_pr(font) # :nodoc:
-      lang = 'en-US'
+      write_def_rpr_r_pr_common(
+                                font,
+                                get_font_style_attributes(font).unshift('en-US').unshift('lang'),
+                                'a:rPr'
+                                )
+    end
 
-      style_attributes = get_font_style_attributes(font)
+    def write_def_rpr_r_pr_common(font, style_attributes, tag)  # :nodoc:
       latin_attributes = get_font_latin_attributes(font)
       has_color = ptrue?(font) && ptrue?(font[:_color])
 
-      # Add the lang type to the attributes.
-      style_attributes.unshift(lang).unshift('lang')
-
       if !latin_attributes.empty? || has_color
-        @writer.tag_elements('a:rPr', style_attributes) do
+        @writer.tag_elements(tag, style_attributes) do
           if has_color
             write_a_solid_fill(:color => font[:_color])
           end
@@ -2938,7 +2928,7 @@ module Writexlsx
           end
         end
       else
-        @writer.empty_tag('a:rPr', style_attributes)
+        @writer.empty_tag(tag, style_attributes)
       end
     end
 
