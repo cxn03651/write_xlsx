@@ -7315,8 +7315,6 @@ module Writexlsx
     #
     def write_sparkline_group(opts)  # :nodoc:
       empty    = opts[:_empty]
-      user_max = 0
-      user_min = 0
       a = []
 
       if opts[:_max]
