@@ -7313,34 +7313,30 @@ module Writexlsx
     #     maxAxisType="custom"
     #     rightToLeft="1">
     #
-    def write_sparkline_group(opts)  # :nodoc:
-      empty    = opts[:_empty]
+    def write_sparkline_group(sparkline)  # :nodoc:
+      @writer.start_tag(
+                        'x14:sparklineGroup',
+                        attributes_from_sparkline(sparkline)
+                        )
+    end
+
+    def attributes_from_sparkline(opts)  # :nodoc:
+      opts[:_cust_max] = cust_max_min(opts[:_max]) if opts[:_max]
+      opts[:_cust_min] = cust_max_min(opts[:_min]) if opts[:_min]
+
+      opts[:_cust_max] = cust_max_min(opts[:_max]) if opts[:_max]
+      opts[:_cust_min] = cust_max_min(opts[:_min]) if opts[:_min]
+
       a = []
-
-      if opts[:_max]
-        if opts[:_max] == 'group'
-          opts[:_cust_max] = 'group'
-        else
-          a << 'manualMax' << opts[:_max]
-          opts[:_cust_max] = 'custom'
-        end
-      end
-
-      if opts[:_min]
-        if opts[:_min] == 'group'
-          opts[:_cust_min] = 'group'
-        else
-          a << 'manualMin' << opts[:_min]
-          opts[:_cust_min] = 'custom'
-        end
-      end
+      a << 'manualMax' << opts[:_max] if opts[:_max] && opts[:_max] != 'group'
+      a << 'manualMin' << opts[:_min] if opts[:_min] && opts[:_min] != 'group'
 
       # Ignore the default type attribute (line).
       a << 'type'          << opts[:_type]   if opts[:_type] != 'line'
 
       a << 'lineWeight'    << opts[:_weight] if opts[:_weight]
       a << 'dateAxis'      << 1              if opts[:_date_axis]
-      a << 'displayEmptyCellsAs' << empty    if ptrue?(empty)
+      a << 'displayEmptyCellsAs' << opts[:_empty]    if ptrue?(opts[:_empty])
 
       a << 'markers'       << 1                if opts[:_markers]
       a << 'high'          << 1                if opts[:_high]
@@ -7353,8 +7349,11 @@ module Writexlsx
       a << 'minAxisType'   << opts[:_cust_min] if opts[:_cust_min]
       a << 'maxAxisType'   << opts[:_cust_max] if opts[:_cust_max]
       a << 'rightToLeft'   << 1                if opts[:_reverse]
+      a
+    end
 
-      @writer.start_tag('x14:sparklineGroup', a)
+    def cust_max_min(max_min)  # :nodoc:
+      max_min == 'group' ? 'group' : 'custom'
     end
 
     #
