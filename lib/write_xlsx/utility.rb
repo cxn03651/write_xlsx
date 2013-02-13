@@ -91,6 +91,13 @@ module Writexlsx
       "=#{sheetname}!#{range1}:#{range2}"
     end
 
+    def check_dimensions(row, col)
+      if !row || row >= ROW_MAX || !col || col >= COL_MAX
+        raise WriteXLSXDimensionError
+      end
+      0
+    end
+
     def absolute_char(absolute)
       absolute ? '$' : ''
     end

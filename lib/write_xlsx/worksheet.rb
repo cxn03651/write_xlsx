@@ -7614,13 +7614,6 @@ module Writexlsx
       0
     end
 
-    def check_dimensions(row, col)
-      if !row || row >= ROW_MAX || !col || col >= COL_MAX
-        raise WriteXLSXDimensionError
-      end
-      0
-    end
-
     def store_row_col_max_min_values(row, col)
       store_row_max_min_values(row)
       store_col_max_min_values(col)
