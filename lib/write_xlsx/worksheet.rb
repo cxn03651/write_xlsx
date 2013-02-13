@@ -7570,15 +7570,6 @@ module Writexlsx
       end
     end
 
-    # Check for a cell reference in A1 notation and substitute row and column
-    def row_col_notation(args)   # :nodoc:
-      if args[0] =~ /^\D/
-        substitute_cellref(*args)
-      else
-        args
-      end
-    end
-
     #
     # Check that row and col are valid and store max and min values for use in
     # other methods/elements.
