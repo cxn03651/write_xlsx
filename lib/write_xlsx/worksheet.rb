@@ -355,6 +355,7 @@ module Writexlsx
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
     attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
     attr_reader :comments_author # :nodoc:
+    attr_accessor :dxf_priority # :nodoc:
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -3119,131 +3120,10 @@ module Writexlsx
     # This method contains a lot of parameters and is described in detail in
     # the next section.
     #
-    #
     def conditional_formatting(*args)
-      range, param, start_cell  =
-        range_param_start_cell_for_conditional_formatting(*args)
-      # Special handling of text criteria.
-      if param[:type] == 'text'
-        case param[:criteria]
-        when 'containsText'
-          param[:type]    = 'containsText';
-          param[:formula] = %Q!NOT(ISERROR(SEARCH("#{param[:value]}",#{start_cell})))!
-        when 'notContains'
-          param[:type]    = 'notContainsText';
-          param[:formula] = %Q!ISERROR(SEARCH("#{param[:value]}",#{start_cell}))!
-        when 'beginsWith'
-          param[:type] = 'beginsWith'
-          param[:formula] =
-            %Q!LEFT(#{start_cell},#{param[:value].size})="#{param[:value]}"!
-        when 'endsWith'
-          param[:type] = 'endsWith'
-          param[:formula] =
-            %Q!RIGHT(#{start_cell},#{param[:value].size})="#{param[:value]}"!
-        else
-          raise "Invalid text criteria '#{param[:criteria]} in conditional_formatting()"
-        end
-      end
-
-      # Special handling of time time_period criteria.
-      if param[:type] == 'timePeriod'
-        case param[:criteria]
-        when 'yesterday'
-            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()-1"
-        when 'today'
-            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()"
-        when 'tomorrow'
-            param[:formula] = "FLOOR(#{start_cell},1)=TODAY()+1"
-        when 'last7Days'
-          param[:formula] =
-            "AND(TODAY()-FLOOR(#{start_cell},1)<=6,FLOOR(#{start_cell},1)<=TODAY())"
-        when 'lastWeek'
-            param[:formula] =
-              "AND(TODAY()-ROUNDDOWN(#{start_cell},0)>=(WEEKDAY(TODAY())),TODAY()-ROUNDDOWN(#{start_cell},0)<(WEEKDAY(TODAY())+7))"
-        when 'thisWeek'
-            param[:formula] =
-              "AND(TODAY()-ROUNDDOWN(#{start_cell},0)<=WEEKDAY(TODAY())-1,ROUNDDOWN(#{start_cell},0)-TODAY()<=7-WEEKDAY(TODAY()))"
-        when 'nextWeek'
-            param[:formula] =
-              "AND(ROUNDDOWN(#{start_cell},0)-TODAY()>(7-WEEKDAY(TODAY())),ROUNDDOWN(#{start_cell},0)-TODAY()<(15-WEEKDAY(TODAY())))"
-        when 'lastMonth'
-            param[:formula] =
-              "AND(MONTH(#{start_cell})=MONTH(TODAY())-1,OR(YEAR(#{start_cell})=YEAR(TODAY()),AND(MONTH(#{start_cell})=1,YEAR(A1)=YEAR(TODAY())-1)))"
-        when 'thisMonth'
-            param[:formula] =
-              "AND(MONTH(#{start_cell})=MONTH(TODAY()),YEAR(#{start_cell})=YEAR(TODAY()))"
-        when 'nextMonth'
-            param[:formula] =
-              "AND(MONTH(#{start_cell})=MONTH(TODAY())+1,OR(YEAR(#{start_cell})=YEAR(TODAY()),AND(MONTH(#{start_cell})=12,YEAR(#{start_cell})=YEAR(TODAY())+1)))"
-        else
-            raise "Invalid time_period criteria '#{param[:criteria]}' in conditional_formatting()"
-        end
-      end
-
-      # Special handling of blanks/error types.
-      case param[:type]
-      when 'containsBlanks'
-        param[:formula] = "LEN(TRIM(#{start_cell}))=0"
-      when 'notContainsBlanks'
-        param[:formula] = "LEN(TRIM(#{start_cell}))>0"
-      when 'containsErrors'
-        param[:formula] = "ISERROR(#{start_cell})"
-      when 'notContainsErrors'
-        param[:formula] = "NOT(ISERROR(#{start_cell}))"
-      when '2_color_scale'
-        param[:type] = 'colorScale'
-
-        # Color scales don't use any additional formatting.
-        param[:format] = nil
-
-        # Turn off 3 color parameters.
-        param[:mid_type]  = nil
-        param[:mid_color] = nil
-
-        param[:min_type]  ||= 'min'
-        param[:max_type]  ||= 'max'
-        param[:min_value] ||= 0
-        param[:max_value] ||= 0
-        param[:min_color] ||= '#FF7128'
-        param[:max_color] ||= '#FFEF9C'
-
-        param[:max_color] = get_palette_color( param[:max_color] )
-        param[:min_color] = get_palette_color( param[:min_color] )
-      when '3_color_scale'
-        param[:type] = 'colorScale'
-
-        # Color scales don't use any additional formatting.
-        param[:format] = nil
-
-        param[:min_type]  ||= 'min'
-        param[:mid_type]  ||= 'percentile'
-        param[:max_type]  ||= 'max'
-        param[:min_value] ||= 0
-        param[:mid_value] ||= 50
-        param[:max_value] ||= 0
-        param[:min_color] ||= '#F8696B'
-        param[:mid_color] ||= '#FFEB84'
-        param[:max_color] ||= '#63BE7B'
-
-        param[:max_color] = get_palette_color(param[:max_color])
-        param[:mid_color] = get_palette_color(param[:mid_color])
-        param[:min_color] = get_palette_color(param[:min_color])
-      when 'dataBar'
-        # Color scales don't use any additional formatting.
-        param[:format] = nil
-
-        param[:min_type]  ||= 'min'
-        param[:max_type]  ||= 'max'
-        param[:min_value] ||= 0
-        param[:max_value] ||= 0
-        param[:bar_color] ||= '#638EC6'
-
-        param[:bar_color] = get_palette_color(param[:bar_color])
-      end
-
-      # Store the validation information until we close the worksheet.
-      @cond_formats[range] ||= []
-      @cond_formats[range] << Package::ConditionalFormat.factory(writer, range, param)
+      cond_format = Package::ConditionalFormat.factory(self, *args)
+      @cond_formats[cond_format.range] ||= []
+      @cond_formats[cond_format.range] << cond_format
     end
 
     #
@@ -4699,69 +4579,30 @@ module Writexlsx
       @writer.data_element('f', formula, attributes)
     end
 
+    def date_1904? #:nodoc:
+      @workbook.date_1904?
+    end
+
+    #
+    # Convert from an Excel internal colour index to a XML style #RRGGBB index
+    # based on the default or user defined values in the Workbook palette.
+    #
+    def get_palette_color(index) #:nodoc:
+      if index =~ /^#([0-9A-F]{6})$/i
+        return "FF#{$~[1]}"
+      end
+
+      # Adjust the colour index.
+      index -= 8
+
+      # Palette is passed in from the Workbook class.
+      rgb = @workbook.palette[index]
+
+      # TODO Add the alpha part to the RGB.
+      sprintf("FF%02X%02X%02X", *rgb[0, 3])
+    end
+
     private
-
-    def range_param_start_cell_for_conditional_formatting(*args)  # :nodoc:
-      range, start_cell = range_start_cell_for_conditional_formatting(*args)
-      param = param_for_conditional_formatting(*args)
-
-      [range, param, start_cell]
-    end
-
-    def row_col_param_for_conditional_formatting(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      if args[0] =~ /^\D/
-        # Check for a user defined multiple range like B3:K6,B8:K11.
-        user_range = args[0].gsub(/\s*,\s*/, ' ').gsub(/\$/, '') if args[0] =~ /,/
-      end
-
-      row1, col1, row2, col2, param = row_col_notation(args)
-      if row2.respond_to?(:keys)
-        param = row2
-        row2, col2 = row1, col1
-      end
-      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
-
-      # Check that row and col are valid without storing the values.
-      check_dimensions(row1, col1)
-      check_dimensions(row2, col2)
-
-      # Swap last row/col for first row/col as necessary
-      row1, row2 = row2, row1 if row1 > row2
-      col1, col2 = col2, col1 if col1 > col2
-
-      [row1, row2, col1, col2, user_range, param]
-    end
-
-    def param_for_conditional_formatting(*args)  # :nodoc:
-      dummy, dummy, dummy, dummy, dummy, param =
-        row_col_param_for_conditional_formatting(*args)
-      check_conditional_formatting_parameters(param)
-
-      param[:format] = param[:format].get_dxf_index if param[:format]
-      param[:priority] = @dxf_priority
-      @dxf_priority += 1
-
-      param
-    end
-
-    def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
-      row1, row2, col1, col2, user_range, param =
-        row_col_param_for_conditional_formatting(*args)
-      # If the first and last cell are the same write a single cell.
-      if row1 == row2 && col1 == col2
-        range = xl_rowcol_to_cell(row1, col1)
-        start_cell = range
-      else
-        range = xl_range(row1, row2, col1, col2)
-        start_cell = xl_rowcol_to_cell(row1, col1)
-      end
-
-      # Override with user defined multiple range if provided.
-      range = user_range if user_range
-
-      [range, start_cell]
-    end
 
     #
     # Convert a table total function to a worksheet formula.
@@ -4920,139 +4761,6 @@ module Writexlsx
       [fragments, length]
     end
 
-    def check_conditional_formatting_parameters(param)  # :nodoc:
-      # Check for valid input parameters.
-      unless (param.keys.uniq - valid_parameter_for_conditional_formatting).empty? &&
-          param.has_key?(:type)                                   &&
-          valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
-        raise WriteXLSXOptionParameterError, "Invalid type : #{param[:type]}"
-      end
-
-      param[:direction] = 'bottom' if param[:type] == 'bottom'
-      param[:type] = valid_type_for_conditional_formatting[param[:type].downcase]
-
-      # Check for valid criteria types.
-      if param.has_key?(:criteria) && valid_criteria_type_for_conditional_formatting.has_key?(param[:criteria].downcase)
-        param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase]
-      end
-
-      # Convert date/times value if required.
-      if %w[date time cellIs].include?(param[:type])
-        param[:type] = 'cellIs'
-
-        param[:value]   = convert_date_time_if_required(param[:value])
-        param[:minimum] = convert_date_time_if_required(param[:minimum])
-        param[:maximum] = convert_date_time_if_required(param[:maximum])
-      end
-
-      # 'Between' and 'Not between' criteria require 2 values.
-      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        unless param.has_key?(:minimum) || param.has_key?(:maximum)
-          raise WriteXLSXOptionParameterError, "Invalid criteria : #{param[:criteria]}"
-        end
-      else
-        param[:minimum] = nil
-        param[:maximum] = nil
-      end
-
-      # Convert date/times value if required.
-      if param[:type] == 'date' || param[:type] == 'time'
-        unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
-          raise WriteXLSXOptionParameterError
-        end
-      end
-    end
-
-    def convert_date_time_if_required(val)
-      if val =~ /T/
-        date_time = convert_date_time(val)
-        raise "Invalid date/time value '#{val}' in conditional_formatting()" unless date_time
-        date_time
-      else
-        val
-      end
-    end
-
-    # List of valid input parameters for conditional_formatting.
-    def valid_parameter_for_conditional_formatting
-      [
-        :type,
-        :format,
-        :criteria,
-        :value,
-        :minimum,
-        :maximum,
-        :min_type,
-        :mid_type,
-        :max_type,
-        :min_value,
-        :mid_value,
-        :max_value,
-        :min_color,
-        :mid_color,
-        :max_color,
-        :bar_color
-      ]
-    end
-
-    # List of  valid validation types for conditional_formatting.
-    def valid_type_for_conditional_formatting
-      {
-        'cell'          => 'cellIs',
-        'date'          => 'date',
-        'time'          => 'time',
-        'average'       => 'aboveAverage',
-        'duplicate'     => 'duplicateValues',
-        'unique'        => 'uniqueValues',
-        'top'           => 'top10',
-        'bottom'        => 'top10',
-        'text'          => 'text',
-        'time_period'   => 'timePeriod',
-        'blanks'        => 'containsBlanks',
-        'no_blanks'     => 'notContainsBlanks',
-        'errors'        => 'containsErrors',
-        'no_errors'     => 'notContainsErrors',
-        '2_color_scale' => '2_color_scale',
-        '3_color_scale' => '3_color_scale',
-        'data_bar'      => 'dataBar',
-        'formula'       => 'expression'
-      }
-    end
-
-    # List of valid criteria types for conditional_formatting.
-    def valid_criteria_type_for_conditional_formatting
-      {
-        'between'                  => 'between',
-        'not between'              => 'notBetween',
-        'equal to'                 => 'equal',
-        '='                        => 'equal',
-        '=='                       => 'equal',
-        'not equal to'             => 'notEqual',
-        '!='                       => 'notEqual',
-        '<>'                       => 'notEqual',
-        'greater than'             => 'greaterThan',
-        '>'                        => 'greaterThan',
-        'less than'                => 'lessThan',
-        '<'                        => 'lessThan',
-        'greater than or equal to' => 'greaterThanOrEqual',
-        '>='                       => 'greaterThanOrEqual',
-        'less than or equal to'    => 'lessThanOrEqual',
-        '<='                       => 'lessThanOrEqual',
-        'containing'               => 'containsText',
-        'not containing'           => 'notContains',
-        'begins with'              => 'beginsWith',
-        'ends with'                => 'endsWith',
-        'yesterday'                => 'yesterday',
-        'today'                    => 'today',
-        'last 7 days'              => 'last7Days',
-        'last week'                => 'lastWeek',
-        'this week'                => 'thisWeek',
-        'next week'                => 'nextWeek',
-        'last month'               => 'lastMonth',
-        'this month'               => 'thisMonth',
-        'next month'               => 'nextMonth'
-      }
-    end
     # Pad out the rest of the area with formatted blank cells.
     def write_formatted_blank_to_area(row_first, row_last, col_first, col_last, format)
       (row_first .. row_last).each do |row|
@@ -5220,25 +4928,6 @@ module Writexlsx
       end
 
       [operator, token]
-    end
-
-    #
-    # Convert from an Excel internal colour index to a XML style #RRGGBB index
-    # based on the default or user defined values in the Workbook palette.
-    #
-    def get_palette_color(index) #:nodoc:
-      if index =~ /^#([0-9A-F]{6})$/i
-        return "FF#{$~[1]}"
-      end
-
-      # Adjust the colour index.
-      index -= 8
-
-      # Palette is passed in from the Workbook class.
-      rgb = @workbook.palette[index]
-
-      # TODO Add the alpha part to the RGB.
-      sprintf("FF%02X%02X%02X", *rgb[0, 3])
     end
 
     #
@@ -7663,10 +7352,6 @@ module Writexlsx
 
     def autofilter_ref? #:nodoc:
       !!@autofilter_ref
-    end
-
-    def date_1904? #:nodoc:
-      @workbook.date_1904?
     end
 
     def print_options_changed? #:nodoc:
