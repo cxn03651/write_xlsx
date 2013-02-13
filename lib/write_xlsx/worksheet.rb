@@ -4863,6 +4863,68 @@ module Writexlsx
 
     private
 
+    def range_param_start_cell_for_conditional_formatting(*args)  # :nodoc:
+      range, start_cell = range_start_cell_for_conditional_formatting(*args)
+      param = param_for_conditional_formatting(*args)
+
+      [range, param, start_cell]
+    end
+
+    def row_col_param_for_conditional_formatting(*args)
+      # Check for a cell reference in A1 notation and substitute row and column
+      if args[0] =~ /^\D/
+        # Check for a user defined multiple range like B3:K6,B8:K11.
+        user_range = args[0].gsub(/\s*,\s*/, ' ').gsub(/\$/, '') if args[0] =~ /,/
+      end
+
+      row1, col1, row2, col2, param = row_col_notation(args)
+      if row2.respond_to?(:keys)
+        param = row2
+        row2, col2 = row1, col1
+      end
+      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
+
+      # Check that row and col are valid without storing the values.
+      check_dimensions(row1, col1)
+      check_dimensions(row2, col2)
+
+      # Swap last row/col for first row/col as necessary
+      row1, row2 = row2, row1 if row1 > row2
+      col1, col2 = col2, col1 if col1 > col2
+
+      [row1, row2, col1, col2, user_range, param]
+    end
+
+    def param_for_conditional_formatting(*args)  # :nodoc:
+      dummy, dummy, dummy, dummy, dummy, param =
+        row_col_param_for_conditional_formatting(*args)
+      check_conditional_formatting_parameters(param)
+
+      param[:format] = param[:format].get_dxf_index if param[:format]
+      param[:priority] = @dxf_priority
+      @dxf_priority += 1
+
+      param
+    end
+
+    def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
+      row1, row2, col1, col2, user_range, param =
+        row_col_param_for_conditional_formatting(*args)
+      # If the first and last cell are the same write a single cell.
+      if row1 == row2 && col1 == col2
+        range = xl_rowcol_to_cell(row1, col1)
+        start_cell = range
+      else
+        range = xl_range(row1, row2, col1, col2)
+        start_cell = xl_rowcol_to_cell(row1, col1)
+      end
+
+      # Override with user defined multiple range if provided.
+      range = user_range if user_range
+
+      [range, start_cell]
+    end
+
     #
     # Convert a table total function to a worksheet formula.
     #
