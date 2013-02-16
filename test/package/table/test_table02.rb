@@ -13,8 +13,7 @@ class TestTable02 < Test::Unit::TestCase
     # Set the table properties.
     @worksheet.add_table('D4:I15', :style => 'Table Style Light 17')
 
-    table = Writexlsx::Package::Table.new
-    table.properties = @worksheet.tables[0]
+    table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)
 
     result = got_to_array(table.instance_variable_get(:@writer).string)

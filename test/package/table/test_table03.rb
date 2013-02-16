@@ -21,8 +21,7 @@ class TestTable03 < Test::Unit::TestCase
                          }
                          )
 
-    table = Writexlsx::Package::Table.new
-    table.properties = @worksheet.tables[0]
+    table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)
 
     result = got_to_array(table.instance_variable_get(:@writer).string)
