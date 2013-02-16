@@ -3732,214 +3732,14 @@ module Writexlsx
     # See also the tables.rb program in the examples directory of the distro
     #
     def add_table(*args)
-      col_formats = []
-=begin
-      # We would need to order the write statements very carefully within this
-      # function to support optimisation mode. Disable add_table() when it is
-      # on for now.
-      if @optimization
-        carp "add_table() isn't supported when set_optimization() is on"
-        return -1
-      end
-=end
-      # Check for a cell reference in A1 notation and substitute row and column
-      row1, col1, row2, col2, param = row_col_notation(args)
-
-      # Check for a valid number of args.
-      raise "Not enough parameters to add_table()" if [row1, col1, row2, col2].include?(nil)
-
-      # Check that row and col are valid without storing the values.
-      check_dimensions_and_update_max_min_values(row1, col1, 1, 1)
-      check_dimensions_and_update_max_min_values(row2, col2, 1, 1)
-
-      # The final hashref contains the validation parameters.
-      param ||= {}
-
-      check_parameter(param, valid_table_parameter, 'add_table')
-
       # Table count is a member of Workbook, global to all Worksheet.
       @workbook.table_count += 1
-      table = {}
-      table[:_columns] = []
-      table[:id] = @workbook.table_count
+      table = Package::Table.new(self, @workbook.table_count, *args)
 
-      # Turn on Excel's defaults.
-      param[:banded_rows] ||= 1
-      param[:header_row]  ||= 1
-      param[:autofilter]  ||= 1
-
-      # Set the table options.
-      table[:_show_first_col]   = ptrue?(param[:first_column])   ? 1 : 0
-      table[:_show_last_col]    = ptrue?(param[:last_column])    ? 1 : 0
-      table[:_show_row_stripes] = ptrue?(param[:banded_rows])    ? 1 : 0
-      table[:_show_col_stripes] = ptrue?(param[:banded_columns]) ? 1 : 0
-      table[:_header_row_count] = ptrue?(param[:header_row])     ? 1 : 0
-      table[:_totals_row_shown] = ptrue?(param[:total_row])      ? 1 : 0
-
-      # Set the table name.
-      if param[:name]
-        table[:_name] = param[:name]
-      else
-        # Set a default name.
-        table[:_name] = "Table#{table[:id]}"
-      end
-
-      # Set the table style.
-      if param[:style]
-        table[:_style] = param[:style]
-        # Remove whitespace from style name.
-        table[:_style].gsub!(/\s/, '')
-      else
-        table[:_style] = "TableStyleMedium9"
-      end
-
-      # Swap last row/col for first row/col as necessary.
-      row1, row2 = row2, row1 if row1 > row2
-      col1, col2 = col2, col1 if col1 > col2
-
-      # Set the data range rows (without the header and footer).
-      first_data_row = row1
-      last_data_row  = row2
-      first_data_row += 1 if param[:header_row] != 0
-      last_data_row  -= 1 if param[:total_row]
-
-      # Set the table and autofilter ranges.
-      table[:_range]   = xl_range(row1, row2,          col1, col2)
-      table[:_a_range] = xl_range(row1, last_data_row, col1, col2)
-
-      # If the header row if off the default is to turn autofilter off.
-      param[:autofilter] = 0 if param[:header_row] == 0
-
-      # Set the autofilter range.
-      if param[:autofilter] && param[:autofilter] != 0
-        table[:_autofilter] = table[:_a_range]
-      end
-
-      # Add the table columns.
-      col_id = 1
-      (col1..col2).each do |col_num|
-        # Set up the default column data.
-        col_data = {
-            :_id             => col_id,
-            :_name           => "Column#{col_id}",
-            :_total_string   => '',
-            :_total_function => '',
-            :_formula        => '',
-            :_format         => nil
-        }
-
-        # Overwrite the defaults with any use defined values.
-        if param[:columns]
-          # Check if there are user defined values for this column.
-          if user_data = param[:columns][col_id - 1]
-            # Map user defined values to internal values.
-            if user_data[:header] && !user_data[:header].empty?
-              col_data[:_name] = user_data[:header]
-            end
-            # Handle the column formula.
-            if user_data[:formula]
-              formula = user_data[:formula]
-              # Remove the leading = from formula.
-              formula.sub!(/^=/, '')
-              # Covert Excel 2010 "@" ref to 2007 "#This Row".
-              formula.gsub!(/@/,'[#This Row],')
-
-              col_data[:_formula] = formula
-
-              (first_data_row..last_data_row).each do |row|
-                write_formula(row, col_num, formula, user_data[:format])
-              end
-            end
-
-            # Handle the function for the total row.
-            if user_data[:total_function]
-              function = user_data[:total_function]
-
-              # Massage the function name.
-              function = function.downcase
-              function.gsub!(/_/, '')
-              function.gsub!(/\s/,'')
-
-              function = 'countNums' if function == 'countnums'
-              function = 'stdDev'    if function == 'stddev'
-
-              col_data[:_total_function] = function
-
-              formula = table_function_to_formula(function, col_data[:_name])
-              write_formula(row2, col_num, formula, user_data[:format])
-            elsif user_data[:total_string]
-              # Total label only (not a function).
-              total_string = user_data[:total_string]
-              col_data[:_total_string] = total_string
-
-              write_string(row2, col_num, total_string, user_data[:format])
-            end
-
-            # Get the dxf format index.
-            if user_data[:format]
-              col_data[:_format] = user_data[:format].get_dxf_index
-            end
-
-            # Store the column format for writing the cell data.
-            # It doesn't matter if it is undefined.
-            col_formats[col_id - 1] = user_data[:format]
-          end
-        end
-
-        # Store the column data.
-        table[:_columns] << col_data
-
-        # Write the column headers to the worksheet.
-        if param[:header_row] != 0
-          write_string(row1, col_num, col_data[:_name])
-        end
-
-        col_id += 1
-      end    # Table columns.
-
-      # Write the cell data if supplied.
-      if data = param[:data]
-
-        i = 0    # For indexing the row data.
-        (first_data_row..last_data_row).each do |row|
-          next unless data[i]
-
-          j = 0    # For indexing the col data.
-          (col1..col2).each do |col|
-            token = data[i][j]
-            write(row, col, token, col_formats[j]) if token
-            j += 1
-          end
-          i += 1
-        end
-      end
-
-      # Store the table data.
+      @external_table_links << ['/table', "../tables/table#{table.id}.xml"]
       @tables << table
-
-      # Store the link used for the rels file.
-      @external_table_links << ['/table', "../tables/table#{table[:id]}.xml"]
-
-      return table
+      table
     end
-
-    # List of valid input parameters.
-    def valid_table_parameter
-      [
-        :autofilter,
-        :banded_columns,
-        :banded_rows,
-        :columns,
-        :data,
-        :first_column,
-        :header_row,
-        :last_column,
-        :name,
-        :style,
-       :total_row
-       ]
-    end
-    private :valid_table_parameter
 
     #
     # Add sparklines to the worksheet.
@@ -5195,27 +4995,6 @@ module Writexlsx
     end
 
     private
-
-    #
-    # Convert a table total function to a worksheet formula.
-    #
-    def table_function_to_formula(function, col_name)
-      subtotals = {
-        :average   => 101,
-        :countNums => 102,
-        :count     => 103,
-        :max       => 104,
-        :min       => 105,
-        :stdDev    => 107,
-        :sum       => 109,
-        :var       => 110
-      }
-
-      unless func_num = subtotals[function.to_sym]
-        raise "Unsupported function '#{function}' in add_table()"
-      end
-      "SUBTOTAL(#{func_num},[#{col_name}])"
-    end
 
     def check_for_valid_input_params(param)
       check_parameter(param, valid_validation_parameter, 'data_validation')
@@ -7734,36 +7513,9 @@ module Writexlsx
       end
     end
 
-    #
-    # Check that row and col are valid and store max and min values for use in
-    # other methods/elements.
-    #
-    # The ignore_row/ignore_col flags is used to indicate that we wish to
-    # perform the dimension check without storing the value.
-    #
-    # The ignore flags are use by set_row() and data_validate.
-    #
-    def check_dimensions_and_update_max_min_values(row, col, ignore_row = 0, ignore_col = 0)       #:nodoc:
-      check_dimensions(row, col)
-      store_row_max_min_values(row) if ignore_row == 0
-      store_col_max_min_values(col) if ignore_col == 0
-
-      0
-    end
-
     def store_row_col_max_min_values(row, col)
       store_row_max_min_values(row)
       store_col_max_min_values(col)
-    end
-
-    def store_row_max_min_values(row)
-      @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
-      @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
-    end
-
-    def store_col_max_min_values(col)
-      @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
-      @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
     end
 
     #

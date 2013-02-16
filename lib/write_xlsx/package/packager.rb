@@ -344,11 +344,8 @@ module Writexlsx
 
           FileUtils.mkdir_p("#{dir}/xl/tables")
 
-          table_props.each do |table_prop|
-            table = Package::Table.new
-
+          table_props.each do |table|
             table.set_xml_writer("#{dir}/xl/tables/table#{index}.xml")
-            table.set_properties(table_prop)
             table.assemble_xml_file
             index += 1
             @table_count += 1
