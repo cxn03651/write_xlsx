@@ -25,6 +25,7 @@ module Writexlsx
     attr_reader :image_types, :images
     attr_reader :shared_strings
     attr_accessor :table_count
+    attr_reader :vba_project
     #
     # A new Excel workbook is created using the new() constructor
     # which accepts either a filename or an IO object as a parameter.
@@ -757,6 +758,13 @@ module Writexlsx
     end
 
     #
+    # Add a vbaProject binary to the XLSX file.
+    #
+    def add_vba_project(vba_project)
+      @vba_project = vba_project
+    end
+
+    #
     # Change the RGB components of the elements in the colour palette.
     #
     # The set_custom_color() method can be used to override one of the built-in
@@ -1066,7 +1074,12 @@ module Writexlsx
         'lastEdited', 4,
         'lowestEdited', 4,
         'rupBuild', 4505
-      ]
+                   ]
+
+      if @vba_project
+        attributes << :codeName << '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}'
+      end
+
       @writer.empty_tag('fileVersion', attributes)
     end
 

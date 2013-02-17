@@ -78,6 +78,7 @@ module Writexlsx
         write_chartsheet_rels_files
         write_drawing_rels_files
         add_image_files
+        add_vba_project
       end
 
       private
@@ -281,6 +282,9 @@ module Writexlsx
         # Add the sharedString rel if there is string data in the workbook.
         content.add_shared_strings unless @workbook.shared_strings_empty?
 
+        # Add vbaProject if present.
+        content.add_vba_project if @workbook.vba_project
+
         content.set_xml_writer("#{@package_dir}/[Content_Types].xml")
         content.assemble_xml_file
       end
@@ -363,7 +367,7 @@ module Writexlsx
 
         rels.add_document_relationship('/officeDocument', 'xl/workbook.xml')
         rels.add_package_relationship('/metadata/core-properties',
-            'docProps/core')
+            'docProps/core.xml')
         rels.add_document_relationship('/extended-properties', 'docProps/app.xml')
         rels.set_xml_writer("#{@package_dir}/_rels/.rels" )
         rels.assemble_xml_file
@@ -395,6 +399,12 @@ module Writexlsx
 
         # Add the sharedString rel if there is string data in the workbook.
         rels.add_document_relationship('/sharedStrings', 'sharedStrings.xml') unless @workbook.shared_strings_empty?
+
+        # Add vbaProject if present.
+        if @workbook.vba_project
+          rels.add_ms_package_relationship('/vbaProject', 'vbaProject.bin')
+        end
+
         rels.set_xml_writer("#{@package_dir}/xl/_rels/workbook.xml.rels")
         rels.assemble_xml_file
       end
@@ -505,7 +515,7 @@ module Writexlsx
 
 
       #
-      # Write the workbook.xml file.
+      # Write the /xl/media/image?.xml files.
       #
       def add_image_files
         return if @workbook.images.empty?
@@ -521,6 +531,19 @@ module Writexlsx
           FileUtils.cp(filename, "#{@package_dir}/xl/media/image#{index}#{extension}")
           index += 1
         end
+      end
+
+      #
+      # Write the vbaProject.bin file.
+      #
+      def add_vba_project
+        dir = @package_dir
+        vba_project = @workbook.vba_project
+
+        return unless vba_project
+
+        FileUtils.mkdir_p("#{dir}/xl")
+        FileUtils.copy(vba_project, "#{dir}/xl/vbaProject.bin")
       end
     end
   end

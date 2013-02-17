@@ -44,7 +44,17 @@ module Writexlsx
       #
       def add_package_relationship(type, target)
         type   = Package_schema + type
-        target = target + '.xml'
+        target = target
+
+        @rels.push([type, target])
+      end
+
+      #
+      # Add container relationship to XLSX .rels xml files. Uses MS schema.
+      #
+      def add_ms_package_relationship(type, target)
+        schema = 'http://schemas.microsoft.com/office/2006/relationships'
+        type = schema + type
 
         @rels.push([type, target])
       end

@@ -137,10 +137,27 @@ module Writexlsx
                      )
       end
 
+      #
+      # Add a vbaProject to the ContentTypes defaults.
+      #
+      def add_vba_project
+        change_the_workbook_xml_content_type_from_xlsx_to_xlsm
+        add_default('bin', 'application/vnd.ms-office.vbaProject')
+      end
+
       private
 
       def write_xml_declaration
         @writer.xml_decl
+      end
+
+      def change_the_workbook_xml_content_type_from_xlsx_to_xlsm
+        @overrides.collect! do |arr|
+          if arr[0] == '/xl/workbook.xml'
+            arr[1] = 'application/vnd.ms-excel.sheet.macroEnabled.main+xml'
+          end
+          arr
+        end
       end
 
       #
