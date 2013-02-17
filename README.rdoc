@@ -74,6 +74,12 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-17 v0.59.0
+ Added macro support via VBA projects extracted from existing Excel
+ xlsm files. User defined functions can be called from worksheets
+ and macros can be called by the user but they cannot, currently,
+ be linked to form elements such as buttons.
+
 2013-02-10 v0.58.0
  Added chart area and plot area formatting.
 
