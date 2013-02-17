@@ -4837,4 +4837,26 @@ EOS
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
+
+  def test_add_vba_project
+    @xlsx = 'add_vba_project.xlsm'
+    workbook = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    worksheet.set_column('A:A', 50)
+
+    # Add the VBA project binary.
+    workbook.add_vba_project(File.join(@test_dir, 'vbaProject.bin'))
+
+    # Show text for the end user.
+    worksheet.write('A1', 'Run the SampleMacro embedded in this file.')
+    worksheet.write('A2', 'You may have to turn on the Excel Developer option first.')
+
+    # Call a user defined function from the VBA project.
+    worksheet.write('A6', 'Result from a user defined function:')
+    worksheet.write('B6', '=MyFunction(7)')
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
 end
