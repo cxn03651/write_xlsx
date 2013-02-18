@@ -32,7 +32,7 @@ write_xlsx uses the same interface as writeexcel gem.
 
 Add this line to your application's Gemfile:
 
-    gem 'writeexcel'
+    gem 'write_xlsx'
 
 And then execute:
 
@@ -40,7 +40,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install writeexcel
+    $ gem install write_xlsx
 
 == Synopsis
 
