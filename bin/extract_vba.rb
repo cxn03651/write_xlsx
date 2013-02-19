@@ -18,6 +18,11 @@ require 'fileutils'
           File.open(path, File::CREAT|File::WRONLY|File::BINARY) do |w|
             w.puts(is.read())
           end
+          # The mod data on vbaProject.bin isn't generally set correctly in the
+          # xlsm/zip file. This can cause issues on Windows so reset it to the
+          # current data.
+          ctime = Time.now
+          File::utime(ctime, ctime, path)
           break
         end
       end
