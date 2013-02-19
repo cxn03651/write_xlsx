@@ -2643,8 +2643,21 @@ module Writexlsx
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
       if link_type == 1
-        # Substiture white space in url.
-        url = url.sub(/[\s\x00]/, '%20')
+        # Escape URL unless it looks already escaped.
+        unless url =~ /%[0-9a-fA-F]{2}/
+          # Escape the URL escape symbol.
+          url = url.gsub(/%/, "%25")
+
+          # Escape whitespae in URL.
+          url = url.gsub(/[\s\x00]/, '%20')
+
+          # Escape other special characters in URL.
+          re = /(["<>\[\]`^{}])/
+          while re =~ url
+            match = $~[1]
+            url = url.sub(re, sprintf("%%%x", match.ord))
+          end
+        end
 
         # Ordinary URL style external links don't have a "location" string.
         str = nil
