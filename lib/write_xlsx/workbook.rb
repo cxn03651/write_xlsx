@@ -20,7 +20,8 @@ module Writexlsx
     attr_writer :firstsheet
     attr_reader :palette
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
-    attr_reader :worksheets, :sheetnames, :charts, :drawings, :num_comment_files, :named_ranges
+    attr_reader :worksheets, :sheetnames, :charts, :drawings
+    attr_reader :num_comment_files, :num_vml_files, :named_ranges
     attr_reader :doc_properties
     attr_reader :image_types, :images
     attr_reader :shared_strings
@@ -100,6 +101,7 @@ module Writexlsx
       @custom_colors       = []
       @doc_properties      = {}
       @local_time          = Time.now
+      @num_vml_files       = 0
       @num_comment_files   = 0
       @optimization        = 0
       @x_window            = 240
@@ -1084,7 +1086,9 @@ module Writexlsx
     end
 
     def write_workbook_pr #:nodoc:
-      attributes = date_1904? ? ['date1904', 1] : []
+      attributes = []
+      attributes << 'codeName' << @vba_codename  if ptrue?(@vba_codename)
+      attributes << 'date1904' << 1              if date_1904?
       attributes << 'defaultThemeVersion' << 124226
       @writer.empty_tag('workbookPr', attributes)
     end
@@ -1207,10 +1211,14 @@ module Writexlsx
       # Set the active sheet.
       @worksheets[@activesheet].activate
 
-      prepare_comments      # Prepare the worksheet cell comments.
-      prepare_defined_names # Set the defined names for the worksheets such as Print Titles.
-      prepare_drawings      # Prepare the drawings, charts and images.
-      add_chart_data        # Add cached data to charts.
+      # Prepare the worksheet VML elements such as comments and buttons.
+      prepare_vml_objects
+      # Set the defined names for the worksheets such as Print Titles.
+      prepare_defined_names
+      # Prepare the drawings, charts and images.
+      prepare_drawings
+      # Add cached data to charts.
+      add_chart_data
 
       # Package the workbook.
       packager = Package::Packager.new
@@ -1458,31 +1466,33 @@ module Writexlsx
     end
 
     #
-    # Iterate through the worksheets and set up the comment data.
+    # Iterate through the worksheets and set up the VML objects.
     #
-    def prepare_comments #:nodoc:
-      comment_id   = 0
-      vml_data_id  = 1
-      vml_shape_id = 1024
+    def prepare_vml_objects  #:nodoc:
+      comment_id    = 0
+      vml_data_id   = 1
+      vml_shape_id  = 1024
+      vml_files     = 0
+      comment_files = 0
 
       @worksheets.each do |sheet|
-        next unless sheet.has_comments?
+        next unless sheet.has_vml?
+        vml_files += 1
+        comment_files += 1 if sheet.has_comments?
 
         comment_id += 1
-        sheet.set_external_vml_links(comment_id)
-        sheet.set_external_comment_links(comment_id)
-        sheet.set_vml_data_id(vml_data_id)
-        sheet.vml_shape_id = vml_shape_id
+        count = sheet.prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
 
         # Each VML file should start with a shape id incremented by 1024.
         vml_data_id  +=    1 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
         vml_shape_id += 1024 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
       end
 
-      @num_comment_files = comment_id
+      @num_vml_files     = vml_files
+      @num_comment_files = comment_files
 
       # Add a font format for cell comments.
-      if comment_id > 0
+      if comment_files > 0
         format = Format.new(
             @xf_format_indices,
             @dxf_format_indices,
