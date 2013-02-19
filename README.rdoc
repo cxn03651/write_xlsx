@@ -74,6 +74,15 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-19 v0.60.0
+ Added Excel form buttons via the worksheet insert_button() method.
+ This allows the user to tie the button to an embedded macro imported
+ using add_vba_project().
+ The portal to the dungeon dimensions is now fully open.
+
+ bug fix in Worksheet#write_url
+ bug fix in bin/vba_extract.rb
+
 2013-02-17 v0.59.0
  Added macro support via VBA projects extracted from existing Excel
  xlsm files. User defined functions can be called from worksheets
