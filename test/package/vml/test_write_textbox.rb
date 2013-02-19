@@ -6,7 +6,7 @@ require 'write_xlsx/package/vml'
 class TestWriteTextbox < Test::Unit::TestCase
   def test_write_textbox
     vml = Writexlsx::Package::Vml.new
-    vml.__send__('write_textbox')
+    vml.__send__('write_comment_textbox')
     result = vml.instance_variable_get(:@writer).string
     expected = '<v:textbox style="mso-direction-alt:auto"><div style="text-align:left"></div></v:textbox>'
     assert_equal(expected, result)
