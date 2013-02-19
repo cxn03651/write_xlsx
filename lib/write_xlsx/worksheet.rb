@@ -356,6 +356,7 @@ module Writexlsx
     attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
     attr_reader :comments_author # :nodoc:
     attr_accessor :dxf_priority # :nodoc:
+    attr_reader :vba_codename # :nodoc:
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -421,7 +422,9 @@ module Writexlsx
 
       @merge = []
 
+      @has_vml  = false
       @comments = Package::Comments.new(self)
+      @buttons_array          = []
 
       @validations = []
 
@@ -2101,6 +2104,8 @@ module Writexlsx
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
+
+      @has_vml = true
 
       # Process the properties of the cell comment.
       @comments.add(Package::Comment.new(@workbook, self, row, col, string, options))
@@ -3882,6 +3887,14 @@ module Writexlsx
     end
 
     #
+    # Insert a button form object into the worksheet.
+    #
+    def insert_button(*args)
+      @buttons_array << button_params(*(row_col_notation(args)))
+      @has_vml = 1
+    end
+
+    #
     # :call-seq:
     #   data_validation(cell_or_cell_range, options)
     #
@@ -4742,6 +4755,10 @@ module Writexlsx
       @comments.size
     end
 
+    def has_vml?  # :nodoc:
+      @has_vml
+    end
+
     def has_comments? # :nodoc:
       !@comments.empty?
     end
@@ -5005,6 +5022,38 @@ module Writexlsx
 
       # TODO Add the alpha part to the RGB.
       sprintf("FF%02X%02X%02X", *rgb[0, 3])
+    end
+
+    def buttons_data  # :nodoc:
+      @buttons_array
+    end
+
+    #
+    # Turn the HoH that stores the comments into an array for easier handling
+    # and set the external links for comments and buttons.
+    #
+    def prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
+      @external_vml_links <<
+        [ '/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
+
+      if has_comments?
+        @comments_array = @comments.sorted_comments
+        @external_comment_links <<
+          [ '/comments', "../comments#{comment_id}.xml" ]
+      end
+
+      count         = @comments.size
+      start_data_id = vml_data_id
+
+      # The VML o:idmap data id contains a comma separated range when there is
+      # more than one 1024 block of comments, like this: data="1,2".
+      (1 .. (count / 1024)).each do |i|
+        vml_data_id = "#{vml_data_id},#{start_data_id + i}"
+      end
+      @vml_data_id = vml_data_id
+      @vml_shape_id = vml_shape_id
+
+      count
     end
 
     private
@@ -5726,6 +5775,70 @@ module Writexlsx
     end
 
     #
+    # This method handles the parameters passed to insert_button as well as
+    # calculating the comment object position and vertices.
+    #
+    def button_params(row, col, params)
+      button = { :_row => row, :_col => col }
+
+      button_number = 1 + @buttons_array.size
+
+      # Set the button caption.
+      caption = params[:caption] || "Button #{button_number}"
+
+      button[:_font] = { :_caption => caption }
+
+      # Set the macro name.
+      if params[:macro]
+        button[:_macro] = "[0]!#{params[:macro]}"
+      else
+        button[:_macro] = "[0]!Button#{button_number}_Click"
+      end
+
+      # Ensure that a width and height have been set.
+      default_width  = 64
+      default_height = 20
+      params[:width]  = default_width  if !params[:width]
+      params[:height] = default_height if !params[:height]
+
+      # Set the x/y offsets.
+      params[:x_offset] = 0 if !params[:x_offset]
+      params[:y_offset] = 0 if !params[:y_offset]
+
+      # Scale the size of the comment box if required.
+      if params[:x_scale]
+        params[:width] = params[:width] * params[:x_scale]
+      end
+      if params[:y_scale]
+        params[:height] = params[:height] * params[:y_scale]
+      end
+
+      # Round the dimensions to the nearest pixel.
+      params[:width]  = (0.5 + params[:width]).to_i
+      params[:height] = (0.5 + params[:height]).to_i
+
+      params[:start_row] = row
+      params[:start_col] = col
+
+      # Calculate the positions of comment object.
+      vertices = position_object_pixels(
+                                        params[:start_col],
+                                        params[:start_row],
+                                        params[:x_offset],
+                                        params[:y_offset],
+                                        params[:width],
+                                        params[:height]
+                                        )
+
+      # Add the width and height for VML.
+      vertices << [params[:width], params[:height]]
+
+      button[:_vertices] = vertices
+
+      button
+    end
+
+    #
     # Based on the algorithm provided by Daniel Rentz of OpenOffice.
     #
     def encode_password(password) #:nodoc:
@@ -5770,8 +5883,13 @@ module Writexlsx
     # Write the <sheetPr> element for Sheet level properties.
     #
     def write_sheet_pr #:nodoc:
-      return if !fit_page? && !filter_on? && !tab_color? && !outline_changed?
+      if !fit_page? && !filter_on? && !tab_color? &&
+          !outline_changed? && !vba_codename?
+        return
+      end
+      codename = @vba_codename
       attributes = []
+      (attributes << 'codeName'   << codename) if codename
       (attributes << 'filterMode' << 1) if filter_on?
 
       if fit_page? || tab_color? || outline_changed?
@@ -6691,7 +6809,7 @@ module Writexlsx
     # Write the <legacyDrawing> element.
     #
     def write_legacy_drawing #:nodoc:
-      return unless has_comments?
+      return unless @has_vml
 
       # Increment the relationship id for any drawings or comments.
       @rel_count += 1
@@ -7664,6 +7782,10 @@ module Writexlsx
 
     def outline_changed?
       ptrue?(@outline_changed)
+    end
+
+    def vba_codename?
+      ptrue?(@vba_codename)
     end
 
     def zoom_scale_normal? #:nodoc:

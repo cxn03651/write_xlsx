@@ -167,8 +167,6 @@ module Writexlsx
       end
 
       def sorted_comments
-        @sorted_comments if @sorted_comments
-
         @sorted_comments = []
         # We sort the comments by row and column but that isn't strictly required.
         @comments.keys.sort.each do |row|

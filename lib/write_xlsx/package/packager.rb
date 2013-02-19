@@ -42,6 +42,7 @@ module Writexlsx
         @sheet_names       = workbook.sheetnames
         @chart_count       = workbook.charts.size
         @drawing_count     = workbook.drawings.size
+        @num_vml_files     = workbook.num_vml_files
         @num_comment_files = workbook.num_comment_files
         @named_ranges      = workbook.named_ranges
 
@@ -153,7 +154,7 @@ module Writexlsx
       def write_vml_files
         index = 1
         @workbook.worksheets.each do |worksheet|
-          next unless worksheet.has_comments?
+          next unless worksheet.has_vml?
           FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
 
           vml = Package::Vml.new
@@ -273,7 +274,7 @@ module Writexlsx
         (1 .. @chart_count).each { |i| content.add_chart_name("chart#{i}") }
         (1 .. @drawing_count).each { |i| content.add_drawing_name("drawing#{i}") }
 
-        content.add_vml_name if @num_comment_files > 0
+        content.add_vml_name if @num_vml_files > 0
 
         (1 .. @table_count).each { |i| content.add_table_name("table#{i}") }
 
