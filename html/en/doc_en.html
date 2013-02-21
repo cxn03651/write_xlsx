@@ -467,10 +467,10 @@ The following example creates a new Excel file based on a filename:
 <p>Here are some other examples of using <code>new</code>:</p>
 
 <pre>
-    workbook1 = WriteExcel.new(filename)
-    workbook2 = WriteExcel.new(&#39;/tmp/filename.xlsx&#39;)
-    workbook3 = WriteExcel.new(&#34;c:\\tmp\\filename.xlsx&#34;)
-    workbook4 = WriteExcel.new(&#39;c:\tmp\filename.xlsx&#39;)
+    workbook1 = WriteXLSX.new(filename)
+    workbook2 = WriteXLSX.new(&#39;/tmp/filename.xlsx&#39;)
+    workbook3 = WriteXLSX.new(&#34;c:\\tmp\\filename.xlsx&#34;)
+    workbook4 = WriteXLSX.new(&#39;c:\tmp\filename.xlsx&#39;)
 </pre>
 
 <p>
@@ -618,22 +618,33 @@ This is a required parameter. It defines the type of chart that will be created.
 <pre>
     chart = workbook.add_chart( :type =&#62; &#39;Chart::bar&#39;, :subtype =&#62; &#39;stacked&#39;)
 </pre>
+<p>
+See the documentation for a list of available chart subtype.
+</p>
 
 </li>
 
 <li><code>:name</code>
-<p>Set the name for the chart sheet. The name property is optional and if it isn&#39;t supplied will default to <code>Chart1 .. n</code>. The name must be a valid Excel worksheet name. See <code>add_worksheet</code> for more details on valid sheet names. The <code>:name</code> property can be omitted for embedded charts.</p>
+<p>
+Set the name for the chart sheet.
+The name property is optional and if it isn&#39;t supplied will default to <code>Chart1 .. n</code>.
+The name must be a valid Excel worksheet name.
+See <a href='#add_worksheet'><code>add_worksheet</code></a>
+for more details on valid sheet names.
+The <code>:name</code> property can be omitted for embedded charts.
+</p>
 
 <pre>
     chart = workbook.add_chart( :type =&#62; &#39;Chart::line&#39;, :name =&#62; &#39;Results Chart&#39; )
 </pre>
 </li>
 
-<li><code>:name_utf16be</code>
-<p>if :name is UTF-16BE format, pass true as :name_utf16be</p>
-</li>
 <li><code>:embedded</code>
-<p>Specifies true that the Chart object will be inserted in a worksheet via the <code>insert_chart</code> Worksheet method. It is an error to try insert a Chart that doesn&#39;t have this flag set.</p>
+<p>
+Specifies that the Chart object will be inserted in a worksheet
+via the <code>insert_chart</code> Worksheet method.
+It is an error to try insert a Chart that doesn&#39;t have this flag set.
+</p>
 
 <pre>
     chart = workbook.add_chart( :type =&#62; &#39;Chart::line&#39;, :embedded =&#62; true )
@@ -644,71 +655,127 @@ This is a required parameter. It defines the type of chart that will be created.
     # Insert the chart into the a worksheet.
     worksheet.insert_chart( &#39;E2&#39;, chart )
 </pre>
+
+<p>
+See documentation for details on how to configure the chart object once
+it is created.
+See also <code>chart_*.rb</code>programs in the examples directory of
+the distro.
+</p>
 </li>
 </ul>
 
-<p>See <a href="#" class="podlinkpod"
->WriteExcel::Chart</a> for details on how to configure the chart object once it is created. See also the <code>chart_*.rb</code> programs in the examples directory of the distro.</p>
-
 <h2><a class='u' href='#___top' title='click to go to top of document'
-name="add_chart_ext"
->add_chart_ext(chart_data, chartname, name_utf16be = false)</a></h2>
+name="add_shape"
+>add_shape(properties)</a></h2>
 
-<p>This method is use to include externally generated charts in a WriteExcel file.</p>
-
+<p>The <code>add_shape</code> method can be used to create new shapes theat may
+be inserted into a worksheet.
+</p>
+<p>
+You can either define the properties at creation time via a hash of Property
+values or later via method calls.
+</p>
 <pre>
-    chart = workbook.add_chart_ext(&#39;chart01.bin&#39;, &#39;Chart1&#39;)
+    # Set properties at creation
+    plus = workbook.add_shape(
+      :type   =&#62; 'plus',
+      :id     =&#62; 3,
+      :width  =&#62; pw,
+      :height =&#62; ph
+    )
+
+    # Default rectangle shape. Set properties later.
+    rect = workbook.add_shape
 </pre>
 
-<p>This feature is semi-deprecated in favour of the &#34;native&#34; charts created using <code>add_chart</code>. Read <code>external_charts.txt</code> in the external_charts directory of the distro for a full explanation.</p>
+<p>
+See document for details on how to configure the shape object once
+it is created.
+</p>
+<p>
+See also the <code>shape_*.rb</code> programs in the examples directory
+of the distro.
+</p>
 
+<h2><a class='u' href='#___top' title='click to go to top of document'
+name="add_vba_project"
+>add_vba_project(&#39;vbaProject.bin&#39;)</a></h2>
+
+<p>
+The <code>add_vba_project</code> method can be used to add macros of functions
+to an WriteXLSX file using a binary VBA project file that has been extracted
+from an existing Excel <code>xlsm</code> file.
+</p>
+
+<pre>
+    workbook = WriteXLSX.new(&#39;file.xlsm&#39;)
+
+    workbook.add_vba_project(&#39;./vbaProject.bin&#39;)
+</pre>
+
+<p>
+The supplied <code>extract_vba.rb</code> utility can be used to extract
+the required <code>vbaProject.bin</code> file from an existing Excel
+file:
+</p>
+
+<pre>
+    $ extract_vba.rb file.xlsm&
+</pre>
+
+<p>
+  Macros can be tied  to buttons using the worksheet <code>insert_button method
+  ( see the <a href='#WORKBOOK_METHODS'>WORKBOOK METHODS</a>
+  section for details):
+</p>
+
+<pre>
+    worksheet.insert_button(&#39;C2&#39;, { :macro =&#62; &#39;my_macro&#39; })
+</pre>
+
+<p>
+Note, Excel uses the file extension <code>xlsm</code> instead of
+<code>xlsx</code> for files that contain macros.
+It is advisable to follow the same convention.
+</p>
+
+<p>
+See also the <code>macros.rb</code> example file.
+</p>
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="close"
 >close</a></h2>
 
-<p>The <code>close</code> method is used to explicitly close an Excel file.</p>
+<p>The <code>close</code> method is used to close an Excel file.</p>
 
 <pre>
     workbook.close
 </pre>
 
-<p>An explicit <code>close</code> is required if the file must be closed prior to performing some external action on it such as copying it, reading its size or attaching it to an email.</p>
-
-<p>In general, if you create a file with a size of 0 bytes or you fail to create a file you need to call <code>close</code>.</p>
-
-<h2><a class='u' href='#___top' title='click to go to top of document'
-name="compatibility_mode"
->compatibility_mode</a></h2>
-
-<p>This method is used to improve compatibility with third party applications that read Excel files.</p>
-
-<pre>
-    workbook.compatibility_mode
-</pre>
-
-<p>An Excel file is comprised of binary records that describe properties of a spreadsheet. Excel is reasonably liberal about this and, outside of a core subset, it doesn&#39;t require every possible record to be present when it reads a file. This is also true of Gnumeric and OpenOffice.Org Calc.</p>
-
-<p>WriteExcel takes advantage of this fact to omit some records in order to minimise the amount of data stored in memory and to simplify and speed up the writing of files. However, some third party applications that read Excel files often expect certain records to be present. In &#34;compatibility mode&#34; WriteExcel writes these records and tries to be as close to an Excel generated file as possible.</p>
-
-<p>Applications that require <code>compatibility_mode</code> are Apache POI, Apple Numbers, and Quickoffice on Nokia, Palm and other devices. You should also use <code>compatibility_mode</code> if your Excel file will be used as an external data source by another Excel file.</p>
-
-<p>If you encounter other situations that require <code>compatibility_mode</code>, please let me know.</p>
-
-<p>It should be noted that <code>compatibility_mode</code> requires additional data to be stored in memory and additional processing. This incurs a memory and speed penalty and may not be suitable for very large files (&#62;20MB).</p>
-
-<p>You must call <code>compatibility_mode</code> before calling <code>add_worksheet</code>.</p>
+<p>
+In general, if you create a file with a size of 0 bytes or you fail
+to create a file you need to call <code>close</code>.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="set_properties"
 >set_properties(params)</a></h2>
 
-<p>The <code>set_properties</code> method can be used to set the document properties of the Excel file created by <code>WriteExcel</code>. These properties are visible when you use the <code>File.Properties</code> menu option in Excel and are also available to external applications that read or index windows files.</p>
+<p>
+The <code>set_properties</code> method can be used to set the document
+properties of the Excel file created by <code>WriteExcel</code>.
+These properties are visible when you use the <code>Office Button -> Prepare -> Properties</code>
+option in Excel and are also available to external applications
+that read or index windows files.
+</p>
 
 <p>The properties should be passed as a hash of values as follows:</p>
 
 <pre>
     workbook.set_properties(
         :title    =&#62; &#39;This is an example spreadsheet&#39;,
+        :author   =&#62; &#39;John McNamara&#39;,
         :comments =&#62; &#39;Created with Ruby and writeexcel&#39;,
     )
 </pre>
@@ -724,34 +791,50 @@ name="set_properties"
     :category
     :keywords
     :comments
+    :status
 </pre>
 
-<p>User defined properties are not supported due to effort required.</p>
-
-<p>Usually WriteExcel allows you to use UTF-16. However, document properties don&#39;t support UTF-16 for these type of strings.</p>
-
-<p>In order to promote the usefulness of Ruby and the writeexcel rubygems consider adding a comment such as the following when using document properties:</p>
-
-<pre>
-    workbook.set_properties(
-        ...,
-        :comments =&#62; &#39;Created with Ruby and writeexcel&#39;,
-        ...,
-    )
-</pre>
-
-<p>See also the <code>properties.rb</code> and <code>properties_jp.rb</code>program in the examples directory of the distro.</p>
+<p>
+See also the <code>properties.rb</code> and <code>properties_jp.rb</code>
+program in the examples directory of the distro.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="define_name"
 >define_name(name, formula, encoding = 0)</a></h2>
 
-<p>This method is used to defined a name that can be used to represent a value, a single cell or a range of cells in a workbook.</p>
+<p>
+This method is used to defined a name that can be used to represent a value,
+a single cell or a range of cells in a workbook.
+</p>
+
+<p>
+For example to set a global/workbook name:
+</p>
 
 <pre>
+    # Global/workbook names.
     workbook.define_name(&#39;Exchange_rate&#39;, &#39;=0.96&#39;)
-    workbook.define_name(&#39;Sales&#39;,         &#39;=Sheet1!G1:H10&#39;)
-    workbook.define_name(&#39;Sheet2!Sales&#39;,  &#39;=Sheet2!G1:G10&#39;)
+    workbook.define_name(&#39;Sales&#39;,         &#39;=Sheet1!$G$1:$H$10&#39;)
+</pre>
+
+<p>
+It is also possible to define a local/worksheet name by prefixing the name with
+the sheet name using the syntax <code>sheetname!definedname:</code>
+</p>
+
+<pre>
+    # Local/worksheet name.
+    workbook.define_name(&#39;=Sheet2!Sales&#39;, &#39;=Sheet2!$G$1:$H$10&#39;)
+</pre>
+
+<p>
+If the sheet name contains spaces or special characters you must enclosed it
+in single quotes like in Excel:
+</p>
+
+<pre>
+    workbook.define_name(&#34;&#39;New Data!&#39;Sales&#34;, &#39;=Sheet2!G1:G10&#39;)
 </pre>
 
 <p>See the defined_name.rb program in the examples dir of the distro.</p>
@@ -762,35 +845,22 @@ name="define_name"
 name="set_tempdir"
 >set_tempdir(dir = '')</a></h2>
 
-<p>For speed and efficiency <code>WriteExcel</code> stores worksheet data in temporary files prior to assembling the final workbook.</p>
+<p><code>WriteXLSX</code> stores worksheet data in temporary files prior to
+assembling the final workbook.</p>
 
-<p>If WriteExcel is unable to create these temporary files it will store the required data in memory. This can be slow for large files.</p>
-
-<p>The problem occurs mainly with IIS on Windows although it could feasibly occur on Unix systems as well. The problem generally occurs because the default temp file directory is defined as <code>C:/</code> or some other directory that IIS doesn&#39;t provide write access to.</p>
-
-<p>To check if this might be a problem on a particular system you can run a simple test program with <code>-w</code> or <code>use warnings</code>. This will generate a warning if the module cannot create the required temporary files:</p>
-
-<pre>
-    #!/usr/bin/ruby -w
-
-    require 'writeexcel'
-
-    workbook  = WriteExcel.new(&#39;test.xls&#39;)
-    worksheet = workbook.add_worksheet
-</pre>
-
-<p>To avoid this problem the <code>set_tempdir</code> method can be used to specify a directory that is accessible for the creation of temporary files.</p>
-
-<p>Even if the default temporary file directory is accessible you may wish to specify an alternative location for security or maintenance reasons:</p>
+<p>
+If the default temporary file directory isn&#39;t accessible to your application,
+or doesn&#39;t contain enough space, you can specify an alternative location
+using the set_tempdir method.
+</p>
 
 <pre>
     workbook.set_tempdir(&#39;/tmp/writeexcel&#39;)
     workbook.set_tempdir(&#39;c:\windows\temp\writeexcel&#39;)
 </pre>
 
-<p>The directory for the temporary file must exist, <code>set_tempdir</code> will not create a new directory.</p>
-
-<p>One disadvantage of using the <code>set_tempdir</code> method is that on some Windows systems it will limit you to approximately 800 concurrent tempfiles. This means that a single program running on one of these systems will be limited to creating a total of 800 workbook and worksheet objects. You can run multiple, non-concurrent programs to work around this if necessary.</p>
+<p>The directory for the temporary file must exist,
+<code>set_tempdir</code> will not create a new directory.</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="set_custom_color"
