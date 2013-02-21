@@ -5103,7 +5103,7 @@ name="Data_Validation_Examples"
 
 <h1><a class='u' href='#___top' title='click to go to top of document'
 name="CONDITIONAL_FORMATTING_IN_EXCEL"
->CONDITIONAL FORMATTING IN EXCEL</h1>
+>CONDITIONAL FORMATTING IN EXCEL</a></h1>
 
 <p>
 Conditional formatting is a feature of Excel which allows you
@@ -6053,325 +6053,483 @@ name="Conditional_Formatting_Examples"
 name="SPARKLINES_IN_EXCEL"
 >SPARKLINES IN EXCEL <img alt='^' src='http://st.pimg.net/tucs/img/up.gif'></a></h1>
 
-<p>Sparklines are a feature of Excel 2010+ which allows you to add small charts to worksheet cells. These are useful for showing visual trends in data in a compact format.</p>
+<p>
+Sparklines are a feature of Excel 2010+ which allows you to add small charts to
+worksheet cells.
+These are useful for showing visual trends in data in a compact format.
+</p>
 
-<p>In Excel::Writer::XLSX Sparklines can be added to cells using the <code>add_sparkline()</code> worksheet method:</p>
+<p>
+In WriteXLSX Sparklines can be added to cells using the
+<code>add_sparkline</code> worksheet method:
+</p>
 
-<pre>    $worksheet-&#62;add_sparkline(
+<pre>
+    worksheet.add_sparkline(
         {
-            location =&#62; &#39;F2&#39;,
-            range    =&#62; &#39;Sheet1!A2:E2&#39;,
-            type     =&#62; &#39;column&#39;,
-            style    =&#62; 12,
+            :location =&#62; &#39;F2&#39;,
+            :range    =&#62; &#39;Sheet1!A2:E2&#39;,
+            :type     =&#62; &#39;column&#39;,
+            :style    =&#62; 12
         }
-    );</pre>
+    )
+</pre>
 
-<p><center><img src="http://jmcnamara.github.com/excel-writer-xlsx/images/examples/sparklines1.jpg" alt="Sparklines example."/></center></p>
+<p>
+<center>
+<img src="http://jmcnamara.github.com/excel-writer-xlsx/images/examples/sparklines1.jpg" alt="Sparklines example."/>
+</center>
+</p>
 
-
-<p><b>Note:</b> Sparklines are a feature of Excel 2010+ only. You can write them to an XLSX file that can be read by Excel 2007 but they won&#39;t be displayed.</p>
+<p>
+<b>Note:</b>
+Sparklines are a feature of Excel 2010+ only.
+You can write them to an XLSX file that can be read by Excel 2007
+but they won&#39;t be displayed.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="add_sparkline(_{_parameter_=&#62;_&#39;value&#39;,_..._}_)"
 >add_sparkline( { parameter =&#62; &#39;value&#39;, ... } )</a></h2>
 
-<p>The <code>add_sparkline()</code> worksheet method is used to add sparklines to a cell or a range of cells.</p>
+<p>
+The <code>add_sparkline</code> worksheet method is used to add sparklines
+to a cell or a range of cells.
+</p>
 
-<p>The parameters to <code>add_sparkline()</code> must be passed in a hash ref. The main sparkline parameters are:</p>
+<p>
+The parameters to <code>add_sparkline</code> must be passed in a hash ref.
+The main sparkline parameters are:
+</p>
 
-<pre>    location        (required)
-    range           (required)
-    type
-    style
+<pre>
+    :location        (required)
+    :range           (required)
+    :type
+    :style
 
-    markers
-    negative_points
-    axis
-    reverse</pre>
+    :markers
+    :negative_points
+    :axis
+    :reverse
+</pre>
 
-<p>Other, less commonly used parameters are:</p>
+<p>
+Other, less commonly used parameters are:
+</p>
 
-<pre>    high_point
-    low_point
-    first_point
-    last_point
-    max
-    min
-    empty_cells
-    show_hidden
-    date_axis
-    weight
+<pre>
+    :high_point
+    :low_point
+    :first_point
+    :last_point
+    :max
+    :min
+    :empty_cells
+    :show_hidden
+    :date_axis
+    :weight
 
-    series_color
-    negative_color
-    markers_color
-    first_color
-    last_color
-    high_color
-    low_color</pre>
+    :series_color
+    :negative_color
+    :markers_color
+    :first_color
+    :last_color
+    :high_color
+    :low_color
+</pre>
 
-<p>These parameters are explained in the sections below:</p>
+<p>
+These parameters are explained in the sections below:
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="location"
->location</a></h2>
+>:location</a></h2>
 
-<p>This is the cell where the sparkline will be displayed:</p>
+<p>
+This is the cell where the sparkline will be displayed:
+</p>
 
-<pre>    location =&#62; &#39;F1&#39;</pre>
+<pre>
+  :location =&#62; &#39;F1&#39;
+</pre>
 
-<p>The <code>location</code> should be a single cell. (For multiple cells see <a href="#Grouped_Sparklines" class="podlinkpod"
->&#34;Grouped Sparklines&#34;</a> below).</p>
+<p>
+The <code>:location</code> should be a single cell.
+(For multiple cells see <a href="#Grouped_Sparklines" class="podlinkpod"
+>&#34;Grouped Sparklines&#34;</a> below).
+</p>
 
-<p>To specify the location in row-column notation use the <code>xl_rowcol_to_cell()</code> function from the <a href="/~jmcnamara/Excel-Writer-XLSX-0.60/lib/Excel/Writer/XLSX/Utility.pm" class="podlinkpod"
->Excel::Writer::XLSX::Utility</a> module.</p>
+<p>
+To specify the location in row-column notation use the <code>xl_rowcol_to_cell</code>
+function
+</p>
 
-<pre>    use Excel::Writer::XLSX::Utility &#39;:rowcol&#39;;
+<pre>
+    require 'write_xlsx'
+    include Writexlsx::Utility
     ...
-    location =&#62; xl_rowcol_to_cell( 0, 5 ), # F1</pre>
+    :location =&#62; xl_rowcol_to_cell(0, 5)    # F1</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="range"
->range</a></h2>
+>:range</a></h2>
 
-<p>This specifies the cell data range that the sparkline will plot:</p>
+<p>
+This specifies the cell data range that the sparkline will plot:
+</p>
 
-<pre>    $worksheet-&#62;add_sparkline(
+<pre>
+    worksheet.add_sparkline(
         {
-            location =&#62; &#39;F1&#39;,
-            range    =&#62; &#39;A1:E1&#39;,
+            :location =&#62; &#39;F1&#39;,
+            :range    =&#62; &#39;A1:E1&#39;
         }
-    );</pre>
+    )
+</pre>
 
-<p>The <code>range</code> should be a 2D array. (For 3D arrays of cells see <a href="#Grouped_Sparklines" class="podlinkpod"
->&#34;Grouped Sparklines&#34;</a> below).</p>
+<p>
+The <code>:range</code> should be a 2D array.
+(For 3D arrays of cells see <a href="#Grouped_Sparklines" class="podlinkpod"
+>&#34;Grouped Sparklines&#34;</a> below).
+</p>
 
-<p>If <code>range</code> is not on the same worksheet you can specify its location using the usual Excel notation:</p>
+<p>
+If <code>:range</code> is not on the same worksheet you can specify its location
+using the usual Excel notation:
+</p>
 
-<pre>            range =&#62; &#39;Sheet1!A1:E1&#39;,</pre>
+<pre>
+    :range =&#62; &#39;Sheet1!A1:E1&#39;
+</pre>
 
-<p>If the worksheet contains spaces or special characters you should quote the worksheet name in the same way that Excel does:</p>
+<p>
+If the worksheet contains spaces or special characters
+you should quote the worksheet name in the same way that Excel does:
+</p>
 
-<pre>            range =&#62; q(&#39;Monthly Data&#39;!A1:E1),</pre>
+<pre>
+    :range =&#62; q(&#39;Monthly Data&#39;!A1:E1)
+</pre>
 
-<p>To specify the location in row-column notation use the <code>xl_range()</code> or <code>xl_range_formula()</code> functions from the <a href="/~jmcnamara/Excel-Writer-XLSX-0.60/lib/Excel/Writer/XLSX/Utility.pm" class="podlinkpod"
->Excel::Writer::XLSX::Utility</a> module.</p>
+<p>
+To specify the location in row-column notation use the <code>xl_range</code>
+or <code>xl_range_formula</code> functions from the Writexlsx::Utility module.
+</p>
 
-<pre>    use Excel::Writer::XLSX::Utility &#39;:rowcol&#39;;
+<pre>
+    require 'write_xlsx'
+    include Writexlsx::Utility
     ...
-    range =&#62; xl_range( 1, 1,  0, 4 ),                   # &#39;A1:E1&#39;
-    range =&#62; xl_range_formula( &#39;Sheet1&#39;, 0, 0,  0, 4 ), # &#39;Sheet1!A2:E2&#39;</pre>
+    range =&#62; xl_range( 1, 1,  0, 4 ),                   # &#39;A2:E2&#39;
+    range =&#62; xl_range_formula( &#39;Sheet1&#39;, 0, 0,  0, 4 ), # &#39;Sheet1!$A$1:$E$1&#39;
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="type"
->type</a></h2>
+>:type</a></h2>
 
-<p>Specifies the type of sparkline. There are 3 available sparkline types:</p>
+<p>
+Specifies the type of sparkline.
+There are 3 available sparkline types:
+</p>
 
-<pre>    line    (default)
+<pre>
+    line    (default)
     column
-    win_loss</pre>
+    win_loss
+</pre>
 
-<p>For example:</p>
+<p>
+For example:
+</p>
 
-<pre>    {
-        location =&#62; &#39;F1&#39;,
-        range    =&#62; &#39;A1:E1&#39;,
-        type     =&#62; &#39;column&#39;,
-    }</pre>
+<pre>
+    {
+        :location =&#62; &#39;F1&#39;,
+        :range    =&#62; &#39;A1:E1&#39;,
+        :type     =&#62; &#39;column&#39;
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="style"
->style</a></h2>
+>:style</a></h2>
 
-<p>Excel provides 36 built-in Sparkline styles in 6 groups of 6. The <code>style</code> parameter can be used to replicate these and should be a corresponding number from 1 .. 36.</p>
+<p>
+Excel provides 36 built-in Sparkline styles in 6 groups of 6.
+The <code>:style</code> parameter can be used to replicate these
+and should be a corresponding number from 1 .. 36.
+</p>
 
-<pre>    {
-        location =&#62; &#39;A14&#39;,
-        range    =&#62; &#39;Sheet2!A2:J2&#39;,
-        style    =&#62; 3,
-    }</pre>
+<pre>
+    {
+        :location =&#62; &#39;A14&#39;,
+        :range    =&#62; &#39;Sheet2!A2:J2&#39;,
+        :style    =&#62; 3
+    }
+</pre>
 
-<p>The style number starts in the top left of the style grid and runs left to right. The default style is 1. It is possible to override colour elements of the sparklines using the <code>*_color</code> parameters below.</p>
+<p>
+The style number starts in the top left of the style grid and runs left to right.
+The default style is 1. It is possible to override colour elements of the
+sparklines using the <code>*_color</code> parameters below.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="markers"
->markers</a></h2>
+>:markers</a></h2>
 
-<p>Turn on the markers for <code>line</code> style sparklines.</p>
+<p>
+Turn on the markers for <code>line</code> style sparklines.
+</p>
 
-<pre>    {
-        location =&#62; &#39;A6&#39;,
-        range    =&#62; &#39;Sheet2!A1:J1&#39;,
-        markers  =&#62; 1,
-    }</pre>
+<pre>
+    {
+        :location =&#62; &#39;A6&#39;,
+        :range    =&#62; &#39;Sheet2!A1:J1&#39;,
+        :markers  =&#62; 1
+    }
+</pre>
 
-<p>Markers aren&#39;t shown in Excel for <code>column</code> and <code>win_loss</code> sparklines.</p>
+<p>
+Markers aren&#39;t shown in Excel for <code>column</code>
+and <code>win_loss</code> sparklines.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="negative_points"
->negative_points</a></h2>
+>:negative_points</a></h2>
 
-<p>Highlight negative values in a sparkline range. This is usually required with <code>win_loss</code> sparklines.</p>
+<p>
+Highlight negative values in a sparkline range.
+This is usually required with <code>win_loss</code> sparklines.
+</p>
 
-<pre>    {
-        location        =&#62; &#39;A21&#39;,
-        range           =&#62; &#39;Sheet2!A3:J3&#39;,
-        type            =&#62; &#39;win_loss&#39;,
-        negative_points =&#62; 1,
-    }</pre>
+<pre>
+    {
+        :location        =&#62; &#39;A21&#39;,
+        :range           =&#62; &#39;Sheet2!A3:J3&#39;,
+        :type            =&#62; &#39;win_loss&#39;,
+        :negative_points =&#62; 1
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="axis"
->axis</a></h2>
+>:axis</a></h2>
 
-<p>Display a horizontal axis in the sparkline:</p>
+<p>
+Display a horizontal axis in the sparkline:
+</p>
 
-<pre>    {
-        location =&#62; &#39;A10&#39;,
-        range    =&#62; &#39;Sheet2!A1:J1&#39;,
-        axis     =&#62; 1,
-    }</pre>
+<pre>
+    {
+        :location =&#62; &#39;A10&#39;,
+        :range    =&#62; &#39;Sheet2!A1:J1&#39;,
+        :axis     =&#62; 1
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="reverse"
->reverse</a></h2>
+>;reverse</a></h2>
 
-<p>Plot the data from right-to-left instead of the default left-to-right:</p>
+<p>
+Plot the data from right-to-left instead of the default left-to-right:
+</p>
 
-<pre>    {
-        location =&#62; &#39;A24&#39;,
-        range    =&#62; &#39;Sheet2!A4:J4&#39;,
-        type     =&#62; &#39;column&#39;,
-        reverse  =&#62; 1,
-    }</pre>
+<pre>
+    {
+        :location =&#62; &#39;A24&#39;,
+        :range    =&#62; &#39;Sheet2!A4:J4&#39;,
+        :type     =&#62; &#39;column&#39;,
+        :reverse  =&#62; 1
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="weight"
->weight</a></h2>
+>;weight</a></h2>
 
-<p>Adjust the default line weight (thickness) for <code>line</code> style sparklines.</p>
+<p>
+Adjust the default line weight (thickness) for <code>line</code> style sparklines.
+</p>
 
-<pre>     weight =&#62; 0.25,</pre>
+<pre>
+    :weight =&#62; 0.25
+</pre>
 
-<p>The weight value should be one of the following values allowed by Excel:</p>
+<p>
+The weight value should be one of the following values allowed by Excel:
+</p>
 
-<pre>    0.25  0.5   0.75
+<pre>
+    0.25  0.5   0.75
     1     1.25
     2.25
     3
     4.25
-    6</pre>
+    6
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="high_point,_low_point,_first_point,_last_point"
->high_point, low_point, first_point, last_point</a></h2>
+>:high_point, :low_point, :first_point, :last_point</a></h2>
 
-<p>Highlight points in a sparkline range.</p>
+<p>
+Highlight points in a sparkline range.
+</p>
 
-<pre>        high_point  =&#62; 1,
-        low_point   =&#62; 1,
-        first_point =&#62; 1,
-        last_point  =&#62; 1,</pre>
+<pre>
+        :high_point  =&#62; 1,
+        :low_point   =&#62; 1,
+        :first_point =&#62; 1,
+        :last_point  =&#62; 1
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="max,_min"
->max, min</a></h2>
+>:max, :min</a></h2>
 
-<p>Specify the maximum and minimum vertical axis values:</p>
+<p>
+Specify the maximum and minimum vertical axis values:
+</p>
 
-<pre>        max         =&#62; 0.5,
-        min         =&#62; -0.5,</pre>
+<pre>
+        :max         =&#62; 0.5,
+        :min         =&#62; -0.5
+</pre>
 
-<p>As a special case you can set the maximum and minimum to be for a group of sparklines rather than one:</p>
+<p>
+As a special case you can set the maximum and minimum to be for a group of
+sparklines rather than one:
+</p>
 
-<pre>        max         =&#62; &#39;group&#39;,</pre>
+<pre>
+        :max         =&#62; &#39;group&#39;
+</pre>
 
 <p>See <a href="#Grouped_Sparklines" class="podlinkpod"
 >&#34;Grouped Sparklines&#34;</a> below.</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="empty_cells"
->empty_cells</a></h2>
+>:empty_cells</a></h2>
 
-<p>Define how empty cells are handled in a sparkline.</p>
+<p>
+Define how empty cells are handled in a sparkline.
+</p>
 
-<pre>    empty_cells =&#62; &#39;zero&#39;,</pre>
+<pre>
+        :empty_cells =&#62; &#39;zero&#39;
+</pre>
 
 <p>The available options are:</p>
 
-<pre>    gaps   : show empty cells as gaps (the default).
+<pre>
+    gaps   : show empty cells as gaps (the default).
     zero   : plot empty cells as 0.
-    connect: Connect points with a line (&#34;line&#34; type  sparklines only).</pre>
+    connect: Connect points with a line (&#34;line&#34; type  sparklines only).
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="show_hidden"
->show_hidden</a></h2>
+>:show_hidden</a></h2>
 
 <p>Plot data in hidden rows and columns:</p>
 
-<pre>    show_hidden =&#62; 1,</pre>
+<pre>    :show_hidden =&#62; 1</pre>
 
 <p>Note, this option is off by default.</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="date_axis"
->date_axis</a></h2>
+>:date_axis</a></h2>
 
-<p>Specify an alternative date axis for the sparkline. This is useful if the data being plotted isn&#39;t at fixed width intervals:</p>
+<p>
+Specify an alternative date axis for the sparkline.
+This is useful if the data being plotted isn&#39;t at fixed width intervals:
+</p>
 
-<pre>    {
-        location  =&#62; &#39;F3&#39;,
-        range     =&#62; &#39;A3:E3&#39;,
-        date_axis =&#62; &#39;A4:E4&#39;,
-    }</pre>
+<pre>
+    {
+        :location  =&#62; &#39;F3&#39;,
+        :range     =&#62; &#39;A3:E3&#39;,
+        :date_axis =&#62; &#39;A4:E4&#39;,
+    }
+</pre>
 
-<p>The number of cells in the date range should correspond to the number of cells in the data range.</p>
+<p>
+The number of cells in the date range should correspond to the number of cells
+in the data range.
+</p>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="series_color"
->series_color</a></h2>
+>:series_color</a></h2>
 
-<p>It is possible to override the colour of a sparkline style using the following parameters:</p>
+<p>
+It is possible to override the colour of a sparkline style using the following
+parameters:
+</p>
 
-<pre>    series_color
-    negative_color
-    markers_color
-    first_color
-    last_color
-    high_color
-    low_color</pre>
+<pre>
+    :series_color
+    :negative_color
+    :markers_color
+    :first_color
+    :last_color
+    :high_color
+    :low_color
+</pre>
 
 <p>The color should be specified as a HTML style <code>#rrggbb</code> hex value:</p>
 
-<pre>    {
-        location     =&#62; &#39;A18&#39;,
-        range        =&#62; &#39;Sheet2!A2:J2&#39;,
-        type         =&#62; &#39;column&#39;,
-        series_color =&#62; &#39;#E965E0&#39;,
-    }</pre>
+<pre>
+    {
+        :location     =&#62; &#39;A18&#39;,
+        :range        =&#62; &#39;Sheet2!A2:J2&#39;,
+        :type         =&#62; &#39;column&#39;,
+        :series_color =&#62; &#39;#E965E0&#39;,
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="Grouped_Sparklines"
 >Grouped Sparklines</a></h2>
 
-<p>The <code>add_sparkline()</code> worksheet method can be used multiple times to write as many sparklines as are required in a worksheet.</p>
+<p>
+The <code>add_sparkline</code> worksheet method can be used multiple times
+to write as many sparklines as are required in a worksheet.
+</p>
 
-<p>However, it is sometimes necessary to group contiguous sparklines so that changes that are applied to one are applied to all. In Excel this is achieved by selecting a 3D range of cells for the data <code>range</code> and a 2D range of cells for the <code>location</code>.</p>
+<p>
+However, it is sometimes necessary to group contiguous sparklines so that changes
+that are applied to one are applied to all.
+In Excel this is achieved by selecting a 3D range of cells for the data
+<code>range</code> and a 2D range of cells for the <code>location</code>.
+</p>
 
-<p>In Excel::Writer::XLSX, you can simulate this by passing an array refs of values to <code>location</code> and <code>range</code>:</p>
+<p>
+In WriteXLSX, you can simulate this by passing an array refs of values to
+<code>location</code> and <code>range</code>:
+</p>
 
-<pre>    {
-        location =&#62; [ &#39;A27&#39;,          &#39;A28&#39;,          &#39;A29&#39;          ],
-        range    =&#62; [ &#39;Sheet2!A5:J5&#39;, &#39;Sheet2!A6:J6&#39;, &#39;Sheet2!A7:J7&#39; ],
-        markers  =&#62; 1,
-    }</pre>
+<pre>
+    {
+        :location =&#62; [ &#39;A27&#39;,          &#39;A28&#39;,          &#39;A29&#39;          ],
+        :range    =&#62; [ &#39;Sheet2!A5:J5&#39;, &#39;Sheet2!A6:J6&#39;, &#39;Sheet2!A7:J7&#39; ],
+        :markers  =&#62; 1
+    }
+</pre>
 
 <h2><a class='u' href='#___top' title='click to go to top of document'
 name="Sparkline_examples"
 >Sparkline examples</a></h2>
 
-<p>See the <code>sparklines1.pl</code> and <code>sparklines2.pl</code> example programs in the <code>examples</code> directory of the distro.</p>
+<p>See the <code>sparklines1.rb</code> and <code>sparklines2.rb</code> example programs in the <code>examples</code> directory of the distro.</p>
 
 <h1><a class='u' href='#___top' title='click to go to top of document'
 name="TABLES_IN_EXCEL"
