@@ -15,6 +15,7 @@ The WriteXLSX supports the following features:
 * Autofilters
 * Data validation
 * Conditional formatting
+* Macros
 * Tables
 * Shapes
 * Sparklines

@@ -430,7 +430,7 @@ module Writexlsx
             worksheet.external_table_links,
             worksheet.external_comment_links
           ].select {|a| a != []}
-
+p external_links
           next if external_links.size == 0
 
           # Create the worksheet .rels dir if required.

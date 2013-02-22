@@ -249,41 +249,6 @@ module Writexlsx
       end
     end
 
-    class HyperlinkCellData < CellData # :nodoc:
-      def initialize(worksheet, row, col, index, xf, link_type, url, str, tip)
-        @worksheet = worksheet
-        @row, @col, @token, @xf, @link_type, @url, @str, @tip =
-          row, col, index, xf, link_type, url, str, tip
-      end
-
-      def data
-        { :sst_id => token }
-      end
-
-      def write_cell
-        attributes = cell_attributes
-        attributes << 't' << 's'
-        @worksheet.writer.tag_elements('c', attributes) do
-          @worksheet.write_cell_value(token)
-        end
-
-        if link_type == 1
-          # External link with rel file relationship.
-          @worksheet.rel_count += 1
-          @worksheet.hlink_refs <<
-            [
-             link_type,    row,     col,
-             @worksheet.rel_count, @str, @tip
-            ]
-
-          @worksheet.external_hyper_links << [ '/hyperlink', @url, 'External' ]
-        elsif link_type
-          # External link with rel file relationship.
-          @worksheet.hlink_refs << [link_type, row, col, @url, @str, @tip ]
-        end
-      end
-    end
-
     class BlankCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, index, xf)
         @worksheet = worksheet
@@ -419,6 +384,9 @@ module Writexlsx
       @zoom = 100
       @outline_row_level = 0
       @outline_col_level = 0
+
+      @default_row_height     = 15
+      @default_row_zeroed     = 0
 
       @merge = []
 
@@ -2642,8 +2610,8 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Store the URL displayed text in the shared string table.
-      index = shared_string_index(str[0, STR_MAX])
+      # Copy string for use in hyperlink elements.
+      url_str = str.dup
 
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
@@ -2665,13 +2633,13 @@ module Writexlsx
         end
 
         # Ordinary URL style external links don't have a "location" string.
-        str = nil
+        url_str = nil
       elsif link_type == 3
         # External Workbook links need to be modified into the right format.
         # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
         # We need the part to the left of the # as the URL and the part to
         # the right as the "location" string (if it exists).
-        url, str = url.split(/#/)
+        url, url_str = url.split(/#/)
 
         # Add the file:/// URI to the url if non-local.
         if url =~ %r![:]! ||        # Windows style "C:/" link.
@@ -2698,7 +2666,22 @@ module Writexlsx
         raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
-      store_data_to_table(HyperlinkCellData.new(self, row, col, index, xf, link_type, url, str, tip))
+      # Write the hyperlink string.
+      write_string(row, col, str, xf)
+
+      # Store the hyperlink data in a separate structure.
+      @hyperlinks ||= {}
+      hash = {
+        :_link_type => link_type,
+        :_url       => url,
+        :_str       => url_str,
+        :_tip       => tip
+      }
+      if @hyperlinks[row]
+        @hyperlinks[row][col] = hash
+      else
+        @hyperlinks[row] = { col => hash }
+      end
     end
 
     #
@@ -2765,7 +2748,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   insert_chart(row, column, chart [ , x, y, scale_x, scale_y ] )
+    #   insert_chart(row, column, chart [ , x, y, x_scale, y_scale ] )
     #
     # Insert a chart into a worksheet. The chart argument should be a Chart
     # object or else it is assumed to be a filename of an external binary file.
@@ -2803,18 +2786,18 @@ module Writexlsx
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, chart, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
+      row, col, chart, x_offset, y_offset, x_scale, y_scale = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
       x_offset ||= 0
       y_offset ||= 0
-      scale_x  ||= 1
-      scale_y  ||= 1
+      x_scale  ||= 1
+      y_scale  ||= 1
 
       raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
       raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
-      @charts << [row, col, chart, x_offset, y_offset, scale_x, scale_y]
+      @charts << [row, col, chart, x_offset, y_offset, x_scale, y_scale]
     end
 
     #
@@ -2993,6 +2976,9 @@ module Writexlsx
 
       return if row.nil?
 
+      # Get the default row height.
+      default_height = @default_row_height
+
       # Use min col in check_dimensions. Default to 0 if undefined.
       min_col = @dim_colmin || 0
 
@@ -3000,10 +2986,12 @@ module Writexlsx
       check_dimensions(row, min_col)
       store_row_col_max_min_values(row, min_col)
 
+      height ||= default_height
+
       # If the height is 0 the row is hidden and the height is the default.
       if height == 0
         hidden = 1
-        height = 15
+        height = default_height
       end
 
       # Set the limits for the outline levels (0 <= x <= 7).
@@ -3020,6 +3008,20 @@ module Writexlsx
 
       # Store the row sizes for use when calculating image vertices.
       @row_sizes[row] = height
+    end
+
+    #
+    # Set the default row properties.
+    #
+    def set_default_row(height = 15, zero_height = 0)
+      if height != 15
+        @default_row_height = height
+
+        # Store the row change to allow optimisations.
+        @row_size_changed = 1
+      end
+
+      @default_row_zeroed = 1 if ptrue?(zero_height)
     end
 
     #
@@ -3822,7 +3824,7 @@ module Writexlsx
       sparkline[:_ranges].collect! do |range|
         # Remove the absolute reference $ symbols.
         range = range.gsub(/\$/, '')
-        # Convert a simiple range into a full Sheet1!A1:D1 range.
+        # Convert a simple range into a full Sheet1!A1:D1 range.
         range = "#{sheetname}!#{range}" unless range =~ /!/
         range
       end
@@ -4801,13 +4803,13 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
-      row, col, chart, x_offset, y_offset, scale_x, scale_y  = @charts[index]
+      row, col, chart, x_offset, y_offset, x_scale, y_scale  = @charts[index]
       chart.id = chart_id - 1
-      scale_x ||= 0
-      scale_y ||= 0
+      x_scale ||= 0
+      y_scale ||= 0
 
-      width  = (0.5 + (480 * scale_x)).to_i
-      height = (0.5 + (288 * scale_y)).to_i
+      width  = (0.5 + (480 * x_scale)).to_i
+      height = (0.5 + (288 * y_scale)).to_i
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
@@ -5506,7 +5508,7 @@ module Writexlsx
           pixels = (4 / 3.0 * height).to_i
         end
       else
-        pixels = 20
+        pixels = (4 * @default_row_height / 3).to_i
       end
       pixels
     end
@@ -5518,10 +5520,10 @@ module Writexlsx
       drawing_type = 2
       drawing
 
-      row, col, image, x_offset, y_offset, scale_x, scale_y = @images[index]
+      row, col, image, x_offset, y_offset, x_scale, y_scale = @images[index]
 
-      width  *= scale_x
-      height *= scale_y
+      width  *= x_scale
+      height *= y_scale
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
@@ -6015,9 +6017,16 @@ module Writexlsx
     #
     def write_sheet_format_pr #:nodoc:
       base_col_width     = 10
-      default_row_height = 15
+      default_row_height = @default_row_height
 
       attributes = ['defaultRowHeight', default_row_height]
+      if @default_row_height != 15
+        attributes << 'customHeight' << 1
+      end
+      if ptrue?(@default_row_zeroed)
+        attributes << 'zeroHeight' << 1
+      end
+
       attributes << 'outlineLevelRow' << @outline_row_level if @outline_row_level > 0
       attributes << 'outlineLevelCol' << @outline_col_level if @outline_col_level > 0
       if @excel_version == 2010
@@ -6679,12 +6688,58 @@ module Writexlsx
     end
 
     #
-    # Write the <hyperlinks> element. The attributes are different for internal
-    # and external links.
+    # Process any sored hyperlinks in row/col order and write the <hyperlinks>
+    # element. The attributes are different for internal and external links.
     #
     def write_hyperlinks #:nodoc:
-      return if @hlink_refs.empty?
+      hlink_refs = []
 
+      # Exit if there are no hyperlinks to process.
+      return if @hyperlinks.nil? || @hyperlinks.keys.empty?
+
+      # Sort the hyperlinks into row order.
+      row_nums = @hyperlinks.keys.sort
+      # Iterte over the rows.
+      row_nums.each do |row_num|
+        # Sort the hyperlinks into column order.
+        col_nums = @hyperlinks[row_num].keys.sort
+        # Iterate over the columns.
+        col_nums.each do |col_num|
+          # Get the link data for this cell.
+          link = @hyperlinks[row_num][col_num]
+          link_type = link[:_link_type]
+
+          # If the cell isn't a string then we have to add the url as
+          # the string to display.
+          if ptrue?(@table) &&
+              ptrue?(@tble[row_num]) &&
+              ptrue?(@table[row_num][col_num])
+            cell = @table[row_num][col_num]
+            display = link[:_url] if cell[0] != 's'
+          end
+          if link_type == 1
+            # External link with rel file relationship.
+            @rel_count += 1
+            hlink_refs <<
+              [
+               link_type,   row_num,
+               col_num,     @rel_count,
+               link[:_str], display,
+               link[:_tip]
+              ]
+          else
+            # Internal link with rel file relationship.
+            hlink_refs <<
+              [
+               link_type,   row_num,
+               col_num,
+               link[:_url], link[:_str], link[:_tip]
+              ]
+          end
+        end
+      end
+
+      # Write the hyperlink elements.
       @writer.tag_elements('hyperlinks') do
         @hlink_refs.each do |aref|
           type, *args = aref
@@ -6701,13 +6756,14 @@ module Writexlsx
     #
     # Write the <hyperlink> element for external links.
     #
-    def write_hyperlink_external(row, col, id, location = nil, tooltip = nil) #:nodoc:
+    def write_hyperlink_external(row, col, id, location = nil, display = nil, tooltip = nil) #:nodoc:
       ref = xl_rowcol_to_cell(row, col)
       r_id = "rId#{id}"
 
       attributes = ['ref', ref, 'r:id', r_id]
 
       attributes << 'location' << location  if location
+      attributes << 'display'  << display   if display
       attributes << 'tooltip'  << tooltip   if tooltip
 
       @writer.empty_tag('hyperlink', attributes)
