@@ -14,8 +14,8 @@ module Writexlsx
         @count   = {} # => count
       end
 
-      def index(string)
-        add(string)
+      def index(string, params = {})
+        add(string) unless params[:only_query]
         @strings.index(string)
       end
 

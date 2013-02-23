@@ -870,8 +870,8 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def shared_string_index(str) #:nodoc:
-      @shared_strings.index(str)
+    def shared_string_index(str, params = {}) #:nodoc:
+      @shared_strings.index(str, params)
     end
 
     def str_unique

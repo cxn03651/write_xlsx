@@ -267,6 +267,8 @@ module Writexlsx
           @worksheet.write_cell_value(token)
         end
 
+        # If the cell isn't a string then we have to add the url
+        # as the string to display.
         if link_type == 1
           # External link with rel file relationship.
           @worksheet.rel_count += 1
@@ -2642,8 +2644,8 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Store the URL displayed text in the shared string table.
-      index = shared_string_index(str[0, STR_MAX])
+      # Copy string for use in hyperlink elements.
+      url_str = str.dup
 
       # External links to URLs and to other Excel workbooks have slightly
       # different characteristics that we have to account for.
@@ -2665,13 +2667,13 @@ module Writexlsx
         end
 
         # Ordinary URL style external links don't have a "location" string.
-        str = nil
+        url_str = nil
       elsif link_type == 3
         # External Workbook links need to be modified into the right format.
         # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
         # We need the part to the left of the # as the URL and the part to
         # the right as the "location" string (if it exists).
-        url, str = url.split(/#/)
+        url, url_str = url.split(/#/)
 
         # Add the file:/// URI to the url if non-local.
         if url =~ %r![:]! ||        # Windows style "C:/" link.
@@ -2698,7 +2700,20 @@ module Writexlsx
         raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
-      store_data_to_table(HyperlinkCellData.new(self, row, col, index, xf, link_type, url, str, tip))
+      # Write the hyperlink string.
+      write_string(row, col, str, xf)
+
+      index = shared_string_index(str[0, STR_MAX], :only_query => true)
+      store_data_to_table(HyperlinkCellData.new(self, row, col, index, xf, link_type, url, url_str, tip))
+
+#      # Store the hyperlink data in a separate structure.
+#      @hyperlinks ||= {}
+#      hash = {
+#        :_link_type => link_type,
+#        :_url       => url,
+#        :_str       => url_str,
+#        :tip        => tip
+#      }
     end
 
     #
@@ -6105,7 +6120,7 @@ module Writexlsx
 
         span_index = row_num / 16
         span       = @row_spans[span_index]
-
+p span
         # Write the cells if the row contains data.
         if @cell_data_table[row_num]
           if !@set_rows[row_num]
@@ -6120,7 +6135,7 @@ module Writexlsx
           write_empty_row(row_num, span, *(@set_rows[row_num]))
         else
           # Row attributes only.
-          write_empty_row(row_num, nil, *(@set_rows[row_num]))
+          write_empty_row(row_num, span, *(@set_rows[row_num]))
         end
       end
     end
@@ -6182,14 +6197,14 @@ module Writexlsx
 
       attributes = ['r',  r + 1]
 
-      (attributes << 'spans'        << spans) if spans
-      (attributes << 's'            << xf_index) if xf_index != 0
-      (attributes << 'customFormat' << 1    ) if format
-      (attributes << 'ht'           << height) if height != 15
-      (attributes << 'hidden'       << 1    ) if ptrue?(hidden)
-      (attributes << 'customHeight' << 1    ) if height != 15
-      (attributes << 'outlineLevel' << level) if ptrue?(level)
-      (attributes << 'collapsed'    << 1    ) if ptrue?(collapsed)
+      (attributes << 'spans'        << spans)    if spans
+      (attributes << 's'            << xf_index) if ptrue?(xf_index)
+      (attributes << 'customFormat' << 1    )    if ptrue?(format)
+      (attributes << 'ht'           << height)   if height != 15
+      (attributes << 'hidden'       << 1    )    if ptrue?(hidden)
+      (attributes << 'customHeight' << 1    )    if height != 15
+      (attributes << 'outlineLevel' << level)    if ptrue?(level)
+      (attributes << 'collapsed'    << 1    )    if ptrue?(collapsed)
 
       if @excel_version == 2010
         attributes << 'x14ac:dyDescent' << '0.25'
@@ -7712,8 +7727,8 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def shared_string_index(str) #:nodoc:
-      @workbook.shared_string_index(str)
+    def shared_string_index(str, params = {}) #:nodoc:
+      @workbook.shared_string_index(str, params)
     end
 
     #
