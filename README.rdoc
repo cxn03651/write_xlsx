@@ -15,6 +15,7 @@ The WriteXLSX supports the following features:
 * Autofilters
 * Data validation
 * Conditional formatting
+* Macros
 * Tables
 * Shapes
 * Sparklines
@@ -74,6 +75,15 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-23 v0.61.0
+  Allow a cell url string to be over written with a number or formula
+  using a second write() call to the same cell. The url remains intact.
+
+  Added Worksheet#set_default_row method to set worksheet default values
+  for rows.
+
+  Added Chart#size method to set the chart dimensions.
+
 2013-02-19 v0.60.0
  Added Excel form buttons via the worksheet insert_button() method.
  This allows the user to tie the button to an embedded macro imported
