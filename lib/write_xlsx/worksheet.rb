@@ -6706,8 +6706,8 @@ module Writexlsx
     end
 
     #
-    # Write the <hyperlinks> element. The attributes are different for internal
-    # and external links.
+    # Process any sored hyperlinks in row/col order and write the <hyperlinks>
+    # element. The attributes are different for internal and external links.
     #
     def write_hyperlinks #:nodoc:
       return unless @hyperlinks
@@ -6763,6 +6763,7 @@ module Writexlsx
 
       return if @hlink_refs.empty?
 
+      # Write the hyperlink elements.
       @writer.tag_elements('hyperlinks') do
         @hlink_refs.each do |aref|
           type, *args = aref
