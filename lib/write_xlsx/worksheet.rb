@@ -2802,7 +2802,7 @@ module Writexlsx
       raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
       raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
-      # Use the values set with chart.size, if any.
+      # Use the values set with chart.set_size, if any.
       x_scale  = chart.x_scale  if chart.x_scale  != 1
       y_scale  = chart.y_scale  if chart.y_scale  != 1
       x_offset = chart.x_offset if ptrue?(chart.x_offset)

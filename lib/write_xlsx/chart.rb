@@ -975,7 +975,7 @@ module Writexlsx
     #
     # Set dimensions for scale for the chart.
     #
-    def size(params = {})
+    def set_size(params = {})
       @width    = params[:width]    if params[:width]
       @height   = params[:height]   if params[:height]
       @x_scale  = params[:x_scale]  if params[:x_scale]
@@ -983,6 +983,9 @@ module Writexlsx
       @x_offset = params[:x_offset] if params[:x_offset]
       @y_offset = params[:y_offset] if params[:y_offset]
     end
+
+    # Backward compatibility with poorly chosen method name.
+    alias :size :set_size
 
     #
     # Setup the default configuration data for an embedded chart.
