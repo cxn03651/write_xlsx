@@ -7,7 +7,6 @@ module Writexlsx
   module Package
 
     class Comment
-
       include Writexlsx::Utility
 
       DEFAULT_COLOR  = 81  # what color ?
@@ -116,6 +115,103 @@ module Writexlsx
         else
           10
         end
+      end
+
+      def v_shape_attributes(id, z_index)
+        v_shape_attributes_base(id, z_index) <<
+          'fillcolor'   << color             <<
+          'o:insetmode' << 'auto'
+      end
+
+      def type
+        '#_x0000_t202'
+      end
+
+      def style_addition
+        ['visibility:', visibility]
+      end
+
+      def write_shape(writer, id, z_index)
+        @writer = writer
+
+        attributes = v_shape_attributes(id, z_index)
+
+        @writer.tag_elements('v:shape', attributes) do
+          writer = @writer
+
+          # Write the v:fill element.
+          write_fill
+          # Write the v:shadow element.
+          write_shadow
+          # Write the v:path element.
+          write_comment_path(nil, 'none')
+          # Write the v:textbox element.
+          write_textbox
+          # Write the x:ClientData element.
+          write_client_data
+        end
+      end
+
+      def visibility
+        ptrue?(visible) ? 'visible' : 'hidden'
+      end
+
+      #
+      # Write the <v:fill> element.
+      #
+      def fill_attributes
+        ['color2', '#ffffe1']
+      end
+
+      #
+      # Write the <v:shadow> element.
+      #
+      def write_shadow
+        attributes = [
+            'on',       't',
+            'color',    'black',
+            'obscured', 't'
+        ]
+
+        @writer.empty_tag('v:shadow', attributes)
+      end
+
+      #
+      # Write the <v:textbox> element.
+      #
+      def write_textbox
+        attributes = ['style', 'mso-direction-alt:auto']
+
+        @writer.tag_elements('v:textbox', attributes) do
+          # Write the div element.
+          write_div('left')
+        end
+      end
+
+      #
+      # Write the <x:ClientData> element.
+      #
+      def write_client_data
+        attributes = ['ObjectType', 'Note']
+
+        @writer.tag_elements('x:ClientData', attributes) do
+          @writer.empty_tag('x:MoveWithCells')
+          @writer.empty_tag('x:SizeWithCells')
+          # Write the x:Anchor element.
+          write_anchor
+          # Write the x:AutoFill element.
+          write_auto_fill
+          # Write the x:Row element.
+          @writer.data_element('x:Row', row)
+          # Write the x:Column element.
+          @writer.data_element('x:Column', col)
+          # Write the x:Visible element.
+          @writer.empty_tag('x:Visible') if ptrue?(visible)
+        end
+      end
+
+      def writer=(w)
+        @writer = w
       end
     end
 

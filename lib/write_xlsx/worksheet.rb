@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/package/button'
 require 'write_xlsx/colors'
 require 'write_xlsx/format'
 require 'write_xlsx/drawing'
@@ -5781,20 +5782,20 @@ module Writexlsx
     # calculating the comment object position and vertices.
     #
     def button_params(row, col, params)
-      button = { :_row => row, :_col => col }
+      button = Writexlsx::Package::Button.new
 
       button_number = 1 + @buttons_array.size
 
       # Set the button caption.
       caption = params[:caption] || "Button #{button_number}"
 
-      button[:_font] = { :_caption => caption }
+      button.font = { :_caption => caption }
 
       # Set the macro name.
       if params[:macro]
-        button[:_macro] = "[0]!#{params[:macro]}"
+        button.macro = "[0]!#{params[:macro]}"
       else
-        button[:_macro] = "[0]!Button#{button_number}_Click"
+        button.macro = "[0]!Button#{button_number}_Click"
       end
 
       # Ensure that a width and height have been set.
@@ -5835,7 +5836,7 @@ module Writexlsx
       # Add the width and height for VML.
       vertices << [params[:width], params[:height]]
 
-      button[:_vertices] = vertices
+      button.vertices = vertices
 
       button
     end
