@@ -3,6 +3,35 @@ require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
+  class Table
+    include Writexlsx::Utility
+
+    attr_reader :horizontal, :vertical, :outline, :show_keys
+
+    def initialize(params = {})
+      @horizontal, @vertical, @outline, @show_keys = true, true, true, false
+      @horizontal = params[:horizontal] if params.has_key?(:horizontal)
+      @vertical   = params[:vertical]   if params.has_key?(:vertical)
+      @outline    = params[:outline]    if params.has_key?(:outline)
+      @show_keys  = params[:show_keys]  if params.has_key?(:show_keys)
+    end
+
+    def write_d_table(writer)
+      writer.tag_elements('c:dTable') do
+        writer.empty_tag('c:showHorzBorder', attributes) if ptrue?(horizontal)
+        writer.empty_tag('c:showVertBorder', attributes) if ptrue?(vertical)
+        writer.empty_tag('c:showOutline',    attributes) if ptrue?(outline)
+        writer.empty_tag('c:showKeys',       attributes) if ptrue?(show_keys)
+      end
+    end
+
+    private
+
+    def attributes
+      ['val', 1]
+    end
+  end
+
   # ==SYNOPSIS
   #
   # To create a simple Excel file with a chart using WriteXLSX:
@@ -512,6 +541,7 @@ module Writexlsx
       @y_scale           = 1
       @x_offset          = 0
       @y_offset          = 0
+      @table             = nil
 
       set_default_properties
     end
@@ -986,6 +1016,13 @@ module Writexlsx
 
     # Backward compatibility with poorly chosen method name.
     alias :size :set_size
+
+    #
+    # Set properties for an axis data table.
+    #
+    def set_table(params = {})
+      @table = Table.new(params)
+    end
 
     #
     # Setup the default configuration data for an embedded chart.
@@ -1755,6 +1792,9 @@ module Writexlsx
         }
         write_val_axis(params)
         write_cat_or_date_axis(params, type)
+
+        # Write the c:dTable element.
+        write_d_table
 
         # Write the c:spPr element for the plotarea formatting.
         write_sp_pr(@plotarea)
@@ -3437,6 +3477,13 @@ module Writexlsx
     #
     def write_a_latin(args)  # :nodoc:
       @writer.empty_tag('a:latin', args)
+    end
+
+    #
+    # Write the <c:dTable> element.
+    #
+    def write_d_table
+      @table.write_d_table(@writer) if @table
     end
 
     def nil_or_max?(val)  # :nodoc:
