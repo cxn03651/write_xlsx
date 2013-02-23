@@ -1,6 +1,6 @@
 = write_xlsx
 
-gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem. write_xlsx is converted from Perl's module Excel::Writer::XLSX-0.61, https://github.com/jmcnamara/excel-writer-xlsx .
+gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem. write_xlsx is converted from Perl's module Excel::Writer::XLSX-0.62, https://github.com/jmcnamara/excel-writer-xlsx .
 
 == Description
 
@@ -75,6 +75,10 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-02-24 v0.62.0
+  Added option for adding a data table to a Chart X-axis.
+  See output from chart_data_table.rb example.
+
 2013-02-23 v0.61.0
   Allow a cell url string to be over written with a number or formula
   using a second write() call to the same cell. The url remains intact.
