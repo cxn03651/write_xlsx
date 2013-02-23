@@ -4859,4 +4859,26 @@ EOS
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
+
+  def test_hide_row_col
+    @xlsx = 'hide_row_col.xlsx'
+    workbook = WriteXLSX.new(@xlsx)
+    worksheet = workbook.add_worksheet
+
+    # Write some data
+    worksheet.write('D1', 'Some hidden columns.')
+    worksheet.write('A8', 'Some hidden rows.')
+
+    # Hide all rows without data.
+    worksheet.set_default_row(nil, 1)
+
+    # Set emptys row that we do want to display. All other will be hidden.
+    (1..6).each { |row| worksheet.set_row(row, 15) }
+
+    # Hide a range of columns.
+    worksheet.set_column('G:XFD', nil, nil, 1)
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
 end

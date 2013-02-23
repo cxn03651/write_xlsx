@@ -247,13 +247,6 @@ class TestWriteMethods < Test::Unit::TestCase
     end
   end
 
-  def test_insert_chart_with_valid_arg_not_raise
-    chart = @workbook.add_chart(:type => 'line')
-    assert_nothing_raised do
-      @worksheet.insert_chart(0, 0, chart)
-    end
-  end
-
   def test_coditional_formatting_with_insufficient_args_raise_InsufficientArgumentError
     assert_raise(WriteXLSXInsufficientArgumentError) do
       @worksheet.conditional_formatting()
