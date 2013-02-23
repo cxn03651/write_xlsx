@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/drawing'
 
-class TestWriteRow < Test::Unit::TestCase
+class TestDrawingWriteRow < Test::Unit::TestCase
   def setup
     @drawing = Writexlsx::Drawing.new
   end
