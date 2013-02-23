@@ -1018,7 +1018,19 @@ module Writexlsx
     alias :size :set_size
 
     #
-    # Set properties for an axis data table.
+    # The set_table method adds a data table below the horizontal axis with the
+    # data used to plot the chart.
+    #
+    #    chart.set_table
+    #
+    # The available options, with default values are:
+    #
+    #    :vertical   => true    # Display vertical lines in the table.
+    #    :horizontal => true    # Display horizontal lines in the table.
+    #    :outline    => true    # Display an outline in the table.
+    #    :show_keys  => false   # Show the legend keys with the table data.
+    #
+    # The data table can only be shown with Bar, Column, Line, Area and Stock charts.
     #
     def set_table(params = {})
       @table = Table.new(params)
