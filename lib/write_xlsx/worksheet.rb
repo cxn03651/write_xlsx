@@ -4784,24 +4784,6 @@ module Writexlsx
       !!@is_chartsheet
     end
 
-    #
-    # Turn the HoH that stores the comments into an array for easier handling
-    # and set the external links.
-    #
-    def set_vml_data_id(vml_data_id) # :nodoc:
-      count = @comments.sorted_comments.size
-      start_data_id = vml_data_id
-
-      # The VML o:idmap data id contains a comma separated range when there is
-      # more than one 1024 block of comments, like this: data="1,2".
-      (1 .. (count / 1024)).each do |i|
-        vml_data_id = "#{vml_data_id},#{start_data_id + i}"
-      end
-      @vml_data_id = vml_data_id
-
-      count
-    end
-
     def set_external_vml_links(comment_id) # :nodoc:
       @external_vml_links <<
         ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
