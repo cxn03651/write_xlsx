@@ -2780,7 +2780,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   insert_chart(row, column, chart [ , x, y, scale_x, scale_y ] )
+    #   insert_chart(row, column, chart [ , x, y, x_scale, y_scale ] )
     #
     # Insert a chart into a worksheet. The chart argument should be a Chart
     # object or else it is assumed to be a filename of an external binary file.
@@ -2802,7 +2802,7 @@ module Writexlsx
     # Writexlsx::Chart for details on how to configure it. See also the
     # chart_*.rb programs in the examples directory of the distro.
     #
-    # The x, y, scale_x and scale_y parameters are optional.
+    # The x, y, x_scale and y_scale parameters are optional.
     #
     # The parameters x and y can be used to specify an offset from the top
     # left hand corner of the cell specified by row and column. The offset
@@ -2810,7 +2810,7 @@ module Writexlsx
     #
     #     worksheet1.insert_chart('E2', chart, 3, 3)
     #
-    # The parameters scale_x and scale_y can be used to scale the inserted
+    # The parameters x_scale and y_scale can be used to scale the inserted
     # image horizontally and vertically:
     #
     #     # Scale the width by 120% and the height by 150%
@@ -2818,29 +2818,35 @@ module Writexlsx
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, chart, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
+      row, col, chart, x_offset, y_offset, x_scale, y_scale = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
       x_offset ||= 0
       y_offset ||= 0
-      scale_x  ||= 1
-      scale_y  ||= 1
+      x_scale  ||= 1
+      y_scale  ||= 1
 
       raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
       raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
-      @charts << [row, col, chart, x_offset, y_offset, scale_x, scale_y]
+      # Use the values set with chart.size, if any.
+      x_scale  = chart.x_scale  if chart.x_scale  != 1
+      y_scale  = chart.y_scale  if chart.y_scale  != 1
+      x_offset = chart.x_offset if ptrue?(chart.x_offset)
+      y_offset = chart.y_offset if ptrue?(chart.y_offset)
+
+      @charts << [row, col, chart, x_offset, y_offset, x_scale, y_scale]
     end
 
     #
     # :call-seq:
-    #   insert_image(row, column, filename [ , x, y, scale_x, scale_y ] )
+    #   insert_image(row, column, filename [ , x, y, x_scale, y_scale ] )
     #
     # Partially supported. Currently only works for 96 dpi images. This
     # will be fixed in an upcoming release.
     #--
     # This method can be used to insert a image into a worksheet. The image
-    # can be in PNG, JPEG or BMP format. The x, y, scale_x and scale_y
+    # can be in PNG, JPEG or BMP format. The x, y, x_scale and y_scale
     # parameters are optional.
     #
     #     worksheet1.insert_image('A1', 'ruby.bmp')
@@ -2857,7 +2863,7 @@ module Writexlsx
     # cell. This can be occasionally useful if you wish to align two or more
     # images relative to the same cell.
     #
-    # The parameters scale_x and scale_y can be used to scale the inserted
+    # The parameters x_scale and y_scale can be used to scale the inserted
     # image horizontally and vertically:
     #
     #     # Scale the inserted image: width x 2.0, height x 0.8
@@ -2879,15 +2885,15 @@ module Writexlsx
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, image, x_offset, y_offset, scale_x, scale_y = row_col_notation(args)
+      row, col, image, x_offset, y_offset, x_scale, y_scale = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, image].include?(nil)
 
       x_offset ||= 0
       y_offset ||= 0
-      scale_x  ||= 1
-      scale_y  ||= 1
+      x_scale  ||= 1
+      y_scale  ||= 1
 
-      @images << [row, col, image, x_offset, y_offset, scale_x, scale_y]
+      @images << [row, col, image, x_offset, y_offset, x_scale, y_scale]
     end
 
     #
@@ -4816,15 +4822,19 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
-      row, col, chart, x_offset, y_offset, scale_x, scale_y  = @charts[index]
+      row, col, chart, x_offset, y_offset, x_scale, y_scale  = @charts[index]
       chart.id = chart_id - 1
-      scale_x ||= 0
-      scale_y ||= 0
+      x_scale ||= 0
+      y_scale ||= 0
 
-      width  = (0.5 + (480 * scale_x)).to_i
-      height = (0.5 + (288 * scale_y)).to_i
+      # Use user specified dimensions, if any.
+      width  = chart.width  if ptrue?(chart.width)
+      height = chart.height if ptrue?(chart.height)
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
+      width  = (0.5 + (width  * x_scale)).to_i
+      height = (0.5 + (height * y_scale)).to_i
+
+      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, false)
 
       # Set the chart name for the embedded object if it has been specified.
       name = chart.name
@@ -5424,8 +5434,7 @@ module Writexlsx
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height) #:nodoc:
-      is_drawing = true
+    def position_object_emus(col_start, row_start, x1, y1, width, height, is_drawing = true) #:nodoc:
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
         position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing)
 
@@ -5533,10 +5542,10 @@ module Writexlsx
       drawing_type = 2
       drawing
 
-      row, col, image, x_offset, y_offset, scale_x, scale_y = @images[index]
+      row, col, image, x_offset, y_offset, x_scale, y_scale = @images[index]
 
-      width  *= scale_x
-      height *= scale_y
+      width  *= x_scale
+      height *= y_scale
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
@@ -5580,7 +5589,7 @@ module Writexlsx
     # See add_shape() for details on how to create the Shape object
     # and Excel::Writer::XLSX::Shape for details on how to configure it.
     #
-    # The x, y, scale_x and scale_y parameters are optional.
+    # The x, y, x_scale and y_scale parameters are optional.
     #
     # The parameters x and y can be used to specify an offset
     # from the top left hand corner of the cell specified by row and col.
@@ -5588,7 +5597,7 @@ module Writexlsx
     #
     #   worksheet1.insert_shape('E2', chart, 3, 3)
     #
-    # The parameters scale_x and scale_y can be used to scale the
+    # The parameters x_scale and y_scale can be used to scale the
     # inserted shape horizontally and vertically:
     #
     #   # Scale the width by 120% and the height by 150%
@@ -5597,7 +5606,7 @@ module Writexlsx
     #
     def insert_shape(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row_start, column_start, shape, x_offset, y_offset, scale_x, scale_y =
+      row_start, column_start, shape, x_offset, y_offset, x_scale, y_scale =
         row_col_notation(args)
       if [row_start, column_start, shape].include?(nil)
         raise "Insufficient arguments in insert_shape()"
@@ -5611,8 +5620,8 @@ module Writexlsx
 
       # Override shape scale if supplied as an argument. Otherwise, use the
       # existing shape scale factors.
-      shape[:scale_x] = scale_x if scale_x
-      shape[:scale_y] = scale_y if scale_y
+      shape[:scale_x] = x_scale if x_scale
+      shape[:scale_y] = y_scale if y_scale
 
       # Assign a shape ID.
       while true

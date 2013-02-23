@@ -438,6 +438,8 @@ module Writexlsx
     attr_accessor :id, :name   # :nodoc:
     attr_writer :index, :palette, :protection   # :nodoc:
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
+    attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
+    attr_reader :width, :height
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -504,6 +506,12 @@ module Writexlsx
       @show_blanks       = 'gap'
       @show_hidden_data  = false
       @show_crosses      = true
+      @width             = 480
+      @height            = 288
+      @x_scale           = 1
+      @y_scale           = 1
+      @x_offset          = 0
+      @y_offset          = 0
 
       set_default_properties
     end
@@ -962,6 +970,18 @@ module Writexlsx
     #
     def show_hidden_data
       @show_hidden_data = true
+    end
+
+    #
+    # Set dimensions for scale for the chart.
+    #
+    def size(params = {})
+      @width    = params[:width]    if params[:width]
+      @height   = params[:height]   if params[:height]
+      @x_scale  = params[:x_scale]  if params[:x_scale]
+      @y_scale  = params[:y_scale]  if params[:y_scale]
+      @x_offset = params[:x_offset] if params[:x_offset]
+      @y_offset = params[:y_offset] if params[:y_offset]
     end
 
     #
