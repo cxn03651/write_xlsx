@@ -23,7 +23,11 @@ class TestAddSeries < Test::Unit::TestCase
       :_labels        => nil,
       :_invert_if_neg => nil,
       :_x2_axis       => nil,
-      :_y2_axis       => nil
+      :_y2_axis       => nil,
+      :_error_bars    => Writexlsx::Chart::ErrorBars.new(
+                                                         :_x_error_bars => nil,
+                                                         :_y_error_bars => nil
+                                                         )
     }
 
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
@@ -49,7 +53,11 @@ class TestAddSeries < Test::Unit::TestCase
                   :_labels        => nil,
                   :_invert_if_neg => nil,
                   :_x2_axis       => nil,
-                  :_y2_axis       => nil
+                  :_y2_axis       => nil,
+                  :_error_bars    => Writexlsx::Chart::ErrorBars.new(
+                                                         :_x_error_bars => nil,
+                                                         :_y_error_bars => nil
+                                                         )
                 }
                ]
 
@@ -80,7 +88,11 @@ class TestAddSeries < Test::Unit::TestCase
                   :_labels       => nil,
                   :_invert_if_neg => nil,
                   :_x2_axis       => nil,
-                  :_y2_axis       => nil
+                  :_y2_axis       => nil,
+                  :_error_bars    => Writexlsx::Chart::ErrorBars.new(
+                                                         :_x_error_bars => nil,
+                                                         :_y_error_bars => nil
+                                                         )
                 }
                ]
 
@@ -106,8 +118,12 @@ class TestAddSeries < Test::Unit::TestCase
       :_labels       => nil,
       :_invert_if_neg => nil,
       :_x2_axis       => nil,
-      :_y2_axis       => nil
-    }
+      :_y2_axis       => nil,
+      :_error_bars    => Writexlsx::Chart::ErrorBars.new(
+                                                         :_x_error_bars => nil,
+                                                         :_y_error_bars => nil
+                                                         )
+   }
 
     @chart.add_series(
                       :categories => [ 'Sheet1', 0, 4, 0, 0 ],
@@ -135,7 +151,11 @@ class TestAddSeries < Test::Unit::TestCase
       :_labels        => nil,
       :_invert_if_neg => nil,
       :_x2_axis       => 1,
-      :_y2_axis       => 1
+      :_y2_axis       => 1,
+      :_error_bars    => Writexlsx::Chart::ErrorBars.new(
+                                                         :_x_error_bars => nil,
+                                                         :_y_error_bars => nil
+                                                         )
     }
 
     @chart.add_series(
