@@ -42,6 +42,6 @@ class TestRegressionChartErrorbars05 < Test::Unit::TestCase
 
     workbook.close
     compare_xlsx_for_regression(
-B                                File.join(@regression_output, @xlsx), @xlsx)
+                                File.join(@regression_output, @xlsx), @xlsx)
   end
 end
