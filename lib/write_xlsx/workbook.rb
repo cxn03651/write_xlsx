@@ -454,13 +454,13 @@ module Writexlsx
     # The properties of a shape object that can be defined via add_shape are
     # shown below.
     #
-    # ====:name
+    # ===:name
     #
     # Defines the name of the shape. This is an optional property and the shape
     # will be given a default name if not supplied. The name is generally only
     # used by Excel Macros to refer to the object.
     #
-    # ====:type
+    # ===:type
     #
     # Defines the type of the object such as +:rect+, +:ellipse+ OR +:triangle+.
     #
@@ -474,7 +474,7 @@ module Writexlsx
     # It creates an example workbook with all supported shapes labelled with
     # their shape names.
     #
-    # ==== Basic Shapes
+    # === Basic Shapes
     #
     #    blockArc              can            chevron       cube          decagon
     #    diamond               dodecagon      donut         ellipse       funnel
@@ -488,7 +488,7 @@ module Writexlsx
     #    star5                 star6          star7         star8         sun
     #    teardrop              trapezoid      triangle
     #
-    # ==== Arrow Shapes
+    # === Arrow Shapes
     #
     #    bentArrow        bentUpArrow       circularArrow     curvedDownArrow
     #    curvedLeftArrow  curvedRightArrow  curvedUpArrow     downArrow
@@ -497,13 +497,13 @@ module Writexlsx
     #    rightArrow       stripedRightArrow swooshArrow       upArrow
     #    upDownArrow      uturnArrow
     #
-    # ==== Connector Shapes
+    # === Connector Shapes
     #
     #    bentConnector2   bentConnector3   bentConnector4
     #    bentConnector5   curvedConnector2 curvedConnector3
     #    curvedConnector4 curvedConnector5 straightConnector1
     #
-    # ==== Callout Shapes
+    # === Callout Shapes
     #
     #    accentBorderCallout1  accentBorderCallout2  accentBorderCallout3
     #    accentCallout1        accentCallout2        accentCallout3
@@ -514,7 +514,7 @@ module Writexlsx
     #    upArrowCallout        upDownArrowCallout    wedgeEllipseCallout
     #    wedgeRectCallout      wedgeRoundRectCallout
     #
-    # ==== Flow Chart Shapes
+    # === Flow Chart Shapes
     #
     #    flowChartAlternateProcess  flowChartCollate        flowChartConnector
     #    flowChartDecision          flowChartDelay          flowChartDisplay
@@ -527,24 +527,24 @@ module Writexlsx
     #    flowChartPunchedCard       flowChartPunchedTape    flowChartSort
     #    flowChartSummingJunction   flowChartTerminator
     #
-    # ==== Action Shapes
+    # === Action Shapes
     #
     #    actionButtonBackPrevious actionButtonBeginning actionButtonBlank
     #    actionButtonDocument     actionButtonEnd       actionButtonForwardNext
     #    actionButtonHelp         actionButtonHome      actionButtonInformation
     #    actionButtonMovie        actionButtonReturn    actionButtonSound
     #
-    # ==== Chart Shapes
+    # === Chart Shapes
     #
     # Not to be confused with Excel Charts.
     #
     #    chartPlus chartStar chartX
     #
-    # ==== Math Shapes
+    # === Math Shapes
     #
     #    mathDivide mathEqual mathMinus mathMultiply mathNotEqual mathPlus
     #
-    # ==== Starts and Banners
+    # === Starts and Banners
     #
     #    arc            bevel          bracePair  bracketPair chord
     #    cloud          corner         diagStripe doubleWave  ellipseRibbon
@@ -553,11 +553,11 @@ module Writexlsx
     #    plus           ribbon         ribbon2    rightBrace  rightBracket
     #    verticalScroll wave
     #
-    # ==== Tab Shapes
+    # === Tab Shapes
     #
     #    cornerTabs plaqueTabs squareTabs
     #
-    # ==== :text
+    # === :text
     #
     # This property is used to make the shape act like a text box.
     #
@@ -566,34 +566,34 @@ module Writexlsx
     # The Text is super-imposed over the shape. The text can be wrapped using
     # the newline character \n.
     #
-    # ==== :id
+    # === :id
     #
     # Identification number for internal identification. This number will be
     # auto-assigned, if not assigned, or if it is a duplicate.
     #
-    # ==== :format
+    # === :format
     #
     # Workbook format for decorating the shape horizontally and/or vertically.
     #
-    # ==== :rotation
+    # === :rotation
     #
     # Shape rotation, in degrees, from 0 to 360
     #
-    # ==== :line, :fill
+    # === :line, :fill
     #
     # Shape color for the outline and fill.
     # Colors may be specified  as a color index, or in RGB format, i.e. AA00FF.
     #
     # See COULOURS IN EXCEL in the main documentation for more information.
     #
-    # ==== :link_type
+    # === :link_type
     #
     # Line type for shape outline. The default is solid.
     # The list of possible values is:
     #
     #    dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot, solid
     #
-    # ==== :valign, :align
+    # === :valign, :align
     #
     # Text alignment within the shape.
     #
@@ -616,14 +616,14 @@ module Writexlsx
     #
     # The default is to center both horizontally and vertically.
     #
-    # ==== :scale_x, :scale_y
+    # === :scale_x, :scale_y
     #
     # Scale factor in x and y dimension, for scaling the shape width and
     # height. The default value is 1.
     #
     # Scaling may be set on the shape object or via insert_shape.
     #
-    # ==== :adjustments
+    # === :adjustments
     #
     # Adjustment of shape vertices. Most shapes do not use this. For some
     # shapes, there is a single adjustment to modify the geometry.
@@ -637,7 +637,7 @@ module Writexlsx
     # dimension. Adjustments may be negative, to route the shape away
     # from the endpoint.
     #
-    # ==== :stencil
+    # === :stencil
     #
     # Shapes work in stencil mode by default. That is, once a shape is
     # inserted, its connection is separated from its master.
@@ -788,7 +788,30 @@ module Writexlsx
     end
 
     #
-    # Add a vbaProject binary to the XLSX file.
+    # The add_vba_project method can be used to add macros or functions to an
+    # WriteXLSX file using a binary VBA project file that has been extracted
+    # from an existing Excel xlsm file.
+    #
+    #     workbook  = WriteXLSX.new('file.xlsm')
+    #
+    #     workbook.add_vba_project('./vbaProject.bin')
+    #
+    # The supplied +extract_vba+ utility can be used to extract the required
+    # +vbaProject.bin+ file from an existing Excel file:
+    #
+    #     $ extract_vba file.xlsm
+    #     Extracted 'vbaProject.bin' successfully
+    #
+    # Macros can be tied to buttons using the worksheet
+    # {insert_button}[Worksheet.html#method-i-insert_button] method
+    # (see the "WORKSHEET METHODS" section for details):
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro' })
+    #
+    # Note, Excel uses the file extension xlsm instead of xlsx for files that
+    # contain macros. It is advisable to follow the same convention.
+    #
+    # See also the macros.rb example file.
     #
     def add_vba_project(vba_project)
       @vba_project = vba_project
