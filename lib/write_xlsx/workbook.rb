@@ -26,7 +26,6 @@ module Writexlsx
   # * close[#method-i-close]
   # * set_properties[#method-i-set_properties]
   # * define_name[#method-i-define_name]
-  # * set_tempdir[#method-i-set_tempdir]
   # * set_custom_color[#method-i-set_custom_color]
   # * sheets[#method-i-sheets]
   # * set_1904[#method-i-set_1904]
@@ -137,23 +136,31 @@ module Writexlsx
     end
 
     #
-    # write XLSX data to file or IO object.
+    # The close method is used to close an Excel file.
+    #
+    # An explicit close is required if the file must be closed prior to performing
+    # some external action on it such as copying it, reading its size or attaching
+    # it to an email.
+    #
+    # In general, if you create a file with a size of 0 bytes or you fail to create
+    # a file you need to call close.
     #
     def close
-      # In case close() is called twice, by user and by DESTROY.
+      # In case close() is called twice.
       return if @fileclosed
 
       @fileclosed = true
       store_workbook
     end
 
+    #
     # get array of Worksheet objects
     #
     # :call-seq:
     #   sheets              -> array of all Wordsheet object
     #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
     #
-    # The sheets() method returns a array, or a sliced array, of the worksheets
+    # The sheets method returns a array, or a sliced array, of the worksheets
     # in a workbook.
     #
     # If no arguments are passed the method returns a list of all the worksheets
@@ -198,11 +205,11 @@ module Writexlsx
     # one system and the other.
     #
     # WriteXLSX stores dates in the 1900 format by default. If you wish to
-    # change this you can call the set_1904() workbook method.
-    # You can query the current value by calling the get_1904() workbook method.
-    # This returns 0 for 1900 and 1 for 1904.
+    # change this you can call the set_1904 workbook method.
+    # You can query the current value by calling the get_1904 workbook method.
+    # This returns false for 1900 and true for 1904.
     #
-    # In general you probably won't need to use set_1904().
+    # In general you probably won't need to use set_1904.
     #
     def set_1904(mode = true)
       unless sheets.empty?
@@ -211,6 +218,9 @@ module Writexlsx
       @date_1904 = ptrue?(mode)
     end
 
+    #
+    # return date system. false = 1900, true = 1904
+    #
     def get_1904
       @date_1904
     end
@@ -680,7 +690,7 @@ module Writexlsx
     #   workbook.define_name('Sales',         '=Sheet1!$G$1:$H$10')
     #
     # It is also possible to define a local/worksheet name by prefixing the name
-    # with the sheet name using the syntax sheetname!definedname:
+    # with the sheet name using the syntax +sheetname!definedname+:
     #
     #   # Local/worksheet name.
     #   workbook.define_name('Sheet2!Sales',  '=Sheet2!$G$1:$G$10')
@@ -820,10 +830,10 @@ module Writexlsx
     #
     # Change the RGB components of the elements in the colour palette.
     #
-    # The set_custom_color() method can be used to override one of the built-in
+    # The set_custom_color method can be used to override one of the built-in
     # palette values with a more suitable colour.
     #
-    # The value for _index_ should be in the range 8..63,
+    # The value for +index+ should be in the range 8..63,
     # see "COLOURS IN EXCEL".
     #
     # The default named colours use the following indices:
@@ -845,12 +855,13 @@ module Writexlsx
     #     33   =>   pink
     #     53   =>   orange
     #
-    # A new colour is set using its RGB (red green blue) components. The red,
-    # green and blue values must be in the range 0..255. You can determine the
-    # required values in Excel using the Tools->Options->Colors->Modify dialog.
+    # A new colour is set using its RGB (red green blue) components. The +red+,
+    # +green+ and +blue+ values must be in the range 0..255. You can determine
+    # the required values in Excel using the Tools->Options->Colors->Modify
+    # dialog.
     #
-    # The set_custom_color() workbook method can also be used with a HTML style
-    # #rrggbb hex value:
+    # The set_custom_color workbook method can also be used with a HTML style
+    # +#rrggbb+ hex value:
     #
     #     workbook.set_custom_color(40, 255,  102,  0   ) # Orange
     #     workbook.set_custom_color(40, 0xFF, 0x66, 0x00) # Same thing
