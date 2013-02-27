@@ -30,7 +30,7 @@ class TestRegressionChartErrorbars05 < Test::Unit::TestCase
     chart.add_series(
                      :categories   => '=Sheet1!$A$1:$A$5',
                      :values       => '=Sheet1!$B$1:$B$5',
-                     :x_error_bars => { :type => 'standatd_error'}
+                     :x_error_bars => { :type => 'standard_error'}
                      )
 
     chart.add_series(
