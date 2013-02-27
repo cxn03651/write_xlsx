@@ -74,6 +74,14 @@ module Writexlsx
 
         @writer.empty_tag('c:barDir', attributes)
       end
+
+      #
+      # Write the <c:errDir> element. Overridden from Chart class since it is not
+      # used in Bar charts.
+      #
+      def write_err_dir(direction)
+        # do nothing
+      end
     end
   end
 end

@@ -27,6 +27,7 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @show_crosses = false
+        @hi_low_lines = {}
 
         # Override and reset the default axis values.
         @x_axis[:_defaults][:num_format] = 'dd/mm/yyyy'
@@ -62,8 +63,14 @@ module Writexlsx
           # Write the series elements.
           series.each {|s| write_series(s)}
 
+          # Write the c:dtopLines element.
+          write_drop_lines
+
           # Write the c:hiLowLines element.
-          write_hi_low_lines if params[:primary_axes] == 1
+          write_hi_low_lines if ptrue?(params[:primary_axes])
+
+          # Write the c:upDownBars element.
+          write_up_down_bars
 
           # Write the c:marker element.
           write_marker_value
