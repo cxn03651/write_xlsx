@@ -17,6 +17,8 @@ module Writexlsx
 
     include Writexlsx::Utility
 
+    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
+
     attr_writer :firstsheet
     attr_reader :palette
     attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
@@ -390,7 +392,8 @@ module Writexlsx
     #     format1 = workbook.add_format(property_hash) # Set properties at creation
     #     format2 = workbook.add_format                # Set properties later
     #
-    # See the Format Class's rdoc for more details about Format properties and how to set them.
+    # See the Format Class's rdoc for more details about Format properties and
+    # how to set them.
     #
     def add_format(properties = {})
       init_data = [
@@ -973,24 +976,28 @@ module Writexlsx
     # invalid characters and if the name is unique in the workbook.
     #
     def check_sheetname(name) #:nodoc:
-      # Increment the Sheet/Chart number used for default sheet names below.
-      @sheetname_count += 1
+      make_and_check_sheet_chart_name(:sheet, name)
+    end
 
-      # Supply default Sheet/Chart name if none has been defined.
-      if name.nil? || name == ''
-        name = "#{@sheet_name}#{@sheetname_count}"
-      end
+    def check_chart_sheetname(name)
+      make_and_check_sheet_chart_name(:chart, name)
+    end
+
+    def make_and_check_sheet_chart_name(type, name)
+      count = sheet_chart_count_increment(type)
+      name = "#{BASE_NAME[type]}#{count}" unless ptrue?(name)
+
       check_valid_sheetname(name)
       name
     end
 
-    def check_chart_sheetname(name)
-      @chartname_count += 1
-      if name.nil? || name == ''
-        name = "#{@chart_name}#{@chartname_count}"
+    def sheet_chart_count_increment(type)
+      case type
+      when :sheet
+        @sheetname_count += 1
+      when :chart
+        @chartname_count += 1
       end
-      check_valid_sheetname(name)
-      name
     end
 
     def check_valid_sheetname(name)
