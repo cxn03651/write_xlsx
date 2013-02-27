@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartErrorbars07 < Test::Unit::TestCase
+class TestRegressionChartDropLines04 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,15 +10,15 @@ class TestRegressionChartErrorbars07 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_chart_errorbars07
-    @xlsx = 'chart_errorbars07.xlsx'
+  def test_chart_drop_lines04
+    @xlsx = 'chart_drop_lines04.xlsx'
     workbook    = WriteXLSX.new(@xlsx)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
-    date_format = workbook.add_format(:num_format => 14)
+    data_format = workbook.add_format(:num_format => 14)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [45470848, 45472768])
+    chart.instance_variable_set(:@axis_ids, [49019520, 49222016])
 
     data = [
             [ '2007-01-01T', '2007-01-02T', '2007-01-03T', '2007-01-04T', '2007-01-05T' ],
@@ -28,7 +28,7 @@ class TestRegressionChartErrorbars07 < Test::Unit::TestCase
            ]
 
     (0..4).each do |row|
-      worksheet.write_date_time(row, 0, data[0][row], date_format)
+      worksheet.write_date_time(row, 0, data[0][row], data_format)
       worksheet.write(row, 1, data[1][row])
       worksheet.write(row, 2, data[2][row])
       worksheet.write(row, 3, data[3][row])
@@ -36,31 +36,29 @@ class TestRegressionChartErrorbars07 < Test::Unit::TestCase
 
     worksheet.set_column('A:D', 11)
 
-    chart.add_series(
-                     :categories   => '=Sheet1!$A$1:$A$5',
-                     :values       => '=Sheet1!$B$1:$B$5',
-                     :y_error_bars => { :type => 'standard_error'}
-                     )
+    chart.set_drop_lines
 
     chart.add_series(
                      :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5',
-                     :y_error_bars => { :type => 'standard_error'}
+                     :values     => '=Sheet1!$B$1:$B$5'
                      )
-
     chart.add_series(
                      :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$D$1:$D$5',
-                     :y_error_bars => { :type => 'standard_error'}
+                     :values     => '=Sheet1!$C$1:$C$5'
                      )
+    chart.add_series(
+                     :categories => '=Sheet1!$A$1:$A$5',
+                     :values     => '=Sheet1!$D$1:$D$5'
+                     )
+
+    chart.set_drop_lines
 
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx), @xlsx,
+    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
                                 [],
-                                {'xl/charts/chart1.xml' => [ '<c:formatCode']}
+                                { 'xl/charts/chart1.xml' => [ '<c:formatCode', ] }
                                 )
   end
 end

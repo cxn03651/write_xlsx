@@ -713,6 +713,10 @@ module Writexlsx
       # Set the trendline properties for the series.
       trendline = get_trendline_properties(params[:trendline])
 
+      # Set the error bars properties for the series.
+      y_error_bars = get_error_bars_properties(params[:y_error_bars])
+      x_error_bars = get_error_bars_properties(params[:x_error_bars])
+
       # Set the labels properties for the series.
       labels = get_labels_properties(params[:data_labels])
 
@@ -739,7 +743,11 @@ module Writexlsx
         :_labels        => labels,
         :_invert_if_neg => invert_if_neg,
         :_x2_axis       => x2_axis,
-        :_y2_axis       => y2_axis
+        :_y2_axis       => y2_axis,
+        :_error_bars    => {
+          :_x_error_bars => x_error_bars,
+          :_y_error_bars => y_error_bars
+        }
       }
     end
 
@@ -1034,6 +1042,55 @@ module Writexlsx
     #
     def set_table(params = {})
       @table = Table.new(params)
+    end
+
+    #
+    # Set properties for the chart up-down bars.
+    #
+    def set_up_down_bars(params = {})
+      # Map border to line.
+      if params[:up]
+        params[:up][:line] = params[:up][:border] if params[:up][:border]
+      else
+        params[:up] = {}
+      end
+      if params[:down]
+        params[:down][:line] = params[:down][:border] if params[:down][:border]
+      else
+        params[:down] = {}
+      end
+
+      # Set the up and down bar properties.
+      @up_down_bars = {
+        :_up => {
+          :_line => get_line_properties(params[:up][:line]),
+          :_fill => get_line_properties(params[:up][:fill])
+        },
+        :_down => {
+          :_line => get_line_properties(params[:down][:line]),
+          :_fill => get_line_properties(params[:down][:fill])
+        }
+      }
+    end
+
+    #
+    # Set properties for the chart drop lines.
+    #
+    def set_drop_lines(params = {})
+      # Set the drop line properties.
+      line = get_line_properties(params[:line])
+
+      @drop_lines = { :_line => line }
+    end
+
+    #
+    # Set properties for the chart high-low lines.
+    #
+    def set_high_low_lines(params = {})
+      # Set the drop line properties.
+      line = get_line_properties(params[:line])
+
+      @hi_low_lines = { :_line => line }
     end
 
     #
@@ -1453,6 +1510,63 @@ module Writexlsx
       return trendline
     end
 
+    #
+    # Convert user defined error bars properties to structure required
+    # internally.
+    #
+    def get_error_bars_properties(params = {})
+      return if !ptrue?(params) || params.empty?
+
+      # Default values.
+      error_bars = {
+        :_type      => 'fixedVal',
+        :_value     => 1,
+        :_endcap    => 1,
+        :_direction => 'both'
+      }
+
+      types = {
+        :fixed              => 'fixedVal',
+        :percentage         => 'percentage',
+        :standard_deviation => 'stdDev',
+        :standard_error     => 'stdErr'
+      }
+
+      # Check the error bars type.
+      error_type = params[:type].to_sym
+
+      if types.key?(error_type)
+        error_bars[:_type] = types[error_type]
+      else
+        raise "Unknown error bars type '#{error_type}'\n"
+      end
+
+      # Set the value for error types that require it.
+      if params.key?(:value)
+        error_bars[:_value] = params[:value]
+      end
+
+      # Set the end-cap style.
+      if params.key?(:end_style)
+        error_bars[:_endcap] = params[:end_style]
+      end
+
+      # Set the error bar direction.
+      if params.key?(:direction)
+        if params[:direction] == 'minus'
+          error_bars[:_direction] = 'minus'
+        elsif params[:direction] == 'plus'
+          error_bars[:_direction] = 'plus'
+        else
+          # Default to 'both'
+        end
+      end
+
+      # Set the line properties for the error bars.
+      error_bars[:_line] = get_line_properties(params[:line])
+
+      error_bars
+    end
     #
     # Convert user defined gridline properties to the structure required internally.
     #
@@ -1898,6 +2012,8 @@ module Writexlsx
         write_d_lbls(series[:_labels])
         # Write the c:trendline element.
         write_trendline(series[:_trendline])
+        # Write the c:errBars element.
+        write_error_bars(series[:_error_bars])
         # Write the c:cat element.
         write_cat(series)
         # Write the c:val element.
@@ -3262,7 +3378,34 @@ module Writexlsx
     # Write the <c:hiLowLines> element.
     #
     def write_hi_low_lines # :nodoc:
-      @writer.empty_tag('c:hiLowLines')
+      return unless @hi_low_lines
+
+      tag = 'c:hiLowLines'
+      if @hi_low_lines[:_line] && ptrue?(@hi_low_lines[:_line][:_defined])
+        @writer.tag_elements(tag) do
+          # Write the c:spPr element.
+          write_sp_pr(@hi_low_lines)
+        end
+      else
+        @writer.empty_tag(tag)
+      end
+    end
+
+    #
+    # Write the <c:dropLines> elent.
+    #
+    def write_drop_lines
+      return unless @drop_lines
+
+      tag = 'c:dropLines'
+      if @drop_lines[:_line] && ptrue?(@drop_lines[:_line][:_defined])
+        @writer.tag_elements(tag) do
+          # Write the c:spPr element.
+          write_sp_pr(@drop_lines)
+        end
+      else
+        @writer.empty_tag(tag)
+      end
     end
 
     #
@@ -3496,6 +3639,139 @@ module Writexlsx
     #
     def write_d_table
       @table.write_d_table(@writer) if @table
+    end
+
+    #
+    # Write the X and Y error bars.
+    #
+    def write_error_bars(error_bars)
+      return unless ptrue?(error_bars)
+
+      if error_bars[:_x_error_bars]
+        write_err_bars('x', error_bars[:_x_error_bars])
+      end
+      if error_bars[:_y_error_bars]
+        write_err_bars('y', error_bars[:_y_error_bars])
+      end
+    end
+
+    #
+    # Write the <c:errBars> element.
+    #
+    def write_err_bars(direction, error_bars)
+      return unless ptrue?(error_bars)
+
+      @writer.tag_elements('c:errBars') do
+        # Write the c:errDir element.
+        write_err_dir(direction)
+
+        # Write the c:errBarType element.
+        write_err_bar_type(error_bars[:_direction])
+
+        # Write the c:errValType element.
+        write_err_val_type(error_bars[:_type])
+
+        unless ptrue?(error_bars[:_endcap])
+          # Write the c:noEndCap element.
+          write_no_end_cap
+        end
+
+        if error_bars[:_type] != 'stdErr'
+          # Write the c:val element.
+          write_error_val(error_bars[:_value])
+        end
+
+        # Write the c:spPr element.
+        write_sp_pr(error_bars)
+      end
+    end
+
+    #
+    # Write the <c:errDir> element.
+    #
+    def write_err_dir(val)
+      @writer.empty_tag('c:errDir', ['val', val])
+    end
+
+    #
+    # Write the <c:errBarType> element.
+    #
+    def write_err_bar_type(val)
+      @writer.empty_tag('c:errBarType', ['val', val])
+    end
+
+    #
+    # Write the <c:errValType> element.
+    #
+    def write_err_val_type(val)
+      @writer.empty_tag('c:errValType', ['val', val])
+    end
+
+    #
+    # Write the <c:noEndCap> element.
+    #
+    def write_no_end_cap
+      @writer.empty_tag('c:noEndCap', ['val', 1])
+    end
+
+    #
+    # Write the <c:val> element.
+    #
+    def write_error_val(val)
+      @writer.empty_tag('c:val', ['val', val])
+    end
+
+    #
+    # Write the <c:upDownBars> element.
+    #
+    def write_up_down_bars
+      return unless ptrue?(@up_down_bars)
+
+      @writer.tag_elements('c:upDownBars') do
+        # Write the c:gapWidth element.
+        write_gap_width
+
+        # Write the c:upBars element.
+        write_up_bars(@up_down_bars[:_up])
+
+        # Write the c:downBars element.
+        write_down_bars(@up_down_bars[:_down])
+      end
+    end
+
+    #
+    # Write the <c:gapWidth> element.
+    #
+    def write_gap_width
+      @writer.empty_tag('c:gapWidth', ['val', 150])
+    end
+
+    #
+    # Write the <c:upBars> element.
+    #
+    def write_up_bars(format)
+      tag = 'c:upBars'
+      if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
+        @writer.tag_elements(tag) do
+          write_sp_pr(format)
+        end
+      else
+        @writer.empty_tag(tag)
+      end
+    end
+
+    #
+    # Write the <c:upBars> element.
+    #
+    def write_down_bars(format)
+      tag = 'c:downBars'
+      if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
+        @writer.tag_elements(tag) do
+          write_sp_pr(format)
+        end
+      else
+        @writer.empty_tag(tag)
+      end
     end
 
     def nil_or_max?(val)  # :nodoc:

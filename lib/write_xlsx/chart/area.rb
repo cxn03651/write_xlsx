@@ -60,6 +60,9 @@ module Writexlsx
           # Write the series elements.
           series.each {|s| write_series(s)}
 
+          # Write the c:dropLines element.
+          write_drop_lines
+
           # Write the c:marker element.
           write_marker_value
 

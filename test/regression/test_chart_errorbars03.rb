@@ -17,7 +17,7 @@ class TestRegressionChartErrorbars03 < Test::Unit::TestCase
     chart       = workbook.add_chart(:type     => 'line', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [63385984, 63387904])
+    chart.instance_variable_set(:@axis_ids, [52288896, 53605504])
 
     data = [
             [ 1, 2, 3, 4,  5 ],

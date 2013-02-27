@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartErrorbars03 < Test::Unit::TestCase
+class TestRegressionChartErrorbars04 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,14 +10,14 @@ class TestRegressionChartErrorbars03 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_chart_errorbars03
-    @xlsx = 'chart_errorbars03.xlsx'
+  def test_chart_errorbars04
+    @xlsx = 'chart_errorbars04.xlsx'
     workbook    = WriteXLSX.new(@xlsx)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type     => 'line', :embedded => 1)
+    chart       = workbook.add_chart(:type     => 'scatter', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [63385984, 63387904])
+    chart.instance_variable_set(:@axis_ids, [61626624, 69664128])
 
     data = [
             [ 1, 2, 3, 4,  5 ],
@@ -30,13 +30,8 @@ class TestRegressionChartErrorbars03 < Test::Unit::TestCase
     chart.add_series(
                      :categories   => '=Sheet1!$A$1:$A$5',
                      :values       => '=Sheet1!$B$1:$B$5',
-                     :y_error_bars => {
-                       :type => 'standard_error',
-                       :line => {
-                         :color     => 'red',
-                         :dash_type => 'round_dot'
-                       }
-                     }
+                     :y_error_bars => { :type => 'standard_error' },
+                     :x_error_bars => { :type => 'standard_deviation', :value => 1 }
                      )
 
     chart.add_series(

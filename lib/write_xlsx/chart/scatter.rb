@@ -114,6 +114,8 @@ module Writexlsx
           write_d_lbls(series[:_labels])
           # Write the c:trendline element.
           write_trendline(series[:_trendline])
+          # Write the c:errBars element.
+          write_error_bars(series[:_error_bars])
           # Write the c:xVal element.
           write_x_val(series)
           # Write the c:yVal element.
