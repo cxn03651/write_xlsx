@@ -33,7 +33,7 @@ class TestRegressionChartsheet05 < Test::Unit::TestCase
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     # Chartsheet test.
-    chart.set_zoom(75)
+    chart.zoom = 75
 
     workbook.close
     compare_xlsx_for_regression(

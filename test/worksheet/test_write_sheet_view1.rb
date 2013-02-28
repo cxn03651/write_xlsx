@@ -19,7 +19,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
 
   def test_write_sheet_views_and_zoom_100
     @worksheet.select
-    @worksheet.set_zoom(100)
+    @worksheet.zoom = 100
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
@@ -28,7 +28,7 @@ class TestWriteSheetView1 < Test::Unit::TestCase
 
   def test_write_sheet_views_and_zoom_200
     @worksheet.select
-    @worksheet.set_zoom(200)
+    @worksheet.zoom = 200
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" zoomScale="200" zoomScaleNormal="200" workbookViewId="0"/></sheetViews>'

@@ -4472,7 +4472,7 @@ EOS
     # Set the columns widths to make the output clearer.
     worksheet1.set_column('A:A', 14)
     worksheet1.set_column('B:B', 50)
-    worksheet1.set_zoom(150)
+    worksheet1.zoom = 150
 
     # Headings.
     worksheet1.write('A1', 'Sparkline',   bold)
