@@ -197,5 +197,17 @@ module Writexlsx
       @x_abs = (x_abslt * 9_525).to_i
       @y_abs = (y_abslt * 9_525).to_i
     end
+
+    def set_position(row_start, column_start, x_offset, y_offset, x_scale, y_scale)
+      @row_start    = row_start
+      @column_start = column_start
+      @x_offset     = x_offset || 0
+      @y_offset     = y_offset || 0
+
+      # Override shape scale if supplied as an argument. Otherwise, use the
+      # existing shape scale factors.
+      @scale_x = x_scale if x_scale
+      @scale_y = y_scale if y_scale
+    end
   end
 end
