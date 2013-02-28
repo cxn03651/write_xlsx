@@ -135,15 +135,6 @@ module Writexlsx
         # Strip leading "-" from Tk style properties e.g. -color => 'red'.
         k = key.to_s.sub(/^-/, '')
         self.instance_variable_set("@#{key}", value)
-=begin
-           if key.to_s == 'format'
-          @format = value
-        elsif value.respond_to?(:coerce)
-          eval "@#{k} = #{value}"
-        else
-          eval "@#{k} = %!#{value}!"
-        end
-=end
       end
     end
 
@@ -153,15 +144,7 @@ module Writexlsx
     def adjustments=(args)
       @adjustments = *args
     end
-=begin
-    def [](attr)
-      self.instance_variable_get("@#{attr}")
-    end
 
-    def []=(attr, value)
-      self.instance_variable_set("@#{attr}", value)
-    end
-=end
     #
     # Convert from an Excel internal colour index to a XML style #RRGGBB index
     # based on the default or user defined values in the Workbook palette.
