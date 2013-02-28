@@ -5287,44 +5287,6 @@ module Writexlsx
     end
 
     #
-    # Calculate the vertices that define the position of a shape object within
-    # the worksheet in EMUs.  Save the vertices with the object.
-    #
-    # The vertices are expressed as English Metric Units (EMUs). There are 12,700
-    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
-    #
-    def position_shape_emus(shape)
-      col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels(
-                               shape.column_start,
-                               shape.row_start,
-                               shape.x_offset,
-                               shape.y_offset,
-                               shape.width  * shape.scale_x,
-                               shape.height * shape.scale_y,
-                               shape.drawing
-                               )
-
-      # Now that x2/y2 have been calculated with a potentially negative
-      # width/height we use the absolute value and convert to EMUs.
-      shape.width_emu  = (shape.width  * 9_525).abs.to_i
-      shape.height_emu = (shape.height * 9_525).abs.to_i
-
-      shape.column_start = col_start.to_i
-      shape.row_start    = row_start.to_i
-      shape.column_end   = col_end.to_i
-      shape.row_end      = row_end.to_i
-
-      # Convert the pixel values to EMUs. See above.
-      shape.x1    = (x1 * 9_525).to_i
-      shape.y1    = (y1 * 9_525).to_i
-      shape.x2    = (x2 * 9_525).to_i
-      shape.y2    = (y2 * 9_525).to_i
-      shape.x_abs = (x_abs * 9_525).to_i
-      shape.y_abs = (y_abs * 9_525).to_i
-    end
-
-    #
     # Convert the width of a cell from user's units to pixels. Excel rounds the
     # column width to the nearest pixel. If the width hasn't been set by the user
     # we use the default value. If the column is hidden it has a value of zero.
@@ -5521,7 +5483,7 @@ module Writexlsx
 
       # Validate the he shape against various rules.
       validate_shape(shape, index)
-      position_shape_emus(shape)
+      shape.calc_position_emus(self)
 
       dimensions = [
                     shape.column_start, shape.row_start,

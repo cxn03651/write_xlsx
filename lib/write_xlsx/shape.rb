@@ -176,5 +176,43 @@ module Writexlsx
 
       sprintf("%02X%02X%02X", *rgb)
     end
+
+    #
+    # Calculate the vertices that define the position of a shape object within
+    # the worksheet in EMUs.  Save the vertices with the object.
+    #
+    # The vertices are expressed as English Metric Units (EMUs). There are 12,700
+    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
+    #
+    def calc_position_emus(worksheet)
+      c_start, r_start, xx1, yy1, c_end, r_end, xx2, yy2, x_abslt, y_abslt =
+        worksheet.position_object_pixels(
+                               @column_start,
+                               @row_start,
+                               @x_offset,
+                               @y_offset,
+                               @width  * @scale_x,
+                               @height * @scale_y,
+                               @drawing
+                               )
+
+      # Now that x2/y2 have been calculated with a potentially negative
+      # width/height we use the absolute value and convert to EMUs.
+      @width_emu  = (@width  * 9_525).abs.to_i
+      @height_emu = (@height * 9_525).abs.to_i
+
+      @column_start = c_start.to_i
+      @row_start    = r_start.to_i
+      @column_end   = c_end.to_i
+      @row_end      = r_end.to_i
+
+      # Convert the pixel values to EMUs. See above.
+      @x1    = (xx1 * 9_525).to_i
+      @y1    = (yy1 * 9_525).to_i
+      @x2    = (xx2 * 9_525).to_i
+      @y2    = (yy2 * 9_525).to_i
+      @x_abs = (x_abslt * 9_525).to_i
+      @y_abs = (y_abslt * 9_525).to_i
+    end
   end
 end
