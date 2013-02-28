@@ -16,7 +16,7 @@ class TestRegressionTabColor01 < Test::Unit::TestCase
     worksheet   = workbook.add_worksheet
 
     worksheet.write('A1', 'Foo')
-    worksheet.set_tab_color('red')
+    worksheet.tab_color = 'red'
 
     workbook.close
     compare_xlsx_for_regression(

@@ -18,7 +18,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
   end
 
   def test_write_sheet_pr_tab_color
-    @worksheet.set_tab_color('red')
+    @worksheet.tab_color = 'red'
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><tabColor rgb="FFFF0000"/></sheetPr>'
@@ -27,7 +27,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
 
   def test_write_sheet_pr_fit_page_and_tab_color
     @worksheet.instance_variable_get(:@print_style).fit_page = true
-    @worksheet.set_tab_color('red')
+    @worksheet.tab_color = 'red'
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr>'

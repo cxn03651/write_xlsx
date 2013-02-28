@@ -33,7 +33,7 @@ class TestRegressionChartsheet06 < Test::Unit::TestCase
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     # Chartsheet test.
-    chart.set_tab_color('red')
+    chart.tab_color = 'red'
 
     workbook.close
     compare_xlsx_for_regression(

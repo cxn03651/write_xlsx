@@ -4064,9 +4064,9 @@ EOS
     worksheet4 = workbook.add_worksheet
 
     # Worksheet1 will have the default tab colour.
-    worksheet2.set_tab_color('red')
-    worksheet3.set_tab_color('green')
-    worksheet4.set_tab_color(0x35)    # Orange
+    worksheet2.tab_color = 'red'
+    worksheet3.tab_color = 'green'
+    worksheet4.tab_color = 0x35    # Orange
 
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
