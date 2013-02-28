@@ -33,7 +33,7 @@ module Writexlsx
   #     write_formula
   #     write_comment
   #     show_comments
-  #     set_comments_author
+  #     comments_author=()
   #     insert_image
   #     insert_chart
   #     insert_shape
@@ -1787,9 +1787,9 @@ module Writexlsx
     #     worksheet.write_comment('C3', 'Atonement', :author => 'Ian McEwan')
     #
     # The default author for all cell comments can be set using the
-    # set_comments_author() method.
+    # comments_author=() method.
     #
-    #     worksheet.set_comments_author('Ruby')
+    #     worksheet.comments_author = 'Ruby'
     #
     # ===Option: visible
     #
@@ -4586,7 +4586,7 @@ module Writexlsx
     #
     # This method is used to set the default author of all cell comments.
     #
-    #     worksheet.set_comments_author('Ruby')
+    #     worksheet.comments_author = 'Ruby'
     #
     # Individual comment authors can be set using the author parameter
     # of the write_comment method.
@@ -4594,8 +4594,14 @@ module Writexlsx
     # The default comment author is an empty string, '',
     # if no author is specified.
     #
-    def set_comments_author(author = '')
-      @comments_author = author if author
+    def comments_author=(author)
+      @comments_author = author || ''
+    end
+
+    # This method is deprecated. use comments_author=().
+    def set_comments_author(author)
+      put_deprecate_message("#{self}.set_comments_author")
+      self.comments_author = author
     end
 
     def comments_count # :nodoc:
