@@ -5429,10 +5429,8 @@ module Writexlsx
         end
       end
 
-      shape.element = @shapes.size
-
       # Allow lookup of entry into shape array by shape ID.
-      @shape_hash[shape.id] = shape.element
+      @shape_hash[shape.id] = shape.element = @shapes.size
 
       # Create link to Worksheet color palette.
       shape.palette = @workbook.palette
