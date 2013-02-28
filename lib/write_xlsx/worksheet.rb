@@ -5466,7 +5466,7 @@ module Writexlsx
       end
 
       # Validate the he shape against various rules.
-      validate_shape(shape, index)
+      shape.validate(index)
       shape.calc_position_emus(self)
 
       dimensions = [
@@ -5481,19 +5481,6 @@ module Writexlsx
       drawing.add_drawing_object(drawing_type, dimensions, shape.name, shape)
     end
     public :prepare_shape
-
-    #
-    # Check shape attributes to ensure they are valid.
-    #
-    def validate_shape(shape, index)
-      unless %w[l ctr r just].include?(shape.align)
-        raise "Shape #{index} (#{shape.type}) alignment (#{shape.align}) not in ['l', 'ctr', 'r', 'just']\n"
-      end
-
-      unless %w[t ctr b].include?(shape.valign)
-        raise "Shape #{index} (#{shape.type}) vertical alignment (#{shape.valign}) not in ['t', 'ctr', 'v']\n"
-      end
-    end
 
     #
     # This method handles the parameters passed to insert_button as well as

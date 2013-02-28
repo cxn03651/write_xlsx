@@ -295,5 +295,18 @@ module Writexlsx
         end
       end
     end
+
+    #
+    # Check shape attributes to ensure they are valid.
+    #
+    def validate(index)
+      unless %w[l ctr r just].include?(@align)
+        raise "Shape #{index} (#{@type}) alignment (#{@align}) not in ['l', 'ctr', 'r', 'just']\n"
+      end
+
+      unless %w[t ctr b].include?(@valign)
+        raise "Shape #{index} (#{@type}) vertical alignment (#{@valign}) not in ['t', 'ctr', 'v']\n"
+      end
+    end
   end
 end
