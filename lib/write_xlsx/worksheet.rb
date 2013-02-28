@@ -58,7 +58,7 @@ module Writexlsx
   #     set_zoom
   #     right_to_left
   #     hide_zero
-  #     set_tab_color
+  #     tab_color=()
   #     autofilter
   #     filter_column
   #     filter_column_list
@@ -798,18 +798,25 @@ module Writexlsx
     #
     # Set the colour of the worksheet tab.
     #
-    # The set_tab_color() method is used to change the colour of the worksheet
+    # The tab_color=() method is used to change the colour of the worksheet
     # tab. This feature is only available in Excel 2002 and later. You can use
     # one of the standard colour names provided by the Format object or a
-    # colour index. See "COLOURS IN EXCEL" and the set_custom_color() method.
+    # colour index.
+    # See "COLOURS IN EXCEL" and the set_custom_color() method.
     #
-    #     worksheet1.set_tab_color('red')
-    #     worksheet2.set_tab_color(0x0C)
+    #     worksheet1.tab_color = 'red'
+    #     worksheet2.tab_color = 0x0C
     #
     # See the tab_colors.rb program in the examples directory of the distro.
     #
-    def set_tab_color(color)
+    def tab_color=(color)
       @tab_color = Colors.new.get_color(color)
+    end
+
+    # This method is deprecated. use tab_color=().
+    def set_tab_color(color)
+      put_deprecate_message("#{self}.set_tab_color")
+      self.tab_color = color
     end
 
     #
