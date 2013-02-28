@@ -16,8 +16,8 @@ class DrawingShape04 < Test::Unit::TestCase
     shape = Writexlsx::Shape.new(:text => 'test', :id => 1000)
 
     # Mock up the color palette.
-    shape[:palette][0] = [0x00, 0x00, 0x00, 0x00]
-    shape[:palette][7] = [0x00, 0x00, 0x00, 0x00]
+    shape.palette[0] = [0x00, 0x00, 0x00, 0x00]
+    shape.palette[7] = [0x00, 0x00, 0x00, 0x00]
 
     @obj = Writexlsx::Drawing.new
     @obj.embedded = 2
@@ -36,7 +36,7 @@ class DrawingShape04 < Test::Unit::TestCase
     inserted = @worksheet.insert_shape(4, 8, shape, 300, 400)
 
     # Force the shape cell x offset to be non-integer
-    inserted[:x_offset] += 0.5
+    inserted.x_offset += 0.5
     @worksheet.__send__(:prepare_shape, 0, 1)
 
     # Truncate drawing object to just the dimensions

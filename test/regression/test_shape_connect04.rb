@@ -49,24 +49,24 @@ class TestRegressionShapeConnect04 < Test::Unit::TestCase
 
     cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
 
-    cxn_shape[:start] = ellipse[:id]
-    cxn_shape[:start_index] = 2   # 2nd connection point, clockwise from top(0)
-    cxn_shape[:start_side] = 'r'  # r)ight or b)ottom
+    cxn_shape.start = ellipse.id
+    cxn_shape.start_index = 2   # 2nd connection point, clockwise from top(0)
+    cxn_shape.start_side = 'r'  # r)ight or b)ottom
 
-    cxn_shape[:end] = p1[:id]
-    cxn_shape[:end_index] = 3     # 3rd connection point on plus, right side
-    cxn_shape[:end_side] = 'l'    # l)eft or t)op
+    cxn_shape.end = p1.id
+    cxn_shape.end_index = 3     # 3rd connection point on plus, right side
+    cxn_shape.end_side = 'l'    # l)eft or t)op
 
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end] = p2[:id]
+    cxn_shape.end = p2.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end] = p3[:id]
+    cxn_shape.end = p3.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end] = p4[:id]
-    cxn_shape[:adjustments] = [-50, 45, 120]
+    cxn_shape.end = p4.id
+    cxn_shape.adjustments = [-50, 45, 120]
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close

@@ -6,7 +6,7 @@ require 'write_xlsx/drawing'
 class DrawingShape01 < Test::Unit::TestCase
   def test_drawing_shape_01
     shape = Writexlsx::Shape.new
-    shape[:id] = 1000
+    shape.id = 1000
 
     @obj = Writexlsx::Drawing.new
     @obj.embedded = 1

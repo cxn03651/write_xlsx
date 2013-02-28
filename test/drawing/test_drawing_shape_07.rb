@@ -14,8 +14,8 @@ class DrawingShape07 < Test::Unit::TestCase
 
   def test_drawing_shape_07
     shape = Writexlsx::Shape.new
-    shape[:line_weight] = 5
-    shape[:line_type] = 'lgDashDot'
+    shape.line_weight = 5
+    shape.line_type   = 'lgDashDot'
 
     @obj = Writexlsx::Drawing.new
     @obj.embedded = 1

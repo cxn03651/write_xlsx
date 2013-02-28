@@ -3389,8 +3389,8 @@ EOS
                                  )
 
     worksheet.insert_shape('A1', normal, 50, 50)
-    normal[:text] = 'Scaled 3w x 2h'
-    normal[:name] = 'Hope'
+    normal.text = 'Scaled 3w x 2h'
+    normal.name = 'Hope'
     worksheet.insert_shape('A1', normal, 250, 50, 3, 2)
 
     workbook.close
@@ -3408,14 +3408,14 @@ EOS
       :type   => type,
       :width  => 90,
       :height => 90
-                                 )
+                               )
 
     (1..10).each do |n|
       # Change the last 5 rectangles to stars. Previously
       # inserted shapes stay as rectangles.
       type = 'star5' if n == 6
-      shape[:type] = type
-      shape[:text] = "#{type} #{n}"
+      shape.type = type
+      shape.text = "#{type} #{n}"
       worksheet.insert_shape('A1', shape, n * 100, 50)
     end
 
@@ -3427,15 +3427,15 @@ EOS
                                  )
     worksheet.insert_shape('A1', stencil, 100, 150)
 
-    stencil[:stencil] = 0
+    stencil.stencil = 0
     worksheet.insert_shape('A1', stencil, 200, 150)
     worksheet.insert_shape('A1', stencil, 300, 150)
 
     # Ooopa! Changed my mind.
     # Change the rectangle to an ellipse (circle),
     # for the last two shapes.
-    stencil[:type] = 'ellipse'
-    stencil[:text] = 'Now its a circle'
+    stencil.type = 'ellipse'
+    stencil.text = 'Now its a circle'
 
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
@@ -3464,14 +3464,14 @@ EOS
     cxn_shape = workbook.add_shape(:type => 'bentConnector3')
 
     # Link the start of the connector to the right side.
-    cxn_shape[:start]       = s1[:id]
-    cxn_shape[:start_index] = 4  # 4th connection pt, clockwise from top(0).
-    cxn_shape[:start_side]  = 'b' # r)ight or b)ottom.
+    cxn_shape.start       = s1.id
+    cxn_shape.start_index = 4  # 4th connection pt, clockwise from top(0).
+    cxn_shape.start_side  = 'b' # r)ight or b)ottom.
 
     # Link the end of the connector to the left side.
-    cxn_shape[:end]         = s2[:id]
-    cxn_shape[:end_index]   = 0  # clockwise from top(0).
-    cxn_shape[:end_side]    = 't' # t)op.
+    cxn_shape.end         = s2.id
+    cxn_shape.end_index   = 0  # clockwise from top(0).
+    cxn_shape.end_side    = 't' # t)op.
 
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
@@ -3502,14 +3502,14 @@ EOS
     cxn_shape = workbook.add_shape(:type => 'curvedConnector3')
 
     # Link the start of the connector to the right side.
-    cxn_shape[:start]       = s1[:id]
-    cxn_shape[:start_index] = 2  # 2nd connection pt, clockwise from top(0).
-    cxn_shape[:start_side]  = 'r' # r)ight or b)ottom.
+    cxn_shape.start       = s1.id
+    cxn_shape.start_index = 2  # 2nd connection pt, clockwise from top(0).
+    cxn_shape.start_side  = 'r' # r)ight or b)ottom.
 
     # Link the end of the connector to the left side.
-    cxn_shape[:end]         = s2[:id]
-    cxn_shape[:end_index]   = 4  # 4th connection pt, clockwise from top(0).
-    cxn_shape[:end_side]    = 'l' # l)eft or t)op.
+    cxn_shape.end         = s2.id
+    cxn_shape.end_index   = 4  # 4th connection pt, clockwise from top(0).
+    cxn_shape.end_side    = 'l' # l)eft or t)op.
 
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
@@ -3553,28 +3553,28 @@ EOS
     p1 = worksheet.insert_shape('A1', plus, 350, 350)
     p2 = worksheet.insert_shape('A1', plus, 150, 350)
     p3 = worksheet.insert_shape('A1', plus, 350, 150)
-    plus[:adjustments] = 35  # change shape of plus symbol.
+    plus.adjustments = 35  # change shape of plus symbol.
     p4 = worksheet.insert_shape('A1', plus, 150, 150)
 
     cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
 
-    cxn_shape[:start]       = ellipse[:id]
-    cxn_shape[:start_index] = 4   # 4th connection pt, clockwise from top(0).
-    cxn_shape[:start_side]  = 'b' # r)ight or b)ottom.
+    cxn_shape.start       = ellipse.id
+    cxn_shape.start_index = 4   # 4th connection pt, clockwise from top(0).
+    cxn_shape.start_side  = 'b' # r)ight or b)ottom.
 
-    cxn_shape[:end]         = p1[:id]
-    cxn_shape[:end_index]   = 0
-    cxn_shape[:end_side]    = 't' # l)eft or t)op.
+    cxn_shape.end         = p1.id
+    cxn_shape.end_index   = 0
+    cxn_shape.end_side    = 't' # l)eft or t)op.
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p2[:id]
+    cxn_shape.end  = p2.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p3[:id]
+    cxn_shape.end  = p3.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p4[:id]
-    cxn_shape[:adjustments] = [-50, 45, 120]
+    cxn_shape.end  = p4.id
+    cxn_shape.adjustments = [-50, 45, 120]
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
@@ -3621,23 +3621,23 @@ EOS
 
     cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
 
-    cxn_shape[:start]       = ellipse[:id]
-    cxn_shape[:start_index] = 2   # 2nd connection pt, clockwise from top(0).
-    cxn_shape[:start_side]  = 'r' # r)ight or b)ottom.
+    cxn_shape.start       = ellipse.id
+    cxn_shape.start_index = 2   # 2nd connection pt, clockwise from top(0).
+    cxn_shape.start_side  = 'r' # r)ight or b)ottom.
 
-    cxn_shape[:end]         = p1[:id]
-    cxn_shape[:end_index]   = 3   # 3rd connection point on plus, right side
-    cxn_shape[:end_side]    = 'l' # l)eft or t)op.
+    cxn_shape.end         = p1.id
+    cxn_shape.end_index   = 3   # 3rd connection point on plus, right side
+    cxn_shape.end_side    = 'l' # l)eft or t)op.
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p2[:id]
+    cxn_shape.end  = p2.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p3[:id]
+    cxn_shape.end  = p3.id
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-    cxn_shape[:end]  = p4[:id]
-    cxn_shape[:adjustments] = [-50, 45, 120]
+    cxn_shape.end  = p4.id
+    cxn_shape.adjustments = [-50, 45, 120]
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close

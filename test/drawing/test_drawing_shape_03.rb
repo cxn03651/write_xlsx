@@ -7,11 +7,11 @@ class DrawingShape03 < Test::Unit::TestCase
   def test_drawing_shape_03
     shape = Writexlsx::Shape.new
     # Set shape properties via []= method
-    shape[:id]         = 1000
-    shape[:start]       = 1001
-    shape[:start_index] = 1
-    shape[:end]         = 1002
-    shape[:end_index]   = 4
+    shape.id          = 1000
+    shape.start       = 1001
+    shape.start_index = 1
+    shape.end         = 1002
+    shape.end_index   = 4
 
     @obj = Writexlsx::Drawing.new
     @obj.embedded = 1

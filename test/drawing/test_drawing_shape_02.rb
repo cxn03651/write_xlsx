@@ -7,8 +7,8 @@ class DrawingShape02 < Test::Unit::TestCase
   def test_drawing_shape_02
     shape = Writexlsx::Shape.new
     # Set shape properties via []= method
-    shape[:id] = 1000
-    shape[:name] = 'Connector 1'
+    shape.id = 1000
+    shape.name = 'Connector 1'
 
     # Set bulk shape properties via set_properties method
     shape.set_properties(:type => 'straightConnector1', :connect => 1)

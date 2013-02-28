@@ -12,9 +12,16 @@ module Writexlsx
   #
   class Shape
 
-    attr_reader :connect, :editAs, :type, :start, :start_index, :end, :end_index
-    attr_reader :tx_box, :fill, :rotation, :flip_h, :flip_v
-    attr_accessor :name
+    attr_reader :edit_as, :type, :drawing
+    attr_reader :tx_box, :fill, :line, :format
+    attr_reader :align, :valign
+    attr_accessor :name, :connect, :type, :id, :start, :end, :rotation
+    attr_accessor :flip_h, :flip_v, :adjustments, :palette, :text, :stencil
+    attr_accessor :row_start, :row_end, :column_start, :column_end
+    attr_accessor :x1, :x2, :y1, :y2, :x_abs, :y_abs, :start_index, :end_index
+    attr_accessor :x_offset, :y_offset, :width, :height, :scale_x, :scale_y
+    attr_accessor :width_emu, :height_emu, :element, :line_weight, :line_type
+    attr_accessor :start_side, :end_side
 
     def initialize(properties = {})
       @writer = Package::XMLWriterSimple.new
@@ -28,7 +35,7 @@ module Writexlsx
       @drawing = 0
 
       # OneCell or Absolute: options to move and/or size with cells.
-      @editAs = ''
+      @edit_as = nil
 
       # Auto-incremented, unless supplied by user.
       @id = 0
@@ -146,7 +153,7 @@ module Writexlsx
     def adjustments=(args)
       @adjustments = *args
     end
-
+=begin
     def [](attr)
       self.instance_variable_get("@#{attr}")
     end
@@ -154,6 +161,7 @@ module Writexlsx
     def []=(attr, value)
       self.instance_variable_set("@#{attr}", value)
     end
+=end
     #
     # Convert from an Excel internal colour index to a XML style #RRGGBB index
     # based on the default or user defined values in the Workbook palette.

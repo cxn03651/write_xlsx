@@ -89,7 +89,7 @@ module Writexlsx
       attributes << :editAs << 'oneCell' if type == 2
 
       # Add attribute for shapes.
-      attributes << :editAs << shape[:edit_as] if shape && !shape[:edit_as].nil?
+      attributes << :editAs << shape.edit_as if shape && !shape.edit_as.nil?
 
       @writer.tag_elements('xdr:twoCellAnchor', attributes) do
         # Write the xdr:from element.
@@ -400,7 +400,7 @@ module Writexlsx
     # Write the <xdr:sp> element.
     #
     def write_sp(index, col_absolute, row_absolute, width, height, shape)
-      if shape[:connect] != 0
+      if shape.connect != 0
         attributes = [:macro,  '']
         @writer.tag_elements('xdr:cxnSp', attributes) do
 
@@ -422,7 +422,7 @@ module Writexlsx
           write_xdr_sp_pr(index, col_absolute, row_absolute, width, height, shape)
 
           # Write the xdr:txBody element.
-          if shape[:text] != 0
+          if shape.text != 0
             write_txBody(col_absolute, row_absolute, width, height, shape)
           end
         end
@@ -435,21 +435,21 @@ module Writexlsx
     def write_nv_cxn_sp_pr(index, shape)
       @writer.tag_elements('xdr:nvCxnSpPr') do
 
-        shape[:name] = [shape[:type], index].join(' ') unless shape[:name]
-        write_c_nv_pr(shape[:id], shape[:name])
+        shape.name = [shape.type, index].join(' ') unless shape.name
+        write_c_nv_pr(shape.id, shape.name)
 
         @writer.tag_elements('xdr:cNvCxnSpPr') do
 
           attributes = [:noChangeShapeType, '1']
           @writer.empty_tag('a:cxnSpLocks', attributes)
 
-          if shape[:start]
-            attributes = ['id', shape[:start], 'idx', shape[:start_index]]
+          if shape.start
+            attributes = ['id', shape.start, 'idx', shape.start_index]
             @writer.empty_tag('a:stCxn', attributes)
           end
 
-          if shape[:end]
-            attributes = ['id', shape[:end], 'idx', shape[:end_index]]
+          if shape.end
+            attributes = ['id', shape.end, 'idx', shape.end_index]
             @writer.empty_tag('a:endCxn', attributes)
           end
         end
@@ -463,9 +463,9 @@ module Writexlsx
       attributes = []
 
       @writer.tag_elements('xdr:nvSpPr') do
-        shape_name = "#{shape[:type]} #{index}"
-        write_c_nv_pr(shape[:id], shape_name)
-        attributes = ['txBox', 1] if shape[:tx_box] != 0
+        shape_name = "#{shape.type} #{index}"
+        write_c_nv_pr(shape.id, shape_name)
+        attributes = ['txBox', 1] if shape.tx_box != 0
         @writer.tag_elements('xdr:cNvSpPr', attributes) do
           attributes = [:noChangeArrowheads, '1']
           @writer.empty_tag('a:spLocks', attributes)
@@ -485,7 +485,7 @@ module Writexlsx
 
         # Pictures are rectangle shapes by default.
         shape = Shape.new
-        shape[:type] = 'rect'
+        shape.type = 'rect'
 
         # Write the xdr:spPr element.
         write_sp_pr(col_absolute, row_absolute, width, height, shape)
@@ -596,9 +596,9 @@ module Writexlsx
         # Write the a:prstGeom element.
         write_a_prst_geom(shape)
 
-        if shape[:fill].to_s.bytesize > 1
+        if shape.fill.to_s.bytesize > 1
           # Write the a:solidFill element.
-          write_a_solid_fill(shape[:fill])
+          write_a_solid_fill(shape.fill)
         else
           @writer.empty_tag('a:noFill')
         end
@@ -611,15 +611,15 @@ module Writexlsx
     #
     # Write the <a:xfrm> element.
     #
-    def write_a_xfrm(col_absolute, row_absolute, width, height, shape = {})
+    def write_a_xfrm(col_absolute, row_absolute, width, height, shape = nil)
       attributes = []
 
-      rotation = shape[:rotation] || 0
+      rotation = shape ? shape.rotation : 0
       rotation *= 60000
 
       attributes << 'rot' << rotation if rotation != 0
-      attributes << 'flipH' << 1      if ptrue?(shape[:flip_h])
-      attributes << 'flipV' << 1      if ptrue?(shape[:flip_v])
+      attributes << 'flipH' << 1      if shape && ptrue?(shape.flip_h)
+      attributes << 'flipV' << 1      if shape && ptrue?(shape.flip_v)
 
       @writer.tag_elements('a:xfrm', attributes) do
         # Write the a:off element.
@@ -659,7 +659,7 @@ module Writexlsx
     #
     def write_a_prst_geom(shape = {})
       attributes = []
-      attributes << 'prst' << shape[:type] if shape[:type]
+      attributes << 'prst' << shape.type if shape.type
 
       @writer.tag_elements('a:prstGeom', attributes) do
         # Write the a:avLst element.
@@ -671,11 +671,11 @@ module Writexlsx
     # Write the <a:avLst> element.
     #
     def write_a_av_lst(shape = {})
-      if shape[:adjustments].respond_to?(:empty?)
-        adjustments = shape[:adjustments]
-      elsif shape[:adjustments].respond_to?(:coerce)
-        adjustments = [shape[:adjustments]]
-      elsif !shape[:adjustments]
+      if shape.adjustments.respond_to?(:empty?)
+        adjustments = shape.adjustments
+      elsif shape.adjustments.respond_to?(:coerce)
+        adjustments = [shape.adjustments]
+      elsif !shape.adjustments
         adjustments = []
       end
 
@@ -685,7 +685,7 @@ module Writexlsx
           adjustments.each do |adj|
             i += 1
             # Only connectors have multiple adjustments.
-            suffix = shape[:connect] != 0 ? i : ''
+            suffix = shape.connect != 0 ? i : ''
 
             # Scale Adjustments: 100,000 = 100%.
             adj_int = (adj * 1000).to_i
@@ -714,10 +714,10 @@ module Writexlsx
     # Write the <a:ln> elements.
     #
     def write_a_ln(shape = {})
-      weight = shape[:line_weight] || 0
+      weight = shape.line_weight || 0
       attributes = ['w', weight * 9525]
       @writer.tag_elements('a:ln', attributes) do
-        line = shape[:line] || 0
+        line = shape.line || 0
         if line.to_s.bytesize > 1
           # Write the a:solidFill element.
           write_a_solid_fill(line)
@@ -725,12 +725,12 @@ module Writexlsx
           @writer.empty_tag('a:noFill')
         end
 
-        if shape[:line_type] != ''
-          attributes = ['val', shape[:line_type]]
+        if shape.line_type != ''
+          attributes = ['val', shape.line_type]
           @writer.empty_tag('a:prstDash', attributes)
         end
 
-        if shape[:connect] != 0
+        if shape.connect != 0
           @writer.empty_tag('a:round')
         else
           attributes = ['lim', 800000]
@@ -753,7 +753,7 @@ module Writexlsx
                     :tIns,         "22860",
                     :rIns,         "27432",
                     :bIns,         "22860",
-                    :anchor,       shape[:valign],
+                    :anchor,       shape.valign,
                     :upright,      "1"
                    ]
       @writer.tag_elements('xdr:txBody') do
@@ -761,23 +761,23 @@ module Writexlsx
         @writer.empty_tag('a:lstStyle')
 
         @writer.tag_elements('a:p') do
-          rotation = shape[:format][:rotation] || 0
+          rotation = shape.format[:rotation] || 0
           rotation *= 60000
 
-          attributes = [:algn, shape[:align], :rtl, rotation]
+          attributes = [:algn, shape.align, :rtl, rotation]
           @writer.tag_elements('a:pPr', attributes) do
             attributes = [:sz, "1000"]
             @writer.empty_tag('a:defRPr', attributes)
           end
 
           @writer.tag_elements('a:r') do
-            size = shape[:format][:size] || 8
+            size = shape.format[:size] || 8
             size *= 100
 
-            bold      = shape[:format][:bold]      || 0
-            italic    = shape[:format][:italic]    || 0
-            underline = ptrue?(shape[:format][:underline]) ? 'sng' : 'none'
-            strike    = ptrue?(shape[:format][:font_strikeout]) ? 'Strike' : 'noStrike'
+            bold      = shape.format[:bold]      || 0
+            italic    = shape.format[:italic]    || 0
+            underline = ptrue?(shape.format[:underline]) ? 'sng' : 'none'
+            strike    = ptrue?(shape.format[:font_strikeout]) ? 'Strike' : 'noStrike'
 
             attributes = [
                           :lang,     "en-US",
@@ -789,7 +789,7 @@ module Writexlsx
                           :baseline, 0
                          ]
             @writer.tag_elements('a:rPr', attributes) do
-              color = shape[:format][:color]
+              color = shape.format[:color]
               if color
                 color = shape.get_palette_color(color)
                 color = color.sub(/^FF/, '')  # Remove leading FF from rgb for shape color.
@@ -799,13 +799,13 @@ module Writexlsx
 
               write_a_solid_fill(color)
 
-              font = shape[:format][:font] || 'Calibri'
+              font = shape.format[:font] || 'Calibri'
               attributes = [:typeface, font]
               @writer.empty_tag('a:latin', attributes)
               @writer.empty_tag('a:cs', attributes)
             end
             @writer.tag_elements('a:t') do
-              @writer.characters(shape[:text])
+              @writer.characters(shape.text)
             end
           end
         end

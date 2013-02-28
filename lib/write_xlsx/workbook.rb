@@ -634,7 +634,7 @@ module Writexlsx
     #
     def add_shape(properties)
       shape = Shape.new(properties)
-      shape[:palette] = @palette
+      shape.palette = @palette
 
       @shapes ||= []
       @shapes << shape  #Store shape reference.

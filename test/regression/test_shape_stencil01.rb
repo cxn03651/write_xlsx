@@ -27,9 +27,9 @@ class TestRegressionShapeStencil01 < Test::Unit::TestCase
     (1..10).each do |n|
       # Change the last 5 rectangles to stars.
       # Previously inserted shapes stay as rectangles
-      shape[:type] = 'star5' if n == 6
-      text = shape[:type]
-      shape[:text] = [text, n.to_s].join(' ')
+      shape.type = 'star5' if n == 6
+      text = shape.type
+      shape.text = [text, n.to_s].join(' ')
       worksheet.insert_shape('A1', shape, n * 100, 50)
     end
 

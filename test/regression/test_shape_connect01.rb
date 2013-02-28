@@ -29,14 +29,14 @@ class TestRegressionShapeConnect01 < Test::Unit::TestCase
     cxn_shape = workbook.add_shape(:type => 'bentConnector3')
 
     # Link the connector to the bottom of the circle
-    cxn_shape[:start] = ellipse[:id]
-    cxn_shape[:start_index] = 4    # 4th connection point, clockwise from top(0)
-    cxn_shape[:start_side]  = 'b'  # r)ight or b)ottom
+    cxn_shape.start = ellipse.id
+    cxn_shape.start_index = 4    # 4th connection point, clockwise from top(0)
+    cxn_shape.start_side  = 'b'  # r)ight or b)ottom
 
     # Link the connector to the bottom of the plus sign
-    cxn_shape[:end] = plus[:id]
-    cxn_shape[:end_index] = 0      # 0 - top connection point
-    cxn_shape[:end_side]  = 't'    # l)eft of t)op
+    cxn_shape.end = plus.id
+    cxn_shape.end_index = 0      # 0 - top connection point
+    cxn_shape.end_side  = 't'    # l)eft of t)op
 
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 

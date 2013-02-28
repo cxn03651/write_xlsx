@@ -14,10 +14,10 @@ class DrawingShape05 < Test::Unit::TestCase
 
   def test_drawing_shape_05
     shape = Writexlsx::Shape.new
-    shape[:id]      = 1000
-    shape[:flip_v]   = 1
-    shape[:flip_h]   = 1
-    shape[:rotation] = 90
+    shape.id       = 1000
+    shape.flip_v   = 1
+    shape.flip_h   = 1
+    shape.rotation = 90
 
     @obj = Writexlsx::Drawing.new
     @obj.instance_variable_set(:@palette, @worksheet.instance_variable_get(:@palette))
