@@ -18,48 +18,48 @@ module Writexlsx
   #
   # The following methods are available through a new worksheet:
   #
-  #     write
-  #     write_number
-  #     write_string
-  #     write_rich_string
-  #     write_blank
-  #     write_row
-  #     write_col
-  #     write_date_time
-  #     write_url
-  #     write_url_range
-  #     write_formula
-  #     write_comment
-  #     show_comments
-  #     set_comments_author
-  #     insert_image
-  #     insert_chart
-  #     insert_shape
-  #     data_validation
-  #     conditional_formatting
-  #     add_sparkline
-  #     add_table
-  #     name
-  #     activate
-  #     select
-  #     hide
-  #     set_first_sheet
-  #     protect
-  #     set_selection
-  #     set_row
-  #     set_column
-  #     outline_settings
-  #     freeze_panes
-  #     split_panes
-  #     merge_range
-  #     merge_range_type
-  #     set_zoom
-  #     right_to_left
-  #     hide_zero
-  #     set_tab_color
-  #     autofilter
-  #     filter_column
-  #     filter_column_list
+  # * write
+  # * write_number
+  # * write_string
+  # * write_rich_string
+  # * write_blank
+  # * write_row
+  # * write_col
+  # * write_date_time
+  # * write_url
+  # * write_url_range
+  # * write_formula
+  # * write_comment
+  # * show_comments
+  # * set_comments_author
+  # * insert_image
+  # * insert_chart
+  # * insert_shape
+  # * data_validation
+  # * conditional_formatting
+  # * add_sparkline
+  # * add_table
+  # * name
+  # * activate
+  # * select
+  # * hide
+  # * set_first_sheet
+  # * protect
+  # * set_selection
+  # * set_row
+  # * set_column
+  # * outline_settings
+  # * freeze_panes
+  # * split_panes
+  # * merge_range
+  # * merge_range_type
+  # * set_zoom
+  # * right_to_left
+  # * hide_zero
+  # * set_tab_color
+  # * autofilter
+  # * filter_column
+  # * filter_column_list
   #
   # ==Cell notation
   #
@@ -105,35 +105,38 @@ module Writexlsx
   # following sections are given in terms of row-column notation. In all cases
   # it is also possible to use A1 notation.
   #
+  # Note: in Excel it is also possible to use a R1C1 notation. This is not
+  # supported by WriteXLSX.
+  #
   # == PAGE SET-UP METHODS
   #
   # Page set-up methods affect the way that a worksheet looks
   # when it is printed. They control features such as page headers and footers
   # and margins. These methods are really just standard worksheet methods.
-  # They are documented here in a separate section for the sake of clarity.
   #
   # The following methods are available for page set-up:
   #
-  #   set_landscape()
-  #   set_portrait()
-  #   set_page_view()
-  #   set_paper()
-  #   center_horizontally()
-  #   center_vertically()
-  #   set_margins()
-  #   set_header()
-  #   set_footer()
-  #   repeat_rows()
-  #   repeat_columns()
-  #   hide_gridlines()
-  #   print_row_col_headers()
-  #   print_area()
-  #   print_across()
-  #   fit_to_pages()
-  #   set_start_page()
-  #   set_print_scale()
-  #   set_h_pagebreaks()
-  #   set_v_pagebreaks()
+  #  * set_landscape
+  #  * set_portrait
+  #  * set_page_view
+  #  * set_paper
+  #  * center_horizontally
+  #  * center_vertically
+  #  * set_margins
+  #  * set_header
+  #  * set_footer
+  #  * repeat_rows
+  #  * repeat_columns
+  #  * hide_gridlines
+  #  * print_row_col_headers
+  #  * print_area
+  #  * print_across
+  #  * fit_to_pages
+  #  * set_start_page
+  #  * set_print_scale
+  #  * set_h_pagebreaks
+  #  * set_v_pagebreaks
+  #
   # A common requirement when working with WriteXLSX is to apply the same
   # page set-up features to all of the worksheets in a workbook. To do this
   # you can use the sheets() method of the workbook class to access the array
@@ -662,7 +665,7 @@ module Writexlsx
     #
     # It is also possible, and generally clearer, to specify a column range
     # using the form of A1 notation used for columns. See the note about
-    # "Cell notation".
+    # {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -798,7 +801,7 @@ module Writexlsx
     # in which case last_row and last_col can be omitted. The active cell
     # within a selected range is determined by the order in which first and
     # last are specified. It is also possible to specify a cell or a range
-    # using A1 notation. See the note about "Cell notation".
+    # using A1 notation. See the note about {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -1448,7 +1451,7 @@ module Writexlsx
     # method. The parameters first_column and last_column are zero based.
     # The last_column parameter is optional if you only wish to specify
     # one column. You can also specify the columns using A1 column
-    # notation, see the note about "Cell notation".
+    # notation, see the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet1.repeat_columns(0)        # Repeat the first column
     #     worksheet2.repeat_columns(0, 1)     # Repeat the first two columns
@@ -1477,7 +1480,7 @@ module Writexlsx
     #
     # This method is used to specify the area of the worksheet that will
     # be printed. All four parameters must be specified. You can also use
-    # A1 notation, see the note about "Cell notation".
+    # A1 notation, see the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet1.print_area( 'A1:H20' );    # Cells A1 to H20
     #     worksheet2.print_area( 0, 0, 19, 7 ); # The same
@@ -1913,7 +1916,7 @@ module Writexlsx
     #     worksheet.write_comment(2, 2, 'This is a comment.')
     #
     # As usual you can replace the row and column parameters with an A1
-    # cell reference. See the note about "Cell notation".
+    # cell reference. See the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet.write(        'C3', 'Hello')
     #     worksheet.write_comment('C3', 'This is a comment.')
@@ -2097,7 +2100,7 @@ module Writexlsx
     #     worksheet.write_number(0, 0, 123456)
     #     worksheet.write_number('A2', 2.3451)
     #
-    # See the note about "Cell notation".
+    # See the note about {"Cell notation"}[#label-Cell+notation].
     # The format parameter is optional.
     #
     # In general it is sufficient to use the write() method.
@@ -2251,7 +2254,7 @@ module Writexlsx
     #         italic, 'j = k', super, '(n-1)', center)
     #
     # As with write_sting() the maximum string size is 32767 characters.
-    # See also the note about "Cell notation".
+    # See also the note about {"Cell notation"}[#label-Cell+notation].
     #
     def write_rich_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2327,7 +2330,7 @@ module Writexlsx
     # This seemingly uninteresting fact means that you can write arrays of
     # data without special treatment for nil or empty string values.
     #
-    # See the note about "Cell notation".
+    # See the note about {"Cell notation"}[#label-Cell+notation].
     #
     def write_blank(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2362,7 +2365,7 @@ module Writexlsx
     #
     # See also the write_array_formula() method.
     #
-    # See the note about "Cell notation". For more information about
+    # See the note about {"Cell notation"}[#label-Cell+notation]. For more information about
     # writing Excel formulas see "FORMULAS AND FUNCTIONS IN EXCEL"
     #
     # If required, it is also possible to specify the calculated value
@@ -3959,7 +3962,8 @@ module Writexlsx
     #
     #     worksheet.data_validation( 'A1',       {...} )
     #     worksheet.data_validation( 'A1:B5',    {...} )
-    # See also the note about "Cell notation" for more information.
+    #
+    # See also the note about {"Cell notation"}[#label-Cell+notation] for more information.
     #
     # The last parameter in data_validation() must be a hash ref containing
     # the parameters that describe the type and style of the data validation.
