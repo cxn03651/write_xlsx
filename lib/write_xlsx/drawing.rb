@@ -461,14 +461,13 @@ module Writexlsx
     #
     def write_nv_sp_pr(index, shape)
       attributes = []
+      attributes << 'txBox' << 1 if shape.tx_box
 
       @writer.tag_elements('xdr:nvSpPr') do
-        shape_name = "#{shape.type} #{index}"
-        write_c_nv_pr(shape.id, shape_name)
-        attributes = ['txBox', 1] if shape.tx_box != 0
+        write_c_nv_pr(shape.id, "#{shape.type} #{index}")
+
         @writer.tag_elements('xdr:cNvSpPr', attributes) do
-          attributes = [:noChangeArrowheads, '1']
-          @writer.empty_tag('a:spLocks', attributes)
+          @writer.empty_tag('a:spLocks', [:noChangeArrowheads, '1'])
         end
       end
     end

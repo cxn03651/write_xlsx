@@ -77,7 +77,7 @@ module Writexlsx
 
       # An alternate way to create a text box, because Excel allows it.
       # It is just a rectangle with text.
-      @tx_box = 0
+      @tx_box = false
 
       # Shape outline colour, or 0 for noFill (default black).
       @line = '000000'
