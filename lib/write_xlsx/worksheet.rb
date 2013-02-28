@@ -55,7 +55,7 @@ module Writexlsx
   #     split_panes
   #     merge_range
   #     merge_range_type
-  #     set_zoom
+  #     zoom=()
   #     right_to_left
   #     hide_zero
   #     tab_color=()
@@ -219,7 +219,6 @@ module Writexlsx
       @shapes                 = []
       @shape_hash             = {}
 
-      @zoom = 100
       @outline_row_level = 0
       @outline_col_level = 0
 
@@ -1334,16 +1333,33 @@ module Writexlsx
     end
 
     #
-    # Set the worksheet zoom factor.
+    # Set the worksheet zoom factor in the range 10 <= $scale <= 400:
     #
-    def set_zoom(scale = 100)
+    #     worksheet1.zoom = 50
+    #     worksheet2.zoom = 75
+    #     worksheet3.zoom = 300
+    #     worksheet4.zoom = 400
+    #
+    # The default zoom factor is 100. You cannot zoom to "Selection" because
+    # it is calculated by Excel at run-time.
+    #
+    # Note, zoom=() does not affect the scale of the printed page.
+    # For that you should use print_scale=().
+    #
+    def zoom=(scale)
       # Confine the scale to Excel's range
       if scale < 10 or scale > 400
         # carp "Zoom factor scale outside range: 10 <= zoom <= 400"
-        scale = 100
+        @zoom = 100
+      else
+        @zoom = scale.to_i
       end
+    end
 
-      @zoom = scale.to_i
+    # This method is deprecated. use zoom=().
+    def set_zoom(scale)
+      put_deprecate_message("#{self}.set_zoom")
+      self.zoom = scale
     end
 
     #
@@ -1357,7 +1373,7 @@ module Writexlsx
     #
     # The default scale factor is 100. Note, print_scale=() does not
     # affect the scale of the visible page in Excel. For that you should
-    # use set_zoom().
+    # use zoom=().
     #
     # Note also that although it is valid to use both fit_to_pages() and
     # print_scale=() on the same worksheet only one of these options
