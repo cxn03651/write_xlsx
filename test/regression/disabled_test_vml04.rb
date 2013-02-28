@@ -26,8 +26,8 @@ class TestRegressionVml04 < Test::Unit::TestCase
     worksheet3.write_comment('A1',  'More text')
 
     # Set the author to match the target XLSX file.
-    worksheet1.set_comments_author('John')
-    worksheet3.set_comments_author('John')
+    worksheet1.comments_author = 'John'
+    worksheet3.comments_author = 'John'
 
     worksheet1.insert_button('B2', {})
     worksheet1.insert_button('C4', {})

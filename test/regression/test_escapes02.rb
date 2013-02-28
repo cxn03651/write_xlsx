@@ -19,7 +19,7 @@ class TestRegressionEscapes02 < Test::Unit::TestCase
     worksheet.write_comment('B2', %q{<>&"'})
 
     # Set the author to match the target XLSX file.
-    worksheet.set_comments_author(%q{I am '"<>&})
+    worksheet.comments_author = %q{I am '"<>&}
 
     workbook.close
     compare_xlsx_for_regression(

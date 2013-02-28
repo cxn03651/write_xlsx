@@ -22,7 +22,7 @@ class TestRegressionComment06 < Test::Unit::TestCase
     worksheet.write_comment('A5', 'Some text')
 
     # Set the author to match the target XLSX file.
-    worksheet.set_comments_author('John')
+    worksheet.comments_author = 'John'
 
     workbook.close
     compare_xlsx_for_regression(

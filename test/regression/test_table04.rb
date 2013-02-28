@@ -25,7 +25,7 @@ class TestRegressionTable04 < Test::Unit::TestCase
     worksheet.write('A1', 'http://perl.com/')
 
     # Add comments to check rId handling.
-    worksheet.set_comments_author('John')
+    worksheet.comments_author = 'John'
     worksheet.write_comment('H1', 'Test1')
     worksheet.write_comment('J1', 'Test2')
     workbook.close
