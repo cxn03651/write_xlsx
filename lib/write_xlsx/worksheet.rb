@@ -5442,7 +5442,7 @@ module Writexlsx
       end
 
       # For connectors change x/y coords based on location of connected shapes.
-      auto_locate_connectors(insert)
+      insert.auto_locate_connectors(@shapes, @shape_hash)
 
       # Insert a link to the shape on the list of shapes. Connection to
       # the parent shape is maintained.
@@ -5481,92 +5481,6 @@ module Writexlsx
       drawing.add_drawing_object(drawing_type, dimensions, shape.name, shape)
     end
     public :prepare_shape
-
-    #
-    # Re-size connector shapes if they are connected to other shapes.
-    #
-    def auto_locate_connectors(shape)
-      # Valid connector shapes.
-      connector_shapes = {
-        :straightConnector => 1,
-        :Connector         => 1,
-        :bentConnector     => 1,
-        :curvedConnector   => 1,
-        :line              => 1
-      }
-
-      shape_base = shape.type.chop.to_sym # Remove the number of segments from end of type.
-      shape.connect = connector_shapes[shape_base] ? 1 : 0
-      return if shape.connect == 0
-
-      # Both ends have to be connected to size it.
-      return if shape.start == 0 && shape.end == 0
-
-      # Both ends need to provide info about where to connect.
-      return if shape.start_side == 0 && shape.end_side == 0
-
-      sid = shape.start
-      eid = shape.end
-
-      slink_id = @shape_hash[sid] || 0
-      sls      = @shapes.fetch(slink_id, Shape.new)
-      elink_id = @shape_hash[eid] || 0
-      els      = @shapes.fetch(elink_id, Shape.new)
-
-      # Assume shape connections are to the middle of an object, and
-      # not a corner (for now).
-      connect_type = shape.start_side + shape.end_side
-      smidx        = sls.x_offset + sls.width / 2
-      emidx        = els.x_offset + els.width / 2
-      smidy        = sls.y_offset + sls.height / 2
-      emidy        = els.y_offset + els.height / 2
-      netx         = (smidx - emidx).abs
-      nety         = (smidy - emidy).abs
-
-      if connect_type == 'bt'
-        sy = sls.y_offset + sls.height
-        ey = els.y_offset
-
-        shape.width = (emidx - smidx).to_i.abs
-        shape.x_offset = [smidx, emidx].min.to_i
-        shape.height =
-          (els.y_offset - (sls.y_offset + sls.height)).to_i.abs
-        shape.y_offset =
-          [sls.y_offset + sls.height, els.y_offset].min.to_i
-        shape.flip_h = smidx < emidx ? 1 : 0
-        shape.rotation = 90
-
-        if sy > ey
-          shape.flip_v = 1
-
-          # Create 3 adjustments for an end shape vertically above a
-          # start shape. Adjustments count from the upper left object.
-          if shape.adjustments.empty?
-            shape.adjustments = [-10, 50, 110]
-          end
-          shape.type = 'bentConnector5'
-        end
-      elsif connect_type == 'rl'
-        shape.width =
-          (els.x_offset - (sls.x_offset + sls.width)).to_i.abs
-        shape.height = (emidy - smidy).to_i.abs
-        shape.x_offset =
-          [sls.x_offset + sls.width, els.x_offset].min
-        shape.y_offset = [smidy, emidy].min
-
-        shape.flip_h = 1 if smidx < emidx && smidy > emidy
-        shape.flip_h = 1 if smidx > emidx && smidy < emidy
-
-        if smidx > emidx
-          # Create 3 adjustments for an end shape to the left of a
-          # start shape.
-          if shape.adjustments.empty?
-            shape.adjustments = [-10, 50, 110]
-          end
-          shape.type = 'bentConnector5'
-        end
-      end
-    end
 
     #
     # Check shape attributes to ensure they are valid.
