@@ -5456,7 +5456,6 @@ module Writexlsx
     #
     def prepare_shape(index, drawing_id)
       shape = @shapes[index]
-      drawing_type = 3
 
       # Create a Drawing object to use with worksheet unless one already exists.
       unless drawing?
@@ -5469,16 +5468,8 @@ module Writexlsx
       shape.validate(index)
       shape.calc_position_emus(self)
 
-      dimensions = [
-                    shape.column_start, shape.row_start,
-                    shape.x1,           shape.y1,
-                    shape.column_end,   shape.row_end,
-                    shape.x2,           shape.y2,
-                    shape.x_abs,        shape.y_abs,
-                    shape.width_emu,    shape.height_emu
-                   ]
-
-      drawing.add_drawing_object(drawing_type, dimensions, shape.name, shape)
+      drawing_type = 3
+      drawing.add_drawing_object(drawing_type, shape.dimensions, shape.name, shape)
     end
     public :prepare_shape
 

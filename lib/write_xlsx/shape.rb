@@ -308,5 +308,16 @@ module Writexlsx
         raise "Shape #{index} (#{@type}) vertical alignment (#{@valign}) not in ['t', 'ctr', 'v']\n"
       end
     end
+
+    def dimensions
+      [
+       @column_start, @row_start,
+       @x1,           @y1,
+       @column_end,   @row_end,
+       @x2,           @y2,
+       @x_abs,        @y_abs,
+       @width_emu,    @height_emu
+      ]
+    end
   end
 end
