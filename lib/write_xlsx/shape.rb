@@ -5,7 +5,7 @@ module Writexlsx
   #
   # Shape - A class for writing Excel shapes.
   #
-  # Used in conjunction with Excel::Writer::XLSX.
+  # Used in conjunction with WriteXLSX.
   #
   # Copyright 2000-2012, John McNamara, jmcnamara@cpan.org
   # Converted to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
