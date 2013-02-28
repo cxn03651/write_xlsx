@@ -5437,21 +5437,17 @@ module Writexlsx
         # used as a stencil. Previously stamped copies don't get modified
         # if the stencil is modified.
         insert = shape.dup
-
-        # For connectors change x/y coords based on location of connected shapes.
-        auto_locate_connectors(insert)
-
-        @shapes << insert
-        insert
       else
-        # For connectors change x/y coords based on location of connected shapes.
-        auto_locate_connectors(shape)
-
-        # Insert a link to the shape on the list of shapes. Connection to
-        # the parent shape is maintained.
-        @shapes << shape
-        return shape
+        insert = shape
       end
+
+      # For connectors change x/y coords based on location of connected shapes.
+      auto_locate_connectors(insert)
+
+      # Insert a link to the shape on the list of shapes. Connection to
+      # the parent shape is maintained.
+      @shapes << insert
+      insert
     end
     public :insert_shape
 
