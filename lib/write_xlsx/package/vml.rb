@@ -26,23 +26,18 @@ module Writexlsx
           z_index = 1
           vml_shape_id = worksheet.vml_shape_id
           unless worksheet.buttons_data.empty?
-            # Write the v:shapetype element.
-            write_button_shapetype
-            worksheet.buttons_data.each do |button|
-              # Write the v:shape element.
-              vml_shape_id += 1
-              button.write_shape(@writer, vml_shape_id, z_index)
-              z_index += 1
+            vml_shape_id, z_index =
+              write_shape_type_and_shape(
+                                         worksheet.buttons_data,
+                                         vml_shape_id, z_index) do
+              write_button_shapetype
             end
           end
           unless worksheet.comments_array.empty?
-            # Write the v:shapetype element.
-            write_comment_shapetype
-            worksheet.comments_array.each do |comment|
-              # Write the v:shape element.
-              vml_shape_id += 1
-              comment.write_shape(@writer, vml_shape_id, z_index)
-              z_index += 1
+            write_shape_type_and_shape(
+                                       worksheet.comments_array,
+                                       vml_shape_id, z_index) do
+              write_comment_shapetype
             end
           end
         end
@@ -51,6 +46,18 @@ module Writexlsx
       end
 
       private
+
+      def write_shape_type_and_shape(data, vml_shape_id, z_index)
+        # Write the v:shapetype element.
+        yield
+        data.each do |obj|
+          # Write the v:shape element.
+          vml_shape_id += 1
+          obj.write_shape(@writer, vml_shape_id, z_index)
+          z_index += 1
+        end
+        [vml_shape_id, z_index]
+      end
 
       #
       # Write the <xml> element. This is the root element of VML.
