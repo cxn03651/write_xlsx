@@ -13,15 +13,9 @@ module Writexlsx
   class Sparkline
     include Writexlsx::Utility
 
-    attr_accessor :type
-    attr_accessor :locations, :ranges, :count, :high, :low
-    attr_accessor :negative, :first, :last, :markers, :min, :max
-    attr_accessor :axis, :reverse, :hidden, :weight, :empty
+    attr_accessor :locations, :ranges
     attr_accessor :date_axis, :series_color, :negative_color, :markers_color
     attr_accessor :first_color, :last_color, :high_color, :low_color
-    attr_accessor :series_color, :negative_color, :markers_color
-    attr_accessor :first_color, :last_color, :high_color, :low_color
-    attr_accessor :max, :min, :cust_max, :cust_min, :reverse
 
     def initialize(ws, param, sheetname)
       @color = {}
