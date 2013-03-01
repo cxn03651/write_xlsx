@@ -1173,14 +1173,11 @@ module Writexlsx
         :_visible           => arg[:visible] || 1
       }
 
-      # Map major_gridlines properties.
-      if arg[:major_gridlines] && ptrue?(arg[:major_gridlines][:visible])
-        axis[:_major_gridlines] = get_gridline_properties(arg[:major_gridlines])
-      end
-
-      # Map minor_gridlines properties.
-      if arg[:minor_gridlines] && ptrue?(arg[:minor_gridlines][:visible])
-        axis[:_minor_gridlines] = get_gridline_properties(arg[:minor_gridlines])
+      # Map major/minor_gridlines properties.
+      [:major_gridlines, :minor_gridlines].each do |lines|
+        if arg[lines] && ptrue?(arg[lines][:visible])
+          axis["_#{lines}".to_sym] = get_gridline_properties(arg[lines])
+        end
       end
 
       # Only use the first letter of bottom, top, left or right.
@@ -2717,28 +2714,19 @@ module Writexlsx
     # Write the <c:majorGridlines> element.
     #
     def write_major_gridlines(gridlines) # :nodoc:
-      write_gridlines_common(gridlines, 'c:majorGridlines')
+      write_gridlines_base('c:majorGridlines', gridlines)
     end
 
     #
     # Write the <c:minorGridlines> element.
     #
     def write_minor_gridlines(gridlines)  # :nodoc:
-      write_gridlines_common(gridlines, 'c:minorGridlines')
+      write_gridlines_base('c:minorGridlines', gridlines)
     end
 
-    def write_gridlines_common(gridlines, tag)  # :nodoc:
-      return unless gridlines
-      return unless ptrue?(gridlines[:_visible])
-
-      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
-        @writer.tag_elements(tag) do
-          # Write the c:spPr element.
-          write_sp_pr(gridlines)
-        end
-      else
-        @writer.empty_tag(tag)
-      end
+    def write_gridlines_base(tag, gridlines)  # :nodoc:
+      return if gridlines.respond_to?(:[]) and !ptrue?(gridlines[:_visible])
+      write_lines_base(tag, gridlines)
     end
 
     #
