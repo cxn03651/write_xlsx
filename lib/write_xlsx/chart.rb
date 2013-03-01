@@ -1049,15 +1049,12 @@ module Writexlsx
     #
     def set_up_down_bars(params = {})
       # Map border to line.
-      if params[:up]
-        params[:up][:line] = params[:up][:border] if params[:up][:border]
-      else
-        params[:up] = {}
-      end
-      if params[:down]
-        params[:down][:line] = params[:down][:border] if params[:down][:border]
-      else
-        params[:down] = {}
+      [:up, :down].each do |up_down|
+        if params[up_down]
+          params[up_down][:line] = params[up_down][:border] if params[up_down][:border]
+        else
+          params[up_down] = {}
+        end
       end
 
       # Set the up and down bar properties.
