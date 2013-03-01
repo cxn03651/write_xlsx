@@ -3653,118 +3653,7 @@ module Writexlsx
     # These are useful for showing visual trends in data in a compact format.
     #
     def add_sparkline(param)
-      sparkline = Sparkline.new
-
-      # Check for valid input parameters.
-      param.each_key do |k|
-        unless valid_sparkline_parameter[k]
-          raise "Unknown parameter '#{k}' in add_sparkline()"
-        end
-      end
-      [:location, :range].each do |required_key|
-        unless param[required_key]
-          raise "Parameter '#{required_key}' is required in add_sparkline()"
-        end
-      end
-
-      # Handle the sparkline type.
-      type = param[:type] || 'line'
-      unless ['line', 'column', 'win_loss'].include?(type)
-        raise "Parameter ':type' must be 'line', 'column' or 'win_loss' in add_sparkline()"
-      end
-      type = 'stacked' if type == 'win_loss'
-      sparkline._type = type
-
-      # We handle single location/range values or array refs of values.
-      sparkline._locations = [param[:location]].flatten
-      sparkline._ranges    = [param[:range]].flatten
-
-      if sparkline._ranges.size != sparkline._locations.size
-        raise "Must have the same number of location and range parameters in add_sparkline()"
-      end
-
-      # Store the count.
-      sparkline._count = sparkline._locations.size
-
-      # Get the worksheet name for the range conversion below.
-      sheetname = quote_sheetname(@name)
-
-      # Cleanup the input ranges.
-      sparkline._ranges.collect! do |range|
-        # Remove the absolute reference $ symbols.
-        range = range.gsub(/\$/, '')
-        # Convert a simple range into a full Sheet1!A1:D1 range.
-        range = "#{sheetname}!#{range}" unless range =~ /!/
-        range
-      end
-
-      # Cleanup the input locations.
-      sparkline._locations.collect! { |location| location.gsub(/\$/, '') }
-
-      # Map options.
-      sparkline._high      = param[:high_point]
-      sparkline._low       = param[:low_point]
-      sparkline._negative  = param[:negative_points]
-      sparkline._first     = param[:first_point]
-      sparkline._last      = param[:last_point]
-      sparkline._markers   = param[:markers]
-      sparkline._min       = param[:min]
-      sparkline._max       = param[:max]
-      sparkline._axis      = param[:axis]
-      sparkline._reverse   = param[:reverse]
-      sparkline._hidden    = param[:show_hidden]
-      sparkline._weight    = param[:weight]
-
-      # Map empty cells options.
-      empty = param[:empty_cells] || ''
-      sparkline._empty = case empty
-      when 'zero'
-        0
-      when 'connect'
-        'span'
-      else
-        'gap'
-      end
-
-      # Map the date axis range.
-      date_range = param[:date_axis]
-      if ptrue?(date_range) && !(date_range =~ /!/)
-        date_range = "#{sheetname}!#{date_range}"
-      end
-      sparkline._date_axis = date_range
-
-      # Set the sparkline styles.
-      style_id = param[:style] || 0
-      style = spark_styles[style_id]
-
-      sparkline._series_color   = style[:series]
-      sparkline._negative_color = style[:negative]
-      sparkline._markers_color  = style[:markers]
-      sparkline._first_color    = style[:first]
-      sparkline._last_color     = style[:last]
-      sparkline._high_color     = style[:high]
-      sparkline._low_color      = style[:low]
-
-      # Override the style colours with user defined colors.
-      sparkline.set_spark_color(:series_color, ptrue?(param[:series_color]) ? get_palette_color(param[:series_color]) : nil)
-      sparkline.set_spark_color(:negative_color, ptrue?(param[:negative_color]) ? get_palette_color(param[:negative_color]) : nil)
-      sparkline.set_spark_color(:markers_color, ptrue?(param[:markers_color]) ? get_palette_color(param[:markers_color]) : nil)
-      sparkline.set_spark_color(:first_color, ptrue?(param[:first_color]) ? get_palette_color(param[:first_color]) : nil)
-      sparkline.set_spark_color(:last_color, ptrue?(param[:last_color]) ? get_palette_color(param[:last_color]) : nil)
-      sparkline.set_spark_color(:high_color, ptrue?(param[:high_color]) ? get_palette_color(param[:high_color]) : nil)
-      sparkline.set_spark_color(:low_color, ptrue?(param[:low_color]) ? get_palette_color(param[:low_color]) : nil)
-      @sparklines << sparkline
-    end
-
-    #
-    #
-    #
-    def set_spark_color(sparkline, param, user_color, palette_color)  # :nodoc:
-      spark_color = "_#{user_color}".to_sym
-
-      return unless palette_color
-
-      sparkline[spark_color] = { :_rgb => palette_color }
+      @sparklines << Sparkline.new(self, param, quote_sheetname(@name))
     end
 
     #
@@ -6676,374 +6565,6 @@ module Writexlsx
       @writer.empty_tag('tablePart', attributes)
     end
 
-    def spark_styles  # :nodoc:
-      [
-       {   # 0
-         :series   => { :_theme => "4", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "5" },
-         :markers  => { :_theme => "4", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "4", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "4", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "4" },
-         :low      => { :_theme => "4" }
-       },
-       {   # 1
-         :series   => { :_theme => "4", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "5" },
-         :markers  => { :_theme => "4", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "4", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "4", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "4" },
-         :low      => { :_theme => "4" }
-       },
-       {   # 2
-         :series   => { :_theme => "5", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "6" },
-         :markers  => { :_theme => "5", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "5", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "5", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "5" },
-         :low      => { :_theme => "5" }
-       },
-       {   # 3
-         :series   => { :_theme => "6", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "7" },
-         :markers  => { :_theme => "6", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "6", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "6", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "6" },
-         :low      => { :_theme => "6" }
-       },
-       {   # 4
-         :series   => { :_theme => "7", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "8" },
-         :markers  => { :_theme => "7", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "7", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "7", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "7" },
-         :low      => { :_theme => "7" }
-       },
-       {   # 5
-         :series   => { :_theme => "8", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "9" },
-         :markers  => { :_theme => "8", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "8", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "8", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "8" },
-         :low      => { :_theme => "8" }
-       },
-       {   # 6
-         :series   => { :_theme => "9", :_tint => "-0.499984740745262" },
-         :negative => { :_theme => "4" },
-         :markers  => { :_theme => "9", :_tint => "-0.499984740745262" },
-         :first    => { :_theme => "9", :_tint => "0.39997558519241921" },
-         :last     => { :_theme => "9", :_tint => "0.39997558519241921" },
-         :high     => { :_theme => "9" },
-         :low      => { :_theme => "9" }
-       },
-       {   # 7
-         :series   => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "5" },
-         :markers  => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "5", :_tint => "-0.249977111117893" }
-       },
-       {   # 8
-         :series   => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "6" },
-         :markers  => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "6", :_tint => "-0.249977111117893" }
-       },
-       {   # 9
-         :series   => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "7" },
-         :markers  => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "7", :_tint => "-0.249977111117893" }
-       },
-       {   # 10
-         :series   => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "8" },
-         :markers  => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "8", :_tint => "-0.249977111117893" }
-       },
-       {   # 11
-         :series   => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "9" },
-         :markers  => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "9", :_tint => "-0.249977111117893" }
-       },
-       {   # 12
-         :series   => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :negative => { :_theme => "4" },
-         :markers  => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "4", :_tint => "-0.249977111117893" }
-       },
-       {   # 13
-         :series   => { :_theme => "4" },
-         :negative => { :_theme => "5" },
-         :markers  => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "4", :_tint => "-0.249977111117893" }
-       },
-       {   # 14
-         :series   => { :_theme => "5" },
-         :negative => { :_theme => "6" },
-         :markers  => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "5", :_tint => "-0.249977111117893" }
-       },
-       {   # 15
-         :series   => { :_theme => "6" },
-         :negative => { :_theme => "7" },
-         :markers  => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "6", :_tint => "-0.249977111117893" }
-       },
-       {   # 16
-         :series   => { :_theme => "7" },
-         :negative => { :_theme => "8" },
-         :markers  => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "7", :_tint => "-0.249977111117893" }
-       },
-       {   # 17
-         :series   => { :_theme => "8" },
-         :negative => { :_theme => "9" },
-         :markers  => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "8", :_tint => "-0.249977111117893" }
-       },
-       {   # 18
-         :series   => { :_theme => "9" },
-         :negative => { :_theme => "4" },
-         :markers  => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "9", :_tint => "-0.249977111117893" }
-       },
-       {   # 19
-         :series   => { :_theme => "4", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "4", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "4", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "4", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "4", :_tint => "-0.499984740745262" }
-       },
-       {   # 20
-         :series   => { :_theme => "5", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "5", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "5", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "5", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "5", :_tint => "-0.499984740745262" }
-       },
-       {   # 21
-         :series   => { :_theme => "6", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "6", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "6", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "6", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "6", :_tint => "-0.499984740745262" }
-       },
-       {   # 22
-         :series   => { :_theme => "7", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "7", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "7", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "7", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "7", :_tint => "-0.499984740745262" }
-       },
-       {   # 23
-         :series   => { :_theme => "8", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "8", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "8", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "8", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "8", :_tint => "-0.499984740745262" }
-       },
-       {   # 24
-         :series   => { :_theme => "9", :_tint => "0.39997558519241921" },
-         :negative => { :_theme => "0", :_tint => "-0.499984740745262" },
-         :markers  => { :_theme => "9", :_tint => "0.79998168889431442" },
-         :first    => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "9", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "9", :_tint => "-0.499984740745262" },
-         :low      => { :_theme => "9", :_tint => "-0.499984740745262" }
-       },
-       {   # 25
-         :series   => { :_theme => "1", :_tint => "0.499984740745262" },
-         :negative => { :_theme => "1", :_tint => "0.249977111117893" },
-         :markers  => { :_theme => "1", :_tint => "0.249977111117893" },
-         :first    => { :_theme => "1", :_tint => "0.249977111117893" },
-         :last     => { :_theme => "1", :_tint => "0.249977111117893" },
-         :high     => { :_theme => "1", :_tint => "0.249977111117893" },
-         :low      => { :_theme => "1", :_tint => "0.249977111117893" }
-       },
-       {   # 26
-         :series   => { :_theme => "1", :_tint => "0.34998626667073579" },
-         :negative => { :_theme => "0", :_tint => "-0.249977111117893" },
-         :markers  => { :_theme => "0", :_tint => "-0.249977111117893" },
-         :first    => { :_theme => "0", :_tint => "-0.249977111117893" },
-         :last     => { :_theme => "0", :_tint => "-0.249977111117893" },
-         :high     => { :_theme => "0", :_tint => "-0.249977111117893" },
-         :low      => { :_theme => "0", :_tint => "-0.249977111117893" }
-       },
-       {   # 27
-         :series   => { :_rgb => "FF323232" },
-         :negative => { :_rgb => "FFD00000" },
-         :markers  => { :_rgb => "FFD00000" },
-         :first    => { :_rgb => "FFD00000" },
-         :last     => { :_rgb => "FFD00000" },
-         :high     => { :_rgb => "FFD00000" },
-         :low      => { :_rgb => "FFD00000" }
-       },
-       {   # 28
-         :series   => { :_rgb => "FF000000" },
-         :negative => { :_rgb => "FF0070C0" },
-         :markers  => { :_rgb => "FF0070C0" },
-         :first    => { :_rgb => "FF0070C0" },
-         :last     => { :_rgb => "FF0070C0" },
-         :high     => { :_rgb => "FF0070C0" },
-         :low      => { :_rgb => "FF0070C0" }
-       },
-       {   # 29
-         :series   => { :_rgb => "FF376092" },
-         :negative => { :_rgb => "FFD00000" },
-         :markers  => { :_rgb => "FFD00000" },
-         :first    => { :_rgb => "FFD00000" },
-         :last     => { :_rgb => "FFD00000" },
-         :high     => { :_rgb => "FFD00000" },
-         :low      => { :_rgb => "FFD00000" }
-       },
-       {   # 30
-         :series   => { :_rgb => "FF0070C0" },
-         :negative => { :_rgb => "FF000000" },
-         :markers  => { :_rgb => "FF000000" },
-         :first    => { :_rgb => "FF000000" },
-         :last     => { :_rgb => "FF000000" },
-         :high     => { :_rgb => "FF000000" },
-         :low      => { :_rgb => "FF000000" }
-       },
-       {   # 31
-         :series   => { :_rgb => "FF5F5F5F" },
-         :negative => { :_rgb => "FFFFB620" },
-         :markers  => { :_rgb => "FFD70077" },
-         :first    => { :_rgb => "FF5687C2" },
-         :last     => { :_rgb => "FF359CEB" },
-         :high     => { :_rgb => "FF56BE79" },
-         :low      => { :_rgb => "FFFF5055" }
-       },
-       {   # 32
-         :series   => { :_rgb => "FF5687C2" },
-         :negative => { :_rgb => "FFFFB620" },
-         :markers  => { :_rgb => "FFD70077" },
-         :first    => { :_rgb => "FF777777" },
-         :last     => { :_rgb => "FF359CEB" },
-         :high     => { :_rgb => "FF56BE79" },
-         :low      => { :_rgb => "FFFF5055" }
-       },
-       {   # 33
-         :series   => { :_rgb => "FFC6EFCE" },
-         :negative => { :_rgb => "FFFFC7CE" },
-         :markers  => { :_rgb => "FF8CADD6" },
-         :first    => { :_rgb => "FFFFDC47" },
-         :last     => { :_rgb => "FFFFEB9C" },
-         :high     => { :_rgb => "FF60D276" },
-         :low      => { :_rgb => "FFFF5367" }
-       },
-       {   # 34
-         :series   => { :_rgb => "FF00B050" },
-         :negative => { :_rgb => "FFFF0000" },
-         :markers  => { :_rgb => "FF0070C0" },
-         :first    => { :_rgb => "FFFFC000" },
-         :last     => { :_rgb => "FFFFC000" },
-         :high     => { :_rgb => "FF00B050" },
-         :low      => { :_rgb => "FFFF0000" }
-       },
-       {   # 35
-         :series   => { :_theme => "3" },
-         :negative => { :_theme => "9" },
-         :markers  => { :_theme => "8" },
-         :first    => { :_theme => "4" },
-         :last     => { :_theme => "5" },
-         :high     => { :_theme => "6" },
-         :low      => { :_theme => "7" }
-       },
-       {   # 36
-         :series   => { :_theme => "1" },
-         :negative => { :_theme => "9" },
-         :markers  => { :_theme => "8" },
-         :first    => { :_theme => "4" },
-         :last     => { :_theme => "5" },
-         :high     => { :_theme => "6" },
-         :low      => { :_theme => "7" }
-       }
-      ]
-    end
-
-    def valid_sparkline_parameter  # :nodoc:
-      {
-        :location        => 1,
-        :range           => 1,
-        :type            => 1,
-        :high_point      => 1,
-        :low_point       => 1,
-        :negative_points => 1,
-        :first_point     => 1,
-        :last_point      => 1,
-        :markers         => 1,
-        :style           => 1,
-        :series_color    => 1,
-        :negative_color  => 1,
-        :markers_color   => 1,
-        :first_color     => 1,
-        :last_color      => 1,
-        :high_color      => 1,
-        :low_color       => 1,
-        :max             => 1,
-        :min             => 1,
-        :axis            => 1,
-        :reverse         => 1,
-        :empty_cells     => 1,
-        :show_hidden     => 1,
-        :date_axis       => 1,
-        :weight          => 1
-      }
-    end
-
     #
     # Write the <extLst> element and sparkline subelements.
     #
@@ -7068,31 +6589,31 @@ module Writexlsx
         write_sparkline_group(sparkline)
 
         # Write the x14:colorSeries element.
-        write_color_series(sparkline._series_color)
+        write_color_series(sparkline.series_color)
 
         # Write the x14:colorNegative element.
-        write_color_negative(sparkline._negative_color)
+        write_color_negative(sparkline.negative_color)
 
         # Write the x14:colorAxis element.
         write_color_axis
 
         # Write the x14:colorMarkers element.
-        write_color_markers(sparkline._markers_color)
+        write_color_markers(sparkline.markers_color)
 
         # Write the x14:colorFirst element.
-        write_color_first(sparkline._first_color)
+        write_color_first(sparkline.first_color)
 
         # Write the x14:colorLast element.
-        write_color_last(sparkline._last_color)
+        write_color_last(sparkline.last_color)
 
         # Write the x14:colorHigh element.
-        write_color_high(sparkline._high_color)
+        write_color_high(sparkline.high_color)
 
         # Write the x14:colorLow element.
-        write_color_low(sparkline._low_color)
+        write_color_low(sparkline.low_color)
 
-        if sparkline._date_axis
-          @writer.data_element('xm:f', sparkline._date_axis)
+        if sparkline.date_axis
+          @writer.data_element('xm:f', sparkline.date_axis)
         end
 
         write_sparklines(sparkline)
@@ -7112,9 +6633,9 @@ module Writexlsx
       # Write the sparkline elements.
       @writer.tag_elements('x14:sparklines') do
 
-        (0 .. sparkline._count-1).each do |i|
-          range    = sparkline._ranges[i]
-          location = sparkline._locations[i]
+        (0 .. sparkline.count-1).each do |i|
+          range    = sparkline.ranges[i]
+          location = sparkline.locations[i]
 
           @writer.tag_elements('x14:sparkline') do
             @writer.data_element('xm:f',     range)
@@ -7183,34 +6704,34 @@ module Writexlsx
     end
 
     def attributes_from_sparkline(opts)  # :nodoc:
-      opts._cust_max = cust_max_min(opts._max) if opts._max
-      opts._cust_min = cust_max_min(opts._min) if opts._min
+      opts.cust_max = cust_max_min(opts.max) if opts.max
+      opts.cust_min = cust_max_min(opts.min) if opts.min
 
-      opts._cust_max = cust_max_min(opts._max) if opts._max
-      opts._cust_min = cust_max_min(opts._min) if opts._min
+      opts.cust_max = cust_max_min(opts.max) if opts.max
+      opts.cust_min = cust_max_min(opts.min) if opts.min
 
       a = []
-      a << 'manualMax' << opts._max if opts._max && opts._max != 'group'
-      a << 'manualMin' << opts._min if opts._min && opts._min != 'group'
+      a << 'manualMax' << opts.max if opts.max && opts.max != 'group'
+      a << 'manualMin' << opts.min if opts.min && opts.min != 'group'
 
       # Ignore the default type attribute (line).
-      a << 'type'          << opts._type   if opts._type != 'line'
+      a << 'type'          << opts.type   if opts.type != 'line'
 
-      a << 'lineWeight'    << opts._weight if opts._weight
-      a << 'dateAxis'      << 1              if opts._date_axis
-      a << 'displayEmptyCellsAs' << opts._empty    if ptrue?(opts._empty)
+      a << 'lineWeight'    << opts.weight      if opts.weight
+      a << 'dateAxis'      << 1                if opts.date_axis
+      a << 'displayEmptyCellsAs' << opts.empty if ptrue?(opts.empty)
 
-      a << 'markers'       << 1              if opts._markers
-      a << 'high'          << 1              if opts._high
-      a << 'low'           << 1              if opts._low
-      a << 'first'         << 1              if opts._first
-      a << 'last'          << 1              if opts._last
-      a << 'negative'      << 1              if opts._negative
-      a << 'displayXAxis'  << 1              if opts._axis
-      a << 'displayHidden' << 1              if opts._hidden
-      a << 'minAxisType'   << opts._cust_min if opts._cust_min
-      a << 'maxAxisType'   << opts._cust_max if opts._cust_max
-      a << 'rightToLeft'   << 1              if opts._reverse
+      a << 'markers'       << 1              if opts.markers
+      a << 'high'          << 1              if opts.high
+      a << 'low'           << 1              if opts.low
+      a << 'first'         << 1              if opts.first
+      a << 'last'          << 1              if opts.last
+      a << 'negative'      << 1              if opts.negative
+      a << 'displayXAxis'  << 1              if opts.axis
+      a << 'displayHidden' << 1              if opts.hidden
+      a << 'minAxisType'   << opts.cust_min  if opts.cust_min
+      a << 'maxAxisType'   << opts.cust_max  if opts.cust_max
+      a << 'rightToLeft'   << 1              if opts.reverse
       a
     end
 
