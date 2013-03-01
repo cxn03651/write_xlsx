@@ -3743,25 +3743,19 @@ module Writexlsx
     # Write the <c:upBars> element.
     #
     def write_up_bars(format)
-      tag = 'c:upBars'
-      if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
-        @writer.tag_elements(tag) do
-          write_sp_pr(format)
-        end
-      else
-        @writer.empty_tag(tag)
-      end
+      write_bars_base('c:upBars', format)
     end
 
     #
     # Write the <c:upBars> element.
     #
     def write_down_bars(format)
-      tag = 'c:downBars'
+      write_bars_base('c:downBars', format)
+    end
+
+    def write_bars_base(tag, format)
       if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
-        @writer.tag_elements(tag) do
-          write_sp_pr(format)
-        end
+        @writer.tag_elements(tag) { write_sp_pr(format) }
       else
         @writer.empty_tag(tag)
       end
