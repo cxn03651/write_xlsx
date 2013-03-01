@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+require 'write_xlsx/utility'
 
 module Writexlsx
   ###############################################################################
