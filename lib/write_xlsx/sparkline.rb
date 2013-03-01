@@ -113,13 +113,9 @@ module Writexlsx
       @low_color      = style[:low]
 
       # Override the style colours with user defined colors.
-      set_spark_color(:series_color, ptrue?(param[:series_color]) ? ws.get_palette_color(param[:series_color]) : nil)
-      set_spark_color(:negative_color, ptrue?(param[:negative_color]) ? ws.get_palette_color(param[:negative_color]) : nil)
-      set_spark_color(:markers_color, ptrue?(param[:markers_color]) ? ws.get_palette_color(param[:markers_color]) : nil)
-      set_spark_color(:first_color, ptrue?(param[:first_color]) ? ws.get_palette_color(param[:first_color]) : nil)
-      set_spark_color(:last_color, ptrue?(param[:last_color]) ? ws.get_palette_color(param[:last_color]) : nil)
-      set_spark_color(:high_color, ptrue?(param[:high_color]) ? ws.get_palette_color(param[:high_color]) : nil)
-      set_spark_color(:low_color, ptrue?(param[:low_color]) ? ws.get_palette_color(param[:low_color]) : nil)
+      [:series_color, :negative_color, :markers_color, :first_color, :last_color, :high_color, :low_color].each do |user_color|
+        set_spark_color(user_color, ptrue?(param[user_color]) ? ws.get_palette_color(param[user_color]) : nil)
+      end
     end
 
     def group_attributes
