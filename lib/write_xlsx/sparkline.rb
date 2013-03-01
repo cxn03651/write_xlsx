@@ -49,9 +49,6 @@ module Writexlsx
         raise "Must have the same number of location and range parameters in add_sparkline()"
       end
 
-      # Store the count.
-      @count = @locations.size
-
       # Cleanup the input ranges.
       @ranges.collect! do |range|
         # Remove the absolute reference $ symbols.
@@ -111,6 +108,10 @@ module Writexlsx
       [:series_color, :negative_color, :markers_color, :first_color, :last_color, :high_color, :low_color].each do |user_color|
         set_spark_color(user_color, ptrue?(param[user_color]) ? ws.get_palette_color(param[user_color]) : nil)
       end
+    end
+
+    def count
+      @locations.size
     end
 
     def group_attributes
