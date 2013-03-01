@@ -38,7 +38,7 @@ module Writexlsx
       unless ['line', 'column', 'win_loss'].include?(type)
         raise "Parameter ':type' must be 'line', 'column' or 'win_loss' in add_sparkline()"
       end
-      type = 'stacked' if type == 'win_loss'
+      type  = 'stacked' if type == 'win_loss'
       @type = type
 
       # We handle single location/range values or array refs of values.
@@ -75,8 +75,7 @@ module Writexlsx
       @weight    = param[:weight]
 
       # Map empty cells options.
-      empty = param[:empty_cells] || ''
-      @empty = case empty
+      @empty = case param[:empty_cells] || ''
       when 'zero'
         0
       when 'connect'
@@ -93,8 +92,7 @@ module Writexlsx
       @date_axis = date_range
 
       # Set the sparkline styles.
-      style_id = param[:style] || 0
-      style = spark_styles[style_id]
+      style = spark_styles[param[:style] || 0]
 
       @series_color   = style[:series]
       @negative_color = style[:negative]
@@ -115,11 +113,8 @@ module Writexlsx
     end
 
     def group_attributes
-      @cust_max = cust_max_min(@max) if @max
-      @cust_min = cust_max_min(@min) if @min
-
-      @cust_max = cust_max_min(@max) if @max
-      @cust_min = cust_max_min(@min) if @min
+      cust_max = cust_max_min(@max) if @max
+      cust_min = cust_max_min(@min) if @min
 
       a = []
       a << 'manualMax' << @max if @max && @max != 'group'
@@ -132,17 +127,17 @@ module Writexlsx
       a << 'dateAxis'      << 1            if @date_axis
       a << 'displayEmptyCellsAs' << @empty if ptrue?(@empty)
 
-      a << 'markers'       << 1          if @markers
-      a << 'high'          << 1          if @high
-      a << 'low'           << 1          if @low
-      a << 'first'         << 1          if @first
-      a << 'last'          << 1          if @last
-      a << 'negative'      << 1          if @negative
-      a << 'displayXAxis'  << 1          if @axis
-      a << 'displayHidden' << 1          if @hidden
-      a << 'minAxisType'   << @cust_min  if @cust_min
-      a << 'maxAxisType'   << @cust_max  if @cust_max
-      a << 'rightToLeft'   << 1          if @reverse
+      a << 'markers'       << 1         if @markers
+      a << 'high'          << 1         if @high
+      a << 'low'           << 1         if @low
+      a << 'first'         << 1         if @first
+      a << 'last'          << 1         if @last
+      a << 'negative'      << 1         if @negative
+      a << 'displayXAxis'  << 1         if @axis
+      a << 'displayHidden' << 1         if @hidden
+      a << 'minAxisType'   << cust_min  if cust_min
+      a << 'maxAxisType'   << cust_max  if cust_max
+      a << 'rightToLeft'   << 1         if @reverse
       a
     end
 
