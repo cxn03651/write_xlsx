@@ -3746,15 +3746,25 @@ module Writexlsx
       sparkline._low_color      = style[:low]
 
       # Override the style colours with user defined colors.
-      set_spark_color(sparkline, param, :series_color)
-      set_spark_color(sparkline, param, :negative_color)
-      set_spark_color(sparkline, param, :markers_color)
-      set_spark_color(sparkline, param, :first_color)
-      set_spark_color(sparkline, param, :last_color)
-      set_spark_color(sparkline, param, :high_color)
-      set_spark_color(sparkline, param, :low_color)
-
+      sparkline.set_spark_color(:series_color, ptrue?(param[:series_color]) ? get_palette_color(param[:series_color]) : nil)
+      sparkline.set_spark_color(:negative_color, ptrue?(param[:negative_color]) ? get_palette_color(param[:negative_color]) : nil)
+      sparkline.set_spark_color(:markers_color, ptrue?(param[:markers_color]) ? get_palette_color(param[:markers_color]) : nil)
+      sparkline.set_spark_color(:first_color, ptrue?(param[:first_color]) ? get_palette_color(param[:first_color]) : nil)
+      sparkline.set_spark_color(:last_color, ptrue?(param[:last_color]) ? get_palette_color(param[:last_color]) : nil)
+      sparkline.set_spark_color(:high_color, ptrue?(param[:high_color]) ? get_palette_color(param[:high_color]) : nil)
+      sparkline.set_spark_color(:low_color, ptrue?(param[:low_color]) ? get_palette_color(param[:low_color]) : nil)
       @sparklines << sparkline
+    end
+
+    #
+    #
+    #
+    def set_spark_color(sparkline, param, user_color, palette_color)  # :nodoc:
+      spark_color = "_#{user_color}".to_sym
+
+      return unless palette_color
+
+      sparkline[spark_color] = { :_rgb => palette_color }
     end
 
     #
@@ -7035,17 +7045,6 @@ module Writexlsx
     end
 
     #
-    #
-    #
-    def set_spark_color(sparkline, param, user_color)  # :nodoc:
-      spark_color = "_#{user_color}".to_sym
-
-      return unless ptrue?(param[user_color])
-
-      sparkline[spark_color] =
-        { :_rgb => get_palette_color(param[user_color]) }
-    end
-    #
     # Write the <extLst> element and sparkline subelements.
     #
     def write_ext_sparklines  # :nodoc:
@@ -7184,34 +7183,34 @@ module Writexlsx
     end
 
     def attributes_from_sparkline(opts)  # :nodoc:
-      opts[:_cust_max] = cust_max_min(opts[:_max]) if opts[:_max]
-      opts[:_cust_min] = cust_max_min(opts[:_min]) if opts[:_min]
+      opts._cust_max = cust_max_min(opts._max) if opts._max
+      opts._cust_min = cust_max_min(opts._min) if opts._min
 
-      opts[:_cust_max] = cust_max_min(opts[:_max]) if opts[:_max]
-      opts[:_cust_min] = cust_max_min(opts[:_min]) if opts[:_min]
+      opts._cust_max = cust_max_min(opts._max) if opts._max
+      opts._cust_min = cust_max_min(opts._min) if opts._min
 
       a = []
-      a << 'manualMax' << opts[:_max] if opts[:_max] && opts[:_max] != 'group'
-      a << 'manualMin' << opts[:_min] if opts[:_min] && opts[:_min] != 'group'
+      a << 'manualMax' << opts._max if opts._max && opts._max != 'group'
+      a << 'manualMin' << opts._min if opts._min && opts._min != 'group'
 
       # Ignore the default type attribute (line).
-      a << 'type'          << opts[:_type]   if opts[:_type] != 'line'
+      a << 'type'          << opts._type   if opts._type != 'line'
 
-      a << 'lineWeight'    << opts[:_weight] if opts[:_weight]
-      a << 'dateAxis'      << 1              if opts[:_date_axis]
-      a << 'displayEmptyCellsAs' << opts[:_empty]    if ptrue?(opts[:_empty])
+      a << 'lineWeight'    << opts._weight if opts._weight
+      a << 'dateAxis'      << 1              if opts._date_axis
+      a << 'displayEmptyCellsAs' << opts._empty    if ptrue?(opts._empty)
 
-      a << 'markers'       << 1                if opts[:_markers]
-      a << 'high'          << 1                if opts[:_high]
-      a << 'low'           << 1                if opts[:_low]
-      a << 'first'         << 1                if opts[:_first]
-      a << 'last'          << 1                if opts[:_last]
-      a << 'negative'      << 1                if opts[:_negative]
-      a << 'displayXAxis'  << 1                if opts[:_axis]
-      a << 'displayHidden' << 1                if opts[:_hidden]
-      a << 'minAxisType'   << opts[:_cust_min] if opts[:_cust_min]
-      a << 'maxAxisType'   << opts[:_cust_max] if opts[:_cust_max]
-      a << 'rightToLeft'   << 1                if opts[:_reverse]
+      a << 'markers'       << 1              if opts._markers
+      a << 'high'          << 1              if opts._high
+      a << 'low'           << 1              if opts._low
+      a << 'first'         << 1              if opts._first
+      a << 'last'          << 1              if opts._last
+      a << 'negative'      << 1              if opts._negative
+      a << 'displayXAxis'  << 1              if opts._axis
+      a << 'displayHidden' << 1              if opts._hidden
+      a << 'minAxisType'   << opts._cust_min if opts._cust_min
+      a << 'maxAxisType'   << opts._cust_max if opts._cust_max
+      a << 'rightToLeft'   << 1              if opts._reverse
       a
     end
 

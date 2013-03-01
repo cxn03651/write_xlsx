@@ -13,28 +13,24 @@ module Writexlsx
   class Sparkline
     include Writexlsx::Utility
 
-    attr_reader   :spark_color
-    attr_writer   :_type
+    attr_accessor :_type
     attr_accessor :_locations, :_ranges, :_count, :_high, :_low
     attr_accessor :_negative, :_first, :_last, :_markers, :_min, :_max
     attr_accessor :_axis, :_reverse, :_hidden, :_weight, :_empty
     attr_accessor :_date_axis, :_series_color, :_negative_color, :_markers_color
     attr_accessor :_first_color, :_last_color, :_high_color, :_low_color
+    attr_accessor :_series_color, :_negative_color, :_markers_color
+    attr_accessor :_first_color, :_last_color, :_high_color, :_low_color
+    attr_accessor :_max, :_min, :_cust_max, :_cust_min, :_reverse
 
-    def spark_color=(args)
-      spark_color, color = args
-      return unless color
-
-      @spark_color ||= {}
-      @spark_color[spark_color] = { :_rgb => color }
+    def initialize
+      @color = {}
     end
 
-    def [](attribute)
-      instance_variable_get("@#{attribute}")
-    end
+    def set_spark_color(user_color, palette_color)
+      return unless palette_color
 
-    def []=(attribute, value)
-      instance_variable_set("@#{attribute}", value)
+      instance_variable_set("@_#{user_color}", { :_rgb => palette_color })
     end
   end
 end
