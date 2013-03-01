@@ -4,6 +4,7 @@ require 'write_xlsx/package/button'
 require 'write_xlsx/colors'
 require 'write_xlsx/format'
 require 'write_xlsx/drawing'
+require 'write_xlsx/sparkline'
 require 'write_xlsx/compatibility'
 require 'write_xlsx/utility'
 require 'write_xlsx/package/conditional_format'
@@ -3652,7 +3653,7 @@ module Writexlsx
     # These are useful for showing visual trends in data in a compact format.
     #
     def add_sparkline(param)
-      sparkline = {}
+      sparkline = Sparkline.new
 
       # Check for valid input parameters.
       param.each_key do |k|
@@ -3672,24 +3673,24 @@ module Writexlsx
         raise "Parameter ':type' must be 'line', 'column' or 'win_loss' in add_sparkline()"
       end
       type = 'stacked' if type == 'win_loss'
-      sparkline[:_type] = type
+      sparkline._type = type
 
       # We handle single location/range values or array refs of values.
-      sparkline[:_locations] = [param[:location]].flatten
-      sparkline[:_ranges]    = [param[:range]].flatten
+      sparkline._locations = [param[:location]].flatten
+      sparkline._ranges    = [param[:range]].flatten
 
-      if sparkline[:_ranges].size != sparkline[:_locations].size
+      if sparkline._ranges.size != sparkline._locations.size
         raise "Must have the same number of location and range parameters in add_sparkline()"
       end
 
       # Store the count.
-      sparkline[:_count] = sparkline[:_locations].size
+      sparkline._count = sparkline._locations.size
 
       # Get the worksheet name for the range conversion below.
       sheetname = quote_sheetname(@name)
 
       # Cleanup the input ranges.
-      sparkline[:_ranges].collect! do |range|
+      sparkline._ranges.collect! do |range|
         # Remove the absolute reference $ symbols.
         range = range.gsub(/\$/, '')
         # Convert a simple range into a full Sheet1!A1:D1 range.
@@ -3698,25 +3699,25 @@ module Writexlsx
       end
 
       # Cleanup the input locations.
-      sparkline[:_locations].collect! { |location| location.gsub(/\$/, '') }
+      sparkline._locations.collect! { |location| location.gsub(/\$/, '') }
 
       # Map options.
-      sparkline[:_high]      = param[:high_point]
-      sparkline[:_low]       = param[:low_point]
-      sparkline[:_negative]  = param[:negative_points]
-      sparkline[:_first]     = param[:first_point]
-      sparkline[:_last]      = param[:last_point]
-      sparkline[:_markers]   = param[:markers]
-      sparkline[:_min]       = param[:min]
-      sparkline[:_max]       = param[:max]
-      sparkline[:_axis]      = param[:axis]
-      sparkline[:_reverse]   = param[:reverse]
-      sparkline[:_hidden]    = param[:show_hidden]
-      sparkline[:_weight]    = param[:weight]
+      sparkline._high      = param[:high_point]
+      sparkline._low       = param[:low_point]
+      sparkline._negative  = param[:negative_points]
+      sparkline._first     = param[:first_point]
+      sparkline._last      = param[:last_point]
+      sparkline._markers   = param[:markers]
+      sparkline._min       = param[:min]
+      sparkline._max       = param[:max]
+      sparkline._axis      = param[:axis]
+      sparkline._reverse   = param[:reverse]
+      sparkline._hidden    = param[:show_hidden]
+      sparkline._weight    = param[:weight]
 
       # Map empty cells options.
       empty = param[:empty_cells] || ''
-      sparkline[:_empty] = case empty
+      sparkline._empty = case empty
       when 'zero'
         0
       when 'connect'
@@ -3730,19 +3731,19 @@ module Writexlsx
       if ptrue?(date_range) && !(date_range =~ /!/)
         date_range = "#{sheetname}!#{date_range}"
       end
-      sparkline[:_date_axis] = date_range
+      sparkline._date_axis = date_range
 
       # Set the sparkline styles.
       style_id = param[:style] || 0
       style = spark_styles[style_id]
 
-      sparkline[:_series_color]   = style[:series]
-      sparkline[:_negative_color] = style[:negative]
-      sparkline[:_markers_color]  = style[:markers]
-      sparkline[:_first_color]    = style[:first]
-      sparkline[:_last_color]     = style[:last]
-      sparkline[:_high_color]     = style[:high]
-      sparkline[:_low_color]      = style[:low]
+      sparkline._series_color   = style[:series]
+      sparkline._negative_color = style[:negative]
+      sparkline._markers_color  = style[:markers]
+      sparkline._first_color    = style[:first]
+      sparkline._last_color     = style[:last]
+      sparkline._high_color     = style[:high]
+      sparkline._low_color      = style[:low]
 
       # Override the style colours with user defined colors.
       set_spark_color(sparkline, param, :series_color)
@@ -7068,31 +7069,31 @@ module Writexlsx
         write_sparkline_group(sparkline)
 
         # Write the x14:colorSeries element.
-        write_color_series(sparkline[:_series_color])
+        write_color_series(sparkline._series_color)
 
         # Write the x14:colorNegative element.
-        write_color_negative(sparkline[:_negative_color])
+        write_color_negative(sparkline._negative_color)
 
         # Write the x14:colorAxis element.
         write_color_axis
 
         # Write the x14:colorMarkers element.
-        write_color_markers(sparkline[:_markers_color])
+        write_color_markers(sparkline._markers_color)
 
         # Write the x14:colorFirst element.
-        write_color_first(sparkline[:_first_color])
+        write_color_first(sparkline._first_color)
 
         # Write the x14:colorLast element.
-        write_color_last(sparkline[:_last_color] )
+        write_color_last(sparkline._last_color)
 
         # Write the x14:colorHigh element.
-        write_color_high(sparkline[:_high_color])
+        write_color_high(sparkline._high_color)
 
         # Write the x14:colorLow element.
-        write_color_low(sparkline[:_low_color])
+        write_color_low(sparkline._low_color)
 
-        if sparkline[:_date_axis]
-          @writer.data_element('xm:f', sparkline[:_date_axis])
+        if sparkline._date_axis
+          @writer.data_element('xm:f', sparkline._date_axis)
         end
 
         write_sparklines(sparkline)
@@ -7112,9 +7113,9 @@ module Writexlsx
       # Write the sparkline elements.
       @writer.tag_elements('x14:sparklines') do
 
-        (0 .. sparkline[:_count]-1).each do |i|
-          range    = sparkline[:_ranges][i]
-          location = sparkline[:_locations][i]
+        (0 .. sparkline._count-1).each do |i|
+          range    = sparkline._ranges[i]
+          location = sparkline._locations[i]
 
           @writer.tag_elements('x14:sparkline') do
             @writer.data_element('xm:f',     range)
