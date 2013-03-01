@@ -122,12 +122,48 @@ module Writexlsx
       set_spark_color(:low_color, ptrue?(param[:low_color]) ? ws.get_palette_color(param[:low_color]) : nil)
     end
 
+    def group_attributes
+      @cust_max = cust_max_min(@max) if @max
+      @cust_min = cust_max_min(@min) if @min
+
+      @cust_max = cust_max_min(@max) if @max
+      @cust_min = cust_max_min(@min) if @min
+
+      a = []
+      a << 'manualMax' << @max if @max && @max != 'group'
+      a << 'manualMin' << @min if @min && @min != 'group'
+
+      # Ignore the default type attribute (line).
+      a << 'type'          << @type        if @type != 'line'
+
+      a << 'lineWeight'    << @weight      if @weight
+      a << 'dateAxis'      << 1            if @date_axis
+      a << 'displayEmptyCellsAs' << @empty if ptrue?(@empty)
+
+      a << 'markers'       << 1          if @markers
+      a << 'high'          << 1          if @high
+      a << 'low'           << 1          if @low
+      a << 'first'         << 1          if @first
+      a << 'last'          << 1          if @last
+      a << 'negative'      << 1          if @negative
+      a << 'displayXAxis'  << 1          if @axis
+      a << 'displayHidden' << 1          if @hidden
+      a << 'minAxisType'   << @cust_min  if @cust_min
+      a << 'maxAxisType'   << @cust_max  if @cust_max
+      a << 'rightToLeft'   << 1          if @reverse
+      a
+    end
+
     private
 
     def set_spark_color(user_color, palette_color)
       return unless palette_color
 
       instance_variable_set("@#{user_color}", { :_rgb => palette_color })
+    end
+
+    def cust_max_min(max_min)  # :nodoc:
+      max_min == 'group' ? 'group' : 'custom'
     end
 
     def valid_sparkline_parameter  # :nodoc:

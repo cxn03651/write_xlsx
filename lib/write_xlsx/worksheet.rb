@@ -6697,46 +6697,7 @@ module Writexlsx
     #     rightToLeft="1">
     #
     def write_sparkline_group(sparkline)  # :nodoc:
-      @writer.start_tag(
-                        'x14:sparklineGroup',
-                        attributes_from_sparkline(sparkline)
-                        )
-    end
-
-    def attributes_from_sparkline(opts)  # :nodoc:
-      opts.cust_max = cust_max_min(opts.max) if opts.max
-      opts.cust_min = cust_max_min(opts.min) if opts.min
-
-      opts.cust_max = cust_max_min(opts.max) if opts.max
-      opts.cust_min = cust_max_min(opts.min) if opts.min
-
-      a = []
-      a << 'manualMax' << opts.max if opts.max && opts.max != 'group'
-      a << 'manualMin' << opts.min if opts.min && opts.min != 'group'
-
-      # Ignore the default type attribute (line).
-      a << 'type'          << opts.type   if opts.type != 'line'
-
-      a << 'lineWeight'    << opts.weight      if opts.weight
-      a << 'dateAxis'      << 1                if opts.date_axis
-      a << 'displayEmptyCellsAs' << opts.empty if ptrue?(opts.empty)
-
-      a << 'markers'       << 1              if opts.markers
-      a << 'high'          << 1              if opts.high
-      a << 'low'           << 1              if opts.low
-      a << 'first'         << 1              if opts.first
-      a << 'last'          << 1              if opts.last
-      a << 'negative'      << 1              if opts.negative
-      a << 'displayXAxis'  << 1              if opts.axis
-      a << 'displayHidden' << 1              if opts.hidden
-      a << 'minAxisType'   << opts.cust_min  if opts.cust_min
-      a << 'maxAxisType'   << opts.cust_max  if opts.cust_max
-      a << 'rightToLeft'   << 1              if opts.reverse
-      a
-    end
-
-    def cust_max_min(max_min)  # :nodoc:
-      max_min == 'group' ? 'group' : 'custom'
+      @writer.start_tag('x14:sparklineGroup', sparkline.group_attributes)
     end
 
     #
