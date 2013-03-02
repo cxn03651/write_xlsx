@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
@@ -52,13 +53,6 @@ module Writexlsx
         # Set the font properties if present.
         @num_font  = @chart.convert_font_args(@args[:num_font])
         @name_font = @chart.convert_font_args(@args[:name_font])
-      end
-
-      def set_property(params, property)
-        instance_variable_set(
-                              "@#{property}",
-                              params[property] || @defaults[property]
-                              )
       end
 
       #
