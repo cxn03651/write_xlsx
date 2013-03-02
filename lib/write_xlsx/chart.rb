@@ -469,7 +469,7 @@ module Writexlsx
     attr_writer :index, :palette, :protection   # :nodoc:
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
     attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
-    attr_reader :width, :height
+    attr_reader :width, :height  # :nodoc:
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -700,26 +700,26 @@ module Writexlsx
       name_id = get_data_id(name_formula, params[:name_data])
 
       # Set the line properties for the series.
-      line = get_line_properties(params[:line])
+      line = line_properties(params[:line])
 
       # Allow 'border' as a synonym for 'line' in bar/column style charts.
-      line = get_line_properties(params[:border]) if params[:border]
+      line = line_properties(params[:border]) if params[:border]
 
       # Set the fill properties for the series.
-      fill = get_fill_properties(params[:fill])
+      fill = fill_properties(params[:fill])
 
       # Set the marker properties for the series.
-      marker = get_marker_properties(params[:marker])
+      marker = marker_properties(params[:marker])
 
       # Set the trendline properties for the series.
-      trendline = get_trendline_properties(params[:trendline])
+      trendline = trendline_properties(params[:trendline])
 
       # Set the error bars properties for the series.
-      y_error_bars = get_error_bars_properties(params[:y_error_bars])
-      x_error_bars = get_error_bars_properties(params[:x_error_bars])
+      y_error_bars = error_bars_properties(params[:y_error_bars])
+      x_error_bars = error_bars_properties(params[:x_error_bars])
 
       # Set the labels properties for the series.
-      labels = get_labels_properties(params[:data_labels])
+      labels = labels_properties(params[:data_labels])
 
       # Set the "invert if negative" fill property.
       invert_if_neg = params[:invert_if_negative]
@@ -1060,12 +1060,12 @@ module Writexlsx
       # Set the up and down bar properties.
       @up_down_bars = {
         :_up => {
-          :_line => get_line_properties(params[:up][:line]),
-          :_fill => get_line_properties(params[:up][:fill])
+          :_line => line_properties(params[:up][:line]),
+          :_fill => line_properties(params[:up][:fill])
         },
         :_down => {
-          :_line => get_line_properties(params[:down][:line]),
-          :_fill => get_line_properties(params[:down][:fill])
+          :_line => line_properties(params[:down][:line]),
+          :_fill => line_properties(params[:down][:fill])
         }
       }
     end
@@ -1075,7 +1075,7 @@ module Writexlsx
     #
     def set_drop_lines(params = {})
       # Set the drop line properties.
-      line = get_line_properties(params[:line])
+      line = line_properties(params[:line])
 
       @drop_lines = { :_line => line }
     end
@@ -1085,7 +1085,7 @@ module Writexlsx
     #
     def set_high_low_lines(params = {})
       # Set the drop line properties.
-      line = get_line_properties(params[:line])
+      line = line_properties(params[:line])
 
       @hi_low_lines = { :_line => line }
     end
@@ -1203,7 +1203,7 @@ module Writexlsx
     #
     # Convert user defined line properties to the structure required internally.
     #
-    def get_line_properties(line) # :nodoc:
+    def line_properties(line) # :nodoc:
       return { :_defined => 0 } unless line
 
       dash_types = {
@@ -1367,7 +1367,7 @@ module Writexlsx
     #
     # Convert user defined fill properties to the structure required internally.
     #
-    def get_fill_properties(fill) # :nodoc:
+    def fill_properties(fill) # :nodoc:
       return { :_defined => 0 } unless fill
 
       fill[:_defined] = 1
@@ -1378,7 +1378,7 @@ module Writexlsx
     #
     # Convert user defined marker properties to the structure required internally.
     #
-    def get_marker_properties(marker) # :nodoc:
+    def marker_properties(marker) # :nodoc:
       return unless marker
 
       types = {
@@ -1407,13 +1407,13 @@ module Writexlsx
       end
 
       # Set the line properties for the marker..
-      line = get_line_properties(marker[:line])
+      line = line_properties(marker[:line])
 
       # Allow 'border' as a synonym for 'line'.
-      line = get_line_properties(marker[:border]) if marker[:border]
+      line = line_properties(marker[:border]) if marker[:border]
 
       # Set the fill properties for the marker.
-      fill = get_fill_properties(marker[:fill])
+      fill = fill_properties(marker[:fill])
 
       marker[:_line] = line
       marker[:_fill] = fill
@@ -1424,7 +1424,7 @@ module Writexlsx
     #
     # Convert user defined trendline properties to the structure required internally.
     #
-    def get_trendline_properties(trendline) # :nodoc:
+    def trendline_properties(trendline) # :nodoc:
       return unless trendline
 
       types = {
@@ -1442,13 +1442,13 @@ module Writexlsx
       trendline[:type] = value_or_raise(types, trend_type, 'trendline type')
 
       # Set the line properties for the trendline..
-      line = get_line_properties(trendline[:line])
+      line = line_properties(trendline[:line])
 
       # Allow 'border' as a synonym for 'line'.
-      line = get_line_properties(trendline[:border]) if trendline[:border]
+      line = line_properties(trendline[:border]) if trendline[:border]
 
       # Set the fill properties for the trendline.
-      fill = get_fill_properties(trendline[:fill])
+      fill = fill_properties(trendline[:fill])
 
       trendline[:_line] = line
       trendline[:_fill] = fill
@@ -1460,7 +1460,7 @@ module Writexlsx
     # Convert user defined error bars properties to structure required
     # internally.
     #
-    def get_error_bars_properties(params = {})
+    def error_bars_properties(params = {})
       return if !ptrue?(params) || params.empty?
 
       # Default values.
@@ -1509,27 +1509,15 @@ module Writexlsx
       end
 
       # Set the line properties for the error bars.
-      error_bars[:_line] = get_line_properties(params[:line])
+      error_bars[:_line] = line_properties(params[:line])
 
       error_bars
-    end
-    #
-    # Convert user defined gridline properties to the structure required internally.
-    #
-    def get_gridline_properties(args)
-      # Set the visible property for the gridline.
-      gridline = { :_visible => args[:visible] }
-
-      # Set the line properties for the gridline.
-      gridline[:_line] = get_line_properties(args[:line])
-
-      gridline
     end
 
     #
     # Convert user defined labels properties to the structure required internally.
     #
-    def get_labels_properties(labels) # :nodoc:
+    def labels_properties(labels) # :nodoc:
       return nil unless labels
 
       position = labels[:position]
@@ -1587,13 +1575,13 @@ module Writexlsx
       # Handle Excel::Writer::XLSX style properties.
 
       # Set the line properties for the chartarea.
-      line = get_line_properties(arg[:line])
+      line = line_properties(arg[:line])
 
       # Allow 'border' as a synonym for 'line'.
-      line = get_line_properties(arg[:border]) if (arg[:border])
+      line = line_properties(arg[:border]) if (arg[:border])
 
       # Set the fill properties for the chartarea.
-      fill = get_fill_properties(arg[:fill])
+      fill = fill_properties(arg[:fill])
 
       area[:_line] = line
       area[:_fill] = fill
