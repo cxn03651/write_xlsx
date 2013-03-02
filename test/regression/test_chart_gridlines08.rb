@@ -38,7 +38,7 @@ class TestChartGridlines08 < Test::Unit::TestCase
                      )
 
     chart.instance_variable_get(:@y_axis).
-      instance_variable_set(:@_major_tick_mark, 'cross')
+      instance_variable_set(:@major_tick_mark, 'cross')
 
     worksheet.insert_chart('E9',  chart)
 

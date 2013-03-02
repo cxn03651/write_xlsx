@@ -36,11 +36,11 @@ module Writexlsx
         end
 
         # Override and reset the default axis values.
-        @x_axis._defaults[:major_gridlines] = { :visible => 1 }
+        @x_axis.defaults[:major_gridlines] = { :visible => 1 }
         set_x_axis
 
         # Hardcode major_tick_mark for now untill there is an accessor.
-        @y_axis._major_tick_mark = 'cross'
+        @y_axis.major_tick_mark = 'cross'
       end
 
       #
