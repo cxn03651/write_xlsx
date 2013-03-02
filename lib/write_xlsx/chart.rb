@@ -2317,47 +2317,6 @@ module Writexlsx
       end
     end
 
-    def write_val_axis_common(position, hide_major_gridlines, params) # :nodoc:
-      position ||= @val_axis_position
-      horiz      = @horiz_val_axis
-
-      # Overwrite the default axis position with a user supplied value.
-      position = params[:axis_position] || position
-
-      @writer.tag_elements('c:valAx') do
-        write_axis_id(params[:axis_id])
-        # Write the c:scaling element.
-        write_scaling_with_param(params[:scaling_axis])
-
-        # Write the c:axPos element.
-        write_axis_pos(position, params[:axis_position_element])
-        # Write the c:majorGridlines element.
-        write_major_gridlines unless hide_major_gridlines
-        # Write the axis title elements.
-        if title = params[:title_axis][:_formula]
-          write_title_formula(title, @y_axis.data_id, horiz)
-        elsif title = params[:title_axis][:_name]
-          write_title_rich(title, horiz)
-        end
-        # Write the c:numberFormat element.
-        write_number_format
-
-        # Write the c:tickLblPos element.
-        write_tick_label_pos(params[:tick_label_pos])
-        # Write the c:crossAx element.
-        write_cross_axis(params[:cross_axis])
-
-        write_crossing(params[:category_crossing])
-
-        # Write the c:crossBetween element.
-        write_cross_between
-        # Write the c:majorUnit element.
-        write_c_major_unit(params[:major_unit])
-        # Write the c:minorUnit element.
-        write_c_minor_unit(params[:minor_unit])
-      end
-    end
-
     #
     # Write the <c:dateAx> element. Usually the X axis.
     #
