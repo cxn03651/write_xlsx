@@ -14,10 +14,6 @@ module Writexlsx
       attr_accessor :num_format, :num_format_linked, :num_font, :name_font
       attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
 
-      def initialize
-        @stringio = Package::XMLWriterSimple.new
-      end
-
       #
       # Convert user defined axis values into axis instance.
       #
@@ -66,7 +62,7 @@ module Writexlsx
       # attribute is 0. The user can override this if required.
       #
 
-      def write_number_format # :nodoc:
+      def write_number_format(writer) # :nodoc:
         source_linked = 1
 
         # Check if a user defined number format has been set.
@@ -84,8 +80,7 @@ module Writexlsx
                       'sourceLinked', source_linked
                      ]
 
-        @stringio.empty_tag('c:numFmt', attributes)
-        @stringio.string
+        writer.empty_tag('c:numFmt', attributes)
       end
 
       #

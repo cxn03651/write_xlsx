@@ -2489,7 +2489,7 @@ module Writexlsx
     #
 
     def write_number_format(axis) # :nodoc:
-      @writer.io_write(axis.write_number_format)
+      axis.write_number_format(@writer)
     end
 
     #
