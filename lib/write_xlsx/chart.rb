@@ -2497,32 +2497,7 @@ module Writexlsx
     # don't always have a number format.
     #
     def write_cat_number_format(axis)
-      format_code    = axis.num_format
-      source_linked  = 1
-      default_format = true
-
-      # Check if a user defined number format has been set.
-      if axis.defaults && format_code != axis.defaults[:num_format]
-        source_linked  = 0
-        default_format = false
-      end
-
-      # User override of linkedSource.
-      if axis.num_format_linked
-        source_linked = 1
-      end
-
-      # Skip if cat doesn't have a num format (unless it is non-default).
-      if !@cat_has_num_fmt && default_format
-        return ''
-      end
-
-      attributes = [
-                    'formatCode',   format_code,
-                    'sourceLinked', source_linked,
-                   ]
-
-      @writer.empty_tag('c:numFmt', attributes)
+      axis.write_cat_number_format(@writer, @cat_has_num_fmt)
     end
 
     #

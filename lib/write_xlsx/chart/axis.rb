@@ -84,6 +84,38 @@ module Writexlsx
       end
 
       #
+      # Write the <c:numFmt> element. Special case handler for category axes which
+      # don't always have a number format.
+      #
+      def write_cat_number_format(writer, cat_has_num_fmt)
+        source_linked  = 1
+        default_format = true
+
+        # Check if a user defined number format has been set.
+        if @defaults && @num_format != @defaults[:num_format]
+          source_linked  = 0
+          default_format = false
+        end
+
+        # User override of linkedSource.
+        if @num_format_linked
+          source_linked = 1
+        end
+
+        # Skip if cat doesn't have a num format (unless it is non-default).
+        if !cat_has_num_fmt && default_format
+          return ''
+        end
+
+        attributes = [
+                      'formatCode',   @num_format,
+                      'sourceLinked', source_linked,
+                     ]
+
+        writer.empty_tag('c:numFmt', attributes)
+      end
+
+      #
       # Convert user defined gridline properties to the structure required internally.
       #
       def get_gridline_properties(args)
