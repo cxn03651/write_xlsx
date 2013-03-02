@@ -28,7 +28,7 @@ module Writexlsx
 
         # Override and reset the default axis values.
         if @subtype == 'percent_stacked'
-          @y_axis[:_defaults][:num_format] = '0%'
+          @y_axis._defaults[:num_format] = '0%'
         end
 
         set_y_axis

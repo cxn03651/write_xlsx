@@ -29,19 +29,19 @@ module Writexlsx
         @show_crosses      = false
 
         # Override and reset the default axis values.
-        if @x_axis[:_defaults]
-          @x_axis[:_defaults][:major_gridlines] = { :visible => 1 }
+        if @x_axis._defaults
+          @x_axis._defaults[:major_gridlines] = { :visible => 1 }
         else
-          @x_axis[:_defaults] = { :major_gridlines => { :visible => 1 } }
+          @x_axis._defaults = { :major_gridlines => { :visible => 1 } }
         end
-        if @y_axis[:_defaults]
-          @y_axis[:_defaults][:major_gridlines] = { :visible => 0 }
+        if @y_axis._defaults
+          @y_axis._defaults[:major_gridlines] = { :visible => 0 }
         else
-          @y_axis[:_defaults] = { :major_gridlines => { :visible => 0 } }
+          @y_axis._defaults = { :major_gridlines => { :visible => 0 } }
         end
 
         if @subtype == 'percent_stacked'
-            @x_axis[:_defaults][:num_format] = '0%'
+            @x_axis._defaults[:num_format] = '0%'
         end
 
         set_x_axis
@@ -55,8 +55,8 @@ module Writexlsx
         if params[:primary_axes] != 0
           # Reverse X and Y axes for Bar charts.
           @y_axis, @x_axis = @x_axis, @y_axis
-          if @y2_axis[:_position] == 'r'
-            @y2_axis[:_position] = 't'
+          if @y2_axis._position == 'r'
+            @y2_axis._position = 't'
           end
         end
 
