@@ -949,7 +949,7 @@ module Writexlsx
     #
     def set_plotarea(params)
       # Convert the user defined properties to internal properties.
-      @plotarea = get_area_properties(params)
+      @plotarea = area_properties(params)
     end
 
     #
@@ -964,7 +964,7 @@ module Writexlsx
     #
     def set_chartarea(params)
       # Convert the user defined properties to internal properties.
-      @chartarea = get_area_properties(params)
+      @chartarea = area_properties(params)
     end
 
     #
@@ -1559,7 +1559,7 @@ module Writexlsx
     #
     # Convert user defined area properties to the structure required internally.
     #
-    def get_area_properties(arg)  # :nodoc:
+    def area_properties(arg)  # :nodoc:
       area = {}
 
       # Map deprecated Spreadsheet::WriteExcel fill colour.
