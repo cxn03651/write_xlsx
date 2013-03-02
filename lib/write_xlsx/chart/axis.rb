@@ -14,12 +14,17 @@ module Writexlsx
       attr_accessor :num_format, :num_format_linked, :num_font, :name_font
       attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
 
+      def initialize
+        @stringio = Package::XMLWriterSimple.new
+      end
+
       #
       # Convert user defined axis values into axis instance.
       #
       def merge_with_hash(chart, params) # :nodoc:
-        @chart = chart
-        args = (defaults || {}).merge(params)
+        @chart    = chart
+        args      = (defaults || {}).merge(params)
+
         @name, @formula = @chart.process_names(args[:name], args[:name_formula])
         @data_id           = @chart.get_data_id(@formula, args[:data])
         @reverse           = args[:reverse]
@@ -53,6 +58,34 @@ module Writexlsx
         # Set the font properties if present.
         @num_font  = @chart.convert_font_args(args[:num_font])
         @name_font = @chart.convert_font_args(args[:name_font])
+      end
+
+      #
+      # Write the <c:numberFormat> element. Note: It is assumed that if a user
+      # defined number format is supplied (i.e., non-default) then the sourceLinked
+      # attribute is 0. The user can override this if required.
+      #
+
+      def write_number_format # :nodoc:
+        source_linked = 1
+
+        # Check if a user defined number format has been set.
+        if @defaults && @num_format != @defaults[:num_format]
+          source_linked = 0
+        end
+
+        # User override of sourceLinked.
+        if ptrue?(@num_format_linked)
+          source_linked = 1
+        end
+
+        attributes = [
+                      'formatCode',   @num_format,
+                      'sourceLinked', source_linked
+                     ]
+
+        @stringio.empty_tag('c:numFmt', attributes)
+        @stringio.string
       end
 
       #

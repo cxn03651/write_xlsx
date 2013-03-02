@@ -2489,25 +2489,7 @@ module Writexlsx
     #
 
     def write_number_format(axis) # :nodoc:
-      format_code = axis.num_format
-      source_linked = 1
-
-      # Check if a user defined number format has been set.
-      if axis.defaults && format_code != axis.defaults[:num_format]
-        source_linked = 0
-      end
-
-      # User override of sourceLinked.
-      if ptrue?(axis.num_format_linked)
-        source_linked = 1
-      end
-
-      attributes = [
-                    'formatCode',   format_code,
-                    'sourceLinked', source_linked
-                   ]
-
-      @writer.empty_tag('c:numFmt', attributes)
+      @writer.io_write(axis.write_number_format)
     end
 
     #
