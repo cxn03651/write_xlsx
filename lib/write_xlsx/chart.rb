@@ -851,7 +851,7 @@ module Writexlsx
     #     )
     #
     def set_x_axis(params = {})
-      @x_axis.convert_axis_args(self, params)
+      @x_axis.merge_with_hash(self, params)
     end
 
     #
@@ -861,21 +861,21 @@ module Writexlsx
     # The properties that can be set are the same as for set_x_axis,
     #
     def set_y_axis(params = {})
-      @y_axis.convert_axis_args(self, params)
+      @y_axis.merge_with_hash(self, params)
     end
 
     #
     # Set the properties of the secondary X-axis.
     #
     def set_x2_axis(params = {})
-      @x2_axis.convert_axis_args(self, params)
+      @x2_axis.merge_with_hash(self, params)
     end
 
     #
     # Set the properties of the secondary Y-axis.
     #
     def set_y2_axis(params = {})
-      @y2_axis.convert_axis_args(self, params)
+      @y2_axis.merge_with_hash(self, params)
     end
 
     #
@@ -1128,54 +1128,6 @@ module Writexlsx
         # Write the c:axId elements
         write_axis_ids(params)
       end
-    end
-
-    #
-    # Convert user defined axis values into private hash values.
-    #
-    def convert_axis_args(axis, params) # :nodoc:
-      defaults = axis._defaults
-      arg = (defaults || {}).merge(params)
-      name, name_formula = process_names(arg[:name], arg[:name_formula])
-
-      data_id = get_data_id(name_formula, arg[:data])
-
-      axis = Axis.new
-      axis._defaults          = defaults
-      axis._name              = name
-      axis._formula           = name_formula
-      axis._data_id           = data_id
-      axis._reverse           = arg[:reverse]
-      axis._min               = arg[:min]
-      axis._max               = arg[:max]
-      axis._minor_unit        = arg[:minor_unit]
-      axis._major_unit        = arg[:major_unit]
-      axis._minor_unit_type   = arg[:minor_unit_type]
-      axis._major_unit_type   = arg[:major_unit_type]
-      axis._log_base          = arg[:log_base]
-      axis._crossing          = arg[:crossing]
-      axis._position          = arg[:position]
-      axis._label_position    = arg[:label_position]
-      axis._num_format        = arg[:num_format]
-      axis._num_format_linked = arg[:num_format_linked]
-      axis._visible           = arg[:visible] || 1
-
-
-      # Map major/minor_gridlines properties.
-      [:major_gridlines, :minor_gridlines].each do |lines|
-        if arg[lines] && ptrue?(arg[lines][:visible])
-          axis.instance_variable_set("@_#{lines}", get_gridline_properties(arg[lines]))
-        end
-      end
-
-      # Only use the first letter of bottom, top, left or right.
-      axis._position = axis._position.downcase[0, 1] if axis._position
-
-      # Set the font properties if present.
-      axis._num_font = convert_font_args(arg[:num_font])
-      axis._name_font  = convert_font_args(arg[:name_font])
-
-      axis
     end
 
     #
