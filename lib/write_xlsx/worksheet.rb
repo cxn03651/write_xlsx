@@ -3929,108 +3929,135 @@ module Writexlsx
     #
     # This is the cell where the sparkline will be displayed:
     #
-    #     location => 'F1'
-    # The location should be a single cell. (For multiple cells see "Grouped Sparklines" below).
+    #     :location => 'F1'
     #
-    # To specify the location in row-column notation use the xl_rowcol_to_cell() function from the Excel::Writer::XLSX::Utility module.
+    # The location should be a single cell. (For multiple cells see
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below).
     #
-    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    # To specify the location in row-column notation use the
+    # xl_rowcol_to_cell() function from the Writexlsx::Utility module.
+    #
+    #     include Writexlsx::Utility
     #     ...
     #     location => xl_rowcol_to_cell( 0, 5 ), # F1
-    # range
+    #
+    # ===:range
     #
     # This specifies the cell data range that the sparkline will plot:
     #
-    #     $worksheet->add_sparkline(
+    #     worksheet.add_sparkline(
     #         {
-    #             location => 'F1',
-    #             range    => 'A1:E1',
+    #             :location => 'F1',
+    #             :range    => 'A1:E1'
     #         }
-    #     );
-    # The range should be a 2D array. (For 3D arrays of cells see "Grouped Sparklines" below).
+    #     )
     #
-    # If range is not on the same worksheet you can specify its location using the usual Excel notation:
+    # The range should be a 2D array. (For 3D arrays of cells see
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below).
     #
-    #             range => 'Sheet1!A1:E1',
-    # If the worksheet contains spaces or special characters you should quote the worksheet name in the same way that Excel does:
+    # If range is not on the same worksheet you can specify its location using
+    # the usual Excel notation:
     #
-    #             range => q('Monthly Data'!A1:E1),
-    # To specify the location in row-column notation use the xl_range() or xl_range_formula() functions from the Excel::Writer::XLSX::Utility module.
+    #             Lrange => 'Sheet1!A1:E1'
     #
-    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    # If the worksheet contains spaces or special characters you should quote
+    # the worksheet name in the same way that Excel does:
+    #
+    #             :range => q('Monthly Data'!A1:E1)
+    #
+    # To specify the location in row-column notation use the xl_range() or
+    # xl_range_formula() functions from the Writexlsx::Utility module.
+    #
+    #     include Writexlsx::Utility
     #     ...
     #     range => xl_range( 1, 1,  0, 4 ),                   # 'A1:E1'
     #     range => xl_range_formula( 'Sheet1', 0, 0,  0, 4 ), # 'Sheet1!A2:E2'
-    # type
+    #
+    # ===:type
     #
     # Specifies the type of sparkline. There are 3 available sparkline types:
     #
-    #     line    (default)
-    #     column
-    #     win_loss
+    #     :line    (default)
+    #     :column
+    #     :win_loss
+    #
     # For example:
     #
     #     {
-    #         location => 'F1',
-    #         range    => 'A1:E1',
-    #         type     => 'column',
+    #         :location => 'F1',
+    #         :range    => 'A1:E1',
+    #         :type     => 'column'
     #     }
-    # style
     #
-    # Excel provides 36 built-in Sparkline styles in 6 groups of 6. The style parameter can be used to replicate these and should be a corresponding number from 1 .. 36.
+    # ===:style
+    #
+    # Excel provides 36 built-in Sparkline styles in 6 groups of 6. The style
+    # parameter can be used to replicate these and should be a corresponding
+    # number from 1 .. 36.
     #
     #     {
-    #         location => 'A14',
-    #         range    => 'Sheet2!A2:J2',
-    #         style    => 3,
+    #         :location => 'A14',
+    #         :range    => 'Sheet2!A2:J2',
+    #         :style    => 3
     #     }
-    # The style number starts in the top left of the style grid and runs left to right. The default style is 1. It is possible to override colour elements of the sparklines using the *_color parameters below.
     #
-    # markers
+    # The style number starts in the top left of the style grid and runs left
+    # to right. The default style is 1. It is possible to override colour
+    # elements of the sparklines using the *_color parameters below.
+    #
+    # ===:markers
     #
     # Turn on the markers for line style sparklines.
     #
     #     {
-    #         location => 'A6',
-    #         range    => 'Sheet2!A1:J1',
-    #         markers  => 1,
+    #         :location => 'A6',
+    #         :range    => 'Sheet2!A1:J1',
+    #         :markers  => 1
     #     }
+    #
     # Markers aren't shown in Excel for column and win_loss sparklines.
     #
-    # negative_points
+    # ===:negative_points
     #
-    # Highlight negative values in a sparkline range. This is usually required with win_loss sparklines.
+    # Highlight negative values in a sparkline range. This is usually required
+    # with win_loss sparklines.
     #
     #     {
-    #         location        => 'A21',
-    #         range           => 'Sheet2!A3:J3',
-    #         type            => 'win_loss',
-    #         negative_points => 1,
+    #         :location        => 'A21',
+    #         :range           => 'Sheet2!A3:J3',
+    #         :type            => 'win_loss',
+    #         :negative_points => 1
     #     }
-    # axis
+    #
+    # ===:axis
     #
     # Display a horizontal axis in the sparkline:
     #
     #     {
-    #         location => 'A10',
-    #         range    => 'Sheet2!A1:J1',
-    #         axis     => 1,
+    #         :location => 'A10',
+    #         :range    => 'Sheet2!A1:J1',
+    #         :axis     => 1
     #     }
-    # reverse
+    #
+    # ===:reverse
     #
     # Plot the data from right-to-left instead of the default left-to-right:
     #
     #     {
-    #         location => 'A24',
-    #         range    => 'Sheet2!A4:J4',
-    #         type     => 'column',
-    #         reverse  => 1,
+    #         :location => 'A24',
+    #         :range    => 'Sheet2!A4:J4',
+    #         :type     => 'column',
+    #         :reverse  => 1
     #     }
-    # weight
+    #
+    # ===:weight
     #
     # Adjust the default line weight (thickness) for line style sparklines.
     #
-    #      weight => 0.25,
+    #      :weight => 0.25
+    #
     # The weight value should be one of the following values allowed by Excel:
     #
     #     0.25  0.5   0.75
@@ -4039,107 +4066,110 @@ module Writexlsx
     #     3
     #     4.25
     #     6
-    # high_point, low_point, first_point, last_point
+    #
+    # ===:high_point, low_point, first_point, last_point
     #
     # Highlight points in a sparkline range.
     #
-    #         high_point  => 1,
-    #         low_point   => 1,
-    #         first_point => 1,
-    #         last_point  => 1,
-    # max, min
+    #         :high_point  => 1,
+    #         :low_point   => 1,
+    #         :first_point => 1,
+    #         :last_point  => 1
+    #
+    # ===:max, min
     #
     # Specify the maximum and minimum vertical axis values:
     #
-    #         max         => 0.5,
-    #         min         => -0.5,
-    # As a special case you can set the maximum and minimum to be for a group of sparklines rather than one:
+    #         :max         => 0.5,
+    #         :min         => -0.5
     #
-    #         max         => 'group',
-    # See "Grouped Sparklines" below.
+    # As a special case you can set the maximum and minimum to be for a group
+    # of sparklines rather than one:
     #
-    # empty_cells
+    #         max         => 'group'
+    # See
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below.
+    #
+    # ===:empty_cells
     #
     # Define how empty cells are handled in a sparkline.
     #
-    #     empty_cells => 'zero',
+    #     :empty_cells => 'zero',
+    #
     # The available options are:
     #
     #     gaps   : show empty cells as gaps (the default).
     #     zero   : plot empty cells as 0.
     #     connect: Connect points with a line ("line" type  sparklines only).
-    # show_hidden
+    #
+    # ===:show_hidden
     #
     # Plot data in hidden rows and columns:
     #
-    #     show_hidden => 1,
+    #     :show_hidden => 1
+    #
     # Note, this option is off by default.
     #
-    # date_axis
+    # ===:date_axis
     #
-    # Specify an alternative date axis for the sparkline. This is useful if the data being plotted isn't at fixed width intervals:
+    # Specify an alternative date axis for the sparkline. This is useful if
+    # the data being plotted isn't at fixed width intervals:
     #
     #     {
-    #         location  => 'F3',
-    #         range     => 'A3:E3',
-    #         date_axis => 'A4:E4',
+    #         :location  => 'F3',
+    #         :range     => 'A3:E3',
+    #         :date_axis => 'A4:E4'
     #     }
-    # The number of cells in the date range should correspond to the number of cells in the data range.
     #
-    # series_color
+    # The number of cells in the date range should correspond to the number
+    # of cells in the data range.
     #
-    # It is possible to override the colour of a sparkline style using the following parameters:
+    # ===:series_color
     #
-    #     series_color
-    #     negative_color
-    #     markers_color
-    #     first_color
-    #     last_color
-    #     high_color
-    #     low_color
+    # It is possible to override the colour of a sparkline style using the
+    # following parameters:
+    #
+    #     :series_color
+    #     :negative_color
+    #     :markers_color
+    #     :first_color
+    #     :last_color
+    #     :high_color
+    #     :low_color
+    #
     # The color should be specified as a HTML style #rrggbb hex value:
     #
     #     {
-    #         location     => 'A18',
-    #         range        => 'Sheet2!A2:J2',
-    #         type         => 'column',
-    #         series_color => '#E965E0',
+    #         :location     => 'A18',
+    #         :range        => 'Sheet2!A2:J2',
+    #         :type         => 'column',
+    #         :series_color => '#E965E0'
     #     }
-    # Grouped Sparklines
     #
-    # The add_sparkline() worksheet method can be used multiple times to write as many sparklines as are required in a worksheet.
+    # ==Grouped Sparklines
     #
-    # However, it is sometimes necessary to group contiguous sparklines so that changes that are applied to one are applied to all. In Excel this is achieved by selecting a 3D range of cells for the data range and a 2D range of cells for the location.
+    # The add_sparkline() worksheet method can be used multiple times to write
+    # as many sparklines as are required in a worksheet.
     #
-    # In Excel::Writer::XLSX, you can simulate this by passing an array refs of values to location and range:
+    # However, it is sometimes necessary to group contiguous sparklines so that
+    # changes that are applied to one are applied to all. In Excel this is
+    # achieved by selecting a 3D range of cells for the data range and a
+    # 2D range of cells for the location.
+    #
+    # In WriteXLSX, you can simulate this by passing an array of values to
+    # location and range:
     #
     #     {
-    #         location => [ 'A27',          'A28',          'A29'          ],
-    #         range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
-    #         markers  => 1,
+    #         :location => [ 'A27',          'A28',          'A29'          ],
+    #         :range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
+    #         :markers  => 1
     #     }
-    # Sparkline examples
     #
-    # See the sparklines1.pl and sparklines2.pl example programs in the examples directory of the distro.
+    # ===Sparkline examples
     #
-    # The add_sparkline worksheet method is used to add sparklines to a cell or a range of cells.
-    #
-    #    worksheet.add_sparkline(
-    #      {
-    #        :location => 'F2',
-    #        :range    => 'Sheet1!A2:E2',
-    #        :type     => 'column',
-    #        :style    => 12
-    #      }
-    #    )
-    #
-    # See also the sparklines1.rb and sparklines2.rb example programs in the examples directory of the distro.
-    #
-    # Note: Sparklines are a feature of Excel 2010+ only.
-    # You can write them to an XLSX file that can be read by Excel 2007 but they won't be displayed.
-    #
-    # Sparklines are a feature of Excel 2010+ which allows you to add small charts to worksheet cells.
-    # These are useful for showing visual trends in data in a compact format.
+    # See the sparklines1.rb and sparklines2.rb example programs in the
+    # examples directory of the distro.
     #
     def add_sparkline(param)
       @sparklines << Sparkline.new(self, param, quote_sheetname(@name))
