@@ -21,7 +21,7 @@ module Writexlsx
   #
   # The following methods are available through a new worksheet:
   #
-  # * write
+  # * {write}[#method-i-write]
   # * write_number
   # * write_string
   # * write_rich_string
@@ -33,7 +33,7 @@ module Writexlsx
   # * write_formula
   # * write_comment
   # * show_comments
-  # * comments_author=()
+  # * {comments_author=}[#method-i-comments_author-3D]
   # * insert_image
   # * insert_chart
   # * insert_shape
@@ -42,12 +42,12 @@ module Writexlsx
   # * conditional_formatting
   # * add_sparkline
   # * add_table
-  # * name
-  # * activate
-  # * select
-  # * hide
+  # * {name}[#method-i-name]
+  # * {activate}[#method-i-activate]
+  # * {select}[#method-i-select]
+  # * {hide}[#method-i-hide]
   # * set_first_sheet
-  # * protect
+  # * {protect}[#method-i-protect]
   # * set_selection
   # * set_row
   # * set_column
@@ -56,11 +56,11 @@ module Writexlsx
   # * split_panes
   # * merge_range
   # * merge_range_type
-  # * zoom=()
+  # * {zoom=}[#method-i-zoom-3D]
   # * right_to_left
   # * hide_zero
-  # * tab_color=()
-  # * autofilter
+  # * {tab_color=}[#method-i-tab_color-3D]
+  # * {autofilter}[#method-i-autofilter]
   # * filter_column
   # * filter_column_list
   #
