@@ -4659,62 +4659,78 @@ module Writexlsx
     #     :length
     #     :custom
     #
-    # :any is used to specify that the type of data is unrestricted.
+    # +:any+ is used to specify that the type of data is unrestricted.
     # This is the same as not applying a data validation. It is only
     # provided for completeness and isn't used very often in the
     # context of WriteXLSX.
     #
-    # :integer restricts the cell to integer values. Excel refers to this
+    # +:integer+ restricts the cell to integer values. Excel refers to this
     # as 'whole number'.
+    #
     #     :validate => 'integer',
     #     :criteria => '>',
     #     :value    => 100,
-    # :decimal restricts the cell to decimal values.
+    #
+    # +:decimal+ restricts the cell to decimal values.
+    #
     #     :validate => 'decimal',
     #     :criteria => '>',
     #     :value    => 38.6,
-    # :list restricts the cell to a set of user specified values. These
+    #
+    # +:list+ restricts the cell to a set of user specified values. These
     # can be passed in an array ref or as a cell range (named ranges aren't
     # currently supported):
+    #
     #     :validate => 'list',
     #     :value    => ['open', 'high', 'close'],
     #     # Or like this:
     #     :value    => 'B1:B3',
+    #
     # Excel requires that range references are only to cells on the same
     # worksheet.
     #
-    # :date restricts the cell to date values. Dates in Excel are expressed
+    # +:date+ restricts the cell to date values. Dates in Excel are expressed
     # as integer values but you can also pass an ISO860 style string as used
-    # in write_date_time(). See also "DATES AND TIME IN EXCEL" for more
-    # information about working with Excel's dates.
+    # in write_date_time(). See also
+    # {"DATES AND TIME IN EXCEL"}[#method-i-write_date_time-label-DATES+AND+TIME+IN+EXCEL]
+    # for more information about working with Excel's dates.
+    #
     #     :validate => 'date',
     #     :criteria => '>',
     #     :value    => 39653, # 24 July 2008
     #     # Or like this:
     #     :value    => '2008-07-24T',
-    # :time restricts the cell to time values. Times in Excel are expressed
+    #
+    # +:time+ restricts the cell to time values. Times in Excel are expressed
     # as decimal values but you can also pass an ISO860 style string as used
-    # in write_date_time(). See also "DATES AND TIME IN EXCEL" for more
-    # information about working with Excel's times.
+    # in write_date_time(). See also
+    # {"DATES AND TIME IN EXCEL"}[#method-i-write_date_time-label-DATES+AND+TIME+IN+EXCEL]
+    # for more information about working with Excel's times.
+    #
     #     :validate => 'time',
     #     :criteria => '>',
     #     :value    => 0.5, # Noon
     #     # Or like this:
     #     :value    => 'T12:00:00',
-    # :length restricts the cell data based on an integer string length.
+    #
+    # +:length+ restricts the cell data based on an integer string length.
     # Excel refers to this as 'Text length'.
+    #
     #     :validate => 'length',
     #     :criteria => '>',
     #     :value    => 10,
-    # :custom restricts the cell based on an external Excel formula
+    #
+    # +:custom+ restricts the cell based on an external Excel formula
     # that returns a TRUE/FALSE value.
+    #
     #     :validate => 'custom',
     #     :value    => '=IF(A10>B10,TRUE,FALSE)',
+    #
     # ===criteria
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The criteria parameter is used to set the criteria by which the data
+    # The +:criteria+ parameter is used to set the criteria by which the data
     # in the cell is validated. It is almost always required except for
     # the list and custom validate options. It has no default value.
     # Allowable values are:
@@ -4748,9 +4764,10 @@ module Writexlsx
     #
     #     :validate => 'custom',
     #     :value    => '=IF(A10>B10,TRUE,FALSE)',
-    # ===value | minimum | source
     #
-    # This parameter is passed in a hash ref to data_validation().
+    # ===:value | :minimum | :source
+    #
+    # This parameter is passed in a hash to data_validation().
     #
     # The value parameter is used to set the limiting value to which the
     # criteria is applied. It is always required and it has no default value.
@@ -4771,54 +4788,59 @@ module Writexlsx
     #     # Use 'source'
     #     :validate => 'list',
     #     :source   => '$B$1:$B$3',
-    # ===maximum
+    #
+    # ===:maximum
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The maximum parameter is used to set the upper limiting value when
+    # The +:maximum: parameter is used to set the upper limiting value when
     # the criteria is either 'between' or 'not between':
     #
     #     :validate => 'integer',
     #     :criteria => 'between',
     #     :minimum  => 1,
     #     :maximum  => 100,
-    # ===ignore_blank
+    #
+    # ===:ignore_blank
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The ignore_blank parameter is used to toggle on and off the
+    # The +:ignore_blank+ parameter is used to toggle on and off the
     # 'Ignore blank' option in the Excel data validation dialog. When the
     # option is on the data validation is not applied to blank data in the
     # cell. It is on by default.
     #
     #     :ignore_blank => 0,  # Turn the option off
-    # ===dropdown
+    #
+    # ===:dropdown
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The dropdown parameter is used to toggle on and off the
+    # The +:dropdown+ parameter is used to toggle on and off the
     # 'In-cell dropdown' option in the Excel data validation dialog.
     # When the option is on a dropdown list will be shown for list validations.
     # It is on by default.
     #
     #     :dropdown => 0,      # Turn the option off
-    # ===input_title
+    #
+    # ===:input_title
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The input_title parameter is used to set the title of the input
+    # The +:input_title+ parameter is used to set the title of the input
     # message that is displayed when a cell is entered. It has no default
     # value and is only displayed if the input message is displayed.
     # See the input_message parameter below.
     #
     #     :input_title   => 'This is the input title',
+    #
     # The maximum title length is 32 characters.
     #
-    # ===input_message
+    # ===:input_message
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The input_message parameter is used to set the input message that
+    # The +:input_message+ parameter is used to set the input message that
     # is displayed when a cell is entered. It has no default value.
     #
     #     :validate      => 'integer',
@@ -4835,22 +4857,22 @@ module Writexlsx
     #
     # The maximum message length is 255 characters.
     #
-    # ===show_input
+    # ===:show_input
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The show_input parameter is used to toggle on and off the 'Show input
+    # The +:show_input+ parameter is used to toggle on and off the 'Show input
     # message when cell is selected' option in the Excel data validation
     # dialog. When the option is off an input message is not displayed even
     # if it has been set using input_message. It is on by default.
     #
     #     :show_input => 0,      # Turn the option off
     #
-    # ===error_title
+    # ===:error_title
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_title parameter is used to set the title of the error message
+    # The +:error_title+ parameter is used to set the title of the error message
     # that is displayed when the data validation criteria is not met.
     # The default error title is 'Microsoft Excel'.
     #
@@ -4858,11 +4880,11 @@ module Writexlsx
     #
     # The maximum title length is 32 characters.
     #
-    # ===error_message
+    # ===:error_message
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_message parameter is used to set the error message that is
+    # The +:error_message+ parameter is used to set the error message that is
     # displayed when a cell is entered. The default error message is
     # "The value you entered is not valid.\nA user has restricted values
     # that can be entered into the cell.".
@@ -4881,11 +4903,12 @@ module Writexlsx
     #
     # The maximum message length is 255 characters.
     #
-    # ===error_type
+    # ===:error_type
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_type parameter is used to specify the type of error dialog that is displayed. There are 3 options:
+    # The +:error_type+ parameter is used to specify the type of error dialog
+    # that is displayed. There are 3 options:
     #
     #     'stop'
     #     'warning'
@@ -4893,11 +4916,11 @@ module Writexlsx
     #
     # The default is 'stop'.
     #
-    # ===show_error
+    # ===:show_error
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The show_error parameter is used to toggle on and off the 'Show error
+    # The +:show_error+ parameter is used to toggle on and off the 'Show error
     # alert after invalid data is entered' option in the Excel data validation
     # dialog. When the option is off an error message is not displayed
     # even if it has been set using error_message. It is on by default.
@@ -4906,7 +4929,7 @@ module Writexlsx
     #
     # ===Data Validation Examples
     #
-    # ====Example 1. Limiting input to an integer greater than a fixed value.
+    # ===Example 1. Limiting input to an integer greater than a fixed value.
     #
     #     worksheet.data_validation('A1',
     #         {
@@ -4914,7 +4937,7 @@ module Writexlsx
     #             :criteria        => '>',
     #             :value           => 0,
     #         });
-    # ====Example 2. Limiting input to an integer greater than a fixed value where the value is referenced from a cell.
+    # ===Example 2. Limiting input to an integer greater than a fixed value where the value is referenced from a cell.
     #
     #     worksheet.data_validation('A2',
     #         {
@@ -4922,7 +4945,7 @@ module Writexlsx
     #             :criteria        => '>',
     #             :value           => '=E3',
     #         });
-    # ====Example 3. Limiting input to a decimal in a fixed range.
+    # ===Example 3. Limiting input to a decimal in a fixed range.
     #
     #     worksheet.data_validation('A3',
     #         {
@@ -4931,21 +4954,21 @@ module Writexlsx
     #             :minimum         => 0.1,
     #             :maximum         => 0.5,
     #         });
-    # ====Example 4. Limiting input to a value in a dropdown list.
+    # ===Example 4. Limiting input to a value in a dropdown list.
     #
     #     worksheet.data_validation('A4',
     #         {
     #             :validate        => 'list',
     #             :source          => ['open', 'high', 'close'],
     #         });
-    # ====Example 5. Limiting input to a value in a dropdown list where the list is specified as a cell range.
+    # ===Example 5. Limiting input to a value in a dropdown list where the list is specified as a cell range.
     #
     #     worksheet.data_validation('A5',
     #         {
     #             :validate        => 'list',
     #             :source          => '=$E$4:$G$4',
     #         });
-    # ====Example 6. Limiting input to a date in a fixed range.
+    # ===Example 6. Limiting input to a date in a fixed range.
     #
     #     worksheet.data_validation('A6',
     #         {
@@ -4954,7 +4977,7 @@ module Writexlsx
     #             :minimum         => '2008-01-01T',
     #             :maximum         => '2008-12-12T',
     #         });
-    # ====Example 7. Displaying a message when the cell is selected.
+    # ===Example 7. Displaying a message when the cell is selected.
     #
     #     worksheet.data_validation('A7',
     #         {
