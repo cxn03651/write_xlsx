@@ -21,48 +21,48 @@ module Writexlsx
   #
   # The following methods are available through a new worksheet:
   #
-  #     write
-  #     write_number
-  #     write_string
-  #     write_rich_string
-  #     write_blank
-  #     write_row
-  #     write_col
-  #     write_date_time
-  #     write_url
-  #     write_url_range
-  #     write_formula
-  #     write_comment
-  #     show_comments
-  #     comments_author=()
-  #     insert_image
-  #     insert_chart
-  #     insert_shape
-  #     data_validation
-  #     conditional_formatting
-  #     add_sparkline
-  #     add_table
-  #     name
-  #     activate
-  #     select
-  #     hide
-  #     set_first_sheet
-  #     protect
-  #     set_selection
-  #     set_row
-  #     set_column
-  #     outline_settings
-  #     freeze_panes
-  #     split_panes
-  #     merge_range
-  #     merge_range_type
-  #     zoom=()
-  #     right_to_left
-  #     hide_zero
-  #     tab_color=()
-  #     autofilter
-  #     filter_column
-  #     filter_column_list
+  # * write
+  # * write_number
+  # * write_string
+  # * write_rich_string
+  # * write_blank
+  # * write_row
+  # * write_col
+  # * write_date_time
+  # * write_url
+  # * write_formula
+  # * write_comment
+  # * show_comments
+  # * comments_author=()
+  # * insert_image
+  # * insert_chart
+  # * insert_shape
+  # * insert_button
+  # * data_validation
+  # * conditional_formatting
+  # * add_sparkline
+  # * add_table
+  # * name
+  # * activate
+  # * select
+  # * hide
+  # * set_first_sheet
+  # * protect
+  # * set_selection
+  # * set_row
+  # * set_column
+  # * outline_settings
+  # * freeze_panes
+  # * split_panes
+  # * merge_range
+  # * merge_range_type
+  # * zoom=()
+  # * right_to_left
+  # * hide_zero
+  # * tab_color=()
+  # * autofilter
+  # * filter_column
+  # * filter_column_list
   #
   # ==Cell notation
   #
@@ -108,35 +108,38 @@ module Writexlsx
   # following sections are given in terms of row-column notation. In all cases
   # it is also possible to use A1 notation.
   #
+  # Note: in Excel it is also possible to use a R1C1 notation. This is not
+  # supported by WriteXLSX.
+  #
   # == PAGE SET-UP METHODS
   #
   # Page set-up methods affect the way that a worksheet looks
   # when it is printed. They control features such as page headers and footers
   # and margins. These methods are really just standard worksheet methods.
-  # They are documented here in a separate section for the sake of clarity.
   #
   # The following methods are available for page set-up:
   #
-  #   set_landscape()
-  #   set_portrait()
-  #   set_page_view()
-  #   set_paper()
-  #   center_horizontally()
-  #   center_vertically()
-  #   set_margins()
-  #   set_header()
-  #   set_footer()
-  #   repeat_rows()
-  #   repeat_columns()
-  #   hide_gridlines()
-  #   print_row_col_headers()
-  #   print_area()
-  #   print_across()
-  #   fit_to_pages()
-  #   set_start_page()
-  #   set_print_scale()
-  #   set_h_pagebreaks()
-  #   set_v_pagebreaks()
+  #  * set_landscape
+  #  * set_portrait
+  #  * set_page_view
+  #  * set_paper
+  #  * center_horizontally
+  #  * center_vertically
+  #  * set_margins
+  #  * set_header
+  #  * set_footer
+  #  * repeat_rows
+  #  * repeat_columns
+  #  * hide_gridlines
+  #  * print_row_col_headers
+  #  * print_area
+  #  * print_across
+  #  * fit_to_pages
+  #  * set_start_page
+  #  * set_print_scale
+  #  * set_h_pagebreaks
+  #  * set_v_pagebreaks
+  #
   # A common requirement when working with WriteXLSX is to apply the same
   # page set-up features to all of the worksheets in a workbook. To do this
   # you can use the sheets() method of the workbook class to access the array
@@ -145,6 +148,131 @@ module Writexlsx
   #   workbook.sheets.each do |worksheet|
   #     worksheet.set_landscape
   #   end
+  #
+  # == FORMULAS AND FUNCTIONS IN EXCEL
+  #
+  # === Introduction
+  #
+  # The following is a brief introduction to formulas and functions in Excel
+  # and WriteXLSX.
+  #
+  # A formula is a string that begins with an equals sign:
+  #
+  #     '=A1+B1'
+  #     '=AVERAGE(1, 2, 3)'
+  #
+  # The formula can contain numbers, strings, boolean values, cell references,
+  # cell ranges and functions. Named ranges are not supported. Formulas should
+  # be written as they appear in Excel, that is cells and functions must be
+  # in uppercase.
+  #
+  # Cells in Excel are referenced using the A1 notation system where the column
+  # is designated by a letter and the row by a number. Columns range from +A+
+  # to +XFD+ i.e. 0 to 16384, rows range from 1 to 1048576.
+  # The Writexlsx::Utility module that is included in the distro contains
+  # helper functions for dealing with A1 notation, for example:
+  #
+  #     require 'write_xlsx'
+  #
+  #     include Writexlsx::Utility
+  #
+  #     row, col = xl_cell_to_rowcol('C2')    # (1, 2)
+  #     str      = xl_rowcol_to_cell(1, 2)    # C2
+  #
+  # The Excel +$+ notation in cell references is also supported. This allows
+  # you to specify whether a row or column is relative or absolute. This only
+  # has an effect if the cell is copied. The following examples show relative
+  # and absolute values.
+  #
+  #     '=A1'   # Column and row are relative
+  #     '=$A1'  # Column is absolute and row is relative
+  #     '=A$1'  # Column is relative and row is absolute
+  #     '=$A$1' # Column and row are absolute
+  #
+  # Formulas can also refer to cells in other worksheets of the current
+  # workbook. For example:
+  #
+  #     '=Sheet2!A1'
+  #     '=Sheet2!A1:A5'
+  #     '=Sheet2:Sheet3!A1'
+  #     '=Sheet2:Sheet3!A1:A5'
+  #     %Q{='Test Data'!A1}
+  #     %Q{='Test Data1:Test Data2'!A1}
+  #
+  # The sheet reference and the cell reference are separated by +!+ the
+  # exclamation mark symbol. If worksheet names contain spaces, commas or
+  # parentheses then Excel requires that the name is enclosed in single
+  # quotes as shown in the last two examples above. In order to avoid using
+  # a lot of escape characters you can use the quote operator +%Q{}+ to
+  # protect the quotes. Only valid sheet names that have been added using the
+  # add_worksheet() method can be used in formulas. You cannot reference
+  # external workbooks.
+  #
+  # The following table lists the operators that are available in Excel's
+  # formulas. The majority of the operators are the same as Ruby's,
+  # differences are indicated:
+  #
+  #     Arithmetic operators:
+  #     =====================
+  #     Operator  Meaning                   Example
+  #        +      Addition                  1+2
+  #        -      Subtraction               2-1
+  #        *      Multiplication            2*3
+  #        /      Division                  1/4
+  #        ^      Exponentiation            2^3      # Equivalent to **
+  #        -      Unary minus               -(1+2)
+  #        %      Percent (Not modulus)     13%
+  #
+  #
+  #     Comparison operators:
+  #     =====================
+  #     Operator  Meaning                   Example
+  #         =     Equal to                  A1 =  B1 # Equivalent to ==
+  #         <>    Not equal to              A1 <> B1 # Equivalent to !=
+  #         >     Greater than              A1 >  B1
+  #         <     Less than                 A1 <  B1
+  #         >=    Greater than or equal to  A1 >= B1
+  #         <=    Less than or equal to     A1 <= B1
+  #
+  #
+  #     String operator:
+  #     ================
+  #     Operator  Meaning                   Example
+  #         &     Concatenation             "Hello " & "World!" # [1]
+  #
+  #
+  #     Reference operators:
+  #     ====================
+  #     Operator  Meaning                   Example
+  #         :     Range operator            A1:A4               # [2]
+  #         ,     Union operator            SUM(1, 2+2, B3)     # [3]
+  #
+  #
+  #     Notes:
+  #     [1]: Equivalent to "Hello " + "World!" in Ruby.
+  #     [2]: This range is equivalent to cells A1, A2, A3 and A4.
+  #     [3]: The comma behaves like the list separator in Perl.
+  #
+  # The range and comma operators can have different symbols in non-English
+  # versions of Excel. These may be supported in a later version of WriteXLSX.
+  # In the meantime European users of Excel take note:
+  #
+  #     worksheet.write('A1', '=SUM(1; 2; 3)')   # Wrong!!
+  #     worksheet.write('A1', '=SUM(1, 2, 3)')   # Okay
+  #
+  # For a general introduction to Excel's formulas and an explanation of the
+  # syntax of the function refer to the Excel help files or the following:
+  # http://office.microsoft.com/en-us/assistance/CH062528031033.aspx.
+  #
+  # If your formula doesn't work in Excel::Writer::XLSX try the following:
+  #
+  #     1. Verify that the formula works in Excel.
+  #     2. Ensure that cell references and formula names are in uppercase.
+  #     3. Ensure that you are using ':' as the range operator, A1:A4.
+  #     4. Ensure that you are using ',' as the union operator, SUM(1,2,3).
+  #     5. If you verify that the formula works in Gnumeric, OpenOffice.org
+  #        or LibreOffice, make sure to note items 2-4 above, since these
+  #        applications are more flexible than Excel with formula syntax.
   #
   class Worksheet
     include Writexlsx::Utility
@@ -491,7 +619,7 @@ module Writexlsx
     #
     # It is also possible, and generally clearer, to specify a column range
     # using the form of A1 notation used for columns. See the note about
-    # "Cell notation".
+    # {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -627,7 +755,7 @@ module Writexlsx
     # in which case last_row and last_col can be omitted. The active cell
     # within a selected range is determined by the order in which first and
     # last are specified. It is also possible to specify a cell or a range
-    # using A1 notation. See the note about "Cell notation".
+    # using A1 notation. See the note about {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -1284,7 +1412,7 @@ module Writexlsx
     # method. The parameters first_column and last_column are zero based.
     # The last_column parameter is optional if you only wish to specify
     # one column. You can also specify the columns using A1 column
-    # notation, see the note about "Cell notation".
+    # notation, see the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet1.repeat_columns(0)        # Repeat the first column
     #     worksheet2.repeat_columns(0, 1)     # Repeat the first two columns
@@ -1313,7 +1441,7 @@ module Writexlsx
     #
     # This method is used to specify the area of the worksheet that will
     # be printed. All four parameters must be specified. You can also use
-    # A1 notation, see the note about "Cell notation".
+    # A1 notation, see the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet1.print_area( 'A1:H20' );    # Cells A1 to H20
     #     worksheet2.print_area( 0, 0, 19, 7 ); # The same
@@ -1492,8 +1620,8 @@ module Writexlsx
     #     write_row
     #     write_col
     #
-    # The general rule is that if the data looks like a something then
-    # a something is written. Here are some examples in both row-column
+    # The general rule is that if the data looks like a _something_ then
+    # a _something_ is written. Here are some examples in both row-column
     # and A1 notation:
     #
     #                                                     # Same as:
@@ -1517,7 +1645,8 @@ module Writexlsx
     #     # Write an array formula. Not available in writeexcel gem.
     #     worksheet.write('A16', '{=SUM(A1:B1*A2:B2)}' ) # write_formula()
     #
-    # The format parameter is optional. It should be a valid Format object.
+    # The +format+ parameter is optional. It should be a valid Format object,
+    # See {"CELL FORMATTING"}[Format.html#label-CELL+FORMATTING]:
     #
     #     format = workbook.add_format
     #     format.set_bold
@@ -1526,9 +1655,9 @@ module Writexlsx
     #
     #     worksheet.write(4, 0, 'Hello', format)    # Formatted string
     #
-    # The write() method will ignore empty strings or nil tokens unless a format
-    # is also supplied. As such you needn't worry about special handling for
-    # empty or nil in your data. See also the write_blank() method.
+    # The write() method will ignore empty strings or +nil+ tokens unless a
+    # format is also supplied. As such you needn't worry about special handling
+    # for empty or nil in your data. See also the write_blank() method.
     #
     # One problem with the write() method is that occasionally data looks like
     # a number but you don't want it treated as a number. For example, zip
@@ -1597,13 +1726,13 @@ module Writexlsx
     #     worksheet.write(0, 2, array[2])
     #
     # Note: For convenience the write() method behaves in the same way as
-    # write_row() if it is passed an array reference.
+    # write_row() if it is passed an array.
     # Therefore the following two method calls are equivalent:
     #
     #     worksheet.write_row('A1', array)    # Write a row of data
     #     worksheet.write(    'A1', array)    # Same thing
     #
-    # As with all of the write methods the format parameter is optional.
+    # As with all of the write methods the +format+ parameter is optional.
     # If a format is specified it is applied to all the elements of the
     # data array.
     #
@@ -1617,6 +1746,7 @@ module Writexlsx
     #            ]
     #
     #     worksheet.write_row('A1', eec)
+    #
     # Would produce a worksheet as follows:
     #
     #      -----------------------------------------------------------
@@ -1632,15 +1762,10 @@ module Writexlsx
     # To write the data in a row-column order refer to the write_col()
     # method below.
     #
-    # Any nil in the data will be ignored unless a format is applied to
+    # Any +nil+ in the data will be ignored unless a format is applied to
     # the data, in which case a formatted blank cell will be written.
     # In either case the appropriate row or column value will still
     # be incremented.
-    #
-    # The write_row() method returns the first error encountered when
-    # writing the elements of the data or zero if no errors were
-    # encountered. See the return values described for the write()
-    # method.
     #
     # See also the write_arrays.rb program in the examples directory
     # of the distro.
@@ -1684,7 +1809,7 @@ module Writexlsx
     #     worksheet.write(1, 0, array[1])
     #     worksheet.write(2, 0, array[2])
     #
-    # As with all of the write methods the format parameter is optional.
+    # As with all of the write methods the +format+ parameter is optional.
     # If a format is specified it is applied to all the elements of the
     # data array.
     #
@@ -1714,7 +1839,7 @@ module Writexlsx
     # To write the data in a column-row order refer to the write_row()
     # method above.
     #
-    # Any nil in the data will be ignored unless a format is applied to
+    # Any +nil+ in the data will be ignored unless a format is applied to
     # the data, in which case a formatted blank cell will be written.
     # In either case the appropriate row or column value will still be
     # incremented.
@@ -1727,10 +1852,6 @@ module Writexlsx
     #
     #     worksheet.write_col('A1', array     ) # Write a column of data
     #     worksheet.write(    'A1', [ array ] ) # Same thing
-    #
-    # The write_col() method returns the first error encountered when
-    # writing the elements of the data or zero if no errors were encountered.
-    # See the return values described for the write() method above.
     #
     # See also the write_arrays.rb program in the examples directory of
     # the distro.
@@ -1752,9 +1873,6 @@ module Writexlsx
     #
     # Write a comment to the specified row and column (zero indexed).
     #
-    # write_comment methods return:
-    #   Returns  0 : normal termination
-    #
     # The write_comment() method is used to add a comment to a cell.
     # A cell comment is indicated in Excel by a small red triangle in the
     # upper right-hand corner of the cell. Moving the cursor over the red
@@ -1766,15 +1884,15 @@ module Writexlsx
     #     worksheet.write_comment(2, 2, 'This is a comment.')
     #
     # As usual you can replace the row and column parameters with an A1
-    # cell reference. See the note about "Cell notation".
+    # cell reference. See the note about {"Cell notation"}[#label-Cell+notation].
     #
     #     worksheet.write(        'C3', 'Hello')
     #     worksheet.write_comment('C3', 'This is a comment.')
     #
     # The write_comment() method will also handle strings in UTF-8 format.
     #
-    #     worksheet.write_comment('C3', "\x{263a}")       # Smiley
-    #     worksheet.write_comment('C4', 'Comment ca va?')
+    #     worksheet.write_comment('C3', "日本")
+    #     worksheet.write_comment('C4', 'Comment ça va')
     #
     # In addition to the basic 3 argument form of write_comment() you can
     # pass in several optional key/value pairs to control the format of
@@ -1910,13 +2028,13 @@ module Writexlsx
     #
     # You can apply as many of these options as you require.
     #
-    # Note about using options that adjust the position of the cell comment
-    # such as start_cell, start_row, start_col, x_offset and y_offset:
+    # <b>Note about using options that adjust the position of the cell comment
+    # such as start_cell, start_row, start_col, x_offset and y_offset</b>:
     # Excel only displays offset cell comments when they are displayed as
     # "visible". Excel does not display hidden cells as moved when you
     # mouse over them.
     #
-    # Note about row height and comments. If you specify the height of a
+    # <b>Note about row height and comments</b>. If you specify the height of a
     # row that contains a comment then WriteXLSX will adjust the
     # height of the comment to maintain the default or user specified
     # dimensions. However, the height of a row can also be adjusted
@@ -1950,8 +2068,8 @@ module Writexlsx
     #     worksheet.write_number(0, 0, 123456)
     #     worksheet.write_number('A2', 2.3451)
     #
-    # See the note about "Cell notation".
-    # The format parameter is optional.
+    # See the note about {"Cell notation"}[#label-Cell+notation].
+    # The +format+ parameter is optional.
     #
     # In general it is sufficient to use the write() method.
     #
@@ -1976,7 +2094,7 @@ module Writexlsx
     #   write_string(row, column, string [, format ] )
     #
     # Write a string to the specified row and column (zero indexed).
-    # format is optional.
+    # +format+ is optional.
     #
     #     worksheet.write_string(0, 0, 'Your text here')
     #     worksheet.write_string('A2', 'or here')
@@ -2022,9 +2140,7 @@ module Writexlsx
     # The method receives string fragments prefixed by format objects. The final
     # format object is used as the cell format.
     #
-    # write_rich_string methods return:
-    #
-    # For example to write the string "This is bold and this is italic"
+    # For example to write the string "This is *bold* and this is _italic_"
     # you would use the following:
     #
     #     bold   = workbook.add_format(:bold   => 1)
@@ -2033,7 +2149,7 @@ module Writexlsx
     #     worksheet.write_rich_string('A1',
     #         'This is ', bold, 'bold', ' and this is ', italic, 'italic')
     #
-    # The basic rule is to break the string into fragments and put a format
+    # The basic rule is to break the string into fragments and put a +format+
     # object before the fragment that you want to format. For example:
     #
     #     # Unformatted string.
@@ -2048,8 +2164,9 @@ module Writexlsx
     #     # In WriteXLSX.
     #     worksheet.write_rich_string('A1',
     #         'This is an ', format, 'example', ' string')
-    # String fragments that don't have a format are given a default
-    # format. So for example when writing the string "Some bold text"
+    #
+    # String fragments that don't have a format are given a default format.
+    # So for example when writing the string "Some *bold* text"
     # you would use the first example below but it would be equivalent
     # to the second:
     #
@@ -2103,8 +2220,10 @@ module Writexlsx
     #     worksheet.write_rich_string('A7',
     #         italic, 'j = k', super, '(n-1)', center)
     #
+    # "http://jmcnamara.github.com/excel-writer-xlsx/images/examples/rich_strings.jpg"
+    #
     # As with write_sting() the maximum string size is 32767 characters.
-    # See also the note about "Cell notation".
+    # See also the note about {"Cell notation"}[#label-Cell+notation].
     #
     def write_rich_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2163,6 +2282,11 @@ module Writexlsx
     # A blank cell is used to specify formatting without adding a string
     # or a number.
     #
+    #     worksheet.write_blank(0, 0, format)
+    #
+    # This method is used to add formatting to cell which doesn't contain a
+    # string or number value.
+    #
     # A blank cell without a format serves no purpose. Therefore, we don't write
     # a BLANK record unless a format is specified. This is mainly an optimisation
     # for the write_row() and write_col() methods.
@@ -2178,9 +2302,9 @@ module Writexlsx
     #     worksheet.write('A2', nil )            # Ignored
     #
     # This seemingly uninteresting fact means that you can write arrays of
-    # data without special treatment for nil or empty string values.
+    # data without special treatment for +nil+ or empty string values.
     #
-    # See the note about "Cell notation".
+    # See the note about {"Cell notation"}[#label-Cell+notation].
     #
     def write_blank(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2201,7 +2325,7 @@ module Writexlsx
     # :call-seq:
     #   write_formula(row, column, formula [ , format [ , value ] ] )
     #
-    # Write a formula or function to the cell specified by row and column:
+    # Write a formula or function to the cell specified by +row+ and +column+:
     #
     #     worksheet.write_formula(0, 0, '=$B$3 + B4')
     #     worksheet.write_formula(1, 0, '=SIN(PI()/4)')
@@ -2209,19 +2333,21 @@ module Writexlsx
     #     worksheet.write_formula('A4', '=IF(A3>1,"Yes", "No")')
     #     worksheet.write_formula('A5', '=AVERAGE(1, 2, 3, 4)')
     #     worksheet.write_formula('A6', '=DATEVALUE("1-Jan-2001")')
+    #
     # Array formulas are also supported:
     #
     #     worksheet.write_formula('A7', '{=SUM(A1:B1*A2:B2)}')
     #
     # See also the write_array_formula() method.
     #
-    # See the note about "Cell notation". For more information about
-    # writing Excel formulas see "FORMULAS AND FUNCTIONS IN EXCEL"
+    # See the note about {"Cell notation"}[#label-Cell+notation].
+    # For more information about writing Excel formulas see
+    # {"FORMULAS AND FUNCTIONS IN EXCEL"}[#label-FORMULAS+AND+FUNCTIONS+IN+EXCEL]
     #
     # If required, it is also possible to specify the calculated value
     # of the formula. This is occasionally necessary when working with
     # non-Excel applications that don't calculate the value of the
-    # formula. The calculated value is added at the end of the argument list:
+    # formula. The calculated +value+ is added at the end of the argument list:
     #
     #     worksheet.write('A1', '=2+2', format, 4)
     #
@@ -2248,16 +2374,13 @@ module Writexlsx
     # :call-seq:
     #   write_array_formula(row1, col1, row2, col2, formula [ , format [ , value ] ] )
     #
-    # Write an array formula to the specified row and column (zero indexed).
-    #
-    # format is optional.
-    #
-    # In Excel an array formula is a formula that performs a calculation
-    # on a set of values. It can return a single value or a range of values.
+    # Write an array formula to a cell range. In Excel an array formula is a
+    # formula that performs a calculation on a set of values. It can return
+    # a single value or a range of values.
     #
     # An array formula is indicated by a pair of braces around the
-    # formula: {=SUM(A1:B1*A2:B2)}. If the array formula returns a single
-    # value then the first and last parameters should be the same:
+    # formula: +{=SUM(A1:B1*A2:B2)}+. If the array formula returns a single
+    # value then the +first_+ and +last_+ parameters should be the same:
     #
     #     worksheet.write_array_formula('A1:A1', '{=SUM(B1:C1*B2:C2)}')
     #
@@ -2375,19 +2498,16 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_url(row, column, url [ , format, string, tool_tip ] )
+    #   write_url(row, column, url [ , format, label ] )
     #
-    # Write a hyperlink to a URL in the cell specified by row and column.
+    # Write a hyperlink to a URL in the cell specified by +row+ and +column+.
     # The hyperlink is comprised of two elements: the visible label and
     # the invisible link. The visible label is the same as the link unless
     # an alternative label is specified. The label parameter is optional.
     # The label is written using the write() method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
-    # The hyperlink can be to a http, ftp, mail, internal sheet, or external
-    # directory url.
-    #
-    # The format parameter is also optional, however, without a format
+    # The +format+ parameter is also optional, however, without a format
     # the link won't look like a format.
     #
     # The suggested format is:
@@ -2401,10 +2521,21 @@ module Writexlsx
     # There are four web style URI's supported:
     # http://, https://, ftp:// and mailto::
     #
-    #     worksheet.write_url(0, 0, 'ftp://www.ruby.org/',  format)
-    #     worksheet.write_url(1, 0, 'http://www.ruby.com/', format, 'Ruby')
-    #     worksheet.write_url('A3', 'http://www.ruby.com/', format)
+    #     worksheet.write_url(0, 0, 'ftp://www.ruby-lang.org/',  format)
+    #     worksheet.write_url('A3', 'http://www.ruby-lang.org/', format)
     #     worksheet.write_url('A4', 'mailto:foo@bar.com', format)
+    #
+    # You can display an alternative string using the +label+ parameter:
+    #
+    #     worksheet.write_url(1, 0, 'http://www.ruby-lang.org/', format, 'Ruby')
+    #
+    # If you wish to have some other cell data such as a number or a formula
+    # you can overwrite the cell using another call to write_*():
+    #
+    #     worksheet.write_url('A1', 'http://www.ruby-lang.org/')
+    #
+    #     # Overwrite the URL string with a formula. The cell is still a link.
+    #     worksheet.write_formula('A1', '=1+1', format)
     #
     # There are two local URIs supported: internal: and external:.
     # These are used for hyperlinks to internal worksheet references or
@@ -2424,19 +2555,26 @@ module Writexlsx
     #
     # Worksheet references are typically of the form Sheet1!A1. You can
     # also refer to a worksheet range using the standard Excel notation:
-    # Sheet1!A1:B2.
+    # +Sheet1!A1:B2+.
     #
     # In external links the workbook and worksheet name must be separated
-    # by the # character: external:Workbook.xlsx#Sheet1!A1'.
+    # by the # character: +external:Workbook.xlsx#Sheet1!A1+.
     #
     # You can also link to a named range in the target worksheet. For
-    # example say you have a named range called my_name in the workbook
-    # c:\temp\foo.xlsx you could link to it as follows:
+    # example say you have a named range called +my_name+ in the workbook
+    # +c:\temp\foo.xlsx+ you could link to it as follows:
     #
     #     worksheet.write_url('A14', 'external:c:\temp\foo.xlsx#my_name')
     #
     # Excel requires that worksheet names containing spaces or non
-    # alphanumeric characters are single quoted as follows 'Sales Data'!A1.
+    # alphanumeric characters are single quoted as follows +'Sales Data'!A1+.
+    #
+    # Note: WriteXLSX will escape the following characters in URLs as required
+    # by Excel: \s " < > \ [ ] ` ^ { } unless the URL already contains +%xx+
+    # style escapes. In which case it is assumed that the URL was escaped
+    # correctly by the user and will by passed directly to Excel.
+    #
+    # See also, the note about {"Cell notation"}[#label-Cell+notation].
     #
     def write_url(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2554,14 +2692,14 @@ module Writexlsx
     #
     #     worksheet.write_date_time('A1', '2004-05-13T23:20', date_format)
     #
-    # The date_string should be in the following format:
+    # The +date_string+ should be in the following format:
     #
     #     yyyy-mm-ddThh:mm:ss.sss
     #
     # This conforms to an ISO8601 date but it should be noted that the
     # full range of ISO8601 formats are not supported.
     #
-    # The following variations on the date_string parameter are permitted:
+    # The following variations on the +date_string+ parameter are permitted:
     #
     #     yyyy-mm-ddThh:mm:ss.sss         # Standard format
     #     yyyy-mm-ddT                     # No time
@@ -2572,8 +2710,10 @@ module Writexlsx
     #
     # Note that the T is required in all cases.
     #
-    # A date should always have a format, otherwise it will appear
-    # as a number, see "DATES AND TIME IN EXCEL" and "CELL FORMATTING".
+    # A date should always have a +format+, otherwise it will appear
+    # as a number, see
+    # {"DATES AND TIME IN EXCEL"}[#method-i-write_date_time-label-DATES+AND+TIME+IN+EXCEL]
+    # and {"CELL FORMATTING"}[#label-CELL+FORMATTING].
     # Here is a typical example:
     #
     #     date_format = workbook.add_format(:num_format => 'mm/dd/yy')
@@ -2584,6 +2724,105 @@ module Writexlsx
     # As with Excel, dates outside these ranges will be written as a string.
     #
     # See also the date_time.rb program in the examples directory of the distro.
+    #
+    #
+    # == DATES AND TIME IN EXCEL
+    #
+    # There are two important things to understand about dates and times in Excel:
+    #
+    # 1 A date/time in Excel is a real number plus an Excel number format.
+    # 2 WriteXLSX doesn't automatically convert date/time strings in write() to an Excel date/time.
+    #
+    # These two points are explained in more detail below along with some
+    # suggestions on how to convert times and dates to the required format.
+    #
+    # === An Excel date/time is a number plus a format
+    #
+    # If you write a date string with write() then all you will get is a string:
+    #
+    #     worksheet.write('A1', '02/03/04')   # !! Writes a string not a date. !!
+    #
+    # Dates and times in Excel are represented by real numbers, for example
+    # "Jan 1 2001 12:30 AM" is represented by the number 36892.521.
+    #
+    # The integer part of the number stores the number of days since the epoch
+    # and the fractional part stores the percentage of the day.
+    #
+    # A date or time in Excel is just like any other number. To have the number
+    # display as a date you must apply an Excel number format to it.
+    # Here are some examples.
+    #
+    #     #!/usr/bin/ruby -w
+    #
+    #     require 'write_xlsx'
+    #
+    #     workbook  = WriteXLSX.new('date_examples.xlsx')
+    #     worksheet = workbook>add_worksheet
+    #
+    #     worksheet.set_column('A:A', 30)    # For extra visibility.
+    #
+    #     number = 39506.5
+    #
+    #     worksheet.write('A1', number)             #   39506.5
+    #
+    #     format2 = workbook.add_format(:num_format => 'dd/mm/yy')
+    #     worksheet.write('A2', number, format2)    #  28/02/08
+    #
+    #     format3 = workbook.add_format(:num_format => 'mm/dd/yy')
+    #     worksheet.write('A3', number, format3)    #  02/28/08
+    #
+    #     format4 = workbook.add_format(:num_format => 'd-m-yyyy')
+    #     worksheet.write('A4', number, format4)    #  28-2-2008
+    #
+    #     format5 = workbook.add_format(:num_format => 'dd/mm/yy hh:mm')
+    #     worksheet.write('A5', number, format5)    #  28/02/08 12:00
+    #
+    #     format6 = workbook.add_format(:num_format => 'd mmm yyyy')
+    #     worksheet.write('A6', number, format6)    # 28 Feb 2008
+    #
+    #     format7 = workbook.add_format(:num_format => 'mmm d yyyy hh:mm AM/PM')
+    #     worksheet.write('A7', number , format7)   #  Feb 28 2008 12:00 PM
+    #
+    # WriteXLSX doesn't automatically convert date/time strings
+    #
+    # WriteXLSX doesn't automatically convert input date strings into Excel's
+    # formatted date numbers due to the large number of possible date formats
+    # and also due to the possibility of misinterpretation.
+    #
+    # For example, does 02/03/04 mean March 2 2004, February 3 2004 or
+    # even March 4 2002.
+    #
+    # Therefore, in order to handle dates you will have to convert them to
+    # numbers and apply an Excel format. Some methods for converting dates are
+    # listed in the next section.
+    #
+    # The most direct way is to convert your dates to the ISO8601
+    # yyyy-mm-ddThh:mm:ss.sss date format and use the write_date_time()
+    # worksheet method:
+    #
+    #     worksheet.write_date_time('A2', '2001-01-01T12:20', format)
+    #
+    # See the write_date_time() section of the documentation for more details.
+    #
+    # A general methodology for handling date strings with write_date_time() is:
+    #
+    # 1. Identify incoming date/time strings with a regex.
+    # 2. Extract the component parts of the date/time using the same regex.
+    # 3. Convert the date/time to the ISO8601 format.
+    # 4. Write the date/time using write_date_time() and a number format.
+    # For a slightly more advanced solution you can modify the write() method
+    # to handle date formats of your choice via the add_write_handler() method.
+    # See the add_write_handler() section of the docs and the
+    # write_handler3.rb and write_handler4.rb programs in the examples
+    # directory of the distro.
+    #
+    # Converting dates and times to an Excel date or time
+    #
+    # The write_date_time() method above is just one way of handling dates and
+    # times.
+    #
+    # You can also use the convert_date_time() worksheet method to convert
+    # from an ISO8601 style date string to an Excel date and time number.
     #
     def write_date_time(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -2608,10 +2847,6 @@ module Writexlsx
     # :call-seq:
     #   insert_chart(row, column, chart [ , x, y, x_scale, y_scale ] )
     #
-    # Insert a chart into a worksheet. The chart argument should be a Chart
-    # object or else it is assumed to be a filename of an external binary file.
-    # The latter is for backwards compatibility.
-    #
     # This method can be used to insert a Chart object into a worksheet.
     # The Chart must be created by the add_chart() Workbook method and
     # it must have the embedded option set.
@@ -2628,10 +2863,10 @@ module Writexlsx
     # Writexlsx::Chart for details on how to configure it. See also the
     # chart_*.rb programs in the examples directory of the distro.
     #
-    # The x, y, x_scale and y_scale parameters are optional.
+    # The +x+, +y+, +x_scale+ and +y_scale+ parameters are optional.
     #
-    # The parameters x and y can be used to specify an offset from the top
-    # left hand corner of the cell specified by row and column. The offset
+    # The parameters +x+ and +y+ can be used to specify an offset from the top
+    # left hand corner of the cell specified by +row+ and +column+. The offset
     # values are in pixels.
     #
     #     worksheet1.insert_chart('E2', chart, 3, 3)
@@ -2666,11 +2901,10 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   insert_image(row, column, filename [ , x, y, x_scale, y_scale ] )
+    #   insert_image(row, column, filename, x=0, y=0, x_scale=1, y_scale=1)
     #
-    # Partially supported. Currently only works for 96 dpi images. This
-    # will be fixed in an upcoming release.
-    #--
+    # Partially supported. Currently only works for 96 dpi images.
+    #
     # This method can be used to insert a image into a worksheet. The image
     # can be in PNG, JPEG or BMP format. The x, y, x_scale and y_scale
     # parameters are optional.
@@ -2679,8 +2913,8 @@ module Writexlsx
     #     worksheet2.insert_image('A1', '../images/ruby.bmp')
     #     worksheet3.insert_image('A1', '.c:\images\ruby.bmp')
     #
-    # The parameters x and y can be used to specify an offset from the top
-    # left hand corner of the cell specified by row and column. The offset
+    # The parameters +x+ and +y+ can be used to specify an offset from the top
+    # left hand corner of the cell specified by +row+ and +column+. The offset
     # values are in pixels.
     #
     #     worksheet1.insert_image('A1', 'ruby.bmp', 32, 10)
@@ -2689,13 +2923,11 @@ module Writexlsx
     # cell. This can be occasionally useful if you wish to align two or more
     # images relative to the same cell.
     #
-    # The parameters x_scale and y_scale can be used to scale the inserted
+    # The parameters +x_scale+ and +y_scale+ can be used to scale the inserted
     # image horizontally and vertically:
     #
     #     # Scale the inserted image: width x 2.0, height x 0.8
     #     worksheet.insert_image('A1', 'perl.bmp', 0, 0, 2, 0.8)
-    #
-    # See also the images.rb program in the examples directory of the distro.
     #
     # Note: you must call set_row() or set_column() before insert_image()
     # if you wish to change the default dimensions of any of the rows or
@@ -2707,7 +2939,6 @@ module Writexlsx
     #
     # BMP images must be 24 bit, true colour, bitmaps. In general it is
     # best to avoid BMP images since they aren't compressed.
-    #++
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
@@ -3631,7 +3862,265 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #    add_sparkline(properties)
+    #
     # Add sparklines to the worksheet.
+    #
+    # Sparklines are a feature of Excel 2010+ which allows you to add small
+    # charts to worksheet cells. These are useful for showing visual trends
+    # in data in a compact format.
+    #
+    # In WriteXLSX Sparklines can be added to cells using the add_sparkline()
+    # worksheet method:
+    #
+    #     worksheet.add_sparkline(
+    #         {
+    #             :location => 'F2',
+    #             :range    => 'Sheet1!A2:E2',
+    #             :type     => 'column',
+    #             :style    => 12
+    #         }
+    #     )
+    #
+    # Note: Sparklines are a feature of Excel 2010+ only. You can write them
+    # to an XLSX file that can be read by Excel 2007 but they won't be
+    # displayed.
+    #
+    # The add_sparkline() worksheet method is used to add sparklines to a
+    # cell or a range of cells.
+    #
+    # The parameters to add_sparkline() must be passed in a hash.
+    # The main sparkline parameters are:
+    #
+    #     :location        (required)
+    #     :range           (required)
+    #     :type
+    #     :style
+    #
+    #     :markers
+    #     :negative_points
+    #     :axis
+    #     :reverse
+    # Other, less commonly used parameters are:
+    #
+    #     :high_point
+    #     :low_point
+    #     :first_point
+    #     :last_point
+    #     :max
+    #     :min
+    #     :empty_cells
+    #     :show_hidden
+    #     :date_axis
+    #     :weight
+    #
+    #     :series_color
+    #     :negative_color
+    #     :markers_color
+    #     :first_color
+    #     :last_color
+    #     :high_color
+    #     :low_color
+    #
+    # These parameters are explained in the sections below:
+    #
+    # ===:location
+    #
+    # This is the cell where the sparkline will be displayed:
+    #
+    #     location => 'F1'
+    # The location should be a single cell. (For multiple cells see "Grouped Sparklines" below).
+    #
+    # To specify the location in row-column notation use the xl_rowcol_to_cell() function from the Excel::Writer::XLSX::Utility module.
+    #
+    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    #     ...
+    #     location => xl_rowcol_to_cell( 0, 5 ), # F1
+    # range
+    #
+    # This specifies the cell data range that the sparkline will plot:
+    #
+    #     $worksheet->add_sparkline(
+    #         {
+    #             location => 'F1',
+    #             range    => 'A1:E1',
+    #         }
+    #     );
+    # The range should be a 2D array. (For 3D arrays of cells see "Grouped Sparklines" below).
+    #
+    # If range is not on the same worksheet you can specify its location using the usual Excel notation:
+    #
+    #             range => 'Sheet1!A1:E1',
+    # If the worksheet contains spaces or special characters you should quote the worksheet name in the same way that Excel does:
+    #
+    #             range => q('Monthly Data'!A1:E1),
+    # To specify the location in row-column notation use the xl_range() or xl_range_formula() functions from the Excel::Writer::XLSX::Utility module.
+    #
+    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    #     ...
+    #     range => xl_range( 1, 1,  0, 4 ),                   # 'A1:E1'
+    #     range => xl_range_formula( 'Sheet1', 0, 0,  0, 4 ), # 'Sheet1!A2:E2'
+    # type
+    #
+    # Specifies the type of sparkline. There are 3 available sparkline types:
+    #
+    #     line    (default)
+    #     column
+    #     win_loss
+    # For example:
+    #
+    #     {
+    #         location => 'F1',
+    #         range    => 'A1:E1',
+    #         type     => 'column',
+    #     }
+    # style
+    #
+    # Excel provides 36 built-in Sparkline styles in 6 groups of 6. The style parameter can be used to replicate these and should be a corresponding number from 1 .. 36.
+    #
+    #     {
+    #         location => 'A14',
+    #         range    => 'Sheet2!A2:J2',
+    #         style    => 3,
+    #     }
+    # The style number starts in the top left of the style grid and runs left to right. The default style is 1. It is possible to override colour elements of the sparklines using the *_color parameters below.
+    #
+    # markers
+    #
+    # Turn on the markers for line style sparklines.
+    #
+    #     {
+    #         location => 'A6',
+    #         range    => 'Sheet2!A1:J1',
+    #         markers  => 1,
+    #     }
+    # Markers aren't shown in Excel for column and win_loss sparklines.
+    #
+    # negative_points
+    #
+    # Highlight negative values in a sparkline range. This is usually required with win_loss sparklines.
+    #
+    #     {
+    #         location        => 'A21',
+    #         range           => 'Sheet2!A3:J3',
+    #         type            => 'win_loss',
+    #         negative_points => 1,
+    #     }
+    # axis
+    #
+    # Display a horizontal axis in the sparkline:
+    #
+    #     {
+    #         location => 'A10',
+    #         range    => 'Sheet2!A1:J1',
+    #         axis     => 1,
+    #     }
+    # reverse
+    #
+    # Plot the data from right-to-left instead of the default left-to-right:
+    #
+    #     {
+    #         location => 'A24',
+    #         range    => 'Sheet2!A4:J4',
+    #         type     => 'column',
+    #         reverse  => 1,
+    #     }
+    # weight
+    #
+    # Adjust the default line weight (thickness) for line style sparklines.
+    #
+    #      weight => 0.25,
+    # The weight value should be one of the following values allowed by Excel:
+    #
+    #     0.25  0.5   0.75
+    #     1     1.25
+    #     2.25
+    #     3
+    #     4.25
+    #     6
+    # high_point, low_point, first_point, last_point
+    #
+    # Highlight points in a sparkline range.
+    #
+    #         high_point  => 1,
+    #         low_point   => 1,
+    #         first_point => 1,
+    #         last_point  => 1,
+    # max, min
+    #
+    # Specify the maximum and minimum vertical axis values:
+    #
+    #         max         => 0.5,
+    #         min         => -0.5,
+    # As a special case you can set the maximum and minimum to be for a group of sparklines rather than one:
+    #
+    #         max         => 'group',
+    # See "Grouped Sparklines" below.
+    #
+    # empty_cells
+    #
+    # Define how empty cells are handled in a sparkline.
+    #
+    #     empty_cells => 'zero',
+    # The available options are:
+    #
+    #     gaps   : show empty cells as gaps (the default).
+    #     zero   : plot empty cells as 0.
+    #     connect: Connect points with a line ("line" type  sparklines only).
+    # show_hidden
+    #
+    # Plot data in hidden rows and columns:
+    #
+    #     show_hidden => 1,
+    # Note, this option is off by default.
+    #
+    # date_axis
+    #
+    # Specify an alternative date axis for the sparkline. This is useful if the data being plotted isn't at fixed width intervals:
+    #
+    #     {
+    #         location  => 'F3',
+    #         range     => 'A3:E3',
+    #         date_axis => 'A4:E4',
+    #     }
+    # The number of cells in the date range should correspond to the number of cells in the data range.
+    #
+    # series_color
+    #
+    # It is possible to override the colour of a sparkline style using the following parameters:
+    #
+    #     series_color
+    #     negative_color
+    #     markers_color
+    #     first_color
+    #     last_color
+    #     high_color
+    #     low_color
+    # The color should be specified as a HTML style #rrggbb hex value:
+    #
+    #     {
+    #         location     => 'A18',
+    #         range        => 'Sheet2!A2:J2',
+    #         type         => 'column',
+    #         series_color => '#E965E0',
+    #     }
+    # Grouped Sparklines
+    #
+    # The add_sparkline() worksheet method can be used multiple times to write as many sparklines as are required in a worksheet.
+    #
+    # However, it is sometimes necessary to group contiguous sparklines so that changes that are applied to one are applied to all. In Excel this is achieved by selecting a 3D range of cells for the data range and a 2D range of cells for the location.
+    #
+    # In Excel::Writer::XLSX, you can simulate this by passing an array refs of values to location and range:
+    #
+    #     {
+    #         location => [ 'A27',          'A28',          'A29'          ],
+    #         range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
+    #         markers  => 1,
+    #     }
+    # Sparkline examples
+    #
+    # See the sparklines1.pl and sparklines2.pl example programs in the examples directory of the distro.
     #
     # The add_sparkline worksheet method is used to add sparklines to a cell or a range of cells.
     #
@@ -3657,7 +4146,87 @@ module Writexlsx
     end
 
     #
-    # Insert a button form object into the worksheet.
+    # :call-seq:
+    #   insert_button(row, col, properties)
+    #
+    # The insert_button() method can be used to insert an Excel form button
+    # into a worksheet.
+    #
+    # This method is generally only useful when used in conjunction with
+    # the Workbook add_vba_project() method to tie the button to a macro
+    # from an embedded VBA project:
+    #
+    #     workbook  = WriteXLSX.new('file.xlsm')
+    #     ...
+    #     workbook.add_vba_project('./vbaProject.bin')
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro' } )
+    #
+    # The properties of the button that can be set are:
+    #
+    #     :macro
+    #     :caption
+    #     :width
+    #     :height
+    #     :x_scale
+    #     :y_scale
+    #     :x_offset
+    #     :y_offset
+    #
+    # === Option: macro
+    # This option is used to set the macro that the button will invoke when
+    # the user clicks on it. The macro should be included using the
+    # Workbook#add_vba_project() method shown above.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro' } )
+    #
+    # The default macro is +ButtonX_Click+ where X is the button number.
+    #
+    # ===Option: caption
+    # This option is used to set the caption on the button. The default is
+    # <tt>Button X</tt> where X is the button number.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', :caption => 'Hello' })
+    #
+    # ===Option: width
+    # This option is used to set the width of the button in pixels.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', :width => 128 })
+    #
+    # The default button width is 64 pixels which is the width of a default cell.
+    #
+    # ===Option: height
+    # This option is used to set the height of the button in pixels.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', :height => 40 })
+    #
+    # The default button height is 20 pixels which is the height of a default cell.
+    #
+    # ===Option: x_scale
+    # This option is used to set the width of the button as a factor of the
+    # default width.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', :x_scale => 2.0 })
+    #
+    # ===Option: y_scale
+    # This option is used to set the height of the button as a factor of the
+    # default height.
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', y_:scale => 2.0 } )
+    #
+    # ===Option: x_offset
+    # This option is used to change the x offset, in pixels, of a button
+    # within a cell:
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro', :x_offset => 2 })
+    #
+    # ===Option: y_offset
+    # This option is used to change the y offset, in pixels, of a comment
+    # within a cell.
+    #
+    # Note: Button is the only Excel form element that is available in
+    # WriteXLSX. Form elements represent a lot of work to implement and the
+    # underlying VML syntax isn't very much fun.
     #
     def insert_button(*args)
       @buttons_array << button_params(*(row_col_notation(args)))
@@ -3711,7 +4280,8 @@ module Writexlsx
     #
     #     worksheet.data_validation( 'A1',       {...} )
     #     worksheet.data_validation( 'A1:B5',    {...} )
-    # See also the note about "Cell notation" for more information.
+    #
+    # See also the note about {"Cell notation"}[#label-Cell+notation] for more information.
     #
     # The last parameter in data_validation() must be a hash ref containing
     # the parameters that describe the type and style of the data validation.
@@ -4482,15 +5052,13 @@ module Writexlsx
     end
 
     #
-    # Make any comments in the worksheet visible.
-    #
     # This method is used to make all cell comments visible when a worksheet
     # is opened.
     #
     #     worksheet.show_comments
     #
     # Individual comments can be made visible using the visible parameter of
-    # the write_comment method (see above):
+    # the write_comment method:
     #
     #     worksheet.write_comment('C3', 'Hello', :visible => 1)
     #
@@ -4504,8 +5072,6 @@ module Writexlsx
       @comments_visible = visible
     end
 
-    #
-    # Set the default author of the cell comments.
     #
     # This method is used to set the default author of all cell comments.
     #
@@ -5271,6 +5837,9 @@ module Writexlsx
     public :prepare_image
 
     #
+    # :call-seq:
+    #   insert_shape(row, col, shape [ , x, y, x_scale, y_scale ] )
+    #
     # Insert a shape into the worksheet.
     #
     # This method can be used to insert a Shape object into a worksheet.
@@ -5286,22 +5855,23 @@ module Writexlsx
     #   worksheet.insert_shape('E2', shape)
     #
     # See add_shape() for details on how to create the Shape object
-    # and Excel::Writer::XLSX::Shape for details on how to configure it.
+    # and Writexlsx::Shape for details on how to configure it.
     #
-    # The x, y, x_scale and y_scale parameters are optional.
+    # The +x+, +y+, +x_scale+ and +y_scale+ parameters are optional.
     #
-    # The parameters x and y can be used to specify an offset
-    # from the top left hand corner of the cell specified by row and col.
+    # The parameters +x+ and +y+ can be used to specify an offset
+    # from the top left hand corner of the cell specified by +row+ and +col+.
     # The offset values are in pixels.
     #
     #   worksheet1.insert_shape('E2', chart, 3, 3)
     #
-    # The parameters x_scale and y_scale can be used to scale the
+    # The parameters +x_scale+ and +y_scale+ can be used to scale the
     # inserted shape horizontally and vertically:
     #
     #   # Scale the width by 120% and the height by 150%
     #   worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
-    # See also the shape*.pl programs in the examples directory of the distro.
+    #
+    # See also the shape*.rb programs in the examples directory of the distro.
     #
     def insert_shape(*args)
       # Check for a cell reference in A1 notation and substitute row and column.

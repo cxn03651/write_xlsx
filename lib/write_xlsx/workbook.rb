@@ -13,38 +13,55 @@ require 'tempfile'
 require 'digest/md5'
 
 module Writexlsx
+
+  # The WriteXLSX provides an object oriented interface to a new Excel workbook.
+  # The following methods are available through a new workbook.
+  #
+  # * new[#method-c-new]
+  # * add_worksheet[#method-i-add_worksheet]
+  # * add_format[#method-i-add_format]
+  # * add_chart[#method-i-add_chart]
+  # * add_shape[#method-i-add_shape]
+  # * add_vba_project[#method-i-add_vba_project]
+  # * close[#method-i-close]
+  # * set_properties[#method-i-set_properties]
+  # * define_name[#method-i-define_name]
+  # * set_custom_color[#method-i-set_custom_color]
+  # * sheets[#method-i-sheets]
+  # * set_1904[#method-i-set_1904]
+  #
   class Workbook
 
     include Writexlsx::Utility
 
     BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
 
-    attr_writer :firstsheet
-    attr_reader :palette
-    attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors
-    attr_reader :worksheets, :sheetnames, :charts, :drawings
-    attr_reader :num_comment_files, :num_vml_files, :named_ranges
-    attr_reader :doc_properties
-    attr_reader :image_types, :images
-    attr_reader :shared_strings
-    attr_accessor :table_count
-    attr_reader :vba_project
+    attr_writer :firstsheet  # :nodoc:
+    attr_reader :palette  # :nodoc:
+    attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors  # :nodoc:
+    attr_reader :worksheets, :sheetnames, :charts, :drawings  # :nodoc:
+    attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
+    attr_reader :doc_properties  # :nodoc:
+    attr_reader :image_types, :images  # :nodoc:
+    attr_reader :shared_strings  # :nodoc:
+    attr_accessor :table_count  # :nodoc:
+    attr_reader :vba_project  # :nodoc:
     #
-    # A new Excel workbook is created using the new() constructor
+    # A new Excel workbook is created using the +new+ constructor
     # which accepts either a filename or an IO object as a parameter.
     # The following example creates a new Excel file based on a filename:
     #
-    #   workbook  = WriteXLSX.new('filename.xlsx')
-    #   worksheet = workbook.add_worksheet
-    #   worksheet.write(0, 0, 'Hi Excel!')
-    #   workbook.close
+    #     workbook  = WriteXLSX.new('filename.xlsx')
+    #     worksheet = workbook.add_worksheet
+    #     worksheet.write(0, 0, 'Hi Excel!')
+    #     workbook.close
     #
-    # Here are some other examples of using new() with filenames:
+    # Here are some other examples of using +new+ with filenames:
     #
-    #   workbook1 = WriteXLSX.new(filename)
-    #   workbook2 = WriteXLSX.new('/tmp/filename.xlsx')
-    #   workbook3 = WriteXLSX.new("c:\\tmp\\filename.xlsx")
-    #   workbook4 = WriteXLSX.new('c:\tmp\filename.xlsx')
+    #     workbook1 = WriteXLSX.new(filename)
+    #     workbook2 = WriteXLSX.new('/tmp/filename.xlsx')
+    #     workbook3 = WriteXLSX.new("c:\\tmp\\filename.xlsx")
+    #     workbook4 = WriteXLSX.new('c:\tmp\filename.xlsx')
     #
     # The last two examples demonstrates how to create a file on DOS or Windows
     # where it is necessary to either escape the directory separator \
@@ -54,24 +71,21 @@ module Writexlsx
     # rather than .xls since the latter causes an Excel warning
     # when used with the XLSX format.
     #
-    # The new() constructor returns a WriteXLSX object that you can use to
+    # The +new+ constructor returns a WriteXLSX object that you can use to
     # add worksheets and store data.
     #
-    # You can also pass a valid IO object to the new() constructor.
+    # You can also pass a valid IO object to the +new+ constructor.
     #
-    #   xlsx = StringIO.new
-    #   workbook = WriteXLSX.new(xlsx)
-    #   ....
-    #   workbook.close
-    #   # you can get XLSX binary data as xlsx.string
+    #     xlsx = StringIO.new
+    #     workbook = WriteXLSX.new(xlsx)
+    #     ....
+    #     workbook.close
+    #     # you can get XLSX binary data as xlsx.string
     #
     # And you can pass default_formats parameter like this:
     #
-    #   formats = {
-    #     :font => 'Arial',
-    #     :size => 10.5
-    #   }
-    #   workbook = WriteXLSX.new('file.xlsx', formats)
+    #     formats = { :font => 'Arial', :size => 10.5 }
+    #     workbook = WriteXLSX.new('file.xlsx', formats)
     #
     def initialize(file, default_formats = {})
       @writer = Package::XMLWriterSimple.new
@@ -124,23 +138,31 @@ module Writexlsx
     end
 
     #
-    # write XLSX data to file or IO object.
+    # The close method is used to close an Excel file.
+    #
+    # An explicit close is required if the file must be closed prior to performing
+    # some external action on it such as copying it, reading its size or attaching
+    # it to an email.
+    #
+    # In general, if you create a file with a size of 0 bytes or you fail to create
+    # a file you need to call close.
     #
     def close
-      # In case close() is called twice, by user and by DESTROY.
+      # In case close() is called twice.
       return if @fileclosed
 
       @fileclosed = true
       store_workbook
     end
 
+    #
     # get array of Worksheet objects
     #
     # :call-seq:
     #   sheets              -> array of all Wordsheet object
     #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
     #
-    # The sheets() method returns a array, or a sliced array, of the worksheets
+    # The sheets method returns a array, or a sliced array, of the worksheets
     # in a workbook.
     #
     # If no arguments are passed the method returns a list of all the worksheets
@@ -185,11 +207,11 @@ module Writexlsx
     # one system and the other.
     #
     # WriteXLSX stores dates in the 1900 format by default. If you wish to
-    # change this you can call the set_1904() workbook method.
-    # You can query the current value by calling the get_1904() workbook method.
-    # This returns 0 for 1900 and 1 for 1904.
+    # change this you can call the set_1904 workbook method.
+    # You can query the current value by calling the get_1904 workbook method.
+    # This returns false for 1900 and true for 1904.
     #
-    # In general you probably won't need to use set_1904().
+    # In general you probably won't need to use set_1904.
     #
     def set_1904(mode = true)
       unless sheets.empty?
@@ -198,6 +220,9 @@ module Writexlsx
       @date_1904 = ptrue?(mode)
     end
 
+    #
+    # return date system. false = 1900, true = 1904
+    #
     def get_1904
       @date_1904
     end
@@ -287,7 +312,8 @@ module Writexlsx
     #
     # This method is use to create a new chart either as a standalone worksheet
     # (the default) or as an embeddable object that can be inserted into
-    # a worksheet via the Worksheet#insert_chart method.
+    # a worksheet via the
+    # {Worksheet#insert_chart}[Worksheet.html#method-i-insert_chart] method.
     #
     #     chart = workbook.add_chart(:type => 'column')
     #
@@ -298,7 +324,7 @@ module Writexlsx
     #     :name     (optional)
     #     :embedded (optional)
     #
-    # :type
+    # === :type
     #
     # This is a required parameter.
     # It defines the type of chart that will be created.
@@ -315,7 +341,7 @@ module Writexlsx
     #     scatter
     #     stock
     #
-    # :subtype
+    # === :subtype
     #
     # Used to define a chart subtype where available.
     #
@@ -325,7 +351,7 @@ module Writexlsx
     # (stacked and percent_stacked). See the documentation for those chart
     # types.
     #
-    # :name
+    # === :name
     #
     # Set the name for the chart sheet. The name property is optional and
     # if it isn't supplied will default to Chart1 .. n. The name must be
@@ -335,11 +361,11 @@ module Writexlsx
     #
     #     chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
     #
-    # :embedded
+    # === :embedded
     #
     # Specifies that the Chart object will be inserted in a worksheet
-    # via the Worksheet#insert_chart method. It is an error to try insert
-    # a Chart that doesn't have this flag set.
+    # via the {Worksheet#insert_chart}[Worksheet.html#insert_chart] method.
+    # It is an error to try insert a Chart that doesn't have this flag set.
     #
     #     chart = workbook.add_chart(:type => 'line', :embedded => 1)
     #
@@ -349,8 +375,8 @@ module Writexlsx
     #     # Insert the chart into the a worksheet.
     #     worksheet.insert_chart('E2', chart)
     #
-    # See Chart for details on how to configure the chart object
-    # once it is created. See also the chart_*.pl programs in the examples
+    # See Chart[Chart.html] for details on how to configure the chart object
+    # once it is created. See also the chart_*.rb programs in the examples
     # directory of the distro.
     #
     def add_chart(params = {})
@@ -384,7 +410,7 @@ module Writexlsx
     end
 
     #
-    # The add_format method can be used to create new Format objects
+    # The +add_format+ method can be used to create new Format objects
     # which are used to apply formatting to a cell. You can either define
     # the properties at creation time via a hash of property values
     # or later via method calls.
@@ -392,8 +418,8 @@ module Writexlsx
     #     format1 = workbook.add_format(property_hash) # Set properties at creation
     #     format2 = workbook.add_format                # Set properties later
     #
-    # See the Format Class's rdoc for more details about Format properties and
-    # how to set them.
+    # See the {Format Class's rdoc}[Format.html] for more details about
+    # Format properties and how to set them.
     #
     def add_format(properties = {})
       init_data = [
@@ -410,28 +436,28 @@ module Writexlsx
     end
 
     #
-    # The add_shape() method can be used to create new shapes that may be
+    # The +add_shape+ method can be used to create new shapes that may be
     # inserted into a worksheet.
     #
     # You can either define the properties at creation time via a hash of
     # property values or later via method calls.
     #
-    #   # Set properties at creation.
-    #   plus  = workbook.add_shape(
-    #             :type   => 'plus',
-    #             :id     => 3,
-    #             :width  => pw,
-    #             :height => ph
-    #           )
+    #     # Set properties at creation.
+    #     plus  = workbook.add_shape(
+    #               :type   => 'plus',
+    #               :id     => 3,
+    #               :width  => pw,
+    #               :height => ph
+    #             )
     #
-    #   # Default rectangle shape. Set properties later.
-    #   rect  = workbook.add_shape
+    #     # Default rectangle shape. Set properties later.
+    #     rect  = workbook.add_shape
     #
     # See also the shape*.rb programs in the examples directory of the distro.
     #
     # === Shape Properties
     #
-    # Any shape property can be queried or modified by [] like hash.
+    # Any shape property can be queried or modified by [ ] like hash.
     #
     #   ellipse = workbook.add_shape(properties)
     #   ellipse[:type] = 'cross'    # No longer an ellipse !
@@ -440,19 +466,19 @@ module Writexlsx
     # The properties of a shape object that can be defined via add_shape are
     # shown below.
     #
-    # ====:name
+    # ===:name
     #
     # Defines the name of the shape. This is an optional property and the shape
     # will be given a default name if not supplied. The name is generally only
     # used by Excel Macros to refer to the object.
     #
-    # ====:type
+    # ===:type
     #
-    # Defines the type of the object such as :rect, :ellipse OR :triangle.
+    # Defines the type of the object such as +:rect+, +:ellipse+ OR +:triangle+.
     #
     #   ellipse = workbook.add_shape(:type => :ellipse)
     #
-    # The default type is :rect.
+    # The default type is +:rect+.
     #
     # The full list of available shapes is shown below.
     #
@@ -460,7 +486,7 @@ module Writexlsx
     # It creates an example workbook with all supported shapes labelled with
     # their shape names.
     #
-    # ===== Basic Shapes
+    # === Basic Shapes
     #
     #    blockArc              can            chevron       cube          decagon
     #    diamond               dodecagon      donut         ellipse       funnel
@@ -474,7 +500,7 @@ module Writexlsx
     #    star5                 star6          star7         star8         sun
     #    teardrop              trapezoid      triangle
     #
-    # ===== Arrow Shapes
+    # === Arrow Shapes
     #
     #    bentArrow        bentUpArrow       circularArrow     curvedDownArrow
     #    curvedLeftArrow  curvedRightArrow  curvedUpArrow     downArrow
@@ -483,13 +509,13 @@ module Writexlsx
     #    rightArrow       stripedRightArrow swooshArrow       upArrow
     #    upDownArrow      uturnArrow
     #
-    # ===== Connector Shapes
+    # === Connector Shapes
     #
     #    bentConnector2   bentConnector3   bentConnector4
     #    bentConnector5   curvedConnector2 curvedConnector3
     #    curvedConnector4 curvedConnector5 straightConnector1
     #
-    # ===== Callout Shapes
+    # === Callout Shapes
     #
     #    accentBorderCallout1  accentBorderCallout2  accentBorderCallout3
     #    accentCallout1        accentCallout2        accentCallout3
@@ -500,7 +526,7 @@ module Writexlsx
     #    upArrowCallout        upDownArrowCallout    wedgeEllipseCallout
     #    wedgeRectCallout      wedgeRoundRectCallout
     #
-    # ===== Flow Chart Shapes
+    # === Flow Chart Shapes
     #
     #    flowChartAlternateProcess  flowChartCollate        flowChartConnector
     #    flowChartDecision          flowChartDelay          flowChartDisplay
@@ -513,24 +539,24 @@ module Writexlsx
     #    flowChartPunchedCard       flowChartPunchedTape    flowChartSort
     #    flowChartSummingJunction   flowChartTerminator
     #
-    # ===== Action Shapes
+    # === Action Shapes
     #
     #    actionButtonBackPrevious actionButtonBeginning actionButtonBlank
     #    actionButtonDocument     actionButtonEnd       actionButtonForwardNext
     #    actionButtonHelp         actionButtonHome      actionButtonInformation
     #    actionButtonMovie        actionButtonReturn    actionButtonSound
     #
-    # ===== Chart Shapes
+    # === Chart Shapes
     #
     # Not to be confused with Excel Charts.
     #
     #    chartPlus chartStar chartX
     #
-    # ===== Math Shapes
+    # === Math Shapes
     #
     #    mathDivide mathEqual mathMinus mathMultiply mathNotEqual mathPlus
     #
-    # ===== Starts and Banners
+    # === Starts and Banners
     #
     #    arc            bevel          bracePair  bracketPair chord
     #    cloud          corner         diagStripe doubleWave  ellipseRibbon
@@ -539,11 +565,11 @@ module Writexlsx
     #    plus           ribbon         ribbon2    rightBrace  rightBracket
     #    verticalScroll wave
     #
-    # ===== Tab Shapes
+    # === Tab Shapes
     #
     #    cornerTabs plaqueTabs squareTabs
     #
-    # ==== :text
+    # === :text
     #
     # This property is used to make the shape act like a text box.
     #
@@ -552,32 +578,34 @@ module Writexlsx
     # The Text is super-imposed over the shape. The text can be wrapped using
     # the newline character \n.
     #
-    # ==== :id
+    # === :id
     #
     # Identification number for internal identification. This number will be
     # auto-assigned, if not assigned, or if it is a duplicate.
     #
-    # ==== :format
+    # === :format
     #
     # Workbook format for decorating the shape horizontally and/or vertically.
     #
-    # ==== :rotation
+    # === :rotation
     #
     # Shape rotation, in degrees, from 0 to 360
     #
-    # ==== :line, :fill
+    # === :line, :fill
     #
     # Shape color for the outline and fill.
     # Colors may be specified  as a color index, or in RGB format, i.e. AA00FF.
     #
-    # ==== :link_type
+    # See COULOURS IN EXCEL in the main documentation for more information.
+    #
+    # === :link_type
     #
     # Line type for shape outline. The default is solid.
     # The list of possible values is:
     #
     #    dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot, solid
     #
-    # ==== :valign, :align
+    # === :valign, :align
     #
     # Text alignment within the shape.
     #
@@ -587,18 +615,27 @@ module Writexlsx
     #    =======     =======
     #    t           Top
     #    ctr         Centre
-    #    b           Bottom    def add_shape(properties)
+    #    b           Bottom
+    #
+    # Horizontal alignment can be:
+    #
+    #    Setting     Meaning
+    #    =======     =======
+    #    l           Left
+    #    r           Right
+    #    ctr         Centre
+    #    just        Justified
     #
     # The default is to center both horizontally and vertically.
     #
-    # ==== :scale_x, :scale_y
+    # === :scale_x, :scale_y
     #
+    # Scale factor in x and y dimension, for scaling the shape width and
+    # height. The default value is 1.
     #
-    # Scale factor in x and y dimension, for scaling the shape width and height. The default value is 1.
+    # Scaling may be set on the shape object or via insert_shape.
     #
-    # Scaling may be set on the shape object or via insert_shape().
-    #
-    # ==== :adjustments
+    # === :adjustments
     #
     # Adjustment of shape vertices. Most shapes do not use this. For some
     # shapes, there is a single adjustment to modify the geometry.
@@ -612,7 +649,7 @@ module Writexlsx
     # dimension. Adjustments may be negative, to route the shape away
     # from the endpoint.
     #
-    # ==== :stencil
+    # === :stencil
     #
     # Shapes work in stencil mode by default. That is, once a shape is
     # inserted, its connection is separated from its master.
@@ -623,7 +660,7 @@ module Writexlsx
     # created once, and then the text of the shape is modified for each
     # employee.
     #
-    # The insert_shape() method returns a reference to the inserted
+    # The insert_shape method returns a reference to the inserted
     # shape (the child).
     #
     # Stencil mode can be turned off, allowing for shape(s) to be
@@ -655,7 +692,7 @@ module Writexlsx
     #   workbook.define_name('Sales',         '=Sheet1!$G$1:$H$10')
     #
     # It is also possible to define a local/worksheet name by prefixing the name
-    # with the sheet name using the syntax sheetname!definedname:
+    # with the sheet name using the syntax +sheetname!definedname+:
     #
     #   # Local/worksheet name.
     #   workbook.define_name('Sheet2!Sales',  '=Sheet2!$G$1:$G$10')
@@ -763,7 +800,30 @@ module Writexlsx
     end
 
     #
-    # Add a vbaProject binary to the XLSX file.
+    # The add_vba_project method can be used to add macros or functions to an
+    # WriteXLSX file using a binary VBA project file that has been extracted
+    # from an existing Excel xlsm file.
+    #
+    #     workbook  = WriteXLSX.new('file.xlsm')
+    #
+    #     workbook.add_vba_project('./vbaProject.bin')
+    #
+    # The supplied +extract_vba+ utility can be used to extract the required
+    # +vbaProject.bin+ file from an existing Excel file:
+    #
+    #     $ extract_vba file.xlsm
+    #     Extracted 'vbaProject.bin' successfully
+    #
+    # Macros can be tied to buttons using the worksheet
+    # {insert_button}[Worksheet.html#method-i-insert_button] method
+    # (see the "WORKSHEET METHODS" section for details):
+    #
+    #     worksheet.insert_button('C2', { :macro => 'my_macro' })
+    #
+    # Note, Excel uses the file extension xlsm instead of xlsx for files that
+    # contain macros. It is advisable to follow the same convention.
+    #
+    # See also the macros.rb example file.
     #
     def add_vba_project(vba_project)
       @vba_project = vba_project
@@ -772,10 +832,10 @@ module Writexlsx
     #
     # Change the RGB components of the elements in the colour palette.
     #
-    # The set_custom_color() method can be used to override one of the built-in
+    # The set_custom_color method can be used to override one of the built-in
     # palette values with a more suitable colour.
     #
-    # The value for _index_ should be in the range 8..63,
+    # The value for +index+ should be in the range 8..63,
     # see "COLOURS IN EXCEL".
     #
     # The default named colours use the following indices:
@@ -797,12 +857,13 @@ module Writexlsx
     #     33   =>   pink
     #     53   =>   orange
     #
-    # A new colour is set using its RGB (red green blue) components. The red,
-    # green and blue values must be in the range 0..255. You can determine the
-    # required values in Excel using the Tools->Options->Colors->Modify dialog.
+    # A new colour is set using its RGB (red green blue) components. The +red+,
+    # +green+ and +blue+ values must be in the range 0..255. You can determine
+    # the required values in Excel using the Tools->Options->Colors->Modify
+    # dialog.
     #
-    # The set_custom_color() workbook method can also be used with a HTML style
-    # #rrggbb hex value:
+    # The set_custom_color workbook method can also be used with a HTML style
+    # +#rrggbb+ hex value:
     #
     #     workbook.set_custom_color(40, 255,  102,  0   ) # Orange
     #     workbook.set_custom_color(40, 0xFF, 0x66, 0x00) # Same thing
@@ -877,11 +938,11 @@ module Writexlsx
       @shared_strings.index(str, params)
     end
 
-    def str_unique
+    def str_unique   # :nodoc:
       @shared_strings.unique_count
     end
 
-    def shared_strings_empty?
+    def shared_strings_empty?  # :nodoc:
       @shared_strings.empty?
     end
 
