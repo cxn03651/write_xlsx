@@ -3215,19 +3215,11 @@ module Writexlsx
     # :call-seq:
     #   conditional_formatting(cell_or_cell_range, options)
     #
-    # This method handles the interface to Excel conditional formatting.
+    # Conditional formatting is a feature of Excel which allows you to apply a
+    # format to a cell or a range of cells based on a certain criteria.
     #
-    # This method contains a lot of parameters and is described in detail in
-    # the section below.
-    #
-    # We allow the format to be called on one cell or a range of cells. The
-    # hashref contains the formatting parameters and must be the last param:
-    #
-    #    conditional_formatting(row, col, {...})
-    #    conditional_formatting(first_row, first_col, last_row, last_col, {...})
-    #
-    # The conditional_format() method is used to add formatting to a cell
-    # or range of cells based on user defined criteria.
+    # For example the following criteria is used to highlight cells >= 50 in
+    # red in the conditional_format.rb example from the distro.
     #
     #     worksheet.conditional_formatting('A1:J10',
     #         {
@@ -3238,15 +3230,14 @@ module Writexlsx
     #         }
     #     )
     #
-    # See also the conditional_format.rb program in the examples directory of
-    # the distro.
+    # http://jmcnamara.github.com/excel-writer-xlsx/images/examples/conditional_example.jpg
     #
     # The conditional_formatting method is used to apply formatting based
     # on user defined criteria to an write_xlsx file.
     #
     # It can be applied to a single cell or a range of cells.
-    # You can pass 3 parameters such as (row, col, {...})
-    # or 5 parameters such as (first_row, first_col, last_row, last_col, {...}).
+    # You can pass 3 parameters such as (+row+, +col+, {...})
+    # or 5 parameters such as (+first_row+, +first_col+, +last_row+, +last_col+, {...}).
     # You can also use A1 style notation. For example:
     #
     #     worksheet.conditional_formatting( 0, 0,       {...} )
@@ -3256,6 +3247,7 @@ module Writexlsx
     #
     #     worksheet.conditional_formatting( 'A1',       {...} )
     #     worksheet.conditional_formatting( 'A1:B5',    {...} )
+    #
     #
     # Using A1 style notation is is also possible to specify
     # non-contiguous ranges, separated by a comma. For example:
@@ -3272,6 +3264,7 @@ module Writexlsx
     #     :value
     #     :minimum
     #     :maximum
+    #
     # Other, less commonly used parameters are:
     #
     #     :min_type
@@ -3284,14 +3277,15 @@ module Writexlsx
     #     :mid_color
     #     :max_color
     #     :bar_color
+    #
     # Additional parameters which are used for specific conditional format types
     # are shown in the relevant sections below.
     #
-    # == :type
+    # === :type
     #
     # This parameter is passed in a hash to conditional_formatting.
     #
-    # The type parameter is used to set the type of conditional formatting
+    # The +:type+ parameter is used to set the type of conditional formatting
     # that you wish to apply. It is always required and it has no default value.
     # Allowable type values and their associated parameters are:
     #
@@ -3339,10 +3333,11 @@ module Writexlsx
     #     'data_bar'        (none)
     #
     #     'formula'         :criteria
+    #
     # All conditional formatting types have a format parameter, see below.
     # Other types and parameters such as icon sets will be added in time.
     #
-    # == :type => 'cell'
+    # === :type => 'cell'
     #
     # This is the most common conditional formatting type. It is used when
     # a format is applied to a cell based on a simple criterion. For example:
@@ -3366,9 +3361,9 @@ module Writexlsx
     #             :format   => green_format
     #         }
     #     )
-    # == :criteria
+    # === :criteria
     #
-    # The criteria parameter is used to set the criteria by which the cell data
+    # The +:criteria+ parameter is used to set the criteria by which the cell data
     # will be evaluated. It has no default value. The most common criteria
     # as applied to { type => 'cell' } are:
     #
@@ -3380,30 +3375,33 @@ module Writexlsx
     #     'less than'                 |  '<'
     #     'greater than or equal to'  |  '>='
     #     'less than or equal to'     |  '<='
+    #
     # You can either use Excel's textual description strings,
     # in the first column above, or the more common symbolic alternatives.
     #
     # Additional criteria which are specific to other conditional format types
     # are shown in the relevant sections below.
     #
-    # == :value
+    # === :value
     #
-    # The value is generally used along with the criteria parameter to set the
+    # The +:value+ is generally used along with the criteria parameter to set the
     # rule by which the cell data will be evaluated.
     #
     #     :type     => 'cell',
     #     :criteria => '>',
     #     :value    => 5
     #     :format   => format
-    # The value property can also be an cell reference.
+    #
+    # The +:value+ property can also be an cell reference.
     #
     #     :type     => 'cell',
     #     :criteria => '>',
     #     :value    => '$C$1',
     #     :format   => format
-    # == :format
     #
-    # The format parameter is used to specify the format that will be applied
+    # === :format
+    #
+    # The +:format+ parameter is used to specify the format that will be applied
     # to the cell when the conditional formatting criterion is met.
     # The format is created using the add_format method in the same way as cell
     # formats:
@@ -3418,6 +3416,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The conditional format follows the same rules as in Excel:
     # it is superimposed over the existing cell format and not all font and
     # border properties can be modified. Font properties that can't be modified
@@ -3447,21 +3446,23 @@ module Writexlsx
     #       :bg_color => '#C6EFCE',
     #       :color    => '#006100'
     #     )
-    # == :minimum
     #
-    # The minimum parameter is used to set the lower limiting value when the
-    # criteria is either 'between' or 'not between':
+    # === :minimum
+    #
+    # The +:minimum+ parameter is used to set the lower limiting value when the
+    # +:criteria+ is either 'between' or 'not between':
     #
     #     :validate => 'integer',
     #     :criteria => 'between',
     #     :minimum  => 1,
     #     :maximum  => 100
-    # == :maximum
     #
-    # The maximum parameter is used to set the upper limiting value when the
-    # criteria is either 'between' or 'not between'. See the previous example.
+    # === :maximum
     #
-    # == :type => 'date'
+    # The +:maximum+ parameter is used to set the upper limiting value when the
+    # +:criteria+ is either 'between' or 'not between'. See the previous example.
+    #
+    # === :type => 'date'
     #
     # The date type is the same as the cell type and uses the same criteria
     # and values. However it allows the value, minimum and maximum properties
@@ -3476,7 +3477,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'time_period'
+    #
+    # === :type => 'time_period'
     #
     # The time_period type is used to specify Excel's "Dates Occurring" style
     # conditional format.
@@ -3488,6 +3490,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The period is set in the criteria and can have one of the following
     # values:
     #
@@ -3500,7 +3503,8 @@ module Writexlsx
     #         :criteria => 'last month',
     #         :criteria => 'this month',
     #         :criteria => 'next month'
-    # == :type => 'text'
+    #
+    # === :type => 'text'
     #
     # The text type is used to specify Excel's "Specific Text" style conditional
     # format. It is used to do simple string matching using the criteria and
@@ -3514,15 +3518,17 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The criteria can have one of the following values:
     #
     #     :criteria => 'containing',
     #     :criteria => 'not containing',
     #     :criteria => 'begins with',
     #     :criteria => 'ends with'
+    #
     # The value parameter should be a string or single character.
     #
-    # == :type => 'average'
+    # === :type => 'average'
     #
     # The average type is used to specify Excel's "Average" style conditional
     # format.
@@ -3534,6 +3540,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The type of average for the conditional format range is specified by the
     # criteria:
     #
@@ -3547,7 +3554,8 @@ module Writexlsx
     #     :criteria => '2 std dev below',
     #     :criteria => '3 std dev above',
     #     :criteria => '3 std dev below'
-    # == :type => 'duplicate'
+    #
+    # === :type => 'duplicate'
     #
     # The duplicate type is used to highlight duplicate cells in a range:
     #
@@ -3557,7 +3565,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'unique'
+    #
+    # === :type => 'unique'
     #
     # The unique type is used to highlight unique cells in a range:
     #
@@ -3567,7 +3576,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'top'
+    #
+    # === :type => 'top'
     #
     # The top type is used to specify the top n values by number or percentage
     # in a range:
@@ -3579,6 +3589,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The criteria can be used to indicate that a percentage condition is
     # required:
     #
@@ -3590,14 +3601,15 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'bottom'
+    #
+    # === :type => 'bottom'
     #
     # The bottom type is used to specify the bottom n values by number or
     # percentage in a range.
     #
     # It takes the same parameters as top, see above.
     #
-    # == :type => 'blanks'
+    # === :type => 'blanks'
     #
     # The blanks type is used to highlight blank cells in a range:
     #
@@ -3607,7 +3619,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'no_blanks'
+    #
+    # === :type => 'no_blanks'
     #
     # The no_blanks type is used to highlight non blank cells in a range:
     #
@@ -3617,7 +3630,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'errors'
+    #
+    # === :type => 'errors'
     #
     # The errors type is used to highlight error cells in a range:
     #
@@ -3627,7 +3641,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'no_errors'
+    #
+    # === :type => 'no_errors'
     #
     # The no_errors type is used to highlight non error cells in a range:
     #
@@ -3637,7 +3652,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => '2_color_scale'
+    #
+    # === :type => '2_color_scale'
     #
     # The 2_color_scale type is used to specify Excel's "2 Color Scale" style
     # conditional format.
@@ -3647,10 +3663,11 @@ module Writexlsx
     #             :type  => '2_color_scale'
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used. These
     # will be extended in time.
     #
-    # == :type => '3_color_scale'
+    # === :type => '3_color_scale'
     #
     # The 3_color_scale type is used to specify Excel's "3 Color Scale" style
     # conditional format.
@@ -3660,10 +3677,11 @@ module Writexlsx
     #             :type  => '3_color_scale'
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used.
     # These will be extended in time.
     #
-    # == :type => 'data_bar'
+    # === :type => 'data_bar'
     #
     # The data_bar type is used to specify Excel's "Data Bar" style conditional
     # format.
@@ -3673,10 +3691,11 @@ module Writexlsx
     #             :type  => 'data_bar',
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used. These
     # will be extended in time.
     #
-    # == :type => 'formula'
+    # === :type => 'formula'
     #
     # The formula type is used to specify a conditional format based on
     # a user defined formula:
@@ -3688,9 +3707,10 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The formula is specified in the criteria.
     #
-    # == :min_type, :mid_type, :max_type
+    # === :min_type, :mid_type, :max_type
     #
     # The min_type and max_type properties are available when the conditional
     # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_type
@@ -3703,17 +3723,20 @@ module Writexlsx
     #             :max_type  => 'percent'
     #         }
     #     )
+    #
     # The available min/mid/max types are:
     #
     #     'num'
     #     'percent'
     #     'percentile'
     #     'formula'
-    # == :min_value, :mid_value, :max_value
     #
-    # The min_value and max_value properties are available when the conditional
-    # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_value
-    # is available for 3_color_scale. The properties are used as follows:
+    # === :min_value, :mid_value, :max_value
+    #
+    # The +:min_value+ and +:max_value+ properties are available when the
+    # conditional formatting type is 2_color_scale, 3_color_scale or
+    # data_bar. The +:mid_value+ is available for 3_color_scale. The properties
+    # are used as follows:
     #
     #     worksheet.conditional_formatting( 'A1:A12',
     #         {
@@ -3722,7 +3745,8 @@ module Writexlsx
     #             :max_value  => 90
     #         }
     #     )
-    # == :min_color, :mid_color, :max_color, :bar_color
+    #
+    # === :min_color, :mid_color, :max_color, :bar_color
     #
     # The min_color and max_color properties are available when the conditional
     # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_color
@@ -3735,10 +3759,11 @@ module Writexlsx
     #             :max_color => "#538ED5"
     #         }
     #     )
+    #
     # The color can be specifies as an Excel::Writer::XLSX color index or,
     # more usefully, as a HTML style RGB hex number, as shown above.
     #
-    # == Conditional Formatting Examples
+    # === Conditional Formatting Examples
     #
     # === Example 1. Highlight cells greater than an integer value.
     #
@@ -3873,7 +3898,7 @@ module Writexlsx
     #
     # The data range can be specified in 'A1' or 'row/col' notation (see also
     # the note about
-    # {"Cell notation"}[#label-Cell+notation] for more information):
+    # {"Cell notation"}[#label-Cell+notation] for more information.
     #
     #     worksheet.add_table('B3:F7')
     #
