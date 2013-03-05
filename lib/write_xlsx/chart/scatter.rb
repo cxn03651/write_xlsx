@@ -110,6 +110,8 @@ module Writexlsx
           write_sp_pr(series)
           # Write the c:marker element.
           write_marker(series[:_marker])
+          # Write the c:dPt element.
+          write_d_pt(series[:_points])
           # Write the c:dLbls element.
           write_d_lbls(series[:_labels])
           # Write the c:trendline element.
@@ -265,6 +267,21 @@ module Writexlsx
             if !series[:_marker] || series[:_marker][:_defined] == 0
               series[:_marker] = { :type => 'none', :_defined => 1 }
             end
+          end
+        end
+      end
+
+      #
+      # Write an individual <c:dPt> element. Override the parent method to add
+      # markers.
+      #
+      def write_d_pt_point(index, point)
+        @writer.tag_elements('c:dPt') do
+          # Write the c:idx element.
+          write_idx(index)
+          @writer.tag_elements('c:marker') do
+            # Write the c:spPr element.
+            write_sp_pr(point)
           end
         end
       end

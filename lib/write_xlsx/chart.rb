@@ -718,6 +718,9 @@ module Writexlsx
       y_error_bars = error_bars_properties(params[:y_error_bars])
       x_error_bars = error_bars_properties(params[:x_error_bars])
 
+      # Set the point properties for the series.
+      points = points_properties(params[:points])
+
       # Set the labels properties for the series.
       labels = labels_properties(params[:data_labels])
 
@@ -745,6 +748,7 @@ module Writexlsx
         :_invert_if_neg => invert_if_neg,
         :_x2_axis       => x2_axis,
         :_y2_axis       => y2_axis,
+        :_points        => points,
         :_error_bars    => {
           :_x_error_bars => x_error_bars,
           :_y_error_bars => y_error_bars
@@ -1589,6 +1593,35 @@ module Writexlsx
       return area
     end
 
+    #
+    # Convert user defined points properties to structure required internally.
+    #
+    def points_properties(user_points = nil)
+      return unless user_points
+
+      points = []
+      user_points.each do |user_point|
+        if user_point
+          # Set the lline properties for the point.
+          line = line_properties(user_point[:line])
+
+          # Allow 'border' as a synonym for 'line'.
+          if user_point[:border]
+            line = line_properties(user_point[:border])
+          end
+
+          # Set the fill properties for the chartarea.
+          fill = fill_properties(user_point[:fill])
+
+          point = {}
+          point[:_line] = line
+          point[:_fill] = fill
+        end
+        points << point
+      end
+      points
+    end
+
     def value_or_raise(hash, key, msg)
       raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
       hash[key.to_sym]
@@ -1927,6 +1960,8 @@ module Writexlsx
         write_marker(series[:_marker])
         # Write the c:invertIfNegative element.
         write_c_invert_if_negative(series[:_invert_if_neg])
+        # Write the c:dPt element.
+        write_d_pt(series[:_points])
         # Write the c:dLbls element.
         write_d_lbls(series[:_labels])
         # Write the c:trendline element.
@@ -3243,6 +3278,32 @@ module Writexlsx
       @writer.empty_tag('c:protection')
     end
 
+    #
+    # Write the <c:dPt> elements.
+    #
+    def write_d_pt(points = nil)
+      return unless ptrue?(points)
+
+      index = -1
+      points.each do |point|
+        index += 1
+        next unless ptrue?(point)
+
+        write_d_pt_point(index, point)
+      end
+    end
+
+    #
+    # Write an individual <c:dPt> element.
+    #
+    def write_d_pt_point(index, point)
+      @writer.tag_elements('c:dPt') do
+        # Write the c:idx element.
+        write_idx(index)
+        # Write the c:spPr element.
+        write_sp_pr(point)
+      end
+    end
     #
     # Write the <c:dLbls> element.
     #
