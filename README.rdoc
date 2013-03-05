@@ -75,14 +75,18 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
-2013-02-27 v0.63.0
+2013-03-05 v0.64.0
+   Added the option to format individual points in a chart series.
+   This allows Pie chart segments to be formatted.
+
+
+2013-03-05 v0.63.0
   Added Chart data tools such as:
     Error Bars
     Up-Down Bars
     High-Low Lines
     Drop Lines.
   See the chart_data_tools.rb example.
-
 
 2013-02-24 v0.62.0
   Added option for adding a data table to a Chart X-axis.
