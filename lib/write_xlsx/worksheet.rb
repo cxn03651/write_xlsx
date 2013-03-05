@@ -5021,7 +5021,7 @@ module Writexlsx
     #
     def set_h_pagebreaks(*args)
       breaks = args.collect do |brk|
-        brk.respond_to?(:to_a) ? brk.to_a : brk
+        Array(brk)
       end.flatten
       @print_style.hbreaks += breaks
     end
