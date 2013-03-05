@@ -79,6 +79,8 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
    Bug fix in handling utf-8 string under ruby 1.8.7
    (examples/demo.rb failed under ruby 1.8.7)
 
+   fix in Worksheet#set_h_pagebreaks
+
 2013-03-05 v0.64.0
    Added the option to format individual points in a chart series.
    This allows Pie chart segments to be formatted.
