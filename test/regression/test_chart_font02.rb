@@ -42,7 +42,7 @@ class TestRegressionChartFont02 < Test::Unit::TestCase
     chart.set_y_axis(
                      :name      => 'YYY',
                      :name_font => { :bold => 1, :italic => 1 },
-                     :num_font  => { :size => 9, :bold => 0, :italic => 1 },
+                     :num_font  => { :size => 9, :bold => 0, :italic => 1 }
                      )
 
     worksheet.insert_chart('E9', chart)

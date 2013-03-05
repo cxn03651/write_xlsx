@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionHyperlink16 < Test::Unit::TestCase
+class TestRegressionHyperlink15 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,7 +10,7 @@ class TestRegressionHyperlink16 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_hyperlink16
+  def test_hyperlink15
     @xlsx = 'hyperlink16.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet

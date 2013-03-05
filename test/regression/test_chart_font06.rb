@@ -54,7 +54,7 @@ class TestRegressionChartFont06 < Test::Unit::TestCase
                        :pitch_family => 34,
                        :charset      => 0,
                        :color        => '#00B0F0'
-                     },
+                     }
                      )
 
     chart.set_y_axis(
