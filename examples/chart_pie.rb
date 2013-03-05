@@ -5,6 +5,12 @@
 #
 # A demo of a Pie chart in Excel::Writer::XLSX.
 #
+# The demo also shows how to set segment colours. It is possible to
+# define chart colors for most types of WrtieXLSX charts
+# via the add_series() method. However, Pie charts are a special case
+# since each segment is represented as a point so it is necessary to
+# assign formatting to each point in the series.
+#
 # reverse(c), March 2011, John McNamara, jmcnamara@cpan.org
 # convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
 #
@@ -27,23 +33,48 @@ worksheet.write('A1', headings, bold)
 worksheet.write('A2', data)
 
 # Create a new chart object. In this case an embedded chart.
-chart = workbook.add_chart(:type => 'pie', :embedded => 1)
+chart1 = workbook.add_chart(:type => 'pie', :embedded => 1)
 
 # Configure the series. Note the use of the array ref to define ranges:
 # [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
-chart.add_series(
+# See below for an alternative syntax.
+chart1.add_series(
     :name       => 'Pie sales data',
     :categories => [ 'Sheet1', 1, 3, 0, 0 ],
     :values     => [ 'Sheet1', 1, 3, 1, 1 ]
 )
 
 # Add a title.
-chart.set_title(:name => 'Popular Pie Types')
+chart1.set_title(:name => 'Popular Pie Types')
 
 # Set an Excel chart style. Blue colors with white outline and shadow.
-chart.set_style(10)
+chart1.set_style(10)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('C2', chart, 25, 10)
+worksheet.insert_chart('C2', chart1, 25, 10)
+
+#
+# Create a Pie chart with user defined segment colors.
+#
+
+# Create an example Pie chart like above.
+chart2 = workbook.add_chart(:type => 'pie', :embedded => 1)
+
+# Configure the series and add user defined segment colours.
+chart2.add_series(
+                  :name       => 'Pie sales data',
+                  :categories => '=Sheet1!$A$2:$A$4',
+                  :values     => '=Sheet1!$B$2:$B$4',
+                  :points     => [
+                                  { :fill => { :color => '#5ABA10' } },
+                                  { :fill => { :color => '#FE110E' } },
+                                  { :fill => { :color => '#CA5C05' } }
+                                 ]
+                  )
+
+# Add a title.
+chart2.set_title(:name => 'Pie Chart with user defined colors')
+
+worksheet.insert_chart('C18', chart2, 25, 10)
 
 workbook.close
