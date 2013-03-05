@@ -401,7 +401,7 @@ module Writexlsx
     end
 
     #
-    # The name() method is used to retrieve the name of a worksheet.
+    # The name method is used to retrieve the name of a worksheet.
     # For example:
     #
     #     workbook.sheets.each do |sheet|
@@ -410,7 +410,7 @@ module Writexlsx
     #
     # For reasons related to the design of WriteXLSX and to the internals
     # of Excel there is no set_name() method. The only way to set the
-    # worksheet name is via the add_worksheet() method.
+    # worksheet name is via the Workbook#add_worksheet() method.
     #
     def name
       @name
@@ -451,7 +451,7 @@ module Writexlsx
     #     worksheet3.activate
     #
     # This is similar to the Excel VBA activate method. More than one worksheet
-    # can be selected via the select() method, see below, however only one
+    # can be selected via the select() method, however only one
     # worksheet can be active.
     #
     # The default active worksheet is the first worksheet.
@@ -531,8 +531,8 @@ module Writexlsx
     # cell will display the results of a formula but not the formula itself.
     #
     # See the protection.rb program in the examples directory of the distro
-    # for an illustrative example and the set_locked and set_hidden format
-    # methods in "CELL FORMATTING".
+    # for an illustrative example and the +set_locked+ and +set_hidden+ format
+    # methods in "CELL FORMATTING", see Format.
     #
     # You can optionally add a password to the worksheet protection:
     #
@@ -548,7 +548,7 @@ module Writexlsx
     # several man months to implement.
     #
     # You can specify which worksheet elements that you which to protect
-    # by passing a hash_ref with any or all of the following keys:
+    # by passing a hash with any or all of the following keys:
     #
     #     # Default shown.
     #     options = {
@@ -568,6 +568,7 @@ module Writexlsx
     #         :pivot_tables          => false,
     #         :select_unlocked_cells => true
     #     }
+    #
     # The default boolean values are shown above. Individual elements
     # can be protected as follows:
     #
@@ -610,12 +611,12 @@ module Writexlsx
     #   set_column(firstcol, lastcol, width, format, hidden, level)
     #
     # This method can be used to change the default properties of a single
-    # column or a range of columns. All parameters apart from first_col
-    # and last_col are optional.
+    # column or a range of columns. All parameters apart from +first_col+
+    # and +last_col+ are optional.
     #
-    # If set_column() is applied to a single column the value of first_col
-    # and last_col should be the same. In the case where last_col is zero
-    # it is set to the same value as first_col.
+    # If set_column() is applied to a single column the value of +first_col+
+    # and +last_col+ should be the same. In the case where +last_col+ is zero
+    # it is set to the same value as +first_col+.
     #
     # It is also possible, and generally clearer, to specify a column range
     # using the form of A1 notation used for columns. See the note about
@@ -635,21 +636,22 @@ module Writexlsx
     # only available at runtime from within Excel.
     #
     # As usual the format parameter is optional, for additional information,
-    # see "CELL FORMATTING". If you wish to set the format without changing
-    # the width you can pass nil as the width parameter:
+    # See {"CELL FORMATTING"}[Format.html#label-CELL+FORMATTING].
+    # If you wish to set the format without changing the width you can pass
+    # nil as the width parameter:
     #
     #     worksheet.set_column(0, 0, nil, format)
     #
     # The format parameter will be applied to any cells in the column that
     # don't have a format. For example
     #
-    #     worksheet.set_column( 'A:A', nil, format1 )    # Set format for col 1
-    #     worksheet.write( 'A1', 'Hello' )                  # Defaults to format1
-    #     worksheet.write( 'A2', 'Hello', format2 )        # Keeps format2
+    #     worksheet.set_column('A:A', nil, format1)    # Set format for col 1
+    #     worksheet.write('A1', 'Hello')               # Defaults to format1
+    #     worksheet.write('A2', 'Hello', format2)      # Keeps format2
     #
     # If you wish to define a column format in this way you should call the
-    # method before any calls to write(). If you call it afterwards it
-    # won't have any effect.
+    # method before any calls to {#write()}[#method-i-write].
+    # If you call it afterwards it won't have any effect.
     #
     # A default row format takes precedence over a default column format
     #
@@ -658,29 +660,30 @@ module Writexlsx
     #     worksheet.write( 'A1', 'Hello' )               # Defaults to format1
     #     worksheet.write( 'A2', 'Hello' )               # Defaults to format2
     #
-    # The hidden parameter should be set to 1 if you wish to hide a column.
+    # The +hidden+ parameter should be set to 1 if you wish to hide a column.
     # This can be used, for example, to hide intermediary steps in a
     # complicated calculation:
     #
     #     worksheet.set_column( 'D:D', 20,  format, 1 )
     #     worksheet.set_column( 'E:E', nil, nil,    1 )
     #
-    # The level parameter is used to set the outline level of the column.
-    # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
-    # columns with the same outline level are grouped together into a single
-    # outline.
+    # The +level+ parameter is used to set the outline level of the column.
+    # Outlines are described in
+    # {"OUTLINES AND GROUPING IN EXCEL"}["method-i-set_row-label-OUTLINES+AND+GROUPING+IN+EXCEL"].
+    # Adjacent columns with the same outline level are grouped together into
+    # a single outline.
     #
     # The following example sets an outline level of 1 for columns B to G:
     #
     #     worksheet.set_column( 'B:G', nil, nil, 0, 1 )
     #
-    # The hidden parameter can also be used to hide collapsed outlined
-    # columns when used in conjunction with the level parameter.
+    # The +hidden+ parameter can also be used to hide collapsed outlined
+    # columns when used in conjunction with the +level+ parameter.
     #
     #     worksheet.set_column( 'B:G', nil, nil, 1, 1 )
     #
     # For collapsed outlines you should also indicate which row has the
-    # collapsed + symbol using the optional collapsed parameter.
+    # collapsed + symbol using the optional +collapsed+ parameter.
     #
     #     worksheet.set_column( 'H:H', nil, nil, 0, 0, 1 )
     #
@@ -688,7 +691,7 @@ module Writexlsx
     # programs in the examples directory of the distro.
     #
     # Excel allows up to 7 outline levels. Therefore the level parameter
-    # should be in the range 0 <= level <= 7.
+    # should be in the range <tt>0 <= level <= 7</tt>.
     #
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -752,10 +755,11 @@ module Writexlsx
     #
     # This method can be used to specify which cell or cells are selected
     # in a worksheet. The most common requirement is to select a single cell,
-    # in which case last_row and last_col can be omitted. The active cell
-    # within a selected range is determined by the order in which first and
-    # last are specified. It is also possible to specify a cell or a range
-    # using A1 notation. See the note about {"Cell notation"}[#label-Cell+notation].
+    # in which case +last_row+ and +last_col+ can be omitted. The active cell
+    # within a selected range is determined by the order in which +first+ and
+    # +last+ are specified. It is also possible to specify a cell or a range
+    # using A1 notation. See the note about
+    # {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -804,7 +808,7 @@ module Writexlsx
     # that the splitter bars are not visible. This is the same as the
     # Window->Freeze Panes menu command in Excel
     #
-    # The parameters row and col are used to specify the location of
+    # The parameters +row+ and +col+ are used to specify the location of
     # the split. It should be noted that the split is specified at the
     # top or left of a cell and that the method uses zero based indexing.
     # Therefore to freeze the first row of a worksheet it is necessary
@@ -812,7 +816,7 @@ module Writexlsx
     # This might lead you to think that you are using a 1 based index
     # but this is not the case.
     #
-    # You can set one of the row and col parameters as zero if you
+    # You can set one of the row and +col+ parameters as zero if you
     # do not want either a vertical or horizontal split.
     #
     # Examples:
@@ -824,14 +828,14 @@ module Writexlsx
     #     worksheet.freeze_panes(1, 2)    # Freeze first row and first 2 columns
     #     worksheet.freeze_panes('C2')    # Same using A1 notation
     #
-    # The parameters top_row and left_col are optional. They are used
+    # The parameters +top_row+ and +left_col+ are optional. They are used
     # to specify the top-most or left-most visible row or column in the
     # scrolling region of the panes. For example to freeze the first row
     # and to have the scrolling region begin at row twenty:
     #
     #     worksheet.freeze_panes(1, 0, 20, 0)
     #
-    # You cannot use A1 notation for the top_row and left_col parameters.
+    # You cannot use A1 notation for the +top_row+ and +left_col+ parameters.
     #
     # See also the panes.rb program in the examples directory of the
     # distribution.
@@ -852,7 +856,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   split_panes(y, x, top_row, left_col, offset_row, offset_col)
+    #   split_panes(y, x, top_row, left_col)
     #
     # Set panes and mark them as split.
     #--
@@ -869,7 +873,7 @@ module Writexlsx
     # method in that the splits between the panes will be visible to the user
     # and each pane will have its own scroll bars.
     #
-    # The parameters y and x are used to specify the vertical and horizontal
+    # The parameters +y+ and +x+ are used to specify the vertical and horizontal
     # position of the split. The units for y and x are the same as those
     # used by Excel to specify row height and column width. However, the
     # vertical and horizontal units are different from each other. Therefore
@@ -877,10 +881,10 @@ module Writexlsx
     # and column widths that you have set or the default values which are 15
     # for a row and 8.43 for a column.
     #
-    # You can set one of the y and x parameters as zero if you do not want
-    # either a vertical or horizontal split. The parameters top_row and left_col
-    # are optional. They are used to specify the top-most or left-most visible
-    # row or column in the bottom-right pane.
+    # You can set one of the +y+ and +x+ parameters as zero if you do not want
+    # either a vertical or horizontal split. The parameters +top_row+ and
+    # +left_col+ are optional. They are used to specify the top-most or
+    # left-most visible row or column in the bottom-right pane.
     #
     # Example:
     #
@@ -1609,7 +1613,7 @@ module Writexlsx
     #
     # Excel makes a distinction between data types such as strings, numbers,
     # blanks, formulas and hyperlinks. To simplify the process of writing
-    # data the write() method acts as a general alias for several more
+    # data the {#write()}[#method-i-write] method acts as a general alias for several more
     # specific methods:
     #
     #     write_string
@@ -1655,11 +1659,11 @@ module Writexlsx
     #
     #     worksheet.write(4, 0, 'Hello', format)    # Formatted string
     #
-    # The write() method will ignore empty strings or +nil+ tokens unless a
+    # The {#write()}[#method-i-write] method will ignore empty strings or +nil+ tokens unless a
     # format is also supplied. As such you needn't worry about special handling
     # for empty or nil in your data. See also the write_blank() method.
     #
-    # One problem with the write() method is that occasionally data looks like
+    # One problem with the {#write()}[#method-i-write] method is that occasionally data looks like
     # a number but you don't want it treated as a number. For example, zip
     # codes or ID numbers often start with a leading zero.
     # If you want to write this data with leading zero(s), use write_string.
@@ -1713,7 +1717,7 @@ module Writexlsx
     # The write_row() method can be used to write a 1D or 2D array of data
     # in one go. This is useful for converting the results of a database
     # query into an Excel worksheet. You must pass a reference to the array
-    # of data rather than the array itself. The write() method is then
+    # of data rather than the array itself. The {#write()}[#method-i-write] method is then
     # called for each element of the data. For example:
     #
     #     array = ['awk', 'gawk', 'mawk']
@@ -1725,7 +1729,7 @@ module Writexlsx
     #     worksheet.write(0, 1, array[1])
     #     worksheet.write(0, 2, array[2])
     #
-    # Note: For convenience the write() method behaves in the same way as
+    # Note: For convenience the {#write()}[#method-i-write] method behaves in the same way as
     # write_row() if it is passed an array.
     # Therefore the following two method calls are equivalent:
     #
@@ -1844,7 +1848,7 @@ module Writexlsx
     # In either case the appropriate row or column value will still be
     # incremented.
     #
-    # As noted above the write() method can be used as a synonym for
+    # As noted above the {#write()}[#method-i-write] method can be used as a synonym for
     # write_row() and write_row() handles nested array refs as columns.
     # Therefore, the following two method calls are equivalent although
     # the more explicit call to write_col() would be preferable for
@@ -2071,7 +2075,7 @@ module Writexlsx
     # See the note about {"Cell notation"}[#label-Cell+notation].
     # The +format+ parameter is optional.
     #
-    # In general it is sufficient to use the write() method.
+    # In general it is sufficient to use the {#write()}[#method-i-write] method.
     #
     # Note: some versions of Excel 2007 do not display the calculated values
     # of formulas written by WriteXLSX. Applying all available Service Packs
@@ -2103,7 +2107,7 @@ module Writexlsx
     # string segment that Excel can display in a cell is 1000.
     # All 32767 characters can be displayed in the formula bar.
     #
-    # In general it is sufficient to use the write() method.
+    # In general it is sufficient to use the {#write()}[#method-i-write] method.
     # However, you may sometimes wish to use the write_string() method
     # to write data that looks like a number but that you don't want
     # treated as a number. For example, zip codes or phone numbers:
@@ -2385,7 +2389,7 @@ module Writexlsx
     #     worksheet.write_array_formula('A1:A1', '{=SUM(B1:C1*B2:C2)}')
     #
     # It this case however it is easier to just use the write_formula()
-    # or write() methods:
+    # or {#write()}[#method-i-write] methods:
     #
     #     # Same as above but more concise.
     #     worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}')
@@ -2448,10 +2452,12 @@ module Writexlsx
       end
     end
 
-    # The outline_settings() method is used to control the appearance of
-    # outlines in Excel. Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
     #
-    # The visible parameter is used to control whether or not outlines are
+    # The outline_settings() method is used to control the appearance of
+    # outlines in Excel. Outlines are described in
+    # {"OUTLINES AND GROUPING IN EXCEL"}["method-i-set_row-label-OUTLINES+AND+GROUPING+IN+EXCEL"].
+    #
+    # The +visible+ parameter is used to control whether or not outlines are
     # visible. Setting this parameter to 0 will cause all outlines on the
     # worksheet to be hidden. They can be unhidden in Excel by means of the
     # "Show Outline Symbols" command button. The default setting is 1 for
@@ -2459,16 +2465,16 @@ module Writexlsx
     #
     #     worksheet.outline_settings(0)
     #
-    # The symbols_below parameter is used to control whether the row outline
+    # The +symbols_below+ parameter is used to control whether the row outline
     # symbol will appear above or below the outline level bar. The default
     # setting is 1 for symbols to appear below the outline level bar.
     #
-    # The symbols_right parameter is used to control whether the column
+    # The +symbols_right+ parameter is used to control whether the column
     # outline symbol will appear to the left or the right of the outline level
     # bar. The default setting is 1 for symbols to appear to the right of
     # the outline level bar.
     #
-    # The auto_style parameter is used to control whether the automatic
+    # The +auto_style+parameter is used to control whether the automatic
     # outline generator in Excel uses automatic styles when creating an
     # outline. This has no effect on a file generated by WriteXLSX but it
     # does have an effect on how the worksheet behaves after it is created.
@@ -2504,7 +2510,7 @@ module Writexlsx
     # The hyperlink is comprised of two elements: the visible label and
     # the invisible link. The visible label is the same as the link unless
     # an alternative label is specified. The label parameter is optional.
-    # The label is written using the write() method. Therefore it is
+    # The label is written using the {#write()}[#method-i-write] method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
     # The +format+ parameter is also optional, however, without a format
@@ -2551,7 +2557,7 @@ module Writexlsx
     #     worksheet.write_url('A13', 'external:..\foo.xlsx#Sheet2!A1',  format)
     #     worksheet.write_url('A13', 'external:\\\\NET\share\foo.xlsx', format)
     #
-    # All of the these URI types are recognised by the write() method, see above.
+    # All of the these URI types are recognised by the {#write()}[#method-i-write] method, see above.
     #
     # Worksheet references are typically of the form Sheet1!A1. You can
     # also refer to a worksheet range using the standard Excel notation:
@@ -2731,14 +2737,14 @@ module Writexlsx
     # There are two important things to understand about dates and times in Excel:
     #
     # 1 A date/time in Excel is a real number plus an Excel number format.
-    # 2 WriteXLSX doesn't automatically convert date/time strings in write() to an Excel date/time.
+    # 2 WriteXLSX doesn't automatically convert date/time strings in {#write()}[#method-i-write] to an Excel date/time.
     #
     # These two points are explained in more detail below along with some
     # suggestions on how to convert times and dates to the required format.
     #
     # === An Excel date/time is a number plus a format
     #
-    # If you write a date string with write() then all you will get is a string:
+    # If you write a date string with {#write()}[#method-i-write] then all you will get is a string:
     #
     #     worksheet.write('A1', '02/03/04')   # !! Writes a string not a date. !!
     #
@@ -2810,7 +2816,7 @@ module Writexlsx
     # 2. Extract the component parts of the date/time using the same regex.
     # 3. Convert the date/time to the ISO8601 format.
     # 4. Write the date/time using write_date_time() and a number format.
-    # For a slightly more advanced solution you can modify the write() method
+    # For a slightly more advanced solution you can modify the {#write()}[#method-i-write] method
     # to handle date formats of your choice via the add_write_handler() method.
     # See the add_write_handler() section of the docs and the
     # write_handler3.rb and write_handler4.rb programs in the examples
@@ -3004,18 +3010,18 @@ module Writexlsx
     #   set_row(row [ , height, format, hidden, level, collapsed ] )
     #
     # This method can be used to change the default properties of a row.
-    # All parameters apart from row are optional.
+    # All parameters apart from +row+ are optional.
     #
     # The most common use for this method is to change the height of a row:
     #
     #     worksheet.set_row(0, 20)    # Row 1 height set to 20
     #
     # If you wish to set the format without changing the height you can
-    # pass nil as the height parameter:
+    # pass +nil+ as the height parameter:
     #
     #     worksheet.set_row(0, nil, format)
     #
-    # The format parameter will be applied to any cells in the row that
+    # The +format+ parameter will be applied to any cells in the row that
     # don't have a format. For example
     #
     #     worksheet.set_row(0, nil, format1)      # Set the format for row 1
@@ -3023,17 +3029,17 @@ module Writexlsx
     #     worksheet.write('B1', 'Hello', format2) # Keeps format2
     #
     # If you wish to define a row format in this way you should call the
-    # method before any calls to write(). Calling it afterwards will overwrite
+    # method before any calls to {#write()}[#method-i-write]. Calling it afterwards will overwrite
     # any format that was previously specified.
     #
-    # The hidden parameter should be set to 1 if you wish to hide a row.
+    # The +hidden+ parameter should be set to 1 if you wish to hide a row.
     # This can be used, for example, to hide intermediary steps in a
     # complicated calculation:
     #
     #     worksheet.set_row(0, 20,  format, 1)
     #     worksheet.set_row(1, nil, nil,    1)
     #
-    # The level parameter is used to set the outline level of the row.
+    # The +level+ parameter is used to set the outline level of the row.
     # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
     # rows with the same outline level are grouped together into a single
     # outline.
@@ -3044,22 +3050,110 @@ module Writexlsx
     #     worksheet.set_row(1, nil, nil, 0, 1)
     #     worksheet.set_row(2, nil, nil, 0, 1)
     #
-    # The hidden parameter can also be used to hide collapsed outlined rows
-    # when used in conjunction with the level parameter.
+    # The +hidden+ parameter can also be used to hide collapsed outlined rows
+    # when used in conjunction with the +level+ parameter.
     #
     #     worksheet.set_row(1, nil, nil, 1, 1)
     #     worksheet.set_row(2, nil, nil, 1, 1)
     #
     # For collapsed outlines you should also indicate which row has the
-    # collapsed + symbol using the optional collapsed parameter.
+    # collapsed + symbol using the optional +collapsed+ parameter.
     #
     #     worksheet.set_row(3, nil, nil, 0, 0, 1)
     #
     # For a more complete example see the outline.rb and outline_collapsed.rb
     # programs in the examples directory of the distro.
     #
-    # Excel allows up to 7 outline levels. Therefore the level parameter
-    # should be in the range 0 <= level <= 7.
+    # Excel allows up to 7 outline levels. Therefore the +level+ parameter
+    # should be in the range <tt>0 <= level <= 7</tt>.
+    #
+    # == OUTLINES AND GROUPING IN EXCEL
+    #
+    # Excel allows you to group rows or columns so that they can be hidden or
+    # displayed with a single mouse click. This feature is referred to as
+    # outlines.
+    #
+    # Outlines can reduce complex data down to a few salient sub-totals or
+    # summaries.
+    #
+    # This feature is best viewed in Excel but the following is an ASCII
+    # representation of what a worksheet with three outlines might look like.
+    # Rows 3-4 and rows 7-8 are grouped at level 2. Rows 2-9 are grouped at
+    # level 1. The lines at the left hand side are called outline level bars.
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #       _    | 1 |   A   |       |       |       |  ...
+    #      |  _  | 2 |   B   |       |       |       |  ...
+    #      | |   | 3 |  (C)  |       |       |       |  ...
+    #      | |   | 4 |  (D)  |       |       |       |  ...
+    #      | -   | 5 |   E   |       |       |       |  ...
+    #      |  _  | 6 |   F   |       |       |       |  ...
+    #      | |   | 7 |  (G)  |       |       |       |  ...
+    #      | |   | 8 |  (H)  |       |       |       |  ...
+    #      | -   | 9 |   I   |       |       |       |  ...
+    #      -     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Clicking the minus sign on each of the level 2 outlines will collapse
+    # and hide the data as shown in the next figure. The minus sign changes
+    # to a plus sign to indicate that the data in the outline is hidden.
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #       _    | 1 |   A   |       |       |       |  ...
+    #      |     | 2 |   B   |       |       |       |  ...
+    #      | +   | 5 |   E   |       |       |       |  ...
+    #      |     | 6 |   F   |       |       |       |  ...
+    #      | +   | 9 |   I   |       |       |       |  ...
+    #      -     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Clicking on the minus sign on the level 1 outline will collapse the
+    # remaining rows as follows:
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #            | 1 |   A   |       |       |       |  ...
+    #      +     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Grouping in WritXLSX is achieved by setting the outline level via the
+    # set_row() and set_column() worksheet methods:
+    #
+    #     set_row(row, height, format, hidden, level, collapsed)
+    #     set_column(first_col, last_col, width, format, hidden, level, collapsed)
+    #
+    # The following example sets an outline level of 1 for rows 1 and 2
+    # (zero-indexed) and columns B to G. The parameters $height and $XF are
+    # assigned default values since they are undefined:
+    #
+    #     worksheet.set_row(1, nil, nil, 0, 1)
+    #     worksheet.set_row(2, nil, nil, 0, 1)
+    #     worksheet.set_column('B:G', nil, nil, 0, 1)
+    #
+    # Excel allows up to 7 outline levels. Therefore the +level+ parameter
+    # should be in the range <tt>0 <= $level <= 7</tt>.
+    #
+    # Rows and columns can be collapsed by setting the +hidden+ flag for the
+    # hidden rows/columns and setting the +collapsed+ flag for the row/column
+    # that has the collapsed + symbol:
+    #
+    #     worksheet.set_row(1, nil, nil, 1, 1)
+    #     worksheet.set_row(2, nil, nil, 1, 1)
+    #     worksheet.set_row(3, nil, nil, 0, 0, 1)          # Collapsed flag.
+    #
+    #     worksheet.set_column('B:G', nil, nil, 1, 1)
+    #     worksheet.set_column('H:H', nil, nil, 0, 0, 1)   # Collapsed flag.
+    #
+    # Note: Setting the $collapsed flag is particularly important for
+    # compatibility with OpenOffice.org and Gnumeric.
+    #
+    # For a more complete example see the outline.rb and outline_collapsed.rb
+    # programs in the examples directory of the distro.
+    #
+    # Some additional outline properties can be set via the outline_settings()
+    # worksheet method, see above.
     #
     def set_row(*args)
       row = args[0]
@@ -3127,8 +3221,27 @@ module Writexlsx
     #
     # merge_range(first_row, first_col, last_row, last_col, string, format)
     #
-    # Merge a range of cells. The first cell should contain the data and the others
-    # should be blank. All cells should contain the same format.
+    # Merge a range of cells. The first cell should contain the data and the
+    # others should be blank. All cells should contain the same format.
+    #
+    # The merge_range() method allows you to merge cells that contain other
+    # types of alignment in addition to the merging:
+    #
+    #     format = workbook.add_format(
+    #         :border => 6,
+    #         :valign => 'vcenter',
+    #         :align  => 'center'
+    #     )
+    #
+    #     worksheet.merge_range('B3:D4', 'Vertical and horizontal', format)
+    #
+    # merge_range() writes its +token+ argument using the worksheet
+    # {#write()}[#method-i-write] method. Therefore it will handle numbers,
+    # strings, formulas or urls as required. If you need to specify the
+    # required write_*() method use the merge_range_type() method, see below.
+    #
+    # The full possibilities of this method are shown in the merge3.rb to
+    # merge6.rb programs in the examples directory of the distribution.
     #
     def merge_range(*args)
       row_first, col_first, row_last, col_last, string, format, *extra_args = row_col_notation(args)
@@ -3156,7 +3269,7 @@ module Writexlsx
     end
 
     #
-    # Same as merge_range() above except the type of write() is specified.
+    # Same as merge_range() above except the type of {#write()}[#method-i-write] is specified.
     #
     def merge_range_type(type, *args)
       case type
@@ -4205,6 +4318,8 @@ module Writexlsx
     #             :style    => 12
     #         }
     #     )
+    #
+    # http://jmcnamara.github.com/excel-writer-xlsx/images/examples/sparklines1.jpg
     #
     # Note: Sparklines are a feature of Excel 2010+ only. You can write them
     # to an XLSX file that can be read by Excel 2007 but they won't be
