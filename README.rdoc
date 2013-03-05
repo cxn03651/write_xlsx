@@ -75,6 +75,10 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-03-06 v0.64.1
+   Bug fix in handling utf-8 string under ruby 1.8.7
+   (examples/demo.rb failed under ruby 1.8.7)
+
 2013-03-05 v0.64.0
    Added the option to format individual points in a chart series.
    This allows Pie chart segments to be formatted.
