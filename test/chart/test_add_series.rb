@@ -27,7 +27,8 @@ class TestAddSeries < Test::Unit::TestCase
       :_error_bars    => {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      }
+      },
+      :_points        => nil
     }
 
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
@@ -57,7 +58,8 @@ class TestAddSeries < Test::Unit::TestCase
                   :_error_bars    => {
                     :_x_error_bars => nil,
                     :_y_error_bars => nil
-                  }
+                  },
+                  :_points        => nil
                 }
                ]
 
@@ -92,7 +94,8 @@ class TestAddSeries < Test::Unit::TestCase
                   :_error_bars    => {
                     :_x_error_bars => nil,
                     :_y_error_bars => nil
-                  }
+                  },
+                  :_points        => nil
                 }
                ]
 
@@ -122,7 +125,8 @@ class TestAddSeries < Test::Unit::TestCase
       :_error_bars    => {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      }
+      },
+      :_points        => nil
    }
 
     @chart.add_series(
@@ -155,7 +159,8 @@ class TestAddSeries < Test::Unit::TestCase
       :_error_bars    => {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      }
+      },
+      :_points        => nil
     }
 
     @chart.add_series(
