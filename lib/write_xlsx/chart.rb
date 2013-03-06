@@ -727,6 +727,16 @@ module Writexlsx
       # Set the "invert if negative" fill property.
       invert_if_neg = params[:invert_if_negative]
 
+      # Set the gap for Bar/Column charts.
+      if params[:gap]
+        @series_gap = params[:gap]
+      end
+
+      # Set the overlap for Bar/Column charts.
+      if params[:overlap]
+        @series_overlap = params[:overlap]
+      end
+
       # Set the secondary axis properties.
       x2_axis = params[:x2_axis]
       y2_axis = params[:y2_axis]
@@ -1115,6 +1125,11 @@ module Writexlsx
       subtype = @subtype
       subtype = 'percentStacked' if subtype == 'percent_stacked'
 
+      # Set a default overlap for stacked charts.
+      if @subtype =~ /stacked/
+        @series_overlap = 100 unless @series_overlap
+      end
+
       @writer.tag_elements('c:barChart') do
         # Write the c:barDir element.
         write_bar_dir
@@ -1126,8 +1141,11 @@ module Writexlsx
         # write the c:marker element.
         write_marker_value
 
+        # Write the c:gapWidth element.
+        write_gap_width(@series_gap)
+
         # write the c:overlap element.
-        write_overlap if @subtype =~ /stacked/
+        write_overlap(@series_overlap)
 
         # Write the c:axId elements
         write_axis_ids(params)
@@ -3192,8 +3210,10 @@ module Writexlsx
     #
     # Write the <c:overlap> element.
     #
-    def write_overlap # :nodoc:
-      @writer.empty_tag('c:overlap', ['val', 100])
+    def write_overlap(val = nil) # :nodoc:
+      return unless val
+
+      @writer.empty_tag('c:overlap', ['val', val])
     end
 
     #
@@ -3502,7 +3522,7 @@ module Writexlsx
 
       @writer.tag_elements('c:upDownBars') do
         # Write the c:gapWidth element.
-        write_gap_width
+        write_gap_width(150)
 
         # Write the c:upBars element.
         write_up_bars(@up_down_bars[:_up])
@@ -3515,8 +3535,10 @@ module Writexlsx
     #
     # Write the <c:gapWidth> element.
     #
-    def write_gap_width
-      @writer.empty_tag('c:gapWidth', ['val', 150])
+    def write_gap_width(val = nil)
+      return unless val
+
+      @writer.empty_tag('c:gapWidth', ['val', val])
     end
 
     #

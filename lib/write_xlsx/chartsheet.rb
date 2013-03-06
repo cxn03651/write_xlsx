@@ -134,6 +134,26 @@ module Writexlsx
       @chart.show_hidden_data(*args)
     end
 
+    def set_size(*args)
+      @chart.set_size(*args)
+    end
+
+    def set_table(*args)
+      @chart.set_table(*args)
+    end
+
+    def set_up_down_bars(*args)
+      @chart.set_up_down_bars(*args)
+    end
+
+    def set_drop_lines(*args)
+      @chart.set_drop_lines(*args)
+    end
+
+    def set_high_low_lines(*args)
+      @chart.set_high_low_lines(*args)
+    end
+
     #
     # Set up chart/drawings.
     #
