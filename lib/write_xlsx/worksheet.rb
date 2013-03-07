@@ -806,7 +806,7 @@ module Writexlsx
     # This method can be used to divide a worksheet into horizontal or
     # vertical regions known as panes and to also "freeze" these panes so
     # that the splitter bars are not visible. This is the same as the
-    # Window->Freeze Panes menu command in Excel
+    # <tt>Window->Freeze</tt> Panes menu command in Excel
     #
     # The parameters +row+ and +col+ are used to specify the location of
     # the split. It should be noted that the split is specified at the
@@ -1466,7 +1466,7 @@ module Writexlsx
     end
 
     #
-    # Set the worksheet zoom factor in the range 10 <= $scale <= 400:
+    # Set the worksheet zoom factor in the range <tt>10 <= scale <= 400</tt>:
     #
     #     worksheet1.zoom = 50
     #     worksheet2.zoom = 75
@@ -3269,7 +3269,39 @@ module Writexlsx
     end
 
     #
-    # Same as merge_range() above except the type of {#write()}[#method-i-write] is specified.
+    # Same as merge_range() above except the type of
+    # {#write()}[#method-i-write] is specified.
+    #
+    # The merge_range() method, see above, uses write() to insert the required
+    # data into to a merged range. However, there may be times where this
+    # isn't what you require so as an alternative the merge_range_type ()
+    # method allows you to specify the type of data you wish to write.
+    # For example:
+    #
+    #     worksheet.merge_range_type('number',  'B2:C2', 123,    format1)
+    #     worksheet.merge_range_type('string',  'B4:C4', 'foo',  format2)
+    #     worksheet.merge_range_type('formula', 'B6:C6', '=1+2', format3)
+    #
+    # The +type+ must be one of the following, which corresponds to a write_*()
+    # method:
+    #
+    #     'number'
+    #     'string'
+    #     'formula'
+    #     'array_formula'
+    #     'blank'
+    #     'rich_string'
+    #     'date_time'
+    #     'url'
+    #
+    # Any arguments after the range should be whatever the appropriate method
+    # accepts:
+    #
+    #     worksheet.merge_range_type('rich_string', 'B8:C8',
+    #                                   'This is ', bold, 'bold', format4)
+    #
+    # Note, you must always pass a format object as an argument, even if it is
+    # a default format.
     #
     def merge_range_type(type, *args)
       case type
@@ -5325,7 +5357,7 @@ module Writexlsx
     #
     # NOTE: It isn't sufficient to just specify the filter condition.
     # You must also hide any rows that don't match the filter condition.
-    # Rows are hidden using the set_row() visible parameter. WriteXLSX cannot
+    # Rows are hidden using the set_row() +visible+ parameter. WriteXLSX cannot
     # do this automatically since it isn't part of the file format.
     # See the autofilter.rb program in the examples directory of the distro
     # for an example.
@@ -5335,7 +5367,7 @@ module Writexlsx
     #     worksheet.filter_column('A', 'x > 2000')
     #     worksheet.filter_column('B', 'x > 2000 and x < 5000')
     #
-    # The column parameter can either be a zero indexed column number or
+    # The +column+ parameter can either be a zero indexed column number or
     # a string column name.
     #
     # The following operators are available:
@@ -5356,7 +5388,7 @@ module Writexlsx
     # the expressions will be interpreted by Excel and not by ruby.
     #
     # An expression can comprise a single statement or two statements
-    # separated by the and and or operators. For example:
+    # separated by the +and+ and +or+ operators. For example:
     #
     #     'x <  2000'
     #     'x >  2000'
@@ -5365,7 +5397,7 @@ module Writexlsx
     #     'x == 2000 or  x == 5000'
     #
     # Filtering of blank or non-blank data can be achieved by using a value
-    # of Blanks or NonBlanks in the expression:
+    # of +Blanks+ or +NonBlanks+ in the expression:
     #
     #     'x == Blanks'
     #     'x == NonBlanks'
@@ -5382,9 +5414,9 @@ module Writexlsx
     # You can also use * to match any character or number and ? to match any
     # single character or number. No other regular expression quantifier is
     # supported by Excel's filters. Excel's regular expression characters can
-    # be escaped using ~.
+    # be escaped using +~+.
     #
-    # The placeholder variable x in the above examples can be replaced by any
+    # The placeholder variable +x+ in the above examples can be replaced by any
     # simple string. The actual placeholder name is ignored internally so the
     # following are all equivalent:
     #
@@ -5398,7 +5430,7 @@ module Writexlsx
     # See the autofilter.rb program in the examples directory of the distro
     # for a more detailed example.
     #
-    # Note Spreadsheet::WriteExcel supports Top 10 style filters. These aren't
+    # Note writeExcel gem supports Top 10 style filters. These aren't
     # currently supported by WriteXLSX but may be added later.
     #
     def filter_column(col, expression)
