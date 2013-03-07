@@ -40,7 +40,7 @@ module Writexlsx
   #     require 'rubygems'
   #     require 'write_xlsx'
   #
-  #     workbook  = WriteXLSX.new( 'chart.xlsx' )
+  #     workbook  = WriteXLSX.new('chart.xlsx')
   #     worksheet = workbook.add_worksheet
   #
   #     # Add the worksheet data the chart refers to.
@@ -64,12 +64,13 @@ module Writexlsx
   #
   # ==DESCRIPTION
   #
-  # The Chart module is an abstract base class for modules that implement
+  # The Chart is an abstract base class for modules that implement
   # charts in WriteXLSX. The information below is applicable to all of
   # the available subclasses.
   #
-  # The Chart module isn't used directly. A chart object is created via
-  # the Workbook add_chart() method where the chart type is specified:
+  # The Chart isn't used directly. A chart object is created via
+  # the {WriteXLXS#add_chart()}
+  # method where the chart type is specified:
   #
   #     chart = workbook.add_chart( :type => 'column' )
   #
@@ -99,6 +100,34 @@ module Writexlsx
   # ===radar
   # Creates a Radar style chart. See Writexlsx::Chart::Radar.
   #
+  # Chart subtypes are also supported in some cases:
+  #
+  #     workbook.add_chart(:type => 'bar', :subtype => 'stacked')
+  #
+  # The currently available subtypes are:
+  #
+  #     area
+  #         stacked
+  #         percent_stacked
+  #
+  #     bar
+  #         stacked
+  #         percent_stacked
+  #
+  #     column
+  #         stacked
+  #         percent_stacked
+  #
+  #     scatter
+  #         straight_with_markers
+  #         straight
+  #         smooth_with_markers
+  #         smooth
+  #
+  #     radar
+  #         with_markers
+  #         filled
+  #
   # ==CHART FORMATTING
   #
   # The following chart formatting properties can be set for any chart object
@@ -112,12 +141,14 @@ module Writexlsx
   #     marker
   #     trendline
   #     data_labels
+  #
   # Chart formatting properties are generally set using hash refs.
   #
   #     chart.add_series(
   #         :values     => '=Sheet1!$B$1:$B$5',
   #         :line       => { color => 'blue' }
   #     )
+  #
   # In some cases the format properties can be nested. For example a marker
   # may contain border and fill sub-properties.
   #
@@ -131,6 +162,7 @@ module Writexlsx
   #             :fill    => { color => 'yellow' }
   #         }
   #     )
+  #
   # ===Line
   #
   # The line format is used to specify properties of line objects that appear
@@ -597,62 +629,81 @@ module Writexlsx
     #     chart.add_series(
     #         :categories => '=Sheet1!$A$2:$A$10', # Optional.
     #         :values     => '=Sheet1!$B$2:$B$10', # Required.
-    #         :line       => { color => 'blue' }
+    #         :line       => { :color => 'blue' }
     #     )
     #
     # The properties that can be set are:
     #
-    # ====:values
-    # This is the most important property of a series and must be set
-    # for every chart object. It links the chart with the worksheet data
-    # that it displays. A formula or array ref can be used for the
-    # data range, see below.
+    # ===:values
+    #   This is the most important property of a series and must be set
+    #   for every chart object. It links the chart with the worksheet data
+    #   that it displays. A formula or array ref can be used for the
+    #   data range, see below.
     #
-    # ====:categories
-    # This sets the chart category labels. The category is more or less
-    # the same as the X-axis. In most chart types the categories property
-    # is optional and the chart will just assume a sequential series
-    # from 1 .. n.
+    # ===:categories
+    #   This sets the chart category labels. The category is more or less
+    #   the same as the X-axis. In most chart types the categories property
+    #   is optional and the chart will just assume a sequential series
+    #   from 1 .. n.
     #
-    # ====:name
-    # Set the name for the series. The name is displayed in the chart
-    # legend and in the formula bar. The name property is optional and
-    # if it isn't supplied it will default to Series 1 .. n.
+    # ===:name
+    #   Set the name for the series. The name is displayed in the chart
+    #   legend and in the formula bar. The name property is optional and
+    #   if it isn't supplied it will default to Series 1 .. n.
     #
-    # ====:line
-    # Set the properties of the series line type such as colour and
-    # width. See the "CHART FORMATTING" section below.
+    # ===:line
+    #   Set the properties of the series line type such as colour and
+    #   width. See the "CHART FORMATTING" section below.
     #
-    # ====:border
-    # Set the border properties of the series such as colour and style.
-    # See the "CHART FORMATTING" section below.
+    # ===:border
+    #   Set the border properties of the series such as colour and style.
+    #   See the "CHART FORMATTING" section below.
     #
-    # ====:fill
-    # Set the fill properties of the series such as colour. See the
-    # "CHART FORMATTING" section below.
+    # ===:fill
+    #   Set the fill properties of the series such as colour. See the
+    #   "CHART FORMATTING"
+    #   section below.
     #
-    # ====:marker
-    # Set the properties of the series marker such as style and color.
-    # See the "CHART FORMATTING" section below.
+    # ==:marker
+    #   Set the properties of the series marker such as style and color.
+    #   See the "CHART FORMATTING" section below.
     #
-    # ====:trendline
-    # Set the properties of the series trendline such as linear,
-    # polynomial and moving average types. See the "CHART FORMATTING"
-    # section below.
+    # ===:trendline
+    #   Set the properties of the series trendline such as linear,
+    #   polynomial and moving average types. See the "CHART FORMATTING"
+    #   section below.
     #
-    # ====:data_labels
-    # Set data labels for the series. See the "CHART FORMATTING"
-    # section below.
+    # ===:data_labels
+    #   Set data labels for the series. See the "CHART FORMATTING"
+    #   section below.
     #
-    # ====:invert_if_negative
-    # Invert the fill colour for negative values. Usually only applicable
-    # to column and bar charts.
+    # ===:invert_if_negative
+    #   Invert the fill colour for negative values. Usually only applicable
+    #   to column and bar charts.
+    #
+    # ===:overlap
+    # Set the overlap between series in a Bar/Column chart. The range is
+    # <tt>+/- 100</tt>. Default is 0.
+    #
+    #     :overlap => 20
+    #
+    # Note, it is only necessary to apply this property to one series of the chart.
+    #
+    # ===:gap
+    # Set the gap between series in a Bar/Column chart. The range is
+    # <tt>0 to 500</tt>. Default is 150.
+    #
+    #     :gap => 200,
+    #
+    # Note, it is only necessary to apply this property to one series of the
+    # chart.
     #
     # The categories and values can take either a range formula such
-    # as =Sheet1!$A$2:$A$7 or, more usefully when generating the range
+    # as <tt>=Sheet1!$A$2:$A$7</tt> or, more usefully when generating the range
     # programmatically, an array ref with zero indexed row/column values:
     #
     #      [ sheetname, row_start, row_end, col_start, col_end ]
+    #
     # The following are equivalent:
     #
     #     chart.add_series( categories => '=Sheet1!$A$2:$A$7'      ) # Same as ...
@@ -677,6 +728,359 @@ module Writexlsx
     #         :name       => 'Test data series 2'
     #     )
     #
+    # ==SERIES OPTIONS
+    #
+    # This section details the following properties of add_series() in more
+    # detail:
+    #
+    #     marker
+    #     trendline
+    #     y_error_bars
+    #     x_error_bars
+    #     data_labels
+    #     points
+    #
+    # ===Marker
+    #
+    # The marker format specifies the properties of the markers used to
+    # distinguish series on a chart. In general only Line and Scatter chart
+    # types and trendlines use markers.
+    #
+    # The following properties can be set for marker formats in a chart.
+    #
+    #     type
+    #     size
+    #     border
+    #     fill
+    #
+    # The type property sets the type of marker that is used with a series.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :marker     => { :type => 'diamond' }
+    #     )
+    #
+    # The following type properties can be set for marker formats in a chart.
+    # These are shown in the same order as in the Excel format dialog.
+    #
+    #     automatic
+    #     none
+    #     square
+    #     diamond
+    #     triangle
+    #     x
+    #     star
+    #     short_dash
+    #     long_dash
+    #     circle
+    #     plus
+    #
+    # The automatic type is a special case which turns on a marker using the
+    # default marker style for the particular series number.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :marker     => { :type => 'automatic' }
+    #     )
+    #
+    # If automatic is on then other marker properties such as size, border or
+    # fill cannot be set.
+    #
+    # The size property sets the size of the marker and is generally used in
+    # conjunction with type.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :marker     => { :type => 'diamond', :size => 7 }
+    #     )
+    #
+    # Nested border and fill properties can also be set for a marker. See the
+    # "CHART FORMATTING"
+    # section below.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :marker     => {
+    #             :type    => 'square',
+    #             :size    => 5,
+    #             :border  => { :color => 'red' },
+    #             :fill    => { :color => 'yellow' }
+    #         }
+    #     )
+    #
+    # ===Trendline
+    #
+    # A trendline can be added to a chart series to indicate trends in the data
+    # such as a moving average or a polynomial fit.
+    #
+    # The following properties can be set for trendlines in a chart series.
+    #
+    #     type
+    #     order       (for polynomial trends)
+    #     period      (for moving average)
+    #     forward     (for all except moving average)
+    #     backward    (for all except moving average)
+    #     name
+    #     line
+    #
+    # The type property sets the type of trendline in the series.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :trendline  => { :type => 'linear' }
+    #     )
+    #
+    # The available trendline types are:
+    #
+    #     exponential
+    #     linear
+    #     log
+    #     moving_average
+    #     polynomial
+    #     power
+    #
+    # A polynomial trendline can also specify the order of the polynomial.
+    # The default value is 2.
+    #
+    #     chart.add_series(
+    #         :values    => '=Sheet1!$B$1:$B$5',
+    #         :trendline => {
+    #             :type  => 'polynomial',
+    #             :order => 3
+    #         }
+    #     )
+    #
+    # A moving_average trendline can also specify the period of the moving
+    # average. The default value is 2.
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :trendline  => {
+    #             :type   => 'moving_average',
+    #             :period => 3,
+    #         }
+    #     )
+    #
+    # The forward and backward properties set the forecast period of the
+    # trendline.
+    #
+    #     chart.add_series(
+    #         :values    => '=Sheet1!$B$1:$B$5',
+    #         :trendline => {
+    #             :type     => 'linear',
+    #             :forward  => 0.5,
+    #             :backward => 0.5
+    #         }
+    #     )
+    #
+    # The name property sets an optional name for the trendline that will
+    # appear in the chart legend. If it isn't specified the Excel default
+    # name will be displayed. This is usually a combination of the
+    # trendline type and the series name.
+    #
+    #     chart.add_series(
+    #         :values    => '=Sheet1!$B$1:$B$5',
+    #         :trendline => {
+    #             :type => 'linear',
+    #             :name => 'Interpolated trend'
+    #         }
+    #     )
+    #
+    # Several of these properties can be set in one go:
+    #
+    #     chart.add_series(
+    #         :values     => '=Sheet1!$B$1:$B$5',
+    #         :trendline  => {
+    #             :type     => 'linear',
+    #             :name     => 'My trend name',
+    #             :forward  => 0.5,
+    #             :backward => 0.5,
+    #             :line     => {
+    #                 :color     => 'red',
+    #                 :width     => 1,
+    #                 :dash_type => 'long_dash'
+    #             }
+    #         }
+    #     )
+    #
+    # Trendlines cannot be added to series in a stacked chart or pie chart,
+    # radar chart or (when implemented) to 3D, surface, or doughnut charts.
+    #
+    # ===Error Bars
+    #
+    # Error bars can be added to a chart series to indicate error bounds in the
+    # data. The error bars can be vertical y_error_bars (the most common type)
+    # or horizontal x_error_bars (for Bar and Scatter charts only).
+    #
+    # The following properties can be set for error bars in a chart series.
+    #
+    #     type
+    #     value       (for all types except standard error)
+    #     direction
+    #     end_style
+    #     line
+    #
+    # The type property sets the type of error bars in the series.
+    #
+    #     chart.add_series(
+    #         :values       => '=Sheet1!$B$1:$B$5',
+    #         :y_error_bars => { :type => 'standard_error' }
+    #     )
+    #
+    # The available error bars types are available:
+    #
+    #     fixed
+    #     percentage
+    #     standard_deviation
+    #     standard_error
+    #
+    # Note, the "custom" error bars type is not supported.
+    #
+    # All error bar types, except for standard_error must also have a value
+    # associated with it for the error bounds:
+    #
+    #     chart.add_series(
+    #         :values       => '=Sheet1!$B$1:$B$5',
+    #         :y_error_bars => {
+    #             :type  => 'percentage',
+    #             :value => 5
+    #         }
+    #     )
+    #
+    # The direction property sets the direction of the error bars. It should
+    # be one of the following:
+    #
+    #     plus    # Positive direction only.
+    #     minus   # Negative direction only.
+    #     both    # Plus and minus directions, The default.
+    #
+    # The end_style property sets the style of the error bar end cap. The
+    # options are 1 (the default) or 0 (for no end cap):
+    #
+    #     chart.add_series(
+    #         :values       => '=Sheet1!$B$1:$B$5',
+    #         :y_error_bars => {
+    #             :type      => 'fixed',
+    #             :value     => 2,
+    #             :end_style => 0,
+    #             :direction => 'minus'
+    #         }
+    #     )
+    #
+    # ===Data Labels
+    #
+    # Data labels can be added to a chart series to indicate the values of the
+    # plotted data points.
+    #
+    # The following properties can be set for data_labels formats in a chart.
+    #
+    #     value
+    #     category
+    #     series_name
+    #     position
+    #     leader_lines
+    #     percentage
+    #
+    # The value property turns on the Value data label for a series.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :value => 1 }
+    #     )
+    # The category property turns on the Category Name data label for a series.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :category => 1 }
+    #     )
+    #
+    # The series_name property turns on the Series Name data label for a series.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :series_name => 1 }
+    #     )
+    #
+    # The position property is used to position the data label for a series.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :value => 1, :position => 'center' },
+    #     )
+    #
+    # Valid positions are:
+    #
+    #     center
+    #     right
+    #     left
+    #     top
+    #     bottom
+    #     above           # Same as top
+    #     below           # Same as bottom
+    #     inside_end      # Pie chart mainly.
+    #     outside_end     # Pie chart mainly.
+    #     best_fit        # Pie chart mainly.
+    #
+    # The percentage property is used to turn on the display of data labels as
+    # a Percentage for a series. It is mainly used for pie charts.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :percentage => 1 }
+    #     )
+    #
+    # The leader_lines property is used to turn on Leader Lines for the data
+    # label for a series. It is mainly used for pie charts.
+    #
+    #     chart.add_series(
+    #         :values      => '=Sheet1!$B$1:$B$5',
+    #         :data_labels => { :value => 1, :leader_lines => 1 }
+    #     )
+    #
+    # Note: Even when leader lines are turned on they aren't automatically
+    # visible in Excel or Excel::Writer::XLSX. Due to an Excel limitation
+    # (or design) leader lines only appear if the data label is moved
+    # manually or if the data labels are very close and need to be adjusted
+    # automatically.
+    #
+    # ===Points
+    #
+    # In general formatting is applied to an entire series in a chart. However,
+    # it is occasionally required to format individual points in a series. In
+    # particular this is required for Pie charts where each segment is
+    # represented by a point.
+    #
+    # In these cases it is possible to use the points property of add_series():
+    #
+    #     chart.add_series(
+    #         :values => '=Sheet1!$A$1:$A$3',
+    #         :points => [
+    #             { :fill => { :color => '#FF0000' } },
+    #             { :fill => { ?color => '#CC0000' } },
+    #             { :fill => { :color => '#990000' } }
+    #         ]
+    #     )
+    #
+    # The points property takes an array ref of format options (see the
+    # "CHART FORMATTING"
+    # section below). To assign default properties to points in a series pass
+    # nil values in the array ref:
+    #
+    #     # Format point 3 of 3 only.
+    #     chart.add_series(
+    #         :values => '=Sheet1!$A$1:$A$3',
+    #         :points => [
+    #             nil,
+    #             nil,
+    #             { :fill => { :color => '#990000' } }
+    #         ]
+    #     )
+    #
+    #     # Format the first point only.
+    #     chart.add_series(
+    #         :values => '=Sheet1!$A$1:$A$3',
+    #         :points => [ { :fill => { :color => '#FF0000' } } ]
+    #                        )
     def add_series(params)
       # Check that the required input has been specified.
       unless params.has_key?(:values)
@@ -864,6 +1268,93 @@ module Writexlsx
     #         :max  => 80
     #     )
     #
+    # ==CHART FONTS
+    #
+    # The following font properties can be set for any chart object that they
+    # apply to (and that are supported by WriteXLSX) such as chart titles,
+    # axis labels and axis numbering. They correspond to the equivalent
+    # Worksheet cell Format object properties. See "FORMAT_METHODS" for more
+    # information.
+    #
+    #     name
+    #     size
+    #     bold
+    #     italic
+    #     underline
+    #     color
+    #
+    # The following explains the available font properties:
+    #
+    # ===name
+    # Set the font name:
+    #
+    #     chart.set_x_axis( :num_font => { :name => 'Arial' } )
+    #
+    # ===size
+    # Set the font size:
+    #
+    #     chart.set_x_axis( :num_font => { :name => 'Arial', :size => 10 } )
+    #
+    # ===bold
+    # Set the font bold property, should be 0 or 1:
+    #
+    #     chart.set_x_axis( :num_font => { :bold => 1 } )
+    #
+    # ===italic
+    # Set the font italic property, should be 0 or 1:
+    #
+    #     chart.set_x_axis( :num_font => { :italic => 1 } )
+    #
+    # ===underline
+    # Set the font underline property, should be 0 or 1:
+    #
+    #     chart.set_x_axis( :num_font => { :underline => 1 } )
+    #
+    # ===color
+    # Set the font color property. Can be a color index, a color name or HTML
+    # style RGB colour:
+    #
+    #     chart.set_x_axis( :num_font => { :color => 'red' } )
+    #     chart.set_y_axis( :num_font => { :color => '#92D050' } )
+    #
+    # Here is an example of Font formatting in a Chart program:
+    #
+    #     # Format the chart title.
+    #     chart.set_title(
+    #         :name      => 'Sales Results Chart',
+    #         :name_font => {
+    #             :name  => 'Calibri',
+    #             :color => 'yellow'
+    #         }
+    #     )
+    #
+    #     # Format the X-axis.
+    #     chart.set_x_axis(
+    #         :name      => 'Month',
+    #         :name_font => {
+    #             :name  => 'Arial',
+    #             :color => '#92D050'
+    #         },
+    #         :num_font => {
+    #             :name  => 'Courier New',
+    #             :color => '#00B0F0'
+    #         }
+    #     )
+    #
+    #     # Format the Y-axis.
+    #     chart.set_y_axis(
+    #         :name      => 'Sales (1000 units)',
+    #         :name_font => {
+    #             :name      => 'Century',
+    #             :underline => 1,
+    #             :color     => 'red'
+    #         },
+    #         :num_font => {
+    #             :bold   => 1,
+    #             :italic => 1,
+    #             :color  => '#7030A0'
+    #         }
+    #     )
     def set_x_axis(params = {})
       @x_axis.merge_with_hash(self, params)
     end
@@ -898,12 +1389,16 @@ module Writexlsx
     # The set_title() method is used to set properties of the chart title.
     #
     #     chart.set_title( :name => 'Year End Results' )
+    #
     # The properties that can be set are:
     #
-    # ====:name
+    # ===:name
     # Set the name (title) for the chart. The name is displayed above the
-    # chart. The name can also be a formula such as =Sheet1!$A$1. The name
+    # chart. The name can also be a formula such as +=Sheet1!$A$1+. The name
     # property is optional. The default is to have no chart title.
+    #
+    # ===:name_font
+    # Set the font properties for the chart title. See the "CHART FONTS" section.
     #
     def set_title(params)
       name, name_formula = process_names(params[:name], params[:name_formula])
@@ -923,12 +1418,14 @@ module Writexlsx
     # The set_legend() method is used to set properties of the chart legend.
     #
     #     chart.set_legend( :position => 'none' )
+    #
     # The properties that can be set are:
     #
-    # ====:position
+    # ===:position
     # Set the position of the chart legend.
     #
     #     chart.set_legend( :position => 'bottom' )
+    #
     # The default legend position is right. The available positions are:
     #
     #     none
@@ -938,13 +1435,15 @@ module Writexlsx
     #     right
     #     overlay_left
     #     overlay_right
-    # ====:delete_series
+    #
+    # ===:delete_series
+    #
     # This allows you to remove 1 or more series from the the legend
     # (the series will still display on the chart). This property takes
     # an array ref as an argument and the series are zero indexed:
     #
     #     # Delete/hide series index 0 and 2 from the legend.
-    #     chart.set_legend( :delete_series => [0, 2] )
+    #     chart.set_legend(:delete_series => [0, 2])
     #
     def set_legend(params)
       @legend_position = params[:position] || 'right'
@@ -972,9 +1471,18 @@ module Writexlsx
     # The set_chartarea() method is used to set the properties of the chart
     # area.
     #
-    # This method isn't implemented yet and is only available in
-    # writeexcel gem. However, it can be simulated using the
-    # set_style() method.
+    #     chart.set_chartarea(
+    #         :border => { :none  => 1 },
+    #         :fill   => { :color => 'red' }
+    #     )
+    #
+    # The properties that can be set are:
+    # ===:border
+    # Set the border properties of the chartarea such as colour and style.
+    # See the "CHART FORMATTING" section.
+    # ===:fill
+    # Set the fill properties of the plotarea such as colour. See the
+    # "CHART FORMATTING" section.
     #
     def set_chartarea(params)
       # Convert the user defined properties to internal properties.
@@ -988,6 +1496,8 @@ module Writexlsx
     # of the 42 built-in styles available on the 'Design' tab in Excel:
     #
     #     chart.set_style( 4 )
+    #
+    # The default style is 2.
     #
     def set_style(style_id = 2)
       style_id = 2 if style_id < 0 || style_id > 42
@@ -1027,6 +1537,35 @@ module Writexlsx
     #
     # Set dimensions for scale for the chart.
     #
+    # The set_size() method is used to set the dimensions of the chart.
+    # The size properties that can be set are:
+    #
+    #      width
+    #      height
+    #      x_scale
+    #      y_scale
+    #      x_offset
+    #      y_offset
+    #
+    # The width and height are in pixels. The default chart width is 480
+    # pixels and the default height is 288 pixels. The size of the chart can
+    # be modified by setting the width and height or by setting the :x_scale
+    # and :y_scale:
+    #
+    #     chart.set_size( :width => 720, :height => 576 )
+    #
+    #     # Same as:
+    #
+    #     chart.set_size( :x_scale => 1.5, :y_scale => 2 )
+    #
+    # The :x_offset and :y_offset position the top left corner of the chart
+    # in the cell that it is inserted into.
+    #
+    # Note: the :x_scale, :y_scale, :x_offset and :y_offset parameters can also
+    # be set via the insert_chart() method:
+    #
+    #       worksheet.insert_chart( 'E2', chart, 2, 4, 1.5, 2 )
+    #
     def set_size(params = {})
       @width    = params[:width]    if params[:width]
       @height   = params[:height]   if params[:height]
@@ -1061,6 +1600,20 @@ module Writexlsx
     #
     # Set properties for the chart up-down bars.
     #
+    # The set_up_down_bars() method adds Up-Down bars to Line charts to
+    # indicate the difference between the first and last data series.
+    #
+    #     chart.set_up_down_bars
+    # It is possible to format the up and down bars to add fill and border
+    # properties if required. See the "CHART FORMATTING" section below.
+    #
+    #     chart.set_up_down_bars(
+    #         :up   => { :fill => { :color => 'green' } },
+    #         :down => { :fill => { :color => 'red' } }
+    #     )
+    # Up-down bars can only be applied to Line charts and to Stock charts
+    # (by default).
+    #
     def set_up_down_bars(params = {})
       # Map border to line.
       [:up, :down].each do |up_down|
@@ -1087,6 +1640,18 @@ module Writexlsx
     #
     # Set properties for the chart drop lines.
     #
+    # The set_drop_lines() method adds Drop Lines to charts to show the
+    # Category value of points in the data.
+    #
+    #     chart.set_drop_lines
+    #
+    # It is possible to format the Drop Line line properties if required.
+    # See the "CHART FORMATTING" section below.
+    #
+    #     chart.set_drop_lines(:line => { :color => 'red', :dash_type => 'square_dot' } )
+    #
+    #     Drop Lines are only available in Line, Area and Stock charts.
+    #
     def set_drop_lines(params = {})
       # Set the drop line properties.
       line = line_properties(params[:line])
@@ -1096,6 +1661,18 @@ module Writexlsx
 
     #
     # Set properties for the chart high-low lines.
+    #
+    # The set_high_low_lines() method adds High-Low lines to charts to show
+    # the maximum and minimum values of points in a Category.
+    #
+    #     chart.set_high_low_lines
+    #
+    # It is possible to format the High-Low Line line properties if required.
+    # See the "CHART FORMATTING" section below.
+    #
+    #     chart.set_high_low_lines( :line => { :color => 'red' } )
+    #
+    #     High-Low Lines are only available in Line and Stock charts.
     #
     def set_high_low_lines(params = {})
       # Set the drop line properties.
@@ -1860,6 +2437,7 @@ module Writexlsx
     #
     # Write the <c:plotArea> element.
     #
+
     def write_plot_area   # :nodoc:
       write_plot_area_base
     end
