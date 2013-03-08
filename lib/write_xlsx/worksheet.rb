@@ -2364,7 +2364,7 @@ module Writexlsx
       else
         check_dimensions(row, col)
         store_row_col_max_min_values(row, col)
-        formula.sub!(/^=/, '')
+        formula = formula.sub(/^=/, '')
 
         store_data_to_table(FormulaCellData.new(self, row, col, formula, format, value))
       end

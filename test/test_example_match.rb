@@ -2889,7 +2889,7 @@ EOS
     workbook.close
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
-=begin
+
   def test_outline_collapsed
     @xlsx = 'outline_collapsed.xlsx'
     workbook   = WriteXLSX.new(@xlsx)
@@ -3074,7 +3074,7 @@ EOS
     worksheet.write('A12', 'Grand Total',         bold)
     worksheet.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
   end
-=end
+
   def test_panes
     @xlsx = 'panes.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
