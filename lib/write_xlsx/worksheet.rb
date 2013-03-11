@@ -21,7 +21,7 @@ module Writexlsx
   #
   # The following methods are available through a new worksheet:
   #
-  # * write
+  # * {#write}[#method-i-write]
   # * write_number
   # * write_string
   # * write_rich_string
@@ -33,7 +33,7 @@ module Writexlsx
   # * write_formula
   # * write_comment
   # * show_comments
-  # * comments_author=()
+  # * {#comments_author=}[#method-i-comments_author-3D]
   # * insert_image
   # * insert_chart
   # * insert_shape
@@ -42,12 +42,12 @@ module Writexlsx
   # * conditional_formatting
   # * add_sparkline
   # * add_table
-  # * name
-  # * activate
-  # * select
-  # * hide
+  # * {#name}[#method-i-name]
+  # * {#activate}[#method-i-activate]
+  # * {#select}[#method-i-select]
+  # * {#hide}[#method-i-hide]
   # * set_first_sheet
-  # * protect
+  # * {#protect}[#method-i-protect]
   # * set_selection
   # * set_row
   # * set_column
@@ -56,13 +56,51 @@ module Writexlsx
   # * split_panes
   # * merge_range
   # * merge_range_type
-  # * zoom=()
+  # * {#zoom=}[#method-i-zoom-3D]
   # * right_to_left
   # * hide_zero
-  # * tab_color=()
-  # * autofilter
+  # * {#tab_color=}[#method-i-tab_color-3D]
+  # * {#autofilter}[#method-i-autofilter]
   # * filter_column
   # * filter_column_list
+  #
+  # == PAGE SET-UP METHODS
+  #
+  # Page set-up methods affect the way that a worksheet looks
+  # when it is printed. They control features such as page headers and footers
+  # and margins. These methods are really just standard worksheet methods.
+  #
+  # The following methods are available for page set-up:
+  #
+  # * set_landscape
+  # * set_portrait
+  # * set_page_view
+  # * set_paper
+  # * center_horizontally
+  # * center_vertically
+  # * set_margins
+  # * set_header
+  # * set_footer
+  # * repeat_rows
+  # * repeat_columns
+  # * hide_gridlines
+  # * print_row_col_headers
+  # * print_area
+  # * print_across
+  # * fit_to_pages
+  # * set_start_page
+  # * set_print_scale
+  # * set_h_pagebreaks
+  # * set_v_pagebreaks
+  #
+  # A common requirement when working with WriteXLSX is to apply the same
+  # page set-up features to all of the worksheets in a workbook. To do this
+  # you can use the sheets() method of the workbook class to access the array
+  # of worksheets in a workbook:
+  #
+  #   workbook.sheets.each do |worksheet|
+  #     worksheet.set_landscape
+  #   end
   #
   # ==Cell notation
   #
@@ -110,44 +148,6 @@ module Writexlsx
   #
   # Note: in Excel it is also possible to use a R1C1 notation. This is not
   # supported by WriteXLSX.
-  #
-  # == PAGE SET-UP METHODS
-  #
-  # Page set-up methods affect the way that a worksheet looks
-  # when it is printed. They control features such as page headers and footers
-  # and margins. These methods are really just standard worksheet methods.
-  #
-  # The following methods are available for page set-up:
-  #
-  #  * set_landscape
-  #  * set_portrait
-  #  * set_page_view
-  #  * set_paper
-  #  * center_horizontally
-  #  * center_vertically
-  #  * set_margins
-  #  * set_header
-  #  * set_footer
-  #  * repeat_rows
-  #  * repeat_columns
-  #  * hide_gridlines
-  #  * print_row_col_headers
-  #  * print_area
-  #  * print_across
-  #  * fit_to_pages
-  #  * set_start_page
-  #  * set_print_scale
-  #  * set_h_pagebreaks
-  #  * set_v_pagebreaks
-  #
-  # A common requirement when working with WriteXLSX is to apply the same
-  # page set-up features to all of the worksheets in a workbook. To do this
-  # you can use the sheets() method of the workbook class to access the array
-  # of worksheets in a workbook:
-  #
-  #   workbook.sheets.each do |worksheet|
-  #     worksheet.set_landscape
-  #   end
   #
   # == FORMULAS AND FUNCTIONS IN EXCEL
   #
@@ -401,7 +401,7 @@ module Writexlsx
     end
 
     #
-    # The name() method is used to retrieve the name of a worksheet.
+    # The name method is used to retrieve the name of a worksheet.
     # For example:
     #
     #     workbook.sheets.each do |sheet|
@@ -410,7 +410,7 @@ module Writexlsx
     #
     # For reasons related to the design of WriteXLSX and to the internals
     # of Excel there is no set_name() method. The only way to set the
-    # worksheet name is via the add_worksheet() method.
+    # worksheet name is via the Workbook#add_worksheet() method.
     #
     def name
       @name
@@ -451,7 +451,7 @@ module Writexlsx
     #     worksheet3.activate
     #
     # This is similar to the Excel VBA activate method. More than one worksheet
-    # can be selected via the select() method, see below, however only one
+    # can be selected via the select() method, however only one
     # worksheet can be active.
     #
     # The default active worksheet is the first worksheet.
@@ -531,8 +531,8 @@ module Writexlsx
     # cell will display the results of a formula but not the formula itself.
     #
     # See the protection.rb program in the examples directory of the distro
-    # for an illustrative example and the set_locked and set_hidden format
-    # methods in "CELL FORMATTING".
+    # for an illustrative example and the +set_locked+ and +set_hidden+ format
+    # methods in "CELL FORMATTING", see Format.
     #
     # You can optionally add a password to the worksheet protection:
     #
@@ -548,7 +548,7 @@ module Writexlsx
     # several man months to implement.
     #
     # You can specify which worksheet elements that you which to protect
-    # by passing a hash_ref with any or all of the following keys:
+    # by passing a hash with any or all of the following keys:
     #
     #     # Default shown.
     #     options = {
@@ -568,6 +568,7 @@ module Writexlsx
     #         :pivot_tables          => false,
     #         :select_unlocked_cells => true
     #     }
+    #
     # The default boolean values are shown above. Individual elements
     # can be protected as follows:
     #
@@ -610,12 +611,12 @@ module Writexlsx
     #   set_column(firstcol, lastcol, width, format, hidden, level)
     #
     # This method can be used to change the default properties of a single
-    # column or a range of columns. All parameters apart from first_col
-    # and last_col are optional.
+    # column or a range of columns. All parameters apart from +first_col+
+    # and +last_col+ are optional.
     #
-    # If set_column() is applied to a single column the value of first_col
-    # and last_col should be the same. In the case where last_col is zero
-    # it is set to the same value as first_col.
+    # If set_column() is applied to a single column the value of +first_col+
+    # and +last_col+ should be the same. In the case where +last_col+ is zero
+    # it is set to the same value as +first_col+.
     #
     # It is also possible, and generally clearer, to specify a column range
     # using the form of A1 notation used for columns. See the note about
@@ -635,21 +636,22 @@ module Writexlsx
     # only available at runtime from within Excel.
     #
     # As usual the format parameter is optional, for additional information,
-    # see "CELL FORMATTING". If you wish to set the format without changing
-    # the width you can pass nil as the width parameter:
+    # See {"CELL FORMATTING"}[Format.html#label-CELL+FORMATTING].
+    # If you wish to set the format without changing the width you can pass
+    # nil as the width parameter:
     #
     #     worksheet.set_column(0, 0, nil, format)
     #
     # The format parameter will be applied to any cells in the column that
     # don't have a format. For example
     #
-    #     worksheet.set_column( 'A:A', nil, format1 )    # Set format for col 1
-    #     worksheet.write( 'A1', 'Hello' )                  # Defaults to format1
-    #     worksheet.write( 'A2', 'Hello', format2 )        # Keeps format2
+    #     worksheet.set_column('A:A', nil, format1)    # Set format for col 1
+    #     worksheet.write('A1', 'Hello')               # Defaults to format1
+    #     worksheet.write('A2', 'Hello', format2)      # Keeps format2
     #
     # If you wish to define a column format in this way you should call the
-    # method before any calls to write(). If you call it afterwards it
-    # won't have any effect.
+    # method before any calls to {#write()}[#method-i-write].
+    # If you call it afterwards it won't have any effect.
     #
     # A default row format takes precedence over a default column format
     #
@@ -658,29 +660,30 @@ module Writexlsx
     #     worksheet.write( 'A1', 'Hello' )               # Defaults to format1
     #     worksheet.write( 'A2', 'Hello' )               # Defaults to format2
     #
-    # The hidden parameter should be set to 1 if you wish to hide a column.
+    # The +hidden+ parameter should be set to 1 if you wish to hide a column.
     # This can be used, for example, to hide intermediary steps in a
     # complicated calculation:
     #
     #     worksheet.set_column( 'D:D', 20,  format, 1 )
     #     worksheet.set_column( 'E:E', nil, nil,    1 )
     #
-    # The level parameter is used to set the outline level of the column.
-    # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
-    # columns with the same outline level are grouped together into a single
-    # outline.
+    # The +level+ parameter is used to set the outline level of the column.
+    # Outlines are described in
+    # {"OUTLINES AND GROUPING IN EXCEL"}["method-i-set_row-label-OUTLINES+AND+GROUPING+IN+EXCEL"].
+    # Adjacent columns with the same outline level are grouped together into
+    # a single outline.
     #
     # The following example sets an outline level of 1 for columns B to G:
     #
     #     worksheet.set_column( 'B:G', nil, nil, 0, 1 )
     #
-    # The hidden parameter can also be used to hide collapsed outlined
-    # columns when used in conjunction with the level parameter.
+    # The +hidden+ parameter can also be used to hide collapsed outlined
+    # columns when used in conjunction with the +level+ parameter.
     #
     #     worksheet.set_column( 'B:G', nil, nil, 1, 1 )
     #
     # For collapsed outlines you should also indicate which row has the
-    # collapsed + symbol using the optional collapsed parameter.
+    # collapsed + symbol using the optional +collapsed+ parameter.
     #
     #     worksheet.set_column( 'H:H', nil, nil, 0, 0, 1 )
     #
@@ -688,7 +691,7 @@ module Writexlsx
     # programs in the examples directory of the distro.
     #
     # Excel allows up to 7 outline levels. Therefore the level parameter
-    # should be in the range 0 <= level <= 7.
+    # should be in the range <tt>0 <= level <= 7</tt>.
     #
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
@@ -752,10 +755,11 @@ module Writexlsx
     #
     # This method can be used to specify which cell or cells are selected
     # in a worksheet. The most common requirement is to select a single cell,
-    # in which case last_row and last_col can be omitted. The active cell
-    # within a selected range is determined by the order in which first and
-    # last are specified. It is also possible to specify a cell or a range
-    # using A1 notation. See the note about {"Cell notation"}[#label-Cell+notation].
+    # in which case +last_row+ and +last_col+ can be omitted. The active cell
+    # within a selected range is determined by the order in which +first+ and
+    # +last+ are specified. It is also possible to specify a cell or a range
+    # using A1 notation. See the note about
+    # {"Cell notation"}[#label-Cell+notation].
     #
     # Examples:
     #
@@ -802,9 +806,9 @@ module Writexlsx
     # This method can be used to divide a worksheet into horizontal or
     # vertical regions known as panes and to also "freeze" these panes so
     # that the splitter bars are not visible. This is the same as the
-    # Window->Freeze Panes menu command in Excel
+    # <tt>Window->Freeze</tt> Panes menu command in Excel
     #
-    # The parameters row and col are used to specify the location of
+    # The parameters +row+ and +col+ are used to specify the location of
     # the split. It should be noted that the split is specified at the
     # top or left of a cell and that the method uses zero based indexing.
     # Therefore to freeze the first row of a worksheet it is necessary
@@ -812,7 +816,7 @@ module Writexlsx
     # This might lead you to think that you are using a 1 based index
     # but this is not the case.
     #
-    # You can set one of the row and col parameters as zero if you
+    # You can set one of the row and +col+ parameters as zero if you
     # do not want either a vertical or horizontal split.
     #
     # Examples:
@@ -824,14 +828,14 @@ module Writexlsx
     #     worksheet.freeze_panes(1, 2)    # Freeze first row and first 2 columns
     #     worksheet.freeze_panes('C2')    # Same using A1 notation
     #
-    # The parameters top_row and left_col are optional. They are used
+    # The parameters +top_row+ and +left_col+ are optional. They are used
     # to specify the top-most or left-most visible row or column in the
     # scrolling region of the panes. For example to freeze the first row
     # and to have the scrolling region begin at row twenty:
     #
     #     worksheet.freeze_panes(1, 0, 20, 0)
     #
-    # You cannot use A1 notation for the top_row and left_col parameters.
+    # You cannot use A1 notation for the +top_row+ and +left_col+ parameters.
     #
     # See also the panes.rb program in the examples directory of the
     # distribution.
@@ -852,7 +856,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   split_panes(y, x, top_row, left_col, offset_row, offset_col)
+    #   split_panes(y, x, top_row, left_col)
     #
     # Set panes and mark them as split.
     #--
@@ -869,7 +873,7 @@ module Writexlsx
     # method in that the splits between the panes will be visible to the user
     # and each pane will have its own scroll bars.
     #
-    # The parameters y and x are used to specify the vertical and horizontal
+    # The parameters +y+ and +x+ are used to specify the vertical and horizontal
     # position of the split. The units for y and x are the same as those
     # used by Excel to specify row height and column width. However, the
     # vertical and horizontal units are different from each other. Therefore
@@ -877,10 +881,10 @@ module Writexlsx
     # and column widths that you have set or the default values which are 15
     # for a row and 8.43 for a column.
     #
-    # You can set one of the y and x parameters as zero if you do not want
-    # either a vertical or horizontal split. The parameters top_row and left_col
-    # are optional. They are used to specify the top-most or left-most visible
-    # row or column in the bottom-right pane.
+    # You can set one of the +y+ and +x+ parameters as zero if you do not want
+    # either a vertical or horizontal split. The parameters +top_row+ and
+    # +left_col+ are optional. They are used to specify the top-most or
+    # left-most visible row or column in the bottom-right pane.
     #
     # Example:
     #
@@ -1462,7 +1466,7 @@ module Writexlsx
     end
 
     #
-    # Set the worksheet zoom factor in the range 10 <= $scale <= 400:
+    # Set the worksheet zoom factor in the range <tt>10 <= scale <= 400</tt>:
     #
     #     worksheet1.zoom = 50
     #     worksheet2.zoom = 75
@@ -1609,7 +1613,7 @@ module Writexlsx
     #
     # Excel makes a distinction between data types such as strings, numbers,
     # blanks, formulas and hyperlinks. To simplify the process of writing
-    # data the write() method acts as a general alias for several more
+    # data the {#write()}[#method-i-write] method acts as a general alias for several more
     # specific methods:
     #
     #     write_string
@@ -1655,11 +1659,11 @@ module Writexlsx
     #
     #     worksheet.write(4, 0, 'Hello', format)    # Formatted string
     #
-    # The write() method will ignore empty strings or +nil+ tokens unless a
+    # The {#write()}[#method-i-write] method will ignore empty strings or +nil+ tokens unless a
     # format is also supplied. As such you needn't worry about special handling
     # for empty or nil in your data. See also the write_blank() method.
     #
-    # One problem with the write() method is that occasionally data looks like
+    # One problem with the {#write()}[#method-i-write] method is that occasionally data looks like
     # a number but you don't want it treated as a number. For example, zip
     # codes or ID numbers often start with a leading zero.
     # If you want to write this data with leading zero(s), use write_string.
@@ -1713,7 +1717,7 @@ module Writexlsx
     # The write_row() method can be used to write a 1D or 2D array of data
     # in one go. This is useful for converting the results of a database
     # query into an Excel worksheet. You must pass a reference to the array
-    # of data rather than the array itself. The write() method is then
+    # of data rather than the array itself. The {#write()}[#method-i-write] method is then
     # called for each element of the data. For example:
     #
     #     array = ['awk', 'gawk', 'mawk']
@@ -1725,7 +1729,7 @@ module Writexlsx
     #     worksheet.write(0, 1, array[1])
     #     worksheet.write(0, 2, array[2])
     #
-    # Note: For convenience the write() method behaves in the same way as
+    # Note: For convenience the {#write()}[#method-i-write] method behaves in the same way as
     # write_row() if it is passed an array.
     # Therefore the following two method calls are equivalent:
     #
@@ -1844,7 +1848,7 @@ module Writexlsx
     # In either case the appropriate row or column value will still be
     # incremented.
     #
-    # As noted above the write() method can be used as a synonym for
+    # As noted above the {#write()}[#method-i-write] method can be used as a synonym for
     # write_row() and write_row() handles nested array refs as columns.
     # Therefore, the following two method calls are equivalent although
     # the more explicit call to write_col() would be preferable for
@@ -2070,7 +2074,7 @@ module Writexlsx
     # See the note about {"Cell notation"}[#label-Cell+notation].
     # The +format+ parameter is optional.
     #
-    # In general it is sufficient to use the write() method.
+    # In general it is sufficient to use the {#write()}[#method-i-write] method.
     #
     # Note: some versions of Excel 2007 do not display the calculated values
     # of formulas written by WriteXLSX. Applying all available Service Packs
@@ -2102,7 +2106,7 @@ module Writexlsx
     # string segment that Excel can display in a cell is 1000.
     # All 32767 characters can be displayed in the formula bar.
     #
-    # In general it is sufficient to use the write() method.
+    # In general it is sufficient to use the {#write()}[#method-i-write] method.
     # However, you may sometimes wish to use the write_string() method
     # to write data that looks like a number but that you don't want
     # treated as a number. For example, zip codes or phone numbers:
@@ -2384,7 +2388,7 @@ module Writexlsx
     #     worksheet.write_array_formula('A1:A1', '{=SUM(B1:C1*B2:C2)}')
     #
     # It this case however it is easier to just use the write_formula()
-    # or write() methods:
+    # or {#write()}[#method-i-write] methods:
     #
     #     # Same as above but more concise.
     #     worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}')
@@ -2447,10 +2451,12 @@ module Writexlsx
       end
     end
 
-    # The outline_settings() method is used to control the appearance of
-    # outlines in Excel. Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
     #
-    # The visible parameter is used to control whether or not outlines are
+    # The outline_settings() method is used to control the appearance of
+    # outlines in Excel. Outlines are described in
+    # {"OUTLINES AND GROUPING IN EXCEL"}["method-i-set_row-label-OUTLINES+AND+GROUPING+IN+EXCEL"].
+    #
+    # The +visible+ parameter is used to control whether or not outlines are
     # visible. Setting this parameter to 0 will cause all outlines on the
     # worksheet to be hidden. They can be unhidden in Excel by means of the
     # "Show Outline Symbols" command button. The default setting is 1 for
@@ -2458,16 +2464,16 @@ module Writexlsx
     #
     #     worksheet.outline_settings(0)
     #
-    # The symbols_below parameter is used to control whether the row outline
+    # The +symbols_below+ parameter is used to control whether the row outline
     # symbol will appear above or below the outline level bar. The default
     # setting is 1 for symbols to appear below the outline level bar.
     #
-    # The symbols_right parameter is used to control whether the column
+    # The +symbols_right+ parameter is used to control whether the column
     # outline symbol will appear to the left or the right of the outline level
     # bar. The default setting is 1 for symbols to appear to the right of
     # the outline level bar.
     #
-    # The auto_style parameter is used to control whether the automatic
+    # The +auto_style+parameter is used to control whether the automatic
     # outline generator in Excel uses automatic styles when creating an
     # outline. This has no effect on a file generated by WriteXLSX but it
     # does have an effect on how the worksheet behaves after it is created.
@@ -2503,7 +2509,7 @@ module Writexlsx
     # The hyperlink is comprised of two elements: the visible label and
     # the invisible link. The visible label is the same as the link unless
     # an alternative label is specified. The label parameter is optional.
-    # The label is written using the write() method. Therefore it is
+    # The label is written using the {#write()}[#method-i-write] method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
     # The +format+ parameter is also optional, however, without a format
@@ -2550,7 +2556,7 @@ module Writexlsx
     #     worksheet.write_url('A13', 'external:..\foo.xlsx#Sheet2!A1',  format)
     #     worksheet.write_url('A13', 'external:\\\\NET\share\foo.xlsx', format)
     #
-    # All of the these URI types are recognised by the write() method, see above.
+    # All of the these URI types are recognised by the {#write()}[#method-i-write] method, see above.
     #
     # Worksheet references are typically of the form Sheet1!A1. You can
     # also refer to a worksheet range using the standard Excel notation:
@@ -2730,14 +2736,14 @@ module Writexlsx
     # There are two important things to understand about dates and times in Excel:
     #
     # 1 A date/time in Excel is a real number plus an Excel number format.
-    # 2 WriteXLSX doesn't automatically convert date/time strings in write() to an Excel date/time.
+    # 2 WriteXLSX doesn't automatically convert date/time strings in {#write()}[#method-i-write] to an Excel date/time.
     #
     # These two points are explained in more detail below along with some
     # suggestions on how to convert times and dates to the required format.
     #
     # === An Excel date/time is a number plus a format
     #
-    # If you write a date string with write() then all you will get is a string:
+    # If you write a date string with {#write()}[#method-i-write] then all you will get is a string:
     #
     #     worksheet.write('A1', '02/03/04')   # !! Writes a string not a date. !!
     #
@@ -2809,7 +2815,7 @@ module Writexlsx
     # 2. Extract the component parts of the date/time using the same regex.
     # 3. Convert the date/time to the ISO8601 format.
     # 4. Write the date/time using write_date_time() and a number format.
-    # For a slightly more advanced solution you can modify the write() method
+    # For a slightly more advanced solution you can modify the {#write()}[#method-i-write] method
     # to handle date formats of your choice via the add_write_handler() method.
     # See the add_write_handler() section of the docs and the
     # write_handler3.rb and write_handler4.rb programs in the examples
@@ -3003,18 +3009,18 @@ module Writexlsx
     #   set_row(row [ , height, format, hidden, level, collapsed ] )
     #
     # This method can be used to change the default properties of a row.
-    # All parameters apart from row are optional.
+    # All parameters apart from +row+ are optional.
     #
     # The most common use for this method is to change the height of a row:
     #
     #     worksheet.set_row(0, 20)    # Row 1 height set to 20
     #
     # If you wish to set the format without changing the height you can
-    # pass nil as the height parameter:
+    # pass +nil+ as the height parameter:
     #
     #     worksheet.set_row(0, nil, format)
     #
-    # The format parameter will be applied to any cells in the row that
+    # The +format+ parameter will be applied to any cells in the row that
     # don't have a format. For example
     #
     #     worksheet.set_row(0, nil, format1)      # Set the format for row 1
@@ -3022,17 +3028,17 @@ module Writexlsx
     #     worksheet.write('B1', 'Hello', format2) # Keeps format2
     #
     # If you wish to define a row format in this way you should call the
-    # method before any calls to write(). Calling it afterwards will overwrite
+    # method before any calls to {#write()}[#method-i-write]. Calling it afterwards will overwrite
     # any format that was previously specified.
     #
-    # The hidden parameter should be set to 1 if you wish to hide a row.
+    # The +hidden+ parameter should be set to 1 if you wish to hide a row.
     # This can be used, for example, to hide intermediary steps in a
     # complicated calculation:
     #
     #     worksheet.set_row(0, 20,  format, 1)
     #     worksheet.set_row(1, nil, nil,    1)
     #
-    # The level parameter is used to set the outline level of the row.
+    # The +level+ parameter is used to set the outline level of the row.
     # Outlines are described in "OUTLINES AND GROUPING IN EXCEL". Adjacent
     # rows with the same outline level are grouped together into a single
     # outline.
@@ -3043,22 +3049,110 @@ module Writexlsx
     #     worksheet.set_row(1, nil, nil, 0, 1)
     #     worksheet.set_row(2, nil, nil, 0, 1)
     #
-    # The hidden parameter can also be used to hide collapsed outlined rows
-    # when used in conjunction with the level parameter.
+    # The +hidden+ parameter can also be used to hide collapsed outlined rows
+    # when used in conjunction with the +level+ parameter.
     #
     #     worksheet.set_row(1, nil, nil, 1, 1)
     #     worksheet.set_row(2, nil, nil, 1, 1)
     #
     # For collapsed outlines you should also indicate which row has the
-    # collapsed + symbol using the optional collapsed parameter.
+    # collapsed + symbol using the optional +collapsed+ parameter.
     #
     #     worksheet.set_row(3, nil, nil, 0, 0, 1)
     #
     # For a more complete example see the outline.rb and outline_collapsed.rb
     # programs in the examples directory of the distro.
     #
-    # Excel allows up to 7 outline levels. Therefore the level parameter
-    # should be in the range 0 <= level <= 7.
+    # Excel allows up to 7 outline levels. Therefore the +level+ parameter
+    # should be in the range <tt>0 <= level <= 7</tt>.
+    #
+    # == OUTLINES AND GROUPING IN EXCEL
+    #
+    # Excel allows you to group rows or columns so that they can be hidden or
+    # displayed with a single mouse click. This feature is referred to as
+    # outlines.
+    #
+    # Outlines can reduce complex data down to a few salient sub-totals or
+    # summaries.
+    #
+    # This feature is best viewed in Excel but the following is an ASCII
+    # representation of what a worksheet with three outlines might look like.
+    # Rows 3-4 and rows 7-8 are grouped at level 2. Rows 2-9 are grouped at
+    # level 1. The lines at the left hand side are called outline level bars.
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #       _    | 1 |   A   |       |       |       |  ...
+    #      |  _  | 2 |   B   |       |       |       |  ...
+    #      | |   | 3 |  (C)  |       |       |       |  ...
+    #      | |   | 4 |  (D)  |       |       |       |  ...
+    #      | -   | 5 |   E   |       |       |       |  ...
+    #      |  _  | 6 |   F   |       |       |       |  ...
+    #      | |   | 7 |  (G)  |       |       |       |  ...
+    #      | |   | 8 |  (H)  |       |       |       |  ...
+    #      | -   | 9 |   I   |       |       |       |  ...
+    #      -     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Clicking the minus sign on each of the level 2 outlines will collapse
+    # and hide the data as shown in the next figure. The minus sign changes
+    # to a plus sign to indicate that the data in the outline is hidden.
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #       _    | 1 |   A   |       |       |       |  ...
+    #      |     | 2 |   B   |       |       |       |  ...
+    #      | +   | 5 |   E   |       |       |       |  ...
+    #      |     | 6 |   F   |       |       |       |  ...
+    #      | +   | 9 |   I   |       |       |       |  ...
+    #      -     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Clicking on the minus sign on the level 1 outline will collapse the
+    # remaining rows as follows:
+    #
+    #             ------------------------------------------
+    #      1 2 3 |   |   A   |   B   |   C   |   D   |  ...
+    #             ------------------------------------------
+    #            | 1 |   A   |       |       |       |  ...
+    #      +     | . |  ...  |  ...  |  ...  |  ...  |  ...
+    #
+    # Grouping in WritXLSX is achieved by setting the outline level via the
+    # set_row() and set_column() worksheet methods:
+    #
+    #     set_row(row, height, format, hidden, level, collapsed)
+    #     set_column(first_col, last_col, width, format, hidden, level, collapsed)
+    #
+    # The following example sets an outline level of 1 for rows 1 and 2
+    # (zero-indexed) and columns B to G. The parameters $height and $XF are
+    # assigned default values since they are undefined:
+    #
+    #     worksheet.set_row(1, nil, nil, 0, 1)
+    #     worksheet.set_row(2, nil, nil, 0, 1)
+    #     worksheet.set_column('B:G', nil, nil, 0, 1)
+    #
+    # Excel allows up to 7 outline levels. Therefore the +level+ parameter
+    # should be in the range <tt>0 <= $level <= 7</tt>.
+    #
+    # Rows and columns can be collapsed by setting the +hidden+ flag for the
+    # hidden rows/columns and setting the +collapsed+ flag for the row/column
+    # that has the collapsed + symbol:
+    #
+    #     worksheet.set_row(1, nil, nil, 1, 1)
+    #     worksheet.set_row(2, nil, nil, 1, 1)
+    #     worksheet.set_row(3, nil, nil, 0, 0, 1)          # Collapsed flag.
+    #
+    #     worksheet.set_column('B:G', nil, nil, 1, 1)
+    #     worksheet.set_column('H:H', nil, nil, 0, 0, 1)   # Collapsed flag.
+    #
+    # Note: Setting the $collapsed flag is particularly important for
+    # compatibility with OpenOffice.org and Gnumeric.
+    #
+    # For a more complete example see the outline.rb and outline_collapsed.rb
+    # programs in the examples directory of the distro.
+    #
+    # Some additional outline properties can be set via the outline_settings()
+    # worksheet method, see above.
     #
     def set_row(*args)
       row = args[0]
@@ -3126,8 +3220,27 @@ module Writexlsx
     #
     # merge_range(first_row, first_col, last_row, last_col, string, format)
     #
-    # Merge a range of cells. The first cell should contain the data and the others
-    # should be blank. All cells should contain the same format.
+    # Merge a range of cells. The first cell should contain the data and the
+    # others should be blank. All cells should contain the same format.
+    #
+    # The merge_range() method allows you to merge cells that contain other
+    # types of alignment in addition to the merging:
+    #
+    #     format = workbook.add_format(
+    #         :border => 6,
+    #         :valign => 'vcenter',
+    #         :align  => 'center'
+    #     )
+    #
+    #     worksheet.merge_range('B3:D4', 'Vertical and horizontal', format)
+    #
+    # merge_range() writes its +token+ argument using the worksheet
+    # {#write()}[#method-i-write] method. Therefore it will handle numbers,
+    # strings, formulas or urls as required. If you need to specify the
+    # required write_*() method use the merge_range_type() method, see below.
+    #
+    # The full possibilities of this method are shown in the merge3.rb to
+    # merge6.rb programs in the examples directory of the distribution.
     #
     def merge_range(*args)
       row_first, col_first, row_last, col_last, string, format, *extra_args = row_col_notation(args)
@@ -3155,7 +3268,39 @@ module Writexlsx
     end
 
     #
-    # Same as merge_range() above except the type of write() is specified.
+    # Same as merge_range() above except the type of
+    # {#write()}[#method-i-write] is specified.
+    #
+    # The merge_range() method, see above, uses write() to insert the required
+    # data into to a merged range. However, there may be times where this
+    # isn't what you require so as an alternative the merge_range_type ()
+    # method allows you to specify the type of data you wish to write.
+    # For example:
+    #
+    #     worksheet.merge_range_type('number',  'B2:C2', 123,    format1)
+    #     worksheet.merge_range_type('string',  'B4:C4', 'foo',  format2)
+    #     worksheet.merge_range_type('formula', 'B6:C6', '=1+2', format3)
+    #
+    # The +type+ must be one of the following, which corresponds to a write_*()
+    # method:
+    #
+    #     'number'
+    #     'string'
+    #     'formula'
+    #     'array_formula'
+    #     'blank'
+    #     'rich_string'
+    #     'date_time'
+    #     'url'
+    #
+    # Any arguments after the range should be whatever the appropriate method
+    # accepts:
+    #
+    #     worksheet.merge_range_type('rich_string', 'B8:C8',
+    #                                   'This is ', bold, 'bold', format4)
+    #
+    # Note, you must always pass a format object as an argument, even if it is
+    # a default format.
     #
     def merge_range_type(type, *args)
       case type
@@ -3214,19 +3359,11 @@ module Writexlsx
     # :call-seq:
     #   conditional_formatting(cell_or_cell_range, options)
     #
-    # This method handles the interface to Excel conditional formatting.
+    # Conditional formatting is a feature of Excel which allows you to apply a
+    # format to a cell or a range of cells based on a certain criteria.
     #
-    # This method contains a lot of parameters and is described in detail in
-    # the section below.
-    #
-    # We allow the format to be called on one cell or a range of cells. The
-    # hashref contains the formatting parameters and must be the last param:
-    #
-    #    conditional_formatting(row, col, {...})
-    #    conditional_formatting(first_row, first_col, last_row, last_col, {...})
-    #
-    # The conditional_format() method is used to add formatting to a cell
-    # or range of cells based on user defined criteria.
+    # For example the following criteria is used to highlight cells >= 50 in
+    # red in the conditional_format.rb example from the distro.
     #
     #     worksheet.conditional_formatting('A1:J10',
     #         {
@@ -3237,15 +3374,14 @@ module Writexlsx
     #         }
     #     )
     #
-    # See also the conditional_format.rb program in the examples directory of
-    # the distro.
+    # http://jmcnamara.github.com/excel-writer-xlsx/images/examples/conditional_example.jpg
     #
     # The conditional_formatting method is used to apply formatting based
     # on user defined criteria to an write_xlsx file.
     #
     # It can be applied to a single cell or a range of cells.
-    # You can pass 3 parameters such as (row, col, {...})
-    # or 5 parameters such as (first_row, first_col, last_row, last_col, {...}).
+    # You can pass 3 parameters such as (+row+, +col+, {...})
+    # or 5 parameters such as (+first_row+, +first_col+, +last_row+, +last_col+, {...}).
     # You can also use A1 style notation. For example:
     #
     #     worksheet.conditional_formatting( 0, 0,       {...} )
@@ -3255,6 +3391,7 @@ module Writexlsx
     #
     #     worksheet.conditional_formatting( 'A1',       {...} )
     #     worksheet.conditional_formatting( 'A1:B5',    {...} )
+    #
     #
     # Using A1 style notation is is also possible to specify
     # non-contiguous ranges, separated by a comma. For example:
@@ -3271,6 +3408,7 @@ module Writexlsx
     #     :value
     #     :minimum
     #     :maximum
+    #
     # Other, less commonly used parameters are:
     #
     #     :min_type
@@ -3283,14 +3421,15 @@ module Writexlsx
     #     :mid_color
     #     :max_color
     #     :bar_color
+    #
     # Additional parameters which are used for specific conditional format types
     # are shown in the relevant sections below.
     #
-    # == :type
+    # === :type
     #
     # This parameter is passed in a hash to conditional_formatting.
     #
-    # The type parameter is used to set the type of conditional formatting
+    # The +:type+ parameter is used to set the type of conditional formatting
     # that you wish to apply. It is always required and it has no default value.
     # Allowable type values and their associated parameters are:
     #
@@ -3338,10 +3477,11 @@ module Writexlsx
     #     'data_bar'        (none)
     #
     #     'formula'         :criteria
+    #
     # All conditional formatting types have a format parameter, see below.
     # Other types and parameters such as icon sets will be added in time.
     #
-    # == :type => 'cell'
+    # === :type => 'cell'
     #
     # This is the most common conditional formatting type. It is used when
     # a format is applied to a cell based on a simple criterion. For example:
@@ -3365,9 +3505,9 @@ module Writexlsx
     #             :format   => green_format
     #         }
     #     )
-    # == :criteria
+    # === :criteria
     #
-    # The criteria parameter is used to set the criteria by which the cell data
+    # The +:criteria+ parameter is used to set the criteria by which the cell data
     # will be evaluated. It has no default value. The most common criteria
     # as applied to { type => 'cell' } are:
     #
@@ -3379,30 +3519,33 @@ module Writexlsx
     #     'less than'                 |  '<'
     #     'greater than or equal to'  |  '>='
     #     'less than or equal to'     |  '<='
+    #
     # You can either use Excel's textual description strings,
     # in the first column above, or the more common symbolic alternatives.
     #
     # Additional criteria which are specific to other conditional format types
     # are shown in the relevant sections below.
     #
-    # == :value
+    # === :value
     #
-    # The value is generally used along with the criteria parameter to set the
+    # The +:value+ is generally used along with the criteria parameter to set the
     # rule by which the cell data will be evaluated.
     #
     #     :type     => 'cell',
     #     :criteria => '>',
     #     :value    => 5
     #     :format   => format
-    # The value property can also be an cell reference.
+    #
+    # The +:value+ property can also be an cell reference.
     #
     #     :type     => 'cell',
     #     :criteria => '>',
     #     :value    => '$C$1',
     #     :format   => format
-    # == :format
     #
-    # The format parameter is used to specify the format that will be applied
+    # === :format
+    #
+    # The +:format+ parameter is used to specify the format that will be applied
     # to the cell when the conditional formatting criterion is met.
     # The format is created using the add_format method in the same way as cell
     # formats:
@@ -3417,6 +3560,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The conditional format follows the same rules as in Excel:
     # it is superimposed over the existing cell format and not all font and
     # border properties can be modified. Font properties that can't be modified
@@ -3446,21 +3590,23 @@ module Writexlsx
     #       :bg_color => '#C6EFCE',
     #       :color    => '#006100'
     #     )
-    # == :minimum
     #
-    # The minimum parameter is used to set the lower limiting value when the
-    # criteria is either 'between' or 'not between':
+    # === :minimum
+    #
+    # The +:minimum+ parameter is used to set the lower limiting value when the
+    # +:criteria+ is either 'between' or 'not between':
     #
     #     :validate => 'integer',
     #     :criteria => 'between',
     #     :minimum  => 1,
     #     :maximum  => 100
-    # == :maximum
     #
-    # The maximum parameter is used to set the upper limiting value when the
-    # criteria is either 'between' or 'not between'. See the previous example.
+    # === :maximum
     #
-    # == :type => 'date'
+    # The +:maximum+ parameter is used to set the upper limiting value when the
+    # +:criteria+ is either 'between' or 'not between'. See the previous example.
+    #
+    # === :type => 'date'
     #
     # The date type is the same as the cell type and uses the same criteria
     # and values. However it allows the value, minimum and maximum properties
@@ -3475,7 +3621,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'time_period'
+    #
+    # === :type => 'time_period'
     #
     # The time_period type is used to specify Excel's "Dates Occurring" style
     # conditional format.
@@ -3487,6 +3634,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The period is set in the criteria and can have one of the following
     # values:
     #
@@ -3499,7 +3647,8 @@ module Writexlsx
     #         :criteria => 'last month',
     #         :criteria => 'this month',
     #         :criteria => 'next month'
-    # == :type => 'text'
+    #
+    # === :type => 'text'
     #
     # The text type is used to specify Excel's "Specific Text" style conditional
     # format. It is used to do simple string matching using the criteria and
@@ -3513,15 +3662,17 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The criteria can have one of the following values:
     #
     #     :criteria => 'containing',
     #     :criteria => 'not containing',
     #     :criteria => 'begins with',
     #     :criteria => 'ends with'
+    #
     # The value parameter should be a string or single character.
     #
-    # == :type => 'average'
+    # === :type => 'average'
     #
     # The average type is used to specify Excel's "Average" style conditional
     # format.
@@ -3533,6 +3684,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The type of average for the conditional format range is specified by the
     # criteria:
     #
@@ -3546,7 +3698,8 @@ module Writexlsx
     #     :criteria => '2 std dev below',
     #     :criteria => '3 std dev above',
     #     :criteria => '3 std dev below'
-    # == :type => 'duplicate'
+    #
+    # === :type => 'duplicate'
     #
     # The duplicate type is used to highlight duplicate cells in a range:
     #
@@ -3556,7 +3709,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'unique'
+    #
+    # === :type => 'unique'
     #
     # The unique type is used to highlight unique cells in a range:
     #
@@ -3566,7 +3720,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'top'
+    #
+    # === :type => 'top'
     #
     # The top type is used to specify the top n values by number or percentage
     # in a range:
@@ -3578,6 +3733,7 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The criteria can be used to indicate that a percentage condition is
     # required:
     #
@@ -3589,14 +3745,15 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'bottom'
+    #
+    # === :type => 'bottom'
     #
     # The bottom type is used to specify the bottom n values by number or
     # percentage in a range.
     #
     # It takes the same parameters as top, see above.
     #
-    # == :type => 'blanks'
+    # === :type => 'blanks'
     #
     # The blanks type is used to highlight blank cells in a range:
     #
@@ -3606,7 +3763,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'no_blanks'
+    #
+    # === :type => 'no_blanks'
     #
     # The no_blanks type is used to highlight non blank cells in a range:
     #
@@ -3616,7 +3774,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'errors'
+    #
+    # === :type => 'errors'
     #
     # The errors type is used to highlight error cells in a range:
     #
@@ -3626,7 +3785,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => 'no_errors'
+    #
+    # === :type => 'no_errors'
     #
     # The no_errors type is used to highlight non error cells in a range:
     #
@@ -3636,7 +3796,8 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
-    # == :type => '2_color_scale'
+    #
+    # === :type => '2_color_scale'
     #
     # The 2_color_scale type is used to specify Excel's "2 Color Scale" style
     # conditional format.
@@ -3646,10 +3807,11 @@ module Writexlsx
     #             :type  => '2_color_scale'
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used. These
     # will be extended in time.
     #
-    # == :type => '3_color_scale'
+    # === :type => '3_color_scale'
     #
     # The 3_color_scale type is used to specify Excel's "3 Color Scale" style
     # conditional format.
@@ -3659,10 +3821,11 @@ module Writexlsx
     #             :type  => '3_color_scale'
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used.
     # These will be extended in time.
     #
-    # == :type => 'data_bar'
+    # === :type => 'data_bar'
     #
     # The data_bar type is used to specify Excel's "Data Bar" style conditional
     # format.
@@ -3672,10 +3835,11 @@ module Writexlsx
     #             :type  => 'data_bar',
     #         }
     #     )
+    #
     # At the moment only the default colors and properties can be used. These
     # will be extended in time.
     #
-    # == :type => 'formula'
+    # === :type => 'formula'
     #
     # The formula type is used to specify a conditional format based on
     # a user defined formula:
@@ -3687,9 +3851,10 @@ module Writexlsx
     #             :format   => format
     #         }
     #     )
+    #
     # The formula is specified in the criteria.
     #
-    # == :min_type, :mid_type, :max_type
+    # === :min_type, :mid_type, :max_type
     #
     # The min_type and max_type properties are available when the conditional
     # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_type
@@ -3702,17 +3867,20 @@ module Writexlsx
     #             :max_type  => 'percent'
     #         }
     #     )
+    #
     # The available min/mid/max types are:
     #
     #     'num'
     #     'percent'
     #     'percentile'
     #     'formula'
-    # == :min_value, :mid_value, :max_value
     #
-    # The min_value and max_value properties are available when the conditional
-    # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_value
-    # is available for 3_color_scale. The properties are used as follows:
+    # === :min_value, :mid_value, :max_value
+    #
+    # The +:min_value+ and +:max_value+ properties are available when the
+    # conditional formatting type is 2_color_scale, 3_color_scale or
+    # data_bar. The +:mid_value+ is available for 3_color_scale. The properties
+    # are used as follows:
     #
     #     worksheet.conditional_formatting( 'A1:A12',
     #         {
@@ -3721,7 +3889,8 @@ module Writexlsx
     #             :max_value  => 90
     #         }
     #     )
-    # == :min_color, :mid_color, :max_color, :bar_color
+    #
+    # === :min_color, :mid_color, :max_color, :bar_color
     #
     # The min_color and max_color properties are available when the conditional
     # formatting type is 2_color_scale, 3_color_scale or data_bar. The mid_color
@@ -3734,10 +3903,11 @@ module Writexlsx
     #             :max_color => "#538ED5"
     #         }
     #     )
+    #
     # The color can be specifies as an Excel::Writer::XLSX color index or,
     # more usefully, as a HTML style RGB hex number, as shown above.
     #
-    # == Conditional Formatting Examples
+    # === Conditional Formatting Examples
     #
     # === Example 1. Highlight cells greater than an integer value.
     #
@@ -3838,6 +4008,9 @@ module Writexlsx
     end
 
     #
+    # :call-seq:
+    #    add_table(row1, col1, row2, col2, properties)
+    #
     # Add an Excel table to a worksheet.
     #
     # The add_table() method is used to group a range of cells into
@@ -3846,9 +4019,304 @@ module Writexlsx
     #   worksheet.add_table('B3:F7', { ... } )
     #
     # This method contains a lot of parameters and is described
-    # in detail in a separate section "TABLES IN EXCEL".
+    # in detail in a section
+    # {"TABLES IN EXCEL"}[#method-i-add_table-label-TABLES+IN+EXCEL].
     #
     # See also the tables.rb program in the examples directory of the distro
+    #
+    # ==TABLES IN EXCEL
+    #
+    # Tables in Excel are a way of grouping a range of cells into a single
+    # entity that has common formatting or that can be referenced from
+    # formulas. Tables can have column headers, autofilters, total rows,
+    # column formulas and default formatting.
+    #
+    # http://jmcnamara.github.com/excel-writer-xlsx/images/examples/tables.jpg
+    #
+    # For more information see "An Overview of Excel Tables"
+    # http://office.microsoft.com/en-us/excel-help/overview-of-excel-tables-HA010048546.aspx.
+    #
+    # Tables are added to a worksheet using the add_table() method:
+    #
+    #     worksheet.add_table('B3:F7', parameters)
+    #
+    # The data range can be specified in 'A1' or 'row/col' notation (see also
+    # the note about
+    # {"Cell notation"}[#label-Cell+notation] for more information.
+    #
+    #     worksheet.add_table('B3:F7')
+    #
+    #     # Same as:
+    #     worksheet.add_table(2, 1, 6, 5)
+    #
+    # The last parameter in add_table() should be a hash ref containing the
+    # parameters that describe the table options and data. The available
+    # parameters are:
+    #
+    #         :data
+    #         :autofilter
+    #         :header_row
+    #         :banded_columns
+    #         :banded_rows
+    #         :first_column
+    #         :last_column
+    #         :style
+    #         :total_row
+    #         :columns
+    #         :name
+    #
+    # The table parameters are detailed below. There are no required parameters
+    # and the hash ref isn't required if no options are specified.
+    #
+    # ===:data
+    #
+    # The +:data+ parameter can be used to specify the data in the cells of the
+    # table.
+    #
+    #     data = [
+    #         [ 'Apples',  10000, 5000, 8000, 6000 ],
+    #         [ 'Pears',   2000,  3000, 4000, 5000 ],
+    #         [ 'Bananas', 6000,  6000, 6500, 6000 ],
+    #         [ 'Oranges', 500,   300,  200,  700 ]
+    #     ]
+    #
+    #     worksheet.add_table('B3:F7', :data => data)
+    #
+    # Table data can also be written separately, as an array or individual
+    # cells.
+    #
+    #     # These two statements are the same as the single statement above.
+    #     worksheet.add_table('B3:F7')
+    #     worksheet.write_col('B4', data)
+    #
+    # Writing the cell data separately is occasionally required when you need
+    # to control the write_*() method used to populate the cells or if you
+    # wish to tweak the cell formatting.
+    #
+    # The data structure should be an array ref of array refs holding row data
+    # as shown above.
+    #
+    # ===:header_row
+    #
+    # The +:header_row+ parameter can be used to turn on or off the header row
+    # in the table. It is on by default.
+    #
+    #     worksheet.add_table('B4:F7', :header_row => 0) # Turn header off.
+    #
+    # The header row will contain default captions such as Column 1, Column 2,
+    # etc. These captions can be overridden using the +:columns+ parameter
+    # below.
+    #
+    # ===:autofilter
+    #
+    # The +:autofilter+ parameter can be used to turn on or off the autofilter
+    # in the header row. It is on by default.
+    #
+    #     worksheet.add_table('B3:F7', :autofilter => 0) # Turn autofilter off.
+    #
+    # The +:autofilter+ is only shown if the +:header_row+ is on. Filters
+    # within the table are not supported.
+    #
+    # ===:banded_rows
+    #
+    # The +:banded_rows+ parameter can be used to used to create rows of
+    # alternating colour in the table. It is on by default.
+    #
+    #     worksheet.add_table('B3:F7', :banded_rows => 0)
+    #
+    # ===:banded_columns
+    #
+    # The +:banded_columns+ parameter can be used to used to create columns
+    # of alternating colour in the table. It is off by default.
+    #
+    #     worksheet.add_table('B3:F7', :banded_columns => 1)
+    #
+    # ===:first_column
+    #
+    # The +:first_column+ parameter can be used to highlight the first column
+    # of the table. The type of highlighting will depend on the style of the
+    # table. It may be bold text or a different colour. It is off by default.
+    #
+    #     worksheet.add_table('B3:F7', :first_column => 1)
+    #
+    # ===:last_column
+    #
+    # The +:last_column+ parameter can be used to highlight the last column
+    # of the table. The type of highlighting will depend on the style of the
+    # table. It may be bold text or a different colour. It is off by default.
+    #
+    #     worksheet.add_table('B3:F7', :last_column => 1)
+    #
+    # ===:style
+    #
+    # The +:style+ parameter can be used to set the style of the table.
+    # Standard Excel table format names should be used (with matching
+    # capitalisation):
+    #
+    #     worksheet11.add_table(
+    #         'B3:F7',
+    #         {
+    #             :data      => data,
+    #             :style     => 'Table Style Light 11'
+    #         }
+    #     )
+    #
+    # The default table style is 'Table Style Medium 9'.
+    #
+    # ===:name
+    #
+    # The +:name+ parameter can be used to set the name of the table.
+    #
+    # By default tables are named Table1, Table2, etc. If you override the
+    # table name you must ensure that it doesn't clash with an existing table
+    # name and that it follows Excel's requirements for table names.
+    #
+    #     worksheet.add_table('B3:F7', :name => 'SalesData')
+    #
+    # If you need to know the name of the table, for example to use it in a
+    # formula, you can get it as follows:
+    #
+    #     table      = worksheet2.add_table('B3:F7')
+    #     table_name = table.name
+    #
+    # ===:total_row
+    #
+    # The +:total_row+ parameter can be used to turn on the total row in the
+    # last row of a table. It is distinguished from the other rows by a
+    # different formatting and also with dropdown SUBTOTAL functions.
+    #
+    #     worksheet.add_table('B3:F7', :total_row => 1)
+    #
+    # The default total row doesn't have any captions or functions. These must
+    # by specified via the +:columns+ parameter below.
+    #
+    # ===:columns
+    #
+    # The +:columns+ parameter can be used to set properties for columns
+    # within the table.
+    #
+    # The sub-properties that can be set are:
+    #
+    #     :header
+    #     :formula
+    #     :total_string
+    #     :total_function
+    #     :format
+    #
+    # The column data must be specified as an array of hash. For example to
+    # override the default 'Column n' style table headers:
+    #
+    #     worksheet.add_table(
+    #         'B3:F7',
+    #         {
+    #             :data    => data,
+    #             :columns => [
+    #                 { :header => 'Product' },
+    #                 { :header => 'Quarter 1' },
+    #                 { :header => 'Quarter 2' },
+    #                 { :header => 'Quarter 3' },
+    #                 { :header => 'Quarter 4' }
+    #             ]
+    #         }
+    #     )
+    #
+    # If you don't wish to specify properties for a specific column you pass
+    # an empty hash and the defaults will be applied:
+    #
+    #             ...
+    #             :columns => [
+    #                 { :header => 'Product' },
+    #                 { :header => 'Quarter 1' },
+    #                 { },                        # Defaults to 'Column 3'.
+    #                 { :header => 'Quarter 3' },
+    #                 { :header => 'Quarter 4' }
+    #             ]
+    #             ...
+    #
+    # Column formulas can by applied using the formula column property:
+    #
+    #     worksheet8.add_table(
+    #         'B3:G7',
+    #         {
+    #             :data    => data,
+    #             :columns => [
+    #                 { :header => 'Product' },
+    #                 { :header => 'Quarter 1' },
+    #                 { :header => 'Quarter 2' },
+    #                 { :header => 'Quarter 3' },
+    #                 { :header => 'Quarter 4' },
+    #                 {
+    #                     :header  => 'Year',
+    #                     :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+    #                 }
+    #             ]
+    #         }
+    #     )
+    #
+    # The Excel 2007 [#This Row] and Excel 2010 @ structural references are
+    # supported within the formula.
+    #
+    # As stated above the total_row table parameter turns on the "Total" row
+    # in the table but it doesn't populate it with any defaults. Total
+    # captions and functions must be specified via the columns property and
+    # the total_string and total_function sub properties:
+    #
+    #     worksheet10.add_table(
+    #         'B3:F8',
+    #         {
+    #             :data      => data,
+    #             :total_row => 1,
+    #             :columns   => [
+    #                 { :header => 'Product',   total_string   => 'Totals' },
+    #                 { :header => 'Quarter 1', total_function => 'sum' },
+    #                 { :header => 'Quarter 2', total_function => 'sum' },
+    #                 { :header => 'Quarter 3', total_function => 'sum' },
+    #                 { :header => 'Quarter 4', total_function => 'sum' }
+    #             ]
+    #         }
+    #     )
+    #
+    # The supported totals row SUBTOTAL functions are:
+    #
+    #         average
+    #         count_nums
+    #         count
+    #         max
+    #         min
+    #         std_dev
+    #         sum
+    #         var
+    #
+    # User defined functions or formulas aren't supported.
+    #
+    # Format can also be applied to columns:
+    #
+    #     currency_format = workbook.add_format(:num_format => '$#,##0')
+    #
+    #     worksheet.add_table(
+    #         'B3:D8',
+    #         {
+    #             :data      => data,
+    #             :total_row => 1,
+    #             :columns   => [
+    #                 { :header => 'Product', :total_string => 'Totals' },
+    #                 {
+    #                     :header         => 'Quarter 1',
+    #                     :total_function => 'sum',
+    #                     :format         => $currency_format
+    #                 },
+    #                 {
+    #                     :header         => 'Quarter 2',
+    #                     :total_function => 'sum',
+    #                     :format         => $currency_format
+    #                 }
+    #             ]
+    #         }
+    #     )
+    #
+    # Standard WriteXLSX format objects can be used. However, they should be
+    # limited to numerical formats. Overriding other table formatting may
+    # produce inconsistent results.
     #
     def add_table(*args)
       # Table count is a member of Workbook, global to all Worksheet.
@@ -3881,6 +4349,8 @@ module Writexlsx
     #             :style    => 12
     #         }
     #     )
+    #
+    # http://jmcnamara.github.com/excel-writer-xlsx/images/examples/sparklines1.jpg
     #
     # Note: Sparklines are a feature of Excel 2010+ only. You can write them
     # to an XLSX file that can be read by Excel 2007 but they won't be
@@ -3928,108 +4398,135 @@ module Writexlsx
     #
     # This is the cell where the sparkline will be displayed:
     #
-    #     location => 'F1'
-    # The location should be a single cell. (For multiple cells see "Grouped Sparklines" below).
+    #     :location => 'F1'
     #
-    # To specify the location in row-column notation use the xl_rowcol_to_cell() function from the Excel::Writer::XLSX::Utility module.
+    # The location should be a single cell. (For multiple cells see
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below).
     #
-    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    # To specify the location in row-column notation use the
+    # xl_rowcol_to_cell() function from the Writexlsx::Utility module.
+    #
+    #     include Writexlsx::Utility
     #     ...
     #     location => xl_rowcol_to_cell( 0, 5 ), # F1
-    # range
+    #
+    # ===:range
     #
     # This specifies the cell data range that the sparkline will plot:
     #
-    #     $worksheet->add_sparkline(
+    #     worksheet.add_sparkline(
     #         {
-    #             location => 'F1',
-    #             range    => 'A1:E1',
+    #             :location => 'F1',
+    #             :range    => 'A1:E1'
     #         }
-    #     );
-    # The range should be a 2D array. (For 3D arrays of cells see "Grouped Sparklines" below).
+    #     )
     #
-    # If range is not on the same worksheet you can specify its location using the usual Excel notation:
+    # The range should be a 2D array. (For 3D arrays of cells see
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below).
     #
-    #             range => 'Sheet1!A1:E1',
-    # If the worksheet contains spaces or special characters you should quote the worksheet name in the same way that Excel does:
+    # If range is not on the same worksheet you can specify its location using
+    # the usual Excel notation:
     #
-    #             range => q('Monthly Data'!A1:E1),
-    # To specify the location in row-column notation use the xl_range() or xl_range_formula() functions from the Excel::Writer::XLSX::Utility module.
+    #             Lrange => 'Sheet1!A1:E1'
     #
-    #     use Excel::Writer::XLSX::Utility ':rowcol';
+    # If the worksheet contains spaces or special characters you should quote
+    # the worksheet name in the same way that Excel does:
+    #
+    #             :range => q('Monthly Data'!A1:E1)
+    #
+    # To specify the location in row-column notation use the xl_range() or
+    # xl_range_formula() functions from the Writexlsx::Utility module.
+    #
+    #     include Writexlsx::Utility
     #     ...
     #     range => xl_range( 1, 1,  0, 4 ),                   # 'A1:E1'
     #     range => xl_range_formula( 'Sheet1', 0, 0,  0, 4 ), # 'Sheet1!A2:E2'
-    # type
+    #
+    # ===:type
     #
     # Specifies the type of sparkline. There are 3 available sparkline types:
     #
-    #     line    (default)
-    #     column
-    #     win_loss
+    #     :line    (default)
+    #     :column
+    #     :win_loss
+    #
     # For example:
     #
     #     {
-    #         location => 'F1',
-    #         range    => 'A1:E1',
-    #         type     => 'column',
+    #         :location => 'F1',
+    #         :range    => 'A1:E1',
+    #         :type     => 'column'
     #     }
-    # style
     #
-    # Excel provides 36 built-in Sparkline styles in 6 groups of 6. The style parameter can be used to replicate these and should be a corresponding number from 1 .. 36.
+    # ===:style
+    #
+    # Excel provides 36 built-in Sparkline styles in 6 groups of 6. The style
+    # parameter can be used to replicate these and should be a corresponding
+    # number from 1 .. 36.
     #
     #     {
-    #         location => 'A14',
-    #         range    => 'Sheet2!A2:J2',
-    #         style    => 3,
+    #         :location => 'A14',
+    #         :range    => 'Sheet2!A2:J2',
+    #         :style    => 3
     #     }
-    # The style number starts in the top left of the style grid and runs left to right. The default style is 1. It is possible to override colour elements of the sparklines using the *_color parameters below.
     #
-    # markers
+    # The style number starts in the top left of the style grid and runs left
+    # to right. The default style is 1. It is possible to override colour
+    # elements of the sparklines using the *_color parameters below.
+    #
+    # ===:markers
     #
     # Turn on the markers for line style sparklines.
     #
     #     {
-    #         location => 'A6',
-    #         range    => 'Sheet2!A1:J1',
-    #         markers  => 1,
+    #         :location => 'A6',
+    #         :range    => 'Sheet2!A1:J1',
+    #         :markers  => 1
     #     }
+    #
     # Markers aren't shown in Excel for column and win_loss sparklines.
     #
-    # negative_points
+    # ===:negative_points
     #
-    # Highlight negative values in a sparkline range. This is usually required with win_loss sparklines.
+    # Highlight negative values in a sparkline range. This is usually required
+    # with win_loss sparklines.
     #
     #     {
-    #         location        => 'A21',
-    #         range           => 'Sheet2!A3:J3',
-    #         type            => 'win_loss',
-    #         negative_points => 1,
+    #         :location        => 'A21',
+    #         :range           => 'Sheet2!A3:J3',
+    #         :type            => 'win_loss',
+    #         :negative_points => 1
     #     }
-    # axis
+    #
+    # ===:axis
     #
     # Display a horizontal axis in the sparkline:
     #
     #     {
-    #         location => 'A10',
-    #         range    => 'Sheet2!A1:J1',
-    #         axis     => 1,
+    #         :location => 'A10',
+    #         :range    => 'Sheet2!A1:J1',
+    #         :axis     => 1
     #     }
-    # reverse
+    #
+    # ===:reverse
     #
     # Plot the data from right-to-left instead of the default left-to-right:
     #
     #     {
-    #         location => 'A24',
-    #         range    => 'Sheet2!A4:J4',
-    #         type     => 'column',
-    #         reverse  => 1,
+    #         :location => 'A24',
+    #         :range    => 'Sheet2!A4:J4',
+    #         :type     => 'column',
+    #         :reverse  => 1
     #     }
-    # weight
+    #
+    # ===:weight
     #
     # Adjust the default line weight (thickness) for line style sparklines.
     #
-    #      weight => 0.25,
+    #      :weight => 0.25
+    #
     # The weight value should be one of the following values allowed by Excel:
     #
     #     0.25  0.5   0.75
@@ -4038,107 +4535,110 @@ module Writexlsx
     #     3
     #     4.25
     #     6
-    # high_point, low_point, first_point, last_point
+    #
+    # ===:high_point, low_point, first_point, last_point
     #
     # Highlight points in a sparkline range.
     #
-    #         high_point  => 1,
-    #         low_point   => 1,
-    #         first_point => 1,
-    #         last_point  => 1,
-    # max, min
+    #         :high_point  => 1,
+    #         :low_point   => 1,
+    #         :first_point => 1,
+    #         :last_point  => 1
+    #
+    # ===:max, min
     #
     # Specify the maximum and minimum vertical axis values:
     #
-    #         max         => 0.5,
-    #         min         => -0.5,
-    # As a special case you can set the maximum and minimum to be for a group of sparklines rather than one:
+    #         :max         => 0.5,
+    #         :min         => -0.5
     #
-    #         max         => 'group',
-    # See "Grouped Sparklines" below.
+    # As a special case you can set the maximum and minimum to be for a group
+    # of sparklines rather than one:
     #
-    # empty_cells
+    #         max         => 'group'
+    # See
+    # {"Grouped Sparklines"}[#method-i-add_sparkline-label-Grouped+Sparklines]
+    # below.
+    #
+    # ===:empty_cells
     #
     # Define how empty cells are handled in a sparkline.
     #
-    #     empty_cells => 'zero',
+    #     :empty_cells => 'zero',
+    #
     # The available options are:
     #
     #     gaps   : show empty cells as gaps (the default).
     #     zero   : plot empty cells as 0.
     #     connect: Connect points with a line ("line" type  sparklines only).
-    # show_hidden
+    #
+    # ===:show_hidden
     #
     # Plot data in hidden rows and columns:
     #
-    #     show_hidden => 1,
+    #     :show_hidden => 1
+    #
     # Note, this option is off by default.
     #
-    # date_axis
+    # ===:date_axis
     #
-    # Specify an alternative date axis for the sparkline. This is useful if the data being plotted isn't at fixed width intervals:
+    # Specify an alternative date axis for the sparkline. This is useful if
+    # the data being plotted isn't at fixed width intervals:
     #
     #     {
-    #         location  => 'F3',
-    #         range     => 'A3:E3',
-    #         date_axis => 'A4:E4',
+    #         :location  => 'F3',
+    #         :range     => 'A3:E3',
+    #         :date_axis => 'A4:E4'
     #     }
-    # The number of cells in the date range should correspond to the number of cells in the data range.
     #
-    # series_color
+    # The number of cells in the date range should correspond to the number
+    # of cells in the data range.
     #
-    # It is possible to override the colour of a sparkline style using the following parameters:
+    # ===:series_color
     #
-    #     series_color
-    #     negative_color
-    #     markers_color
-    #     first_color
-    #     last_color
-    #     high_color
-    #     low_color
+    # It is possible to override the colour of a sparkline style using the
+    # following parameters:
+    #
+    #     :series_color
+    #     :negative_color
+    #     :markers_color
+    #     :first_color
+    #     :last_color
+    #     :high_color
+    #     :low_color
+    #
     # The color should be specified as a HTML style #rrggbb hex value:
     #
     #     {
-    #         location     => 'A18',
-    #         range        => 'Sheet2!A2:J2',
-    #         type         => 'column',
-    #         series_color => '#E965E0',
+    #         :location     => 'A18',
+    #         :range        => 'Sheet2!A2:J2',
+    #         :type         => 'column',
+    #         :series_color => '#E965E0'
     #     }
-    # Grouped Sparklines
     #
-    # The add_sparkline() worksheet method can be used multiple times to write as many sparklines as are required in a worksheet.
+    # ==Grouped Sparklines
     #
-    # However, it is sometimes necessary to group contiguous sparklines so that changes that are applied to one are applied to all. In Excel this is achieved by selecting a 3D range of cells for the data range and a 2D range of cells for the location.
+    # The add_sparkline() worksheet method can be used multiple times to write
+    # as many sparklines as are required in a worksheet.
     #
-    # In Excel::Writer::XLSX, you can simulate this by passing an array refs of values to location and range:
+    # However, it is sometimes necessary to group contiguous sparklines so that
+    # changes that are applied to one are applied to all. In Excel this is
+    # achieved by selecting a 3D range of cells for the data range and a
+    # 2D range of cells for the location.
+    #
+    # In WriteXLSX, you can simulate this by passing an array of values to
+    # location and range:
     #
     #     {
-    #         location => [ 'A27',          'A28',          'A29'          ],
-    #         range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
-    #         markers  => 1,
+    #         :location => [ 'A27',          'A28',          'A29'          ],
+    #         :range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
+    #         :markers  => 1
     #     }
-    # Sparkline examples
     #
-    # See the sparklines1.pl and sparklines2.pl example programs in the examples directory of the distro.
+    # ===Sparkline examples
     #
-    # The add_sparkline worksheet method is used to add sparklines to a cell or a range of cells.
-    #
-    #    worksheet.add_sparkline(
-    #      {
-    #        :location => 'F2',
-    #        :range    => 'Sheet1!A2:E2',
-    #        :type     => 'column',
-    #        :style    => 12
-    #      }
-    #    )
-    #
-    # See also the sparklines1.rb and sparklines2.rb example programs in the examples directory of the distro.
-    #
-    # Note: Sparklines are a feature of Excel 2010+ only.
-    # You can write them to an XLSX file that can be read by Excel 2007 but they won't be displayed.
-    #
-    # Sparklines are a feature of Excel 2010+ which allows you to add small charts to worksheet cells.
-    # These are useful for showing visual trends in data in a compact format.
+    # See the sparklines1.rb and sparklines2.rb example programs in the
+    # examples directory of the distro.
     #
     def add_sparkline(param)
       @sparklines << Sparkline.new(self, param, quote_sheetname(@name))
@@ -4330,62 +4830,78 @@ module Writexlsx
     #     :length
     #     :custom
     #
-    # :any is used to specify that the type of data is unrestricted.
+    # +:any+ is used to specify that the type of data is unrestricted.
     # This is the same as not applying a data validation. It is only
     # provided for completeness and isn't used very often in the
     # context of WriteXLSX.
     #
-    # :integer restricts the cell to integer values. Excel refers to this
+    # +:integer+ restricts the cell to integer values. Excel refers to this
     # as 'whole number'.
+    #
     #     :validate => 'integer',
     #     :criteria => '>',
     #     :value    => 100,
-    # :decimal restricts the cell to decimal values.
+    #
+    # +:decimal+ restricts the cell to decimal values.
+    #
     #     :validate => 'decimal',
     #     :criteria => '>',
     #     :value    => 38.6,
-    # :list restricts the cell to a set of user specified values. These
+    #
+    # +:list+ restricts the cell to a set of user specified values. These
     # can be passed in an array ref or as a cell range (named ranges aren't
     # currently supported):
+    #
     #     :validate => 'list',
     #     :value    => ['open', 'high', 'close'],
     #     # Or like this:
     #     :value    => 'B1:B3',
+    #
     # Excel requires that range references are only to cells on the same
     # worksheet.
     #
-    # :date restricts the cell to date values. Dates in Excel are expressed
+    # +:date+ restricts the cell to date values. Dates in Excel are expressed
     # as integer values but you can also pass an ISO860 style string as used
-    # in write_date_time(). See also "DATES AND TIME IN EXCEL" for more
-    # information about working with Excel's dates.
+    # in write_date_time(). See also
+    # {"DATES AND TIME IN EXCEL"}[#method-i-write_date_time-label-DATES+AND+TIME+IN+EXCEL]
+    # for more information about working with Excel's dates.
+    #
     #     :validate => 'date',
     #     :criteria => '>',
     #     :value    => 39653, # 24 July 2008
     #     # Or like this:
     #     :value    => '2008-07-24T',
-    # :time restricts the cell to time values. Times in Excel are expressed
+    #
+    # +:time+ restricts the cell to time values. Times in Excel are expressed
     # as decimal values but you can also pass an ISO860 style string as used
-    # in write_date_time(). See also "DATES AND TIME IN EXCEL" for more
-    # information about working with Excel's times.
+    # in write_date_time(). See also
+    # {"DATES AND TIME IN EXCEL"}[#method-i-write_date_time-label-DATES+AND+TIME+IN+EXCEL]
+    # for more information about working with Excel's times.
+    #
     #     :validate => 'time',
     #     :criteria => '>',
     #     :value    => 0.5, # Noon
     #     # Or like this:
     #     :value    => 'T12:00:00',
-    # :length restricts the cell data based on an integer string length.
+    #
+    # +:length+ restricts the cell data based on an integer string length.
     # Excel refers to this as 'Text length'.
+    #
     #     :validate => 'length',
     #     :criteria => '>',
     #     :value    => 10,
-    # :custom restricts the cell based on an external Excel formula
+    #
+    # +:custom+ restricts the cell based on an external Excel formula
     # that returns a TRUE/FALSE value.
+    #
     #     :validate => 'custom',
     #     :value    => '=IF(A10>B10,TRUE,FALSE)',
+    #
     # ===criteria
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The criteria parameter is used to set the criteria by which the data
+    # The +:criteria+ parameter is used to set the criteria by which the data
     # in the cell is validated. It is almost always required except for
     # the list and custom validate options. It has no default value.
     # Allowable values are:
@@ -4419,9 +4935,10 @@ module Writexlsx
     #
     #     :validate => 'custom',
     #     :value    => '=IF(A10>B10,TRUE,FALSE)',
-    # ===value | minimum | source
     #
-    # This parameter is passed in a hash ref to data_validation().
+    # ===:value | :minimum | :source
+    #
+    # This parameter is passed in a hash to data_validation().
     #
     # The value parameter is used to set the limiting value to which the
     # criteria is applied. It is always required and it has no default value.
@@ -4442,54 +4959,59 @@ module Writexlsx
     #     # Use 'source'
     #     :validate => 'list',
     #     :source   => '$B$1:$B$3',
-    # ===maximum
+    #
+    # ===:maximum
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The maximum parameter is used to set the upper limiting value when
+    # The +:maximum: parameter is used to set the upper limiting value when
     # the criteria is either 'between' or 'not between':
     #
     #     :validate => 'integer',
     #     :criteria => 'between',
     #     :minimum  => 1,
     #     :maximum  => 100,
-    # ===ignore_blank
+    #
+    # ===:ignore_blank
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The ignore_blank parameter is used to toggle on and off the
+    # The +:ignore_blank+ parameter is used to toggle on and off the
     # 'Ignore blank' option in the Excel data validation dialog. When the
     # option is on the data validation is not applied to blank data in the
     # cell. It is on by default.
     #
     #     :ignore_blank => 0,  # Turn the option off
-    # ===dropdown
+    #
+    # ===:dropdown
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The dropdown parameter is used to toggle on and off the
+    # The +:dropdown+ parameter is used to toggle on and off the
     # 'In-cell dropdown' option in the Excel data validation dialog.
     # When the option is on a dropdown list will be shown for list validations.
     # It is on by default.
     #
     #     :dropdown => 0,      # Turn the option off
-    # ===input_title
+    #
+    # ===:input_title
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The input_title parameter is used to set the title of the input
+    # The +:input_title+ parameter is used to set the title of the input
     # message that is displayed when a cell is entered. It has no default
     # value and is only displayed if the input message is displayed.
     # See the input_message parameter below.
     #
     #     :input_title   => 'This is the input title',
+    #
     # The maximum title length is 32 characters.
     #
-    # ===input_message
+    # ===:input_message
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The input_message parameter is used to set the input message that
+    # The +:input_message+ parameter is used to set the input message that
     # is displayed when a cell is entered. It has no default value.
     #
     #     :validate      => 'integer',
@@ -4506,22 +5028,22 @@ module Writexlsx
     #
     # The maximum message length is 255 characters.
     #
-    # ===show_input
+    # ===:show_input
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The show_input parameter is used to toggle on and off the 'Show input
+    # The +:show_input+ parameter is used to toggle on and off the 'Show input
     # message when cell is selected' option in the Excel data validation
     # dialog. When the option is off an input message is not displayed even
     # if it has been set using input_message. It is on by default.
     #
     #     :show_input => 0,      # Turn the option off
     #
-    # ===error_title
+    # ===:error_title
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_title parameter is used to set the title of the error message
+    # The +:error_title+ parameter is used to set the title of the error message
     # that is displayed when the data validation criteria is not met.
     # The default error title is 'Microsoft Excel'.
     #
@@ -4529,11 +5051,11 @@ module Writexlsx
     #
     # The maximum title length is 32 characters.
     #
-    # ===error_message
+    # ===:error_message
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_message parameter is used to set the error message that is
+    # The +:error_message+ parameter is used to set the error message that is
     # displayed when a cell is entered. The default error message is
     # "The value you entered is not valid.\nA user has restricted values
     # that can be entered into the cell.".
@@ -4552,11 +5074,12 @@ module Writexlsx
     #
     # The maximum message length is 255 characters.
     #
-    # ===error_type
+    # ===:error_type
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The error_type parameter is used to specify the type of error dialog that is displayed. There are 3 options:
+    # The +:error_type+ parameter is used to specify the type of error dialog
+    # that is displayed. There are 3 options:
     #
     #     'stop'
     #     'warning'
@@ -4564,11 +5087,11 @@ module Writexlsx
     #
     # The default is 'stop'.
     #
-    # ===show_error
+    # ===:show_error
     #
     # This parameter is passed in a hash ref to data_validation().
     #
-    # The show_error parameter is used to toggle on and off the 'Show error
+    # The +:show_error+ parameter is used to toggle on and off the 'Show error
     # alert after invalid data is entered' option in the Excel data validation
     # dialog. When the option is off an error message is not displayed
     # even if it has been set using error_message. It is on by default.
@@ -4577,7 +5100,7 @@ module Writexlsx
     #
     # ===Data Validation Examples
     #
-    # ====Example 1. Limiting input to an integer greater than a fixed value.
+    # ===Example 1. Limiting input to an integer greater than a fixed value.
     #
     #     worksheet.data_validation('A1',
     #         {
@@ -4585,7 +5108,7 @@ module Writexlsx
     #             :criteria        => '>',
     #             :value           => 0,
     #         });
-    # ====Example 2. Limiting input to an integer greater than a fixed value where the value is referenced from a cell.
+    # ===Example 2. Limiting input to an integer greater than a fixed value where the value is referenced from a cell.
     #
     #     worksheet.data_validation('A2',
     #         {
@@ -4593,7 +5116,7 @@ module Writexlsx
     #             :criteria        => '>',
     #             :value           => '=E3',
     #         });
-    # ====Example 3. Limiting input to a decimal in a fixed range.
+    # ===Example 3. Limiting input to a decimal in a fixed range.
     #
     #     worksheet.data_validation('A3',
     #         {
@@ -4602,21 +5125,21 @@ module Writexlsx
     #             :minimum         => 0.1,
     #             :maximum         => 0.5,
     #         });
-    # ====Example 4. Limiting input to a value in a dropdown list.
+    # ===Example 4. Limiting input to a value in a dropdown list.
     #
     #     worksheet.data_validation('A4',
     #         {
     #             :validate        => 'list',
     #             :source          => ['open', 'high', 'close'],
     #         });
-    # ====Example 5. Limiting input to a value in a dropdown list where the list is specified as a cell range.
+    # ===Example 5. Limiting input to a value in a dropdown list where the list is specified as a cell range.
     #
     #     worksheet.data_validation('A5',
     #         {
     #             :validate        => 'list',
     #             :source          => '=$E$4:$G$4',
     #         });
-    # ====Example 6. Limiting input to a date in a fixed range.
+    # ===Example 6. Limiting input to a date in a fixed range.
     #
     #     worksheet.data_validation('A6',
     #         {
@@ -4625,7 +5148,7 @@ module Writexlsx
     #             :minimum         => '2008-01-01T',
     #             :maximum         => '2008-12-12T',
     #         });
-    # ====Example 7. Displaying a message when the cell is selected.
+    # ===Example 7. Displaying a message when the cell is selected.
     #
     #     worksheet.data_validation('A7',
     #         {
@@ -4833,7 +5356,7 @@ module Writexlsx
     #
     # NOTE: It isn't sufficient to just specify the filter condition.
     # You must also hide any rows that don't match the filter condition.
-    # Rows are hidden using the set_row() visible parameter. WriteXLSX cannot
+    # Rows are hidden using the set_row() +visible+ parameter. WriteXLSX cannot
     # do this automatically since it isn't part of the file format.
     # See the autofilter.rb program in the examples directory of the distro
     # for an example.
@@ -4843,7 +5366,7 @@ module Writexlsx
     #     worksheet.filter_column('A', 'x > 2000')
     #     worksheet.filter_column('B', 'x > 2000 and x < 5000')
     #
-    # The column parameter can either be a zero indexed column number or
+    # The +column+ parameter can either be a zero indexed column number or
     # a string column name.
     #
     # The following operators are available:
@@ -4864,7 +5387,7 @@ module Writexlsx
     # the expressions will be interpreted by Excel and not by ruby.
     #
     # An expression can comprise a single statement or two statements
-    # separated by the and and or operators. For example:
+    # separated by the +and+ and +or+ operators. For example:
     #
     #     'x <  2000'
     #     'x >  2000'
@@ -4873,7 +5396,7 @@ module Writexlsx
     #     'x == 2000 or  x == 5000'
     #
     # Filtering of blank or non-blank data can be achieved by using a value
-    # of Blanks or NonBlanks in the expression:
+    # of +Blanks+ or +NonBlanks+ in the expression:
     #
     #     'x == Blanks'
     #     'x == NonBlanks'
@@ -4890,9 +5413,9 @@ module Writexlsx
     # You can also use * to match any character or number and ? to match any
     # single character or number. No other regular expression quantifier is
     # supported by Excel's filters. Excel's regular expression characters can
-    # be escaped using ~.
+    # be escaped using +~+.
     #
-    # The placeholder variable x in the above examples can be replaced by any
+    # The placeholder variable +x+ in the above examples can be replaced by any
     # simple string. The actual placeholder name is ignored internally so the
     # following are all equivalent:
     #
@@ -4906,7 +5429,7 @@ module Writexlsx
     # See the autofilter.rb program in the examples directory of the distro
     # for a more detailed example.
     #
-    # Note Spreadsheet::WriteExcel supports Top 10 style filters. These aren't
+    # Note writeExcel gem supports Top 10 style filters. These aren't
     # currently supported by WriteXLSX but may be added later.
     #
     def filter_column(col, expression)
