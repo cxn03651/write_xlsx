@@ -47,28 +47,28 @@ plus = workbook.add_shape(
 p1 = worksheet.insert_shape('A1', plus, 350, 350)
 p2 = worksheet.insert_shape('A1', plus, 150, 350)
 p3 = worksheet.insert_shape('A1', plus, 350, 150)
-plus[:adjustments] = 35  # change shape of plus symbol.
+plus.adjustments = 35  # change shape of plus symbol.
 p4 = worksheet.insert_shape('A1', plus, 150, 150)
 
 cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
 
-cxn_shape[:start]       = ellipse[:id]
-cxn_shape[:start_index] = 4   # 4th connection pt, clockwise from top(0).
-cxn_shape[:start_side]  = 'b' # r)ight or b)ottom.
+cxn_shape.start       = ellipse.id
+cxn_shape.start_index = 4   # 4th connection pt, clockwise from top(0).
+cxn_shape.start_side  = 'b' # r)ight or b)ottom.
 
-cxn_shape[:end]         = p1[:id]
-cxn_shape[:end_index]   = 0
-cxn_shape[:end_side]    = 't' # l)eft or t)op.
+cxn_shape.end         = p1.id
+cxn_shape.end_index   = 0
+cxn_shape.end_side    = 't' # l)eft or t)op.
 worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-cxn_shape[:end]  = p2[:id]
+cxn_shape.end  = p2.id
 worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-cxn_shape[:end]  = p3[:id]
+cxn_shape.end  = p3.id
 worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
-cxn_shape[:end]  = p4[:id]
-cxn_shape[:adjustments] = [-50, 45, 120]
+cxn_shape.end  = p4.id
+cxn_shape.adjustments = [-50, 45, 120]
 worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
 workbook.close

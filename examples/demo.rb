@@ -88,9 +88,8 @@ worksheet.write('B9', 'http://www.ruby-lang.org/', hyperlink_format)
 #
 # Images
 #
-# Not implemented yet.
-#worksheet.write('A10', "Images")
-#worksheet.insert_image('B10', 'republic.png', 16, 8)
+worksheet.write('A10', "Images")
+worksheet.insert_image('B10', 'republic.png', 16, 8)
 
 
 #######################################################################

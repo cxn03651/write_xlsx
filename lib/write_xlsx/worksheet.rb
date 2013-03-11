@@ -1858,7 +1858,6 @@ module Writexlsx
     #
     def write_col(*args)
       row, col, tokens, *options = row_col_notation(args)
-      raise "Not an array ref in call to write_col()$!" unless tokens.respond_to?(:to_ary)
 
       tokens.each do |token|
         # write() will deal with any nested arrays

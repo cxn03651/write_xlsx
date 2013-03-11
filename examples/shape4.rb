@@ -29,8 +29,8 @@ shape = workbook.add_shape(
   # Change the last 5 rectangles to stars. Previously
   # inserted shapes stay as rectangles.
   type = 'star5' if n == 6
-  shape[:type] = type
-  shape[:text] = "#{type} #{n}"
+  shape.type = type
+  shape.text = "#{type} #{n}"
   worksheet.insert_shape('A1', shape, n * 100, 50)
 end
 
@@ -42,14 +42,14 @@ stencil = workbook.add_shape(
                              )
 worksheet.insert_shape('A1', stencil, 100, 150)
 
-stencil[:stencil] = 0
+stencil.stencil = 0
 worksheet.insert_shape('A1', stencil, 200, 150)
 worksheet.insert_shape('A1', stencil, 300, 150)
 
 # Ooopa! Changed my mind.
 # Change the rectangle to an ellipse (circle),
 # for the last two shapes.
-stencil[:type] = 'ellipse'
-stencil[:text] = 'Now its a circle'
+stencil.type = 'ellipse'
+stencil.text = 'Now its a circle'
 
 workbook.close

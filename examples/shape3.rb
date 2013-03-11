@@ -25,8 +25,8 @@ normal = workbook.add_shape(
                             )
 
 worksheet.insert_shape('A1', normal, 50, 50)
-normal[:text] = 'Scaled 3w x 2h'
-normal[:name] = 'Hope'
+normal.text = 'Scaled 3w x 2h'
+normal.name = 'Hope'
 worksheet.insert_shape('A1', normal, 250, 50, 3, 2)
 
 workbook.close
