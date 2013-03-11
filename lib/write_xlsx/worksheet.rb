@@ -64,6 +64,44 @@ module Writexlsx
   # * filter_column
   # * filter_column_list
   #
+  # == PAGE SET-UP METHODS
+  #
+  # Page set-up methods affect the way that a worksheet looks
+  # when it is printed. They control features such as page headers and footers
+  # and margins. These methods are really just standard worksheet methods.
+  #
+  # The following methods are available for page set-up:
+  #
+  # * set_landscape
+  # * set_portrait
+  # * set_page_view
+  # * set_paper
+  # * center_horizontally
+  # * center_vertically
+  # * set_margins
+  # * set_header
+  # * set_footer
+  # * repeat_rows
+  # * repeat_columns
+  # * hide_gridlines
+  # * print_row_col_headers
+  # * print_area
+  # * print_across
+  # * fit_to_pages
+  # * set_start_page
+  # * set_print_scale
+  # * set_h_pagebreaks
+  # * set_v_pagebreaks
+  #
+  # A common requirement when working with WriteXLSX is to apply the same
+  # page set-up features to all of the worksheets in a workbook. To do this
+  # you can use the sheets() method of the workbook class to access the array
+  # of worksheets in a workbook:
+  #
+  #   workbook.sheets.each do |worksheet|
+  #     worksheet.set_landscape
+  #   end
+  #
   # ==Cell notation
   #
   # WriteXLSX supports two forms of notation to designate the position of cells:
@@ -110,44 +148,6 @@ module Writexlsx
   #
   # Note: in Excel it is also possible to use a R1C1 notation. This is not
   # supported by WriteXLSX.
-  #
-  # == PAGE SET-UP METHODS
-  #
-  # Page set-up methods affect the way that a worksheet looks
-  # when it is printed. They control features such as page headers and footers
-  # and margins. These methods are really just standard worksheet methods.
-  #
-  # The following methods are available for page set-up:
-  #
-  #  * set_landscape
-  #  * set_portrait
-  #  * set_page_view
-  #  * set_paper
-  #  * center_horizontally
-  #  * center_vertically
-  #  * set_margins
-  #  * set_header
-  #  * set_footer
-  #  * repeat_rows
-  #  * repeat_columns
-  #  * hide_gridlines
-  #  * print_row_col_headers
-  #  * print_area
-  #  * print_across
-  #  * fit_to_pages
-  #  * set_start_page
-  #  * set_print_scale
-  #  * set_h_pagebreaks
-  #  * set_v_pagebreaks
-  #
-  # A common requirement when working with WriteXLSX is to apply the same
-  # page set-up features to all of the worksheets in a workbook. To do this
-  # you can use the sheets() method of the workbook class to access the array
-  # of worksheets in a workbook:
-  #
-  #   workbook.sheets.each do |worksheet|
-  #     worksheet.set_landscape
-  #   end
   #
   # == FORMULAS AND FUNCTIONS IN EXCEL
   #
