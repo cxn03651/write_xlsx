@@ -12,9 +12,7 @@ module Writexlsx
       end
 
       def set_xml_writer(filename = nil)
-        fh = File.open(filename, "wb")
-
-        @io = fh
+        @filename = filename
       end
 
       def xml_decl(encoding = 'UTF-8', standalone = true)
@@ -75,6 +73,9 @@ module Writexlsx
       end
 
       def close
+        if @filename
+          File.open(@filename, "wb") { |f| f << string }
+        end
         @io.close
       end
 
