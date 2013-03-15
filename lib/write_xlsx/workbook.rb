@@ -954,6 +954,10 @@ module Writexlsx
       @dxf_formats.dup
     end
 
+    def chartsheet_count
+      worksheets.select { |s| s.is_chartsheet? }.count
+    end
+
     private
 
     def setup_filename(file) #:nodoc:
@@ -1289,8 +1293,7 @@ module Writexlsx
       add_chart_data
 
       # Package the workbook.
-      packager = Package::Packager.new
-      packager.add_workbook(self)
+      packager = Package::Packager.new(self)
       packager.set_package_dir(@tempdir)
       packager.create_package
 
@@ -1728,7 +1731,7 @@ module Writexlsx
 
         drawing_id += 1
 
-        (0 .. chart_count - 1).each do |index|
+        sheet.charts.each_with_index do |chart, index|
           chart_ref_id += 1
           sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end

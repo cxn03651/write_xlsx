@@ -18,41 +18,15 @@ module Writexlsx
 
       include Writexlsx::Utility
 
-      def initialize
-        @package_dir       = ''
-        @workbook         = nil
-        @sheet_names      = []
-        @worksheet_count  = 0
-        @chartsheet_count = 0
-        @chart_count      = 0
-        @drawing_count    = 0
-        @table_count      = 0
-        @named_ranges     = []
+      def initialize(workbook)
+        @workbook     = workbook
+        @package_dir  = ''
+        @table_count  = 0
+        @named_ranges = []
       end
 
       def set_package_dir(package_dir)
         @package_dir = package_dir
-      end
-
-      #
-      # Add the Workbook object to the package.
-      #
-      def add_workbook(workbook)
-        @workbook          = workbook
-        @sheet_names       = workbook.sheetnames
-        @chart_count       = workbook.charts.size
-        @drawing_count     = workbook.drawings.size
-        @num_vml_files     = workbook.num_vml_files
-        @num_comment_files = workbook.num_comment_files
-        @named_ranges      = workbook.named_ranges
-
-        workbook.worksheets.each do |worksheet|
-          if worksheet.is_chartsheet?
-            @chartsheet_count += 1
-          else
-            @worksheet_count += 1
-          end
-        end
       end
 
       #
@@ -206,10 +180,10 @@ module Writexlsx
         FileUtils.mkdir_p("#{@package_dir}/docProps")
 
         # Add the Worksheet heading pairs.
-        app.add_heading_pair(['Worksheets', @worksheet_count])
+        app.add_heading_pair(['Worksheets', @workbook.worksheets.reject {|s| s.is_chartsheet?}.count])
 
         # Add the Chartsheet heading pairs.
-        app.add_heading_pair(['Charts', @chartsheet_count])
+        app.add_heading_pair(['Charts', @workbook.chartsheet_count])
 
         # Add the Worksheet parts.
         @workbook.worksheets.each do |worksheet|
@@ -224,13 +198,13 @@ module Writexlsx
         end
 
         # Add the Named Range heading pairs.
-        range_count = @named_ranges.size
+        range_count = @workbook.named_ranges.size
         if range_count != 0
           app.add_heading_pair([ 'Named Ranges', range_count ])
         end
 
         # Add the Named Ranges parts.
-        @named_ranges.each { |named_range| app.add_part_name(named_range) }
+        @workbook.named_ranges.each { |named_range| app.add_part_name(named_range) }
 
         app.set_properties(properties)
 
@@ -271,14 +245,14 @@ module Writexlsx
           end
         end
 
-        (1 .. @chart_count).each { |i| content.add_chart_name("chart#{i}") }
-        (1 .. @drawing_count).each { |i| content.add_drawing_name("drawing#{i}") }
+        (1 .. @workbook.charts.size).each { |i| content.add_chart_name("chart#{i}") }
+        (1 .. @workbook.drawings.size).each { |i| content.add_drawing_name("drawing#{i}") }
 
-        content.add_vml_name if @num_vml_files > 0
+        content.add_vml_name if @workbook.num_vml_files > 0
 
         (1 .. @table_count).each { |i| content.add_table_name("table#{i}") }
 
-        (1 .. @num_comment_files).each { |i| content.add_comment_name("comments#{i}") }
+        (1 .. @workbook.num_comment_files).each { |i| content.add_comment_name("comments#{i}") }
 
         # Add the sharedString rel if there is string data in the workbook.
         content.add_shared_strings unless @workbook.shared_strings_empty?
