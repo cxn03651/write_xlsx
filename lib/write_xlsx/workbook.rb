@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
+require 'write_xlsx/worksheets'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
 require 'write_xlsx/format'
@@ -101,7 +102,7 @@ module Writexlsx
       @chart_name          = 'Chart'
       @sheetname_count     = 0
       @chartname_count     = 0
-      @worksheets          = []
+      @worksheets          = Worksheets.new
       @charts              = []
       @drawings            = []
       @sheetnames          = []
@@ -265,7 +266,7 @@ module Writexlsx
       write_book_views
 
       # Write the worksheet names and ids.
-      write_sheets
+      @worksheets.write_sheets(@writer)
 
       # Write the workbook defined names.
       write_defined_names
@@ -955,7 +956,7 @@ module Writexlsx
     end
 
     def chartsheet_count
-      worksheets.select { |s| s.is_chartsheet? }.count
+      @worksheets.chartsheet_count
     end
 
     private
@@ -1083,10 +1084,7 @@ module Writexlsx
     end
 
     def is_sheetname_uniq?(name)
-      @worksheets.each do |worksheet|
-        return false if name.downcase == worksheet.name.downcase
-      end
-      true
+      @worksheets.is_sheetname_uniq?(name)
     end
 
     #
@@ -1186,29 +1184,6 @@ module Writexlsx
         attributes << 'activeTab' << @activesheet
       end
       @writer.empty_tag('workbookView', attributes)
-    end
-
-    def write_sheets #:nodoc:
-      @writer.tag_elements('sheets') do
-        id_num = 1
-        @worksheets.each do |sheet|
-          write_sheet(sheet.name, id_num, sheet.hidden?)
-          id_num += 1
-        end
-      end
-    end
-
-    def write_sheet(name, sheet_id, hidden = false) #:nodoc:
-      attributes = [
-        'name',    name,
-        'sheetId', sheet_id
-      ]
-
-      if hidden
-        attributes << 'state' << 'hidden'
-      end
-      attributes << 'r:id' << "rId#{sheet_id}"
-      @writer.empty_tag_encoded('sheet', attributes)
     end
 
     def write_calc_pr #:nodoc:
