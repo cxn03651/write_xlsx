@@ -447,17 +447,10 @@ module Writexlsx
       if @xf_index
         @xf_index
       else
-        key = get_format_key
-        indices_href = @xf_format_indices
-
-        if indices_href[key]
-          indices_href[key]
-        else
-          index = 1 + indices_href.keys.size
-          indices_href[key] = index
-          @xf_index = index
-          index
-        end
+        @xf_format_indices[get_format_key] ||
+          @xf_index =
+          @xf_format_indices[get_format_key] =
+          1 + @xf_format_indices.keys.size
       end
     end
 
