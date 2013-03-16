@@ -302,8 +302,6 @@ module Writexlsx
 
       @page_setup = PageSetup.new
 
-      @print_area    = ''
-
       @screen_gridlines = true
       @show_zeros = true
       @dim_rowmin = nil
@@ -1010,10 +1008,7 @@ module Writexlsx
     # the printer's default paper.
     #
     def paper=(paper_size)
-      if paper_size
-        @paper_size         = paper_size
-        @page_setup.page_setup_changed = true
-      end
+      @page_setup.paper = paper_size
     end
 
     def set_paper(paper_size)
@@ -1173,9 +1168,9 @@ module Writexlsx
     def set_header(string = '', margin = 0.3)
       raise 'Header string must be less than 255 characters' if string.length >= 255
 
-      @header                = string
-      @page_setup.margin_header = margin
-      @header_footer_changed = true
+      @page_setup.header                = string
+      @page_setup.margin_header         = margin
+      @page_setup.header_footer_changed = true
     end
 
     #
@@ -1186,25 +1181,23 @@ module Writexlsx
     def set_footer(string = '', margin = 0.3)
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
-      @footer                = string
-      @page_setup.margin_footer = margin
-      @header_footer_changed = true
+      @page_setup.footer                = string
+      @page_setup.margin_footer         = margin
+      @page_setup.header_footer_changed = true
     end
 
     #
     # Center the worksheet data horizontally between the margins on the printed page:
     #
     def center_horizontally
-      @print_options_changed = true
-      @hcenter               = true
+      @page_setup.center_horizontally
     end
 
     #
     # Center the worksheet data vertically between the margins on the printed page:
     #
     def center_vertically
-      @print_options_changed = true
-      @vcenter               = true
+      @page_setup.center_vertically
     end
 
     #
@@ -1448,7 +1441,7 @@ module Writexlsx
     #     worksheet2.print_area( 'A:H' );       # Columns A to H if rows have data
     #
     def print_area(*args)
-      return @print_area.dup if args.empty?
+      return @page_setup.print_area.dup if args.empty?
       row1, col1, row2, col2 = row_col_notation(args)
       return if [row1, col1, row2, col2].include?(nil)
 
@@ -1458,7 +1451,7 @@ module Writexlsx
       end
 
       # Build up the print area range "=Sheet2!R1C1:R2C1"
-      @print_area = convert_name_area(row1, col1, row2, col2)
+      @page_setup.print_area = convert_name_area(row1, col1, row2, col2)
     end
 
     #
@@ -4710,17 +4703,13 @@ module Writexlsx
     # is true, i.e. only the printed gridlines are hidden.
     #
     def hide_gridlines(option = 1)
-      if option == 0 || !option
-        @print_gridlines       = true    # 1 = display, 0 = hide
-        @screen_gridlines      = true
-        @print_options_changed = true
-      elsif option == 1
-        @print_gridlines  = false
-        @screen_gridlines = true
-      else
-        @print_gridlines  = false
+      if option == 2
         @screen_gridlines = false
+      else
+        @screen_gridlines = true
       end
+
+      @page_setup.hide_gridlines(option)
     end
 
     # Set the option to print the row and column headers on the printed page.
@@ -4747,13 +4736,14 @@ module Writexlsx
     # Do not confuse these headers with page headers as described in the
     # set_header() section above.
     #
-    def print_row_col_headers(headers = 1)
-      if headers
-        @print_headers         = 1
-        @print_options_changed = 1
-      else
-        @print_headers = 0
-      end
+    def print_row_col_headers(headers = true)
+      @page_setup.print_row_col_headers(headers)
+      # if headers
+      #   @print_headers         = 1
+      #   @page_setup.print_options_changed = 1
+      # else
+      #   @print_headers = 0
+      # end
     end
 
     #
@@ -6123,7 +6113,7 @@ module Writexlsx
     def write_sheet_view #:nodoc:
       attributes = []
       # Hide screen gridlines if required
-      attributes << 'showGridLines' << 0 unless screen_gridlines?
+      attributes << 'showGridLines' << 0 unless @screen_gridlines
 
       # Hide zeroes in cells.
       attributes << 'showZeros' << 0 unless show_zeros?
@@ -6536,55 +6526,14 @@ module Writexlsx
     # Write the <pageMargins> element.
     #
     def write_page_margins #:nodoc:
-      @writer.empty_tag('pageMargins', @page_setup.attributes)
+      @page_setup.write_page_margins(@writer)
     end
 
     #
     # Write the <pageSetup> element.
     #
-    # The following is an example taken from Excel.
-    #
-    # <pageSetup
-    #     paperSize="9"
-    #     scale="110"
-    #     fitToWidth="2"
-    #     fitToHeight="2"
-    #     pageOrder="overThenDown"
-    #     orientation="portrait"
-    #     blackAndWhite="1"
-    #     draft="1"
-    #     horizontalDpi="200"
-    #     verticalDpi="200"
-    #     r:id="rId1"
-    # />
-    #
     def write_page_setup #:nodoc:
-      attributes = []
-
-      return unless page_setup_changed?
-
-      # Set paper size.
-      attributes << 'paperSize' << @paper_size if @paper_size
-
-      # Set the scale
-      attributes << 'scale' << @page_setup.scale if @page_setup.scale != 100
-
-      # Set the "Fit to page" properties.
-      attributes << 'fitToWidth' << @page_setup.fit_width if @page_setup.fit_page && @page_setup.fit_width != 1
-
-      attributes << 'fitToHeight' << @page_setup.fit_height if @page_setup.fit_page && @page_setup.fit_height != 1
-
-      # Set the page print direction.
-      attributes << 'pageOrder' << "overThenDown" if print_across?
-
-      # Set page orientation.
-      if @page_setup.orientation?
-        attributes << 'orientation' << 'portrait'
-      else
-        attributes << 'orientation' << 'landscape'
-      end
-
-      @writer.empty_tag('pageSetup', attributes)
+      @page_setup.write_page_setup(@writer)
     end
 
     #
@@ -6626,49 +6575,14 @@ module Writexlsx
     # Write the <printOptions> element.
     #
     def write_print_options #:nodoc:
-      attributes = []
-
-      return unless print_options_changed?
-
-      # Set horizontal centering.
-      attributes << 'horizontalCentered' << 1 if hcenter?
-
-      # Set vertical centering.
-      attributes << 'verticalCentered' << 1   if vcenter?
-
-      # Enable row and column headers.
-      attributes << 'headings' << 1 if print_headers?
-
-      # Set printed gridlines.
-      attributes << 'gridLines' << 1 if print_gridlines?
-
-      @writer.empty_tag('printOptions', attributes)
+      @page_setup.write_print_options(@writer)
     end
 
     #
     # Write the <headerFooter> element.
     #
     def write_header_footer #:nodoc:
-      return unless header_footer_changed?
-
-      @writer.tag_elements('headerFooter') do
-        write_odd_header if @header && @header != ''
-        write_odd_footer if @footer && @footer != ''
-      end
-    end
-
-    #
-    # Write the <oddHeader> element.
-    #
-    def write_odd_header #:nodoc:
-      @writer.data_element('oddHeader', @header)
-    end
-
-    #
-    # Write the <oddFooter> element.
-    #
-    def write_odd_footer #:nodoc:
-      @writer.data_element('oddFooter', @footer)
+      @page_setup.write_header_footer(@writer)
     end
 
     #
@@ -7614,44 +7528,12 @@ module Writexlsx
       !!@show_zeros
     end
 
-    def screen_gridlines? #:nodoc:
-      !!@screen_gridlines
-    end
-
     def protect? #:nodoc:
       !!@protect
     end
 
     def autofilter_ref? #:nodoc:
       !!@autofilter_ref
-    end
-
-    def print_options_changed? #:nodoc:
-      !!@print_options_changed
-    end
-
-    def hcenter? #:nodoc:
-      !!@hcenter
-    end
-
-    def vcenter? #:nodoc:
-      !!@vcenter
-    end
-
-    def print_headers? #:nodoc:
-      !!@print_headers
-    end
-
-    def print_gridlines? #:nodoc:
-      !!@print_gridlines
-    end
-
-    def page_setup_changed? #:nodoc:
-      @page_setup.page_setup_changed
-    end
-
-    def header_footer_changed? #:nodoc:
-      !!@header_footer_changed
     end
 
     def drawing? #:nodoc:
@@ -7664,10 +7546,6 @@ module Writexlsx
       else
         margin
       end
-    end
-
-    def print_across?
-      @page_setup.across
     end
 
     # List of valid criteria types.
