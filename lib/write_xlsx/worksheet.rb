@@ -9,7 +9,7 @@ require 'write_xlsx/compatibility'
 require 'write_xlsx/utility'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/worksheet/cell_data'
-require 'write_xlsx/worksheet/print_style'
+require 'write_xlsx/worksheet/page_setup'
 require 'tempfile'
 
 module Writexlsx
@@ -300,7 +300,7 @@ module Writexlsx
       @cell_data_table = {}
       @excel_version = 2007
 
-      @print_style = PrintStyle.new
+      @page_setup = PageSetup.new
 
       @print_area    = ''
 
@@ -904,16 +904,16 @@ module Writexlsx
     # need to call this method.
     #
     def set_portrait
-      @print_style.orientation        = true
-      @print_style.page_setup_changed = true
+      @page_setup.orientation        = true
+      @page_setup.page_setup_changed = true
     end
 
     #
     # Set the page orientation as landscape.
     #
     def set_landscape
-      @print_style.orientation         = false
-      @print_style.page_setup_changed  = true
+      @page_setup.orientation         = false
+      @page_setup.page_setup_changed  = true
     end
 
     #
@@ -1012,7 +1012,7 @@ module Writexlsx
     def paper=(paper_size)
       if paper_size
         @paper_size         = paper_size
-        @print_style.page_setup_changed = true
+        @page_setup.page_setup_changed = true
       end
     end
 
@@ -1174,7 +1174,7 @@ module Writexlsx
       raise 'Header string must be less than 255 characters' if string.length >= 255
 
       @header                = string
-      @print_style.margin_header = margin
+      @page_setup.margin_header = margin
       @header_footer_changed = true
     end
 
@@ -1187,7 +1187,7 @@ module Writexlsx
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
       @footer                = string
-      @print_style.margin_footer = margin
+      @page_setup.margin_footer = margin
       @header_footer_changed = true
     end
 
@@ -1257,7 +1257,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_left=(margin)
-      @print_style.margin_left = remove_white_space(margin)
+      @page_setup.margin_left = remove_white_space(margin)
     end
 
     #
@@ -1265,7 +1265,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_right=(margin)
-      @print_style.margin_right = remove_white_space(margin)
+      @page_setup.margin_right = remove_white_space(margin)
     end
 
     #
@@ -1273,7 +1273,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_top=(margin)
-      @print_style.margin_top = remove_white_space(margin)
+      @page_setup.margin_top = remove_white_space(margin)
     end
 
     #
@@ -1281,7 +1281,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_bottom=(margin)
-      @print_style.margin_bottom = remove_white_space(margin)
+      @page_setup.margin_bottom = remove_white_space(margin)
     end
 
     #
@@ -1394,11 +1394,11 @@ module Writexlsx
 
       # Build up the print titles "Sheet1!$1:$2"
       sheetname = quote_sheetname(name)
-      @print_style.repeat_rows = "#{sheetname}!#{area}"
+      @page_setup.repeat_rows = "#{sheetname}!#{area}"
     end
 
     def print_repeat_rows   # :nodoc:
-      @print_style.repeat_rows
+      @page_setup.repeat_rows
     end
     #
     # :call-seq:
@@ -1428,11 +1428,11 @@ module Writexlsx
       last_col ||= first_col
 
       area = "#{xl_col_to_name(first_col, 1)}:#{xl_col_to_name(last_col, 1)}"
-      @print_style.repeat_cols = "#{quote_sheetname(@name)}!#{area}"
+      @page_setup.repeat_cols = "#{quote_sheetname(@name)}!#{area}"
     end
 
     def print_repeat_cols  # :nodoc:
-      @print_style.repeat_cols
+      @page_setup.repeat_cols
     end
 
     #
@@ -1515,10 +1515,10 @@ module Writexlsx
       scale_val = 100 if scale_val < 10 || scale_val > 400
 
       # Turn off "fit to page" option.
-      @print_style.fit_page = false
+      @page_setup.fit_page = false
 
-      @print_style.scale              = scale_val
-      @print_style.page_setup_changed = true
+      @page_setup.scale              = scale_val
+      @page_setup.page_setup_changed = true
     end
 
     #
@@ -1581,10 +1581,10 @@ module Writexlsx
     #
     def print_across(across = true)
       if across
-        @print_style.across             = true
-        @print_style.page_setup_changed = true
+        @page_setup.across             = true
+        @page_setup.page_setup_changed = true
       else
-        @print_style.across = false
+        @page_setup.across = false
       end
     end
 
@@ -4784,10 +4784,10 @@ module Writexlsx
     # are defined in the worksheet.
     #
     def fit_to_pages(width = 1, height = 1)
-      @print_style.fit_page   = true
-      @print_style.fit_width  = width
-      @print_style.fit_height  = height
-      @print_style.page_setup_changed = true
+      @page_setup.fit_page   = true
+      @page_setup.fit_width  = width
+      @page_setup.fit_height  = height
+      @page_setup.page_setup_changed = true
     end
 
     #
@@ -5022,7 +5022,7 @@ module Writexlsx
       breaks = args.collect do |brk|
         Array(brk)
       end.flatten
-      @print_style.hbreaks += breaks
+      @page_setup.hbreaks += breaks
     end
 
     #
@@ -5047,7 +5047,7 @@ module Writexlsx
     # method it will override all manual page breaks.
     #
     def set_v_pagebreaks(*args)
-      @print_style.vbreaks += args
+      @page_setup.vbreaks += args
     end
 
     #
@@ -6536,7 +6536,7 @@ module Writexlsx
     # Write the <pageMargins> element.
     #
     def write_page_margins #:nodoc:
-      @writer.empty_tag('pageMargins', @print_style.attributes)
+      @writer.empty_tag('pageMargins', @page_setup.attributes)
     end
 
     #
@@ -6567,18 +6567,18 @@ module Writexlsx
       attributes << 'paperSize' << @paper_size if @paper_size
 
       # Set the scale
-      attributes << 'scale' << @print_style.scale if @print_style.scale != 100
+      attributes << 'scale' << @page_setup.scale if @page_setup.scale != 100
 
       # Set the "Fit to page" properties.
-      attributes << 'fitToWidth' << @print_style.fit_width if @print_style.fit_page && @print_style.fit_width != 1
+      attributes << 'fitToWidth' << @page_setup.fit_width if @page_setup.fit_page && @page_setup.fit_width != 1
 
-      attributes << 'fitToHeight' << @print_style.fit_height if @print_style.fit_page && @print_style.fit_height != 1
+      attributes << 'fitToHeight' << @page_setup.fit_height if @page_setup.fit_page && @page_setup.fit_height != 1
 
       # Set the page print direction.
       attributes << 'pageOrder' << "overThenDown" if print_across?
 
       # Set page orientation.
-      if @print_style.orientation?
+      if @page_setup.orientation?
         attributes << 'orientation' << 'portrait'
       else
         attributes << 'orientation' << 'landscape'
@@ -6688,10 +6688,10 @@ module Writexlsx
     def write_breaks(tag) # :nodoc:
       case tag
       when 'rowBreaks'
-        page_breaks = sort_pagebreaks(*(@print_style.hbreaks))
+        page_breaks = sort_pagebreaks(*(@page_setup.hbreaks))
         max = 16383
       when 'colBreaks'
-        page_breaks = sort_pagebreaks(*(@print_style.vbreaks))
+        page_breaks = sort_pagebreaks(*(@page_setup.vbreaks))
         max = 1048575
       else
         raise "Invalid parameter '#{tag}' in write_breaks."
@@ -7579,7 +7579,7 @@ module Writexlsx
     end
 
     def fit_page? #:nodoc:
-      @print_style.fit_page
+      @page_setup.fit_page
     end
 
     def filter_on? #:nodoc:
@@ -7647,7 +7647,7 @@ module Writexlsx
     end
 
     def page_setup_changed? #:nodoc:
-      @print_style.page_setup_changed
+      @page_setup.page_setup_changed
     end
 
     def header_footer_changed? #:nodoc:
@@ -7667,7 +7667,7 @@ module Writexlsx
     end
 
     def print_across?
-      @print_style.across
+      @page_setup.across
     end
 
     # List of valid criteria types.

@@ -2,7 +2,7 @@
 
 module Writexlsx
   class Worksheet
-    class PrintStyle # :nodoc:
+    class PageSetup # :nodoc:
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
       attr_accessor :repeat_rows, :repeat_cols, :print_area                   # :nodoc:

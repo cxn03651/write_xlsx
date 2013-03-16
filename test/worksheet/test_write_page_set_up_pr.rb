@@ -10,7 +10,7 @@ class TestWritePageSetUpPr < Test::Unit::TestCase
   end
 
   def test_write_page_set_up_pr
-    @worksheet.instance_variable_get(:@print_style).fit_page = true
+    @worksheet.instance_variable_get(:@page_setup).fit_page = true
     @worksheet.__send__('write_page_set_up_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetUpPr fitToPage="1"/>'
