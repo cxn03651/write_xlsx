@@ -29,7 +29,142 @@ module Writexlsx
       end
     end
 
+    def write_worksheet_files(package_dir)
+      dir = "#{package_dir}/xl/worksheets"
+      self.reject { |sheet| sheet.is_chartsheet? }.
+        each_with_index do |sheet, index|
+        write_sheet_files(dir, sheet, index)
+      end
+    end
+
+    def write_chartsheet_files(package_dir)
+      dir = "#{package_dir}/xl/chartsheets"
+      self.select { |sheet| sheet.is_chartsheet? }.
+        each_with_index do |sheet, index|
+        write_sheet_files(dir, sheet, index)
+      end
+    end
+
+    def write_vml_files(package_dir)
+      dir = "#{package_dir}/xl/drawings"
+      self.select { |sheet| sheet.has_vml? }.
+        each_with_index do |sheet, index|
+        FileUtils.mkdir_p(dir)
+
+        vml = Package::Vml.new
+        vml.set_xml_writer("#{dir}/vmlDrawing#{index+1}.vml")
+        vml.assemble_xml_file(sheet)
+      end
+    end
+
+    def write_comment_files(package_dir)
+      self.select { |sheet| sheet.has_comments? }.
+        each_with_index do |sheet, index|
+        FileUtils.mkdir_p("#{package_dir}/xl/drawings")
+        sheet.comments_xml_writer = "#{package_dir}/xl/comments#{index+1}.xml"
+        sheet.comments_assemble_xml_file
+      end
+    end
+
+    def write_table_files(package_dir)
+      unless tables.empty?
+        dir = "#{package_dir}/xl/tables"
+        FileUtils.mkdir_p(dir)
+        tables.each_with_index do |table, index|
+          table.set_xml_writer("#{dir}/table#{index+1}.xml")
+          table.assemble_xml_file
+        end
+      end
+    end
+
+    def write_chartsheet_rels_files(package_dir)
+      dir = "#{package_dir}/xl/chartsheets/_rels"
+      self.select { |sheet| sheet.is_chartsheet? }.
+        each_with_index do |sheet, index|
+
+        external_links = sheet.external_drawing_links
+
+        next if external_links.empty?
+
+        FileUtils.mkdir_p(dir)
+        rels = Package::Relationships.new
+
+        external_links.each do |link_data|
+          rels.add_worksheet_relationship(*link_data)
+        end
+
+        # Create the .rels file such as /xl/chartsheets/_rels/sheet1.xml.rels.
+        rels.set_xml_writer("#{dir}/sheet#{index+1}.xml.rels")
+        rels.assemble_xml_file
+      end
+    end
+
+    def write_drawing_rels_files(package_dir)
+      dir = "#{package_dir}/xl/drawings/_rels"
+      self.reject { |sheet| sheet.drawing_links.empty? }.
+        each_with_index do |sheet, index|
+
+        FileUtils.mkdir_p(dir)
+
+        rels = Package::Relationships.new
+
+        sheet.drawing_links.each do |drawing_data|
+          rels.add_document_relationship(*drawing_data)
+        end
+
+        # Create the .rels file such as /xl/drawings/_rels/sheet1.xml.rels.
+        rels.set_xml_writer("#{dir}/drawing#{index+1}.xml.rels")
+        rels.assemble_xml_file
+      end
+    end
+
+    def write_worksheet_rels_files(package_dir)
+      dir = "#{package_dir}/xl/worksheets/_rels"
+
+      self.reject { |sheet| sheet.is_chartsheet? }.
+        each_with_index do |sheet, index|
+
+        external_links = [
+                          sheet.external_hyper_links,
+                          sheet.external_drawing_links,
+                          sheet.external_vml_links,
+                          sheet.external_table_links,
+                          sheet.external_comment_links
+                         ].reject { |a| a.empty? }
+
+        next if external_links.size == 0
+
+        FileUtils.mkdir_p(dir)
+
+        rels = Package::Relationships.new
+
+        external_links.each do |link_datas|
+          link_datas.each do |link_data|
+            rels.add_worksheet_relationship(*link_data)
+          end
+        end
+
+        # Create the .rels file such as /xl/worksheets/_rels/sheet1.xml.rels.
+        rels.set_xml_writer("#{dir}/sheet#{index+1}.xml.rels")
+        rels.assemble_xml_file
+      end
+    end
+
+    def tables
+      self.inject([]) { |tables, sheet| tables + sheet.tables }.flatten
+    end
+
+    def tables_count
+      tables.count
+    end
+
     private
+
+    def write_sheet_files(dir, sheet, index)
+      FileUtils.mkdir_p(dir)
+      sheet.set_xml_writer("#{dir}/sheet#{index+1}.xml")
+      sheet.assemble_xml_file
+    end
 
     def write_sheet(writer, sheet, sheet_id) #:nodoc:
       attributes = [

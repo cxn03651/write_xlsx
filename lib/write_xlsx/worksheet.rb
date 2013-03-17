@@ -5373,6 +5373,10 @@ module Writexlsx
       count
     end
 
+    def tables_count
+      @tables.size
+    end
+
     private
 
     def check_for_valid_input_params(param)
@@ -7025,7 +7029,7 @@ module Writexlsx
       # Return if worksheet doesn't contain any tables.
       return if @tables.empty?
 
-      attributes = ['count', @tables.size]
+      attributes = ['count', tables_count]
 
       @writer.tag_elements('tableParts', attributes) do
 

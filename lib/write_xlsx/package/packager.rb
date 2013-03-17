@@ -21,7 +21,7 @@ module Writexlsx
       def initialize(workbook)
         @workbook     = workbook
         @package_dir  = ''
-        @table_count  = 0
+        @table_count  = @workbook.worksheets.tables_count
         @named_ranges = []
       end
 
@@ -72,27 +72,12 @@ module Writexlsx
       # Write the worksheet files.
       #
       def write_worksheet_files
-        FileUtils.mkdir_p("#{@package_dir}/xl/worksheets")
-
-        index = 1
-        @workbook.worksheets.each do |worksheet|
-          next if worksheet.is_chartsheet?
-          worksheet.set_xml_writer("#{@package_dir}/xl/worksheets/sheet#{index}.xml")
-          index += 1
-          worksheet.assemble_xml_file
-        end
+        @workbook.worksheets.write_worksheet_files(@package_dir)
       end
 
       #
       def write_chartsheet_files
-        index = 1
-        @workbook.worksheets.each do |worksheet|
-          next unless worksheet.is_chartsheet?
-          FileUtils.mkdir_p("#{@package_dir}/xl/chartsheets")
-          worksheet.set_xml_writer("#{@package_dir}/xl/chartsheets/sheet#{index}.xml")
-          index += 1
-          worksheet.assemble_xml_file
-        end
+        @workbook.worksheets.write_chartsheet_files(@package_dir)
       end
 
       #
@@ -110,14 +95,11 @@ module Writexlsx
       end
 
       def write_chart_or_drawing_files(objects, filename)
-        return if objects.empty?
+        dir = "#{@package_dir}/xl/#{filename}s"
 
-        FileUtils.mkdir_p("#{@package_dir}/xl/#{filename}s")
-
-        index = 1
-        objects.each do |object|
-          object.set_xml_writer("#{@package_dir}/xl/#{filename}s/#{filename}#{index}.xml")
-          index += 1
+        objects.each_with_index do |object, index|
+          FileUtils.mkdir_p(dir)
+          object.set_xml_writer("#{dir}/#{filename}#{index+1}.xml")
           object.assemble_xml_file
         end
       end
@@ -126,33 +108,14 @@ module Writexlsx
       # Write the comment VML files.
       #
       def write_vml_files
-        index = 1
-        @workbook.worksheets.each do |worksheet|
-          next unless worksheet.has_vml?
-          FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
-
-          vml = Package::Vml.new
-          vml.set_xml_writer("#{@package_dir}/xl/drawings/vmlDrawing#{index}.vml")
-          index += 1
-          vml.assemble_xml_file(worksheet)
-        end
+        @workbook.worksheets.write_vml_files(@package_dir)
       end
 
       #
       # Write the comment files.
       #
       def write_comment_files
-        index = 1
-        @workbook.worksheets.each do |worksheet|
-          next unless worksheet.has_comments?
-
-          FileUtils.mkdir_p("#{@package_dir}/xl/drawings")
-
-          worksheet.comments_xml_writer = "#{@package_dir}/xl/comments#{index}.xml"
-          index += 1
-
-          worksheet.comments_assemble_xml_file
-        end
+        @workbook.worksheets.write_comment_files(@package_dir)
       end
 
       #
@@ -186,16 +149,12 @@ module Writexlsx
         app.add_heading_pair(['Charts', @workbook.chartsheet_count])
 
         # Add the Worksheet parts.
-        @workbook.worksheets.each do |worksheet|
-          next if worksheet.is_chartsheet?
-          app.add_part_name(worksheet.name)
-        end
+        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
+          each { |sheet| app.add_part_name(sheet.name) }
 
         # Add the Chartsheet parts.
-        @workbook.worksheets.each do |worksheet|
-          next unless worksheet.is_chartsheet?
-          app.add_part_name(worksheet.name)
-        end
+        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
+          each { |sheet| app.add_part_name(sheet.name) }
 
         # Add the Named Range heading pairs.
         range_count = @workbook.named_ranges.size
@@ -232,17 +191,13 @@ module Writexlsx
         content = Package::ContentTypes.new
 
         content.add_image_types(@workbook.image_types)
-
-        worksheet_index  = 1
-        chartsheet_index = 1
-        @workbook.worksheets.each do |worksheet|
-          if worksheet.is_chartsheet?
-            content.add_chartsheet_name("sheet#{chartsheet_index}")
-            chartsheet_index += 1
-          else
-            content.add_worksheet_name("sheet#{worksheet_index}")
-            worksheet_index += 1
-          end
+        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
+          each_with_index do |sheet, index|
+          content.add_worksheet_name("sheet#{index+1}")
+        end
+        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
+          each_with_index do |sheet, index|
+          content.add_chartsheet_name("sheet#{index+1}")
         end
 
         (1 .. @workbook.charts.size).each { |i| content.add_chart_name("chart#{i}") }
@@ -296,23 +251,7 @@ module Writexlsx
       # Write the table files.
       #
       def write_table_files
-        dir = @package_dir
-
-        index = 1
-        @workbook.worksheets.each do |worksheet|
-          table_props = worksheet.tables
-
-          next if table_props.empty?
-
-          FileUtils.mkdir_p("#{dir}/xl/tables")
-
-          table_props.each do |table|
-            table.set_xml_writer("#{dir}/xl/tables/table#{index}.xml")
-            table.assemble_xml_file
-            index += 1
-            @table_count += 1
-          end
-        end
+        @workbook.worksheets.write_table_files(@package_dir)
       end
 
       #
@@ -372,103 +311,21 @@ module Writexlsx
       # data such as hyperlinks or drawings.
       #
       def write_worksheet_rels_files
-        existing_rels_dir = false
-
-        index = 0
-        @workbook.worksheets.each do |worksheet|
-          next if worksheet.is_chartsheet?
-
-          index += 1
-
-          external_links = [
-            worksheet.external_hyper_links,
-            worksheet.external_drawing_links,
-            worksheet.external_vml_links,
-            worksheet.external_table_links,
-            worksheet.external_comment_links
-          ].select {|a| a != []}
-
-          next if external_links.size == 0
-
-          # Create the worksheet .rels dir if required.
-          if !existing_rels_dir
-            FileUtils.mkdir_p("#{@package_dir}/xl/worksheets")
-            FileUtils.mkdir_p("#{@package_dir}/xl/worksheets/_rels")
-            existing_rels_dir = true
-          end
-
-          rels = Package::Relationships.new
-
-          external_links.each do |link_datas|
-            link_datas.each do |link_data|
-              type, target, target_mode = link_data
-              rels.add_worksheet_relationship(type, target, target_mode)
-            end
-          end
-
-          # Create the .rels file such as /xl/worksheets/_rels/sheet1.xml.rels.
-          rels.set_xml_writer(
-            "#{@package_dir}/xl/worksheets/_rels/sheet#{index}.xml.rels")
-          rels.assemble_xml_file
-        end
+        @workbook.worksheets.write_worksheet_rels_files(@package_dir)
       end
 
       #
       # Write the chartsheet .rels files for links to drawing files.
       #
       def write_chartsheet_rels_files
-        existing_rels_dir = false
-        index = 0
-        @workbook.worksheets.each do |worksheet|
-          next unless worksheet.is_chartsheet?
-          index += 1
-
-          external_links = worksheet.external_drawing_links
-
-          next if external_links.empty?
-
-          # Create the chartsheet .rels dir if required.
-          if !existing_rels_dir
-            FileUtils.mkdir_p("#{@package_dir}/xl/chartsheets/_rels")
-            existing_rels_dir = true
-          end
-
-          rels = Package::Relationships.new
-
-          external_links.each do |link_data|
-            rels.add_worksheet_relationship(*link_data)
-          end
-
-          # Create the .rels file such as /xl/chartsheets/_rels/sheet1.xml.rels.
-          rels.set_xml_writer(
-              "#{@package_dir}/xl/chartsheets/_rels/sheet#{index}.xml.rels")
-          rels.assemble_xml_file
-        end
+        @workbook.worksheets.write_chartsheet_rels_files(@package_dir)
       end
 
       #
       # Write the drawing .rels files for worksheets that contain charts or drawings.
       #
       def write_drawing_rels_files
-        index = 0
-        @workbook.worksheets.each do |worksheet|
-          next if worksheet.drawing_links.empty?
-          index += 1
-
-          # Create the drawing .rels dir if required.
-          FileUtils.mkdir_p("#{@package_dir}/xl/drawings/_rels")
-
-          rels = Package::Relationships.new
-
-          worksheet.drawing_links.each do |drawing_data|
-            rels.add_document_relationship(*drawing_data)
-          end
-
-          # Create the .rels file such as /xl/drawings/_rels/sheet1.xml.rels.
-          rels.set_xml_writer(
-                              "#{@package_dir}/xl/drawings/_rels/drawing#{index}.xml.rels")
-          rels.assemble_xml_file
-        end
+        @workbook.worksheets.write_drawing_rels_files(@package_dir)
       end
 
 
@@ -476,18 +333,11 @@ module Writexlsx
       # Write the /xl/media/image?.xml files.
       #
       def add_image_files
-        return if @workbook.images.empty?
+        dir = "#{@package_dir}/xl/media"
 
-        index    = 1
-
-        FileUtils.mkdir_p("#{@package_dir}/xl/media")
-
-        @workbook.images.each do |image|
-          filename  = image[0]
-          extension = ".#{image[1]}"
-
-          FileUtils.cp(filename, "#{@package_dir}/xl/media/image#{index}#{extension}")
-          index += 1
+        @workbook.images.each_with_index do |image, index|
+          FileUtils.mkdir_p(dir)
+          FileUtils.cp(image[0], "#{dir}/image#{index+1}.#{image[1]}")
         end
       end
 
