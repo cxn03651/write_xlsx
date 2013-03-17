@@ -461,17 +461,10 @@ module Writexlsx
       if @dxf_index
           @dxf_index
       else
-        key  = get_format_key
-        indices = @dxf_format_indices
-
-        if indices[key]
-          indices[key]
-        else
-          index = indices.size
-          indices[key] = index
-          @dxf_index = index
-          index
-        end
+        @dxf_format_indices[get_format_key] ||
+          @dxf_index =
+          @dxf_format_indices[get_format_key] =
+          @dxf_format_indices.size
       end
     end
 
