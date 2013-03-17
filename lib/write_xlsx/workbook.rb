@@ -39,7 +39,6 @@ module Writexlsx
 
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
-    attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors  # :nodoc:
     attr_reader :worksheets, :sheetnames, :charts, :drawings  # :nodoc:
     attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
     attr_reader :doc_properties  # :nodoc:
@@ -947,16 +946,21 @@ module Writexlsx
       @shared_strings.empty?
     end
 
-    def xf_formats     # :nodoc:
-      @xf_formats.dup
-    end
-
-    def dxf_formats    # :nodoc:
-      @dxf_formats.dup
-    end
-
     def chartsheet_count
       @worksheets.chartsheet_count
+    end
+
+    def style_properties
+      [
+       @xf_formats,
+       @palette,
+       @font_count,
+       @num_format_count,
+       @border_count,
+       @fill_count,
+       @custom_colors,
+       @dxf_formats
+      ]
     end
 
     private

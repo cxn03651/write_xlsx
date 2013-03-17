@@ -268,32 +268,15 @@ module Writexlsx
       # Write the style xml file.
       #
       def write_styles_file
-        dir              = @package_dir
-        xf_formats       = @workbook.xf_formats
-        palette          = @workbook.palette
-        font_count       = @workbook.font_count
-        num_format_count = @workbook.num_format_count
-        border_count     = @workbook.border_count
-        fill_count       = @workbook.fill_count
-        custom_colors    = @workbook.custom_colors
-        dxf_formats      = @workbook.dxf_formats
+        dir              = "#{@package_dir}/xl"
 
         rels = Package::Styles.new
 
-        FileUtils.mkdir_p("#{@package_dir}/xl")
+        FileUtils.mkdir_p(dir)
 
-        rels.set_style_properties(
-            xf_formats,
-            palette,
-            font_count,
-            num_format_count,
-            border_count,
-            fill_count,
-            custom_colors,
-            dxf_formats
-        )
+        rels.set_style_properties(*@workbook.style_properties)
 
-        rels.set_xml_writer("#{@package_dir}/xl/styles.xml" )
+        rels.set_xml_writer("#{dir}/styles.xml" )
         rels.assemble_xml_file
       end
 

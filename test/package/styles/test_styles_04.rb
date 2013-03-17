@@ -26,16 +26,7 @@ class TestStyles04 < Test::Unit::TestCase
     workbook.__send__('prepare_format_properties')
 
     @style = Writexlsx::Package::Styles.new
-    @style.set_style_properties(
-      workbook.xf_formats,
-      workbook.palette,
-      workbook.font_count,
-      workbook.num_format_count,
-      workbook.border_count,
-      workbook.fill_count,
-      workbook.custom_colors,
-      workbook.dxf_formats
-    )
+    @style.set_style_properties(*workbook.style_properties)
     @style.assemble_xml_file
     result = got_to_array(@style.xml_str)
     expected = expected_to_array(<<EOS
