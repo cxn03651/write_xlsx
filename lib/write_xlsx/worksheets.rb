@@ -158,6 +158,11 @@ module Writexlsx
       tables.count
     end
 
+    def index_by_name(sheetname)
+      name = sheetname.sub(/^'/,'').sub(/'$/,'')
+      self.collect { |sheet| sheet.name }.index(name)
+    end
+
     private
 
     def write_sheet_files(dir, sheet, index)

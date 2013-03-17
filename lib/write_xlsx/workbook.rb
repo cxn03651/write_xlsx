@@ -39,7 +39,7 @@ module Writexlsx
 
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
-    attr_reader :worksheets, :sheetnames, :charts, :drawings  # :nodoc:
+    attr_reader :worksheets, :charts, :drawings  # :nodoc:
     attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
     attr_reader :doc_properties  # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
@@ -104,7 +104,6 @@ module Writexlsx
       @worksheets          = Worksheets.new
       @charts              = []
       @drawings            = []
-      @sheetnames          = []
       @formats             = []
       @xf_formats          = []
       @xf_format_indices   = {}
@@ -305,7 +304,6 @@ module Writexlsx
       name  = check_sheetname(name)
       worksheet = Worksheet.new(self, @worksheets.size, name)
       @worksheets << worksheet
-      @sheetnames << name
       worksheet
     end
 
@@ -403,7 +401,6 @@ module Writexlsx
         chartsheet = Chartsheet.new(self, @worksheets.size, sheetname)
         chartsheet.chart   = chart
         @worksheets << chartsheet
-        @sheetnames << sheetname
       end
       @charts << chart
       ptrue?(embedded) ? chart : chartsheet
@@ -716,7 +713,7 @@ module Writexlsx
       if name =~ /^(.*)!(.*)$/
         sheetname   = $1
         name        = $2
-        sheet_index = get_sheet_index(sheetname)
+        sheet_index = @worksheets.index_by_name(sheetname)
       else
         sheet_index = -1   # Use -1 to indicate global names.
       end
@@ -1738,23 +1735,6 @@ module Writexlsx
       @charts = @charts.sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
-    end
-
-    #
-    # Convert a sheet name to its index. Return undef otherwise.
-    #
-    def get_sheet_index(sheetname) #:nodoc:
-      sheet_count = @sheetnames.size
-      sheet_index = nil
-
-      sheetname.sub!(/^'/, '')
-      sheetname.sub!(/'$/, '')
-
-      ( 0 .. sheet_count - 1 ).each do |i|
-        sheet_index = i if sheetname == @sheetnames[i]
-      end
-
-      sheet_index
     end
 
     #
