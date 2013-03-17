@@ -4,6 +4,10 @@ require 'write_xlsx/package/xml_writer_simple'
 
 module Writexlsx
   class Worksheets < DelegateClass(Array)
+    include Writexlsx::Utility
+
+    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
+
     def initialize
       super([])
     end
@@ -12,11 +16,20 @@ module Writexlsx
       self.select { |worksheet| worksheet.is_chartsheet? }.count
     end
 
-    def is_sheetname_uniq?(name)
-      self.each do |worksheet|
-        return false if name.downcase == worksheet.name.downcase
-      end
-      true
+    def sheetname_count
+      self.count - chartname_count
+    end
+
+    def chartname_count
+      chartsheet_count
+    end
+
+    def make_and_check_sheet_chart_name(type, name)
+      count = sheet_chart_count(type)
+      name = "#{BASE_NAME[type]}#{count+1}" unless ptrue?(name)
+
+      check_valid_sheetname(name)
+      name
     end
 
     def write_sheets(writer)
@@ -164,6 +177,39 @@ module Writexlsx
     end
 
     private
+
+    def sheet_chart_count(type)
+      case type
+      when :sheet
+        sheetname_count
+      when :chart
+        chartname_count
+      end
+    end
+
+    def check_valid_sheetname(name)
+      # Check that sheet name is <= 31. Excel limit.
+      raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
+
+      # Check that sheetname doesn't contain any invalid characters
+      invalid_char = /[\[\]:*?\/\\]/
+      if name =~ invalid_char
+        raise 'Invalid character []:*?/\\ in worksheet name: ' + name
+      end
+
+      # Check that the worksheet name doesn't already exist since this is a fatal
+      # error in Excel 97. The check must also exclude case insensitive matches.
+      unless is_sheetname_uniq?(name)
+        raise "Worksheet name '#{name}', with case ignored, is already used."
+      end
+    end
+
+    def is_sheetname_uniq?(name)
+      self.each do |worksheet|
+        return false if name.downcase == worksheet.name.downcase
+      end
+      true
+    end
 
     def write_sheet_files(dir, sheet, index)
       FileUtils.mkdir_p(dir)

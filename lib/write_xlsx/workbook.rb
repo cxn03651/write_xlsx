@@ -35,8 +35,6 @@ module Writexlsx
 
     include Writexlsx::Utility
 
-    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
-
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
     attr_reader :worksheets, :charts, :drawings  # :nodoc:
@@ -97,10 +95,6 @@ module Writexlsx
       @firstsheet          = 0
       @selected            = 0
       @fileclosed          = false
-      @sheet_name          = 'Sheet'
-      @chart_name          = 'Chart'
-      @sheetname_count     = 0
-      @chartname_count     = 0
       @worksheets          = Worksheets.new
       @charts              = []
       @drawings            = []
@@ -1043,49 +1037,11 @@ module Writexlsx
     # invalid characters and if the name is unique in the workbook.
     #
     def check_sheetname(name) #:nodoc:
-      make_and_check_sheet_chart_name(:sheet, name)
+      @worksheets.make_and_check_sheet_chart_name(:sheet, name)
     end
 
     def check_chart_sheetname(name)
-      make_and_check_sheet_chart_name(:chart, name)
-    end
-
-    def make_and_check_sheet_chart_name(type, name)
-      count = sheet_chart_count_increment(type)
-      name = "#{BASE_NAME[type]}#{count}" unless ptrue?(name)
-
-      check_valid_sheetname(name)
-      name
-    end
-
-    def sheet_chart_count_increment(type)
-      case type
-      when :sheet
-        @sheetname_count += 1
-      when :chart
-        @chartname_count += 1
-      end
-    end
-
-    def check_valid_sheetname(name)
-      # Check that sheet name is <= 31. Excel limit.
-      raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
-
-      # Check that sheetname doesn't contain any invalid characters
-      invalid_char = /[\[\]:*?\/\\]/
-      if name =~ invalid_char
-        raise 'Invalid character []:*?/\\ in worksheet name: ' + name
-      end
-
-      # Check that the worksheet name doesn't already exist since this is a fatal
-      # error in Excel 97. The check must also exclude case insensitive matches.
-      unless is_sheetname_uniq?(name)
-        raise "Worksheet name '#{name}', with case ignored, is already used."
-      end
-    end
-
-    def is_sheetname_uniq?(name)
-      @worksheets.is_sheetname_uniq?(name)
+      @worksheets.make_and_check_sheet_chart_name(:chart, name)
     end
 
     #
