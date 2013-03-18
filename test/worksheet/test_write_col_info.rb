@@ -41,7 +41,7 @@ class TestWriteColInfo < Test::Unit::TestCase
     min       = 7
     max       = 7
     width     = nil
-    format    = Writexlsx::Format.new({}, {}, :xf_index => 1)
+    format    = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
     hidden    = false
     level     = 0
     collapsed = 0
@@ -55,7 +55,7 @@ class TestWriteColInfo < Test::Unit::TestCase
     min       = 8
     max       = 8
     width     = 8.43
-    format    = Writexlsx::Format.new({}, {}, :xf_index => 1)
+    format    = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
     hidden    = false
     level     = 0
     collapsed = 0

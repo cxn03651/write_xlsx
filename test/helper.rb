@@ -19,7 +19,7 @@ class Writexlsx::Workbook
   # Set the default index for each format. This is mainly used for testing.
   #
   def set_default_xf_indices #:nodoc:
-    @formats.each { |format| format.get_xf_index }
+    @formats.formats.each { |format| format.get_xf_index }
   end
 end
 

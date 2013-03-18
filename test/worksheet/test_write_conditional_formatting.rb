@@ -10,7 +10,7 @@ class TestWriteConditionalFormatting < Test::Unit::TestCase
   end
 
   def test_conditional_formatting_01
-    format = Writexlsx::Format.new({}, {})
+    format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
     @worksheet.conditional_formatting('A1',
         :type     => 'cell',
@@ -25,7 +25,7 @@ class TestWriteConditionalFormatting < Test::Unit::TestCase
   end
 
   def test_conditional_formatting_02
-    format = Writexlsx::Format.new({}, {})
+    format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
     @worksheet.conditional_formatting('A2',
         :type     => 'cell',
@@ -40,7 +40,7 @@ class TestWriteConditionalFormatting < Test::Unit::TestCase
   end
 
   def test_conditional_formatting_03
-    format = Writexlsx::Format.new({}, {})
+    format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
     @worksheet.conditional_formatting('A3',
         :type     => 'cell',
@@ -55,7 +55,7 @@ class TestWriteConditionalFormatting < Test::Unit::TestCase
   end
 
   def test_conditional_formatting_04
-    format = Writexlsx::Format.new({}, {})
+    format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
     @worksheet.conditional_formatting('A1',
         :type     => 'cell',

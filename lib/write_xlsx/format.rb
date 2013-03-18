@@ -174,9 +174,8 @@ module Writexlsx
     attr_accessor :dxf_bg_color, :dxf_fg_color   # :nodoc:
     attr_reader :rotation, :bold, :italic, :font_strikeout
 
-    def initialize(xf_format_indices = {}, dxf_format_indices = {}, params = {})   # :nodoc:
-      @xf_format_indices = xf_format_indices
-      @dxf_format_indices = dxf_format_indices
+    def initialize(formats, params = {})   # :nodoc:
+      @formats = formats
 
       @xf_index       = nil
       @dxf_index      = nil
@@ -250,7 +249,6 @@ module Writexlsx
       reserve = [
                  :xf_index,
                  :dxf_index,
-                 :xf_format_indices,
                  :xdf_format_indices,
                  :palette
                 ]
@@ -446,11 +444,10 @@ module Writexlsx
     def get_xf_index
       if @xf_index
         @xf_index
+      elsif @formats.xf_index_by_key(get_format_key)
+        @formats.xf_index_by_key(get_format_key)
       else
-        @xf_format_indices[get_format_key] ||
-          @xf_index =
-          @xf_format_indices[get_format_key] =
-          1 + @xf_format_indices.keys.size
+        @xf_index = @formats.set_xf_index_by_key(get_format_key)
       end
     end
 
@@ -459,12 +456,11 @@ module Writexlsx
     #
     def get_dxf_index
       if @dxf_index
-          @dxf_index
+        @dxf_index
+      elsif @formats.dxf_index_by_key(get_format_key)
+        @formats.dxf_index_by_key(get_format_key)
       else
-        @dxf_format_indices[get_format_key] ||
-          @dxf_index =
-          @dxf_format_indices[get_format_key] =
-          @dxf_format_indices.size
+        @dxf_index = @formats.set_dxf_index_by_key(get_format_key)
       end
     end
 

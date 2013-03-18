@@ -4,6 +4,7 @@ require 'write_xlsx/package/packager'
 require 'write_xlsx/worksheets'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
+require 'write_xlsx/formats'
 require 'write_xlsx/format'
 require 'write_xlsx/shape'
 require 'write_xlsx/utility'
@@ -98,11 +99,9 @@ module Writexlsx
       @worksheets          = Worksheets.new
       @charts              = []
       @drawings            = []
-      @formats             = []
+      @formats             = Formats.new
       @xf_formats          = []
-      @xf_format_indices   = {}
       @dxf_formats         = []
-      @dxf_format_indices  = {}
       @font_count          = 0
       @num_format_count    = 0
       @defined_names       = []
@@ -413,15 +412,9 @@ module Writexlsx
     # Format properties and how to set them.
     #
     def add_format(properties = {})
-      init_data = [
-        @xf_format_indices,
-        @dxf_format_indices,
-        properties
-      ]
+      format = Format.new(@formats, properties)
 
-      format = Format.new(*init_data)
-
-      @formats.push(format)    # Store format reference
+      @formats.formats.push(format)    # Store format reference
 
       format
     end
@@ -1263,7 +1256,7 @@ module Writexlsx
     # formats.
     #
     def prepare_formats #:nodoc:
-      @formats.each do |format|
+      @formats.formats.each do |format|
         xf_index  = format.xf_index
         dxf_index = format.dxf_index
 
@@ -1497,8 +1490,7 @@ module Writexlsx
       # Add a font format for cell comments.
       if comment_files > 0
         format = Format.new(
-            @xf_format_indices,
-            @dxf_format_indices,
+            @formats,
             :font          => 'Tahoma',
             :size          => 8,
             :color_indexed => 81,
@@ -1507,7 +1499,7 @@ module Writexlsx
 
         format.get_xf_index
 
-        @formats << format
+        @formats.formats << format
       end
     end
 
