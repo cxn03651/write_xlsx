@@ -3,7 +3,7 @@ require 'delegate'
 require 'write_xlsx/package/xml_writer_simple'
 
 module Writexlsx
-  class Worksheets < DelegateClass(Array)
+  class Sheets < DelegateClass(Array)
     include Writexlsx::Utility
 
     BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
@@ -13,7 +13,7 @@ module Writexlsx
     end
 
     def chartsheet_count
-      self.select { |worksheet| worksheet.is_chartsheet? }.count
+      chartsheets.count
     end
 
     def sheetname_count
@@ -44,16 +44,14 @@ module Writexlsx
 
     def write_worksheet_files(package_dir)
       dir = "#{package_dir}/xl/worksheets"
-      self.reject { |sheet| sheet.is_chartsheet? }.
-        each_with_index do |sheet, index|
+      worksheets.each_with_index do |sheet, index|
         write_sheet_files(dir, sheet, index)
       end
     end
 
     def write_chartsheet_files(package_dir)
       dir = "#{package_dir}/xl/chartsheets"
-      self.select { |sheet| sheet.is_chartsheet? }.
-        each_with_index do |sheet, index|
+      chartsheets.each_with_index do |sheet, index|
         write_sheet_files(dir, sheet, index)
       end
     end
@@ -91,38 +89,28 @@ module Writexlsx
     end
 
     def write_chartsheet_rels_files(package_dir)
-      dir = "#{package_dir}/xl/chartsheets/_rels"
-      self.select { |sheet| sheet.is_chartsheet? }.
-        each_with_index do |sheet, index|
-
-        external_links = sheet.external_drawing_links
-
-        next if external_links.empty?
-
-        FileUtils.mkdir_p(dir)
-        rels = Package::Relationships.new
-
-        external_links.each do |link_data|
-          rels.add_worksheet_relationship(*link_data)
-        end
-
-        # Create the .rels file such as /xl/chartsheets/_rels/sheet1.xml.rels.
-        rels.set_xml_writer("#{dir}/sheet#{index+1}.xml.rels")
-        rels.assemble_xml_file
-      end
+      write_sheet_rels_files_base(chartsheets, "#{package_dir}/xl/chartsheets/_rels",
+                            'sheet')
     end
 
     def write_drawing_rels_files(package_dir)
+      # write_rels_files_base(
+      #                       self.reject { |sheet| sheet.drawing_links[0].empty? },
+      #                       "#{package_dir}/xl/drawings/_rels",
+
+      #                       )
       dir = "#{package_dir}/xl/drawings/_rels"
-      self.reject { |sheet| sheet.drawing_links.empty? }.
+      self.reject { |sheet| sheet.drawing_links[0].empty? }.
         each_with_index do |sheet, index|
 
         FileUtils.mkdir_p(dir)
 
         rels = Package::Relationships.new
 
-        sheet.drawing_links.each do |drawing_data|
-          rels.add_document_relationship(*drawing_data)
+        sheet.drawing_links.each do |drawing_datas|
+          drawing_datas.each do |drawing_data|
+            rels.add_document_relationship(*drawing_data)
+          end
         end
 
         # Create the .rels file such as /xl/drawings/_rels/sheet1.xml.rels.
@@ -132,33 +120,27 @@ module Writexlsx
     end
 
     def write_worksheet_rels_files(package_dir)
-      dir = "#{package_dir}/xl/worksheets/_rels"
+      write_sheet_rels_files_base(worksheets, "#{package_dir}/xl/worksheets/_rels",
+                            'sheet')
+    end
 
-      self.reject { |sheet| sheet.is_chartsheet? }.
-        each_with_index do |sheet, index|
+    def write_sheet_rels_files_base(sheets, dir, body)
+      sheets.each_with_index do |sheet, index|
 
-        external_links = [
-                          sheet.external_hyper_links,
-                          sheet.external_drawing_links,
-                          sheet.external_vml_links,
-                          sheet.external_table_links,
-                          sheet.external_comment_links
-                         ].reject { |a| a.empty? }
-
-        next if external_links.size == 0
+        next if sheet.external_links.empty?
 
         FileUtils.mkdir_p(dir)
 
         rels = Package::Relationships.new
 
-        external_links.each do |link_datas|
+        sheet.external_links.each do |link_datas|
           link_datas.each do |link_data|
             rels.add_worksheet_relationship(*link_data)
           end
         end
 
         # Create the .rels file such as /xl/worksheets/_rels/sheet1.xml.rels.
-        rels.set_xml_writer("#{dir}/sheet#{index+1}.xml.rels")
+        rels.set_xml_writer("#{dir}/#{body}#{index+1}.xml.rels")
         rels.assemble_xml_file
       end
     end
@@ -177,6 +159,14 @@ module Writexlsx
     end
 
     private
+
+    def worksheets
+      self.reject { |worksheet| worksheet.is_chartsheet? }
+    end
+
+    def chartsheets
+      self.select { |worksheet| worksheet.is_chartsheet? }
+    end
 
     def sheet_chart_count(type)
       case type

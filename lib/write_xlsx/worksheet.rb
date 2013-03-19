@@ -279,9 +279,6 @@ module Writexlsx
 
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
-    attr_reader :external_hyper_links, :external_drawing_links # :nodoc:
-    attr_reader :external_vml_links, :external_table_links # :nodoc:
-    attr_reader :external_comment_links, :drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
@@ -5343,6 +5340,20 @@ module Writexlsx
 
     def buttons_data  # :nodoc:
       @buttons_array
+    end
+
+    def external_links
+      [
+       @external_hyper_links,
+       @external_drawing_links,
+       @external_vml_links,
+       @external_table_links,
+       @external_comment_links
+      ].reject { |a| a.empty? }
+    end
+
+    def drawing_links
+      [@drawing_links]
     end
 
     #

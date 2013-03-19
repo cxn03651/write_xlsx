@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
-require 'write_xlsx/worksheets'
+require 'write_xlsx/sheets'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
 require 'write_xlsx/formats'
@@ -96,7 +96,7 @@ module Writexlsx
       @firstsheet          = 0
       @selected            = 0
       @fileclosed          = false
-      @worksheets          = Worksheets.new
+      @worksheets          = Sheets.new
       @charts              = []
       @drawings            = []
       @formats             = Formats.new

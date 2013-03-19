@@ -169,6 +169,10 @@ module Writexlsx
       @drawing_links << [ '/chart', "../charts/chart#{chart_id}.xml"]
     end
 
+    def external_links
+      [@external_drawing_links]
+    end
+
     private
 
     #
