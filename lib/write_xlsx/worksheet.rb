@@ -284,7 +284,7 @@ module Writexlsx
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
     attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
-    attr_reader :comments_author # :nodoc:
+    attr_reader :comments, :comments_author # :nodoc:
     attr_accessor :dxf_priority # :nodoc:
     attr_reader :vba_codename # :nodoc:
 
@@ -5235,14 +5235,6 @@ module Writexlsx
 
     def comments_visible? # :nodoc:
       !!@comments_visible
-    end
-
-    def comments_xml_writer=(file) # :nodoc:
-      @comments.set_xml_writer(file)
-    end
-
-    def comments_assemble_xml_file # :nodoc:
-      @comments.assemble_xml_file
     end
 
     def comments_array # :nodoc:
