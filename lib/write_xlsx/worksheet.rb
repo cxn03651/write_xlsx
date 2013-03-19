@@ -9,6 +9,7 @@ require 'write_xlsx/compatibility'
 require 'write_xlsx/utility'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/worksheet/cell_data'
+require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/page_setup'
 require 'tempfile'
 
@@ -4630,50 +4631,8 @@ module Writexlsx
     # of the distro.
     #
     def data_validation(*args)
-      # Check for a cell reference in A1 notation and substitute row and column.
-      row1, col1, row2, col2, options = row_col_notation(args)
-      if row2.respond_to?(:keys)
-        param = row2.dup
-        row2, col2 = row1, col1
-      elsif options.respond_to?(:keys)
-        param = options.dup
-      else
-        raise WriteXLSXInsufficientArgumentError
-      end
-      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
-
-      check_dimensions(row1, col1)
-      check_dimensions(row2, col2)
-
-      check_for_valid_input_params(param)
-
-      param[:value] = param[:source]  if param[:source]
-      param[:value] = param[:minimum] if param[:minimum]
-
-      param[:validate] = valid_validation_type[param[:validate].downcase]
-      return if param[:validate] == 'none'
-      if ['list', 'custom'].include?(param[:validate])
-        param[:criteria]  = 'between'
-        param[:maximum]   = nil
-      end
-
-      check_criteria_required(param)
-      check_valid_citeria_types(param)
-      param[:criteria] = valid_criteria_type[param[:criteria].downcase]
-
-      check_maximum_value_when_criteria_is_between_or_notbetween(param)
-      param[:error_type] = param.has_key?(:error_type) ? error_type[param[:error_type].downcase] : 0
-
-      convert_date_time_value_if_required(param)
-      set_some_defaults(param)
-
-      param[:cells] = [[row1, col1, row2, col2]]
-
-      # A (for now) undocumented parameter to pass additional cell ranges.
-      param[:other_cells].each { |cells| param[:cells] << cells } if param.has_key?(:other_cells)
-
-      # Store the validation information until we close the worksheet.
-      @validations << param
+      validation = DataValidation.new(*args)
+      @validations << validation unless validation.validate_none?
     end
 
     #
@@ -5389,104 +5348,6 @@ module Writexlsx
     end
 
     private
-
-    def check_for_valid_input_params(param)
-      check_parameter(param, valid_validation_parameter, 'data_validation')
-
-      unless param.has_key?(:validate)
-        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
-      end
-      unless valid_validation_type.has_key?(param[:validate].downcase)
-        raise WriteXLSXOptionParameterError,
-        "Unknown validation type '#{param[:validate]}' for parameter :validate in data_validation()"
-      end
-      if param[:error_type] && !error_type.has_key?(param[:error_type].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
-      end
-    end
-
-    def check_criteria_required(param)
-      unless param.has_key?(:criteria)
-        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
-      end
-    end
-
-    def check_valid_citeria_types(param)
-      unless valid_criteria_type.has_key?(param[:criteria].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#{param[:criteria]}' for parameter :criteria in data_validation()"
-      end
-    end
-
-    def check_maximum_value_when_criteria_is_between_or_notbetween(param)
-      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        unless param.has_key?(:maximum)
-          raise WriteXLSXOptionParameterError,
-            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
-        end
-      else
-        param[:maximum] = nil
-      end
-    end
-
-    def error_type
-      {'stop' => 0, 'warning' => 1, 'information' => 2}
-    end
-
-    def convert_date_time_value_if_required(param)
-      if param[:validate] == 'date' || param[:validate] == 'time'
-        unless convert_date_time_value(param, :value) && convert_date_time_value(param, :maximum)
-          raise WriteXLSXOptionParameterError, "Invalid date/time value."
-        end
-      end
-    end
-
-    def set_some_defaults(param)
-      param[:ignore_blank]  ||= 1
-      param[:dropdown]      ||= 1
-      param[:show_input]    ||= 1
-      param[:show_error]    ||= 1
-    end
-
-    # List of valid input parameters.
-    def valid_validation_parameter
-      [
-        :validate,
-        :criteria,
-        :value,
-        :source,
-        :minimum,
-        :maximum,
-        :ignore_blank,
-        :dropdown,
-        :show_input,
-        :input_title,
-        :input_message,
-        :show_error,
-        :error_title,
-        :error_message,
-        :error_type,
-        :other_cells
-      ]
-    end
-
-    def valid_validation_type # :nodoc:
-      {
-        'any'             => 'none',
-        'any value'       => 'none',
-        'whole number'    => 'whole',
-        'whole'           => 'whole',
-        'integer'         => 'whole',
-        'decimal'         => 'decimal',
-        'list'            => 'list',
-        'date'            => 'date',
-        'time'            => 'time',
-        'text length'     => 'textLength',
-        'length'          => 'textLength',
-        'custom'          => 'custom'
-      }
-    end
 
     # Convert the list of format, string tokens to pairs of (format, string)
     # except for the first string fragment which doesn't require a default
@@ -7272,85 +7133,8 @@ module Writexlsx
     #
     def write_data_validations #:nodoc:
       write_some_elements('dataValidations', @validations) do
-        @validations.each { |validation| write_data_validation(validation) }
+        @validations.each { |validation| validation.write_data_validation(@writer) }
       end
-    end
-
-    #
-    # Write the <dataValidation> element.
-    #
-    def write_data_validation(param) #:nodoc:
-      sqref      = ''
-      attributes = []
-
-      # Set the cell range(s) for the data validation.
-      param[:cells].each do |cells|
-        # Add a space between multiple cell ranges.
-        sqref += ' ' if sqref != ''
-
-        row_first, col_first, row_last, col_last = cells
-
-        # Swap last row/col for first row/col as necessary
-        row_first, row_last = row_last, row_first if row_first > row_last
-        col_first, col_last = col_last, col_first if col_first > col_last
-
-        # If the first and last cell are the same write a single cell.
-        if row_first == row_last && col_first == col_last
-          sqref += xl_rowcol_to_cell(row_first, col_first)
-        else
-          sqref += xl_range(row_first, row_last, col_first, col_last)
-        end
-      end
-
-      #use Data::Dumper::Perltidy
-      #print Dumper param
-
-      attributes << 'type' << param[:validate]
-      attributes << 'operator' << param[:criteria] if param[:criteria] != 'between'
-
-      if param[:error_type]
-        attributes << 'errorStyle' << 'warning' if param[:error_type] == 1
-        attributes << 'errorStyle' << 'information' if param[:error_type] == 2
-      end
-      attributes << 'allowBlank'       << 1 if param[:ignore_blank] != 0
-      attributes << 'showDropDown'     << 1 if param[:dropdown]     == 0
-      attributes << 'showInputMessage' << 1 if param[:show_input]   != 0
-      attributes << 'showErrorMessage' << 1 if param[:show_error]   != 0
-
-      attributes << 'errorTitle' << param[:error_title]  if param[:error_title]
-      attributes << 'error' << param[:error_message]     if param[:error_message]
-      attributes << 'promptTitle' << param[:input_title] if param[:input_title]
-      attributes << 'prompt' << param[:input_message]    if param[:input_message]
-      attributes << 'sqref' << sqref
-
-      @writer.tag_elements('dataValidation', attributes) do
-        # Write the formula1 element.
-        write_formula_1(param[:value])
-        # Write the formula2 element.
-        write_formula_2(param[:maximum]) if param[:maximum]
-      end
-    end
-
-    #
-    # Write the <formula1> element.
-    #
-    def write_formula_1(formula) #:nodoc:
-      # Convert a list array ref into a comma separated string.
-      formula   = %!"#{formula.join(',')}"! if formula.kind_of?(Array)
-
-      formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
-
-      @writer.data_element('formula1', formula)
-    end
-
-    # write_formula_2()
-    #
-    # Write the <formula2> element.
-    #
-    def write_formula_2(formula) #:nodoc:
-      formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
-
-      @writer.data_element('formula2', formula)
     end
 
     #
@@ -7555,28 +7339,6 @@ module Writexlsx
       end
     end
 
-    # List of valid criteria types.
-    def valid_criteria_type  # :nodoc:
-      {
-        'between'                     => 'between',
-        'not between'                 => 'notBetween',
-        'equal to'                    => 'equal',
-        '='                           => 'equal',
-        '=='                          => 'equal',
-        'not equal to'                => 'notEqual',
-        '!='                          => 'notEqual',
-        '<>'                          => 'notEqual',
-        'greater than'                => 'greaterThan',
-        '>'                           => 'greaterThan',
-        'less than'                   => 'lessThan',
-        '<'                           => 'lessThan',
-        'greater than or equal to'    => 'greaterThanOrEqual',
-        '>='                          => 'greaterThanOrEqual',
-        'less than or equal to'       => 'lessThanOrEqual',
-        '<='                          => 'lessThanOrEqual'
-      }
-    end
-
     def set_active_pane_and_cell_selections(row, col, top_row, left_col, active_cell, sqref) # :nodoc:
       if row > 0 && col > 0
         active_pane = 'bottomRight'
@@ -7614,16 +7376,6 @@ module Writexlsx
         raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
       end
       col
-    end
-
-    def convert_date_time_value(param, key)  # :nodoc:
-      if param[key] && param[key] =~ /T/
-        date_time = convert_date_time(param[key])
-        param[key] = date_time if date_time
-        date_time
-      else
-        true
-      end
     end
   end
 end
