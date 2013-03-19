@@ -6920,204 +6920,40 @@ module Writexlsx
     # Write the <extLst> element and sparkline subelements.
     #
     def write_ext_sparklines  # :nodoc:
-      sparklines = @sparklines
-
-      # Return if worksheet doesn't contain any sparklines.
-      return if sparklines.empty?
-
-      # Write the extLst element.
-      @writer.start_tag('extLst')
-
-      # Write the ext element.
-      write_ext
-
-      # Write the x14:sparklineGroups element.
-      write_sparkline_groups
-
-      # Write the sparkline elements.
-      sparklines.reverse.each do |sparkline|
-        # Write the x14:sparklineGroup element.
-        write_sparkline_group(sparkline)
-
-        # Write the x14:colorSeries element.
-        write_color_series(sparkline.series_color)
-
-        # Write the x14:colorNegative element.
-        write_color_negative(sparkline.negative_color)
-
-        # Write the x14:colorAxis element.
-        write_color_axis
-
-        # Write the x14:colorMarkers element.
-        write_color_markers(sparkline.markers_color)
-
-        # Write the x14:colorFirst element.
-        write_color_first(sparkline.first_color)
-
-        # Write the x14:colorLast element.
-        write_color_last(sparkline.last_color)
-
-        # Write the x14:colorHigh element.
-        write_color_high(sparkline.high_color)
-
-        # Write the x14:colorLow element.
-        write_color_low(sparkline.low_color)
-
-        if sparkline.date_axis
-          @writer.data_element('xm:f', sparkline.date_axis)
-        end
-
-        write_sparklines(sparkline)
-
-        @writer.end_tag('x14:sparklineGroup')
-      end
-
-      @writer.end_tag('x14:sparklineGroups')
-      @writer.end_tag('ext')
-      @writer.end_tag('extLst')
+      @writer.tag_elements('extLst') { write_ext } unless @sparklines.empty?
     end
 
-    #
-    # Write the <x14:sparklines> element and <x14:sparkline> subelements.
-    #
-    def write_sparklines(sparkline)  # :nodoc:
-      # Write the sparkline elements.
-      @writer.tag_elements('x14:sparklines') do
-
-        (0 .. sparkline.count-1).each do |i|
-          range    = sparkline.ranges[i]
-          location = sparkline.locations[i]
-
-          @writer.tag_elements('x14:sparkline') do
-            @writer.data_element('xm:f',     range)
-            @writer.data_element('xm:sqref', location)
-          end
-        end
+    def write_ext
+      @writer.tag_elements('ext', write_ext_attributes) do
+        write_sparkline_groups
       end
     end
 
-    #
-    # Write the <ext> element.
-    #
-    def write_ext  # :nodoc:
+    def write_ext_attributes
       schema     = 'http://schemas.microsoft.com/office/'
       xmlns_x_14 = "#{schema}spreadsheetml/2009/9/main"
       uri        = '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
 
-      attributes = [
-                    'xmlns:x14', xmlns_x_14,
-                    'uri',       uri
-                   ]
-
-      @writer.start_tag('ext', attributes)
+      [
+       'xmlns:x14', xmlns_x_14,
+       'uri',       uri
+      ]
     end
 
-    #
-    # Write the <x14:sparklineGroups> element.
-    #
-    def write_sparkline_groups  # :nodoc:
+    def write_sparkline_groups
+      # Write the x14:sparklineGroups element.
+      @writer.tag_elements('x14:sparklineGroups', sparkline_groups_attributes) do
+        # Write the sparkline elements.
+        @sparklines.reverse.each do |sparkline|
+          sparkline.write_sparkline_group(@writer)
+        end
+      end
+    end
+
+    def sparkline_groups_attributes  # :nodoc:
       xmlns_xm = 'http://schemas.microsoft.com/office/excel/2006/main'
 
-      attributes = ['xmlns:xm', xmlns_xm]
-
-      @writer.start_tag('x14:sparklineGroups', attributes)
-    end
-
-    #
-    # Write the <x14:sparklineGroup> element.
-    #
-    # Example for order.
-    #
-    # <x14:sparklineGroup
-    #     manualMax="0"
-    #     manualMin="0"
-    #     lineWeight="2.25"
-    #     type="column"
-    #     dateAxis="1"
-    #     displayEmptyCellsAs="span"
-    #     markers="1"
-    #     high="1"
-    #     low="1"
-    #     first="1"
-    #     last="1"
-    #     negative="1"
-    #     displayXAxis="1"
-    #     displayHidden="1"
-    #     minAxisType="custom"
-    #     maxAxisType="custom"
-    #     rightToLeft="1">
-    #
-    def write_sparkline_group(sparkline)  # :nodoc:
-      @writer.start_tag('x14:sparklineGroup', sparkline.group_attributes)
-    end
-
-    #
-    # Helper function for the sparkline color functions below.
-    #
-    def write_spark_color(element, color)  # :nodoc:
-      attr = []
-
-      attr << 'rgb'   << color[:_rgb]   if color[:_rgb]
-      attr << 'theme' << color[:_theme] if color[:_theme]
-      attr << 'tint'  << color[:_tint]  if color[:_tint]
-
-      @writer.empty_tag(element, attr)
-    end
-
-    #
-    # Write the <x14:colorSeries> element.
-    #
-    def write_color_series(param)  # :nodoc:
-      write_spark_color('x14:colorSeries', param)
-    end
-
-    #
-    # Write the <x14:colorNegative> element.
-    #
-    def write_color_negative(param)  # :nodoc:
-      write_spark_color('x14:colorNegative', param)
-    end
-
-    #
-    # Write the <x14:colorAxis> element.
-    #
-    def write_color_axis  # :nodoc:
-      write_spark_color('x14:colorAxis', { :_rgb => 'FF000000'} )
-    end
-
-    #
-    # Write the <x14:colorMarkers> element.
-    #
-    def write_color_markers(param)  # :nodoc:
-      write_spark_color('x14:colorMarkers', param)
-    end
-
-    #
-    # Write the <x14:colorFirst> element.
-    #
-    def write_color_first(param)  # :nodoc:
-      write_spark_color('x14:colorFirst', param)
-    end
-
-    #
-    # Write the <x14:colorLast> element.
-    #
-    def write_color_last(param)  # :nodoc:
-      write_spark_color('x14:colorLast', param)
-    end
-
-    #
-    # Write the <x14:colorHigh> element.
-    #
-    def write_color_high(param)  # :nodoc:
-      write_spark_color('x14:colorHigh', param)
-    end
-
-    #
-    # Write the <x14:colorLow> element.
-    #
-    def write_color_low(param)  # :nodoc:
-      write_spark_color('x14:colorLow', param)
+      ['xmlns:xm', xmlns_xm]
     end
 
     #
