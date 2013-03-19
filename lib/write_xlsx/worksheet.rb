@@ -7439,14 +7439,6 @@ module Writexlsx
       [span_min, span_max]
     end
 
-    def xf(format) #:nodoc:
-      if format.kind_of?(Format)
-        format.xf_index
-      else
-        0
-      end
-    end
-
     #
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
