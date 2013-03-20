@@ -278,6 +278,9 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
+    MAX_DIGIT_WIDTH = 7    # For Calabri 11.
+    PADDING         = 5
+
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
     attr_reader :vml_data_id # :nodoc:
@@ -5615,9 +5618,6 @@ module Writexlsx
     # we use the default value. If the column is hidden it has a value of zero.
     #
     def size_col(col) #:nodoc:
-      max_digit_width = 7    # For Calabri 11.
-      padding         = 5
-
       # Look up the cell value to see if it has been changed.
       if @col_sizes[col]
         width = @col_sizes[col]
@@ -5628,7 +5628,7 @@ module Writexlsx
         elsif width < 1
           pixels = (width * 12 + 0.5).to_i
         else
-          pixels = (width * max_digit_width + 0.5).to_i + padding
+          pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
         end
       else
         pixels = 64
@@ -6093,10 +6093,8 @@ module Writexlsx
        end
 
       # Convert column width from user units to character width.
-      max_digit_width = 7.0    # For Calabri 11.
-      padding         = 5.0
       if width && width > 0
-        width = ((width * max_digit_width + padding) / max_digit_width * 256).to_i/256.0
+        width = ((width * MAX_DIGIT_WIDTH + PADDING) / MAX_DIGIT_WIDTH.to_f * 256).to_i/256.0
         width = width.to_i if width.to_s =~ /\.0+$/
       end
       attributes = [
@@ -6344,14 +6342,11 @@ module Writexlsx
     # Convert column width from user units to pane split width.
     #
     def calculate_x_split_width(width) #:nodoc:
-      max_digit_width = 7    # For Calabri 11.
-      padding         = 5
-
       # Convert to pixels.
       if width < 1
         pixels = int(width * 12 + 0.5)
       else
-        pixels = (width * max_digit_width + 0.5).to_i + padding
+        pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
       end
 
       # Convert to points.
