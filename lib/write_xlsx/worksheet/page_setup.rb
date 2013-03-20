@@ -63,8 +63,6 @@ module Writexlsx
         if option == 0 || !option
           @print_gridlines  = true
           @print_options_changed = true
-        elsif option = 1
-          @print_gridlines  = false
         else
           @print_gridlines  = false
         end
