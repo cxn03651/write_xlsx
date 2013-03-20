@@ -5895,9 +5895,8 @@ module Writexlsx
                     'xmlns:r',  schema + 'officeDocument/2006/relationships'
                    ]
       if @excel_version == 2010
-        attributes << 'xmlns:mc' << "#{schema}markup-compatibility/2006"
-        attributes << 'xmlns:x14ac' <<
-          'http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac'
+        attributes << 'xmlns:mc'     << "#{schema}markup-compatibility/2006"
+        attributes << 'xmlns:x14ac'  << "#{OFFICE_URL}spreadsheetml/2009/9/ac"
         attributes << 'mc:Ignorable' << 'x14ac'
       end
       @writer.start_tag('worksheet', attributes)
@@ -6884,13 +6883,9 @@ module Writexlsx
     end
 
     def write_ext_attributes
-      schema     = 'http://schemas.microsoft.com/office/'
-      xmlns_x_14 = "#{schema}spreadsheetml/2009/9/main"
-      uri        = '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
-
       [
-       'xmlns:x14', xmlns_x_14,
-       'uri',       uri
+       'xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main",
+       'uri',       '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
       ]
     end
 
@@ -6905,7 +6900,7 @@ module Writexlsx
     end
 
     def sparkline_groups_attributes  # :nodoc:
-      xmlns_xm = 'http://schemas.microsoft.com/office/excel/2006/main'
+      xmlns_xm = "#{OFFICE_URL}excel/2006/main"
 
       ['xmlns:xm', xmlns_xm]
     end

@@ -16,6 +16,8 @@ require 'digest/md5'
 
 module Writexlsx
 
+  OFFICE_URL = 'http://schemas.microsoft.com/office/'
+
   # The WriteXLSX provides an object oriented interface to a new Excel workbook.
   # The following methods are available through a new workbook.
   #
@@ -1148,9 +1150,10 @@ module Writexlsx
 
     def write_ext #:nodoc:
       tag = 'ext'
+      uri = "#{OFFICE_URL}mac/excel/2008/main"
       attributes = [
-        'xmlns:mx', 'http://schemas.microsoft.com/office/mac/excel/2008/main',
-        'uri', 'http://schemas.microsoft.com/office/mac/excel/2008/main'
+        'xmlns:mx', uri,
+        'uri', uri
       ]
       @writer.tag_elements(tag, attributes) { write_mx_arch_id }
     end
