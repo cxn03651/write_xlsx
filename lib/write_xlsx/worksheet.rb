@@ -5264,9 +5264,7 @@ module Writexlsx
     # Write the cell array formula <f> element.
     #
     def write_cell_array_formula(formula, range) #:nodoc:
-      attributes = ['t', 'array', 'ref', range]
-
-      @writer.data_element('f', formula, attributes)
+      @writer.data_element('f', formula, ['t', 'array', 'ref', range])
     end
 
     def date_1904? #:nodoc:
@@ -5933,10 +5931,7 @@ module Writexlsx
     # Write the <pageSetUpPr> element.
     #
     def write_page_set_up_pr #:nodoc:
-      return unless fit_page?
-
-      attributes = ['fitToPage', 1]
-      @writer.empty_tag('pageSetUpPr', attributes)
+      @writer.empty_tag('pageSetUpPr', ['fitToPage', 1]) if fit_page?
     end
 
     # Write the <dimension> element. This specifies the range of cells in the
@@ -5968,8 +5963,7 @@ module Writexlsx
         cell_2 = xl_rowcol_to_cell(@dim_rowmax, @dim_colmax)
         ref = cell_1 + ':' + cell_2
       end
-      attributes = ['ref', ref]
-      @writer.empty_tag('dimension', attributes)
+      @writer.empty_tag('dimension', ['ref', ref])
     end
     #
     # Write the <sheetViews> element.
@@ -6363,24 +6357,17 @@ module Writexlsx
     # Write the <sheetCalcPr> element for the worksheet calculation properties.
     #
     def write_sheet_calc_pr #:nodoc:
-      full_calc_on_load = 1
-
-      attributes = ['fullCalcOnLoad', full_calc_on_load]
-
-      @writer.empty_tag('sheetCalcPr', attributes)
+      @writer.empty_tag('sheetCalcPr', ['fullCalcOnLoad', 1])
     end
 
     #
     # Write the <phoneticPr> element.
     #
     def write_phonetic_pr #:nodoc:
-      font_id = 1
-      type    = 'noConversion'
-
       attributes = [
-          'fontId', font_id,
-          'type',   type
-      ]
+                    'fontId', 1,
+                    'type',   'noConversion'
+                   ]
 
       @writer.empty_tag('phoneticPr', attributes)
     end
@@ -6411,9 +6398,7 @@ module Writexlsx
     def write_some_elements(tag, container)
       return if container.empty?
 
-      attributes = ['count', container.size]
-
-      @writer.tag_elements(tag, attributes) do
+      @writer.tag_elements(tag, ['count', container.size]) do
         yield
       end
     end
@@ -6427,11 +6412,8 @@ module Writexlsx
       # Convert the merge dimensions to a cell range.
       cell_1 = xl_rowcol_to_cell(row_min, col_min)
       cell_2 = xl_rowcol_to_cell(row_max, col_max)
-      ref    = "#{cell_1}:#{cell_2}"
 
-      attributes = ['ref', ref]
-
-      @writer.empty_tag('mergeCell', attributes)
+      @writer.empty_tag('mergeCell', ['ref', "#{cell_1}:#{cell_2}"])
     end
 
     #
@@ -6539,9 +6521,7 @@ module Writexlsx
     # Write the <filterColumn> element.
     #
     def write_filter_column(col_id, type, *filters) #:nodoc:
-      attributes = ['colId', col_id]
-
-      @writer.tag_elements('filterColumn', attributes) do
+      @writer.tag_elements('filterColumn', ['colId', col_id]) do
         if type == 1
           # Type == 1 is the new XLSX style filter.
           write_filters(*filters)
@@ -6574,7 +6554,6 @@ module Writexlsx
       @writer.empty_tag('filter', ['val', val])
     end
 
-
     #
     # Write the <customFilters> element.
     #
@@ -6599,7 +6578,6 @@ module Writexlsx
         end
       end
     end
-
 
     #
     # Write the <customFilter> element.
@@ -6738,8 +6716,7 @@ module Writexlsx
     def write_tab_color #:nodoc:
       return unless tab_color?
 
-      attributes = ['rgb', get_palette_color(@tab_color)]
-      @writer.empty_tag('tabColor', attributes)
+      @writer.empty_tag('tabColor', ['rgb', get_palette_color(@tab_color)])
     end
 
     #
@@ -6803,11 +6780,7 @@ module Writexlsx
     # Write the <drawing> element.
     #
     def write_drawing(id) #:nodoc:
-      r_id = "rId#{id}"
-
-      attributes = ['r:id', r_id]
-
-      @writer.empty_tag('drawing', attributes)
+      @writer.empty_tag('drawing', ['r:id', "rId#{id}"])
     end
 
     #
@@ -6818,11 +6791,7 @@ module Writexlsx
 
       # Increment the relationship id for any drawings or comments.
       @rel_count += 1
-      id = @rel_count
-
-      attributes = ['r:id', "rId#{id}"]
-
-      @writer.empty_tag('legacyDrawing', attributes)
+      @writer.empty_tag('legacyDrawing', ['r:id', "rId#{@rel_count}"])
     end
 
     #
@@ -6868,29 +6837,23 @@ module Writexlsx
     # Write the underline font element.
     #
     def write_underline(writer, underline) #:nodoc:
-      attributes = underline_attributes(underline)
-      writer.empty_tag('u', attributes)
+      writer.empty_tag('u', underline_attributes(underline))
     end
 
     #
     # Write the <vertAlign> font sub-element.
     #
     def write_vert_align(writer, val) #:nodoc:
-      attributes = ['val', val]
-
-      writer.empty_tag('vertAlign', attributes)
+      writer.empty_tag('vertAlign', ['val', val])
     end
 
     #
     # Write the <tableParts> element.
     #
     def write_table_parts
-      # Return if worksheet doesn't contain any tables.
       return if @tables.empty?
 
-      attributes = ['count', tables_count]
-
-      @writer.tag_elements('tableParts', attributes) do
+      @writer.tag_elements('tableParts', ['count', tables_count]) do
 
         @tables.each do |table|
           # Write the tablePart element.
@@ -6904,11 +6867,7 @@ module Writexlsx
     # Write the <tablePart> element.
     #
     def write_table_part(id)
-      r_id = "rId#{id}"
-
-      attributes = ['r:id', r_id]
-
-      @writer.empty_tag('tablePart', attributes)
+      @writer.empty_tag('tablePart', ['r:id', "rId#{id}"])
     end
 
     #
@@ -6973,9 +6932,7 @@ module Writexlsx
     # Write the <conditionalFormatting> element.
     #
     def write_conditional_formatting(range, cond_formats) #:nodoc:
-      attributes = ['sqref', range]
-
-      @writer.tag_elements('conditionalFormatting', attributes) do
+      @writer.tag_elements('conditionalFormatting', ['sqref', range]) do
         cond_formats.each { |cond_format| cond_format.write_cf_rule }
       end
     end
