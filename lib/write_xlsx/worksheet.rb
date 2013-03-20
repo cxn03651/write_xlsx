@@ -3847,9 +3847,10 @@ module Writexlsx
     def add_table(*args)
       # Table count is a member of Workbook, global to all Worksheet.
       @workbook.table_count += 1
-      table = Package::Table.new(self, @workbook.table_count, *args)
+      id = @workbook.table_count
+      table = Package::Table.new(self, id, *args)
 
-      @external_table_links << ['/table', "../tables/table#{table.id}.xml"]
+      @external_table_links << ['/table', "../tables/table#{id}.xml"]
       @tables << table
       table
     end
