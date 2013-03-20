@@ -6772,27 +6772,14 @@ module Writexlsx
     # Write the <drawing> elements.
     #
     def write_drawings #:nodoc:
-      return unless drawing?
-      @rel_count += 1
-      write_drawing(@rel_count)
-    end
-
-    #
-    # Write the <drawing> element.
-    #
-    def write_drawing(id) #:nodoc:
-      @writer.empty_tag('drawing', ['r:id', "rId#{id}"])
+      increment_rel_id_and_write_r_id('drawing') if drawing?
     end
 
     #
     # Write the <legacyDrawing> element.
     #
     def write_legacy_drawing #:nodoc:
-      return unless @has_vml
-
-      # Increment the relationship id for any drawings or comments.
-      @rel_count += 1
-      @writer.empty_tag('legacyDrawing', ['r:id', "rId#{@rel_count}"])
+      increment_rel_id_and_write_r_id('legacyDrawing') if has_vml?
     end
 
     #
@@ -6809,12 +6796,7 @@ module Writexlsx
       return if @tables.empty?
 
       @writer.tag_elements('tableParts', ['count', tables_count]) do
-
-        tables_count.times do
-          # Write the tablePart element.
-          @rel_count += 1
-          write_table_part(@rel_count)
-        end
+        tables_count.times { increment_rel_id_and_write_r_id('tablePart') }
       end
     end
 
@@ -6823,6 +6805,15 @@ module Writexlsx
     #
     def write_table_part(id)
       @writer.empty_tag('tablePart', ['r:id', "rId#{id}"])
+    end
+
+    def increment_rel_id_and_write_r_id(tag)
+      @rel_count += 1
+      write_r_id(tag, @rel_count)
+    end
+
+    def write_r_id(tag, id)
+      @writer.empty_tag(tag, ['r:id', "rId#{id}"])
     end
 
     #
