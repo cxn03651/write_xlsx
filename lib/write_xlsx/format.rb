@@ -734,5 +734,46 @@ module Writexlsx
     def [](attr)
       self.instance_variable_get("@#{attr}")
     end
+
+    def write_font(writer, worksheet) #:nodoc:
+      writer.tag_elements('rPr') do
+        writer.empty_tag('b')       if bold?
+        writer.empty_tag('i')       if italic?
+        writer.empty_tag('strike')  if strikeout?
+        writer.empty_tag('outline') if outline?
+        writer.empty_tag('shadow')  if shadow?
+
+        # Handle the underline variants.
+        write_underline(writer, underline) if underline?
+
+        write_vert_align(writer, 'superscript') if font_script == 1
+        write_vert_align(writer, 'subscript')   if font_script == 2
+
+        writer.empty_tag('sz', ['val', size])
+
+        if ptrue?(theme)
+          write_color(writer, 'theme', theme)
+        elsif ptrue?(@color)
+          color = worksheet.get_palette_color(@color)
+          write_color(writer, 'rgb', color)
+        else
+          write_color(writer, 'theme', 1)
+        end
+
+        writer.empty_tag('rFont',  ['val', font])
+        writer.empty_tag('family', ['val', font_family])
+
+        if font == 'Calibri' && hyperlink == 0
+          writer.empty_tag('scheme', ['val', font_scheme])
+        end
+      end
+    end
+
+    #
+    # Write the <vertAlign> font sub-element.
+    #
+    def write_vert_align(writer, val) #:nodoc:
+      writer.empty_tag('vertAlign', ['val', val])
+    end
   end
 end

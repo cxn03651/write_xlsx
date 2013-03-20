@@ -2250,7 +2250,7 @@ module Writexlsx
         if token.respond_to?(:xf_index)
           # Write the font run.
           writer.start_tag('r')
-          write_font(writer, token)
+          token.write_font(writer, self)
         else
           # Write the string fragment part, with whitespace handling.
           attributes = []
@@ -6794,56 +6794,10 @@ module Writexlsx
     end
 
     #
-    # Write the <font> element.
-    #
-    def write_font(writer, format) #:nodoc:
-      writer.tag_elements('rPr') do
-        writer.empty_tag('b')       if format.bold?
-        writer.empty_tag('i')       if format.italic?
-        writer.empty_tag('strike')  if format.strikeout?
-        writer.empty_tag('outline') if format.outline?
-        writer.empty_tag('shadow')  if format.shadow?
-
-        # Handle the underline variants.
-        write_underline(writer, format.underline) if format.underline?
-
-        write_vert_align(writer, 'superscript') if format.font_script == 1
-        write_vert_align(writer, 'subscript')   if format.font_script == 2
-
-        writer.empty_tag('sz', ['val', format.size])
-
-        theme = format.theme
-        color = format.color
-        if ptrue?(theme)
-          write_color(writer, 'theme', theme)
-        elsif ptrue?(color)
-          color = get_palette_color(color)
-          write_color(writer, 'rgb', color)
-        else
-          write_color(writer, 'theme', 1)
-        end
-
-        writer.empty_tag('rFont',  ['val', format.font])
-        writer.empty_tag('family', ['val', format.font_family])
-
-        if format.font == 'Calibri' && format.hyperlink == 0
-          writer.empty_tag('scheme', ['val', format.font_scheme])
-        end
-      end
-    end
-
-    #
     # Write the underline font element.
     #
     def write_underline(writer, underline) #:nodoc:
       writer.empty_tag('u', underline_attributes(underline))
-    end
-
-    #
-    # Write the <vertAlign> font sub-element.
-    #
-    def write_vert_align(writer, val) #:nodoc:
-      writer.empty_tag('vertAlign', ['val', val])
     end
 
     #
@@ -6900,9 +6854,7 @@ module Writexlsx
     end
 
     def sparkline_groups_attributes  # :nodoc:
-      xmlns_xm = "#{OFFICE_URL}excel/2006/main"
-
-      ['xmlns:xm', xmlns_xm]
+      ['xmlns:xm', "#{OFFICE_URL}excel/2006/main"]
     end
 
     #
