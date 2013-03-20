@@ -371,30 +371,30 @@ module Writexlsx
 
     def assemble_xml_file #:nodoc:
       @writer.xml_decl
-      write_worksheet
-      write_sheet_pr
-      write_dimension
-      write_sheet_views
-      write_sheet_format_pr
-      write_cols
-      write_sheet_data
-      write_sheet_protection
-      write_auto_filter
-      write_merge_cells
-      write_conditional_formats
-      write_data_validations
-      write_hyperlinks
-      write_print_options
-      write_page_margins
-      write_page_setup
-      write_header_footer
-      write_row_breaks
-      write_col_breaks
-      write_drawings
-      write_legacy_drawing
-      write_table_parts
-      write_ext_sparklines
-      @writer.end_tag('worksheet')
+      @writer.tag_elements('worksheet', write_worksheet_attributes) do
+        write_sheet_pr
+        write_dimension
+        write_sheet_views
+        write_sheet_format_pr
+        write_cols
+        write_sheet_data
+        write_sheet_protection
+        write_auto_filter
+        write_merge_cells
+        write_conditional_formats
+        write_data_validations
+        write_hyperlinks
+        write_print_options
+        write_page_margins
+        write_page_setup
+        write_header_footer
+        write_row_breaks
+        write_col_breaks
+        write_drawings
+        write_legacy_drawing
+        write_table_parts
+        write_ext_sparklines
+      end
       @writer.crlf
       @writer.close
     end
@@ -5889,18 +5889,18 @@ module Writexlsx
     #
     # Write the <worksheet> element. This is the root element of Worksheet.
     #
-    def write_worksheet #:nodoc:
-      schema                 = 'http://schemas.openxmlformats.org/'
+    def write_worksheet_attributes #:nodoc:
+      schema = 'http://schemas.openxmlformats.org/'
       attributes = [
-                    'xmlns',    schema + 'spreadsheetml/2006/main',
-                    'xmlns:r',  schema + 'officeDocument/2006/relationships'
+                    'xmlns',    "#{schema}spreadsheetml/2006/main",
+                    'xmlns:r',  "#{schema}officeDocument/2006/relationships"
                    ]
       if @excel_version == 2010
         attributes << 'xmlns:mc'     << "#{schema}markup-compatibility/2006"
         attributes << 'xmlns:x14ac'  << "#{OFFICE_URL}spreadsheetml/2009/9/ac"
         attributes << 'mc:Ignorable' << 'x14ac'
       end
-      @writer.start_tag('worksheet', attributes)
+      attributes
     end
 
     #
