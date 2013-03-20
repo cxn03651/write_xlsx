@@ -5907,16 +5907,13 @@ module Writexlsx
     # Write the <sheetPr> element for Sheet level properties.
     #
     def write_sheet_pr #:nodoc:
-      if !fit_page? && !filter_on? && !tab_color? &&
-          !outline_changed? && !vba_codename?
-        return
-      end
-      codename = @vba_codename
-      attributes = []
-      (attributes << 'codeName'   << codename) if codename
-      (attributes << 'filterMode' << 1) if filter_on?
+      return unless tab_outline_fit? || vba_codename? || filter_on?
 
-      if fit_page? || tab_color? || outline_changed?
+      attributes = []
+      attributes << 'codeName'   << @vba_codename if vba_codename?
+      attributes << 'filterMode' << 1             if filter_on?
+
+      if tab_outline_fit?
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
           write_outline_pr
@@ -5925,6 +5922,10 @@ module Writexlsx
       else
         @writer.empty_tag('sheetPr', attributes)
       end
+    end
+
+    def tab_outline_fit?
+      tab_color? || outline_changed? || fit_page?
     end
 
     #
