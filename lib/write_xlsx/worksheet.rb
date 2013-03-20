@@ -6809,7 +6809,7 @@ module Writexlsx
 
       @writer.tag_elements('tableParts', ['count', tables_count]) do
 
-        @tables.each do |table|
+        tables_count.times do
           # Write the tablePart element.
           @rel_count += 1
           write_table_part(@rel_count)
