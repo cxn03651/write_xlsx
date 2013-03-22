@@ -286,7 +286,7 @@ module Writexlsx
     attr_reader :vml_data_id # :nodoc:
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
-    attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
+    attr_reader :vml_shape_id # :nodoc:
     attr_reader :comments, :comments_author # :nodoc:
     attr_accessor :dxf_priority # :nodoc:
     attr_reader :vba_codename # :nodoc:
