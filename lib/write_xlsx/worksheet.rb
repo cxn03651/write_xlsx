@@ -2398,8 +2398,7 @@ module Writexlsx
       end
 
       # Remove array formula braces and the leading =.
-      formula.sub!(/^\{(.*)\}$/, '\1')
-      formula.sub!(/^=/, '')
+      formula = formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
 
       store_data_to_table(FormulaArrayCellData.new(self, row1, col1, formula, xf, range, value))
 
