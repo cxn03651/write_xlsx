@@ -2549,11 +2549,11 @@ module Writexlsx
 
       # Remove the URI scheme from internal links.
       if url =~ /^internal:/
-        url.sub!(/^internal:/, '')
+        url = url.sub(/^internal:/, '')
         link_type = 2
       # Remove the URI scheme from external links.
       elsif url =~ /^external:/
-        url.sub!(/^external:/, '')
+        url = url.sub(/^external:/, '')
         link_type = 3
       end
 
@@ -2562,7 +2562,7 @@ module Writexlsx
 
       # For external links change the directory separator from Unix to Dos.
       if link_type == 3
-        url.gsub!(%r|/|, '\\')
+        url = url.gsub(%r|/|, '\\')
         str.gsub!(%r|/|, '\\')
       end
 
