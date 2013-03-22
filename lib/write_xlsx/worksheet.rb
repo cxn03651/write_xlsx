@@ -2223,44 +2223,19 @@ module Writexlsx
       row, col, *rich_strings = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
-      cell_format = cell_format_of_rich_string(rich_strings)
+      xf = cell_format_of_rich_string(rich_strings)
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      string = rich_string_xml_string(rich_strings)
-      # # Create a temp XML::Writer object and use it to write the rich string
-      # # XML to a string.
-      # writer = Package::XMLWriterSimple.new
+      fragments, length = rich_strings_fragments(rich_strings)
+      # can't allow 2 formats in a row
+      return -4 unless fragments
 
-      # fragments, length = rich_strings_fragments(rich_strings)
-      # # can't allow 2 formats in a row
-      # return -4 unless fragments
+      index = shared_string_index(xml_str_of_rich_string(fragments))
 
-      # # If the first token is a string start the <r> element.
-      # writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
-
-      # # Write the XML elements for the format string fragments.
-      # fragments.each do |token|
-      #   if token.respond_to?(:xf_index)
-      #     # Write the font run.
-      #     writer.start_tag('r')
-      #     token.write_font(writer, self)
-      #   else
-      #     # Write the string fragment part, with whitespace handling.
-      #     attributes = []
-
-      #     attributes << 'xml:space' << 'preserve' if token =~ /^\s/ || token =~ /\s$/
-      #     writer.data_element('t', token, attributes)
-      #     writer.end_tag('r')
-      #   end
-      # end
-
-      # Add the XML string to the shared string table.
-      index = shared_string_index(string)
-
-      store_data_to_table(StringCellData.new(self, row, col, index, cell_format))
+      store_data_to_table(StringCellData.new(self, row, col, index, xf))
     end
 
     #
@@ -5386,15 +5361,10 @@ module Writexlsx
       [fragments, length]
     end
 
-    def rich_string_xml_string(rich_strings)
+    def xml_str_of_rich_string(fragments)
       # Create a temp XML::Writer object and use it to write the rich string
       # XML to a string.
       writer = Package::XMLWriterSimple.new
-
-      fragments, length = rich_strings_fragments(rich_strings)
-      # can't allow 2 formats in a row
-p fragments
-      return -4 unless fragments
 
       # If the first token is a string start the <r> element.
       writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
