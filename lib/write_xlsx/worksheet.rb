@@ -16,7 +16,8 @@ require 'tempfile'
 
 module Writexlsx
   #
-  # A new worksheet is created by calling the add_worksheet() method from a workbook object:
+  # A new worksheet is created by calling the add_worksheet() method from a
+  # workbook object:
   #
   #     worksheet1 = workbook.add_worksheet
   #     worksheet2 = workbook.add_worksheet
@@ -279,8 +280,8 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
-    MAX_DIGIT_WIDTH = 7    # For Calabri 11.
-    PADDING         = 5
+    MAX_DIGIT_WIDTH = 7    # For Calabri 11.  # :nodoc:
+    PADDING         = 5                       # :nodoc:
 
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:

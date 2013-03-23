@@ -16,7 +16,7 @@ require 'digest/md5'
 
 module Writexlsx
 
-  OFFICE_URL = 'http://schemas.microsoft.com/office/'
+  OFFICE_URL = 'http://schemas.microsoft.com/office/'   # :nodoc:
 
   # The WriteXLSX provides an object oriented interface to a new Excel workbook.
   # The following methods are available through a new workbook.
