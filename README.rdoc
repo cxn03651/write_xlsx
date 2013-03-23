@@ -75,11 +75,14 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
-2013-03-06 v0.65.0
+2013-03-23 v0.65.0
    Added options to format series Gap/Overlap for Bar/Column charts.
 
    Bug fix in Worksheet#write_formula
    (write_formula change original formula string)
+
+   Bug fix in Worksheet#set_column
+   (failure when parameter level is out of range)
 
 2013-03-06 v0.64.1
    Bug fix in handling utf-8 string under ruby 1.8.7
