@@ -12,9 +12,7 @@ module Writexlsx
       end
 
       def set_xml_writer(filename = nil)
-        fh = File.open(filename, "wb")
-
-        @io = fh
+        @filename = filename
       end
 
       def xml_decl(encoding = 'UTF-8', standalone = true)
@@ -28,14 +26,27 @@ module Writexlsx
         end_tag(tag)
       end
 
+      def tag_elements_str(tag, attributes = [])
+        str = ''
+        str << start_tag_str(tag, attributes)
+        str << yield
+        str << end_tag_str(tag)
+      end
+
       def start_tag(tag, attr = [])
-        str = "<#{tag}#{key_vals(attr)}>"
-        io_write(str)
+        io_write(start_tag_str(tag, attr))
+      end
+
+      def start_tag_str(tag, attr = [])
+        "<#{tag}#{key_vals(attr)}>"
       end
 
       def end_tag(tag)
-        str = "</#{tag}>"
-        io_write(str)
+        io_write(end_tag_str(tag))
+      end
+
+      def end_tag_str(tag)
+        "</#{tag}>"
       end
 
       def empty_tag(tag, attr = [])
@@ -44,8 +55,11 @@ module Writexlsx
       end
 
       def empty_tag_encoded(tag, attr = [])
-        str = "<#{tag}#{key_vals(attr)}/>"
-        io_write(str)
+        io_write(empty_tag_encoded_str(tag, attr))
+      end
+
+      def empty_tag_encoded_str(tag, attr = [])
+        "<#{tag}#{key_vals(attr)}/>"
       end
 
       def data_element(tag, data, attr = [])
@@ -75,6 +89,9 @@ module Writexlsx
       end
 
       def close
+        if @filename
+          File.open(@filename, "wb") { |f| f << string }
+        end
         @io.close
       end
 

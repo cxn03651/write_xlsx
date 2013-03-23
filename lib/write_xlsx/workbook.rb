@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
+require 'write_xlsx/sheets'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
+require 'write_xlsx/formats'
 require 'write_xlsx/format'
 require 'write_xlsx/shape'
 require 'write_xlsx/utility'
@@ -13,6 +15,8 @@ require 'tempfile'
 require 'digest/md5'
 
 module Writexlsx
+
+  OFFICE_URL = 'http://schemas.microsoft.com/office/'
 
   # The WriteXLSX provides an object oriented interface to a new Excel workbook.
   # The following methods are available through a new workbook.
@@ -34,12 +38,9 @@ module Writexlsx
 
     include Writexlsx::Utility
 
-    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
-
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
-    attr_reader :font_count, :num_format_count, :border_count, :fill_count, :custom_colors  # :nodoc:
-    attr_reader :worksheets, :sheetnames, :charts, :drawings  # :nodoc:
+    attr_reader :worksheets, :charts, :drawings  # :nodoc:
     attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
     attr_reader :doc_properties  # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
@@ -97,19 +98,12 @@ module Writexlsx
       @firstsheet          = 0
       @selected            = 0
       @fileclosed          = false
-      @sheet_name          = 'Sheet'
-      @chart_name          = 'Chart'
-      @sheetname_count     = 0
-      @chartname_count     = 0
-      @worksheets          = []
+      @worksheets          = Sheets.new
       @charts              = []
       @drawings            = []
-      @sheetnames          = []
-      @formats             = []
+      @formats             = Formats.new
       @xf_formats          = []
-      @xf_format_indices   = {}
       @dxf_formats         = []
-      @dxf_format_indices  = {}
       @font_count          = 0
       @num_format_count    = 0
       @defined_names       = []
@@ -265,7 +259,7 @@ module Writexlsx
       write_book_views
 
       # Write the worksheet names and ids.
-      write_sheets
+      @worksheets.write_sheets(@writer)
 
       # Write the workbook defined names.
       write_defined_names
@@ -305,7 +299,6 @@ module Writexlsx
       name  = check_sheetname(name)
       worksheet = Worksheet.new(self, @worksheets.size, name)
       @worksheets << worksheet
-      @sheetnames << name
       worksheet
     end
 
@@ -403,7 +396,6 @@ module Writexlsx
         chartsheet = Chartsheet.new(self, @worksheets.size, sheetname)
         chartsheet.chart   = chart
         @worksheets << chartsheet
-        @sheetnames << sheetname
       end
       @charts << chart
       ptrue?(embedded) ? chart : chartsheet
@@ -422,15 +414,9 @@ module Writexlsx
     # Format properties and how to set them.
     #
     def add_format(properties = {})
-      init_data = [
-        @xf_format_indices,
-        @dxf_format_indices,
-        properties
-      ]
+      format = Format.new(@formats, properties)
 
-      format = Format.new(*init_data)
-
-      @formats.push(format)    # Store format reference
+      @formats.formats.push(format)    # Store format reference
 
       format
     end
@@ -716,7 +702,7 @@ module Writexlsx
       if name =~ /^(.*)!(.*)$/
         sheetname   = $1
         name        = $2
-        sheet_index = get_sheet_index(sheetname)
+        sheet_index = @worksheets.index_by_name(sheetname)
       else
         sheet_index = -1   # Use -1 to indicate global names.
       end
@@ -946,12 +932,21 @@ module Writexlsx
       @shared_strings.empty?
     end
 
-    def xf_formats     # :nodoc:
-      @xf_formats.dup
+    def chartsheet_count
+      @worksheets.chartsheet_count
     end
 
-    def dxf_formats    # :nodoc:
-      @dxf_formats.dup
+    def style_properties
+      [
+       @xf_formats,
+       @palette,
+       @font_count,
+       @num_format_count,
+       @border_count,
+       @fill_count,
+       @custom_colors,
+       @dxf_formats
+      ]
     end
 
     private
@@ -1037,52 +1032,11 @@ module Writexlsx
     # invalid characters and if the name is unique in the workbook.
     #
     def check_sheetname(name) #:nodoc:
-      make_and_check_sheet_chart_name(:sheet, name)
+      @worksheets.make_and_check_sheet_chart_name(:sheet, name)
     end
 
     def check_chart_sheetname(name)
-      make_and_check_sheet_chart_name(:chart, name)
-    end
-
-    def make_and_check_sheet_chart_name(type, name)
-      count = sheet_chart_count_increment(type)
-      name = "#{BASE_NAME[type]}#{count}" unless ptrue?(name)
-
-      check_valid_sheetname(name)
-      name
-    end
-
-    def sheet_chart_count_increment(type)
-      case type
-      when :sheet
-        @sheetname_count += 1
-      when :chart
-        @chartname_count += 1
-      end
-    end
-
-    def check_valid_sheetname(name)
-      # Check that sheet name is <= 31. Excel limit.
-      raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
-
-      # Check that sheetname doesn't contain any invalid characters
-      invalid_char = /[\[\]:*?\/\\]/
-      if name =~ invalid_char
-        raise 'Invalid character []:*?/\\ in worksheet name: ' + name
-      end
-
-      # Check that the worksheet name doesn't already exist since this is a fatal
-      # error in Excel 97. The check must also exclude case insensitive matches.
-      unless is_sheetname_uniq?(name)
-        raise "Worksheet name '#{name}', with case ignored, is already used."
-      end
-    end
-
-    def is_sheetname_uniq?(name)
-      @worksheets.each do |worksheet|
-        return false if name.downcase == worksheet.name.downcase
-      end
-      true
+      @worksheets.make_and_check_sheet_chart_name(:chart, name)
     end
 
     #
@@ -1184,29 +1138,6 @@ module Writexlsx
       @writer.empty_tag('workbookView', attributes)
     end
 
-    def write_sheets #:nodoc:
-      @writer.tag_elements('sheets') do
-        id_num = 1
-        @worksheets.each do |sheet|
-          write_sheet(sheet.name, id_num, sheet.hidden?)
-          id_num += 1
-        end
-      end
-    end
-
-    def write_sheet(name, sheet_id, hidden = false) #:nodoc:
-      attributes = [
-        'name',    name,
-        'sheetId', sheet_id
-      ]
-
-      if hidden
-        attributes << 'state' << 'hidden'
-      end
-      attributes << 'r:id' << "rId#{sheet_id}"
-      @writer.empty_tag_encoded('sheet', attributes)
-    end
-
     def write_calc_pr #:nodoc:
       attributes = ['calcId', 124519]
       @writer.empty_tag('calcPr', attributes)
@@ -1219,9 +1150,10 @@ module Writexlsx
 
     def write_ext #:nodoc:
       tag = 'ext'
+      uri = "#{OFFICE_URL}mac/excel/2008/main"
       attributes = [
-        'xmlns:mx', 'http://schemas.microsoft.com/office/mac/excel/2008/main',
-        'uri', 'http://schemas.microsoft.com/office/mac/excel/2008/main'
+        'xmlns:mx', uri,
+        'uri', uri
       ]
       @writer.tag_elements(tag, attributes) { write_mx_arch_id }
     end
@@ -1289,8 +1221,7 @@ module Writexlsx
       add_chart_data
 
       # Package the workbook.
-      packager = Package::Packager.new
-      packager.add_workbook(self)
+      packager = Package::Packager.new(self)
       packager.set_package_dir(@tempdir)
       packager.create_package
 
@@ -1328,7 +1259,7 @@ module Writexlsx
     # formats.
     #
     def prepare_formats #:nodoc:
-      @formats.each do |format|
+      @formats.formats.each do |format|
         xf_index  = format.xf_index
         dxf_index = format.dxf_index
 
@@ -1562,8 +1493,7 @@ module Writexlsx
       # Add a font format for cell comments.
       if comment_files > 0
         format = Format.new(
-            @xf_format_indices,
-            @dxf_format_indices,
+            @formats,
             :font          => 'Tahoma',
             :size          => 8,
             :color_indexed => 81,
@@ -1572,7 +1502,7 @@ module Writexlsx
 
         format.get_xf_index
 
-        @formats << format
+        @formats.formats << format
       end
     end
 
@@ -1728,7 +1658,7 @@ module Writexlsx
 
         drawing_id += 1
 
-        (0 .. chart_count - 1).each do |index|
+        sheet.charts.each_with_index do |chart, index|
           chart_ref_id += 1
           sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end
@@ -1756,23 +1686,6 @@ module Writexlsx
       @charts = @charts.sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
-    end
-
-    #
-    # Convert a sheet name to its index. Return undef otherwise.
-    #
-    def get_sheet_index(sheetname) #:nodoc:
-      sheet_count = @sheetnames.size
-      sheet_index = nil
-
-      sheetname.sub!(/^'/, '')
-      sheetname.sub!(/'$/, '')
-
-      ( 0 .. sheet_count - 1 ).each do |i|
-        sheet_index = i if sheetname == @sheetnames[i]
-      end
-
-      sheet_index
     end
 
     #

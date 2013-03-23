@@ -10,7 +10,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
   end
 
   def test_write_sheet_pr_fit_page
-    @worksheet.instance_variable_get(:@print_style).fit_page = true
+    @worksheet.instance_variable_get(:@page_setup).fit_page = true
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
@@ -26,7 +26,7 @@ class TestWriteSheetPr < Test::Unit::TestCase
   end
 
   def test_write_sheet_pr_fit_page_and_tab_color
-    @worksheet.instance_variable_get(:@print_style).fit_page = true
+    @worksheet.instance_variable_get(:@page_setup).fit_page = true
     @worksheet.tab_color = 'red'
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string

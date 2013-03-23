@@ -33,15 +33,6 @@ class TestWriteSheetView < Test::Unit::TestCase
     assert_equal(expected, result)
   end
 
-  def test_write_sheet_view_tab_selected_and_hide_gridlines_true
-    @worksheet.select
-    @worksheet.hide_gridlines(true)
-    @worksheet.__send__('write_sheet_view')
-    result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0"/>'
-    assert_equal(expected, result)
-  end
-
   def test_write_sheet_view_tab_selected_and_hide_gridlines_false
     @worksheet.select
     @worksheet.hide_gridlines(false)

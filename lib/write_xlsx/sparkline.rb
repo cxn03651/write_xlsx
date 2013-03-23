@@ -14,10 +14,6 @@ module Writexlsx
   class Sparkline
     include Writexlsx::Utility
 
-    attr_accessor :locations, :ranges
-    attr_accessor :date_axis, :series_color, :negative_color, :markers_color
-    attr_accessor :first_color, :last_color, :high_color, :low_color
-
     def initialize(ws, param, sheetname)
       @color = {}
 
@@ -141,7 +137,147 @@ module Writexlsx
       a
     end
 
+    #
+    # Write the <x14:sparklineGroup> element.
+    #
+    # Example for order.
+    #
+    # <x14:sparklineGroup
+    #     manualMax="0"
+    #     manualMin="0"
+    #     lineWeight="2.25"
+    #     type="column"
+    #     dateAxis="1"
+    #     displayEmptyCellsAs="span"
+    #     markers="1"
+    #     high="1"
+    #     low="1"
+    #     first="1"
+    #     last="1"
+    #     negative="1"
+    #     displayXAxis="1"
+    #     displayHidden="1"
+    #     minAxisType="custom"
+    #     maxAxisType="custom"
+    #     rightToLeft="1">
+    #
+    def write_sparkline_group(writer)
+      @writer = writer
+
+      @writer.tag_elements('x14:sparklineGroup', group_attributes) do
+        write
+      end
+    end
+
     private
+
+    def write
+      write_color_series
+      write_color_negative
+      write_color_axis
+      write_color_markers
+      write_color_first
+      write_color_last
+      write_color_high
+      write_color_low
+      write_xmf_date_axis if @date_axis
+      write_sparklines
+    end
+
+    #
+    # Write the <x14:colorSeries> element.
+    #
+    def write_color_series
+      write_spark_color('x14:colorSeries', @series_color)
+    end
+
+    #
+    # Write the <x14:colorNegative> element.
+    #
+    def write_color_negative
+      write_spark_color('x14:colorNegative', @negative_color)
+    end
+
+    #
+    # Write the <x14:colorAxis> element.
+    #
+    def write_color_axis  # :nodoc:
+      write_spark_color('x14:colorAxis', { :_rgb => 'FF000000'} )
+    end
+
+    #
+    # Write the <x14:colorMarkers> element.
+    #
+    def write_color_markers  # :nodoc:
+      write_spark_color('x14:colorMarkers', @markers_color)
+    end
+
+    #
+    # Write the <x14:colorFirst> element.
+    #
+    def write_color_first  # :nodoc:
+      write_spark_color('x14:colorFirst', @first_color)
+    end
+
+    #
+    # Write the <x14:colorLast> element.
+    #
+    def write_color_last  # :nodoc:
+      write_spark_color('x14:colorLast', @last_color)
+    end
+
+    #
+    # Write the <x14:colorHigh> element.
+    #
+    def write_color_high  # :nodoc:
+      write_spark_color('x14:colorHigh', @high_color)
+    end
+
+    #
+    # Write the <x14:colorLow> element.
+    #
+    def write_color_low  # :nodoc:
+      write_spark_color('x14:colorLow', @low_color)
+    end
+
+    #
+    # Write the <xm:f> element.
+    #
+    def write_xmf_date_axis
+      @writer.data_element('xm:f', @date_axis)
+    end
+
+    #
+    # Write the <x14:sparklines> element and <x14:sparkline> subelements.
+    #
+    def write_sparklines  # :nodoc:
+      # Write the sparkline elements.
+      @writer.tag_elements('x14:sparklines') do
+
+        (0 .. count-1).each do |i|
+          range    = @ranges[i]
+          location = @locations[i]
+
+          @writer.tag_elements('x14:sparkline') do
+            @writer.data_element('xm:f',     range)
+            @writer.data_element('xm:sqref', location)
+          end
+        end
+      end
+    end
+
+    #
+    # Helper function for the sparkline color functions below.
+    #
+    def write_spark_color(element, color)  # :nodoc:
+      attr = []
+
+      attr << 'rgb'   << color[:_rgb]   if color[:_rgb]
+      attr << 'theme' << color[:_theme] if color[:_theme]
+      attr << 'tint'  << color[:_tint]  if color[:_tint]
+
+      @writer.empty_tag(element, attr)
+    end
 
     def set_spark_color(user_color, palette_color)
       return unless palette_color

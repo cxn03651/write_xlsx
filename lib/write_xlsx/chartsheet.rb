@@ -24,7 +24,7 @@ module Writexlsx
       @chart             = nil
       @charts            = [1]
       @zoom_scale_normal = 0
-      @print_style.orientation = false
+      @page_setup.orientation = false
     end
 
     #
@@ -162,11 +162,15 @@ module Writexlsx
 
       drawing = Drawing.new
       @drawing = drawing
-      @drawing.orientation = @print_style.orientation
+      @drawing.orientation = @page_setup.orientation
 
       @external_drawing_links << [ '/drawing', "../drawings/drawing#{drawing_id}.xml" ]
 
       @drawing_links << [ '/chart', "../charts/chart#{chart_id}.xml"]
+    end
+
+    def external_links
+      [@external_drawing_links]
     end
 
     private

@@ -174,9 +174,8 @@ module Writexlsx
     attr_accessor :dxf_bg_color, :dxf_fg_color   # :nodoc:
     attr_reader :rotation, :bold, :italic, :font_strikeout
 
-    def initialize(xf_format_indices = {}, dxf_format_indices = {}, params = {})   # :nodoc:
-      @xf_format_indices = xf_format_indices
-      @dxf_format_indices = dxf_format_indices
+    def initialize(formats, params = {})   # :nodoc:
+      @formats = formats
 
       @xf_index       = nil
       @dxf_index      = nil
@@ -250,7 +249,6 @@ module Writexlsx
       reserve = [
                  :xf_index,
                  :dxf_index,
-                 :xf_format_indices,
                  :xdf_format_indices,
                  :palette
                 ]
@@ -446,18 +444,10 @@ module Writexlsx
     def get_xf_index
       if @xf_index
         @xf_index
+      elsif @formats.xf_index_by_key(get_format_key)
+        @formats.xf_index_by_key(get_format_key)
       else
-        key = get_format_key
-        indices_href = @xf_format_indices
-
-        if indices_href[key]
-          indices_href[key]
-        else
-          index = 1 + indices_href.keys.size
-          indices_href[key] = index
-          @xf_index = index
-          index
-        end
+        @xf_index = @formats.set_xf_index_by_key(get_format_key)
       end
     end
 
@@ -466,19 +456,11 @@ module Writexlsx
     #
     def get_dxf_index
       if @dxf_index
-          @dxf_index
+        @dxf_index
+      elsif @formats.dxf_index_by_key(get_format_key)
+        @formats.dxf_index_by_key(get_format_key)
       else
-        key  = get_format_key
-        indices = @dxf_format_indices
-
-        if indices[key]
-          indices[key]
-        else
-          index = indices.size
-          indices[key] = index
-          @dxf_index = index
-          index
-        end
+        @dxf_index = @formats.set_dxf_index_by_key(get_format_key)
       end
     end
 
@@ -751,6 +733,47 @@ module Writexlsx
 
     def [](attr)
       self.instance_variable_get("@#{attr}")
+    end
+
+    def write_font(writer, worksheet) #:nodoc:
+      writer.tag_elements('rPr') do
+        writer.empty_tag('b')       if bold?
+        writer.empty_tag('i')       if italic?
+        writer.empty_tag('strike')  if strikeout?
+        writer.empty_tag('outline') if outline?
+        writer.empty_tag('shadow')  if shadow?
+
+        # Handle the underline variants.
+        write_underline(writer, underline) if underline?
+
+        write_vert_align(writer, 'superscript') if font_script == 1
+        write_vert_align(writer, 'subscript')   if font_script == 2
+
+        writer.empty_tag('sz', ['val', size])
+
+        if ptrue?(theme)
+          write_color(writer, 'theme', theme)
+        elsif ptrue?(@color)
+          color = worksheet.get_palette_color(@color)
+          write_color(writer, 'rgb', color)
+        else
+          write_color(writer, 'theme', 1)
+        end
+
+        writer.empty_tag('rFont',  ['val', font])
+        writer.empty_tag('family', ['val', font_family])
+
+        if font == 'Calibri' && hyperlink == 0
+          writer.empty_tag('scheme', ['val', font_scheme])
+        end
+      end
+    end
+
+    #
+    # Write the <vertAlign> font sub-element.
+    #
+    def write_vert_align(writer, val) #:nodoc:
+      writer.empty_tag('vertAlign', ['val', val])
     end
   end
 end

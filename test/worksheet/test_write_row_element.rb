@@ -39,7 +39,7 @@ class TestWriteRow < Test::Unit::TestCase
   end
 
   def test_write_row_6_nil_nil_format
-    format = Writexlsx::Format.new({}, {}, :xf_index => 1)
+    format = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
     @worksheet.__send__('write_row_element', 6, nil, nil, format)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<row r="7" s="1" customFormat="1">'

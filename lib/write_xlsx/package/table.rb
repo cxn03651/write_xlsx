@@ -24,7 +24,7 @@ module Writexlsx
         end
       end
 
-      attr_reader :id
+#      attr_reader :id
 
       def initialize(worksheet, id, *args)
         @worksheet = worksheet
@@ -61,16 +61,11 @@ module Writexlsx
       def assemble_xml_file
         write_xml_declaration
         # Write the table element.
-        write_table
-        # Write the autoFilter element.
-        write_auto_filter
-        # Write the tableColumns element.
-        write_table_columns
-        # Write the tableStyleInfo element.
-        write_table_style_info
-
-        # Close the table tag
-        @writer.end_tag('table')
+        @writer.tag_elements('table', write_table_attributes) do
+          write_auto_filter
+          write_table_columns
+          write_table_style_info
+        end
 
         # Close the XML writer object and filehandle.
         @writer.crlf
@@ -290,7 +285,7 @@ module Writexlsx
           @name = @param[:name]
         else
           # Set a default name.
-          @name = "Table#{id}"
+          @name = "Table#{@id}"
         end
       end
 
@@ -310,16 +305,13 @@ module Writexlsx
         @writer.xml_decl('UTF-8', 1)
       end
 
-      #
-      # Write the <table> element.
-      #
-      def write_table
+      def write_table_attributes
         schema           = 'http://schemas.openxmlformats.org/'
         xmlns            = "#{schema}spreadsheetml/2006/main"
 
         attributes = [
                       'xmlns',       xmlns,
-                      'id',          id,
+                      'id',          @id,
                       'name',        @name,
                       'displayName', @name,
                       'ref',         @range
@@ -334,7 +326,6 @@ module Writexlsx
         else
           attributes << 'totalsRowShown' << 0
         end
-        @writer.start_tag('table', attributes)
       end
 
       #

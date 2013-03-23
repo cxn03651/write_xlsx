@@ -10,7 +10,7 @@ class TestWorksheet04 < Test::Unit::TestCase
   end
 
   def test_assemble_xml_file_set_row
-    format = Writexlsx::Format.new({}, {}, :xf_index => 1, :bold => 1)
+    format = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1, :bold => 1)
     @worksheet.select
     @worksheet.set_row(1, 30)
     @worksheet.set_row(3, nil, nil, 1)

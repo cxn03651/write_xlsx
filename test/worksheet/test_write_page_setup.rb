@@ -13,7 +13,7 @@ class TestWorksheetWritePageSetup < Test::Unit::TestCase
     assert @worksheet
   end
 
-  def test_write_page_setup
+  def test_write_page_setup2
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = ''

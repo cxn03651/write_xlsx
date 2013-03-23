@@ -10,7 +10,7 @@ class TestWorksheet03 < Test::Unit::TestCase
   end
 
   def test_assemble_xml_file_set_column
-    format = Writexlsx::Format.new({}, {}, :xf_index => 1, :bold => 1)
+    format = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1, :bold => 1)
     @worksheet.select
     @worksheet.set_column('B:D', 5)
     @worksheet.set_column('F:F', 8, nil, 1)

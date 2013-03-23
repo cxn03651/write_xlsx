@@ -9,7 +9,9 @@ require 'write_xlsx/compatibility'
 require 'write_xlsx/utility'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/worksheet/cell_data'
-require 'write_xlsx/worksheet/print_style'
+require 'write_xlsx/worksheet/data_validation'
+require 'write_xlsx/worksheet/hyperlink'
+require 'write_xlsx/worksheet/page_setup'
 require 'tempfile'
 
 module Writexlsx
@@ -277,16 +279,16 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
+    MAX_DIGIT_WIDTH = 7    # For Calabri 11.
+    PADDING         = 5
+
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
-    attr_reader :external_hyper_links, :external_drawing_links # :nodoc:
-    attr_reader :external_vml_links, :external_table_links # :nodoc:
-    attr_reader :external_comment_links, :drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
-    attr_accessor :vml_shape_id, :rel_count, :hlink_refs # :nodoc:
-    attr_reader :comments_author # :nodoc:
+    attr_reader :vml_shape_id # :nodoc:
+    attr_reader :comments, :comments_author # :nodoc:
     attr_accessor :dxf_priority # :nodoc:
     attr_reader :vba_codename # :nodoc:
 
@@ -300,9 +302,7 @@ module Writexlsx
       @cell_data_table = {}
       @excel_version = 2007
 
-      @print_style = PrintStyle.new
-
-      @print_area    = ''
+      @page_setup = PageSetup.new
 
       @screen_gridlines = true
       @show_zeros = true
@@ -372,30 +372,30 @@ module Writexlsx
 
     def assemble_xml_file #:nodoc:
       @writer.xml_decl
-      write_worksheet
-      write_sheet_pr
-      write_dimension
-      write_sheet_views
-      write_sheet_format_pr
-      write_cols
-      write_sheet_data
-      write_sheet_protection
-      write_auto_filter
-      write_merge_cells
-      write_conditional_formats
-      write_data_validations
-      write_hyperlinks
-      write_print_options
-      write_page_margins
-      write_page_setup
-      write_header_footer
-      write_row_breaks
-      write_col_breaks
-      write_drawings
-      write_legacy_drawing
-      write_table_parts
-      write_ext_sparklines
-      @writer.end_tag('worksheet')
+      @writer.tag_elements('worksheet', write_worksheet_attributes) do
+        write_sheet_pr
+        write_dimension
+        write_sheet_views
+        write_sheet_format_pr
+        write_cols
+        write_sheet_data
+        write_sheet_protection
+        write_auto_filter
+        write_merge_cells
+        write_conditional_formats
+        write_data_validations
+        write_hyperlinks
+        write_print_options
+        write_page_margins
+        write_page_setup
+        write_header_footer
+        write_row_breaks
+        write_col_breaks
+        write_drawings
+        write_legacy_drawing
+        write_table_parts
+        write_ext_sparklines
+      end
       @writer.crlf
       @writer.close
     end
@@ -908,16 +908,16 @@ module Writexlsx
     # need to call this method.
     #
     def set_portrait
-      @print_style.orientation        = true
-      @print_style.page_setup_changed = true
+      @page_setup.orientation        = true
+      @page_setup.page_setup_changed = true
     end
 
     #
     # Set the page orientation as landscape.
     #
     def set_landscape
-      @print_style.orientation         = false
-      @print_style.page_setup_changed  = true
+      @page_setup.orientation         = false
+      @page_setup.page_setup_changed  = true
     end
 
     #
@@ -1014,10 +1014,7 @@ module Writexlsx
     # the printer's default paper.
     #
     def paper=(paper_size)
-      if paper_size
-        @paper_size         = paper_size
-        @print_style.page_setup_changed = true
-      end
+      @page_setup.paper = paper_size
     end
 
     def set_paper(paper_size)
@@ -1177,9 +1174,9 @@ module Writexlsx
     def set_header(string = '', margin = 0.3)
       raise 'Header string must be less than 255 characters' if string.length >= 255
 
-      @header                = string
-      @print_style.margin_header = margin
-      @header_footer_changed = true
+      @page_setup.header                = string
+      @page_setup.margin_header         = margin
+      @page_setup.header_footer_changed = true
     end
 
     #
@@ -1190,25 +1187,23 @@ module Writexlsx
     def set_footer(string = '', margin = 0.3)
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
-      @footer                = string
-      @print_style.margin_footer = margin
-      @header_footer_changed = true
+      @page_setup.footer                = string
+      @page_setup.margin_footer         = margin
+      @page_setup.header_footer_changed = true
     end
 
     #
     # Center the worksheet data horizontally between the margins on the printed page:
     #
     def center_horizontally
-      @print_options_changed = true
-      @hcenter               = true
+      @page_setup.center_horizontally
     end
 
     #
     # Center the worksheet data vertically between the margins on the printed page:
     #
     def center_vertically
-      @print_options_changed = true
-      @vcenter               = true
+      @page_setup.center_vertically
     end
 
     #
@@ -1261,7 +1256,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_left=(margin)
-      @print_style.margin_left = remove_white_space(margin)
+      @page_setup.margin_left = remove_white_space(margin)
     end
 
     #
@@ -1269,7 +1264,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_right=(margin)
-      @print_style.margin_right = remove_white_space(margin)
+      @page_setup.margin_right = remove_white_space(margin)
     end
 
     #
@@ -1277,7 +1272,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_top=(margin)
-      @print_style.margin_top = remove_white_space(margin)
+      @page_setup.margin_top = remove_white_space(margin)
     end
 
     #
@@ -1285,7 +1280,7 @@ module Writexlsx
     # See margins=()
     #
     def margin_bottom=(margin)
-      @print_style.margin_bottom = remove_white_space(margin)
+      @page_setup.margin_bottom = remove_white_space(margin)
     end
 
     #
@@ -1398,11 +1393,11 @@ module Writexlsx
 
       # Build up the print titles "Sheet1!$1:$2"
       sheetname = quote_sheetname(name)
-      @print_style.repeat_rows = "#{sheetname}!#{area}"
+      @page_setup.repeat_rows = "#{sheetname}!#{area}"
     end
 
     def print_repeat_rows   # :nodoc:
-      @print_style.repeat_rows
+      @page_setup.repeat_rows
     end
     #
     # :call-seq:
@@ -1432,11 +1427,11 @@ module Writexlsx
       last_col ||= first_col
 
       area = "#{xl_col_to_name(first_col, 1)}:#{xl_col_to_name(last_col, 1)}"
-      @print_style.repeat_cols = "#{quote_sheetname(@name)}!#{area}"
+      @page_setup.repeat_cols = "#{quote_sheetname(@name)}!#{area}"
     end
 
     def print_repeat_cols  # :nodoc:
-      @print_style.repeat_cols
+      @page_setup.repeat_cols
     end
 
     #
@@ -1452,7 +1447,7 @@ module Writexlsx
     #     worksheet2.print_area( 'A:H' );       # Columns A to H if rows have data
     #
     def print_area(*args)
-      return @print_area.dup if args.empty?
+      return @page_setup.print_area.dup if args.empty?
       row1, col1, row2, col2 = row_col_notation(args)
       return if [row1, col1, row2, col2].include?(nil)
 
@@ -1462,7 +1457,7 @@ module Writexlsx
       end
 
       # Build up the print area range "=Sheet2!R1C1:R2C1"
-      @print_area = convert_name_area(row1, col1, row2, col2)
+      @page_setup.print_area = convert_name_area(row1, col1, row2, col2)
     end
 
     #
@@ -1519,10 +1514,10 @@ module Writexlsx
       scale_val = 100 if scale_val < 10 || scale_val > 400
 
       # Turn off "fit to page" option.
-      @print_style.fit_page = false
+      @page_setup.fit_page = false
 
-      @print_style.scale              = scale_val
-      @print_style.page_setup_changed = true
+      @page_setup.scale              = scale_val
+      @page_setup.page_setup_changed = true
     end
 
     #
@@ -1585,10 +1580,10 @@ module Writexlsx
     #
     def print_across(across = true)
       if across
-        @print_style.across             = true
-        @print_style.page_setup_changed = true
+        @page_setup.across             = true
+        @page_setup.page_setup_changed = true
       else
-        @print_style.across = false
+        @page_setup.across = false
       end
     end
 
@@ -2233,46 +2228,17 @@ module Writexlsx
       row, col, *rich_strings = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
 
-      # If the last arg is a format we use it as the cell format.
-      if rich_strings[-1].respond_to?(:xf_index)
-        xf = rich_strings.pop
-      else
-        xf = nil
-      end
+      xf = cell_format_of_rich_string(rich_strings)
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Create a temp XML::Writer object and use it to write the rich string
-      # XML to a string.
-      writer = Package::XMLWriterSimple.new
-
       fragments, length = rich_strings_fragments(rich_strings)
       # can't allow 2 formats in a row
       return -4 unless fragments
 
-      # If the first token is a string start the <r> element.
-      writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
-
-      # Write the XML elements for the format string fragments.
-      fragments.each do |token|
-        if token.respond_to?(:xf_index)
-          # Write the font run.
-          writer.start_tag('r')
-          write_font(writer, token)
-        else
-          # Write the string fragment part, with whitespace handling.
-          attributes = []
-
-          attributes << 'xml:space' << 'preserve' if token =~ /^\s/ || token =~ /\s$/
-          writer.data_element('t', token, attributes)
-          writer.end_tag('r')
-        end
-      end
-
-      # Add the XML string to the shared string table.
-      index = shared_string_index(writer.string)
+      index = shared_string_index(xml_str_of_rich_string(fragments))
 
       store_data_to_table(StringCellData.new(self, row, col, index, xf))
     end
@@ -2437,8 +2403,7 @@ module Writexlsx
       end
 
       # Remove array formula braces and the leading =.
-      formula.sub!(/^\{(.*)\}$/, '\1')
-      formula.sub!(/^=/, '')
+      formula = formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
 
       store_data_to_table(FormulaArrayCellData.new(self, row1, col1, formula, xf, range, value))
 
@@ -2587,102 +2552,26 @@ module Writexlsx
       xf, str = str, xf if str.respond_to?(:xf_index) || !xf.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
-      link_type = 1
-
-      # Remove the URI scheme from internal links.
-      if url =~ /^internal:/
-        url.sub!(/^internal:/, '')
-        link_type = 2
-      # Remove the URI scheme from external links.
-      elsif url =~ /^external:/
-        url.sub!(/^external:/, '')
-        link_type = 3
-      end
-
-      # The displayed string defaults to the url string.
-      str ||= url.dup
-
-      # For external links change the directory separator from Unix to Dos.
-      if link_type == 3
-        url.gsub!(%r|/|, '\\')
-        str.gsub!(%r|/|, '\\')
-      end
-
-      # Strip the mailto header.
-      str.sub!(/^mailto:/, '')
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Copy string for use in hyperlink elements.
-      url_str = str.dup
+      hyperlink = Hyperlink.new(url, str)
+      hyperlink.tip = tip
 
-      # External links to URLs and to other Excel workbooks have slightly
-      # different characteristics that we have to account for.
-      if link_type == 1
-        # Escape URL unless it looks already escaped.
-        unless url =~ /%[0-9a-fA-F]{2}/
-          # Escape the URL escape symbol.
-          url = url.gsub(/%/, "%25")
-
-          # Escape whitespae in URL.
-          url = url.gsub(/[\s\x00]/, '%20')
-
-          # Escape other special characters in URL.
-          re = /(["<>\[\]`^{}])/
-          while re =~ url
-            match = $~[1]
-            url = url.sub(re, sprintf("%%%x", match.ord))
-          end
-        end
-
-        # Ordinary URL style external links don't have a "location" string.
-        url_str = nil
-      elsif link_type == 3
-        # External Workbook links need to be modified into the right format.
-        # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
-        # We need the part to the left of the # as the URL and the part to
-        # the right as the "location" string (if it exists).
-        url, url_str = url.split(/#/)
-
-        # Add the file:/// URI to the url if non-local.
-        if url =~ %r![:]! ||        # Windows style "C:/" link.
-            url =~ %r!^\\\\!        # Network share.
-          url = "file:///#{url}"
-        end
-
-        # Convert a ./dir/file.xlsx link to dir/file.xlsx.
-        url = url.sub(%r!^.\\!, '')
-
-        # Treat as a default external link now that the data has been modified.
-        link_type = 1
-      end
-
-      # Excel limits escaped URL to 255 characters.
-      if url.bytesize > 255
-        raise "URL '#{url}' > 255 characters, it exceeds Excel's limit for URLS."
-      end
-
-      # Check the limit of URLS per worksheet.
       @hlink_count += 1
 
       if @hlink_count > 65_530
-        raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
+        raise "URL '#{hyperlink.url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
       # Write the hyperlink string.
-      write_string(row, col, str, xf)
+      write_string(row, col, hyperlink.str, xf)
 
       # Store the hyperlink data in a separate structure.
       @hyperlinks      ||= {}
       @hyperlinks[row] ||= {}
-      @hyperlinks[row][col] = {
-        :_link_type => link_type,
-        :_url       => url,
-        :_str       => url_str,
-        :_tip       => tip
-      }
+      @hyperlinks[row][col] = hyperlink
     end
 
     #
@@ -4321,9 +4210,10 @@ module Writexlsx
     def add_table(*args)
       # Table count is a member of Workbook, global to all Worksheet.
       @workbook.table_count += 1
-      table = Package::Table.new(self, @workbook.table_count, *args)
+      id = @workbook.table_count
+      table = Package::Table.new(self, id, *args)
 
-      @external_table_links << ['/table', "../tables/table#{table.id}.xml"]
+      @external_table_links << ['/table', "../tables/table#{id}.xml"]
       @tables << table
       table
     end
@@ -5163,50 +5053,8 @@ module Writexlsx
     # of the distro.
     #
     def data_validation(*args)
-      # Check for a cell reference in A1 notation and substitute row and column.
-      row1, col1, row2, col2, options = row_col_notation(args)
-      if row2.respond_to?(:keys)
-        param = row2.dup
-        row2, col2 = row1, col1
-      elsif options.respond_to?(:keys)
-        param = options.dup
-      else
-        raise WriteXLSXInsufficientArgumentError
-      end
-      raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
-
-      check_dimensions(row1, col1)
-      check_dimensions(row2, col2)
-
-      check_for_valid_input_params(param)
-
-      param[:value] = param[:source]  if param[:source]
-      param[:value] = param[:minimum] if param[:minimum]
-
-      param[:validate] = valid_validation_type[param[:validate].downcase]
-      return if param[:validate] == 'none'
-      if ['list', 'custom'].include?(param[:validate])
-        param[:criteria]  = 'between'
-        param[:maximum]   = nil
-      end
-
-      check_criteria_required(param)
-      check_valid_citeria_types(param)
-      param[:criteria] = valid_criteria_type[param[:criteria].downcase]
-
-      check_maximum_value_when_criteria_is_between_or_notbetween(param)
-      param[:error_type] = param.has_key?(:error_type) ? error_type[param[:error_type].downcase] : 0
-
-      convert_date_time_value_if_required(param)
-      set_some_defaults(param)
-
-      param[:cells] = [[row1, col1, row2, col2]]
-
-      # A (for now) undocumented parameter to pass additional cell ranges.
-      param[:other_cells].each { |cells| param[:cells] << cells } if param.has_key?(:other_cells)
-
-      # Store the validation information until we close the worksheet.
-      @validations << param
+      validation = DataValidation.new(*args)
+      @validations << validation unless validation.validate_none?
     end
 
     #
@@ -5233,17 +5081,13 @@ module Writexlsx
     # is true, i.e. only the printed gridlines are hidden.
     #
     def hide_gridlines(option = 1)
-      if option == 0 || !option
-        @print_gridlines       = true    # 1 = display, 0 = hide
-        @screen_gridlines      = true
-        @print_options_changed = true
-      elsif option == 1
-        @print_gridlines  = false
-        @screen_gridlines = true
-      else
-        @print_gridlines  = false
+      if option == 2
         @screen_gridlines = false
+      else
+        @screen_gridlines = true
       end
+
+      @page_setup.hide_gridlines(option)
     end
 
     # Set the option to print the row and column headers on the printed page.
@@ -5270,13 +5114,14 @@ module Writexlsx
     # Do not confuse these headers with page headers as described in the
     # set_header() section above.
     #
-    def print_row_col_headers(headers = 1)
-      if headers
-        @print_headers         = 1
-        @print_options_changed = 1
-      else
-        @print_headers = 0
-      end
+    def print_row_col_headers(headers = true)
+      @page_setup.print_row_col_headers(headers)
+      # if headers
+      #   @print_headers         = 1
+      #   @page_setup.print_options_changed = 1
+      # else
+      #   @print_headers = 0
+      # end
     end
 
     #
@@ -5307,10 +5152,10 @@ module Writexlsx
     # are defined in the worksheet.
     #
     def fit_to_pages(width = 1, height = 1)
-      @print_style.fit_page   = true
-      @print_style.fit_width  = width
-      @print_style.fit_height  = height
-      @print_style.page_setup_changed = true
+      @page_setup.fit_page   = true
+      @page_setup.fit_width  = width
+      @page_setup.fit_height  = height
+      @page_setup.page_setup_changed = true
     end
 
     #
@@ -5545,7 +5390,7 @@ module Writexlsx
       breaks = args.collect do |brk|
         Array(brk)
       end.flatten
-      @print_style.hbreaks += breaks
+      @page_setup.hbreaks += breaks
     end
 
     #
@@ -5570,7 +5415,7 @@ module Writexlsx
     # method it will override all manual page breaks.
     #
     def set_v_pagebreaks(*args)
-      @print_style.vbreaks += args
+      @page_setup.vbreaks += args
     end
 
     #
@@ -5814,14 +5659,6 @@ module Writexlsx
       !!@comments_visible
     end
 
-    def comments_xml_writer=(file) # :nodoc:
-      @comments.set_xml_writer(file)
-    end
-
-    def comments_assemble_xml_file # :nodoc:
-      @comments.assemble_xml_file
-    end
-
     def comments_array # :nodoc:
       @comments.sorted_comments
     end
@@ -5846,9 +5683,7 @@ module Writexlsx
     # Write the cell array formula <f> element.
     #
     def write_cell_array_formula(formula, range) #:nodoc:
-      attributes = ['t', 'array', 'ref', range]
-
-      @writer.data_element('f', formula, attributes)
+      @writer.data_element('f', formula, ['t', 'array', 'ref', range])
     end
 
     def date_1904? #:nodoc:
@@ -5876,6 +5711,20 @@ module Writexlsx
 
     def buttons_data  # :nodoc:
       @buttons_array
+    end
+
+    def external_links
+      [
+       @external_hyper_links,
+       @external_drawing_links,
+       @external_vml_links,
+       @external_table_links,
+       @external_comment_links
+      ].reject { |a| a.empty? }
+    end
+
+    def drawing_links
+      [@drawing_links]
     end
 
     #
@@ -5906,104 +5755,19 @@ module Writexlsx
       count
     end
 
+    def tables_count
+      @tables.size
+    end
+
     private
 
-    def check_for_valid_input_params(param)
-      check_parameter(param, valid_validation_parameter, 'data_validation')
-
-      unless param.has_key?(:validate)
-        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
-      end
-      unless valid_validation_type.has_key?(param[:validate].downcase)
-        raise WriteXLSXOptionParameterError,
-        "Unknown validation type '#{param[:validate]}' for parameter :validate in data_validation()"
-      end
-      if param[:error_type] && !error_type.has_key?(param[:error_type].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
-      end
-    end
-
-    def check_criteria_required(param)
-      unless param.has_key?(:criteria)
-        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
-      end
-    end
-
-    def check_valid_citeria_types(param)
-      unless valid_criteria_type.has_key?(param[:criteria].downcase)
-        raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#{param[:criteria]}' for parameter :criteria in data_validation()"
-      end
-    end
-
-    def check_maximum_value_when_criteria_is_between_or_notbetween(param)
-      if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-        unless param.has_key?(:maximum)
-          raise WriteXLSXOptionParameterError,
-            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
-        end
+    def cell_format_of_rich_string(rich_strings)
+      # If the last arg is a format we use it as the cell format.
+      if rich_strings[-1].respond_to?(:xf_index)
+        rich_strings.pop
       else
-        param[:maximum] = nil
+        nil
       end
-    end
-
-    def error_type
-      {'stop' => 0, 'warning' => 1, 'information' => 2}
-    end
-
-    def convert_date_time_value_if_required(param)
-      if param[:validate] == 'date' || param[:validate] == 'time'
-        unless convert_date_time_value(param, :value) && convert_date_time_value(param, :maximum)
-          raise WriteXLSXOptionParameterError, "Invalid date/time value."
-        end
-      end
-    end
-
-    def set_some_defaults(param)
-      param[:ignore_blank]  ||= 1
-      param[:dropdown]      ||= 1
-      param[:show_input]    ||= 1
-      param[:show_error]    ||= 1
-    end
-
-    # List of valid input parameters.
-    def valid_validation_parameter
-      [
-        :validate,
-        :criteria,
-        :value,
-        :source,
-        :minimum,
-        :maximum,
-        :ignore_blank,
-        :dropdown,
-        :show_input,
-        :input_title,
-        :input_message,
-        :show_error,
-        :error_title,
-        :error_message,
-        :error_type,
-        :other_cells
-      ]
-    end
-
-    def valid_validation_type # :nodoc:
-      {
-        'any'             => 'none',
-        'any value'       => 'none',
-        'whole number'    => 'whole',
-        'whole'           => 'whole',
-        'integer'         => 'whole',
-        'decimal'         => 'decimal',
-        'list'            => 'list',
-        'date'            => 'date',
-        'time'            => 'time',
-        'text length'     => 'textLength',
-        'length'          => 'textLength',
-        'custom'          => 'custom'
-      }
     end
 
     # Convert the list of format, string tokens to pairs of (format, string)
@@ -6042,6 +5806,32 @@ module Writexlsx
         pos += 1
       end
       [fragments, length]
+    end
+
+    def xml_str_of_rich_string(fragments)
+      # Create a temp XML::Writer object and use it to write the rich string
+      # XML to a string.
+      writer = Package::XMLWriterSimple.new
+
+      # If the first token is a string start the <r> element.
+      writer.start_tag('r') if !fragments[0].respond_to?(:xf_index)
+
+      # Write the XML elements for the format string fragments.
+      fragments.each do |token|
+        if token.respond_to?(:xf_index)
+          # Write the font run.
+          writer.start_tag('r')
+          token.write_font(writer, self)
+        else
+          # Write the string fragment part, with whitespace handling.
+          attributes = []
+
+          attributes << 'xml:space' << 'preserve' if token =~ /^\s/ || token =~ /\s$/
+          writer.data_element('t', token, attributes)
+          writer.end_tag('r')
+        end
+      end
+      writer.string
     end
 
     # Pad out the rest of the area with formatted blank cells.
@@ -6280,9 +6070,6 @@ module Writexlsx
     # we use the default value. If the column is hidden it has a value of zero.
     #
     def size_col(col) #:nodoc:
-      max_digit_width = 7    # For Calabri 11.
-      padding         = 5
-
       # Look up the cell value to see if it has been changed.
       if @col_sizes[col]
         width = @col_sizes[col]
@@ -6293,7 +6080,7 @@ module Writexlsx
         elsif width < 1
           pixels = (width * 12 + 0.5).to_i
         else
-          pixels = (width * max_digit_width + 0.5).to_i + padding
+          pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
         end
       else
         pixels = 64
@@ -6555,35 +6342,31 @@ module Writexlsx
     #
     # Write the <worksheet> element. This is the root element of Worksheet.
     #
-    def write_worksheet #:nodoc:
-      schema                 = 'http://schemas.openxmlformats.org/'
+    def write_worksheet_attributes #:nodoc:
+      schema = 'http://schemas.openxmlformats.org/'
       attributes = [
-                    'xmlns',    schema + 'spreadsheetml/2006/main',
-                    'xmlns:r',  schema + 'officeDocument/2006/relationships'
+                    'xmlns',    "#{schema}spreadsheetml/2006/main",
+                    'xmlns:r',  "#{schema}officeDocument/2006/relationships"
                    ]
       if @excel_version == 2010
-        attributes << 'xmlns:mc' << "#{schema}markup-compatibility/2006"
-        attributes << 'xmlns:x14ac' <<
-          'http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac'
+        attributes << 'xmlns:mc'     << "#{schema}markup-compatibility/2006"
+        attributes << 'xmlns:x14ac'  << "#{OFFICE_URL}spreadsheetml/2009/9/ac"
         attributes << 'mc:Ignorable' << 'x14ac'
       end
-      @writer.start_tag('worksheet', attributes)
+      attributes
     end
 
     #
     # Write the <sheetPr> element for Sheet level properties.
     #
     def write_sheet_pr #:nodoc:
-      if !fit_page? && !filter_on? && !tab_color? &&
-          !outline_changed? && !vba_codename?
-        return
-      end
-      codename = @vba_codename
-      attributes = []
-      (attributes << 'codeName'   << codename) if codename
-      (attributes << 'filterMode' << 1) if filter_on?
+      return unless tab_outline_fit? || vba_codename? || filter_on?
 
-      if fit_page? || tab_color? || outline_changed?
+      attributes = []
+      attributes << 'codeName'   << @vba_codename if vba_codename?
+      attributes << 'filterMode' << 1             if filter_on?
+
+      if tab_outline_fit?
         @writer.tag_elements('sheetPr', attributes) do
           write_tab_color
           write_outline_pr
@@ -6594,14 +6377,15 @@ module Writexlsx
       end
     end
 
+    def tab_outline_fit?
+      tab_color? || outline_changed? || fit_page?
+    end
+
     #
     # Write the <pageSetUpPr> element.
     #
     def write_page_set_up_pr #:nodoc:
-      return unless fit_page?
-
-      attributes = ['fitToPage', 1]
-      @writer.empty_tag('pageSetUpPr', attributes)
+      @writer.empty_tag('pageSetUpPr', ['fitToPage', 1]) if fit_page?
     end
 
     # Write the <dimension> element. This specifies the range of cells in the
@@ -6633,8 +6417,7 @@ module Writexlsx
         cell_2 = xl_rowcol_to_cell(@dim_rowmax, @dim_colmax)
         ref = cell_1 + ':' + cell_2
       end
-      attributes = ['ref', ref]
-      @writer.empty_tag('dimension', attributes)
+      @writer.empty_tag('dimension', ['ref', ref])
     end
     #
     # Write the <sheetViews> element.
@@ -6646,7 +6429,7 @@ module Writexlsx
     def write_sheet_view #:nodoc:
       attributes = []
       # Hide screen gridlines if required
-      attributes << 'showGridLines' << 0 unless screen_gridlines?
+      attributes << 'showGridLines' << 0 unless @screen_gridlines
 
       # Hide zeroes in cells.
       attributes << 'showZeros' << 0 unless show_zeros?
@@ -6758,10 +6541,8 @@ module Writexlsx
        end
 
       # Convert column width from user units to character width.
-      max_digit_width = 7.0    # For Calabri 11.
-      padding         = 5.0
       if width && width > 0
-        width = ((width * max_digit_width + padding) / max_digit_width * 256).to_i/256.0
+        width = ((width * MAX_DIGIT_WIDTH + PADDING) / MAX_DIGIT_WIDTH.to_f * 256).to_i/256.0
         width = width.to_i if width.to_s =~ /\.0+$/
       end
       attributes = [
@@ -7009,14 +6790,11 @@ module Writexlsx
     # Convert column width from user units to pane split width.
     #
     def calculate_x_split_width(width) #:nodoc:
-      max_digit_width = 7    # For Calabri 11.
-      padding         = 5
-
       # Convert to pixels.
       if width < 1
         pixels = int(width * 12 + 0.5)
       else
-        pixels = (width * max_digit_width + 0.5).to_i + padding
+        pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
       end
 
       # Convert to points.
@@ -7033,24 +6811,17 @@ module Writexlsx
     # Write the <sheetCalcPr> element for the worksheet calculation properties.
     #
     def write_sheet_calc_pr #:nodoc:
-      full_calc_on_load = 1
-
-      attributes = ['fullCalcOnLoad', full_calc_on_load]
-
-      @writer.empty_tag('sheetCalcPr', attributes)
+      @writer.empty_tag('sheetCalcPr', ['fullCalcOnLoad', 1])
     end
 
     #
     # Write the <phoneticPr> element.
     #
     def write_phonetic_pr #:nodoc:
-      font_id = 1
-      type    = 'noConversion'
-
       attributes = [
-          'fontId', font_id,
-          'type',   type
-      ]
+                    'fontId', 1,
+                    'type',   'noConversion'
+                   ]
 
       @writer.empty_tag('phoneticPr', attributes)
     end
@@ -7059,55 +6830,14 @@ module Writexlsx
     # Write the <pageMargins> element.
     #
     def write_page_margins #:nodoc:
-      @writer.empty_tag('pageMargins', @print_style.attributes)
+      @page_setup.write_page_margins(@writer)
     end
 
     #
     # Write the <pageSetup> element.
     #
-    # The following is an example taken from Excel.
-    #
-    # <pageSetup
-    #     paperSize="9"
-    #     scale="110"
-    #     fitToWidth="2"
-    #     fitToHeight="2"
-    #     pageOrder="overThenDown"
-    #     orientation="portrait"
-    #     blackAndWhite="1"
-    #     draft="1"
-    #     horizontalDpi="200"
-    #     verticalDpi="200"
-    #     r:id="rId1"
-    # />
-    #
     def write_page_setup #:nodoc:
-      attributes = []
-
-      return unless page_setup_changed?
-
-      # Set paper size.
-      attributes << 'paperSize' << @paper_size if @paper_size
-
-      # Set the scale
-      attributes << 'scale' << @print_style.scale if @print_style.scale != 100
-
-      # Set the "Fit to page" properties.
-      attributes << 'fitToWidth' << @print_style.fit_width if @print_style.fit_page && @print_style.fit_width != 1
-
-      attributes << 'fitToHeight' << @print_style.fit_height if @print_style.fit_page && @print_style.fit_height != 1
-
-      # Set the page print direction.
-      attributes << 'pageOrder' << "overThenDown" if print_across?
-
-      # Set page orientation.
-      if @print_style.orientation?
-        attributes << 'orientation' << 'portrait'
-      else
-        attributes << 'orientation' << 'landscape'
-      end
-
-      @writer.empty_tag('pageSetup', attributes)
+      @page_setup.write_page_setup(@writer)
     end
 
     #
@@ -7122,9 +6852,7 @@ module Writexlsx
     def write_some_elements(tag, container)
       return if container.empty?
 
-      attributes = ['count', container.size]
-
-      @writer.tag_elements(tag, attributes) do
+      @writer.tag_elements(tag, ['count', container.size]) do
         yield
       end
     end
@@ -7138,60 +6866,22 @@ module Writexlsx
       # Convert the merge dimensions to a cell range.
       cell_1 = xl_rowcol_to_cell(row_min, col_min)
       cell_2 = xl_rowcol_to_cell(row_max, col_max)
-      ref    = "#{cell_1}:#{cell_2}"
 
-      attributes = ['ref', ref]
-
-      @writer.empty_tag('mergeCell', attributes)
+      @writer.empty_tag('mergeCell', ['ref', "#{cell_1}:#{cell_2}"])
     end
 
     #
     # Write the <printOptions> element.
     #
     def write_print_options #:nodoc:
-      attributes = []
-
-      return unless print_options_changed?
-
-      # Set horizontal centering.
-      attributes << 'horizontalCentered' << 1 if hcenter?
-
-      # Set vertical centering.
-      attributes << 'verticalCentered' << 1   if vcenter?
-
-      # Enable row and column headers.
-      attributes << 'headings' << 1 if print_headers?
-
-      # Set printed gridlines.
-      attributes << 'gridLines' << 1 if print_gridlines?
-
-      @writer.empty_tag('printOptions', attributes)
+      @page_setup.write_print_options(@writer)
     end
 
     #
     # Write the <headerFooter> element.
     #
     def write_header_footer #:nodoc:
-      return unless header_footer_changed?
-
-      @writer.tag_elements('headerFooter') do
-        write_odd_header if @header && @header != ''
-        write_odd_footer if @footer && @footer != ''
-      end
-    end
-
-    #
-    # Write the <oddHeader> element.
-    #
-    def write_odd_header #:nodoc:
-      @writer.data_element('oddHeader', @header)
-    end
-
-    #
-    # Write the <oddFooter> element.
-    #
-    def write_odd_footer #:nodoc:
-      @writer.data_element('oddFooter', @footer)
+      @page_setup.write_header_footer(@writer)
     end
 
     #
@@ -7211,10 +6901,10 @@ module Writexlsx
     def write_breaks(tag) # :nodoc:
       case tag
       when 'rowBreaks'
-        page_breaks = sort_pagebreaks(*(@print_style.hbreaks))
+        page_breaks = sort_pagebreaks(*(@page_setup.hbreaks))
         max = 16383
       when 'colBreaks'
-        page_breaks = sort_pagebreaks(*(@print_style.vbreaks))
+        page_breaks = sort_pagebreaks(*(@page_setup.vbreaks))
         max = 1048575
       else
         raise "Invalid parameter '#{tag}' in write_breaks."
@@ -7285,9 +6975,7 @@ module Writexlsx
     # Write the <filterColumn> element.
     #
     def write_filter_column(col_id, type, *filters) #:nodoc:
-      attributes = ['colId', col_id]
-
-      @writer.tag_elements('filterColumn', attributes) do
+      @writer.tag_elements('filterColumn', ['colId', col_id]) do
         if type == 1
           # Type == 1 is the new XLSX style filter.
           write_filters(*filters)
@@ -7320,7 +7008,6 @@ module Writexlsx
       @writer.empty_tag('filter', ['val', val])
     end
 
-
     #
     # Write the <customFilters> element.
     #
@@ -7345,7 +7032,6 @@ module Writexlsx
         end
       end
     end
-
 
     #
     # Write the <customFilter> element.
@@ -7383,21 +7069,13 @@ module Writexlsx
     def write_hyperlinks #:nodoc:
       return unless @hyperlinks
 
-      # Sort the hyperlinks into row order.
-      row_nums = @hyperlinks.keys.sort
-
-      # Exit if there are no hyperlinks to process.
-      return if row_nums.empty?
-
-      # Iterate over the rows.
-      row_nums.each do |row_num|
+      @hyperlinks.keys.sort.each do |row_num|
         # Sort the hyperlinks into column order.
         col_nums = @hyperlinks[row_num].keys.sort
         # Iterate over the columns.
         col_nums.each do |col_num|
           # Get the link data for this cell.
-          link      = @hyperlinks[row_num][col_num]
-          link_type = link[:_link_type]
+          link = @hyperlinks[row_num][col_num]
 
           # If the cell isn't a string then we have to add the url as
           # the string to display
@@ -7405,29 +7083,19 @@ module Writexlsx
               ptrue?(@cell_data_table[row_num]) &&
               ptrue?(@cell_data_table[row_num][col_num])
             if @cell_data_table[row_num][col_num].display_url_string?
-              display = link[:_url]
-            else
-              display = nil
+              link.display = link.url_str
             end
           end
 
-          if link_type == 1
+          if link.link_type == 1
             # External link with rel file relationship.
             @rel_count += 1
-            @hlink_refs << [
-                            link_type, row_num, col_num,
-                            @rel_count, link[:_str], display, link[:_tip]
-                           ]
+            @hlink_refs << [link, row_num, col_num, @rel_count]
             # Links for use by the packager.
-            @external_hyper_links << [
-                                      '/hyperlink', link[:_url], 'External'
-                                     ]
+            @external_hyper_links << ['/hyperlink', link.url, 'External']
           else
             # Internal link with rel file relationship.
-            @hlink_refs << [
-                            link_type, row_num, col_num,
-                            link[:_url], link[:_str], link[:_tip]
-                           ]
+            @hlink_refs << [link, row_num, col_num]
           end
         end
       end
@@ -7437,12 +7105,11 @@ module Writexlsx
       # Write the hyperlink elements.
       @writer.tag_elements('hyperlinks') do
         @hlink_refs.each do |aref|
-          type, *args = aref
-
-          if type == 1
-            write_hyperlink_external(*args)
-          elsif type == 2
-            write_hyperlink_internal(*args)
+          case aref[0].link_type
+          when 1
+            write_hyperlink_external(*aref)
+          when 2
+            write_hyperlink_internal(*aref)
           end
         end
       end
@@ -7451,31 +7118,15 @@ module Writexlsx
     #
     # Write the <hyperlink> element for external links.
     #
-    def write_hyperlink_external(row, col, id, location = nil, display = nil, tooltip = nil) #:nodoc:
-      ref = xl_rowcol_to_cell(row, col)
-      r_id = "rId#{id}"
-
-      attributes = ['ref', ref, 'r:id', r_id]
-
-      attributes << 'location' << location  if location
-      attributes << 'display'  << display   if display
-      attributes << 'tooltip'  << tooltip   if tooltip
-
-      @writer.empty_tag('hyperlink', attributes)
+    def write_hyperlink_external(link, row, col, id)  # :nodoc:
+      @writer.empty_tag('hyperlink', link.write_external_attributes(row, col, id))
     end
 
     #
     # Write the <hyperlink> element for internal links.
     #
-    def write_hyperlink_internal(row, col, location, display, tooltip = nil) #:nodoc:
-      ref = xl_rowcol_to_cell(row, col)
-
-      attributes = ['ref', ref, 'location', location]
-
-      attributes << 'tooltip' << tooltip if tooltip
-      attributes << 'display' << display
-
-      @writer.empty_tag('hyperlink', attributes)
+    def write_hyperlink_internal(link, row, col)  #:nodoc:
+      @writer.empty_tag('hyperlink', link.write_internal_attributes(row, col))
     end
 
     #
@@ -7484,8 +7135,7 @@ module Writexlsx
     def write_tab_color #:nodoc:
       return unless tab_color?
 
-      attributes = ['rgb', get_palette_color(@tab_color)]
-      @writer.empty_tag('tabColor', attributes)
+      @writer.empty_tag('tabColor', ['rgb', get_palette_color(@tab_color)])
     end
 
     #
@@ -7540,109 +7190,31 @@ module Writexlsx
     # Write the <drawing> elements.
     #
     def write_drawings #:nodoc:
-      return unless drawing?
-      @rel_count += 1
-      write_drawing(@rel_count)
-    end
-
-    #
-    # Write the <drawing> element.
-    #
-    def write_drawing(id) #:nodoc:
-      r_id = "rId#{id}"
-
-      attributes = ['r:id', r_id]
-
-      @writer.empty_tag('drawing', attributes)
+      increment_rel_id_and_write_r_id('drawing') if drawing?
     end
 
     #
     # Write the <legacyDrawing> element.
     #
     def write_legacy_drawing #:nodoc:
-      return unless @has_vml
-
-      # Increment the relationship id for any drawings or comments.
-      @rel_count += 1
-      id = @rel_count
-
-      attributes = ['r:id', "rId#{id}"]
-
-      @writer.empty_tag('legacyDrawing', attributes)
-    end
-
-    #
-    # Write the <font> element.
-    #
-    def write_font(writer, format) #:nodoc:
-      writer.tag_elements('rPr') do
-        writer.empty_tag('b')       if format.bold?
-        writer.empty_tag('i')       if format.italic?
-        writer.empty_tag('strike')  if format.strikeout?
-        writer.empty_tag('outline') if format.outline?
-        writer.empty_tag('shadow')  if format.shadow?
-
-        # Handle the underline variants.
-        write_underline(writer, format.underline) if format.underline?
-
-        write_vert_align(writer, 'superscript') if format.font_script == 1
-        write_vert_align(writer, 'subscript')   if format.font_script == 2
-
-        writer.empty_tag('sz', ['val', format.size])
-
-        theme = format.theme
-        color = format.color
-        if ptrue?(theme)
-          write_color(writer, 'theme', theme)
-        elsif ptrue?(color)
-          color = get_palette_color(color)
-          write_color(writer, 'rgb', color)
-        else
-          write_color(writer, 'theme', 1)
-        end
-
-        writer.empty_tag('rFont',  ['val', format.font])
-        writer.empty_tag('family', ['val', format.font_family])
-
-        if format.font == 'Calibri' && format.hyperlink == 0
-          writer.empty_tag('scheme', ['val', format.font_scheme])
-        end
-      end
+      increment_rel_id_and_write_r_id('legacyDrawing') if has_vml?
     end
 
     #
     # Write the underline font element.
     #
     def write_underline(writer, underline) #:nodoc:
-      attributes = underline_attributes(underline)
-      writer.empty_tag('u', attributes)
-    end
-
-    #
-    # Write the <vertAlign> font sub-element.
-    #
-    def write_vert_align(writer, val) #:nodoc:
-      attributes = ['val', val]
-
-      writer.empty_tag('vertAlign', attributes)
+      writer.empty_tag('u', underline_attributes(underline))
     end
 
     #
     # Write the <tableParts> element.
     #
     def write_table_parts
-      # Return if worksheet doesn't contain any tables.
       return if @tables.empty?
 
-      attributes = ['count', @tables.size]
-
-      @writer.tag_elements('tableParts', attributes) do
-
-        @tables.each do |table|
-          # Write the tablePart element.
-          @rel_count += 1
-          write_table_part(@rel_count)
-        end
+      @writer.tag_elements('tableParts', ['count', tables_count]) do
+        tables_count.times { increment_rel_id_and_write_r_id('tablePart') }
       end
     end
 
@@ -7650,215 +7222,50 @@ module Writexlsx
     # Write the <tablePart> element.
     #
     def write_table_part(id)
-      r_id = "rId#{id}"
+      @writer.empty_tag('tablePart', ['r:id', "rId#{id}"])
+    end
 
-      attributes = ['r:id', r_id]
+    def increment_rel_id_and_write_r_id(tag)
+      @rel_count += 1
+      write_r_id(tag, @rel_count)
+    end
 
-      @writer.empty_tag('tablePart', attributes)
+    def write_r_id(tag, id)
+      @writer.empty_tag(tag, ['r:id', "rId#{id}"])
     end
 
     #
     # Write the <extLst> element and sparkline subelements.
     #
     def write_ext_sparklines  # :nodoc:
-      sparklines = @sparklines
+      @writer.tag_elements('extLst') { write_ext } unless @sparklines.empty?
+    end
 
-      # Return if worksheet doesn't contain any sparklines.
-      return if sparklines.empty?
+    def write_ext
+      @writer.tag_elements('ext', write_ext_attributes) do
+        write_sparkline_groups
+      end
+    end
 
-      # Write the extLst element.
-      @writer.start_tag('extLst')
+    def write_ext_attributes
+      [
+       'xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main",
+       'uri',       '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
+      ]
+    end
 
-      # Write the ext element.
-      write_ext
-
+    def write_sparkline_groups
       # Write the x14:sparklineGroups element.
-      write_sparkline_groups
-
-      # Write the sparkline elements.
-      sparklines.reverse.each do |sparkline|
-        # Write the x14:sparklineGroup element.
-        write_sparkline_group(sparkline)
-
-        # Write the x14:colorSeries element.
-        write_color_series(sparkline.series_color)
-
-        # Write the x14:colorNegative element.
-        write_color_negative(sparkline.negative_color)
-
-        # Write the x14:colorAxis element.
-        write_color_axis
-
-        # Write the x14:colorMarkers element.
-        write_color_markers(sparkline.markers_color)
-
-        # Write the x14:colorFirst element.
-        write_color_first(sparkline.first_color)
-
-        # Write the x14:colorLast element.
-        write_color_last(sparkline.last_color)
-
-        # Write the x14:colorHigh element.
-        write_color_high(sparkline.high_color)
-
-        # Write the x14:colorLow element.
-        write_color_low(sparkline.low_color)
-
-        if sparkline.date_axis
-          @writer.data_element('xm:f', sparkline.date_axis)
-        end
-
-        write_sparklines(sparkline)
-
-        @writer.end_tag('x14:sparklineGroup')
-      end
-
-      @writer.end_tag('x14:sparklineGroups')
-      @writer.end_tag('ext')
-      @writer.end_tag('extLst')
-    end
-
-    #
-    # Write the <x14:sparklines> element and <x14:sparkline> subelements.
-    #
-    def write_sparklines(sparkline)  # :nodoc:
-      # Write the sparkline elements.
-      @writer.tag_elements('x14:sparklines') do
-
-        (0 .. sparkline.count-1).each do |i|
-          range    = sparkline.ranges[i]
-          location = sparkline.locations[i]
-
-          @writer.tag_elements('x14:sparkline') do
-            @writer.data_element('xm:f',     range)
-            @writer.data_element('xm:sqref', location)
-          end
+      @writer.tag_elements('x14:sparklineGroups', sparkline_groups_attributes) do
+        # Write the sparkline elements.
+        @sparklines.reverse.each do |sparkline|
+          sparkline.write_sparkline_group(@writer)
         end
       end
     end
 
-    #
-    # Write the <ext> element.
-    #
-    def write_ext  # :nodoc:
-      schema     = 'http://schemas.microsoft.com/office/'
-      xmlns_x_14 = "#{schema}spreadsheetml/2009/9/main"
-      uri        = '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
-
-      attributes = [
-                    'xmlns:x14', xmlns_x_14,
-                    'uri',       uri
-                   ]
-
-      @writer.start_tag('ext', attributes)
-    end
-
-    #
-    # Write the <x14:sparklineGroups> element.
-    #
-    def write_sparkline_groups  # :nodoc:
-      xmlns_xm = 'http://schemas.microsoft.com/office/excel/2006/main'
-
-      attributes = ['xmlns:xm', xmlns_xm]
-
-      @writer.start_tag('x14:sparklineGroups', attributes)
-    end
-
-    #
-    # Write the <x14:sparklineGroup> element.
-    #
-    # Example for order.
-    #
-    # <x14:sparklineGroup
-    #     manualMax="0"
-    #     manualMin="0"
-    #     lineWeight="2.25"
-    #     type="column"
-    #     dateAxis="1"
-    #     displayEmptyCellsAs="span"
-    #     markers="1"
-    #     high="1"
-    #     low="1"
-    #     first="1"
-    #     last="1"
-    #     negative="1"
-    #     displayXAxis="1"
-    #     displayHidden="1"
-    #     minAxisType="custom"
-    #     maxAxisType="custom"
-    #     rightToLeft="1">
-    #
-    def write_sparkline_group(sparkline)  # :nodoc:
-      @writer.start_tag('x14:sparklineGroup', sparkline.group_attributes)
-    end
-
-    #
-    # Helper function for the sparkline color functions below.
-    #
-    def write_spark_color(element, color)  # :nodoc:
-      attr = []
-
-      attr << 'rgb'   << color[:_rgb]   if color[:_rgb]
-      attr << 'theme' << color[:_theme] if color[:_theme]
-      attr << 'tint'  << color[:_tint]  if color[:_tint]
-
-      @writer.empty_tag(element, attr)
-    end
-
-    #
-    # Write the <x14:colorSeries> element.
-    #
-    def write_color_series(param)  # :nodoc:
-      write_spark_color('x14:colorSeries', param)
-    end
-
-    #
-    # Write the <x14:colorNegative> element.
-    #
-    def write_color_negative(param)  # :nodoc:
-      write_spark_color('x14:colorNegative', param)
-    end
-
-    #
-    # Write the <x14:colorAxis> element.
-    #
-    def write_color_axis  # :nodoc:
-      write_spark_color('x14:colorAxis', { :_rgb => 'FF000000'} )
-    end
-
-    #
-    # Write the <x14:colorMarkers> element.
-    #
-    def write_color_markers(param)  # :nodoc:
-      write_spark_color('x14:colorMarkers', param)
-    end
-
-    #
-    # Write the <x14:colorFirst> element.
-    #
-    def write_color_first(param)  # :nodoc:
-      write_spark_color('x14:colorFirst', param)
-    end
-
-    #
-    # Write the <x14:colorLast> element.
-    #
-    def write_color_last(param)  # :nodoc:
-      write_spark_color('x14:colorLast', param)
-    end
-
-    #
-    # Write the <x14:colorHigh> element.
-    #
-    def write_color_high(param)  # :nodoc:
-      write_spark_color('x14:colorHigh', param)
-    end
-
-    #
-    # Write the <x14:colorLow> element.
-    #
-    def write_color_low(param)  # :nodoc:
-      write_spark_color('x14:colorLow', param)
+    def sparkline_groups_attributes  # :nodoc:
+      ['xmlns:xm', "#{OFFICE_URL}excel/2006/main"]
     end
 
     #
@@ -7866,85 +7273,8 @@ module Writexlsx
     #
     def write_data_validations #:nodoc:
       write_some_elements('dataValidations', @validations) do
-        @validations.each { |validation| write_data_validation(validation) }
+        @validations.each { |validation| validation.write_data_validation(@writer) }
       end
-    end
-
-    #
-    # Write the <dataValidation> element.
-    #
-    def write_data_validation(param) #:nodoc:
-      sqref      = ''
-      attributes = []
-
-      # Set the cell range(s) for the data validation.
-      param[:cells].each do |cells|
-        # Add a space between multiple cell ranges.
-        sqref += ' ' if sqref != ''
-
-        row_first, col_first, row_last, col_last = cells
-
-        # Swap last row/col for first row/col as necessary
-        row_first, row_last = row_last, row_first if row_first > row_last
-        col_first, col_last = col_last, col_first if col_first > col_last
-
-        # If the first and last cell are the same write a single cell.
-        if row_first == row_last && col_first == col_last
-          sqref += xl_rowcol_to_cell(row_first, col_first)
-        else
-          sqref += xl_range(row_first, row_last, col_first, col_last)
-        end
-      end
-
-      #use Data::Dumper::Perltidy
-      #print Dumper param
-
-      attributes << 'type' << param[:validate]
-      attributes << 'operator' << param[:criteria] if param[:criteria] != 'between'
-
-      if param[:error_type]
-        attributes << 'errorStyle' << 'warning' if param[:error_type] == 1
-        attributes << 'errorStyle' << 'information' if param[:error_type] == 2
-      end
-      attributes << 'allowBlank'       << 1 if param[:ignore_blank] != 0
-      attributes << 'showDropDown'     << 1 if param[:dropdown]     == 0
-      attributes << 'showInputMessage' << 1 if param[:show_input]   != 0
-      attributes << 'showErrorMessage' << 1 if param[:show_error]   != 0
-
-      attributes << 'errorTitle' << param[:error_title]  if param[:error_title]
-      attributes << 'error' << param[:error_message]     if param[:error_message]
-      attributes << 'promptTitle' << param[:input_title] if param[:input_title]
-      attributes << 'prompt' << param[:input_message]    if param[:input_message]
-      attributes << 'sqref' << sqref
-
-      @writer.tag_elements('dataValidation', attributes) do
-        # Write the formula1 element.
-        write_formula_1(param[:value])
-        # Write the formula2 element.
-        write_formula_2(param[:maximum]) if param[:maximum]
-      end
-    end
-
-    #
-    # Write the <formula1> element.
-    #
-    def write_formula_1(formula) #:nodoc:
-      # Convert a list array ref into a comma separated string.
-      formula   = %!"#{formula.join(',')}"! if formula.kind_of?(Array)
-
-      formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
-
-      @writer.data_element('formula1', formula)
-    end
-
-    # write_formula_2()
-    #
-    # Write the <formula2> element.
-    #
-    def write_formula_2(formula) #:nodoc:
-      formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
-
-      @writer.data_element('formula2', formula)
     end
 
     #
@@ -7960,9 +7290,7 @@ module Writexlsx
     # Write the <conditionalFormatting> element.
     #
     def write_conditional_formatting(range, cond_formats) #:nodoc:
-      attributes = ['sqref', range]
-
-      @writer.tag_elements('conditionalFormatting', attributes) do
+      @writer.tag_elements('conditionalFormatting', ['sqref', range]) do
         cond_formats.each { |cond_format| cond_format.write_cf_rule }
       end
     end
@@ -8094,7 +7422,7 @@ module Writexlsx
     end
 
     def fit_page? #:nodoc:
-      @print_style.fit_page
+      @page_setup.fit_page
     end
 
     def filter_on? #:nodoc:
@@ -8129,44 +7457,12 @@ module Writexlsx
       !!@show_zeros
     end
 
-    def screen_gridlines? #:nodoc:
-      !!@screen_gridlines
-    end
-
     def protect? #:nodoc:
       !!@protect
     end
 
     def autofilter_ref? #:nodoc:
       !!@autofilter_ref
-    end
-
-    def print_options_changed? #:nodoc:
-      !!@print_options_changed
-    end
-
-    def hcenter? #:nodoc:
-      !!@hcenter
-    end
-
-    def vcenter? #:nodoc:
-      !!@vcenter
-    end
-
-    def print_headers? #:nodoc:
-      !!@print_headers
-    end
-
-    def print_gridlines? #:nodoc:
-      !!@print_gridlines
-    end
-
-    def page_setup_changed? #:nodoc:
-      @print_style.page_setup_changed
-    end
-
-    def header_footer_changed? #:nodoc:
-      !!@header_footer_changed
     end
 
     def drawing? #:nodoc:
@@ -8179,32 +7475,6 @@ module Writexlsx
       else
         margin
       end
-    end
-
-    def print_across?
-      @print_style.across
-    end
-
-    # List of valid criteria types.
-    def valid_criteria_type  # :nodoc:
-      {
-        'between'                     => 'between',
-        'not between'                 => 'notBetween',
-        'equal to'                    => 'equal',
-        '='                           => 'equal',
-        '=='                          => 'equal',
-        'not equal to'                => 'notEqual',
-        '!='                          => 'notEqual',
-        '<>'                          => 'notEqual',
-        'greater than'                => 'greaterThan',
-        '>'                           => 'greaterThan',
-        'less than'                   => 'lessThan',
-        '<'                           => 'lessThan',
-        'greater than or equal to'    => 'greaterThanOrEqual',
-        '>='                          => 'greaterThanOrEqual',
-        'less than or equal to'       => 'lessThanOrEqual',
-        '<='                          => 'lessThanOrEqual'
-      }
     end
 
     def set_active_pane_and_cell_selections(row, col, top_row, left_col, active_cell, sqref) # :nodoc:
@@ -8244,16 +7514,6 @@ module Writexlsx
         raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
       end
       col
-    end
-
-    def convert_date_time_value(param, key)  # :nodoc:
-      if param[key] && param[key] =~ /T/
-        date_time = convert_date_time(param[key])
-        param[key] = date_time if date_time
-        date_time
-      else
-        true
-      end
     end
   end
 end
