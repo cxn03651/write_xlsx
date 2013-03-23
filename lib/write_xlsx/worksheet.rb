@@ -609,7 +609,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   set_column(firstcol, lastcol, width, format, hidden, level)
+    #   set_column(firstcol, lastcol, width, format, hidden, level, collapsed)
     #
     # This method can be used to change the default properties of a single
     # column or a range of columns. All parameters apart from +first_col+
@@ -711,7 +711,7 @@ module Writexlsx
       # Ensure 2nd col is larger than first. Also for KB918419 bug.
       firstcol, lastcol = lastcol, firstcol if firstcol > lastcol
 
-      width, format, hidden, level = data
+      width, format, hidden, level, collapsed = data
 
       # Check that cols are valid and store max and min values with default row.
       # NOTE: The check shouldn't modify the row dimensions and should only modify
@@ -732,7 +732,7 @@ module Writexlsx
       @outline_col_level = level if level > @outline_col_level
 
       # Store the column data.
-      @colinfo.push([firstcol, lastcol] + data)
+      @colinfo << [firstcol, lastcol, width, format, hidden, level, collapsed]
 
       # Store the column change to allow optimisations.
       @col_size_changed = 1
@@ -6516,14 +6516,18 @@ module Writexlsx
       return if @colinfo.empty?
 
       @writer.tag_elements('cols') do
-        @colinfo.each {|col_info| write_col_info(*col_info) }
+        @colinfo.each {|col_info| write_col_info(col_info) }
       end
     end
 
     #
     # Write the <col> element.
     #
-    def write_col_info(*args) #:nodoc:
+    def write_col_info(args) #:nodoc:
+      @writer.empty_tag('col', col_info_attributes(args))
+    end
+
+    def col_info_attributes(args)
       min    = args[0] || 0     # First formatted column.
       max    = args[1] || 0     # Last formatted column.
       width  = args[2]          # Col width in user units.
@@ -6552,13 +6556,12 @@ module Writexlsx
           'width', width
       ]
 
-      (attributes << 'style' << xf_index) if xf_index != 0
-      (attributes << 'hidden' << 1)       if hidden != 0
-      (attributes << 'customWidth' << 1)  if custom_width
-      (attributes << 'outlineLevel' << level) if level != 0
-      (attributes << 'collapsed'    << 1) if collapsed != 0
-
-      @writer.empty_tag('col', attributes)
+      attributes << 'style'        << xf_index if xf_index != 0
+      attributes << 'hidden'       << 1        if hidden != 0
+      attributes << 'customWidth'  << 1        if custom_width
+      attributes << 'outlineLevel' << level    if level != 0
+      attributes << 'collapsed'    << 1        if collapsed != 0
+      attributes
     end
 
     #
