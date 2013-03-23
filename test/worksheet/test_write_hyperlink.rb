@@ -10,28 +10,33 @@ class TestWriteHyperlink < Test::Unit::TestCase
   end
 
   def test_write_hyperlink_external
-    @worksheet.__send__('write_hyperlink_external', 0, 0, 1)
+    hyperlink = Writexlsx::Worksheet::Hyperlink.new('')
+    @worksheet.__send__('write_hyperlink_external', hyperlink, 0, 0, 1)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<hyperlink ref="A1" r:id="rId1"/>'
     assert_equal(expected, result)
   end
 
   def test_write_hyperlink_internal_sheet2
-    @worksheet.__send__('write_hyperlink_internal', 0, 0, 'Sheet2!A1', 'Sheet2!A1')
+    hyperlink = Writexlsx::Worksheet::Hyperlink.new('internal:Sheet2!A1', 'Sheet2!A1')
+    @worksheet.__send__('write_hyperlink_internal', hyperlink, 0, 0)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<hyperlink ref="A1" location="Sheet2!A1" display="Sheet2!A1"/>'
     assert_equal(expected, result)
   end
 
-  def test_write_hyperlink_internal_quated_sheet
-    @worksheet.__send__('write_hyperlink_internal', 4, 0, "'Data Sheet'!D5", "'Data Sheet'!D5")
+  def test_write_hyperlink_internal_quoted_sheet
+    hyperlink = Writexlsx::Worksheet::Hyperlink.new("internal:'Data Sheet'!D5", "'Data Sheet'!D5")
+    @worksheet.__send__('write_hyperlink_internal', hyperlink, 4, 0)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %q{<hyperlink ref="A5" location="'Data Sheet'!D5" display="'Data Sheet'!D5"/>}
     assert_equal(expected, result)
   end
 
   def test_write_hyperlink_internal_tooltip
-    @worksheet.__send__('write_hyperlink_internal', 17, 0, 'Sheet2!A1', 'Sheet2!A1', 'Screen Tip 1')
+    hyperlink = Writexlsx::Worksheet::Hyperlink.new('internal:Sheet2!A1', 'Sheet2!A1')
+    hyperlink.tip = 'Screen Tip 1'
+    @worksheet.__send__('write_hyperlink_internal', hyperlink, 17, 0)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<hyperlink ref="A18" location="Sheet2!A1" tooltip="Screen Tip 1" display="Sheet2!A1"/>'
     assert_equal(expected, result)

@@ -10,6 +10,7 @@ require 'write_xlsx/utility'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/worksheet/cell_data'
 require 'write_xlsx/worksheet/data_validation'
+require 'write_xlsx/worksheet/hyperlink'
 require 'write_xlsx/worksheet/page_setup'
 require 'tempfile'
 
@@ -2545,102 +2546,26 @@ module Writexlsx
       xf, str = str, xf if str.respond_to?(:xf_index) || !xf.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
-      link_type = 1
-
-      # Remove the URI scheme from internal links.
-      if url =~ /^internal:/
-        url = url.sub(/^internal:/, '')
-        link_type = 2
-      # Remove the URI scheme from external links.
-      elsif url =~ /^external:/
-        url = url.sub(/^external:/, '')
-        link_type = 3
-      end
-
-      # The displayed string defaults to the url string.
-      str ||= url.dup
-
-      # For external links change the directory separator from Unix to Dos.
-      if link_type == 3
-        url = url.gsub(%r|/|, '\\')
-        str.gsub!(%r|/|, '\\')
-      end
-
-      # Strip the mailto header.
-      str.sub!(/^mailto:/, '')
-
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # Copy string for use in hyperlink elements.
-      url_str = str.dup
+      hyperlink = Hyperlink.new(url, str)
+      hyperlink.tip = tip
 
-      # External links to URLs and to other Excel workbooks have slightly
-      # different characteristics that we have to account for.
-      if link_type == 1
-        # Escape URL unless it looks already escaped.
-        unless url =~ /%[0-9a-fA-F]{2}/
-          # Escape the URL escape symbol.
-          url = url.gsub(/%/, "%25")
-
-          # Escape whitespae in URL.
-          url = url.gsub(/[\s\x00]/, '%20')
-
-          # Escape other special characters in URL.
-          re = /(["<>\[\]`^{}])/
-          while re =~ url
-            match = $~[1]
-            url = url.sub(re, sprintf("%%%x", match.ord))
-          end
-        end
-
-        # Ordinary URL style external links don't have a "location" string.
-        url_str = nil
-      elsif link_type == 3
-        # External Workbook links need to be modified into the right format.
-        # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
-        # We need the part to the left of the # as the URL and the part to
-        # the right as the "location" string (if it exists).
-        url, url_str = url.split(/#/)
-
-        # Add the file:/// URI to the url if non-local.
-        if url =~ %r![:]! ||        # Windows style "C:/" link.
-            url =~ %r!^\\\\!        # Network share.
-          url = "file:///#{url}"
-        end
-
-        # Convert a ./dir/file.xlsx link to dir/file.xlsx.
-        url = url.sub(%r!^.\\!, '')
-
-        # Treat as a default external link now that the data has been modified.
-        link_type = 1
-      end
-
-      # Excel limits escaped URL to 255 characters.
-      if url.bytesize > 255
-        raise "URL '#{url}' > 255 characters, it exceeds Excel's limit for URLS."
-      end
-
-      # Check the limit of URLS per worksheet.
       @hlink_count += 1
 
       if @hlink_count > 65_530
-        raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
+        raise "URL '#{hyperlink.url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
       # Write the hyperlink string.
-      write_string(row, col, str, xf)
+      write_string(row, col, hyperlink.str, xf)
 
       # Store the hyperlink data in a separate structure.
       @hyperlinks      ||= {}
       @hyperlinks[row] ||= {}
-      @hyperlinks[row][col] = {
-        :_link_type => link_type,
-        :_url       => url,
-        :_str       => url_str,
-        :_tip       => tip
-      }
+      @hyperlinks[row][col] = hyperlink
     end
 
     #
@@ -6621,21 +6546,13 @@ module Writexlsx
     def write_hyperlinks #:nodoc:
       return unless @hyperlinks
 
-      # Sort the hyperlinks into row order.
-      row_nums = @hyperlinks.keys.sort
-
-      # Exit if there are no hyperlinks to process.
-      return if row_nums.empty?
-
-      # Iterate over the rows.
-      row_nums.each do |row_num|
+      @hyperlinks.keys.sort.each do |row_num|
         # Sort the hyperlinks into column order.
         col_nums = @hyperlinks[row_num].keys.sort
         # Iterate over the columns.
         col_nums.each do |col_num|
           # Get the link data for this cell.
-          link      = @hyperlinks[row_num][col_num]
-          link_type = link[:_link_type]
+          link = @hyperlinks[row_num][col_num]
 
           # If the cell isn't a string then we have to add the url as
           # the string to display
@@ -6643,29 +6560,19 @@ module Writexlsx
               ptrue?(@cell_data_table[row_num]) &&
               ptrue?(@cell_data_table[row_num][col_num])
             if @cell_data_table[row_num][col_num].display_url_string?
-              display = link[:_url]
-            else
-              display = nil
+              link.display = link.url_str
             end
           end
 
-          if link_type == 1
+          if link.link_type == 1
             # External link with rel file relationship.
             @rel_count += 1
-            @hlink_refs << [
-                            link_type, row_num, col_num,
-                            @rel_count, link[:_str], display, link[:_tip]
-                           ]
+            @hlink_refs << [link, row_num, col_num, @rel_count]
             # Links for use by the packager.
-            @external_hyper_links << [
-                                      '/hyperlink', link[:_url], 'External'
-                                     ]
+            @external_hyper_links << ['/hyperlink', link.url, 'External']
           else
             # Internal link with rel file relationship.
-            @hlink_refs << [
-                            link_type, row_num, col_num,
-                            link[:_url], link[:_str], link[:_tip]
-                           ]
+            @hlink_refs << [link, row_num, col_num]
           end
         end
       end
@@ -6675,12 +6582,11 @@ module Writexlsx
       # Write the hyperlink elements.
       @writer.tag_elements('hyperlinks') do
         @hlink_refs.each do |aref|
-          type, *args = aref
-
-          if type == 1
-            write_hyperlink_external(*args)
-          elsif type == 2
-            write_hyperlink_internal(*args)
+          case aref[0].link_type
+          when 1
+            write_hyperlink_external(*aref)
+          when 2
+            write_hyperlink_internal(*aref)
           end
         end
       end
@@ -6689,31 +6595,15 @@ module Writexlsx
     #
     # Write the <hyperlink> element for external links.
     #
-    def write_hyperlink_external(row, col, id, location = nil, display = nil, tooltip = nil) #:nodoc:
-      ref = xl_rowcol_to_cell(row, col)
-      r_id = "rId#{id}"
-
-      attributes = ['ref', ref, 'r:id', r_id]
-
-      attributes << 'location' << location  if location
-      attributes << 'display'  << display   if display
-      attributes << 'tooltip'  << tooltip   if tooltip
-
-      @writer.empty_tag('hyperlink', attributes)
+    def write_hyperlink_external(link, row, col, id)  # :nodoc:
+      @writer.empty_tag('hyperlink', link.write_external_attributes(row, col, id))
     end
 
     #
     # Write the <hyperlink> element for internal links.
     #
-    def write_hyperlink_internal(row, col, location, display, tooltip = nil) #:nodoc:
-      ref = xl_rowcol_to_cell(row, col)
-
-      attributes = ['ref', ref, 'location', location]
-
-      attributes << 'tooltip' << tooltip if tooltip
-      attributes << 'display' << display
-
-      @writer.empty_tag('hyperlink', attributes)
+    def write_hyperlink_internal(link, row, col)  #:nodoc:
+      @writer.empty_tag('hyperlink', link.write_internal_attributes(row, col))
     end
 
     #
