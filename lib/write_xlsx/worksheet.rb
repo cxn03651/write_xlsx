@@ -6055,12 +6055,12 @@ module Writexlsx
         position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing)
 
       # Convert the pixel values to EMUs. See above.
-      x1    *= 9_525
-      y1    *= 9_525
-      x2    *= 9_525
-      y2    *= 9_525
-      x_abs *= 9_525
-      y_abs *= 9_525
+      x1    = (0.5 + 9_525 * x1).to_i
+      y1    = (0.5 + 9_525 * y1).to_i
+      x2    = (0.5 + 9_525 * x2).to_i
+      y2    = (0.5 + 9_525 * y2).to_i
+      x_abs = (0.5 + 9_525 * x_abs).to_i
+      y_abs = (0.5 + 9_525 * y_abs).to_i
 
       [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
     end
