@@ -378,7 +378,7 @@ module Writexlsx
     # Returns a unique hash key for the Format object.
     #
     def get_format_key
-      [get_font_key, get_border_key, get_fill_key, @num_format, get_alignment_key].join(':')
+      [get_font_key, get_border_key, get_fill_key, get_alignment_key, @num_format, @locked, @hidden].join(':')
     end
 
     #
