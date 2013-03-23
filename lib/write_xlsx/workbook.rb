@@ -1130,7 +1130,7 @@ module Writexlsx
         attributes << 'tabRatio' << @tab_ratio
       end
       if @firstsheet > 0
-        attributes << 'firstSheet' << @firstsheet
+        attributes << 'firstSheet' << @firstsheet + 1
       end
       if @activesheet > 0
         attributes << 'activeTab' << @activesheet

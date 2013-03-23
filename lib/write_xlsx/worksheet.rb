@@ -515,7 +515,7 @@ module Writexlsx
     #
     def set_first_sheet
       @hidden = false
-      @workbook.firstsheet = self
+      @workbook.firstsheet = @index
     end
 
     #
