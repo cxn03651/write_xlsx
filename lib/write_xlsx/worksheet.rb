@@ -78,10 +78,10 @@ module Writexlsx
   # * set_landscape
   # * set_portrait
   # * set_page_view
-  # * set_paper
+  # * {paper=}[#method-i-paper-3D]
   # * center_horizontally
   # * center_vertically
-  # * set_margins
+  # * {margins=}[#method-i-margin-3D]
   # * set_header
   # * set_footer
   # * repeat_rows
@@ -91,8 +91,8 @@ module Writexlsx
   # * print_area
   # * print_across
   # * fit_to_pages
-  # * set_start_page
-  # * set_print_scale
+  # * {start_page=}[#method-i-start_page-3D]
+  # * {print_scale=}[#method-i-print_scale-3D]
   # * set_h_pagebreaks
   # * set_v_pagebreaks
   #

@@ -83,7 +83,7 @@ module Writexlsx
   # Creates a Bar style (transposed histogram) chart. See Writexlsx::Chart::Bar.
   #
   # ===column
-  # Creates a column style (histogram) chart. See Writexlsx::Chart::Column.
+  # Creates a Column style (histogram) chart. See Writexlsx::Chart::Column.
   #
   # ===line
   # Creates a Line style chart. See Writexlsx::Chart::Line.
