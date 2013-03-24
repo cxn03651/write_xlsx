@@ -172,65 +172,9 @@ module Writexlsx
       def write_fonts
         write_format_elements('fonts', @font_count) do
           @xf_formats.each do |format|
-            write_font(format) if format.has_font?
+            format.write_font(@writer, self) if format.has_font?
           end
         end
-      end
-
-      #
-      # Write the <font> element.
-      #
-      def write_font(format, dxf_format = nil)
-        @writer.tag_elements('font') do
-          # The condense and extend elements are mainly used in dxf formats.
-          write_condense unless format.font_condense == 0
-          write_extend   unless format.font_extend   == 0
-
-          @writer.empty_tag('b')       if format.bold?
-          @writer.empty_tag('i')       if format.italic?
-          @writer.empty_tag('strike')  if format.strikeout?
-          @writer.empty_tag('outline') if format.outline?
-          @writer.empty_tag('shadow')  if format.shadow?
-
-          # Handle the underline variants.
-          write_underline( format.underline ) if format.underline?
-
-          write_vert_align('superscript') if format.font_script == 1
-          write_vert_align('subscript')   if format.font_script == 2
-
-          @writer.empty_tag('sz', ['val', format.size]) if !dxf_format
-
-          theme = format.theme
-          if theme != 0
-            write_color('theme', theme)
-          elsif format.color_indexed != 0
-            write_color('indexed', format.color_indexed)
-          elsif format.color != 0
-            color = get_palette_color(format.color)
-            write_color('rgb', color)
-          elsif !dxf_format
-            write_color('theme', 1)
-          end
-
-          if !dxf_format
-            @writer.empty_tag('name',   ['val', format.font])
-            @writer.empty_tag('family', ['val', format.font_family])
-
-            if format.font == 'Calibri' && format.hyperlink == 0
-              @writer.empty_tag('scheme', ['val', format.font_scheme])
-            end
-          end
-        end
-      end
-
-      #
-      # _write_underline()
-      #
-      # Write the underline font element.
-      #
-      def write_underline(underline)
-        attributes = underline_attributes(underline)
-        @writer.empty_tag('u', attributes)
       end
 
       #
@@ -580,7 +524,7 @@ module Writexlsx
             # Write the font elements for format objects that have them.
             @dxf_formats.each do |format|
               @writer.tag_elements('dxf') do
-                write_font(format, 1) if format.has_dxf_font?
+                format.write_font(@writer, self, 1) if format.has_dxf_font?
 
                 if format.num_format_index != 0
                   write_num_fmt(format.num_format_index, format.num_format)

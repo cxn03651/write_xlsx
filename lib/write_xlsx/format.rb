@@ -735,20 +735,37 @@ module Writexlsx
       self.instance_variable_get("@#{attr}")
     end
 
-    def write_font(writer, worksheet) #:nodoc:
+    def write_font(writer, worksheet, dxf_format = nil) #:nodoc:
+      writer.tag_elements('font') do
+        # The condense and extend elements are mainly used in dxf formats.
+        write_condense(writer) if ptrue?(@font_condense)
+        write_extend(writer)   if ptrue?(@font_extend)
+
+        write_font_shapes(writer)
+
+        writer.empty_tag('sz', ['val', size]) unless dxf_format
+
+        if ptrue?(theme)
+          write_color(writer, 'theme', theme)
+        elsif ptrue?(@color_indexed)
+          write_color(writer, 'indexed', @color_indexed)
+        elsif ptrue?(@color)
+          color = worksheet.get_palette_color(@color)
+          write_color(writer, 'rgb', color)
+        elsif !ptrue?(dxf_format)
+          write_color(writer, 'theme', 1)
+        end
+
+        unless ptrue?(dxf_format)
+          writer.empty_tag('name',   ['val', @font])
+          write_font_family_scheme(writer)
+        end
+      end
+    end
+
+    def write_font_rpr(writer, worksheet) #:nodoc:
       writer.tag_elements('rPr') do
-        writer.empty_tag('b')       if bold?
-        writer.empty_tag('i')       if italic?
-        writer.empty_tag('strike')  if strikeout?
-        writer.empty_tag('outline') if outline?
-        writer.empty_tag('shadow')  if shadow?
-
-        # Handle the underline variants.
-        write_underline(writer, underline) if underline?
-
-        write_vert_align(writer, 'superscript') if font_script == 1
-        write_vert_align(writer, 'subscript')   if font_script == 2
-
+        write_font_shapes(writer)
         writer.empty_tag('sz', ['val', size])
 
         if ptrue?(theme)
@@ -760,12 +777,57 @@ module Writexlsx
           write_color(writer, 'theme', 1)
         end
 
-        writer.empty_tag('rFont',  ['val', font])
-        writer.empty_tag('family', ['val', font_family])
+        writer.empty_tag('rFont',  ['val', @font])
+        write_font_family_scheme(writer)
+      end
+    end
 
-        if font == 'Calibri' && hyperlink == 0
-          writer.empty_tag('scheme', ['val', font_scheme])
-        end
+    private
+
+    def write_font_shapes(writer)
+      writer.empty_tag('b')       if bold?
+      writer.empty_tag('i')       if italic?
+      writer.empty_tag('strike')  if strikeout?
+      writer.empty_tag('outline') if outline?
+      writer.empty_tag('shadow')  if shadow?
+
+      # Handle the underline variants.
+      write_underline(writer, underline) if underline?
+
+      write_vert_align(writer, 'superscript') if font_script == 1
+      write_vert_align(writer, 'subscript')   if font_script == 2
+    end
+
+    def write_font_family_scheme(writer)
+      writer.empty_tag('family', ['val', @font_family])
+
+      if @font == 'Calibri' && !ptrue?(@hyperlink)
+        writer.empty_tag('scheme', ['val', @font_scheme])
+      end
+    end
+
+    #
+    # Write the underline font element.
+    #
+    def write_underline(writer, underline)
+      writer.empty_tag('u', write_underline_attributes(underline))
+    end
+
+    #
+    # Write the underline font element.
+    #
+    def write_underline_attributes(underline)
+      val = 'val'
+      # Handle the underline variants.
+      case underline
+      when 2
+        [val, 'double']
+      when 33
+        [val, 'singleAccounting']
+      when 34
+        [val, 'doubleAccounting']
+      else
+        []
       end
     end
 
@@ -774,6 +836,20 @@ module Writexlsx
     #
     def write_vert_align(writer, val) #:nodoc:
       writer.empty_tag('vertAlign', ['val', val])
+    end
+
+    #
+    # Write the <condense> element.
+    #
+    def write_condense(writer)
+      writer.empty_tag('condense', ['val', 0])
+    end
+
+    #
+    # Write the <extend> element.
+    #
+    def write_extend(writer)
+      writer.empty_tag('extend', ['val', 0])
     end
   end
 end

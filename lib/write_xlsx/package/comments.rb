@@ -419,11 +419,7 @@ module Writexlsx
       # Write the <color> element.
       #
       def write_color
-        indexed = 81
-
-        attributes = ['indexed', indexed]
-
-        @writer.empty_tag('color', attributes)
+        @writer.empty_tag('color', ['indexed', 81])
       end
 
       #

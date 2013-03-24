@@ -5824,7 +5824,7 @@ module Writexlsx
         if token.respond_to?(:xf_index)
           # Write the font run.
           writer.start_tag('r')
-          token.write_font(writer, self)
+          token.write_font_rpr(writer, self)
         else
           # Write the string fragment part, with whitespace handling.
           attributes = []
