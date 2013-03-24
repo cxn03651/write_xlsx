@@ -75,6 +75,11 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-03-23 v0.65.1
+   Bug fix for non-integer image scaling.
+   Bug fix in Worksheet#set_first_sheet
+   Bug fix in Worksheet#start_page=()
+
 2013-03-23 v0.65.0
    Added options to format series Gap/Overlap for Bar/Column charts.
 
