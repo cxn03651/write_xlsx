@@ -3,6 +3,8 @@
 module Writexlsx
   class Worksheet
     class PageSetup # :nodoc:
+      include Writexlsx::Utility
+
       attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
       attr_accessor :margin_header, :margin_footer                            # :nodoc:
       attr_accessor :repeat_rows, :repeat_cols, :print_area                   # :nodoc:
@@ -11,6 +13,7 @@ module Writexlsx
       attr_writer :across                                                   # :nodoc:
       attr_accessor :orientation, :print_options_changed  # :nodoc:
       attr_accessor :header, :footer, :header_footer_changed
+      attr_writer :page_start
 
       def initialize # :nodoc:
         @margin_left = 0.7
@@ -80,6 +83,7 @@ module Writexlsx
       #     fitToHeight="2"
       #     pageOrder="overThenDown"
       #     orientation="portrait"
+      #     useFirstPageNumber="1"
       #     blackAndWhite="1"
       #     draft="1"
       #     horizontalDpi="200"
@@ -102,6 +106,7 @@ module Writexlsx
         else
           attributes << 'landscape'
         end
+        attributes << 'useFirstPageNumber' << @page_start if ptrue?(@page_start)
 
         writer.empty_tag('pageSetup', attributes)
       end

@@ -1589,18 +1589,20 @@ module Writexlsx
     end
 
     #
-    # Not implememt yet.
-    #--
-    # The set_start_page() method is used to set the number of the
+    # The start_page=() method is used to set the number of the
     # starting page when the worksheet is printed out.
     # The default value is 1.
     #
     #     worksheet.set_start_page(2)
-    #++
     #
-    def set_start_page(page_start)
-      @page_start   = page_start
+    def start_page=(page_start)
+      @page_setup.page_start = page_start
       @custom_start = 1
+    end
+
+    def set_start_page(page_start)
+      put_deprecate_message("#{self}.set_start_page")
+      self::start_page = page_start
     end
 
     #
