@@ -245,31 +245,29 @@ module Writexlsx
       write_xml_declaration
 
       # Write the root workbook element.
-      write_workbook
+      write_workbook do
 
-      # Write the XLSX file version.
-      write_file_version
+        # Write the XLSX file version.
+        write_file_version
 
-      # Write the workbook properties.
-      write_workbook_pr
+        # Write the workbook properties.
+        write_workbook_pr
 
-      # Write the workbook view properties.
-      write_book_views
+        # Write the workbook view properties.
+        write_book_views
 
-      # Write the worksheet names and ids.
-      @worksheets.write_sheets(@writer)
+        # Write the worksheet names and ids.
+        @worksheets.write_sheets(@writer)
 
-      # Write the workbook defined names.
-      write_defined_names
+        # Write the workbook defined names.
+        write_defined_names
 
-      # Write the workbook calculation properties.
-      write_calc_pr
+        # Write the workbook calculation properties.
+        write_calc_pr
 
-      # Write the workbook extension storage.
-      #write_ext_lst
-
-      # Close the workbook tag.
-      write_workbook_end
+        # Write the workbook extension storage.
+        #write_ext_lst
+      end
 
       # Close the XML writer object and filehandle.
       @writer.crlf
@@ -1091,11 +1089,9 @@ module Writexlsx
         'xmlns:r',
         schema + '/officeDocument/2006/relationships'
       ]
-      @writer.start_tag('workbook', attributes)
-    end
-
-    def write_workbook_end #:nodoc:
-      @writer.end_tag('workbook')
+      @writer.tag_elements('workbook', attributes) do
+        yield
+      end
     end
 
     def write_file_version #:nodoc:
