@@ -5463,10 +5463,6 @@ module Writexlsx
       self.comments_author = author
     end
 
-    def comments_count # :nodoc:
-      @comments.size
-    end
-
     def has_vml?  # :nodoc:
       @has_vml
     end
@@ -5662,7 +5658,7 @@ module Writexlsx
       !!@comments_visible
     end
 
-    def comments_array # :nodoc:
+    def sorted_comments # :nodoc:
       @comments.sorted_comments
     end
 
@@ -5735,27 +5731,20 @@ module Writexlsx
     # and set the external links for comments and buttons.
     #
     def prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
-      @external_vml_links <<
-        [ '/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
-
-      if has_comments?
-        @comments_array = @comments.sorted_comments
-        @external_comment_links <<
-          [ '/comments', "../comments#{comment_id}.xml" ]
-      end
-
-      count         = @comments.size
-      start_data_id = vml_data_id
+      set_external_vml_links(comment_id)
+      set_external_comment_links(comment_id) if has_comments?
 
       # The VML o:idmap data id contains a comma separated range when there is
       # more than one 1024 block of comments, like this: data="1,2".
-      (1 .. (count / 1024)).each do |i|
-        vml_data_id = "#{vml_data_id},#{start_data_id + i}"
+      (1 .. num_comments_block).each do |i|
+        vml_data_id = "#{vml_data_id},#{vml_data_id + i}"
       end
       @vml_data_id = vml_data_id
       @vml_shape_id = vml_shape_id
+    end
 
-      count
+    def num_comments_block
+      @comments.size / 1024
     end
 
     def tables_count

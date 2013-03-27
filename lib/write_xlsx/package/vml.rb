@@ -33,9 +33,9 @@ module Writexlsx
               write_button_shapetype
             end
           end
-          unless worksheet.comments_array.empty?
+          unless worksheet.sorted_comments.empty?
             write_shape_type_and_shape(
-                                       worksheet.comments_array,
+                                       worksheet.sorted_comments,
                                        vml_shape_id, z_index) do
               write_comment_shapetype
             end

@@ -1430,30 +1430,28 @@ module Writexlsx
     # the named ranges for App.xml.
     #
     def prepare_defined_names #:nodoc:
-      defined_names =  @defined_names
-
       @worksheets.each do |sheet|
         # Check for Print Area settings.
         if sheet.autofilter_area
-          range  = sheet.autofilter_area
-          hidden = 1
-
-          # Store the defined names.
-          defined_names << ['_xlnm._FilterDatabase', sheet.index, range, hidden]
+          @defined_names << [
+                             '_xlnm._FilterDatabase',
+                             sheet.index,
+                             sheet.autofilter_area,
+                             1
+                            ]
         end
 
         # Check for Print Area settings.
         if !sheet.print_area.empty?
-          range = sheet.print_area
-
-          # Store the defined names.
-          defined_names << ['_xlnm.Print_Area', sheet.index, range]
+          @defined_names << [
+                             '_xlnm.Print_Area',
+                             sheet.index,
+                             sheet.print_area
+                            ]
         end
 
         # Check for repeat rows/cols. aka, Print Titles.
         if !sheet.print_repeat_cols.empty? || !sheet.print_repeat_rows.empty?
-          range = ''
-
           if !sheet.print_repeat_cols.empty? && !sheet.print_repeat_rows.empty?
             range = sheet.print_repeat_cols + ',' + sheet.print_repeat_rows
           else
@@ -1461,48 +1459,43 @@ module Writexlsx
           end
 
           # Store the defined names.
-          defined_names << ['_xlnm.Print_Titles', sheet.index, range]
+          @defined_names << ['_xlnm.Print_Titles', sheet.index, range]
         end
       end
 
-      defined_names  = sort_defined_names(defined_names)
-      @defined_names = defined_names
-      @named_ranges  = extract_named_ranges(defined_names)
+      @defined_names  = sort_defined_names(@defined_names)
+      @named_ranges  = extract_named_ranges(@defined_names)
     end
 
     #
     # Iterate through the worksheets and set up the VML objects.
     #
     def prepare_vml_objects  #:nodoc:
-      comment_id    = 0
       vml_data_id   = 1
       vml_shape_id  = 1024
 
-      @worksheets.each do |sheet|
-        next unless sheet.has_vml?
-
-        comment_id += 1
-        count = sheet.prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
+      @worksheets.select { |sheet| sheet.has_vml? }.each_with_index do |sheet, index|
+        sheet.prepare_vml_objects(vml_data_id, vml_shape_id, index + 1)
 
         # Each VML file should start with a shape id incremented by 1024.
-        vml_data_id  +=    1 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
-        vml_shape_id += 1024 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
+        vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
+        vml_shape_id += 1024 * ( 1 + sheet.num_comments_block )
       end
 
-      # Add a font format for cell comments.
-      if num_comment_files > 0
-        format = Format.new(
-            @formats,
-            :font          => 'Tahoma',
-            :size          => 8,
-            :color_indexed => 81,
-            :font_only     => 1
-        )
+      add_font_format_for_cell_comments if num_comment_files > 0
+    end
 
-        format.get_xf_index
+    def add_font_format_for_cell_comments
+      format = Format.new(
+                          @formats,
+                          :font          => 'Tahoma',
+                          :size          => 8,
+                          :color_indexed => 81,
+                          :font_only     => 1
+                          )
 
-        @formats.formats << format
-      end
+      format.get_xf_index
+      @formats.formats << format
     end
 
     #
