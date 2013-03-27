@@ -41,7 +41,7 @@ module Writexlsx
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
     attr_reader :worksheets, :charts, :drawings  # :nodoc:
-    attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
+    attr_reader :num_comment_files, :named_ranges   # :nodoc:
     attr_reader :doc_properties  # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
     attr_reader :shared_strings  # :nodoc:
@@ -111,7 +111,6 @@ module Writexlsx
       @custom_colors       = []
       @doc_properties      = {}
       @local_time          = Time.now
-      @num_vml_files       = 0
       @num_comment_files   = 0
       @optimization        = 0
       @x_window            = 240
@@ -949,6 +948,10 @@ module Writexlsx
       ]
     end
 
+    def num_vml_files
+      @worksheets.select { |sheet| sheet.has_vml? }.count
+    end
+
     private
 
     def setup_filename(file) #:nodoc:
@@ -1471,12 +1474,10 @@ module Writexlsx
       comment_id    = 0
       vml_data_id   = 1
       vml_shape_id  = 1024
-      vml_files     = 0
       comment_files = 0
 
       @worksheets.each do |sheet|
         next unless sheet.has_vml?
-        vml_files += 1
         comment_files += 1 if sheet.has_comments?
 
         comment_id += 1
@@ -1487,7 +1488,6 @@ module Writexlsx
         vml_shape_id += 1024 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
       end
 
-      @num_vml_files     = vml_files
       @num_comment_files = comment_files
 
       # Add a font format for cell comments.
@@ -1569,7 +1569,6 @@ module Writexlsx
         end
       end
     end
-    private :chart_data
 
     #
     # Sort internal and user defined names in the same order as used by Excel.
