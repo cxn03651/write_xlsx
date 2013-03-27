@@ -1150,18 +1150,15 @@ module Writexlsx
     end
 
     def write_ext_lst #:nodoc:
-      tag = 'extLst'
-      @writer.tag_elements(tag) { write_ext }
+      @writer.tag_elements('extLst') { write_ext }
     end
 
     def write_ext #:nodoc:
-      tag = 'ext'
-      uri = "#{OFFICE_URL}mac/excel/2008/main"
       attributes = [
-        'xmlns:mx', uri,
+        'xmlns:mx', "#{OFFICE_URL}mac/excel/2008/main",
         'uri', uri
       ]
-      @writer.tag_elements(tag, attributes) { write_mx_arch_id }
+      @writer.tag_elements('ext', attributes) { write_mx_arch_id }
     end
 
     def write_mx_arch_id #:nodoc:
@@ -1170,14 +1167,13 @@ module Writexlsx
 
     def write_defined_names #:nodoc:
       return if @defined_names.nil? || @defined_names.empty?
-      tag = 'definedNames'
-      @writer.tag_elements(tag) do
+      @writer.tag_elements('definedNames') do
         @defined_names.each { |defined_name| write_defined_name(defined_name) }
       end
     end
 
-    def write_defined_name(data) #:nodoc:
-      name, id, range, hidden = data
+    def write_defined_name(defined_name) #:nodoc:
+      name, id, range, hidden = defined_name
 
       attributes = ['name', name]
       attributes << 'localSheetId' << "#{id}" unless id == -1
