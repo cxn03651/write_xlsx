@@ -119,14 +119,7 @@ module Writexlsx
     #            nil if the date is invalid.
     #
     def convert_date_time(date_time_string)       #:nodoc:
-      date_time = date_time_string
-
-      days      = 0 # Number of days since epoch
-      seconds   = 0 # Time expressed as fraction of 24h hours in seconds
-
-      # Strip leading and trailing whitespace.
-      date_time.sub!(/^\s+/, '')
-      date_time.sub!(/\s+$/, '')
+      date_time = date_time_string.sub(/^\s+/, '').sub(/\s+$/, '').sub(/Z$/, '')
 
       # Check for invalid date char.
       return nil if date_time =~ /[^0-9T:\-\.Z]/
@@ -134,8 +127,8 @@ module Writexlsx
       # Check for "T" after date or before time.
       return nil unless date_time =~ /\dT|T\d/
 
-      # Strip trailing Z in ISO8601 date.
-      date_time.sub!(/Z$/, '')
+      days      = 0 # Number of days since epoch
+      seconds   = 0 # Time expressed as fraction of 24h hours in seconds
 
       # Split into date and time.
       date, time = date_time.split(/T/)
