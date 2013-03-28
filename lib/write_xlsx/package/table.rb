@@ -24,8 +24,6 @@ module Writexlsx
         end
       end
 
-#      attr_reader :id
-
       def initialize(worksheet, id, *args)
         @worksheet = worksheet
         @writer  = Package::XMLWriterSimple.new
@@ -204,25 +202,15 @@ module Writexlsx
       def handle_the_column_formula(col_data, col_num, formula, format)
         return unless formula
 
-        # Remove the leading = from formula.
-        formula.sub!(/^=/, '')
-        # Covert Excel 2010 "@" ref to 2007 "#This Row".
-        formula.gsub!(/@/,'[#This Row],')
-
-        col_data.formula = formula
+        col_data.formula = formula.sub(/^=/, '').gsub(/@/,'[#This Row],')
 
         (@first_data_row..@last_data_row).each do |row|
-          @worksheet.write_formula(row, col_num, formula, format)
+          @worksheet.write_formula(row, col_num, col_data.formula, format)
         end
       end
 
       def handle_the_function_for_the_table_row(row2, col_data, col_num, total_function, format)
-        function = total_function
-
-        # Massage the function name.
-        function = function.downcase
-        function.gsub!(/_/, '')
-        function.gsub!(/\s/,'')
+        function = total_function.downcase.gsub(/[_\s]/, '')
 
         function = 'countNums' if function == 'countnums'
         function = 'stdDev'    if function == 'stddev'
@@ -272,9 +260,7 @@ module Writexlsx
 
       def set_the_table_style
         if @param[:style]
-          @style = @param[:style]
-          # Remove whitespace from style name.
-          @style.gsub!(/\s/, '')
+          @style = @param[:style].gsub(/\s/, '')
         else
           @style = "TableStyleMedium9"
         end
