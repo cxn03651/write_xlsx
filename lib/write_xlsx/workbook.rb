@@ -693,10 +693,6 @@ module Writexlsx
     def define_name(name, formula)
       sheet_index = nil
       sheetname   = ''
-      full_name   = name
-
-      # Remove the = sign from the formula if it exists.
-      formula.sub!(/^=/, '')
 
       # Local defined names are formatted like "Sheet1!name".
       if name =~ /^(.*)!(.*)$/
@@ -722,7 +718,7 @@ module Writexlsx
         raise "Invalid name '#{name}' looks like a cell name in defined_name()\n"
       end
 
-      @defined_names.push([ name, sheet_index, formula])
+      @defined_names.push([ name, sheet_index, formula.sub(/^=/, '') ])
     end
 
     #
