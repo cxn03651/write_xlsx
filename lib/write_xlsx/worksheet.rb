@@ -6582,14 +6582,10 @@ module Writexlsx
 
         # Write the cells if the row contains data.
         if @cell_data_table[row_num]
-          if !@set_rows[row_num]
-            write_row_element(row_num, span)
-          else
-            write_row_element(row_num, span, *(@set_rows[row_num]))
+          args = @set_rows[row_num] || []
+          write_row_element(row_num, span, *args) do
+            write_cell_column_dimension(row_num)
           end
-
-          write_cell_column_dimension(row_num)
-          @writer.end_tag('row')
         elsif @comments[row_num]
           write_empty_row(row_num, span, *(@set_rows[row_num]))
         else
@@ -6646,12 +6642,24 @@ module Writexlsx
     #
     # Write the <row> element.
     #
-    def write_row_element(r, spans = nil, height = nil, format = nil, hidden = false, level = 0, collapsed = false, empty_row = false) #:nodoc:
+    def write_row_element(*args)  # :nodoc:
+      @writer.tag_elements('row', row_attributes(args)) do
+        yield
+      end
+    end
+
+    #
+    # Write and empty <row> element, i.e., attributes only, no cell data.
+    #
+    def write_empty_row(*args) #:nodoc:
+      @writer.empty_tag('row', row_attributes(args))
+    end
+
+    def row_attributes(args)
+      r, spans, height, format, hidden, level, collapsed, empty_row = args
       height    ||= @default_row_height
       hidden    ||= 0
       level     ||= 0
-      collapsed ||= 0
-      empty_row ||= 0
       xf_index = format ? format.get_xf_index : 0
 
       attributes = ['r',  r + 1]
@@ -6668,20 +6676,7 @@ module Writexlsx
       if @excel_version == 2010
         attributes << 'x14ac:dyDescent' << '0.25'
       end
-      if ptrue?(empty_row)
-        @writer.empty_tag('row', attributes)
-      else
-        @writer.start_tag('row', attributes)
-      end
-    end
-
-    #
-    # Write and empty <row> element, i.e., attributes only, no cell data.
-    #
-    def write_empty_row(*args) #:nodoc:
-        new_args = args.dup
-        new_args[7] = 1
-        write_row_element(*new_args)
+      attributes
     end
 
     #
