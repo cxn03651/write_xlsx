@@ -367,24 +367,21 @@ module Writexlsx
 
       @writer.tag_elements('a:graphicData', attributes) do
         # Write the c:chart element.
-        write_c_chart("rId#{index}")
+        write_c_chart(index)
       end
     end
 
     #
     # Write the <c:chart> element.
     #
-    def write_c_chart(r_id)
+    def write_c_chart(id)
       schema  = 'http://schemas.openxmlformats.org/'
       xmlns_c = "#{schema}drawingml/2006/chart"
       xmlns_r = "#{schema}officeDocument/2006/relationships"
 
 
-      attributes = [
-        'xmlns:c', xmlns_c,
-        'xmlns:r', xmlns_r,
-        'r:id',    r_id
-      ]
+      attributes = ['xmlns:c', xmlns_c, 'xmlns:r', xmlns_r]
+      attributes += r_id_attributes(id)
 
       @writer.empty_tag('c:chart', attributes)
     end

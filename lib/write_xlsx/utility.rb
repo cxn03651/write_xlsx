@@ -495,5 +495,9 @@ module Writexlsx
 
       @writer.empty_tag('v:stroke', attributes)
     end
+
+    def r_id_attributes(id)
+      ['r:id', "rId#{id}"]
+    end
   end
 end

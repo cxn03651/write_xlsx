@@ -216,7 +216,7 @@ module Writexlsx
       if sheet.hidden?
         attributes << 'state' << 'hidden'
       end
-      attributes << 'r:id' << "rId#{sheet_id}"
+      attributes += r_id_attributes(sheet_id)
       writer.empty_tag_encoded('sheet', attributes)
     end
   end

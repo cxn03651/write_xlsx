@@ -7137,10 +7137,9 @@ module Writexlsx
     # Write the <outlinePr> element.
     #
     def write_outline_pr
-      attributes = []
-
       return unless outline_changed?
 
+      attributes = []
       attributes << "applyStyles"  << 1 if @outline_style != 0
       attributes << "summaryBelow" << 0 if @outline_below == 0
       attributes << "summaryRight" << 0 if @outline_right == 0
@@ -7217,7 +7216,7 @@ module Writexlsx
     # Write the <tablePart> element.
     #
     def write_table_part(id)
-      @writer.empty_tag('tablePart', ['r:id', "rId#{id}"])
+      @writer.empty_tag('tablePart', r_id_attributes(id))
     end
 
     def increment_rel_id_and_write_r_id(tag)
@@ -7226,7 +7225,7 @@ module Writexlsx
     end
 
     def write_r_id(tag, id)
-      @writer.empty_tag(tag, ['r:id', "rId#{id}"])
+      @writer.empty_tag(tag, r_id_attributes(id))
     end
 
     #
