@@ -6595,40 +6595,6 @@ module Writexlsx
       end
     end
 
-    #
-    # Write out the worksheet data as a single row with cells. This method is
-    # used when memory optimisation is on. A single row is written and the data
-    # table is reset. That way only one row of data is kept in memory at any one
-    # time. We don't write span data in the optimised case since it is optional.
-    #
-    def write_single_row(current_row = 0) #:nodoc:
-      row_num     = @previous_row
-
-      # Set the new previous row as the current row.
-      @previous_row = current_row
-
-      # Skip row if it doesn't contain row formatting, cell data or a comment.
-      return not_contain_formatting_or_data?(row_num)
-
-      # Write the cells if the row contains data.
-      if @cell_data_table[row_num]
-        if !@set_rows[row_num]
-          write_row(row_num)
-        else
-          write_row(row_num, nil, @set_rows[row_num])
-        end
-
-        write_cell_column_dimension(row_num)
-        @writer.end_tag('row')
-      else
-        # Row attributes or comments only.
-        write_empty_row(row_num, nil, @set_rows[row_num])
-      end
-
-      # Reset table.
-      @cell_data_table = {}
-    end
-
     def not_contain_formatting_or_data?(row_num) # :nodoc:
       !@set_rows[row_num] && !@cell_data_table[row_num] && !@comments.has_comment_in_row?(row_num)
     end
