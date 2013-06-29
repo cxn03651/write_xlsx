@@ -90,7 +90,8 @@ module Writexlsx
       def write_external_attributes(row, col, id)
         ref = xl_rowcol_to_cell(row, col)
 
-        attributes = ['ref', ref, 'r:id', "rId#{id}"]
+        attributes = ['ref', ref]
+        attributes += r_id_attributes(id)
 
         attributes << 'location' << url_str if url_str
         attributes << 'display'  << display if display

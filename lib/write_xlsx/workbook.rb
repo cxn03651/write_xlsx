@@ -41,7 +41,7 @@ module Writexlsx
     attr_writer :firstsheet  # :nodoc:
     attr_reader :palette  # :nodoc:
     attr_reader :worksheets, :charts, :drawings  # :nodoc:
-    attr_reader :num_comment_files, :num_vml_files, :named_ranges  # :nodoc:
+    attr_reader :named_ranges   # :nodoc:
     attr_reader :doc_properties  # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
     attr_reader :shared_strings  # :nodoc:
@@ -111,8 +111,6 @@ module Writexlsx
       @custom_colors       = []
       @doc_properties      = {}
       @local_time          = Time.now
-      @num_vml_files       = 0
-      @num_comment_files   = 0
       @optimization        = 0
       @x_window            = 240
       @y_window            = 15
@@ -247,31 +245,29 @@ module Writexlsx
       write_xml_declaration
 
       # Write the root workbook element.
-      write_workbook
+      write_workbook do
 
-      # Write the XLSX file version.
-      write_file_version
+        # Write the XLSX file version.
+        write_file_version
 
-      # Write the workbook properties.
-      write_workbook_pr
+        # Write the workbook properties.
+        write_workbook_pr
 
-      # Write the workbook view properties.
-      write_book_views
+        # Write the workbook view properties.
+        write_book_views
 
-      # Write the worksheet names and ids.
-      @worksheets.write_sheets(@writer)
+        # Write the worksheet names and ids.
+        @worksheets.write_sheets(@writer)
 
-      # Write the workbook defined names.
-      write_defined_names
+        # Write the workbook defined names.
+        write_defined_names
 
-      # Write the workbook calculation properties.
-      write_calc_pr
+        # Write the workbook calculation properties.
+        write_calc_pr
 
-      # Write the workbook extension storage.
-      #write_ext_lst
-
-      # Close the workbook tag.
-      write_workbook_end
+        # Write the workbook extension storage.
+        #write_ext_lst
+      end
 
       # Close the XML writer object and filehandle.
       @writer.crlf
@@ -655,7 +651,7 @@ module Writexlsx
     # This is not very useful for inserting multiple shapes,
     # since the x/y coordinates also gets modified.
     #
-    def add_shape(properties)
+    def add_shape(properties = {})
       shape = Shape.new(properties)
       shape.palette = @palette
 
@@ -945,6 +941,14 @@ module Writexlsx
       ]
     end
 
+    def num_vml_files
+      @worksheets.select { |sheet| sheet.has_vml? }.count
+    end
+
+    def num_comment_files
+      @worksheets.select { |sheet| sheet.has_comments? }.count
+    end
+
     private
 
     def setup_filename(file) #:nodoc:
@@ -1081,11 +1085,9 @@ module Writexlsx
         'xmlns:r',
         schema + '/officeDocument/2006/relationships'
       ]
-      @writer.start_tag('workbook', attributes)
-    end
-
-    def write_workbook_end #:nodoc:
-      @writer.end_tag('workbook')
+      @writer.tag_elements('workbook', attributes) do
+        yield
+      end
     end
 
     def write_file_version #:nodoc:
@@ -1140,18 +1142,15 @@ module Writexlsx
     end
 
     def write_ext_lst #:nodoc:
-      tag = 'extLst'
-      @writer.tag_elements(tag) { write_ext }
+      @writer.tag_elements('extLst') { write_ext }
     end
 
     def write_ext #:nodoc:
-      tag = 'ext'
-      uri = "#{OFFICE_URL}mac/excel/2008/main"
       attributes = [
-        'xmlns:mx', uri,
+        'xmlns:mx', "#{OFFICE_URL}mac/excel/2008/main",
         'uri', uri
       ]
-      @writer.tag_elements(tag, attributes) { write_mx_arch_id }
+      @writer.tag_elements('ext', attributes) { write_mx_arch_id }
     end
 
     def write_mx_arch_id #:nodoc:
@@ -1160,14 +1159,13 @@ module Writexlsx
 
     def write_defined_names #:nodoc:
       return if @defined_names.nil? || @defined_names.empty?
-      tag = 'definedNames'
-      @writer.tag_elements(tag) do
+      @writer.tag_elements('definedNames') do
         @defined_names.each { |defined_name| write_defined_name(defined_name) }
       end
     end
 
-    def write_defined_name(data) #:nodoc:
-      name, id, range, hidden = data
+    def write_defined_name(defined_name) #:nodoc:
+      name, id, range, hidden = defined_name
 
       attributes = ['name', name]
       attributes << 'localSheetId' << "#{id}" unless id == -1
@@ -1420,30 +1418,28 @@ module Writexlsx
     # the named ranges for App.xml.
     #
     def prepare_defined_names #:nodoc:
-      defined_names =  @defined_names
-
       @worksheets.each do |sheet|
         # Check for Print Area settings.
         if sheet.autofilter_area
-          range  = sheet.autofilter_area
-          hidden = 1
-
-          # Store the defined names.
-          defined_names << ['_xlnm._FilterDatabase', sheet.index, range, hidden]
+          @defined_names << [
+                             '_xlnm._FilterDatabase',
+                             sheet.index,
+                             sheet.autofilter_area,
+                             1
+                            ]
         end
 
         # Check for Print Area settings.
         if !sheet.print_area.empty?
-          range = sheet.print_area
-
-          # Store the defined names.
-          defined_names << ['_xlnm.Print_Area', sheet.index, range]
+          @defined_names << [
+                             '_xlnm.Print_Area',
+                             sheet.index,
+                             sheet.print_area
+                            ]
         end
 
         # Check for repeat rows/cols. aka, Print Titles.
         if !sheet.print_repeat_cols.empty? || !sheet.print_repeat_rows.empty?
-          range = ''
-
           if !sheet.print_repeat_cols.empty? && !sheet.print_repeat_rows.empty?
             range = sheet.print_repeat_cols + ',' + sheet.print_repeat_rows
           else
@@ -1451,55 +1447,49 @@ module Writexlsx
           end
 
           # Store the defined names.
-          defined_names << ['_xlnm.Print_Titles', sheet.index, range]
+          @defined_names << ['_xlnm.Print_Titles', sheet.index, range]
         end
       end
 
-      defined_names  = sort_defined_names(defined_names)
-      @defined_names = defined_names
-      @named_ranges  = extract_named_ranges(defined_names)
+      @defined_names  = sort_defined_names(@defined_names)
+      @named_ranges  = extract_named_ranges(@defined_names)
     end
 
     #
     # Iterate through the worksheets and set up the VML objects.
     #
     def prepare_vml_objects  #:nodoc:
-      comment_id    = 0
-      vml_data_id   = 1
-      vml_shape_id  = 1024
-      vml_files     = 0
-      comment_files = 0
+      comment_id     = 0
+      vml_drawing_id = 0
+      vml_data_id    = 1
+      vml_shape_id   = 1024
 
-      @worksheets.each do |sheet|
-        next unless sheet.has_vml?
-        vml_files += 1
-        comment_files += 1 if sheet.has_comments?
+      @worksheets.select { |sheet| sheet.has_vml? }.each do |sheet|
+        comment_id += 1 if sheet.has_comments?
+        vml_drawing_id += 1
 
-        comment_id += 1
-        count = sheet.prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
+        sheet.prepare_vml_objects(vml_data_id, vml_shape_id,
+                                  vml_drawing_id, comment_id)
 
         # Each VML file should start with a shape id incremented by 1024.
-        vml_data_id  +=    1 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
-        vml_shape_id += 1024 * ( ( 1024 + sheet.comments_count ) / 1024.0 ).to_i
+        vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
+        vml_shape_id += 1024 * ( 1 + sheet.num_comments_block )
       end
 
-      @num_vml_files     = vml_files
-      @num_comment_files = comment_files
+      add_font_format_for_cell_comments if num_comment_files > 0
+    end
 
-      # Add a font format for cell comments.
-      if comment_files > 0
-        format = Format.new(
-            @formats,
-            :font          => 'Tahoma',
-            :size          => 8,
-            :color_indexed => 81,
-            :font_only     => 1
-        )
+    def add_font_format_for_cell_comments
+      format = Format.new(
+                          @formats,
+                          :font          => 'Tahoma',
+                          :size          => 8,
+                          :color_indexed => 81,
+                          :font_only     => 1
+                          )
 
-        format.get_xf_index
-
-        @formats.formats << format
-      end
+      format.get_xf_index
+      @formats.formats << format
     end
 
     #
@@ -1565,7 +1555,6 @@ module Writexlsx
         end
       end
     end
-    private :chart_data
 
     #
     # Sort internal and user defined names in the same order as used by Excel.

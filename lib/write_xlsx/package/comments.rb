@@ -263,18 +263,21 @@ module Writexlsx
       end
 
       def sorted_comments
-        @sorted_comments = []
-        # We sort the comments by row and column but that isn't strictly required.
-        @comments.keys.sort.each do |row|
-          @comments[row].keys.sort.each do |col|
-            # Set comment visibility if required and not already user defined.
-            @comments[row][col].visible ||= 1 if comments_visible?
+        unless @sorted_comments
+          @sorted_comments = []
+          # We sort the comments by row and column but that isn't strictly required.
+          @comments.keys.sort.each do |row|
+            @comments[row].keys.sort.each do |col|
+              # Set comment visibility if required and not already user defined.
+              @comments[row][col].visible ||= 1 if comments_visible?
 
-            # Set comment author if not already user defined.
-            @comments[row][col].author ||= @worksheet.comments_author
-            @sorted_comments << @comments[row][col]
+              # Set comment author if not already user defined.
+              @comments[row][col].author ||= @worksheet.comments_author
+              @sorted_comments << @comments[row][col]
+            end
           end
         end
+
         @sorted_comments
       end
 

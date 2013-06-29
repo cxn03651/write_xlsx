@@ -790,7 +790,7 @@ module Writexlsx
         if row_first == row_last && col_first == col_last
           sqref = active_cell
         else
-          sqref = xl_range(row_first, col_first, row_last, col_last)
+          sqref = xl_range(row_first, row_last, col_first, col_last)
         end
       end
 
@@ -5463,10 +5463,6 @@ module Writexlsx
       self.comments_author = author
     end
 
-    def comments_count # :nodoc:
-      @comments.size
-    end
-
     def has_vml?  # :nodoc:
       @has_vml
     end
@@ -5475,13 +5471,17 @@ module Writexlsx
       !@comments.empty?
     end
 
+    def has_shapes?
+      @has_shapes
+    end
+
     def is_chartsheet? # :nodoc:
       !!@is_chartsheet
     end
 
-    def set_external_vml_links(comment_id) # :nodoc:
+    def set_external_vml_links(vml_drawing_id) # :nodoc:
       @external_vml_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
+        ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
     end
 
     def set_external_comment_links(comment_id) # :nodoc:
@@ -5662,7 +5662,7 @@ module Writexlsx
       !!@comments_visible
     end
 
-    def comments_array # :nodoc:
+    def sorted_comments # :nodoc:
       @comments.sorted_comments
     end
 
@@ -5734,28 +5734,21 @@ module Writexlsx
     # Turn the HoH that stores the comments into an array for easier handling
     # and set the external links for comments and buttons.
     #
-    def prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
-      @external_vml_links <<
-        [ '/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
-
-      if has_comments?
-        @comments_array = @comments.sorted_comments
-        @external_comment_links <<
-          [ '/comments', "../comments#{comment_id}.xml" ]
-      end
-
-      count         = @comments.size
-      start_data_id = vml_data_id
+    def prepare_vml_objects(vml_data_id, vml_shape_id, vml_drawing_id, comment_id)
+      set_external_vml_links(vml_drawing_id)
+      set_external_comment_links(comment_id) if has_comments?
 
       # The VML o:idmap data id contains a comma separated range when there is
       # more than one 1024 block of comments, like this: data="1,2".
-      (1 .. (count / 1024)).each do |i|
-        vml_data_id = "#{vml_data_id},#{start_data_id + i}"
+      (1 .. num_comments_block).each do |i|
+        vml_data_id = "#{vml_data_id},#{vml_data_id + i}"
       end
       @vml_data_id = vml_data_id
       @vml_shape_id = vml_shape_id
+    end
 
-      count
+    def num_comments_block
+      @comments.size / 1024
     end
 
     def tables_count
@@ -6244,6 +6237,7 @@ module Writexlsx
         @drawing = Drawing.new
         @drawing.embedded = 1
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
+        @has_shapes = true
       end
 
       # Validate the he shape against various rules.
@@ -6593,14 +6587,10 @@ module Writexlsx
 
         # Write the cells if the row contains data.
         if @cell_data_table[row_num]
-          if !@set_rows[row_num]
-            write_row_element(row_num, span)
-          else
-            write_row_element(row_num, span, *(@set_rows[row_num]))
+          args = @set_rows[row_num] || []
+          write_row_element(row_num, span, *args) do
+            write_cell_column_dimension(row_num)
           end
-
-          write_cell_column_dimension(row_num)
-          @writer.end_tag('row')
         elsif @comments[row_num]
           write_empty_row(row_num, span, *(@set_rows[row_num]))
         else
@@ -6608,40 +6598,6 @@ module Writexlsx
           write_empty_row(row_num, span, *(@set_rows[row_num]))
         end
       end
-    end
-
-    #
-    # Write out the worksheet data as a single row with cells. This method is
-    # used when memory optimisation is on. A single row is written and the data
-    # table is reset. That way only one row of data is kept in memory at any one
-    # time. We don't write span data in the optimised case since it is optional.
-    #
-    def write_single_row(current_row = 0) #:nodoc:
-      row_num     = @previous_row
-
-      # Set the new previous row as the current row.
-      @previous_row = current_row
-
-      # Skip row if it doesn't contain row formatting, cell data or a comment.
-      return not_contain_formatting_or_data?(row_num)
-
-      # Write the cells if the row contains data.
-      if @cell_data_table[row_num]
-        if !@set_rows[row_num]
-          write_row(row_num)
-        else
-          write_row(row_num, nil, @set_rows[row_num])
-        end
-
-        write_cell_column_dimension(row_num)
-        @writer.end_tag('row')
-      else
-        # Row attributes or comments only.
-        write_empty_row(row_num, nil, @set_rows[row_num])
-      end
-
-      # Reset table.
-      @cell_data_table = {}
     end
 
     def not_contain_formatting_or_data?(row_num) # :nodoc:
@@ -6657,12 +6613,24 @@ module Writexlsx
     #
     # Write the <row> element.
     #
-    def write_row_element(r, spans = nil, height = nil, format = nil, hidden = false, level = 0, collapsed = false, empty_row = false) #:nodoc:
+    def write_row_element(*args)  # :nodoc:
+      @writer.tag_elements('row', row_attributes(args)) do
+        yield
+      end
+    end
+
+    #
+    # Write and empty <row> element, i.e., attributes only, no cell data.
+    #
+    def write_empty_row(*args) #:nodoc:
+      @writer.empty_tag('row', row_attributes(args))
+    end
+
+    def row_attributes(args)
+      r, spans, height, format, hidden, level, collapsed, empty_row = args
       height    ||= @default_row_height
       hidden    ||= 0
       level     ||= 0
-      collapsed ||= 0
-      empty_row ||= 0
       xf_index = format ? format.get_xf_index : 0
 
       attributes = ['r',  r + 1]
@@ -6679,20 +6647,7 @@ module Writexlsx
       if @excel_version == 2010
         attributes << 'x14ac:dyDescent' << '0.25'
       end
-      if ptrue?(empty_row)
-        @writer.empty_tag('row', attributes)
-      else
-        @writer.start_tag('row', attributes)
-      end
-    end
-
-    #
-    # Write and empty <row> element, i.e., attributes only, no cell data.
-    #
-    def write_empty_row(*args) #:nodoc:
-        new_args = args.dup
-        new_args[7] = 1
-        write_row_element(*new_args)
+      attributes
     end
 
     #
@@ -7148,10 +7103,9 @@ module Writexlsx
     # Write the <outlinePr> element.
     #
     def write_outline_pr
-      attributes = []
-
       return unless outline_changed?
 
+      attributes = []
       attributes << "applyStyles"  << 1 if @outline_style != 0
       attributes << "summaryBelow" << 0 if @outline_below == 0
       attributes << "summaryRight" << 0 if @outline_right == 0
@@ -7228,7 +7182,7 @@ module Writexlsx
     # Write the <tablePart> element.
     #
     def write_table_part(id)
-      @writer.empty_tag('tablePart', ['r:id', "rId#{id}"])
+      @writer.empty_tag('tablePart', r_id_attributes(id))
     end
 
     def increment_rel_id_and_write_r_id(tag)
@@ -7237,7 +7191,7 @@ module Writexlsx
     end
 
     def write_r_id(tag, id)
-      @writer.empty_tag(tag, ['r:id', "rId#{id}"])
+      @writer.empty_tag(tag, r_id_attributes(id))
     end
 
     #

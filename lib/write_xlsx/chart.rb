@@ -1790,11 +1790,17 @@ module Writexlsx
         :_underline    => params[:underline],
         :_pitch_family => params[:pitch_family],
         :_charset      => params[:charset],
-        :_baseline     => params[:baseline] || 0
+        :_baseline     => params[:baseline] || 0,
+        :_rotation     => params[:rotation]
       }
 
       # Convert font size units.
       font[:_size] *= 100 if font[:_size] && font[:_size] != 0
+
+      # Convert rotation into 60,000ths of a degree.
+      if ptrue?(font[:_rotation])
+        font[:_rotation] = 60_000 * font[:_rotation].to_i
+      end
 
       font
     end
@@ -3428,6 +3434,18 @@ module Writexlsx
     end
 
     #
+    # Write the <a:bodyPr> element for axis fonts.
+    #
+    def write_axis_body_pr(rot = nil, vert = nil)
+      attributes = []
+
+      attributes << 'rot'  << rot  if rot
+      attributes << 'vert' << vert if vert
+
+      @writer.empty_tag('a:bodyPr', attributes)
+    end
+
+    #
     # Write the <a:lstStyle> element.
     #
     def write_a_lst_style # :nodoc:
@@ -3989,7 +4007,7 @@ module Writexlsx
       return unless font
 
       @writer.tag_elements('c:txPr') do
-        @writer.empty_tag('a:bodyPr')
+        write_axis_body_pr(font[:_rotation])
         write_a_lst_style
         @writer.tag_elements('a:p') do
           write_a_p_pr_rich(font)
