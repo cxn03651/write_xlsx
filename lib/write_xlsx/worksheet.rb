@@ -5471,13 +5471,17 @@ module Writexlsx
       !@comments.empty?
     end
 
+    def has_shapes?
+      @has_shapes
+    end
+
     def is_chartsheet? # :nodoc:
       !!@is_chartsheet
     end
 
-    def set_external_vml_links(comment_id) # :nodoc:
+    def set_external_vml_links(vml_drawing_id) # :nodoc:
       @external_vml_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{comment_id}.vml"]
+        ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
     end
 
     def set_external_comment_links(comment_id) # :nodoc:
@@ -5730,8 +5734,8 @@ module Writexlsx
     # Turn the HoH that stores the comments into an array for easier handling
     # and set the external links for comments and buttons.
     #
-    def prepare_vml_objects(vml_data_id, vml_shape_id, comment_id)
-      set_external_vml_links(comment_id)
+    def prepare_vml_objects(vml_data_id, vml_shape_id, vml_drawing_id, comment_id)
+      set_external_vml_links(vml_drawing_id)
       set_external_comment_links(comment_id) if has_comments?
 
       # The VML o:idmap data id contains a comma separated range when there is
@@ -6233,6 +6237,7 @@ module Writexlsx
         @drawing = Drawing.new
         @drawing.embedded = 1
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
+        @has_shapes = true
       end
 
       # Validate the he shape against various rules.

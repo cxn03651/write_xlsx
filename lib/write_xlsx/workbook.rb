@@ -651,7 +651,7 @@ module Writexlsx
     # This is not very useful for inserting multiple shapes,
     # since the x/y coordinates also gets modified.
     #
-    def add_shape(properties)
+    def add_shape(properties = {})
       shape = Shape.new(properties)
       shape.palette = @palette
 
@@ -1463,11 +1463,17 @@ module Writexlsx
     # Iterate through the worksheets and set up the VML objects.
     #
     def prepare_vml_objects  #:nodoc:
-      vml_data_id   = 1
-      vml_shape_id  = 1024
+      comment_id     = 0
+      vml_drawing_id = 0
+      vml_data_id    = 1
+      vml_shape_id   = 1024
 
-      @worksheets.select { |sheet| sheet.has_vml? }.each_with_index do |sheet, index|
-        sheet.prepare_vml_objects(vml_data_id, vml_shape_id, index + 1)
+      @worksheets.select { |sheet| sheet.has_vml? }.each do |sheet|
+        comment_id += 1 if sheet.has_comments?
+        vml_drawing_id += 1
+
+        sheet.prepare_vml_objects(vml_data_id, vml_shape_id,
+                                  vml_drawing_id, comment_id)
 
         # Each VML file should start with a shape id incremented by 1024.
         vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )

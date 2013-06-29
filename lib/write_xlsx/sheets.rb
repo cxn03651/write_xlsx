@@ -100,8 +100,14 @@ module Writexlsx
 
       #                       )
       dir = "#{package_dir}/xl/drawings/_rels"
-      self.reject { |sheet| sheet.drawing_links[0].empty? }.
-        each_with_index do |sheet, index|
+
+      index = 0
+      self.each do |sheet|
+        if !sheet.drawing_links[0].empty? || sheet.has_shapes?
+          index += 1
+        end
+
+        next if sheet.drawing_links[0].empty?
 
         FileUtils.mkdir_p(dir)
 
@@ -114,7 +120,7 @@ module Writexlsx
         end
 
         # Create the .rels file such as /xl/drawings/_rels/sheet1.xml.rels.
-        rels.set_xml_writer("#{dir}/drawing#{index+1}.xml.rels")
+        rels.set_xml_writer("#{dir}/drawing#{index}.xml.rels")
         rels.assemble_xml_file
       end
     end
