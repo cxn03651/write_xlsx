@@ -75,6 +75,13 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-06-30 v0.69.0
+   Added chart font rotation property. Mainly for use with data axes to make the display more compact.
+   Fix for issue where shapes on one worksheet corrupted charts on a subsequent worksheet.
+   Fix for issue where add_button invalidated cell comments in the same workbook.
+   Fix for set_selection with cell range.
+   Fix for issue with image scaling.
+
 2013-03-23 v0.65.1
    Bug fix for non-integer image scaling.
    Bug fix in Worksheet#set_first_sheet
