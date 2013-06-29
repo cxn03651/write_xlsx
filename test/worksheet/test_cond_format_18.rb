@@ -32,7 +32,7 @@ class TestCondFormat18 < Test::Unit::TestCase
     @worksheet.write('A11', 11)
     @worksheet.write('A12', 12)
 
-    @worksheet.conditional_formatting('$A$3:$A$4,A1 , A6:$A$8 ,$A10  ,   A$12',
+    @worksheet.conditional_formatting('=$A$3:$A$4,A1 , A6:$A$8 ,$A10  ,   A$12',
                                       {
                                         :type      => '3_color_scale'
                                       }
