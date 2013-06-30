@@ -1281,6 +1281,7 @@ module Writexlsx
     #     bold
     #     italic
     #     underline
+    #     rotation
     #     color
     #
     # The following explains the available font properties:
@@ -1309,6 +1310,13 @@ module Writexlsx
     # Set the font underline property, should be 0 or 1:
     #
     #     chart.set_x_axis( :num_font => { :underline => 1 } )
+    #
+    # ===rotation
+    # See the font rotation in the range -90 to 90:
+    #
+    #     chart.set_x_axis(:num_font => { :rotation => 45 })
+    #
+    # This is useful for displaying large axis data such as dates in a more compact format.
     #
     # ===color
     # Set the font color property. Can be a color index, a color name or HTML
