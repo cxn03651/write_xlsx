@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 require 'rubygems'
+require 'simplecov'
 require 'bundler'
+
+SimpleCov.start
+
 begin
   Bundler.setup(:default, :development)
 rescue Bundler::BundlerError => e

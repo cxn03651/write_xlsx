@@ -23,5 +23,6 @@ Gem::Specification.new do |gem|
   ]
 
   gem.add_runtime_dependency(%q<rubyzip>, [">= 0"])
+  gem.add_development_dependency(%q<simplecov>)
 end
 
