@@ -41,6 +41,7 @@ module Writexlsx
         @cross_between     = 'midCat'
         @horiz_val_axis    = 0
         @val_axis_position = 'b'
+        @smooth_allowed    = 1
       end
 
       #
@@ -123,7 +124,11 @@ module Writexlsx
           # Write the c:yVal element.
           write_y_val(series)
           # Write the c:smooth element.
-          write_c_smooth
+          if @subtype =~ /smooth/ && !series[:_smooth]
+            write_c_smooth(1)
+          else
+            write_c_smooth(series[:_smooth])
+          end
         end
       end
 
@@ -225,20 +230,6 @@ module Writexlsx
         attributes = ['val', val]
 
         @writer.empty_tag('c:scatterStyle', attributes)
-      end
-
-      #
-      # Write the <c:smooth> element.
-      #
-      def write_c_smooth
-        subtype = @subtype
-        val     = 1
-
-        return unless subtype =~ /smooth/
-
-        attributes = ['val', val]
-
-        @writer.empty_tag('c:smooth', attributes)
       end
 
       #

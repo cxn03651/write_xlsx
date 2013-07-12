@@ -575,6 +575,7 @@ module Writexlsx
       @x_offset          = 0
       @y_offset          = 0
       @table             = nil
+      @smooth_allowed    = 0
 
       set_default_properties
     end
@@ -1118,6 +1119,9 @@ module Writexlsx
       # Set the trendline properties for the series.
       trendline = trendline_properties(params[:trendline])
 
+      # Set the line smooth property for the series.
+      smooth = params[:smooth]
+
       # Set the error bars properties for the series.
       y_error_bars = error_bars_properties(params[:y_error_bars])
       x_error_bars = error_bars_properties(params[:x_error_bars])
@@ -1158,6 +1162,7 @@ module Writexlsx
         :_fill          => fill,
         :_marker        => marker,
         :_trendline     => trendline,
+        :_smooth        => smooth,
         :_labels        => labels,
         :_invert_if_neg => invert_if_neg,
         :_x2_axis       => x2_axis,
@@ -2582,6 +2587,8 @@ module Writexlsx
         write_cat(series)
         # Write the c:val element.
         write_val(series)
+        # Write the c:smooth element.
+        write_c_smooth(series[:_smooth]) if ptrue?(@smooth_allowed)
       end
     end
 
@@ -4157,6 +4164,17 @@ module Writexlsx
     #
     def write_down_bars(format)
       write_bars_base('c:downBars', format)
+    end
+
+    #
+    # Write the <c:smooth> element.
+    #
+    def write_c_smooth(smooth)
+      return unless ptrue?(smooth)
+
+      attributes = ['val', 1]
+
+      @writer.empty_tag('c:smooth', attributes)
     end
 
     def write_bars_base(tag, format)
