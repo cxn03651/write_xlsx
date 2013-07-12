@@ -23,6 +23,6 @@ Gem::Specification.new do |gem|
   ]
 
   gem.add_runtime_dependency(%q<rubyzip>, [">= 0"])
-  gem.add_development_dependency(%q<simplecov>)
+  gem.add_development_dependency(%q<simplecov>) if RUBY_VERSION >= "1.9"
 end
 
