@@ -6074,7 +6074,7 @@ module Writexlsx
         if width == 0
           pixels = 0
         elsif width < 1
-          pixels = (width * 12 + 0.5).to_i
+          pixels = (width * (MAX_DIGIT_WIDTH + PADDING) + 0.5).to_i
         else
           pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
         end
@@ -6542,10 +6542,15 @@ module Writexlsx
        end
 
       # Convert column width from user units to character width.
-      if width && width > 0
-        width = ((width * MAX_DIGIT_WIDTH + PADDING) / MAX_DIGIT_WIDTH.to_f * 256).to_i/256.0
-        width = width.to_i if width.to_s =~ /\.0+$/
+      if width && width < 1
+        width =
+         ((width * (MAX_DIGIT_WIDTH + PADDING) + 0.5).to_i / MAX_DIGIT_WIDTH.to_f * 256).to_i / 256.0
+      else
+        width =
+          (((width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING).to_i/ MAX_DIGIT_WIDTH.to_f * 256).to_i / 256.0
       end
+      width = width.to_i if width - width.to_i == 0
+
       attributes = [
           'min',   min + 1,
           'max',   max + 1,
