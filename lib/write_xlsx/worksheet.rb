@@ -6117,7 +6117,7 @@ module Writexlsx
       width  *= x_scale
       height *= y_scale
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
+      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, 0)
 
       # Convert from pixels to emus.
       width  = (0.5 + (width  * 9_525)).to_i
