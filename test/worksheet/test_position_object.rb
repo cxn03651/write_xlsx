@@ -18,7 +18,7 @@ class TestPositionObject < Test::Unit::TestCase
   def test_position_object_emus_02
     @worksheet.set_column('L:L', 3.86)
     result = @worksheet.__send__("position_object_emus", 4, 8, 0, 0, 480, 288)
-    expected = [4, 8, 0, 0, 11, 22, 0, 76200, 2438400, 1524000]
+    expected = [4, 8, 0, 0, 12, 22, 0, 76200, 2438400, 1524000]
     assert_equal(expected, result)
   end
 
@@ -26,7 +26,7 @@ class TestPositionObject < Test::Unit::TestCase
     @worksheet.set_column('L:L', 3.86)
     @worksheet.set_row(22, 6)
     result = @worksheet.__send__("position_object_emus", 4, 8, 0, 0, 480, 288)
-    expected = [4, 8, 0, 0, 11, 22, 0, 0, 2438400, 1524000]
+    expected = [4, 8, 0, 0, 12, 23, 0, 0, 2438400, 1524000]
     assert_equal(expected, result)
   end
 

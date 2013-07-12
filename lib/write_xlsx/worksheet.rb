@@ -5507,7 +5507,7 @@ module Writexlsx
       width  = (0.5 + (width  * x_scale)).to_i
       height = (0.5 + (height * y_scale)).to_i
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, false)
+      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
       # Set the chart name for the embedded object if it has been specified.
       name = chart.name
@@ -5605,7 +5605,7 @@ module Writexlsx
     #    y2           # Distance to bottom of object.
     #    width        # Width of object frame.
     #    height       # Height of object frame.
-    def position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing = false) #:nodoc:
+    def position_object_pixels(col_start, row_start, x1, y1, width, height) #:nodoc:
       # Calculate the absolute x offset of the top-left vertex.
       if @col_size_changed
         x_abs = (1 .. col_start).inject(0) {|sum, col| sum += size_col(col)}
@@ -5643,13 +5643,6 @@ module Writexlsx
 
       # Subtract the underlying cell heights to find the end cell of the object.
       height, row_end = adjust_row_offset(height, row_end)
-
-      # The following is only required for positioning drawing/chart objects
-      # and not comments. It is probably the result of a bug.
-      if ptrue?(is_drawing)
-        col_end -= 1 if width == 0
-        row_end -= 1 if height == 0
-      end
 
       # The end vertices are whatever is left from the width and height.
       x2 = width
@@ -6045,9 +6038,9 @@ module Writexlsx
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height, is_drawing = true) #:nodoc:
+    def position_object_emus(col_start, row_start, x1, y1, width, height) #:nodoc:
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels(col_start, row_start, x1, y1, width, height, is_drawing)
+        position_object_pixels(col_start, row_start, x1, y1, width, height)
 
       # Convert the pixel values to EMUs. See above.
       x1    = (0.5 + 9_525 * x1).to_i
@@ -6117,7 +6110,7 @@ module Writexlsx
       width  *= x_scale
       height *= y_scale
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, 0)
+      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
       # Convert from pixels to emus.
       width  = (0.5 + (width  * 9_525)).to_i

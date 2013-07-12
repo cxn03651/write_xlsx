@@ -175,8 +175,7 @@ module Writexlsx
                                @x_offset,
                                @y_offset,
                                @width  * @scale_x,
-                               @height * @scale_y,
-                               @drawing
+                               @height * @scale_y
                                )
 
       # Now that x2/y2 have been calculated with a potentially negative
