@@ -75,6 +75,11 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-07-13 v0.70.0
+   Fix for rendering images that are the same size as cell boundaries.
+   Fix for inaccurate column width calculation.
+   Added Chart line smoothing option.
+
 2013-06-30 v0.69.0
    Added chart font rotation property. Mainly for use with data axes to make the display more compact.
    Fix for issue where shapes on one worksheet corrupted charts on a subsequent worksheet.
