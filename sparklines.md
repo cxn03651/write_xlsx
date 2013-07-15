@@ -296,7 +296,7 @@ and range:
 #### <a name="sparkline_examples" class="anchor" href="#sparkline_examples"><span class="octicon octicon-link" /></a>Sparkline examples
 
 See the
-[sparklines1.rb](examples.html#sparkline1)
+[sparklines1.rb](examples.html#sparklines1)
 and
-[sparklines2.rb](examples.html#sparkline2)
+[sparklines2.rb](examples.html#sparklines2)
 example programs in the examples directory of the distro.
