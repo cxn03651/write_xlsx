@@ -102,7 +102,7 @@ colour in the table. It is on by default.
 
     worksheet.add_table('B3:F7', { :banded_rows => 0 } )
 
-##### <a name="banded_columns" class="anchor" href="#banded_columns"><span class="octicon octicon-link" /></a>banded_columns
+##### <a name="banded_columns" class="anchor" href="#banded_columns"><span class="octicon octicon-link" /></a>:banded_columns
 
 The `:banded_columns` parameter can be used to used to create columns of
 alternating colour in the table. It is off by default.
