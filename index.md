@@ -2,27 +2,6 @@
 layout: default
 title: WriteXLSX
 ---
-### <a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link" /></a>CONTENTS
-* [DESCRIPTION](#description)
-* [SYNOPSIS](#synopsis)
-* [EXAMPLES](examples.html)
-* [WORKBOOK METHOD](workbook.html)
-* [WORKSHEET METHOD](worksheet.html)
-* [PAGE SET-UP METHOD](page_set_up.html)
-* [CELL FORMATTING](cell_formatting.html)
-* [FORMAT METHODS](format.html)
-* [COLORS IN EXCEL](colors.html)
-* [DATES AND TIME IN EXCEL](dates_and_time.html)
-* [OUTLINES AND GROUPING IN EXCEL](outlines_and_grouping.html)
-* [DATA VALIDATION IN EXCEL](data_validation.html)
-* [CONDITIONAL FORMATTING IN EXCEL](conditional_formatting.html)
-* [SPARKLINES IN EXCEL](sparklines.html)
-* [TABLES IN EXCEL](tables.html)
-* [FORMURAS AND FUNCTIONS IN EXCEL](formulas_and_functions.html)
-* [CHART METHODS](chart.html)
-* [CHART FONTS](chart_fonts.html)
-* [SHAPE](shape.html)
-
 ### <a name="description" class="anchor" href="#description"><span class="octicon octicon-link" /></a>DESCRIPTION
 The WriteXLSX rubygem can be used to create an Excel file in the 2007+ XLSX format.
 
