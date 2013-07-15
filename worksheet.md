@@ -3,7 +3,7 @@ layout: default
 title: Worksheet Method
 ---
 
-### WORKSHEET METHODS
+### <a name="worksheet" class="anchor" href="#worksheet"><span class="octicon octicon-link" /></a>WORKSHEET METHODS
 A new worksheet is created by calling the `add_worksheet()` method from a workbook object:
 
     worksheet1 = workbook.add_worksheet
@@ -122,7 +122,7 @@ Here are some examples in both row-column and A1 notation:
     worksheet.write(5, 0,  ''                    ) # write_blank()
     worksheet.write(6, 0,  undef                 ) # write_blank()
     worksheet.write(7, 0                         ) # write_blank()
-    worksheet.write(8, 0,  'http://www.perl.com/') # write_url()
+    worksheet.write(8, 0,  'http://www.ruby.com/') # write_url()
     worksheet.write('A9',  'ftp://ftp.cpan.org/' ) # write_url()
     worksheet.write('A10', 'internal:Sheet1!A1'  ) # write_url()
     worksheet.write('A11', 'external:c:\foo.xlsx') # write_url()
@@ -158,7 +158,7 @@ The "looks like" rule is defined by regular expressions:
 `write_string()` if none of the previous conditions apply.
 
 The `format` parameter is optional.
-It should be a valid Format object, see ["CELL FORMATTING"](#cell_formatting.html):
+It should be a valid Format object, see ["CELL FORMATTING"](cell_formatting.html#cell_formatting):
 
     format = workbook.add_format
     format.set_bold
@@ -206,9 +206,6 @@ However the maximum string segment that Excel can display in a cell is 1000.
 All 32767 characters can be displayed in the formula bar.
 
 The `format` parameter is optional.
-
-The `write()` method will also handle strings in UTF-8 format.
-See also the `unicode_\*.rb` programs in the examples directory of the distro.
 
 In general it is sufficient to use the `write()` method.
 However, you may sometimes wish to use the `write_string()` method to write data
@@ -283,7 +280,9 @@ The `write_rich_string()` method allows you to do this by using the last argumen
     worksheet.write_rich_string('A5',
       'Some ', bold, 'bold text', ' centered', center)
 
-See the `rich_strings.rb` example in the distro for more examples.
+See the
+[`rich_strings.rb`](examples.html#rich_strings)
+example in the distro for more examples.
 
     bold   = workbook.add_format(:bold        => 1)
     italic = workbook.add_format(:italic      => 1)
@@ -382,8 +381,6 @@ The `write_row()` method returns the first error encountered when writing the el
 or zero if no errors were encountered.
 See the return values described for the `write()` method above.
 
-See also the `write_arrays.rb` program in the examples directory of the distro.
-
 #### <a name="write_col" class="anchor" href="#write_col"><span class="octicon octicon-link" /></a>write_col(row, column, array, format = nil)
 
 The `write_col()` method can be used to write a 1D or 2D array of data in one go.
@@ -433,8 +430,6 @@ In either case the appropriate `row` or `column` value will still be incremented
 The `write_col()` method returns the first error encountered when writing the elements of the data
 or zero if no errors were encountered. See the return values described for the `write()` method above.
 
-See also the `write_arrays.rb` program in the examples directory of the distro.
-
 #### <a name="write_date_time" class="anchor" href="#write_date_time"><span class="octicon octicon-link" /></a>write_date_time(row, col, date_string, format)
 
 The `write_date_time()` method can be used to write a date or time to the cell specified by `row` and `column`:
@@ -459,7 +454,7 @@ The following variations on the `date_string` parameter are permitted:
 Note that the `T` is required in all cases.
 
 A date should always have a `format`, otherwise it will appear as a number,
-see ["DATES AND TIME IN EXCEL"](dates_and_time.html) and ["CELL FORMATTING"](cell_formatting.html).
+see ["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time) and ["CELL FORMATTING"](cell_formatting.html#cell_formatting).
 Here is a typical example:
 
     date_format = workbook.add_format(:num_format => 'mm/dd/yy')
@@ -469,7 +464,9 @@ Valid dates should be in the range 1900-01-01 to 9999-12-31,
 for the 1900 epoch and 1904-01-01 to 9999-12-31, for the 1904 epoch.
 As with Excel, dates outside these ranges will be written as a string.
 
-See also the `date_time.rb` program in the examples directory of the distro.
+See also the
+[`date_time.rb`](examples.html#date_time)
+program in the examples directory of the distro.
 
 #### <a name="write_url" class="anchor" href="#write_url"><span class="octicon octicon-link" /></a>write_url(row, col, url, format = nil, label = nil)
 
@@ -575,7 +572,7 @@ Array formulas are also supported:
 See also the `write_array_formula()` method below.
 
 See the note about ["Cell notation"](#cell-notation).
-For more information about writing Excel formulas see ["FORMULAS AND FUNCTIONS IN EXCEL"](formulas_and_functions.html)
+For more information about writing Excel formulas see ["FORMULAS AND FUNCTIONS IN EXCEL"](formulas_and_functions.html#formulas_and_functions)
 
 If required, it is also possible to specify the calculated value of the `formula`.
 This is occasionally necessary when working with non-Excel applications that don't calculate the value
@@ -619,7 +616,9 @@ The calculated `value` is added at the end of the argument list:
 In addition, some early versions of Excel 2007 don't calculate the values of array formulas when they aren't supplied.
 Installing the latest Office Service Pack should fix this issue.
 
-See also the `array_formula.rb` program in the examples directory of the distro.
+See also the
+[`array_formula.rb`](examples.html#array_formula)
+program in the examples directory of the distro.
 
 Note: Array formulas are not supported by writeexcel gem.
 
@@ -689,7 +688,7 @@ and provide comments to a workbook.
 The default author for all cell comments can be set
 using the `set_comments_author()` method (see below).
 
-    worksheet.set_comments_author('Perl')
+    worksheet.set_comments_author('Ruby')
 
 ##### Option: visible
 This option is used to make a cell comment visible when the worksheet is opened.
@@ -801,7 +800,7 @@ If all of the cell comments have been made visible you can hide individual comme
 
 This method is used to set the default author of all cell comments.
 
-    worksheet.set_comments_author('Perl')
+    worksheet.set_comments_author('Ruby')
 
 Individual comment authors can be set using the author parameter of the `write_comment` method (see above).
 
@@ -859,8 +858,10 @@ the embedded option set.
     worksheet.insert_chart('E2', chart)
 
 See `add_chart()` for details on how to create the Chart object
-and [Chart](chart.html) for details on how to configure it.
-See also the chart_\*.rb programs in the examples directory of the distro.
+and [Chart](chart.html#chart) for details on how to configure it.
+See also the
+[`chart_\*.rb`](examples.html#chart_area)
+programs in the examples directory of the distro.
 
 The `x`, `y`, `x_scale` and `y_scale` parameters are optional.
 
@@ -891,7 +892,7 @@ The Shape must be created by the `add_shape()` Workbook method.
     worksheet.insert_shape('E2', shape)
 
 See `add_shape()` for details on how to create the Shape object
-and [Shape](shape.html) for details on how to configure it.
+and [Shape](shape.html#shape) for details on how to configure it.
 
 The `x`, `y`, `x_scale` and `y_scale` parameters are optional.
 
@@ -907,7 +908,9 @@ horizontally and vertically:
     # Scale the width by 120% and the height by 150%
     worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
 
-See also the `shape\*.rb` programs in the examples directory of the distro.
+See also the
+[`shape\*.rb`](examples.html#shape1)
+programs in the examples directory of the distro.
 
 #### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, properties)
 
@@ -1005,9 +1008,11 @@ or to limit the user input to a dropdown list of values.
         })
 
 This method contains a lot of parameters and is described in detail in
-a separate section ["DATA VALIDATION IN EXCEL"](data_validation.html).
+a separate section ["DATA VALIDATION IN EXCEL"](data_validation.html#data_validation).
 
-See also the `data_validate.rb` program in the examples directory of the distro
+See also the
+[`data_validate.rb`](examples.html#data_validate)
+program in the examples directory of the distro
 
 #### <a name="conditional_formatting" class="anchor" href="#conditional_formatting"><span class="octicon octicon-link" /></a>conditional_formatting()
 
@@ -1024,9 +1029,11 @@ or range of cells based on user defined criteria.
     )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["CONDITIONAL FORMATTING IN EXCEL"](conditional_formatting.html).
+in a separate section ["CONDITIONAL FORMATTING IN EXCEL"](conditional_formatting.html#conditional_formatting).
 
-See also the `conditional_format.rb` program in the examples directory of the distro
+See also the
+[`conditional_format.rb`](examples.html#conditional_format)
+program in the examples directory of the distro
 
 #### <a name="add_sparkline" class="anchor" href="#add_sparkline"><span class="octicon octicon-link" /></a>add_sparkline()
 
@@ -1042,9 +1049,13 @@ The `add_sparkline()` worksheet method is used to add sparklines to a cell or a 
     )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["SPARKLINES IN EXCEL"](sparklines.html).
+in a separate section ["SPARKLINES IN EXCEL"](sparklines.html#sparklines).
 
-See also `sparklines1.rb` and `sparklines2.rb` example programs
+See also
+[`sparklines1.rb`](examples.html#sparklines1)
+and
+[`sparklines2.rb`](examples.html#sparklines2)
+example programs
 in the examples directory of the distro.
 
 Note: Sparklines are a feature of Excel 2010+ only.
@@ -1058,9 +1069,11 @@ The `add_table()` method is used to group a range of cells into an Excel Table.
     worksheet.add_table('B3:F7', { ... } )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["TABLES IN EXCEL"](tables.html).
+in a separate section ["TABLES IN EXCEL"](tables.html#tables).
 
-See also the `tables.rb` program in the examples directory of the distro
+See also the
+[`tables.rb`](examples.html#tables)
+program in the examples directory of the distro
 
 #### <a name="name" class="anchor" href="#name"><span class="octicon octicon-link" /></a>name()
 
@@ -1150,9 +1163,11 @@ hidden properties if they have been set.
 A locked cell cannot be edited and this property is on by default for all cells.
 A hidden cell will display the results of a formula but not the formula itself.
 
-See the `protection.rb` program in the examples directory of the distro for an
+See the
+[`protection.rb`](examples.html#protection)
+program in the examples directory of the distro for an
 illustrative example and the `set_locked` and `set_hidden` format methods
-in ["CELL FORMATTING"](cell_formatting.html).
+in ["CELL FORMATTING"](cell_formatting.html#cell_formatting).
 
 You can optionally add a password to the worksheet protection:
 
@@ -1262,7 +1277,10 @@ collapsed + symbol using the optional `collapsed` parameter.
 
     worksheet.set_row(3, nil, nil, 0, 0, 1)
 
-For a more complete example see the `outline.rb` and `outline_collapsed.rb`
+For a more complete example see the
+[`outline.rb`](examples.html#outline)
+and
+[`outline_collapsed.rb`](examples.html#outline_collapsed)
 programs in the examples directory of the distro.
 
 Excel allows up to 7 outline levels.
@@ -1341,7 +1359,10 @@ collapsed + symbol using the optional `collapsed` parameter.
 
     worksheet.set_column('H:H', nil, nil, 0, 0, 1)
 
-For a more complete example see the `outline.rb` and `outline_collapsed.rb`
+For a more complete example see the
+[`outline.rb`](examples.html#outline)
+and
+[`outline_collapsed.rb`](examples.html#outline_collapsed)
 programs in the examples directory of the distro.
 
 Excel allows up to 7 outline levels.
@@ -1361,7 +1382,9 @@ with an entry for each hidden row.
 
     worksheet.set_default_row(nil, 1)
 
-See the `hide_row_col.rb` example program.
+See the
+[`hide_row_col.rb`](examples.html#hide_row_col)
+example program.
 
 #### <a name="outline_settings" class="anchor" href="#outline_settings"><span class="octicon octicon-link" /></a>outline_settings(visible, symbols_below, symbols_right, auto_style)
 
@@ -1429,7 +1452,9 @@ the scrolling region begin at row twenty:
 
 You cannot use A1 notation for the $top_row and `left_col` parameters.
 
-See also the `panes.rb` program in the examples directory of the distribution.
+See also the
+[`panes.rb`](examples.html#panes)
+program in the examples directory of the distribution.
 
 #### <a name="split_panes" class="anchor" href="#split_panes"><span class="octicon octicon-link" /></a>split_panes(y, x, top_row, left_col)
 
@@ -1479,8 +1504,11 @@ Therefore it will handle numbers, strings, formulas or urls as required.
 If you need to specify the required `write_\*()` method use the
 `merge_range_type()` method, see below.
 
-The full possibilities of this method are shown in the `merge3.rb` to
-`merge6.rb` programs in the examples directory of the distribution.
+The full possibilities of this method are shown in the
+[`merge3.rb`](examples.html#merge3)
+to
+[`merge6.rb`](examples.html#merge6)
+programs in the examples directory of the distribution.
 
 #### <a name="merge_range_type" class="anchor" href="#merge_range_type"><span class="octicon octicon-link" /></a>merge_range_type(type, first_row, first_col, last_row, last_col, ... )
 
@@ -1555,7 +1583,9 @@ See "COLOURS IN EXCEL" and the `set_custom_color()` method.
     worksheet1.set_tab_color('red')
     worksheet2.set_tab_color(0x0C)
 
-See the `tab_colors.rb` program in the examples directory of the distro.
+See the
+[`tab_colors.rb`](examples.html#tab_colors)
+program in the examples directory of the distro.
 
 #### <a name="autofilter" class="anchor" href="#autofilter"><span class="octicon octicon-link" /></a>autofilter(first_row, first_col, last_row, last_col)
 
@@ -1573,7 +1603,9 @@ To add an autofilter to a worksheet:
 Filter conditions can be applied using the `filter_column()` or
 `filter_column_list()` method.
 
-See the `autofilter.rb` program in the examples directory of the distro
+See the
+[`autofilter.rb`](examples.html#autofilter)
+program in the examples directory of the distro
 for a more detailed example.
 
 #### <a name="filter_column" class="anchor" href="#filter_column"><span class="octicon octicon-link" /></a>filter_column(column, expression)
@@ -1585,7 +1617,9 @@ NOTE: It isn't sufficient to just specify the filter condition.
 You must also hide any rows that don't match the filter condition.
 Rows are hidden using the `set_row()` visible parameter.
 WriteXLSX cannot do this automatically since it isn't part of the file format.
-See the `autofilter.rb` program in the examples directory of the distro for an example.
+See the
+[`autofilter.rb`](examples.html#autofilter)
+program in the examples directory of the distro for an example.
 
 The conditions for the filter are specified using simple expressions:
 
@@ -1651,7 +1685,9 @@ all equivalent:
 Also, note that a filter condition can only be applied to a column in a range
 specified by the `autofilter()` Worksheet method.
 
-See the `autofilter.rb` program in the examples directory of the distro for
+See the
+[`autofilter.rb`](examples.html#autofilter)
+program in the examples directory of the distro for
 a more detailed example.
 
 Note writeexcel gem supports Top 10 style filters.
@@ -1694,7 +1730,9 @@ NOTE: It isn't sufficient to just specify the filter condition.
 You must also hide any rows that don't match the filter condition.
 Rows are hidden using the `set_row()` visible parameter.
 WriteXLSX cannot do this automatically since it isn't part of the file format.
-See the `autofilter.rb` program in the examples directory of the distro for an example.
+See the
+[`autofilter.rb`](examples.html#autofilter)
+program in the examples directory of the distro for an example.
 
 #### <a name="convert_date_time" class="anchor" href="#convert_date_time"><span class="octicon octicon-link" /></a>convert_date_time(date_string)
 

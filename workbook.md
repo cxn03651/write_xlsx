@@ -3,7 +3,7 @@ layout: default
 title: Workbook Method
 ---
 
-### WORKBOOK METHODS
+### <a name="workbook" class="anchor" href="#workbook"><span class="octicon octicon-link" /></a>WORKBOOK METHODS
 
 The WriteXLSX rubygem provides an object oriented interface to a new Excel workbook.
 The following methods are available through a new workbook.
@@ -44,10 +44,10 @@ The last two examples demonstrates how to create a file on DOS or Windows
 where it is necessary to either escape the directory separator \ or to use single quotes
 to ensure that it isn't interpolated.
 
-It is recommended that the filename uses the extension .xlsx rather than .xls
+It is recommended that the filename uses the extension `.xlsx` rather than `.xls`
 since the latter causes an Excel warning when used with the XLSX format.
 
-You can use IO object like this:
+You can pass a  IO object to the new constructor.:
 
     require 'write_xlsx'
     require 'stringio'
@@ -58,6 +58,12 @@ You can use IO object like this:
     .......
     workbook.close
     # You can get XLSX binary from io.string.
+
+And you can also pass default format properties.
+
+    workbook = WriteXLSX.new(filename, :font => 'Courier New', :size => 11)
+
+See the ["CELL FORMATTING"](cell_formatting.html#cell_formatting) section for more details about Format properties and how to set them.
 
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
@@ -85,7 +91,7 @@ You can either define the properties at creation time via a hash of property val
     format1 = workbook.add_format(props_hash)   # Set properties at creation
     format2 = workbook.add_format               # Set properties later
 
-See the ["CELL FORMATTING"](cell_formatting.html) section for more details about Format properties and how to set them.
+See the ["CELL FORMATTING"](cell_formatting.html#cell_formatting) section for more details about Format properties and how to set them.
 
 #### <a name="add_chart" class="anchor" href="#add_chart"><span class="octicon octicon-link" /></a>add_chart(properties)
 
@@ -121,7 +127,7 @@ Used to define a chart subtype where available.
 
     chart = workbook.add_chart(:type => 'bar', :subtype => 'stacked')
 
-See the [Chart documentation](chart.html) for a list of available chart subtypes.
+See the [Chart documentation](chart.html#chart) for a list of available chart subtypes.
 
 ##### :name
 
@@ -146,8 +152,10 @@ It is an error to try insert a Chart that doesn't have this flag set.
     # Insert the chart into the a worksheet.
     worksheet.insert_chart('E2', chart)
 
-See [Chart](chart.html) for details on how to configure the chart object once it is created.
-See also the chart_\*.rb programs in the examples directory of the distro.
+See [Chart](chart.html#chart) for details on how to configure the chart object once it is created.
+See also the
+[`chart_\*.rb`](examples.html#chart_area))
+programs in the examples directory of the distro.
 
 #### <a name="add_shape" class="anchor" href="#add_shape"><span class="octicon octicon-link" /></a>add_shape(properties)
 
@@ -166,9 +174,11 @@ You can either define the properties at creation time via a hash of property val
     # Default rectangle shape. Set properties later.
     rect =  workbook.add_shape
 
-See [Shape](shape.html) for details on how to configure the shape object once it is created.
+See [Shape](shape.html#shape) for details on how to configure the shape object once it is created.
 
-See also the shape\*.rb programs in the examples directory of the distro.
+See also the
+[`shape\*.rb`](examples.html#shape1)
+programs in the examples directory of the distro.
 
 #### <a name="add_vba_project" class="anchor" href="#add_vba_project"><span class="octicon octicon-link" /></a>add_vba_project( 'vbaProject.bin' )
 
@@ -186,14 +196,16 @@ file from an existing Excel file:
     Extracted 'vbaProject.bin' successfully
 
 Macros can be tied to buttons using the worksheet `insert_button()` method
-(see the ["WORKSHEET METHODS"](worksheet.html) section for details):
+(see the ["WORKSHEET METHODS"](worksheet.html#worksheet) section for details):
 
     worksheet.insert_button('C2', { :macro => 'my_macro' })
 
 Note, Excel uses the file extension xlsm instead of xlsx for files that contain macros.
 It is advisable to follow the same convention.
 
-See also the macros.rb example file.
+See also the
+[`macros.rb`](examples.html#macros)
+example file.
 
 #### <a name="close" class="anchor" href="#close"><span class="octicon octicon-link" /></a>close
 
@@ -233,7 +245,9 @@ The properties that can be set are:
     :comments
     :status
 
-See also the properties.rb program in the examples directory of the distro.
+See also the
+[`properties.rb`](examples.html#properties)
+program in the examples directory of the distro.
 
 #### <a name="define_name" class="anchor" href="#define_name"><span class="octicon octicon-link" /></a>define_name
 
@@ -257,7 +271,9 @@ it in single quotes like in Excel:
 
     workbook.define_name("'New Data'!Sales",  '=Sheet2!$G$1:$G$10')
 
-See the defined_name.rb program in the examples dir of the distro.
+See the
+[`defined_name.rb`](examples.html#defined_name)
+program in the examples dir of the distro.
 
 #### <a name="set_tempdir" class="anchor" href="#set_tempdir"><span class="octicon octicon-link" /></a>set_tempdir
 
@@ -277,7 +293,7 @@ The directory for the temporary file must exist, `set_tempdir()` will not create
 The `set_custom_color()` method can be used to override one of the built-in palette values
 with a more suitable colour.
 
-The value for `index` should be in the range 8..63, see ["COLOURS IN EXCEL"](colors_in_excel.html).
+The value for `index` should be in the range 8..63, see ["COLOURS IN EXCEL"](colors.html#colors).
 
 The default named colours use the following indices:
 
@@ -362,6 +378,6 @@ If you wish to change this you can call the `set_1904()` workbook method.
 You can query the current value by calling the `get_1904()` workbook method.
 This returns `false` for 1900 and `true` for 1904.
 
-See also ["DATES AND TIME IN EXCEL"](dates_and_time.hmtl) for more information about working with Excel's date system.
+See also ["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time) for more information about working with Excel's date system.
 
 In general you probably won't need to use `set_1904()`.

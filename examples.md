@@ -2,6 +2,7 @@
 layout: default
 title: Examples
 ---
+<a name="examples" class="anchor" href="#examples"></a>
 #### <a name="a_simple" class="anchor" href="#s_simple"><span class="octicon octicon-link" /></a>a_simple
 A simple demo of some of the features.
 ![Output from a_simple.rb](images/examples/a_simple.jpg)

@@ -3,7 +3,7 @@ layout: default
 title: Page Set-Up Method
 ---
 
-### PAGE SET-UP METHODS
+### <a name="page_set_up" class="anchor" href="#page_set_up"><span class="octicon octicon-link" /></a>PAGE SET-UP METHODS
 
 Page set-up methods affect the way that a worksheet looks when it is printed.
 They control features such as page headers and footers and margins.
@@ -297,7 +297,9 @@ The header and footer margins are independent of the top and bottom margins.
 Note, the header or footer string must be less than 255 characters.
 Strings longer than this will not be written and a warning will be generated.
 
-See, also the `headers.rb` program in the examples directory of the distribution.
+See, also the
+[`headers.rb`](examples.html#headers)
+program in the examples directory of the distribution.
 
 #### <a name="set_footer" class="anchor" href="#set_footer"><span class="octicon octicon-link" /></a>set_footer(string, margin)
 

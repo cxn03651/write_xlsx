@@ -60,5 +60,6 @@ the RGB (red green blue) components of the colour:
     worksheet.write_blank('A1', format)
 
 You can generate and example of the Excel palette using
-`colors.rb` in the examples directory.
+[`colors.rb`](examples.html#colors)
+in the examples directory.
 

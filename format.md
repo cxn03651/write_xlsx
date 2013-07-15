@@ -2,7 +2,7 @@
 layout: default
 title: Format Methods
 ---
-### FORMAT METHODS
+### <a name="format" class="anchor" href="#format"><span class="octicon octicon-link" /></a>FORMAT METHODS
 
 The Format object methods are described in more detail in the following sections.
 In addition, there is a Perl program called `formats.rb` in the examples
@@ -76,7 +76,8 @@ Specify the font used:
 Excel can only display fonts that are installed on the system that it is running
 on. Therefore it is best to use the fonts that come as standard such as
 'Calibri', 'Times New Roman' and 'Courier New'.
-See also the Fonts worksheet created by `formats.rb`
+See also the Fonts worksheet created by
+[`formats.rb`](examples.html#formats)
 
 #### <a name="set_size" class="anchor" href="#set_size"><span class="octicon octicon-link" /></a>set_size(size)
 
@@ -124,7 +125,9 @@ Note: The `set_color()` method is used to set the colour of the font in a cell.
 To set the colour of a cell use the `set_bg_color()` and `set_pattern()` methods.
 
 For additional examples see the 'Named colors' and 'Standard colors' worksheets
-created by `formats.rb` in the examples directory.
+created by
+[`formats.rb`](examples.html#formats)
+in the examples directory.
 
 See also "COLOURS IN EXCEL".
 
@@ -268,7 +271,9 @@ The colour format should have one of the following values:
 Alternatively you can specify the colour based on a colour index as follows:
 
 \[Color n\], where n is a standard Excel colour index - 7.
-See the 'Standard colors' worksheet created by `formats.rb`.
+See the 'Standard colors' worksheet created by
+[`formats.rb`](examples.html#formats)
+.
 
 For more information refer to the documentation on formatting in the docs
 directory of the WriteXLSX distro, the Excel on-line help or
@@ -319,7 +324,9 @@ Excel's built-in formats are shown in the following table:
     49      0x31    @
 
 For examples of these formatting codes see the 'Numerical formats' worksheet
-created by `formats.rb`.
+created by
+[`formats.rb`](examples.html#formats)
+.
 
 Note 1. Numeric formats 23 to 36 are not documented by Microsoft and may differ
 in international versions.
@@ -411,7 +418,9 @@ The vjustify (vertical justify) option can be used to provide automatic text
 wrapping in a cell. The height of the cell will be adjusted to accommodate
 the wrapped text. To specify where the text wraps use the `set_text_wrap()` method.
 
-For further examples see the 'Alignment' worksheet created by `formats.rb`.
+For further examples see the 'Alignment' worksheet created by
+[`formats.rb`](examples.html#formats)
+.
 
 #### <a name="set_center_across" class="anchor" href="#set_center_across"><span class="octicon octicon-link" /></a>set_center_across()
 
@@ -431,7 +440,11 @@ Only one cell should contain the text, the other cells should be blank:
     worksheet.write(1, 1, 'Center across selection', format)
     worksheet.write_blank(1, 2, format)
 
-See also the `merge1.rb` to `merge6.rb` programs in the examples directory
+See also the
+[`merge1.rb`](examples.html#merge1)
+to
+[`merge6.rb`](examples.html#merge6)
+programs in the examples directory
 and the `merge_range()` method.
 
 #### <a name="set_text_wrap" class="anchor" href="#set_text_wrap"><span class="octicon octicon-link" /></a>set_text_wrap()
@@ -450,7 +463,9 @@ is used to indicate the end of line:
 Excel will adjust the height of the row to accommodate the wrapped text.
 A similar effect can be obtained without newlines using the
 `set_align('vjustify')` method.
-See the `textwrap.rb` program in the examples directory.
+See the
+[`textwrap.rb`](examples.html#textwrap)
+program in the examples directory.
 
 #### <a name="set_rotation" class="anchor" href="#set_rotation"><span class="octicon octicon-link" /></a>set_rotation()
 
@@ -513,7 +528,9 @@ Only applies to Far Eastern versions of Excel.
 Set the background pattern of a cell.
 
 Examples of the available patterns are shown in the 'Patterns' worksheet
-created by `formats.rb`. However, it is unlikely that you will ever need
+created by
+[`formats.rb`](examples.html#formats)
+. However, it is unlikely that you will ever need
 anything other than Pattern 1 which is a solid fill of the background color.
 
 #### <a name="set_bg_color" class="anchor" href="#set_bg_color"><span class="octicon octicon-link" /></a>set_bg_color()
@@ -535,7 +552,9 @@ Here is an example of how to set up a solid fill in a cell:
     format.set_bg_color('green')
     worksheet.write('A1', 'Ray', format)
 
-For further examples see the 'Patterns' worksheet created by `formats.rb`.
+For further examples see the 'Patterns' worksheet created by
+[`formats.rb`](examples.html#formats)
+.
 
 #### <a name="set_fg_color" class="anchor" href="#set_fg_color"><span class="octicon octicon-link" /></a>set_fg_color()
 
@@ -545,7 +564,9 @@ For further examples see the 'Patterns' worksheet created by `formats.rb`.
 
 The `set_fg_color()` method can be used to set the foreground colour of a pattern.
 
-For further examples see the 'Patterns' worksheet created by `formats.rb`.
+For further examples see the 'Patterns' worksheet created by
+[`formats.rb`](examples.html#formats)
+.
 
 #### <a name="set_border" class="anchor" href="#set_border"><span class="octicon octicon-link" /></a>set_border()
 
@@ -613,7 +634,9 @@ The following shows the borders in the order shown in the Excel Dialog.
     1       -----------       6       ===========
 
 Examples of the available border styles are shown in the 'Borders' worksheet
-created by `formats.rb`.
+created by
+[`formats.rb`](examples.html#formats)
+.
 
 #### <a name="set_border_color" class="anchor" href="#set_border_color"><span class="octicon octicon-link" /></a>set_border_color()
 
@@ -630,7 +653,9 @@ Set the colour of the cell borders. A cell border is comprised of a border on
 the bottom, top, left and right. These can be set to the same colour using
 `set_border_color()` or individually using the relevant method calls shown
 above. Examples of the border styles and colours are shown in the 'Borders'
-worksheet created by `formats.rb`.
+worksheet created by
+[`formats.rb`](examples.html#formats)
+.
 
 #### <a name="copy" class="anchor" href="#copy"><span class="octicon octicon-link" /></a>copy(format)
 
