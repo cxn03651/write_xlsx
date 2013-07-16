@@ -4,6 +4,8 @@ gem to create a new file in the Excel 2007+ XLSX format, and you can use the sam
 
 == Description
 
+Reference doc : http://cxn03651.github.io/write_xlsx/
+
 The WriteXLSX supports the following features:
 * Multiple worksheets
 * Strings and numbers
