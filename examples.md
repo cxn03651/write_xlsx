@@ -15,7 +15,7 @@ A demo of some of the available features.
 All the available formatting on several worksheets.
 ![Output from formats.rb](images/examples/formats.jpg)
 
-#### <a name="regions" class="anchor" href="#regions"><span class="octicon octicon-link" /></a>regioans
+#### <a name="regions" class="anchor" href="#regions"><span class="octicon octicon-link" /></a>regions
 A simple example of multiple worksheets.
 ![Output from regions.rb](images/examples/regions.jpg)
 
