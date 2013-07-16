@@ -67,7 +67,7 @@ object within the worksheet.
     # Insert the shape into the worksheet.
     worksheet.insert_shape( 'E2', shape )
 
-Using the cell location and the $x and $y cell offsets it is possible to
+Using the cell location and the `x` and `y` cell offsets it is possible to
 position a shape anywhere on the canvas of a worksheet.
 
 A more detailed explanation of the `insert_shape()` method is given
