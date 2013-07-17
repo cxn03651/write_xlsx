@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.version       = WriteXLSX::VERSION
   gem.authors       = ["Hideo NAKAMURA"]
   gem.email         = ["cxn03651@msj.biglobe.ne.jp"]
-  gem.description   = "write_xlsx s a gem to create a new file in the Excel 2007+ XLSX format, and you can use the same interface as writeexcel gem.\nThe WriteXLSX supports the following features:\n  * Multiple worksheets\n  * Strings and numbers\n  * Unicode text\n  * Rich string formats\n  * Formulas (including array formats)\n  * cell formatting\n  * Embedded images\n  * Charts\n  * Autofilters\n  * Data validation\n  * Hyperlinks\n  * Defined names\n  * Grouping/Outlines\n  * Cell comments\n  * Panes\n  * Page set-up and printing options\n\nwrite_xlsx uses the same interface as writeexcel gem.\n\ndocumentation is not completed, but writeexcel\u{2019}s documentation will help you. See http://writeexcel.web.fc2.com/\n\nAnd you can find many examples in this gem.\n"
+  gem.description   = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.summary       = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.homepage = "http://github.com/cxn03651/write_xlsx#readme"
 
