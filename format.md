@@ -5,8 +5,9 @@ title: Format Methods
 ### <a name="format" class="anchor" href="#format"><span class="octicon octicon-link" /></a>FORMAT METHODS
 
 The Format object methods are described in more detail in the following sections.
-In addition, there is a Perl program called `formats.rb` in the examples
-directory of the WriteExcel distribution.
+In addition, there is a Ruby program called
+[`formats.rb`](examples.html#formats)
+in the examples directory of the WriteXLSX distribution.
 This program creates an Excel workbook called formats.xlsx which contains
 examples of almost all the format types.
 
