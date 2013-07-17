@@ -232,7 +232,7 @@ Sparklines demo showing formatting options.
 ![Output from sparklines2.rb](images/examples/sparklines2.jpg)
 
 #### <a name="stats_ext" class="anchor" href="#stats_ext"><span class="octicon octicon-link" /></a>stats_ext
-Same as stats.rb with external references.
+Same as [stats.rb](#stats) with external references.
 ![Output from stats_ext.rb](images/examples/stats_ext.jpg)
 
 #### <a name="stocks" class="anchor" href="#stocks"><span class="octicon octicon-link" /></a>stocks
