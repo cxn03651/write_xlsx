@@ -54,7 +54,7 @@ rows as follows:
            | 1 |   A   |       |       |       |  ...
      +     | . |  ...  |  ...  |  ...  |  ...  |  ...
 
-Grouping in Excel::Writer::XLSX is achieved by setting the outline level via
+Grouping in WriteXLSX is achieved by setting the outline level via
 the `set_row()` and `set_column()` worksheet methods:
 
     set_row(row, height, format, hidden, level, collapsed)

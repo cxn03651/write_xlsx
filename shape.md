@@ -8,7 +8,7 @@ NAME
 
 #### <a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link" /></a>SYNOPSIS
 
-To create a simple Excel file containing shapes using Excel::Writer::XLSX:
+To create a simple Excel file containing shapes using WriteXLSX:
 
     require 'write_xlsx'
 
