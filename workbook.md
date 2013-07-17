@@ -331,7 +331,7 @@ The return value from `set_custom_color()` is the index of the colour that was c
     ferrari = workbook.set_custom_color(40, 216, 12, 12)
 
     format = workbook.add_format(
-        :bg_color => $ferrari,
+        :bg_color => ferrari,
         :pattern  => 1,
         :border   => 1
     )

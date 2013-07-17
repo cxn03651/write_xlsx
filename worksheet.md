@@ -759,12 +759,12 @@ See the `:start_cell` option above. The column is zero indexed.
 ##### Option: x_offset
 This option is used to change the x offset, in pixels, of a comment within a cell:
 
-    worksheet.write_comment('C3', $comment, :x_offset => 30)
+    worksheet.write_comment('C3', comment, :x_offset => 30)
 
 ##### Option: y_offset
 This option is used to change the y offset, in pixels, of a comment within a cell:
 
-    worksheet.write_comment('C3', $comment, :x_offset => 30)
+    worksheet.write_comment('C3', comment, :x_offset => 30)
 
 You can apply as many of these options as you require.
 
@@ -1267,7 +1267,7 @@ The following example sets an outline level of 1 for rows 1 and 2 (zero-indexed)
     worksheet.set_row(2, nil, nil, 0, 1)
 
 The `hidden` parameter can also be used to hide collapsed outlined rows when
-used in conjunction with the $level parameter.
+used in conjunction with the `level` parameter.
 
     worksheet.set_row(1, nil, nil, 1, 1)
     worksheet.set_row(2, nil, nil, 1, 1)
@@ -1284,12 +1284,12 @@ and
 programs in the examples directory of the distro.
 
 Excel allows up to 7 outline levels.
-Therefore the $level parameter should be in the range 0 <= $level <= 7.
+Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
 #### <a name="set_column" class="anchor" href="#set_column"><span class="octicon octicon-link" /></a>set_column(first_col, last_col, width, format, hidden, level, collapsed)
 
 This method can be used to change the default properties of a single column or
-a range of columns. All parameters apart from $first_col and $last_col are optional.
+a range of columns. All parameters apart from `first_col` and `last_col` are optional.
 
 If `set_column()` is applied to a single column the value of `first_col` and `last_col`
 should be the same. In the case where `last_col` is zero it is set to the same
@@ -1366,7 +1366,7 @@ and
 programs in the examples directory of the distro.
 
 Excel allows up to 7 outline levels.
-Therefore the $level parameter should be in the range 0 <= $level <= 7.
+Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
 #### <a name="set_default_row" class="anchor" href="#set_default_row"><span class="octicon octicon-link" /></a>set_default_row(height, hide_unused_rows)
 
@@ -1450,7 +1450,7 @@ the scrolling region begin at row twenty:
 
     worksheet.freeze_panes(1, 0, 20, 0)
 
-You cannot use A1 notation for the $top_row and `left_col` parameters.
+You cannot use A1 notation for the `top_row` and `left_col` parameters.
 
 See also the
 [`panes.rb`](examples.html#panes)
@@ -1500,7 +1500,7 @@ of alignment in addition to the merging:
 
     worksheet.merge_range('B3:D4', 'Vertical and horizontal', format)
 
-`merge_range()` writes its $token argument using the worksheet `write()` method.
+`merge_range()` writes its `token` argument using the worksheet `write()` method.
 Therefore it will handle numbers, strings, formulas or urls as required.
 If you need to specify the required `write_\*()` method use the
 `merge_range_type()` method, see below.
@@ -1542,7 +1542,7 @@ Note, you must always pass a format object as an argument, even if it is a defau
 
 #### <a name="set_zoom" class="anchor" href="#set_zoom"><span class="octicon octicon-link" /></a>set_zoom(scale)
 
-Set the worksheet zoom factor in the range 10 <= $scale <= 400:
+Set the worksheet zoom factor in the range `10 <= scale <= 400`:
 
     worksheet1.set_zoom(50)
     worksheet2.set_zoom(75)

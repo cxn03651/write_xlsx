@@ -60,7 +60,7 @@ The `:data` parameter can be used to specify the data in the cells of the table.
         [ 'Oranges', 500,   300,  200,  700 ]
     ]
 
-    worksheet.add_table('B3:F7', { :data => $data } )
+    worksheet.add_table('B3:F7', { :data => data } )
 
 Table data can also be written separately, as an array or individual cells.
 
@@ -186,7 +186,7 @@ For example to override the default 'Column n' style table headers:
     worksheet.add_table(
         'B3:F7',
         {
-            :data    => $data,
+            :data    => data,
             :columns => [
                 { :header => 'Product' },
                 { :header => 'Quarter 1' },
@@ -215,7 +215,7 @@ Column formulas can by applied using the formula column property:
     worksheet8.add_table(
         'B3:G7',
         {
-            :data    => $data,
+            :data    => data,
             :columns => [
                 { :header => 'Product' },
                 { :header => 'Quarter 1' },
@@ -241,7 +241,7 @@ and the `:total_string` and `:total_function` sub properties:
     worksheet10.add_table(
         'B3:F8',
         {
-            :data      => $data,
+            :data      => data,
             :total_row => 1,
             :columns   => [
                 { :header => 'Product',   :total_string   => 'Totals' },
@@ -268,12 +268,12 @@ User defined functions or formulas aren't supported.
 
 Format can also be applied to columns:
 
-    currency_format = $workbook->add_format( num_format => '$#,##0' );
+    currency_format = workbook.add_format(:num_format => '$#,##0')
 
     worksheet.add_table(
         'B3:D8',
         {
-            :data      => $data,
+            :data      => data,
             :total_row => 1,
             :columns   => [
                 { :header => 'Product', :total_string => 'Totals' },

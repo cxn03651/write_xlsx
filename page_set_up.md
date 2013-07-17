@@ -158,7 +158,7 @@ format by writeexcel gem.
 
 #### <a name="set_header" class="anchor" href="#set_header"><span class="octicon octicon-link" /></a>set_header(string, margin)
 
-Headers and footers are generated using a $string which is a combination of
+Headers and footers are generated using a `string` which is a combination of
 plain text and control characters. The `margin` parameter is optional.
 
 The available control character are:
@@ -346,7 +346,7 @@ If you have defined your own cell borders you may wish to hide the default gridl
 
     worksheet.hide_gridlines
 
-The following values of $option are valid:
+The following values of `option` are valid:
 
     0 : Don't hide gridlines
     1 : Hide printed gridlines only
@@ -449,7 +449,7 @@ when the worksheet is printed out. The default value is 1.
 #### <a name="set_print_scale" class="anchor" href="#set_print_scale"><span class="octicon octicon-link" /></a>set_print_scale(scale = 100)
 
 Set the scale factor of the printed page.
-Scale factors in the range 10 <= $scale <= 400 are valid:
+Scale factors in the range `10 <= scale <= 400` are valid:
 
     worksheet1.set_print_scale(50)
     worksheet2.set_print_scale(75)

@@ -144,7 +144,7 @@ For example:
             :type     => 'cell',
             :criteria => 'greater than',
             :value    => 5,
-            :format   => $red_format,
+            :format   => red_format,
         }
     )
 
@@ -156,7 +156,7 @@ Or, using the between criteria:
             :criteria => 'between',
             :minimum  => 20,
             :maximum  => 30,
-            :format   => $green_format,
+            :format   => green_format,
         }
     )
 
@@ -211,7 +211,7 @@ formats:
             :type     => 'cell',
             :criteria => '>',
             :value    => 5
-            ?format   => $format,
+            ?format   => format,
         }
     )
 
@@ -287,7 +287,7 @@ conditional format.
         {
             :type     => 'time_period',
             :criteria => 'yesterday',
-            :format   => $format,
+            :format   => format,
         }
     )
 

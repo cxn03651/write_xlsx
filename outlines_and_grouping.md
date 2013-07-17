@@ -69,11 +69,11 @@ undefined:
     worksheet.set_row(2, nil, nil, 0, 1)
     worksheet.set_column('B:G', nil, nil, 0, 1)
 
-Excel allows up to 7 outline levels. Therefore the $level parameter should be
-in the range 0 <= $level <= 7.
+Excel allows up to 7 outline levels. Therefore the `level` parameter should be
+in the range `0 <= level <= 7`.
 
-Rows and columns can be collapsed by setting the $hidden flag for the hidden
-rows/columns and setting the $collapsed flag for the row/column that has the
+Rows and columns can be collapsed by setting the `hidden` flag for the hidden
+rows/columns and setting the `collapsed` flag for the row/column that has the
 collapsed + symbol:
 
     worksheet.set_row(1, nil, nil, 1, 1)
@@ -83,7 +83,7 @@ collapsed + symbol:
     worksheet.set_column('B:G', nil, nil, 1, 1)
     worksheet.set_column('H:H', nil, nil, 0, 0, 1)   # Collapsed flag.
 
-Note: Setting the $collapsed flag is particularly important for compatibility
+Note: Setting the `collapsed` flag is particularly important for compatibility
 with OpenOffice.org and Gnumeric.
 
 For a more complete example see the
