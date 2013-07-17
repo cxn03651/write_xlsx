@@ -20,7 +20,7 @@ an Excel file in binary XLS format.
 WriteXLSX supports all of the features of Writeexcel and in some cases has
 more functionality.
 For more details
-see ["Compatibility with Writeexcel"](compatibility_with_writeexcel.html).
+see ["Compatibility with Writeexcel"](compatibility_with_writeexcel.html#compatibility_with_writeexcel).
 
 The main advantage of the XLSX format over the XLS format is that it allows a larger number of rows and columns in a worksheet.
 The XLSX file format also produces much smaller files than the XLS file format.
