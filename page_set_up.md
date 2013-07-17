@@ -287,7 +287,7 @@ double ampersand &&:
 As stated above the margin parameter is optional. As with the other margins
 the value should be in inches. The default header and footer margin is 0.3
 inch. Note, the default margin is different from the default used in the binary
-file format by Spreadsheet::WriteExcel. The header and footer margin size can
+file format by WriteExcel gem. The header and footer margin size can
 be set as follows:
 
     worksheet.set_header('&CHello', 0.75)

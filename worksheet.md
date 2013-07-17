@@ -131,7 +131,7 @@ Here are some examples in both row-column and A1 notation:
     worksheet.write('A14', \@array               ) # write_row()
     worksheet.write('A15', [\@array]             ) # write_col()
 
-    # Write an array formula. Not available in Spreadsheet::WriteExcel.
+    # Write an array formula. Not available in WriteExcel gem.
     worksheet.write('A19', '{=SUM(A1:B1*A2:B2)}' ) # write_formula()
 
 The "looks like" rule is defined by regular expressions:
