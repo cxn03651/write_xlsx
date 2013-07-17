@@ -5,7 +5,8 @@ title: WriteXLSX
 ### <a name="description" class="anchor" href="#description"><span class="octicon octicon-link" /></a>DESCRIPTION
 The WriteXLSX rubygem can be used to create an Excel file in the 2007+ XLSX format.
 
-This is ported to Ruby from Perl module [Excel::Wirter::XLSX](http://search.cpan.org/~jmcnamara/Excel-Writer-XLSX-0.70/).
+The WriteXLSX and this document is ported from Perl module [Excel::Wirter::XLSX](http://search.cpan.org/~jmcnamara/Excel-Writer-XLSX-0.70/).
+If you have any problem and question, please contact [me](mailto:cxn03651@msj.biglobe.ne.jp).
 
 The XLSX format is the Office Open XML (OOXML) format used by Excel 2007 and later.
 
@@ -14,8 +15,12 @@ Text, numbers, and formulas can be written to the cells.
 
 This module cannot, as yet, be used to write to an existing Excel XLSX file.
 
-WriteXLSX uses the same interface as the Writeexcel rubygem which produces an Excel file in binary XLS format.
-WriteXLSX supports all of the features of Writeexcel and in some cases has more functionality. For more details see ["Compatibility with Writeexcel"](compatibility_with_writeexcel.html).
+WriteXLSX uses the same interface as the Writeexcel rubygem which produces
+an Excel file in binary XLS format.
+WriteXLSX supports all of the features of Writeexcel and in some cases has
+more functionality.
+For more details
+see ["Compatibility with Writeexcel"](compatibility_with_writeexcel.html).
 
 The main advantage of the XLSX format over the XLS format is that it allows a larger number of rows and columns in a worksheet.
 The XLSX file format also produces much smaller files than the XLS file format.
