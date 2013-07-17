@@ -1483,7 +1483,8 @@ Example:
 
 You cannot use A1 notation with this method.
 
-See also the `freeze_panes()` method and the `panes.rb` program in the examples
+See also the `freeze_panes()` method and the
+[`panes.rb`](examples.html#panes) program in the examples
 directory of the distribution.
 
 #### <a name="merge_range" class="anchor" href="#merge_range"><span class="octicon octicon-link" /></a>merge_range(first_row, first_col, last_row, last_col, token, format)
