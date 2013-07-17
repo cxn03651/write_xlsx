@@ -120,7 +120,7 @@ Here are some examples in both row-column and A1 notation:
     worksheet.write(3, 0,  3.00001               ) # write_number()
     worksheet.write(4, 0,  ""                    ) # write_blank()
     worksheet.write(5, 0,  ''                    ) # write_blank()
-    worksheet.write(6, 0,  undef                 ) # write_blank()
+    worksheet.write(6, 0,  nil                   ) # write_blank()
     worksheet.write(7, 0                         ) # write_blank()
     worksheet.write(8, 0,  'http://www.ruby.com/') # write_url()
     worksheet.write('A9',  'ftp://ftp.cpan.org/' ) # write_url()
@@ -1235,7 +1235,7 @@ The most common use for this method is to change the height of a row:
 
     worksheet.set_row(0, 20)    # Row 1 height set to 20
 
-If you wish to set the format without changing the height you can pass undef as the height parameter:
+If you wish to set the format without changing the height you can pass nil as the height parameter:
 
     worksheet.set_row(0, nil, format)
 
