@@ -12,6 +12,7 @@ The XLSX format is the Office Open XML (OOXML) format used by Excel 2007 and lat
 
 Multiple worksheets can be added to a workbook and formatting can be applied to cells.
 Text, numbers, and formulas can be written to the cells.
+See [Examples](examples.html#examples)
 
 This module cannot, as yet, be used to write to an existing Excel XLSX file.
 
