@@ -2261,17 +2261,21 @@ module Writexlsx
     # Add a unique ids for primary or secondary axis.
     #
     def add_axis_ids(params) # :nodoc:
+      if ptrue?(params[:primary_axes])
+        @axis_ids  += ids
+      else
+        @axis2_ids += ids
+      end
+    end
+
+    def ids
       chart_id   = 1 + @id
       axis_count = 1 + @axis2_ids.size + @axis_ids.size
 
       id1 = sprintf('5%03d%04d', chart_id, axis_count)
       id2 = sprintf('5%03d%04d', chart_id, axis_count + 1)
 
-      if ptrue?(params[:primary_axes])
-        @axis_ids  << id1 << id2
-      else
-        @axis2_ids << id1 << id2
-      end
+      [id1, id2]
     end
 
     #
