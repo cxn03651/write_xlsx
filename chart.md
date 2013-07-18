@@ -136,64 +136,44 @@ The name property is optional and if it isn't supplied it will default to Series
 
 ##### <a name="line" class="anchor" href="#line"><span class="octicon octicon-link" /></a>:line
 Set the properties of the series line type such as colour and width.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="border" class="anchor" href="#border"><span class="octicon octicon-link" /></a>:border
 Set the border properties of the series such as colour and style.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="fill" class="anchor" href="#fill"><span class="octicon octicon-link" /></a>:fill
 Set the fill properties of the series such as colour.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="marker" class="anchor" href="#marker"><span class="octicon octicon-link" /></a>:marker
 Set the properties of the series marker such as style and colour.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="trendline" class="anchor" href="#trendline"><span class="octicon octicon-link" /></a>:trendline
 Set the properties of the series trendline such as linear,
 polynomial and moving average types.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="smooth" class="anchor" href="#smooth"><span class="octicon octicon-link" /></a>:smooth
 The smooth option is used to set the smooth property of a line series.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="y_error_bars" class="anchor" href="#y_error_bars"><span class="octicon octicon-link" /></a>:y_error_bars
 Set vertical error bounds for a chart series.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="x_error_bars" class="anchor" href="#x_error_bars"><span class="octicon octicon-link" /></a>:x_error_bars
 Set horizontal error bounds for a chart series.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="data_labels" class="anchor" href="#data_labels"><span class="octicon octicon-link" /></a>:data_labels
 Set data labels for the series.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 #### <a name="points" class="anchor" href="#points"><span class="octicon octicon-link" /></a>:points
 Set properties for individual points in a series.
-See the
-["SERIES OPTIONS"](#series_options)
-section below.
+See the [SERIES OPTIONS][] section below.
 
 ##### <a name="invert_if_negative" class="anchor" href="#invert_if_negative"><span class="octicon octicon-link" /></a>:invert_if_negative
 Invert the fill colour for negative values.
@@ -290,7 +270,7 @@ Set the font properties for the axis title.
 
     chart.set_x_axis(:name_font => {:name => 'Arial', :size => 10})
 
-See the ["CHART FONTS"](chart_fonts.html#chart_fonts) section below.
+See the [CHART FONTS][] section below.
 
 ##### <a name="set_x_axis_num_font" class="anchor" href="#set_x_axis_num_font"><span class="octicon octicon-link" /></a>:num_font
 Set the font properties for the axis numbers.
@@ -298,7 +278,7 @@ Set the font properties for the axis numbers.
 
     chart.set_x_axis(:num_font => {:bold => 1, :italic => 1})
 
-See the ["CHART FONTS"](chart_fonts.html#chart_fonts) section below.
+See the [CHART FONTS][] section below.
 
 ##### <a name="set_x_axis_num_format" class="anchor" href="#set_x_axis_num_format"><span class="octicon octicon-link" /></a>:num_format
 Set the number format for the axis.
@@ -396,9 +376,7 @@ The visible property is usually on for the X-axis
 but it depends on the type of chart.
 
 The line property sets the gridline properties such as colour and width.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_x_axis_minor_gridlines" class="anchor" href="#set_x_axis_minor_gridlines"><span class="octicon octicon-link" /></a>:minor_gridlines
 This takes the same options as major_gridlines above.
@@ -468,9 +446,7 @@ The `:x_offset` and `:y_offset` position the top left corner of the chart
 in the cell that it is inserted into.
 
 Note: the `:x_scale`, `:y_scale`, `:x_offset` and `:y_offset` parameters
-can also be set via the
-[`:insert_chart()`](worksheet.html#insert_chart)
-method:
+can also be set via the [insert_chart()][] method:
 
     worksheet.insert_chart('E2', chart, 2, 4, 1.5, 2)
 
@@ -540,15 +516,11 @@ The properties that can be set are:
 
 ##### <a name="set_chartarea_border" class="anchor" href="#set_chartarea_border"><span class="octicon octicon-link" /></a>:border
 Set the border properties of the chartarea such as colour and style.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_chartarea_fill" class="anchor" href="#set_chartarea_fill"><span class="octicon octicon-link" /></a>:fill
 Set the fill properties of the chartarea such as colour.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 #### <a name="set_plotarea" class="anchor" href="#set_plotarea"><span class="octicon octicon-link" /></a>set_plotarea()
 
@@ -563,15 +535,11 @@ The properties that can be set are:
 
 ##### <a name="set_plotarea_border" class="anchor" href="#set_plotarea_border"><span class="octicon octicon-link" /></a>:border
 Set the border properties of the plotarea such as colour and style.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_plotarea_fill" class="anchor" href="#set_plotarea_fill"><span class="octicon octicon-link" /></a>:fill
 Set the fill properties of the plotarea such as colour.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
 #### <a name="set_style" class="anchor" href="#set_style"><span class="octicon octicon-link" /></a>set_style()
 
@@ -607,9 +575,7 @@ the difference between the first and last data series.
 
 It is possible to format the up and down bars to add fill and border properties
 if required.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
     chart.set_up_down_bars(
         :up   => { :fill => { :color => 'green' } },
@@ -626,9 +592,7 @@ value of points in the data.
     chart.set_drop_lines
 
 It is possible to format the Drop Line line properties if required.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
     chart.set_drop_lines(:line => { :color => 'red', :dash_type => 'square_dot' } )
 
@@ -642,9 +606,7 @@ maximum and minimum values of points in a Category.
     chart.set_high_low_lines
 
 It is possible to format the High-Low Line line properties if required.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
     chart.set_high_low_lines( :line => { :color => 'red' } )
 
@@ -735,9 +697,7 @@ in conjunction with type.
     )
 
 Nested border and fill properties can also be set for a marker.
-See the
-["CHART FORMATTING"](#chart_formatting)
-section below.
+See the [CHART FORMATTING][] section below.
 
     chart.add_series(
         :values     => '=Sheet1!$B$1:$B$5',
@@ -1002,9 +962,7 @@ In these cases it is possible to use the points property of `add_series()`:
     )
 
 The points property takes an array ref of format options
-(see the
-["CHART FORMATTING"](#chart_formatting)
-section below).
+(see the [CHART FORMATTING][] section below).
 To assign default properties to points in a series pass `nil` values in the array:
 
     # Format point 3 of 3 only.
@@ -1197,3 +1155,8 @@ can be set for both. The type of axis that a property applies to is shown in
 the `set_x_axis()` section of the documentation above.
 
 Some charts such as `Scatter` and `Stock` have two value axes.
+
+[CHART FONTS]: chart_fonts.html#chart_fonts
+[CHART FORMATTING]: chart.html#chart_formatting
+[SERIES OPTIONS]: chart.html#series_options
+[insert_chart()]: worksheet.html#insert_chart

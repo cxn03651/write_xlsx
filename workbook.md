@@ -63,7 +63,7 @@ And you can also pass default format properties.
 
     workbook = WriteXLSX.new(filename, :font => 'Courier New', :size => 11)
 
-See the ["CELL FORMATTING"](cell_formatting.html#cell_formatting) section for more details about Format properties and how to set them.
+See the [CELL FORMATTING][] section for more details about Format properties and how to set them.
 
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
@@ -91,12 +91,13 @@ You can either define the properties at creation time via a hash of property val
     format1 = workbook.add_format(props_hash)   # Set properties at creation
     format2 = workbook.add_format               # Set properties later
 
-See the ["CELL FORMATTING"](cell_formatting.html#cell_formatting) section for more details about Format properties and how to set them.
+See the [CELL FORMATTING][] section for more details about Format properties and how to set them.
 
 #### <a name="add_chart" class="anchor" href="#add_chart"><span class="octicon octicon-link" /></a>add_chart(properties)
 
 This method is use to create a new chart either as a standalone worksheet (the default)
-or as an embeddable object that can be inserted into a worksheet via the `insert_chart()` Worksheet method.
+or as an embeddable object that can be inserted into a worksheet via the
+[insert_chart()][] Worksheet method.
 
     chart = workbook.add_chart(:type => 'column')
 
@@ -127,7 +128,7 @@ Used to define a chart subtype where available.
 
     chart = workbook.add_chart(:type => 'bar', :subtype => 'stacked')
 
-See the [Chart documentation](chart.html#chart) for a list of available chart subtypes.
+See the [Chart Documentation][] for a list of available chart subtypes.
 
 ##### :name
 
@@ -141,7 +142,8 @@ The name property can be omitted for embedded charts.
 
 ##### :embedded
 
-Specifies that the Chart object will be inserted in a worksheet via the `insert_chart()` Worksheet method.
+Specifies that the Chart object will be inserted in a worksheet via the
+[insert_chart()][] Worksheet method.
 It is an error to try insert a Chart that doesn't have this flag set.
 
     chart = workbook.add_chart(:type => 'line', :embedded => 1)
@@ -152,7 +154,7 @@ It is an error to try insert a Chart that doesn't have this flag set.
     # Insert the chart into the a worksheet.
     worksheet.insert_chart('E2', chart)
 
-See [Chart](chart.html#chart) for details on how to configure the chart object once it is created.
+See [Chart Documentation][] for details on how to configure the chart object once it is created.
 See also the
 [`chart_\*.rb`](examples.html#chart_area))
 programs in the examples directory of the distro.
@@ -293,7 +295,7 @@ The directory for the temporary file must exist, `set_tempdir()` will not create
 The `set_custom_color()` method can be used to override one of the built-in palette values
 with a more suitable colour.
 
-The value for `index` should be in the range 8..63, see ["COLOURS IN EXCEL"](colors.html#colors).
+The value for `index` should be in the range 8..63, see [COLOURS IN EXCEL][].
 
 The default named colours use the following indices:
 
@@ -378,6 +380,19 @@ If you wish to change this you can call the `set_1904()` workbook method.
 You can query the current value by calling the `get_1904()` workbook method.
 This returns `false` for 1900 and `true` for 1904.
 
-See also ["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time) for more information about working with Excel's date system.
+See also [DATES AND TIME IN EXCEL][] for more information about working with Excel's date system.
 
 In general you probably won't need to use `set_1904()`.
+
+
+[CELL NOTATION]: worksheet.html#cell-notation
+[CELL FORMATTING]: cell_formatting.html#cell_formatting
+[COLOURS IN EXCEL]: colors.html#colors
+[DATA VALIDATION IN EXCEL]: data_validation.html#data_validation
+[DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
+[Chart Documentation]: chart.html#chart
+[FORMULAS AND FUNCTIONS IN EXCEL]: formulas_and_functions.html#formulas_and_functions
+[CONDITIONAL FORMATTING IN EXCEL]: conditional_formatting.html#conditional_formatting
+[SPARKLINES IN EXCEL]: sparklines.html#sparklines
+[TABLES IN EXCEL]: tables.html#tables
+[insert_chart()]: worksheet.html#insert_chart

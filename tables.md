@@ -21,9 +21,7 @@ Tables are added to a worksheet using the `add_table()` method:
     worksheet.add_table('B3:F7', { parameters })
 
 The data range can be specified in 'A1' or 'row/col' notation
-(see also the note about
-["Cell notation"](worksheet.html#cell-notation)
-for more information):
+(see also the note about [CELL NOTATION][] for more information):
 
     worksheet.add_table('B3:F7')
     # Same as:
@@ -293,3 +291,6 @@ Format can also be applied to columns:
 
 Standard WriteXLSX format objects can be used. However, they should be limited
 to numerical formats. Overriding other table formatting may produce inconsistent results.
+
+
+[CELL NOTATION]: worksheet.html#cell-notation

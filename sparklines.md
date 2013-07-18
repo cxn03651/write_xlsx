@@ -9,8 +9,7 @@ to worksheet cells.
 These are useful for showing visual trends in data in a compact format.
 
 In WriteXLSX Sparklines can be added to cells using the
-[`add_sparkline()`](worksheet.html#add_sparkline)
-worksheet method:
+[add_sparkline()][] worksheet method:
 
     worksheet.add_sparkline(
         {
@@ -29,10 +28,10 @@ but they won't be displayed.
 
 #### <a name="add_sparkline" class="anchor" href="#add_sparkline"><span class="octicon octicon-link" /></a>add_sparkline( { parameter => 'value', ... } )
 
-The `add_sparkline()` worksheet method is used to add sparklines to a cell
+The [add_sparkline()][] worksheet method is used to add sparklines to a cell
 or a range of cells.
 
-The parameters to `add_sparkline()` must be passed in a hash.
+The parameters to [add_sparkline()][] must be passed in a hash.
 The main sparkline parameters are:
 
     :location        (required)
@@ -75,9 +74,7 @@ This is the cell where the sparkline will be displayed:
     :location => 'F1'
 
 The `:location` should be a single cell.
-(For multiple cells see
-["Grouped Sparklines"](#grouped_sparklines)
-below).
+(For multiple cells see [Grouped Sparklines] below).
 
 #### <a name="range" class="anchor" href="#range"><span class="octicon octicon-link" /></a>:range
 
@@ -91,9 +88,7 @@ This specifies the cell data range that the sparkline will plot:
     )
 
 The `:range` should be a 2D array.
-(For 3D arrays of cells see
-["Grouped Sparklines"](#grouped_sparklines)
-below).
+(For 3D arrays of cells see [Grouped Sparklines] below).
 
 If `:range` is not on the same worksheet you can specify its location
 using the usual Excel notation:
@@ -217,7 +212,7 @@ As a special case you can set the maximum and minimum to be for a group of spark
 
         :max         => 'group',
 
-See ["Grouped Sparklines"](#grouped_sparklines) below.
+See [Grouped Sparklines][] below.
 
 ##### <a name="empty_cells" class="anchor" href="#empty_cells"><span class="octicon octicon-link" /></a>:empty_cells
 
@@ -300,3 +295,7 @@ See the
 and
 [sparklines2.rb](examples.html#sparklines2)
 example programs in the examples directory of the distro.
+
+
+[Grouped Sparklines]: sparklines.html#grouped_sparklines
+[add_sparkline()]: worksheet.html#add_sparkline

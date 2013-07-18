@@ -51,9 +51,7 @@ You can also use A1 style notation. For example:
     worksheet.data_validation('A1',       {...})
     worksheet.data_validation('A1:B5',    {...})
 
-See also the note about
-["Cell notation"](worksheet.html#cell-notation)
-for more information.
+See also the note about [CELL NOTATION][] for more information.
 
 The last parameter in `data_validation()` must be a hash ref containing the
 parameters that describe the type and style of the data validation.
@@ -141,10 +139,9 @@ Excel requires that range references are only to cells on the same worksheet.
 
 *date* restricts the cell to date values.
 Dates in Excel are expressed as integer values but you can also pass an ISO8601
-style string as used in [`write_date_time()`](worksheet.html#write_date_time).
-See also
-["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time)
-for more information about working with Excel's dates.
+style string as used in [write_date_time()][].
+See also [DATES AND TIME IN EXCEL][] for more information about working
+with Excel's dates.
 
     :validate => 'date',
     :criteria => '>',
@@ -154,10 +151,9 @@ for more information about working with Excel's dates.
 
 *time* restricts the cell to time values.
 Times in Excel are expressed as decimal values but you can also pass an
-ISO8601 style string as used in [`write_date_time()`](worksheet.html#write_date_time).
-See also
-["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time)
-for more information about working with Excel's times.
+ISO8601 style string as used in [write_date_time()][].
+See also [DATES AND TIME IN EXCEL][] for more information about working
+with Excel's times.
 
     :validate => 'time',
     :criteria => '>',
@@ -452,3 +448,16 @@ See also the
 [`data_validate.rb`](examples.html#data_validate)
 program in the examples directory of the distro.
 
+
+[CELL NOTATION]: worksheet.html#cell-notation
+[CELL FORMATTING]: cell_formatting.html#cell_formatting
+[COLOURS IN EXCEL]: colors.html#colors
+[DATA VALIDATION IN EXCEL]: data_validation.html#data_validation
+[DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
+[Chart Documentation]: chart.html#chart
+[FORMULAS AND FUNCTIONS IN EXCEL]: formulas_and_functions.html#formulas_and_functions
+[CONDITIONAL FORMATTING IN EXCEL]: conditional_formatting.html#conditional_formatting
+[SPARKLINES IN EXCEL]: sparklines.html#sparklines
+[TABLES IN EXCEL]: tables.html#tables
+[insert_chart()]: worksheet.html#insert_chart
+[write_date_time()]: worksheet.html#write_date_time

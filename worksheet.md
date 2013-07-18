@@ -57,7 +57,7 @@ The following methods are available through a new worksheet:
 * [filter_column](#filter_column)
 * [filter_column_list](#filter_column_list)
 
-#### <a name="cell-notation" class="anchor" href="#cell-notation"><span class="octicon octicon-link" /></a>Cell notation
+#### <a name="cell-notation" class="anchor" href="#cell-notation"><span class="octicon octicon-link" /></a>CELL NOTATION
 
 WriteXLSX supports two forms of notation to designate the position of cells:
 Row-column notation and A1 notation.
@@ -158,7 +158,7 @@ The "looks like" rule is defined by regular expressions:
 `write_string()` if none of the previous conditions apply.
 
 The `format` parameter is optional.
-It should be a valid Format object, see ["CELL FORMATTING"](cell_formatting.html#cell_formatting):
+It should be a valid Format object, see [CELL FORMATTING][]
 
     format = workbook.add_format
     format.set_bold
@@ -178,7 +178,7 @@ The write methods return:
     -1 for insufficient number of arguments.
     -2 for row or column out of bounds.
     -3 for string too long.
-
+l
 #### <a name="write_number" class="anchor" href="#write_number"><span class="octicon octicon-link" /></a>write_number(row, column, number, format = nil)
 
 Write an integer or a float to the cell specified by `row` and `column`:
@@ -186,7 +186,7 @@ Write an integer or a float to the cell specified by `row` and `column`:
     worksheet.write_number(0, 0, 123456)
     worksheet.write_number('A2', 2.3451)
 
-See the note about ["Cell notation"](#cell-notation).
+See the note about [CELL NOTATION][].
 The `format` parameter is optional.
 
 In general it is sufficient to use the `write()` method.
@@ -222,7 +222,7 @@ To get around this you can use the Excel text format @:
     format1 = workbook.add_format(:num_format => '@')
     worksheet.write_string('A2', '01209', format1)
 
-See also the note about ["Cell notation"](#cell-notation).
+See also the note about [CELL NOTATION][].
 
 #### <a name="write_rich_string" class="anchor" href="#write_rich_string"><span class="octicon octicon-link" /></a>write_rich_string(row, column, format, string, ..., cell_format = nil)
 
@@ -305,7 +305,7 @@ example in the distro for more examples.
       italic, 'j = k', super, '(n-1)', center)
 
 As with `write_sting()` the maximum string size is 32767 characters.
-See also the note about ["Cell notation"](#cell-notation).
+See also the note about [CELL NOTATION][].
 
 #### <a name="write_blank" class="anchor" href="#write_blank"><span class="octicon octicon-link" /></a>write_blank(row, column, format)
 
@@ -328,7 +328,7 @@ As such, if you write an empty cell without formatting it is ignored:
 This seemingly uninteresting fact means that you can write arrays of data
 without special treatment for nil or empty string values.
 
-See the note about ["Cell notation"](#cell-notation).
+See the note about [CELL NOTATION][].
 
 #### <a name="write_row" class="anchor" href="#write_row"><span class="octicon octicon-link" /></a>write_row(row, column, array, format = nil)
 
@@ -454,7 +454,7 @@ The following variations on the `date_string` parameter are permitted:
 Note that the `T` is required in all cases.
 
 A date should always have a `format`, otherwise it will appear as a number,
-see ["DATES AND TIME IN EXCEL"](dates_and_time.html#dates_and_time) and ["CELL FORMATTING"](cell_formatting.html#cell_formatting).
+see [DATES AND TIME IN EXCEL][] and [CELL FORMATTING][].
 Here is a typical example:
 
     date_format = workbook.add_format(:num_format => 'mm/dd/yy')
@@ -552,7 +552,7 @@ Note: WriteXLSX will escape the following characters in URLs as required by Exce
 `\s` `"` `<` `>` `\` `[` `]` `backquote` `^` `{` `}` unless the URL already contains `%xx` style escapes.
 In which case it is assumed that the URL was escaped correctly by the user and will by passed directly to Excel.
 
-See also, the note about ["Cell notation"](#cell-notation).
+See also, the note about [CELL NOTATION][].
 
 #### <a name="write_formul" class="anchor" href="#write_formul"><span class="octicon octicon-link" /></a>write_formula(row, column, formula, format = nil, value = nil)
 
@@ -571,8 +571,8 @@ Array formulas are also supported:
 
 See also the `write_array_formula()` method below.
 
-See the note about ["Cell notation"](#cell-notation).
-For more information about writing Excel formulas see ["FORMULAS AND FUNCTIONS IN EXCEL"](formulas_and_functions.html#formulas_and_functions)
+See the note about [CELL NOTATION][].
+For more information about writing Excel formulas see [FORMULAS AND FUNCTIONS IN EXCEL][].
 
 If required, it is also possible to specify the calculated value of the `formula`.
 This is occasionally necessary when working with non-Excel applications that don't calculate the value
@@ -651,7 +651,7 @@ The following example shows how to add a comment to a cell:
     worksheet.write_comment(2, 2, 'This is a comment.')
 
 As usual you can replace the `row` and `column` parameters with an A1 cell reference.
-See the note about ["Cell notation"](#cell-notation).
+See the note about [CELL NOTATION][].
 
     worksheet.write(        'C3', 'Hello')
     worksheet.write_comment('C3', 'This is a comment.')
@@ -731,7 +731,7 @@ This option is used to set the height of the cell comment box explicitly in pixe
 ##### Option: color
 This option is used to set the background colour of cell comment box.
 You can use one of the named colours recognised by WriteXLSX or a colour index.
-See "COLOURS IN EXCEL".
+See [COLOURS IN EXCEL][].
 
     worksheet.write_comment('C3', 'Hello', :color => 'green')
     worksheet.write_comment('C4', 'Hello', :color => 0x35)      # Orange
@@ -858,7 +858,7 @@ the embedded option set.
     worksheet.insert_chart('E2', chart)
 
 See `add_chart()` for details on how to create the Chart object
-and [Chart](chart.html#chart) for details on how to configure it.
+and [Chart Documentation](chart.html#chart) for details on how to configure it.
 See also the
 [`chart_\*.rb`](examples.html#chart_area)
 programs in the examples directory of the distro.
@@ -1008,7 +1008,7 @@ or to limit the user input to a dropdown list of values.
         })
 
 This method contains a lot of parameters and is described in detail in
-a separate section ["DATA VALIDATION IN EXCEL"](data_validation.html#data_validation).
+a separate section [DATA VALIDATION IN EXCEL][].
 
 See also the
 [`data_validate.rb`](examples.html#data_validate)
@@ -1029,7 +1029,7 @@ or range of cells based on user defined criteria.
     )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["CONDITIONAL FORMATTING IN EXCEL"](conditional_formatting.html#conditional_formatting).
+in a separate section [CONDITIONAL FORMATTING IN EXCEL][].
 
 See also the
 [`conditional_format.rb`](examples.html#conditional_format)
@@ -1049,7 +1049,7 @@ The `add_sparkline()` worksheet method is used to add sparklines to a cell or a 
     )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["SPARKLINES IN EXCEL"](sparklines.html#sparklines).
+in a separate section [SPARKLINES IN EXCEL][].
 
 See also
 [`sparklines1.rb`](examples.html#sparklines1)
@@ -1069,7 +1069,7 @@ The `add_table()` method is used to group a range of cells into an Excel Table.
     worksheet.add_table('B3:F7', { ... } )
 
 This method contains a lot of parameters and is described in detail
-in a separate section ["TABLES IN EXCEL"](tables.html#tables).
+in a separate section [TABLES IN EXCEL][].
 
 See also the
 [`tables.rb`](examples.html#tables)
@@ -1167,7 +1167,7 @@ See the
 [`protection.rb`](examples.html#protection)
 program in the examples directory of the distro for an
 illustrative example and the `set_locked` and `set_hidden` format methods
-in ["CELL FORMATTING"](cell_formatting.html#cell_formatting).
+in [CELL FORMATTING][].
 
 You can optionally add a password to the worksheet protection:
 
@@ -1213,7 +1213,7 @@ The most common requirement is to select a single cell, in which case
 `last_row` and `last_col` can be omitted. The active cell within a selected
 range is determined by the order in which `first` and `last` are specified.
 It is also possible to specify a cell or a range using A1 notation.
-See the note about ["Cell notation"](#cell-notation).
+See the note about [CELL NOTATION][].
 
 Examples:
 
@@ -1297,7 +1297,7 @@ value as `first_col`.
 
 It is also possible, and generally clearer, to specify a column range using
 the form of A1 notation used for columns.
-See the note about ["Cell notation"](#cell-notation).
+See the note about [CELL NOTATION][].
 
 Examples:
 
@@ -1312,7 +1312,7 @@ Unfortunately, there is no way to specify "AutoFit" for a column in the Excel fi
 This feature is only available at runtime from within Excel.
 
 As usual the format parameter is optional, for additional information,
-see ["CELL FORMATTING"](#cell-formatting).
+see [CELL FORMATTING][].
 If you wish to set the format without changing the width you can pass nil
 as the width parameter:
 
@@ -1579,7 +1579,7 @@ In Excel this option is found under Tools->Options->View.
 The `set_tab_color()` method is used to change the colour of the worksheet tab.
 You can use one of the standard colour names provided by the Format object
 or a colour index.
-See "COLOURS IN EXCEL" and the `set_custom_color()` method.
+See [COLOURS IN EXCEL][] and the `set_custom_color()` method.
 
     worksheet1.set_tab_color('red')
     worksheet2.set_tab_color(0x0C)
@@ -1743,3 +1743,15 @@ method to convert date strings to a number that represents an Excel date and tim
 It is exposed as a public method for utility purposes.
 
 The `date_string` format is detailed in the `write_date_time()` method.
+
+[CELL NOTATION]: worksheet.html#cell-notation
+[CELL FORMATTING]: cell_formatting.html#cell_formatting
+[COLOURS IN EXCEL]: colors.html#colors
+[DATA VALIDATION IN EXCEL]: data_validation.html#data_validation
+[DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
+[Chart Documentation]: chart.html#chart
+[FORMULAS AND FUNCTIONS IN EXCEL]: formulas_and_functions.html#formulas_and_functions
+[CONDITIONAL FORMATTING IN EXCEL]: conditional_formatting.html#conditional_formatting
+[SPARKLINES IN EXCEL]: sparklines.html#sparklines
+[TABLES IN EXCEL]: tables.html#tables
+[insert_chart()]: worksheet.html#insert_chart

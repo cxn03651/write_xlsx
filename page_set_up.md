@@ -329,7 +329,7 @@ This can be achieved by using the `repeat_columns()` method.
 The parameters `first_column` and `last_column` are zero based.
 The `last_column` parameter is optional if you only wish to specify one column.
 You can also specify the columns using A1 column notation,
-see the note about ["Cell notation"](worksheet.html#cell-notation).
+see the note about [CELL NOTATION][].
 
     worksheet1.repeat_columns(0)        # Repeat the first column
     worksheet2.repeat_columns(0, 1)     # Repeat the first two columns
@@ -385,7 +385,7 @@ Do not confuse these headers with page headers as described in the
 
 This method is used to specify the area of the worksheet that will be printed.
 All four parameters must be specified.
-You can also use A1 notation, see the note about ["Cell notation"](worksheet.html#cell-notation).
+You can also use A1 notation, see the note about [CELL NOTATION][].
 
     worksheet1.print_area('A1:H20')    # Cells A1 to H20
     worksheet2.print_area(0, 0, 19, 7) # The same
@@ -510,3 +510,6 @@ call it more than once:
 Note: If you specify the "fit to page" option via the `fit_to_pages()`
 method it will override all manual page breaks.
 
+
+
+[CELL NOTATION]: worksheet.html#cell-notation

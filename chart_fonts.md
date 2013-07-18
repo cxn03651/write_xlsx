@@ -8,7 +8,7 @@ The following font properties can be set for any chart object that they apply to
 (and that are supported by WriteXLSX) such as chart titles, axis labels
 and axis numbering.
 They correspond to the equivalent Worksheet cell Format object properties.
-See ["FORMAT_METHODS"](format.html#format) for more information.
+See [FORMAT METHODS][] for more information.
 
     :name
     :size
@@ -96,3 +96,6 @@ Here is an example of Font formatting in a Chart program:
             :color  => '#7030A0',
         }
     )
+
+
+[FORMAT METHODS]: format.html#format
