@@ -8,7 +8,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
   end
 
   def test_write_number_format
-    axis = Writexlsx::Chart::Axis.new
+    axis = Writexlsx::Chart::Axis.new(@chart)
     axis.num_format = 'General'
     axis.defaults   = { :num_format => 'General' }
 
@@ -18,7 +18,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
   end
 
   def test_write_number_format02
-    axis = Writexlsx::Chart::Axis.new
+    axis = Writexlsx::Chart::Axis.new(@chart)
     axis.num_format = '#,##0.00'
     axis.defaults   = { :num_format => 'General' }
 
@@ -28,7 +28,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
   end
 
   def test_write_number_format03
-    axis = Writexlsx::Chart::Axis.new
+    axis = Writexlsx::Chart::Axis.new(@chart)
     axis.num_format = 'General'
     axis.defaults   = { :num_format => 'General' }
 
@@ -38,7 +38,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
   end
 
   def test_write_number_format04
-    axis = Writexlsx::Chart::Axis.new
+    axis = Writexlsx::Chart::Axis.new(@chart)
     axis.num_format = '#,##0.00'
     axis.defaults   = { :num_format => 'General' }
 

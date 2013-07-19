@@ -2,6 +2,7 @@
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart/axis'
+require 'write_xlsx/chart/caption'
 require 'write_xlsx/chart/series'
 
 module Writexlsx
@@ -100,10 +101,11 @@ module Writexlsx
       @protection        = 0
       @chartarea         = {}
       @plotarea          = {}
-      @x_axis            = Axis.new
-      @y_axis            = Axis.new
-      @x2_axis           = Axis.new
-      @y2_axis           = Axis.new
+      @title             = Caption.new(self)
+      @x_axis            = Axis.new(self)
+      @y_axis            = Axis.new(self)
+      @x2_axis           = Axis.new(self)
+      @y2_axis           = Axis.new(self)
       @name              = ''
       @show_blanks       = 'gap'
       @show_hidden_data  = false
@@ -181,7 +183,7 @@ module Writexlsx
     # Set the properties of the x-axis.
     #
     def set_x_axis(params = {})
-      @x_axis.merge_with_hash(self, params)
+      @x_axis.merge_with_hash(params)
     end
 
     #
@@ -191,36 +193,28 @@ module Writexlsx
     # The properties that can be set are the same as for set_x_axis,
     #
     def set_y_axis(params = {})
-      @y_axis.merge_with_hash(self, params)
+      @y_axis.merge_with_hash(params)
     end
 
     #
     # Set the properties of the secondary X-axis.
     #
     def set_x2_axis(params = {})
-      @x2_axis.merge_with_hash(self, params)
+      @x2_axis.merge_with_hash(params)
     end
 
     #
     # Set the properties of the secondary Y-axis.
     #
     def set_y2_axis(params = {})
-      @y2_axis.merge_with_hash(self, params)
+      @y2_axis.merge_with_hash(params)
     end
 
     #
     # Set the properties of the chart title.
     #
     def set_title(params)
-      name, name_formula = process_names(params[:name], params[:name_formula])
-      data_id = get_data_id(name_formula, params[:data])
-
-      @title_name    = name
-      @title_formula = name_formula
-      @title_data_id = data_id
-
-      # Set the font properties if present.
-      @title_font = convert_font_args(params[:name_font])
+      @title.merge_with_hash(params)
     end
 
     #
@@ -451,6 +445,19 @@ module Writexlsx
       line[:_defined] = 1
 
       line
+    end
+
+    #
+    # Switch name and name_formula parameters if required.
+    #
+    def process_names(name = nil, name_formula = nil) # :nodoc:
+      # Name looks like a formula, use it to set name_formula.
+      if name && name =~ /^=[^!]+!\$/
+        name_formula = name
+        name         = ''
+      end
+
+      [name, name_formula]
     end
 
     #
@@ -860,10 +867,10 @@ module Writexlsx
     def write_chart # :nodoc:
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
-        if @title_formula
-          write_title_formula(@title_formula, @title_data_id, nil, @title_font)
-        elsif @title_name
-          write_title_rich(@title_name, nil, @title_font)
+        if @title.formula
+          write_title_formula(@title.formula, @title.data_id, nil, @title.name_font)
+        elsif @title.name
+          write_title_rich(@title.name, nil, @title.name_font)
         end
 
         # Write the c:plotArea element.
