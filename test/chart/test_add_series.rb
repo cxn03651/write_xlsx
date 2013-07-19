@@ -8,28 +8,28 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values
-    series = Series.new
-    series.categories      = nil
-    series.values          = '=Sheet1!$A$1:$A$5'
-    series.name            = nil
-    series.name_formula   = nil
-    series.name_id         = nil
-    series.cat_data_id     = nil
-    series.val_data_id    = 0
-    series.line           = { :_defined => 0 }
-    series.fill           = { :_defined => 0 }
-    series.marker = nil
-    series.trendline = nil
-    series.smooth = nil
-    series.labels = nil
-    series.invert_if_neg = nil
-    series.x2_axis = nil
-    series.y2_axis = nil
-    series.error_bars = {
+    series = Series.new(@chart)
+    series.instance_variable_set(:@categories, nil)
+    series.instance_variable_set(:@values, '=Sheet1!$A$1:$A$5')
+    series.instance_variable_set(:@name, nil)
+    series.instance_variable_set(:@name_formula, nil)
+    series.instance_variable_set(:@name_id, nil)
+    series.instance_variable_set(:@cat_data_id, nil)
+    series.instance_variable_set(:@val_data_id, 0)
+    series.instance_variable_set(:@line, { :_defined => 0 })
+    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@marker, nil)
+    series.instance_variable_set(:@trendline, nil)
+    series.instance_variable_set(:@smooth, nil)
+    series.instance_variable_set(:@labels, nil)
+    series.instance_variable_set(:@invert_if_neg, nil)
+    series.instance_variable_set(:@x2_axis, nil)
+    series.instance_variable_set(:@y2_axis, nil)
+    series.instance_variable_set(:@error_bars, {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-    }
-    series.points = nil
+    })
+    series.instance_variable_set(:@points, nil)
 
     expected = series
 
@@ -40,28 +40,28 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_with_categories_and_values
-    series = Series.new
-    series.categories     = '=Sheet1!$A$1:$A$5'
-    series.values         = '=Sheet1!$B$1:$B$5'
-    series.name           = 'Text'
-    series.name_formula   = nil
-    series.name_id        = nil
-    series.cat_data_id    = 0
-    series.val_data_id = 1
-    series.line           = { :_defined => 0 }
-    series.fill           = { :_defined => 0 }
-    series.marker = nil
-    series.trendline = nil
-    series.smooth = nil
-    series.labels = nil
-    series.invert_if_neg = nil
-    series.x2_axis = nil
-    series.y2_axis = nil
-    series.error_bars = {
+    series = Series.new(@chart)
+    series.instance_variable_set(:@categories, '=Sheet1!$A$1:$A$5')
+    series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
+    series.instance_variable_set(:@name, 'Text')
+    series.instance_variable_set(:@name_formula, nil)
+    series.instance_variable_set(:@name_id       , nil)
+    series.instance_variable_set(:@cat_data_id   , 0)
+    series.instance_variable_set(:@val_data_id, 1)
+    series.instance_variable_set(:@line          , { :_defined => 0 })
+    series.instance_variable_set(:@fill          , { :_defined => 0 })
+    series.instance_variable_set(:@marker, nil)
+    series.instance_variable_set(:@trendline, nil)
+    series.instance_variable_set(:@smooth, nil)
+    series.instance_variable_set(:@labels, nil)
+    series.instance_variable_set(:@invert_if_neg, nil)
+    series.instance_variable_set(:@x2_axis, nil)
+    series.instance_variable_set(:@y2_axis, nil)
+    series.instance_variable_set(:@error_bars, {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-    }
-    series.points = nil
+    })
+    series.instance_variable_set(:@points, nil)
     expected = [ series ]
 
     @chart.add_series(
@@ -75,28 +75,28 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values_checked_by_array
-    series = Series.new
-    series.categories     = nil
-    series.values         = '=Sheet1!$A$1:$A$5'
-    series.name           = nil
-    series.name_formula   = nil
-    series.name_id        = nil
-    series.cat_data_id    = nil
-    series.val_data_id = 0
-    series.line           = { :_defined => 0 }
-    series.fill           = { :_defined => 0 }
-    series.marker = nil
-    series.trendline = nil
-    series.smooth = nil
-    series.labels = nil
-    series.invert_if_neg = nil
-    series.x2_axis = nil
-    series.y2_axis = nil
-    series.error_bars = {
+    series = Series.new(@chart)
+    series.instance_variable_set(:@categories, nil)
+    series.instance_variable_set(:@values, '=Sheet1!$A$1:$A$5')
+    series.instance_variable_set(:@name, nil)
+    series.instance_variable_set(:@name_formula, nil)
+    series.instance_variable_set(:@name_id       , nil)
+    series.instance_variable_set(:@cat_data_id   , nil)
+    series.instance_variable_set(:@val_data_id, 0)
+    series.instance_variable_set(:@line          , { :_defined => 0 })
+    series.instance_variable_set(:@fill          , { :_defined => 0 })
+    series.instance_variable_set(:@marker, nil)
+    series.instance_variable_set(:@trendline, nil)
+    series.instance_variable_set(:@smooth, nil)
+    series.instance_variable_set(:@labels, nil)
+    series.instance_variable_set(:@invert_if_neg, nil)
+    series.instance_variable_set(:@x2_axis, nil)
+    series.instance_variable_set(:@y2_axis, nil)
+    series.instance_variable_set(:@error_bars, {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-    }
-    series.points = nil
+    })
+    series.instance_variable_set(:@points, nil)
     expected = [ series ]
 
     @chart.add_series(:values => ['Sheet1', 0, 4, 0, 0])
@@ -106,28 +106,28 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_both_checked_by_array
-    series = Series.new
-    series.categories     = '=Sheet1!$A$1:$A$5'
-    series.values         = '=Sheet1!$B$1:$B$5'
-    series.name           = 'Text'
-    series.name_formula   = nil
-    series.name_id        = nil
-    series.cat_data_id   = 0
-    series.val_data_id = 1
-    series.line           = { :_defined => 0 }
-    series.fill           = { :_defined => 0 }
-    series.marker = nil
-    series.trendline = nil
-    series.smooth = nil
-    series.labels = nil
-    series.invert_if_neg = nil
-    series.x2_axis = nil
-    series.y2_axis = nil
-    series.error_bars = {
+    series = Series.new(@chart)
+    series.instance_variable_set(:@categories, '=Sheet1!$A$1:$A$5')
+    series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
+    series.instance_variable_set(:@name, 'Text')
+    series.instance_variable_set(:@name_formula, nil)
+    series.instance_variable_set(:@name_id       , nil)
+    series.instance_variable_set(:@cat_data_id  , 0)
+    series.instance_variable_set(:@val_data_id, 1)
+    series.instance_variable_set(:@line          , { :_defined => 0 })
+    series.instance_variable_set(:@fill          , { :_defined => 0 })
+    series.instance_variable_set(:@marker, nil)
+    series.instance_variable_set(:@trendline, nil)
+    series.instance_variable_set(:@smooth, nil)
+    series.instance_variable_set(:@labels, nil)
+    series.instance_variable_set(:@invert_if_neg, nil)
+    series.instance_variable_set(:@x2_axis, nil)
+    series.instance_variable_set(:@y2_axis, nil)
+    series.instance_variable_set(:@error_bars, {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-    }
-    series.points = nil
+    })
+    series.instance_variable_set(:@points, nil)
     expected = series
 
     @chart.add_series(
@@ -141,28 +141,29 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_secondary_axis
-    series = Series.new
-    series.categories     = '=Sheet1!$A$1:$A$5'
-    series.values         = '=Sheet1!$B$1:$B$5'
-    series.name           = 'Text'
-    series.name_formula   = nil
-    series.name_id        = nil
-    series.cat_data_id    = 0
-    series.val_data_id = 1
-    series.line           = { :_defined => 0 }
-    series.fill           = { :_defined => 0 }
-    series.marker = nil
-    series.trendline = nil
-    series.smooth = nil
-    series.labels = nil
-    series.invert_if_neg = nil
-    series.x2_axis = 1
-    series.y2_axis = 1
-    series.error_bars = {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
-    }
-    series.points = nil
+    series = Series.new(@chart)
+    series.instance_variable_set(:@categories,  '=Sheet1!$A$1:$A$5')
+    series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
+    series.instance_variable_set(:@name, 'Text')
+    series.instance_variable_set(:@name_formula, nil)
+    series.instance_variable_set(:@name_id, nil)
+    series.instance_variable_set(:@cat_data_id, 0)
+    series.instance_variable_set(:@val_data_id, 1)
+    series.instance_variable_set(:@line          , { :_defined => 0 })
+    series.instance_variable_set(:@fill          , { :_defined => 0 })
+    series.instance_variable_set(:@marker, nil)
+    series.instance_variable_set(:@trendline, nil)
+    series.instance_variable_set(:@smooth, nil)
+    series.instance_variable_set(:@labels, nil)
+    series.instance_variable_set(:@invert_if_neg, nil)
+    series.instance_variable_set(:@x2_axis, 1)
+    series.instance_variable_set(:@y2_axis, 1)
+    series.instance_variable_set(:@error_bars,
+                                 {
+                                   :_x_error_bars => nil,
+                                   :_y_error_bars => nil
+                                 })
+    series.instance_variable_set(:@points, nil)
     expected = series
 
     @chart.add_series(

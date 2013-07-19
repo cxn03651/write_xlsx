@@ -361,6 +361,19 @@ module Writexlsx
     end
 
     #
+    # Switch name and name_formula parameters if required.
+    #
+    def process_names(name = nil, name_formula = nil) # :nodoc:
+      # Name looks like a formula, use it to set name_formula.
+      if name && name =~ /^=[^!]+!\$/
+        name_formula = name
+        name         = ''
+      end
+
+      [name, name_formula]
+    end
+
+    #
     # Convert vertices from pixels to points.
     #
     def pixels_to_points(vertices)
