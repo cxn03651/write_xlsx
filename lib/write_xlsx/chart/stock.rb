@@ -95,19 +95,19 @@ module Writexlsx
         array = []
         @series.each do |series|
           if index % 4 != 3
-            if series[:_line][:_defined].nil? || series[:_line][:_defined] == 0
-              series[:_line] = {
+            if series.line[:_defined].nil? || series.line[:_defined] == 0
+              series.line = {
                 :width    => 2.25,
                 :none     => 1,
                 :_defined => 1
               }
             end
 
-            if series[:_marker].nil? || series[:_marker] == 0
+            if series.marker.nil? || series.marker == 0
               if index % 4 == 2
-                series[:_marker] = { :type => 'dot', :size => 3 }
+                series.marker = { :type => 'dot', :size => 3 }
               else
-                series[:_marker] = { :type => 'none' }
+                series.marker = { :type => 'none' }
               end
             end
           end

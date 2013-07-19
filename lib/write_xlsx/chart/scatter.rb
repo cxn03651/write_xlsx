@@ -110,24 +110,24 @@ module Writexlsx
           # Write the c:spPr element.
           write_sp_pr(series)
           # Write the c:marker element.
-          write_marker(series[:_marker])
+          write_marker(series.marker)
           # Write the c:dPt element.
-          write_d_pt(series[:_points])
+          write_d_pt(series.points)
           # Write the c:dLbls element.
-          write_d_lbls(series[:_labels])
+          write_d_lbls(series.labels)
           # Write the c:trendline element.
-          write_trendline(series[:_trendline])
+          write_trendline(series.trendline)
           # Write the c:errBars element.
-          write_error_bars(series[:_error_bars])
+          write_error_bars(series.error_bars)
           # Write the c:xVal element.
           write_x_val(series)
           # Write the c:yVal element.
           write_y_val(series)
           # Write the c:smooth element.
-          if @subtype =~ /smooth/ && !series[:_smooth]
+          if @subtype =~ /smooth/ && !series.smooth
             write_c_smooth(1)
           else
-            write_c_smooth(series[:_smooth])
+            write_c_smooth(series.smooth)
           end
         end
       end
@@ -188,8 +188,8 @@ module Writexlsx
       # Write the <c:xVal> element.
       #
       def write_x_val(series)
-        formula = series[:_categories]
-        data_id = series[:_cat_data_id]
+        formula = series.categories
+        data_id = series.cat_data_id
         data    = @formula_data[data_id]
 
         @writer.tag_elements('c:xVal') do
@@ -211,8 +211,8 @@ module Writexlsx
       # Write the <c:yVal> element.
       #
       def write_y_val(series)
-        formula = series[:_values]
-        data_id = series[:_val_data_id]
+        formula = series.values
+        data_id = series.val_data_id
         data    = @formula_data[data_id]
 
         @writer.tag_elements('c:yVal') do
@@ -244,8 +244,8 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
-            if series[:_line][:_defined] == 0
-              series[:_line] = { :width => 2.25, :none => 1, :_defined => 1 }
+            if series.line[:_defined] == 0
+              series.line = { :width => 2.25, :none => 1, :_defined => 1 }
             end
           end
         end
@@ -255,8 +255,8 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.
-            if !series[:_marker] || series[:_marker][:_defined] == 0
-              series[:_marker] = { :type => 'none', :_defined => 1 }
+            if !series.marker || series.marker[:_defined] == 0
+              series.marker = { :type => 'none', :_defined => 1 }
             end
           end
         end

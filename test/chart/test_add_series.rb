@@ -8,29 +8,30 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values
-    expected = {
-      :_categories    => nil,
-      :_values        => '=Sheet1!$A$1:$A$5',
-      :_name          => nil,
-      :_name_formula  => nil,
-      :_name_id       => nil,
-      :_cat_data_id   => nil,
-      :_val_data_id   => 0,
-      :_line          => { :_defined => 0 },
-      :_fill          => { :_defined => 0 },
-      :_marker        => nil,
-      :_trendline     => nil,
-      :_smooth        => nil,
-      :_labels        => nil,
-      :_invert_if_neg => nil,
-      :_x2_axis       => nil,
-      :_y2_axis       => nil,
-      :_error_bars    => {
+    series = Series.new
+    series.categories      = nil
+    series.values          = '=Sheet1!$A$1:$A$5'
+    series.name            = nil
+    series.name_formula   = nil
+    series.name_id         = nil
+    series.cat_data_id     = nil
+    series.val_data_id    = 0
+    series.line           = { :_defined => 0 }
+    series.fill           = { :_defined => 0 }
+    series.marker = nil
+    series.trendline = nil
+    series.smooth = nil
+    series.labels = nil
+    series.invert_if_neg = nil
+    series.x2_axis = nil
+    series.y2_axis = nil
+    series.error_bars = {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      },
-      :_points        => nil
     }
+    series.points = nil
+
+    expected = series
 
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
 
@@ -39,31 +40,29 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_with_categories_and_values
-    expected = [
-                {
-                  :_categories   => '=Sheet1!$A$1:$A$5',
-                  :_values       => '=Sheet1!$B$1:$B$5',
-                  :_name         => 'Text',
-                  :_name_formula => nil,
-                  :_name_id      => nil,
-                  :_cat_data_id  => 0,
-                  :_val_data_id  => 1,
-                  :_line         => { :_defined => 0 },
-                  :_fill         => { :_defined => 0 },
-                  :_marker       => nil,
-                  :_trendline    => nil,
-                  :_smooth        => nil,
-                  :_labels        => nil,
-                  :_invert_if_neg => nil,
-                  :_x2_axis       => nil,
-                  :_y2_axis       => nil,
-                  :_error_bars    => {
-                    :_x_error_bars => nil,
-                    :_y_error_bars => nil
-                  },
-                  :_points        => nil
-                }
-               ]
+    series = Series.new
+    series.categories     = '=Sheet1!$A$1:$A$5'
+    series.values         = '=Sheet1!$B$1:$B$5'
+    series.name           = 'Text'
+    series.name_formula   = nil
+    series.name_id        = nil
+    series.cat_data_id    = 0
+    series.val_data_id = 1
+    series.line           = { :_defined => 0 }
+    series.fill           = { :_defined => 0 }
+    series.marker = nil
+    series.trendline = nil
+    series.smooth = nil
+    series.labels = nil
+    series.invert_if_neg = nil
+    series.x2_axis = nil
+    series.y2_axis = nil
+    series.error_bars = {
+        :_x_error_bars => nil,
+        :_y_error_bars => nil
+    }
+    series.points = nil
+    expected = [ series ]
 
     @chart.add_series(
                       :categories => '=Sheet1!$A$1:$A$5',
@@ -76,31 +75,29 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values_checked_by_array
-    expected = [
-                {
-                  :_categories   => nil,
-                  :_values       => '=Sheet1!$A$1:$A$5',
-                  :_name         => nil,
-                  :_name_formula => nil,
-                  :_name_id      => nil,
-                  :_cat_data_id  => nil,
-                  :_val_data_id  => 0,
-                  :_line         => { :_defined => 0 },
-                  :_fill         => { :_defined => 0 },
-                  :_marker       => nil,
-                  :_trendline    => nil,
-                  :_smooth        => nil,
-                  :_labels       => nil,
-                  :_invert_if_neg => nil,
-                  :_x2_axis       => nil,
-                  :_y2_axis       => nil,
-                  :_error_bars    => {
-                    :_x_error_bars => nil,
-                    :_y_error_bars => nil
-                  },
-                  :_points        => nil
-                }
-               ]
+    series = Series.new
+    series.categories     = nil
+    series.values         = '=Sheet1!$A$1:$A$5'
+    series.name           = nil
+    series.name_formula   = nil
+    series.name_id        = nil
+    series.cat_data_id    = nil
+    series.val_data_id = 0
+    series.line           = { :_defined => 0 }
+    series.fill           = { :_defined => 0 }
+    series.marker = nil
+    series.trendline = nil
+    series.smooth = nil
+    series.labels = nil
+    series.invert_if_neg = nil
+    series.x2_axis = nil
+    series.y2_axis = nil
+    series.error_bars = {
+        :_x_error_bars => nil,
+        :_y_error_bars => nil
+    }
+    series.points = nil
+    expected = [ series ]
 
     @chart.add_series(:values => ['Sheet1', 0, 4, 0, 0])
 
@@ -109,29 +106,29 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_both_checked_by_array
-    expected = {
-      :_categories   => '=Sheet1!$A$1:$A$5',
-      :_values       => '=Sheet1!$B$1:$B$5',
-      :_name         => 'Text',
-      :_name_formula => nil,
-      :_name_id      => nil,
-      :_cat_data_id  => 0,
-      :_val_data_id  => 1,
-      :_line         => { :_defined => 0 },
-      :_fill         => { :_defined => 0 },
-      :_marker       => nil,
-      :_trendline    => nil,
-      :_smooth       => nil,
-      :_labels       => nil,
-      :_invert_if_neg => nil,
-      :_x2_axis       => nil,
-      :_y2_axis       => nil,
-      :_error_bars    => {
+    series = Series.new
+    series.categories     = '=Sheet1!$A$1:$A$5'
+    series.values         = '=Sheet1!$B$1:$B$5'
+    series.name           = 'Text'
+    series.name_formula   = nil
+    series.name_id        = nil
+    series.cat_data_id   = 0
+    series.val_data_id = 1
+    series.line           = { :_defined => 0 }
+    series.fill           = { :_defined => 0 }
+    series.marker = nil
+    series.trendline = nil
+    series.smooth = nil
+    series.labels = nil
+    series.invert_if_neg = nil
+    series.x2_axis = nil
+    series.y2_axis = nil
+    series.error_bars = {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      },
-      :_points        => nil
-   }
+    }
+    series.points = nil
+    expected = series
 
     @chart.add_series(
                       :categories => [ 'Sheet1', 0, 4, 0, 0 ],
@@ -144,29 +141,29 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_secondary_axis
-    expected = {
-      :_categories    => '=Sheet1!$A$1:$A$5',
-      :_values        => '=Sheet1!$B$1:$B$5',
-      :_name          => 'Text',
-      :_name_formula  => nil,
-      :_name_id       => nil,
-      :_cat_data_id   => 0,
-      :_val_data_id   => 1,
-      :_line          => { :_defined => 0 },
-      :_fill          => { :_defined => 0 },
-      :_marker        => nil,
-      :_trendline     => nil,
-      :_smooth        => nil,
-      :_labels        => nil,
-      :_invert_if_neg => nil,
-      :_x2_axis       => 1,
-      :_y2_axis       => 1,
-      :_error_bars    => {
+    series = Series.new
+    series.categories     = '=Sheet1!$A$1:$A$5'
+    series.values         = '=Sheet1!$B$1:$B$5'
+    series.name           = 'Text'
+    series.name_formula   = nil
+    series.name_id        = nil
+    series.cat_data_id    = 0
+    series.val_data_id = 1
+    series.line           = { :_defined => 0 }
+    series.fill           = { :_defined => 0 }
+    series.marker = nil
+    series.trendline = nil
+    series.smooth = nil
+    series.labels = nil
+    series.invert_if_neg = nil
+    series.x2_axis = 1
+    series.y2_axis = 1
+    series.error_bars = {
         :_x_error_bars => nil,
         :_y_error_bars => nil
-      },
-      :_points        => nil
     }
+    series.points = nil
+    expected = series
 
     @chart.add_series(
                       :categories => [ 'Sheet1', 0, 4, 0, 0 ],

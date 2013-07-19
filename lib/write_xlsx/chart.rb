@@ -2,6 +2,7 @@
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart/axis'
+require 'write_xlsx/chart/series'
 
 module Writexlsx
   class Table
@@ -1150,29 +1151,30 @@ module Writexlsx
       y2_axis = params[:y2_axis]
 
       # Add the user supplied data to the internal structures.
-      @series << {
-        :_values        => values,
-        :_categories    => categories,
-        :_name          => name,
-        :_name_formula  => name_formula,
-        :_name_id       => name_id,
-        :_val_data_id   => val_id,
-        :_cat_data_id   => cat_id,
-        :_line          => line,
-        :_fill          => fill,
-        :_marker        => marker,
-        :_trendline     => trendline,
-        :_smooth        => smooth,
-        :_labels        => labels,
-        :_invert_if_neg => invert_if_neg,
-        :_x2_axis       => x2_axis,
-        :_y2_axis       => y2_axis,
-        :_points        => points,
-        :_error_bars    => {
+      series = Series.new
+      series.values         = values
+      series.categories     = categories
+      series.name           = name
+      series.name_formula   = name_formula
+      series.name_id        = name_id
+      series.val_data_id    = val_id
+      series.cat_data_id    = cat_id
+      series.line           = line
+      series.fill           = fill
+      series.marker         = marker
+      series.trendline      = trendline
+      series.smooth         = smooth
+      series.labels         = labels
+      series.invert_if_neg  = invert_if_neg
+      series.x2_axis        = x2_axis
+      series.y2_axis        = y2_axis
+      series.points         = points
+      series.error_bars     = {
           :_x_error_bars => x_error_bars,
           :_y_error_bars => y_error_bars
-        }
       }
+
+      @series << series
     end
 
     #
@@ -2245,7 +2247,7 @@ module Writexlsx
     # Returns series which use the primary axes.
     #
     def get_primary_axes_series
-      @series.reject {|s| s[:_y2_axis]}
+      @series.reject {|s| s.y2_axis}
     end
     alias :primary_axes_series :get_primary_axes_series
 
@@ -2253,7 +2255,7 @@ module Writexlsx
     # Returns series which use the secondary axes.
     #
     def get_secondary_axes_series
-      @series.select {|s| s[:_y2_axis]}
+      @series.select {|s| s.y2_axis}
     end
     alias :secondary_axes_series :get_secondary_axes_series
 
@@ -2576,23 +2578,23 @@ module Writexlsx
         # Write the c:spPr element.
         write_sp_pr(series)
         # Write the c:marker element.
-        write_marker(series[:_marker])
+        write_marker(series.marker)
         # Write the c:invertIfNegative element.
-        write_c_invert_if_negative(series[:_invert_if_neg])
+        write_c_invert_if_negative(series.invert_if_neg)
         # Write the c:dPt element.
-        write_d_pt(series[:_points])
+        write_d_pt(series.points)
         # Write the c:dLbls element.
-        write_d_lbls(series[:_labels])
+        write_d_lbls(series.labels)
         # Write the c:trendline element.
-        write_trendline(series[:_trendline])
+        write_trendline(series.trendline)
         # Write the c:errBars element.
-        write_error_bars(series[:_error_bars])
+        write_error_bars(series.error_bars)
         # Write the c:cat element.
         write_cat(series)
         # Write the c:val element.
         write_val(series)
         # Write the c:smooth element.
-        write_c_smooth(series[:_smooth]) if ptrue?(@smooth_allowed)
+        write_c_smooth(series.smooth) if ptrue?(@smooth_allowed)
       end
     end
 
@@ -2614,9 +2616,9 @@ module Writexlsx
     # Write the series name.
     #
     def write_series_name(series) # :nodoc:
-      if name = series[:_name_formula]
-        write_tx_formula(name, series[:_name_id])
-      elsif name = series[:_name]
+      if name = series.name_formula
+        write_tx_formula(name, series.name_id)
+      elsif name = series.name
         write_tx_value(name)
       end
     end
@@ -2626,8 +2628,8 @@ module Writexlsx
     #
     def write_cat(series) # :nodoc:
 
-      formula = series[:_categories]
-      data_id = series[:_cat_data_id]
+      formula = series.categories
+      data_id = series.cat_data_id
 
       data = @formula_data[data_id] if data_id
 
@@ -2653,7 +2655,7 @@ module Writexlsx
     # Write the <c:val> element.
     #
     def write_val(series) # :nodoc:
-      write_val_base(series[:_values], series[:_val_data_id], 'c:val')
+      write_val_base(series.values, series.val_data_id, 'c:val')
     end
 
     def write_val_base(formula, data_id, tag) # :nodoc:
@@ -3635,22 +3637,25 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      return if (!series.has_key?(:_line) || !ptrue?(series[:_line][:_defined])) &&
-                (!series.has_key?(:_fill) || !ptrue?(series[:_fill][:_defined]))
+      line = series.respond_to?(:line) ? series.line : series[:_line]
+      fill = series.respond_to?(:fill) ? series.fill : series[:_fill]
+
+      return if (!line || !ptrue?(line[:_defined])) &&
+        (!fill || !ptrue?(fill[:_defined]))
 
       @writer.tag_elements('c:spPr') do
         # Write the fill elements for solid charts such as pie and bar.
-        if series[:_fill] && series[:_fill][:_defined] != 0
-          if ptrue?(series[:_fill][:none])
+        if fill && fill[:_defined] != 0
+          if ptrue?(fill[:none])
             # Write the a:noFill element.
             write_a_no_fill
           else
             # Write the a:solidFill element.
-            write_a_solid_fill(series[:_fill])
+            write_a_solid_fill(fill)
           end
         end
         # Write the a:ln element.
-        write_a_ln(series[:_line]) if series[:_line] && ptrue?(series[:_line][:_defined])
+        write_a_ln(line) if line && ptrue?(line[:_defined])
       end
     end
 
