@@ -868,7 +868,7 @@ module Writexlsx
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
         if @title.formula
-          write_title_formula(@title.formula, @title.data_id, nil, @title.name_font)
+          write_title_formula(@title, nil)
         elsif @title.name
           write_title_rich(@title.name, nil, @title.name_font)
         end
@@ -1182,7 +1182,7 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis.formula, @x_axis.data_id, horiz, @x_axis.name_font)
+          write_title_formula(x_axis, horiz, @x_axis)
         elsif x_axis.name
           write_title_rich(x_axis.name, horiz, x_axis.name_font)
         end
@@ -1250,7 +1250,7 @@ module Writexlsx
 
         # Write the axis title elements.
         if y_axis.formula
-          write_title_formula(y_axis.formula, y_axis.data_id, horiz, y_axis.name_font)
+          write_title_formula(y_axis, horiz)
         elsif y_axis.name
           write_title_rich(y_axis.name, horiz, y_axis.name_font)
         end
@@ -1320,7 +1320,7 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis.formula, y_axis.data_id, horiz, x_axis.name_font)
+          write_title_formula(x_axis, horiz)
         elsif x_axis.name
           write_title_rich(x_axis.name, horiz, x_axis.name_font)
         end
@@ -1386,7 +1386,7 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis.formula, x_axis.data_id, nil, x_axis.name_font)
+          write_title_formula(x_axis, nil)
         elsif x_axis.name
           write_title_rich(x_axis.name, nil, x_axis.name_font)
         end
@@ -1800,14 +1800,14 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, data_id, horiz = nil, font = nil) # :nodoc:
+    def write_title_formula(title, horiz = nil, axis = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
-        write_tx_formula(title, data_id)
+        write_tx_formula(title.formula, axis ? axis.data_id : title.data_id)
         # Write the c:layout element.
         write_layout
         # Write the c:txPr element.
-        write_tx_pr(horiz, font)
+        write_tx_pr(horiz, axis ? axis.name_font : title.name_font)
       end
     end
 
