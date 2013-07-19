@@ -422,7 +422,7 @@ The properties that can be set are the same as for `set_x_axis`, see above.
 #### <a name="set_x2_axis" class="anchor" href="#set_x2_axis"><span class="octicon octicon-link" /></a>set_x2_axis()
 
 The `set_x2_axis()` method is used to set properties of the secondary X axis.
-The properties that can be set are the same as for `set_x_axis`, see above.
+The properties that can be set are the same as for [set_x_axis()][], see above.
 The default properties for this axis are:
 
     :label_position => 'none',
@@ -432,7 +432,7 @@ The default properties for this axis are:
 #### <a name="set_y2_axis" class="anchor" href="#set_y2_axis"><span class="octicon octicon-link" /></a>set_y2_axis()
 
 The `set_y2_axis()` method is used to set properties of the secondary Y axis.
-The properties that can be set are the same as for `set_x_axis`, see above.
+The properties that can be set are the same as for [set_x_axis()][], see above.
 The default properties for this axis are:
 
     :major_gridlines => { :visible => 0 }
@@ -1170,7 +1170,7 @@ some can be set for a category axis and some properties can be set for both.
 
 For example the min and max properties can only be set for value axes and reverse
 can be set for both. The type of axis that a property applies to is shown in
-the `set_x_axis()` section of the documentation above.
+the [set_x_axis()][] section of the documentation above.
 
 Some charts such as `Scatter` and `Stock` have two value axes.
 
@@ -1178,3 +1178,4 @@ Some charts such as `Scatter` and `Stock` have two value axes.
 [CHART FORMATTING]: chart.html#chart_formatting
 [SERIES OPTIONS]: chart.html#series_options
 [insert_chart()]: worksheet.html#insert_chart
+[set_x_axis()]: #set_x_axis
