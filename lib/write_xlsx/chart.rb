@@ -860,10 +860,10 @@ module Writexlsx
     def write_chart # :nodoc:
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
-        if title = @title_formula
-          write_title_formula(title, @title_data_id, nil, @title_font)
-        elsif title = @title_name
-          write_title_rich(title, nil, @title_font)
+        if @title_formula
+          write_title_formula(@title_formula, @title_data_id, nil, @title_font)
+        elsif @title_name
+          write_title_rich(@title_name, nil, @title_font)
         end
 
         # Write the c:plotArea element.
@@ -1174,10 +1174,10 @@ module Writexlsx
         write_minor_gridlines(x_axis.minor_gridlines)
 
         # Write the axis title elements.
-        if title = x_axis.formula
-          write_title_formula(title, @x_axis.data_id, horiz, @x_axis.name_font)
-        elsif title = x_axis.name
-          write_title_rich(title, horiz, x_axis.name_font)
+        if x_axis.formula
+          write_title_formula(x_axis.formula, @x_axis.data_id, horiz, @x_axis.name_font)
+        elsif x_axis.name
+          write_title_rich(x_axis.name, horiz, x_axis.name_font)
         end
 
         # Write the c:numFmt element.
@@ -1242,10 +1242,10 @@ module Writexlsx
         write_minor_gridlines(y_axis.minor_gridlines)
 
         # Write the axis title elements.
-        if title = y_axis.formula
-          write_title_formula(title, y_axis.data_id, horiz, y_axis.name_font)
-        elsif title = y_axis.name
-          write_title_rich(title, horiz, y_axis.name_font)
+        if y_axis.formula
+          write_title_formula(y_axis.formula, y_axis.data_id, horiz, y_axis.name_font)
+        elsif y_axis.name
+          write_title_rich(y_axis.name, horiz, y_axis.name_font)
         end
 
         # Write the c:numberFormat element.
@@ -1312,10 +1312,10 @@ module Writexlsx
         write_minor_gridlines(x_axis.minor_gridlines)
 
         # Write the axis title elements.
-        if title = x_axis.formula
-          write_title_formula(title, y_axis.data_id, horiz, x_axis.name_font)
-        elsif title = x_axis.name
-          write_title_rich(title, horiz, x_axis.name_font)
+        if x_axis.formula
+          write_title_formula(x_axis.formula, y_axis.data_id, horiz, x_axis.name_font)
+        elsif x_axis.name
+          write_title_rich(x_axis.name, horiz, x_axis.name_font)
         end
 
         # Write the c:numberFormat element.
@@ -1378,10 +1378,10 @@ module Writexlsx
         write_minor_gridlines(x_axis.minor_gridlines)
 
         # Write the axis title elements.
-        if title = x_axis.formula
-          write_title_formula(title, x_axis.data_id, nil, x_axis.name_font)
-        elsif title = x_axis.name
-          write_title_rich(title, nil, x_axis.name_font)
+        if x_axis.formula
+          write_title_formula(x_axis.formula, x_axis.data_id, nil, x_axis.name_font)
+        elsif x_axis.name
+          write_title_rich(x_axis.name, nil, x_axis.name_font)
         end
         # Write the c:numFmt element.
         write_number_format(x_axis)
