@@ -101,6 +101,24 @@ More charts and sub-types will be supported in time.
 Methods that are common to all chart types are documented below.
 See the documentation for each of the above chart modules for chart specific information.
 
+* [add_series](#add_series)
+* [set_x_axis](#set_x_axis)
+* [set_y_axis](#set_y_axis)
+* [set_x2_axis](#set_x2_axis)
+* [set_y2_axis](#set_y2_axis)
+* [set_size](#set_size)
+* [set_title](#set_title)
+* [set_legend](#set_legend)
+* [set_chartarea](#set_chartarea)
+* [set_plotarea](#set_plotarea)
+* [set_style](#set_style)
+* [set_table](#set_table)
+* [set_up_down_bars](#set_up_down_bars)
+* [set_drop_lines](#set_drop_lines)
+* [set_high_low_lines](#set_high_low_lines)
+* [show_blanks_as](#show_blanks_as)
+* [show_hidden_data](#show_hidden_data)
+
 #### <a name="add_series" class="anchor" href="#add_series"><span class="octicon octicon-link" /></a>add_series()
 
 In an Excel chart a "series" is a collection of information such as values,
