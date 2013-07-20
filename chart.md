@@ -487,7 +487,7 @@ The default is to have no chart title.
 Set the font properties for the chart title.
 See the [CHART FONTS][] section below.
 
-#### <a name="set_legend" class="anchor" href="#set_legend"><span class="octicon octicon-link" /></a>:set_legend()
+#### <a name="set_legend" class="anchor" href="#set_legend"><span class="octicon octicon-link" /></a>set_legend()
 
 The `set_legend()` method is used to set properties of the chart legend.
 
