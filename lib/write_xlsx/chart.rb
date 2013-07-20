@@ -1027,10 +1027,10 @@ module Writexlsx
     # Write the series name.
     #
     def write_series_name(series) # :nodoc:
-      if name = series.name_formula
-        write_tx_formula(name, series.name_id)
-      elsif name = series.name
-        write_tx_value(name)
+      if series.name_formula
+        write_tx_formula(series.name_formula, series.name_id)
+      elsif series.name
+        write_tx_value(series.name)
       end
     end
 
