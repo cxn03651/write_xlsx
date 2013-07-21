@@ -27,7 +27,7 @@ The data range can be specified in 'A1' or 'row/col' notation
     # Same as:
     worksheet.add_table( 2, 1, 6, 5)
 
-The last parameter in `add_table()` should be a hash ref containing the
+The last parameter in `add_table()` should be a hash containing the
 parameters that describe the table options and data.
 The available parameters are:
 
@@ -70,7 +70,7 @@ Writing the cell data separately is occasionally required when you need
 to control the `write_\*()` method used to populate the cells or if you wish
 to tweak the cell formatting.
 
-The `:data` structure should be an array ref of array holding row data
+The `:data` structure should be an array of array holding row data
 as shown above.
 
 ##### <a name="header_row" class="anchor" href="#header_row"><span class="octicon octicon-link" /></a>:header_row
@@ -178,7 +178,7 @@ The sub-properties that can be set are:
     :total_function
     :format
 
-The column data must be specified as an array ref of hash.
+The column data must be specified as an array of hash.
 For example to override the default 'Column n' style table headers:
 
     worksheet.add_table(

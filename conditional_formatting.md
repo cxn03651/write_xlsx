@@ -50,7 +50,7 @@ separated by a comma. For example:
 
     worksheet.conditional_formatting('A1:D5,A8:D12', {...})
 
-The last parameter in `conditional_formatting()` must be a hash ref containing
+The last parameter in `conditional_formatting()` must be a hash containing
 the parameters that describe the type and style of the data validation.
 The main parameters are:
 
@@ -79,7 +79,7 @@ are shown in the relevant sections below.
 
 ##### <a name="type" class="anchor" href="#type"><span class="octicon octicon-link" /></a>:type
 
-This parameter is passed in a hash ref to `conditional_formatting()`.
+This parameter is passed in a hash to `conditional_formatting()`.
 
 The `:type` parameter is used to set the type of conditional formatting that
 you wish to apply. It is always required and it has no default value.

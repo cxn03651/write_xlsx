@@ -53,7 +53,7 @@ You can also use A1 style notation. For example:
 
 See also the note about [CELL NOTATION][] for more information.
 
-The last parameter in `data_validation()` must be a hash ref containing the
+The last parameter in `data_validation()` must be a hash containing the
 parameters that describe the type and style of the data validation.
 The allowable parameters are:
 
@@ -93,7 +93,7 @@ The data_validation method returns:
 
 ##### :validate
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The validate parameter is used to set the type of data that you wish to
 validate. It is always required and it has no default value.
@@ -127,7 +127,7 @@ Excel refers to this as 'whole number'.
     :value    => 38.6,
 
 *list* restricts the cell to a set of user specified values.
-These can be passed in an array ref or as a cell range
+These can be passed in an array or as a cell range
 (named ranges aren't currently supported):
 
     :validate => 'list',
@@ -176,7 +176,7 @@ that returns a TRUE/FALSE value.
 
 ##### <a name="criteria" class="anchor" href="#criteria"><span class="octicon octicon-link" /></a>:criteria
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The criteria parameter is used to set the criteria by which the data in the cell
 is validated.
@@ -215,7 +215,7 @@ If you specify one it will be ignored.
 
 ##### <a name="value_minimum_source" class="anchor" href="#value_minimum_source"><span class="octicon octicon-link" /></a>:value | :minimum | :source
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The value parameter is used to set the limiting value to which the criteria
 is applied.
@@ -240,7 +240,7 @@ description of the parameter:
 
 ##### <a name="maximum" class="anchor" href="#maximum"><span class="octicon octicon-link" /></a>:maximum
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The maximum parameter is used to set the upper limiting value when the criteria
 is either 'between' or 'not between':
@@ -252,7 +252,7 @@ is either 'between' or 'not between':
 
 ##### <a name="ignore_blank" class="anchor" href="#ignore_blank"><span class="octicon octicon-link" /></a>:ignore_blank
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The ignore_blank parameter is used to toggle on and off the 'Ignore blank'
 option in the Excel data validation dialog.
@@ -263,7 +263,7 @@ cell. It is on by default.
 
 ##### <a name="dropdown" class="anchor" href="#dropdown"><span class="octicon octicon-link" /></a>:dropdown
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The dropdown parameter is used to toggle on and off the 'In-cell dropdown'
 option in the Excel data validation dialog.
@@ -274,7 +274,7 @@ It is on by default.
 
 ##### <a name="input_title" class="anchor" href="#input_title"><span class="octicon octicon-link" /></a>:input_title
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The input_title parameter is used to set the title of the input message that is
 displayed when a cell is entered. It has no default value and is only displayed
@@ -286,7 +286,7 @@ The maximum title length is 32 characters.
 
 ##### <a name="input_message" class="anchor" href="#input_message"><span class="octicon octicon-link" /></a>:input_message
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The input_message parameter is used to set the input message that is displayed
 when a cell is entered. It has no default value.
@@ -307,7 +307,7 @@ The maximum message length is 255 characters.
 
 ##### <a name="show_input" class="anchor" href="#show_input"><span class="octicon octicon-link" /></a>:show_input
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The show_input parameter is used to toggle on and off the 'Show input message
 when cell is selected' option in the Excel data validation dialog.
@@ -318,7 +318,7 @@ if it has been set using input_message. It is on by default.
 
 ##### <a name="error_title" class="anchor" href="#error_title"><span class="octicon octicon-link" /></a>:error_title
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The error_title parameter is used to set the title of the error message
 that is displayed when the data validation criteria is not met.
@@ -330,7 +330,7 @@ The maximum title length is 32 characters.
 
 ##### <a name="error_message" class="anchor" href="#error_message"><span class="octicon octicon-link" /></a>:error_message
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The error_message parameter is used to set the error message that is
 displayed when a cell is entered.
@@ -353,7 +353,7 @@ The maximum message length is 255 characters.
 
 ##### <a name="error_type" class="anchor" href="#error_type"><span class="octicon octicon-link" /></a>:error_type
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The error_type parameter is used to specify the type of error dialog
 that is displayed. There are 3 options:
@@ -366,7 +366,7 @@ The default is 'stop'.
 
 ##### <a name="show_error" class="anchor" href="#show_error"><span class="octicon octicon-link" /></a>:show_error
 
-This parameter is passed in a hash ref to `data_validation()`.
+This parameter is passed in a hash to `data_validation()`.
 
 The show_error parameter is used to toggle on and off the
 'Show error alert after invalid data is entered' option in the Excel
