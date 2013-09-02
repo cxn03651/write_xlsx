@@ -1137,7 +1137,7 @@ module Writexlsx
     end
 
     def write_calc_pr #:nodoc:
-      attributes = ['calcId', 124519]
+      attributes = ['calcId', 124519, 'fullCalcOnLoad', 1]
       @writer.empty_tag('calcPr', attributes)
     end
 

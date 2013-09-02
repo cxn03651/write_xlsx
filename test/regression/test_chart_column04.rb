@@ -38,7 +38,7 @@ class TestRegressionChartColumn04 < Test::Unit::TestCase
                                 nil,
                                 {
                                   'xl/charts/chart1.xml' => ['<c:pageMargins'],
-                                  'xl/workbook.xml'      => ['<fileVersion', '<calcPr']
+                                  'xl/workbook.xml'      => ['<fileVersion']
                                 }
                                 )
   end

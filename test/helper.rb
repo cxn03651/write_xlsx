@@ -108,6 +108,19 @@ class Test::Unit::TestCase
         got_xml_str = got_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d\:\d\d:\d\dZ/,'')
       end
 
+      # Remove workbookView dimensions which are almost always different.
+      if exp_members[i].name == 'xl/workbook.xml'
+        exp_xml_str.sub!(/<workbookView[^>]*>/, '<workbookView/>')
+        got_xml_str.sub!(/<workbookView[^>]*>/, '<workbookView/>')
+      end
+
+      # Remove the calcpr elements which may have different Excel version ids.
+      if exp_members[i].name == 'xl/workbook.xml'
+        exp_xml_str.sub!(/<calcPr[^>]*>/, '<calcPr/>')
+        got_xml_str.sub!(/<calcPr[^>]*>/, '<calcPr/>')
+      end
+
+      # Remove printer specific settings from Worksheet pageSetup elements.
       if exp_members[i].name =~ %r!xl/worksheets/sheet\d.xml!
         exp_xml_str = exp_xml_str.
           sub(/horizontalDpi="200" /, '').

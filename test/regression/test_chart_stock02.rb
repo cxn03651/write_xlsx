@@ -65,7 +65,7 @@ class TestRegressionChartStock02 < Test::Unit::TestCase
                                 nil,
                                 {
                                   'xl/charts/chart1.xml' => [ '<c:formatCode', '<c:pageMargins' ],
-                                  'xl/workbook.xml'      => [ '<fileVersion',  '<calcPr' ],
+                                  'xl/workbook.xml'      => [ '<fileVersion' ],
                                   'xl/worksheets/sheet1.xml' => [ '<sheetView', '<selection activeCell', '</sheetView' ],
                                 }
                                 )
