@@ -45,7 +45,7 @@ noted below.
     write_comment()             Yes
     show_comments()             Yes
     set_comments_author()       Yes
-    insert_image()              Yes/Partial, see docs.
+    insert_image()              Yes
     insert_chart()              Yes
     insert_shape()              Yes. Not in WriteExcel.
     insert_button()             Yes. Not in WriteExcel.
