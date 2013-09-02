@@ -77,6 +77,10 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
   workbook.close
 
 == Recent change
+2013-09-02 v0.71.0
+   Fixed issue in image handling.
+   Added fix to ensure formula calculation on load regardless of Excel version.
+
 2013-07-13 v0.70.0
    Fix for rendering images that are the same size as cell boundaries.
    Fix for inaccurate column width calculation.
