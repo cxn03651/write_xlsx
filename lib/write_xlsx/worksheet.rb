@@ -1671,7 +1671,8 @@ module Writexlsx
     #
     def write(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      token = row_col_notation(args)[2] || ''
+      row_col_args = row_col_notation(args)
+      token = row_col_args[2] || ''
 
       # Match an array ref.
       if token.respond_to?(:to_ary)
@@ -1697,8 +1698,8 @@ module Writexlsx
         write_formula(*args)
       # Match blank
       elsif token == ''
-        args.delete_at(2)     # remove the empty string from the parameter list
-        write_blank(*args)
+        row_col_args.delete_at(2)     # remove the empty string from the parameter list
+        write_blank(*row_col_args)
       else
         write_string(*args)
       end
