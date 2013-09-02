@@ -5608,7 +5608,7 @@ module Writexlsx
     def position_object_pixels(col_start, row_start, x1, y1, width, height) #:nodoc:
       # Calculate the absolute x offset of the top-left vertex.
       if @col_size_changed
-        x_abs = (1 .. col_start).inject(0) {|sum, col| sum += size_col(col)}
+        x_abs = (0 .. col_start-1).inject(0) {|sum, col| sum += size_col(col)}
       else
         # Optimisation for when the column widths haven't changed.
         x_abs = 64 * col_start
@@ -5618,7 +5618,7 @@ module Writexlsx
       # Calculate the absolute y offset of the top-left vertex.
       # Store the column change to allow optimisations.
       if @row_size_changed
-        y_abs = (1 .. row_start).inject(0) {|sum, row| sum += size_row(row)}
+        y_abs = (0 .. row_start-1).inject(0) {|sum, row| sum += size_row(row)}
       else
         # Optimisation for when the row heights haven't changed.
         y_abs = 20 * row_start
