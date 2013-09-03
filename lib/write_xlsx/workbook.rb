@@ -1694,9 +1694,8 @@ module Writexlsx
           # Test for PNGs.
           type, width, height = process_png(data)
           image_types[:png] = 1
-        elsif data.unpack('n')[0] == 0xFFD8 &&
-            (data.unpack('x6 A4')[0] == 'JFIF' || data.unpack('x6 A4')[0] == 'Exif')
-          # Test for JFIF and Exif JPEGs.
+        elsif data.unpack('n')[0] == 0xFFD8
+          # Test for JPEG files.
           type, width, height = process_jpg(data, filename)
           @image_types[:jpeg] = 1
         elsif data.unpack('A2')[0] == 'BM'
