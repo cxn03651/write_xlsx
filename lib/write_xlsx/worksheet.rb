@@ -739,8 +739,7 @@ module Writexlsx
 
       # Store the col sizes for use when calculating image vertices taking
       # hidden columns into account. Also store the column formats.
-      width  ||= 0                        # Ensure width isn't nil.
-      width = 0 if ptrue?(hidden)         # Set width to zero if col is hidden
+      width = 0 if ptrue?(hidden)         # Set width to zero if hidden
 
       (firstcol .. lastcol).each do |col|
         @col_sizes[col]   = width
@@ -3086,6 +3085,8 @@ module Writexlsx
 
       # Store the row change to allow optimisations.
       @row_size_changed = true
+
+      height = 0 if ptrue?(hidden)
 
       # Store the row sizes for use when calculating image vertices.
       @row_sizes[row] = height
