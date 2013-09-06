@@ -79,6 +79,7 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 == Recent change
 2013-09-03 v0.72.0
    Fix for charts and images that cross rows and columns that are hidden or formatted but which don't have size changes.
+   Fix : Worksheet#write bug when using A1 notation and blank token.
 
 2013-09-02 v0.71.0
    Fixed issue in image handling.
