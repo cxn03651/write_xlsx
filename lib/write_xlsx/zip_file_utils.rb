@@ -29,6 +29,7 @@ module ZipFileUtils
         }
       end
     }
+    FileUtils.chmod(0644, dest)
   end
 
   # src  zip filename
