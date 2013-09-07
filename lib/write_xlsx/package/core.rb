@@ -51,7 +51,7 @@ module Writexlsx
       def localtime_to_iso8601_date(local_time = nil)
         local_time ||= Time.now
 
-        date = local_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        local_time.strftime('%Y-%m-%dT%H:%M:%SZ')
       end
 
       def write_xml_declaration
@@ -101,28 +101,22 @@ module Writexlsx
       # Write the <dcterms:created> element.
       #
       def write_dcterms_created
-        date     = @properties[:created]
-        xsi_type = 'dcterms:W3CDTF'
-
-        date = localtime_to_iso8601_date(date)
-
-        attributes = ['xsi:type', xsi_type]
-
-        @writer.data_element('dcterms:created', date, attributes)
+        write_dcterms('dcterms:created')
       end
 
       #
       # Write the <dcterms:modified> element.
       #
       def write_dcterms_modified
-        date     = @properties[:created]
-        xsi_type = 'dcterms:W3CDTF'
+        write_dcterms('dcterms:modified')
+      end
 
-        date =  localtime_to_iso8601_date(date)
+      def write_dcterms(tag)
+        @writer.data_element(tag, dcterms_date, ['xsi:type', 'dcterms:W3CDTF'])
+      end
 
-        attributes = ['xsi:type', xsi_type]
-
-        @writer.data_element('dcterms:modified', date, attributes)
+      def dcterms_date
+        localtime_to_iso8601_date(@properties[:created])
       end
 
       #
