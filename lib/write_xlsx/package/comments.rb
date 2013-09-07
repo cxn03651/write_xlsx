@@ -137,8 +137,6 @@ module Writexlsx
         attributes = v_shape_attributes(id, z_index)
 
         @writer.tag_elements('v:shape', attributes) do
-          writer = @writer
-
           # Write the v:fill element.
           write_fill
           # Write the v:shadow element.
