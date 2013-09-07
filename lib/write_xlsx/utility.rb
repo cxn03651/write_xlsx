@@ -499,5 +499,42 @@ module Writexlsx
       @writer.crlf
       @writer.close
     end
+
+    #
+    # Convert user defined line properties to the structure required internally.
+    #
+    def line_properties(line) # :nodoc:
+      return { :_defined => 0 } unless line
+
+      dash_types = {
+        :solid               => 'solid',
+        :round_dot           => 'sysDot',
+        :square_dot          => 'sysDash',
+        :dash                => 'dash',
+        :dash_dot            => 'dashDot',
+        :long_dash           => 'lgDash',
+        :long_dash_dot       => 'lgDashDot',
+        :long_dash_dot_dot   => 'lgDashDotDot',
+        :dot                 => 'dot',
+        :system_dash_dot     => 'sysDashDot',
+        :system_dash_dot_dot => 'sysDashDotDot'
+      }
+
+      # Check the dash type.
+      dash_type = line[:dash_type]
+
+      if dash_type
+        line[:dash_type] = value_or_raise(dash_types, dash_type, 'dash type')
+      end
+
+      line[:_defined] = 1
+
+      line
+    end
+
+    def value_or_raise(hash, key, msg)
+      raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
+      hash[key.to_sym]
+    end
   end
 end
