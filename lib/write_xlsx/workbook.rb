@@ -1504,33 +1504,45 @@ module Writexlsx
       @worksheets.each { |worksheet| worksheets[worksheet.name] = worksheet }
 
       @charts.each do |chart|
-        chart.formula_ids.each do |range, id|
-          # Skip if the series has user defined data.
-          if chart.formula_data[id]
-            seen_ranges[range] = chart.formula_data[id] unless seen_ranges[range]
-            next
-          # Check to see if the data is already cached locally.
-          elsif seen_ranges[range]
-            chart.formula_data[id] = seen_ranges[range]
-            next
+        chart.formula_ids.each do |compound_range, id|
+
+          # compound ranges are made up up a range1,range2,...rangeN
+          # the following allows charts to support compound ranges
+          ranges = compound_range.split(',')
+          ranges.each_with_index do |range|
+
+             # Skip if the series has user defined data.
+            if chart.formula_data[id] && ranges.size==1
+              seen_ranges[range] = chart.formula_data[id] unless seen_ranges[range]
+              next
+            # Check to see if the data is already cached locally.
+            elsif seen_ranges[range]
+              chart.formula_data[id] = seen_ranges[range]
+              next
+            end
+
+            # Convert the range formula to a sheet name and cell range.
+            sheetname, *cells = get_chart_range(range)
+
+            # Skip if we couldn't parse the formula.
+            next unless sheetname
+
+            # Raise if the name is unknown since it indicates a user error in
+            # a chart series formula.
+            unless worksheets[sheetname]
+              raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n"
+            end
+
+            # Add the data to the chart.
+            # And store range data locally to avoid lookup if seen agein.
+            cd = chart_data(worksheets[sheetname], cells)
+            seen_ranges[range] = cd
+            if chart.formula_data[id].nil?
+              chart.formula_data[id] = cd
+            else
+              chart.formula_data[id] += cd
+            end
           end
-
-          # Convert the range formula to a sheet name and cell range.
-          sheetname, *cells = get_chart_range(range)
-
-          # Skip if we couldn't parse the formula.
-          next unless sheetname
-
-          # Raise if the name is unknown since it indicates a user error in
-          # a chart series formula.
-          unless worksheets[sheetname]
-            raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n"
-          end
-
-          # Add the data to the chart.
-          # And store range data locally to avoid lookup if seen agein.
-          chart.formula_data[id] =
-            seen_ranges[range] = chart_data(worksheets[sheetname], cells)
         end
       end
     end
