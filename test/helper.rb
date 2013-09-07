@@ -68,7 +68,7 @@ class Test::Unit::TestCase
 
   def entrys(xlsx)
     result = []
-    Zip::ZipFile.foreach(xlsx) { |entry| result << entry }
+    Zip::File.foreach(xlsx) { |entry| result << entry }
     result
   end
 
