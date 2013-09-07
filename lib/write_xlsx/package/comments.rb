@@ -250,14 +250,12 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_comments
-        write_authors(sorted_comments)
-        write_comment_list(sorted_comments)
-
-        @writer.end_tag('comments')
-        @writer.crlf
-        @writer.close
+        write_xml_declaration do
+          write_comments do
+            write_authors(sorted_comments)
+            write_comment_list(sorted_comments)
+          end
+        end
       end
 
       def sorted_comments
@@ -289,10 +287,6 @@ module Writexlsx
         @worksheet.comments_visible?
       end
 
-      def write_xml_declaration
-        @writer.xml_decl
-      end
-
       #
       # Write the <comments> element.
       #
@@ -301,7 +295,7 @@ module Writexlsx
 
         attributes = [ 'xmlns', xmlns]
 
-        @writer.start_tag('comments', attributes)
+        @writer.tag_elements('comments', attributes) { yield }
       end
 
       #

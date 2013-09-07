@@ -31,13 +31,12 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_types do
-          write_defaults
-          write_overrides
+        write_xml_declaration do
+          write_types do
+            write_defaults
+            write_overrides
+          end
         end
-        @writer.crlf
-        @writer.close
       end
       #
       # Add elements to the ContentTypes defaults.
@@ -145,10 +144,6 @@ module Writexlsx
       end
 
       private
-
-      def write_xml_declaration
-        @writer.xml_decl
-      end
 
       def change_the_workbook_xml_content_type_from_xlsx_to_xlsm
         @overrides.collect! do |arr|

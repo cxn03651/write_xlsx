@@ -23,10 +23,9 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_relationships
-        @writer.crlf
-        @writer.close
+        write_xml_declaration do
+          write_relationships
+        end
       end
 
       #
@@ -70,10 +69,6 @@ module Writexlsx
       end
 
       private
-
-      def write_xml_declaration
-        @writer.xml_decl
-      end
 
       #
       # Write the <Relationships> element.

@@ -57,17 +57,14 @@ module Writexlsx
       # Assemble and writes the XML file.
       #
       def assemble_xml_file
-        write_xml_declaration
-        # Write the table element.
-        @writer.tag_elements('table', write_table_attributes) do
-          write_auto_filter
-          write_table_columns
-          write_table_style_info
+        write_xml_declaration do
+          # Write the table element.
+          @writer.tag_elements('table', write_table_attributes) do
+            write_auto_filter
+            write_table_columns
+            write_table_style_info
+          end
         end
-
-        # Close the XML writer object and filehandle.
-        @writer.crlf
-        @writer.close
       end
 
       def add_the_table_columns
@@ -282,13 +279,6 @@ module Writexlsx
 
       def set_the_autofilter_range
         @autofilter = @a_range if ptrue?(@param[:autofilter])
-      end
-
-      #
-      # Write the XML declaration.
-      #
-      def write_xml_declaration
-        @writer.xml_decl('UTF-8', 1)
       end
 
       def write_table_attributes

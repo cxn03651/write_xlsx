@@ -22,21 +22,20 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_cp_core_properties do
-          write_dc_title
-          write_dc_subject
-          write_dc_creator
-          write_cp_keywords
-          write_dc_description
-          write_cp_last_modified_by
-          write_dcterms_created
-          write_dcterms_modified
-          write_cp_category
-          write_cp_content_status
+        write_xml_declaration do
+          write_cp_core_properties do
+            write_dc_title
+            write_dc_subject
+            write_dc_creator
+            write_cp_keywords
+            write_dc_description
+            write_cp_last_modified_by
+            write_dcterms_created
+            write_dcterms_modified
+            write_cp_category
+            write_cp_content_status
+          end
         end
-        @writer.crlf
-        @writer.close
       end
 
       def set_properties(properties)
@@ -52,10 +51,6 @@ module Writexlsx
         local_time ||= Time.now
 
         local_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-      end
-
-      def write_xml_declaration
-        @writer.xml_decl
       end
 
       #

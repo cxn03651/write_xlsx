@@ -242,36 +242,33 @@ module Writexlsx
       # Prepare format object for passing to Style.rb.
       prepare_format_properties
 
-      write_xml_declaration
+      write_xml_declaration do
 
-      # Write the root workbook element.
-      write_workbook do
+        # Write the root workbook element.
+        write_workbook do
 
-        # Write the XLSX file version.
-        write_file_version
+          # Write the XLSX file version.
+          write_file_version
 
-        # Write the workbook properties.
-        write_workbook_pr
+          # Write the workbook properties.
+          write_workbook_pr
 
-        # Write the workbook view properties.
-        write_book_views
+          # Write the workbook view properties.
+          write_book_views
 
-        # Write the worksheet names and ids.
-        @worksheets.write_sheets(@writer)
+          # Write the worksheet names and ids.
+          @worksheets.write_sheets(@writer)
 
-        # Write the workbook defined names.
-        write_defined_names
+          # Write the workbook defined names.
+          write_defined_names
 
-        # Write the workbook calculation properties.
-        write_calc_pr
+          # Write the workbook calculation properties.
+          write_calc_pr
 
-        # Write the workbook extension storage.
-        #write_ext_lst
+          # Write the workbook extension storage.
+          #write_ext_lst
+        end
       end
-
-      # Close the XML writer object and filehandle.
-      @writer.crlf
-      @writer.close
     end
 
     #
@@ -1071,10 +1068,6 @@ module Writexlsx
       # Check that we have a 1D range only.
       return nil if row_start != row_end && col_start != col_end
       return [sheetname, row_start, col_start, row_end, col_end]
-    end
-
-    def write_xml_declaration #:nodoc:
-      @writer.xml_decl
     end
 
     def write_workbook #:nodoc:

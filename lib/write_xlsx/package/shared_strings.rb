@@ -42,21 +42,13 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-
-        # Write the sst table.
-        write_sst { write_sst_strings }
-
-        # Close the sst tag.
-        @writer.crlf
-        @writer.close
+        write_xml_declaration do
+          # Write the sst table.
+          write_sst { write_sst_strings }
+        end
       end
 
       private
-
-      def write_xml_declaration
-        @writer.xml_decl
-      end
 
       #
       # Write the <sst> element.

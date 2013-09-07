@@ -20,22 +20,21 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_properties do
-          write_application
-          write_doc_security
-          write_scale_crop
-          write_heading_pairs
-          write_titles_of_parts
-          write_manager
-          write_company
-          write_links_up_to_date
-          write_shared_doc
-          write_hyperlinks_changed
-          write_app_version
+        write_xml_declaration do
+          write_properties do
+            write_application
+            write_doc_security
+            write_scale_crop
+            write_heading_pairs
+            write_titles_of_parts
+            write_manager
+            write_company
+            write_links_up_to_date
+            write_shared_doc
+            write_hyperlinks_changed
+            write_app_version
+          end
         end
-        @writer.crlf
-        @writer.close
       end
 
       def add_part_name(part_name)
@@ -56,10 +55,6 @@ module Writexlsx
       end
 
       private
-
-      def write_xml_declaration
-        @writer.xml_decl
-      end
 
       #
       # Write the <Properties> element.

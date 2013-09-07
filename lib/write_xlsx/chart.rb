@@ -130,33 +130,23 @@ module Writexlsx
     # Assemble and write the XML file.
     #
     def assemble_xml_file   # :nodoc:
-      @writer.xml_decl
-
-      # Write the c:chartSpace element.
-      write_chart_space do
-
-        # Write the c:lang element.
-        write_lang
-
-        # Write the c:style element.
-        write_style
-
-        # Write the c:protection element.
-        write_protection
-
-        # Write the c:chart element.
-        write_chart
-
-        # Write the c:spPr element for the chartarea formatting.
-        write_sp_pr(@chartarea)
-
-        # Write the c:printSettings element.
-        write_print_settings if @embedded && @embedded != 0
+      write_xml_declaration do
+        # Write the c:chartSpace element.
+        write_chart_space do
+          # Write the c:lang element.
+          write_lang
+          # Write the c:style element.
+          write_style
+          # Write the c:protection element.
+          write_protection
+          # Write the c:chart element.
+          write_chart
+          # Write the c:spPr element for the chartarea formatting.
+          write_sp_pr(@chartarea)
+          # Write the c:printSettings element.
+          write_print_settings if @embedded && @embedded != 0
+        end
       end
-
-      # Close the XML writer object and filehandle.
-      @writer.crlf
-      @writer.close
     end
 
     #

@@ -372,33 +372,32 @@ module Writexlsx
     end
 
     def assemble_xml_file #:nodoc:
-      @writer.xml_decl
-      @writer.tag_elements('worksheet', write_worksheet_attributes) do
-        write_sheet_pr
-        write_dimension
-        write_sheet_views
-        write_sheet_format_pr
-        write_cols
-        write_sheet_data
-        write_sheet_protection
-        write_auto_filter
-        write_merge_cells
-        write_conditional_formats
-        write_data_validations
-        write_hyperlinks
-        write_print_options
-        write_page_margins
-        write_page_setup
-        write_header_footer
-        write_row_breaks
-        write_col_breaks
-        write_drawings
-        write_legacy_drawing
-        write_table_parts
-        write_ext_sparklines
+      write_xml_declaration do
+        @writer.tag_elements('worksheet', write_worksheet_attributes) do
+          write_sheet_pr
+          write_dimension
+          write_sheet_views
+          write_sheet_format_pr
+          write_cols
+          write_sheet_data
+          write_sheet_protection
+          write_auto_filter
+          write_merge_cells
+          write_conditional_formats
+          write_data_validations
+          write_hyperlinks
+          write_print_options
+          write_page_margins
+          write_page_setup
+          write_header_footer
+          write_row_breaks
+          write_col_breaks
+          write_drawings
+          write_legacy_drawing
+          write_table_parts
+          write_ext_sparklines
+        end
       end
-      @writer.crlf
-      @writer.close
     end
 
     #

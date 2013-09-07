@@ -25,21 +25,20 @@ module Writexlsx
       end
 
       def assemble_xml_file
-        write_xml_declaration
-        write_style_sheet do
-          write_num_fmts
-          write_fonts
-          write_fills
-          write_borders
-          write_cell_style_xfs
-          write_cell_xfs
-          write_cell_styles
-          write_dxfs
-          write_table_styles
-          write_colors
+        write_xml_declaration do
+          write_style_sheet do
+            write_num_fmts
+            write_fonts
+            write_fills
+            write_borders
+            write_cell_style_xfs
+            write_cell_xfs
+            write_cell_styles
+            write_dxfs
+            write_table_styles
+            write_colors
+          end
         end
-        @writer.crlf
-        @writer.close
       end
 
       #
@@ -586,10 +585,6 @@ module Writexlsx
             write_color('rgb', color)
           end
         end
-      end
-
-      def write_xml_declaration
-        @writer.xml_decl
       end
 
       #

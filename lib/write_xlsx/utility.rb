@@ -492,5 +492,12 @@ module Writexlsx
     def r_id_attributes(id)
       ['r:id', "rId#{id}"]
     end
+
+    def write_xml_declaration
+      @writer.xml_decl
+      yield
+      @writer.crlf
+      @writer.close
+    end
   end
 end

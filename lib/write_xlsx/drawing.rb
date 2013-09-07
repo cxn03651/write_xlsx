@@ -27,30 +27,22 @@ module Writexlsx
     # Assemble and write the XML file.
     #
     def assemble_xml_file
-      @writer.xml_decl
-
-      # Write the xdr:wsDr element.
-      write_drawing_workspace
-
-      if @embedded
-        index = 0
-        @drawings.each do |dimensions|
-          # Write the xdr:twoCellAnchor element.
-          index += 1
-
-          write_two_cell_anchor(index, *(dimensions.flatten))
+      write_xml_declaration do
+        # Write the xdr:wsDr element.
+        write_drawing_workspace do
+          if @embedded
+            index = 0
+            @drawings.each do |dimensions|
+              # Write the xdr:twoCellAnchor element.
+              index += 1
+              write_two_cell_anchor(index, *(dimensions.flatten))
+            end
+          else
+            # Write the xdr:absoluteAnchor element.
+            write_absolute_anchor(1)
+          end
         end
-      else
-        index = 0
-
-        # Write the xdr:absoluteAnchor element.
-        index += 1
-        write_absolute_anchor(index)
       end
-
-      @writer.end_tag('xdr:wsDr')
-      @writer.crlf
-      @writer.close
     end
 
     #
@@ -72,7 +64,7 @@ module Writexlsx
           'xmlns:a',    "#{schema}2006/main"
       ]
 
-      @writer.start_tag('xdr:wsDr', attributes)
+      @writer.tag_elements('xdr:wsDr', attributes) { yield }
     end
 
     #
