@@ -32,11 +32,10 @@ module Writexlsx
 
       def assemble_xml_file
         write_xml_declaration
-        write_types
-        write_defaults
-        write_overrides
-
-        @writer.end_tag('Types')
+        write_types do
+          write_defaults
+          write_overrides
+        end
         @writer.crlf
         @writer.close
       end
@@ -185,7 +184,7 @@ module Writexlsx
         xmlns = 'http://schemas.openxmlformats.org/package/2006/content-types'
         attributes = ['xmlns', xmlns]
 
-        @writer.start_tag('Types', attributes)
+        @writer.tag_elements('Types', attributes) { yield }
       end
 
       #

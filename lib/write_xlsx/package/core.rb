@@ -62,8 +62,6 @@ module Writexlsx
       # Write the <cp:coreProperties> element.
       #
       def write_cp_core_properties
-        tag = 'cp:coreProperties'
-
         xmlns_cp       = 'http://schemas.openxmlformats.org/package/2006/metadata/core-properties'
         xmlns_dc       = 'http://purl.org/dc/elements/1.1/'
         xmlns_dcterms  = 'http://purl.org/dc/terms/'
@@ -78,9 +76,7 @@ module Writexlsx
             'xmlns:xsi',      xmlns_xsi
         ]
 
-        @writer.start_tag(tag, attributes)
-        yield
-        @writer.end_tag(tag)
+        @writer.tag_elements('cp:coreProperties', attributes) { yield }
       end
 
       #

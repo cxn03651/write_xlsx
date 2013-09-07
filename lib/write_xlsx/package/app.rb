@@ -21,20 +21,19 @@ module Writexlsx
 
       def assemble_xml_file
         write_xml_declaration
-        write_properties
-        write_application
-        write_doc_security
-        write_scale_crop
-        write_heading_pairs
-        write_titles_of_parts
-        write_manager
-        write_company
-        write_links_up_to_date
-        write_shared_doc
-        write_hyperlinks_changed
-        write_app_version
-
-        @writer.end_tag('Properties')
+        write_properties do
+          write_application
+          write_doc_security
+          write_scale_crop
+          write_heading_pairs
+          write_titles_of_parts
+          write_manager
+          write_company
+          write_links_up_to_date
+          write_shared_doc
+          write_hyperlinks_changed
+          write_app_version
+        end
         @writer.crlf
         @writer.close
       end
@@ -66,13 +65,15 @@ module Writexlsx
       # Write the <Properties> element.
       #
       def write_properties
+        tag = 'Properties'
+
         schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
         attributes = [
             'xmlns',     "#{schema}extended-properties",
             'xmlns:vt',  "#{schema}docPropsVTypes"
         ]
 
-        @writer.start_tag('Properties', attributes)
+        @writer.tag_elements('Properties', attributes) { yield }
       end
 
       #
@@ -125,10 +126,8 @@ module Writexlsx
       # Write the <vt:vector> element.
       #
       def write_vt_vector(base_type, data)
-        size      = data.size
-
         attributes = [
-          'size',     size,
+          'size',     data.size,
           'baseType', base_type
         ]
 

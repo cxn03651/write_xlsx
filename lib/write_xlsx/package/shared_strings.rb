@@ -45,13 +45,9 @@ module Writexlsx
         write_xml_declaration
 
         # Write the sst table.
-        write_sst
-
-        # Write the sst strings.
-        write_sst_strings
+        write_sst { write_sst_strings }
 
         # Close the sst tag.
-        @writer.end_tag('sst')
         @writer.crlf
         @writer.close
       end
@@ -75,7 +71,7 @@ module Writexlsx
            'uniqueCount', unique_count
           ]
 
-        @writer.start_tag('sst', attributes)
+        @writer.tag_elements('sst', attributes) { yield }
       end
 
       #

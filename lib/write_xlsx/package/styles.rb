@@ -26,18 +26,18 @@ module Writexlsx
 
       def assemble_xml_file
         write_xml_declaration
-        write_style_sheet
-        write_num_fmts
-        write_fonts
-        write_fills
-        write_borders
-        write_cell_style_xfs
-        write_cell_xfs
-        write_cell_styles
-        write_dxfs
-        write_table_styles
-        write_colors
-        @writer.end_tag('styleSheet')
+        write_style_sheet do
+          write_num_fmts
+          write_fonts
+          write_fills
+          write_borders
+          write_cell_style_xfs
+          write_cell_xfs
+          write_cell_styles
+          write_dxfs
+          write_table_styles
+          write_colors
+        end
         @writer.crlf
         @writer.close
       end
@@ -83,7 +83,7 @@ module Writexlsx
 
         attributes = ['xmlns', xmlns]
 
-        @writer.start_tag('styleSheet', attributes)
+        @writer.tag_elements('styleSheet', attributes) { yield }
       end
 
       #
