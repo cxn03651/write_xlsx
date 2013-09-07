@@ -23,19 +23,18 @@ module Writexlsx
 
       def assemble_xml_file
         write_xml_declaration
-        write_cp_core_properties
-        write_dc_title
-        write_dc_subject
-        write_dc_creator
-        write_cp_keywords
-        write_dc_description
-        write_cp_last_modified_by
-        write_dcterms_created
-        write_dcterms_modified
-        write_cp_category
-        write_cp_content_status
-
-        @writer.end_tag('cp:coreProperties')
+        write_cp_core_properties do
+          write_dc_title
+          write_dc_subject
+          write_dc_creator
+          write_cp_keywords
+          write_dc_description
+          write_cp_last_modified_by
+          write_dcterms_created
+          write_dcterms_modified
+          write_cp_category
+          write_cp_content_status
+        end
         @writer.crlf
         @writer.close
       end
@@ -63,6 +62,8 @@ module Writexlsx
       # Write the <cp:coreProperties> element.
       #
       def write_cp_core_properties
+        tag = 'cp:coreProperties'
+
         xmlns_cp       = 'http://schemas.openxmlformats.org/package/2006/metadata/core-properties'
         xmlns_dc       = 'http://purl.org/dc/elements/1.1/'
         xmlns_dcterms  = 'http://purl.org/dc/terms/'
@@ -77,7 +78,9 @@ module Writexlsx
             'xmlns:xsi',      xmlns_xsi
         ]
 
-        @writer.start_tag('cp:coreProperties', attributes)
+        @writer.start_tag(tag, attributes)
+        yield
+        @writer.end_tag(tag)
       end
 
       #
