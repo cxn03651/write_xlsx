@@ -2558,7 +2558,7 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      hyperlink = Hyperlink.new(url, str)
+      hyperlink = Hyperlink.factory(url, str)
       hyperlink.tip = tip
 
       @hlink_count += 1
