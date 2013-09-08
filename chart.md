@@ -1124,8 +1124,8 @@ the interior of a column or the background of the chart itself.
 
 The following properties can be set for fill formats in a chart.
 
-    none
-    color
+    :none
+    :color
 
 The none property is used to turn the fill property off (it is generally on by default).
 
