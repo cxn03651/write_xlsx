@@ -1172,12 +1172,21 @@ module Writexlsx
     #
     # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
     #
-    def write_val_axis(params) # :nodoc:
-      x_axis   = params[:x_axis]
-      y_axis   = params[:y_axis]
+    def write_val_axis(params, cat = false) # :nodoc:
       axis_ids = params[:axis_ids]
       position = params[:position] || @val_axis_position
       horiz    = @horiz_val_axis
+      if cat
+        x_axis   = params[:y_axis]
+        y_axis   = params[:x_axis]
+        axis_ids_0 = axis_ids[1]
+        axis_ids_1 = axis_ids[0]
+      else
+        x_axis   = params[:x_axis]
+        y_axis   = params[:y_axis]
+        axis_ids_0 = axis_ids[0]
+        axis_ids_1 = axis_ids[1]
+      end
 
       return unless axis_ids && !axis_ids.empty?
 
@@ -1185,7 +1194,7 @@ module Writexlsx
       position = y_axis.position || position
 
       @writer.tag_elements('c:valAx') do
-        write_axis_id(axis_ids[1])
+        write_axis_id(axis_ids_1)
 
         # Write the c:scaling element.
         write_scaling_with_param(y_axis)
@@ -1221,7 +1230,7 @@ module Writexlsx
         write_axis_font(y_axis.num_font)
 
         # Write the c:crossAx element.
-        write_cross_axis(axis_ids[0])
+        write_cross_axis(axis_ids_0)
 
         write_crossing(x_axis.crossing)
 
@@ -1243,67 +1252,7 @@ module Writexlsx
     # Usually the X axis.
     #
     def write_cat_val_axis(params) # :nodoc:
-      x_axis   = params[:x_axis]
-      y_axis   = params[:y_axis]
-      axis_ids = params[:axis_ids]
-      position = params[:position] || @val_axis_position
-      horiz    = @horiz_val_axis
-
-      return unless axis_ids && !axis_ids.empty?
-
-      # Overwrite the default axis position with a user supplied value.
-      position = x_axis.position || position
-
-      @writer.tag_elements('c:valAx') do
-        write_axis_id(axis_ids[0])
-
-        # Write the c:scaling element.
-        write_scaling_with_param(x_axis)
-
-        write_delete(1) unless ptrue?(x_axis.visible)
-
-        # Write the c:axPos element.
-        write_axis_pos(position, y_axis.reverse)
-
-        # Write the c:majorGridlines element.
-        write_major_gridlines(x_axis.major_gridlines)
-
-        # Write the c:minorGridlines element.
-        write_minor_gridlines(x_axis.minor_gridlines)
-
-        # Write the axis title elements.
-        if x_axis.formula
-          write_title_formula(x_axis, horiz)
-        elsif x_axis.name
-          write_title_rich(x_axis, horiz)
-        end
-
-        # Write the c:numberFormat element.
-        write_number_format(x_axis)
-
-        # Write the c:majorTickMark element.
-        write_major_tick_mark(x_axis.major_tick_mark)
-
-        # Write the c:tickLblPos element.
-        write_tick_label_pos(x_axis.label_position)
-
-        # Write the axis font elements.
-        write_axis_font(x_axis.num_font)
-
-        # Write the c:crossAx element.
-        write_cross_axis(axis_ids[1])
-
-        write_crossing(y_axis.crossing)
-
-        # Write the c:crossBetween element.
-        write_cross_between
-
-        # Write the c:majorUnit element.
-        write_c_major_unit(x_axis.major_unit)
-
-        # Write the c:minorunit element.
-        write_c_minor_unit(x_axis.minor_unit)
-      end
+      write_val_axis(params, true)
     end
 
     #
