@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+require 'write_xlsx/col_name'
+
 module Writexlsx
   module Utility
     ROW_MAX  = 1048576  # :nodoc:
@@ -50,25 +52,7 @@ module Writexlsx
     end
 
     def xl_col_to_name(col, col_absolute)
-      # Change from 0-indexed to 1 indexed.
-      col += 1
-      col_str = ''
-
-      while col > 0
-        # Set remainder from 1 .. 26
-        remainder = col % 26
-        remainder = 26 if remainder == 0
-
-        # Convert the remainder to a character. C-ishly.
-        col_letter = ("A".ord + remainder - 1).chr
-
-        # Accumulate the column letters, right to left.
-        col_str = col_letter + col_str
-
-        # Get the next order of magnitude.
-        col = (col - 1) / 26
-      end
-
+      col_str = ColName.instance.col_str(col)
       "#{absolute_char(col_absolute)}#{col_str}"
     end
 
