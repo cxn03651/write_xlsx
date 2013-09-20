@@ -1,5 +1,7 @@
 Change history of write_xlsx rubygem.
 
+2013-09-21 v0.72.3.beta1
+   speed up when script handles large number of cells.
 
 2013-09-07 v0.72.2
    work well with rubyzip 1.0.0
