@@ -19,7 +19,8 @@ Gem::Specification.new do |gem|
 
   gem.extra_rdoc_files = [
     "LICENSE.txt",
-    "README.rdoc"
+    "README.md",
+    "Changes"
   ]
 
   gem.add_runtime_dependency(%q<rubyzip>, [">=1.0.0"])
