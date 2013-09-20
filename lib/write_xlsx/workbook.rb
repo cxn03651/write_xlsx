@@ -1073,10 +1073,10 @@ module Writexlsx
     def write_workbook #:nodoc:
       schema  = 'http://schemas.openxmlformats.org'
       attributes = [
-        'xmlns',
-        schema + '/spreadsheetml/2006/main',
-        'xmlns:r',
-        schema + '/officeDocument/2006/relationships'
+        ['xmlns',
+         schema + '/spreadsheetml/2006/main'],
+        ['xmlns:r',
+         schema + '/officeDocument/2006/relationships']
       ]
       @writer.tag_elements('workbook', attributes) do
         yield
@@ -1085,14 +1085,14 @@ module Writexlsx
 
     def write_file_version #:nodoc:
       attributes = [
-        'appName', 'xl',
-        'lastEdited', 4,
-        'lowestEdited', 4,
-        'rupBuild', 4505
+                    ['appName', 'xl'],
+                    ['lastEdited', 4],
+                    ['lowestEdited', 4],
+                    ['rupBuild', 4505]
                    ]
 
       if @vba_project
-        attributes << :codeName << '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}'
+        attributes << [:codeName, '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}']
       end
 
       @writer.empty_tag('fileVersion', attributes)
@@ -1100,9 +1100,9 @@ module Writexlsx
 
     def write_workbook_pr #:nodoc:
       attributes = []
-      attributes << 'codeName' << @vba_codename  if ptrue?(@vba_codename)
-      attributes << 'date1904' << 1              if date_1904?
-      attributes << 'defaultThemeVersion' << 124226
+      attributes << ['codeName', @vba_codename]  if ptrue?(@vba_codename)
+      attributes << ['date1904', 1]              if date_1904?
+      attributes << ['defaultThemeVersion', 124226]
       @writer.empty_tag('workbookPr', attributes)
     end
 
@@ -1112,25 +1112,28 @@ module Writexlsx
 
     def write_workbook_view #:nodoc:
       attributes = [
-        'xWindow',       @x_window,
-        'yWindow',       @y_window,
-        'windowWidth',   @window_width,
-        'windowHeight',  @window_height
+                    ['xWindow',       @x_window],
+                    ['yWindow',       @y_window],
+                    ['windowWidth',   @window_width],
+                    ['windowHeight',  @window_height]
                    ]
       if @tab_ratio != 500
-        attributes << 'tabRatio' << @tab_ratio
+        attributes << ['tabRatio', @tab_ratio]
       end
       if @firstsheet > 0
-        attributes << 'firstSheet' << @firstsheet + 1
+        attributes << ['firstSheet', @firstsheet + 1]
       end
       if @activesheet > 0
-        attributes << 'activeTab' << @activesheet
+        attributes << ['activeTab', @activesheet]
       end
       @writer.empty_tag('workbookView', attributes)
     end
 
     def write_calc_pr #:nodoc:
-      attributes = ['calcId', 124519, 'fullCalcOnLoad', 1]
+      attributes = [
+                    ['calcId', 124519],
+                    ['fullCalcOnLoad', 1]
+                   ]
       @writer.empty_tag('calcPr', attributes)
     end
 
@@ -1140,8 +1143,8 @@ module Writexlsx
 
     def write_ext #:nodoc:
       attributes = [
-        'xmlns:mx', "#{OFFICE_URL}mac/excel/2008/main",
-        'uri', uri
+        ['xmlns:mx', "#{OFFICE_URL}mac/excel/2008/main"],
+        ['uri', uri]
       ]
       @writer.tag_elements('ext', attributes) { write_mx_arch_id }
     end
@@ -1160,9 +1163,9 @@ module Writexlsx
     def write_defined_name(defined_name) #:nodoc:
       name, id, range, hidden = defined_name
 
-      attributes = ['name', name]
-      attributes << 'localSheetId' << "#{id}" unless id == -1
-      attributes << 'hidden'       << '1'     if hidden
+      attributes = [ ['name', name] ]
+      attributes << ['localSheetId', "#{id}"] unless id == -1
+      attributes << ['hidden',       '1']     if hidden
 
       @writer.data_element('definedName', range, attributes)
     end

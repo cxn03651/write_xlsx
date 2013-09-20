@@ -269,11 +269,11 @@ module Writexlsx
 
     def underline_attributes(underline)
       if underline == 2
-        ['val', 'double']
+        [['val', 'double']]
       elsif underline == 33
-        ['val', 'singleAccounting']
+        [['val', 'singleAccounting']]
       elsif underline == 34
-        ['val', 'doubleAccounting']
+        [['val', 'doubleAccounting']]
       else
         []    # Default to single underline.
       end
@@ -283,7 +283,7 @@ module Writexlsx
     # Write the <color> element.
     #
     def write_color(writer, name, value) #:nodoc:
-      attributes = [name, value]
+      attributes = [[name, value]]
 
       writer.empty_tag('color', attributes)
     end
@@ -362,9 +362,9 @@ module Writexlsx
 
     def v_shape_attributes_base(id, z_index)
       [
-       'id',          "_x0000_s#{id}",
-       'type',        type,
-       'style',       (v_shape_style_base(z_index, vertices) + style_addition).join,
+       ['id',          "_x0000_s#{id}"],
+       ['type',        type],
+       ['style',       (v_shape_style_base(z_index, vertices) + style_addition).join]
       ]
     end
 
@@ -409,8 +409,8 @@ module Writexlsx
     def write_comment_path(gradientshapeok, connecttype)
       attributes      = []
 
-      attributes << 'gradientshapeok' << 't' if gradientshapeok
-      attributes << 'o:connecttype' << connecttype
+      attributes << ['gradientshapeok', 't'] if gradientshapeok
+      attributes << ['o:connecttype', connecttype]
 
       @writer.empty_tag('v:path', attributes)
     end
@@ -437,7 +437,7 @@ module Writexlsx
     #
     def write_div(align, font = nil)
       style = "text-align:#{align}"
-      attributes = ['style', style]
+      attributes = [['style', style]]
 
       @writer.tag_elements('div', attributes) do
         if font
@@ -457,9 +457,9 @@ module Writexlsx
       color   = '#000000'
 
       attributes = [
-                    'face',  face,
-                    'size',  size,
-                    'color', color
+                    ['face',  face],
+                    ['size',  size],
+                    ['color', color]
                    ]
       @writer.data_element('font', caption, attributes)
     end
@@ -468,7 +468,7 @@ module Writexlsx
     # Write the <v:stroke> element.
     #
     def write_stroke
-      attributes = ['joinstyle', 'miter']
+      attributes = [['joinstyle', 'miter']]
 
       @writer.empty_tag('v:stroke', attributes)
     end

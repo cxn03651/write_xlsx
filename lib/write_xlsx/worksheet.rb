@@ -5680,7 +5680,12 @@ module Writexlsx
     # Write the cell array formula <f> element.
     #
     def write_cell_array_formula(formula, range) #:nodoc:
-      @writer.data_element('f', formula, ['t', 'array', 'ref', range])
+      @writer.data_element('f', formula,
+                           [
+                            ['t', 'array'],
+                            ['ref', range]
+                           ]
+                           )
     end
 
     def date_1904? #:nodoc:
@@ -5816,7 +5821,7 @@ module Writexlsx
           # Write the string fragment part, with whitespace handling.
           attributes = []
 
-          attributes << 'xml:space' << 'preserve' if token =~ /^\s/ || token =~ /\s$/
+          attributes << ['xml:space', 'preserve'] if token =~ /^\s/ || token =~ /\s$/
           writer.data_element('t', token, attributes)
           writer.end_tag('r')
         end
@@ -6336,13 +6341,13 @@ module Writexlsx
     def write_worksheet_attributes #:nodoc:
       schema = 'http://schemas.openxmlformats.org/'
       attributes = [
-                    'xmlns',    "#{schema}spreadsheetml/2006/main",
-                    'xmlns:r',  "#{schema}officeDocument/2006/relationships"
+                    ['xmlns',    "#{schema}spreadsheetml/2006/main"],
+                    ['xmlns:r',  "#{schema}officeDocument/2006/relationships"]
                    ]
       if @excel_version == 2010
-        attributes << 'xmlns:mc'     << "#{schema}markup-compatibility/2006"
-        attributes << 'xmlns:x14ac'  << "#{OFFICE_URL}spreadsheetml/2009/9/ac"
-        attributes << 'mc:Ignorable' << 'x14ac'
+        attributes << ['xmlns:mc',     "#{schema}markup-compatibility/2006"]
+        attributes << ['xmlns:x14ac',  "#{OFFICE_URL}spreadsheetml/2009/9/ac"]
+        attributes << ['mc:Ignorable', 'x14ac']
       end
       attributes
     end
@@ -6354,8 +6359,8 @@ module Writexlsx
       return unless tab_outline_fit? || vba_codename? || filter_on?
 
       attributes = []
-      attributes << 'codeName'   << @vba_codename if vba_codename?
-      attributes << 'filterMode' << 1             if filter_on?
+      attributes << ['codeName',   @vba_codename] if vba_codename?
+      attributes << ['filterMode', 1]             if filter_on?
 
       if tab_outline_fit?
         @writer.tag_elements('sheetPr', attributes) do
@@ -6376,7 +6381,7 @@ module Writexlsx
     # Write the <pageSetUpPr> element.
     #
     def write_page_set_up_pr #:nodoc:
-      @writer.empty_tag('pageSetUpPr', ['fitToPage', 1]) if fit_page?
+      @writer.empty_tag('pageSetUpPr', [ ['fitToPage', 1] ]) if fit_page?
     end
 
     # Write the <dimension> element. This specifies the range of cells in the
@@ -6408,7 +6413,7 @@ module Writexlsx
         cell_2 = xl_rowcol_to_cell(@dim_rowmax, @dim_colmax)
         ref = cell_1 + ':' + cell_2
       end
-      @writer.empty_tag('dimension', ['ref', ref])
+      @writer.empty_tag('dimension', [ ['ref', ref] ])
     end
     #
     # Write the <sheetViews> element.
@@ -6420,31 +6425,31 @@ module Writexlsx
     def write_sheet_view #:nodoc:
       attributes = []
       # Hide screen gridlines if required
-      attributes << 'showGridLines' << 0 unless @screen_gridlines
+      attributes << ['showGridLines', 0] unless @screen_gridlines
 
       # Hide zeroes in cells.
-      attributes << 'showZeros' << 0 unless show_zeros?
+      attributes << ['showZeros', 0] unless show_zeros?
 
       # Display worksheet right to left for Hebrew, Arabic and others.
-      attributes << 'rightToLeft' << 1 if @right_to_left
+      attributes << ['rightToLeft', 1] if @right_to_left
 
       # Show that the sheet tab is selected.
-      attributes << 'tabSelected' << 1 if @selected
+      attributes << ['tabSelected', 1] if @selected
 
       # Turn outlines off. Also required in the outlinePr element.
-      attributes << "showOutlineSymbols" << 0 if @outline_on
+      attributes << ["showOutlineSymbols", 0] if @outline_on
 
       # Set the page view/layout mode if required.
       # TODO. Add pageBreakPreview mode when requested.
-      (attributes << 'view' << 'pageLayout') if page_view?
+      attributes << ['view', 'pageLayout'] if page_view?
 
       # Set the zoom level.
       if @zoom != 100
-        (attributes << 'zoomScale' << @zoom) unless page_view?
-        (attributes << 'zoomScaleNormal' << @zoom) if zoom_scale_normal?
+        attributes << ['zoomScale', @zoom] unless page_view?
+        attributes << ['zoomScaleNormal', @zoom] if zoom_scale_normal?
       end
 
-      attributes << 'workbookViewId' << 0
+      attributes << ['workbookViewId', 0]
 
       if @panes.empty? && @selections.empty?
         @writer.empty_tag('sheetView', attributes)
@@ -6468,9 +6473,9 @@ module Writexlsx
     #
     def write_selection(pane, active_cell, sqref) #:nodoc:
       attributes  = []
-      (attributes << 'pane' << pane) if pane
-      (attributes << 'activeCell' << active_cell) if active_cell
-      (attributes << 'sqref' << sqref) if sqref
+      attributes << ['pane', pane]              if pane
+      attributes << ['activeCell', active_cell] if active_cell
+      attributes << ['sqref', sqref]            if sqref
 
       @writer.empty_tag('selection', attributes)
     end
@@ -6481,19 +6486,21 @@ module Writexlsx
     def write_sheet_format_pr #:nodoc:
       base_col_width     = 10
 
-      attributes = ['defaultRowHeight', @default_row_height]
+      attributes = [
+                    ['defaultRowHeight', @default_row_height]
+                   ]
       if @default_row_height != 15
-        attributes << 'customHeight' << 1
+        attributes << ['customHeight', 1]
       end
 
       if ptrue?(@default_row_zeroed)
-        attributes << 'zeroHeight' << 1
+        attributes << ['zeroHeight', 1]
       end
 
-      attributes << 'outlineLevelRow' << @outline_row_level if @outline_row_level > 0
-      attributes << 'outlineLevelCol' << @outline_col_level if @outline_col_level > 0
+      attributes << ['outlineLevelRow', @outline_row_level] if @outline_row_level > 0
+      attributes << ['outlineLevelCol', @outline_col_level] if @outline_col_level > 0
       if @excel_version == 2010
-        attributes << 'x14ac:dyDescent' << '0.25'
+        attributes << ['x14ac:dyDescent', '0.25']
       end
       @writer.empty_tag('sheetFormatPr', attributes)
     end
@@ -6546,16 +6553,16 @@ module Writexlsx
       width = width.to_i if width - width.to_i == 0
 
       attributes = [
-          'min',   min + 1,
-          'max',   max + 1,
-          'width', width
+          ['min',   min + 1],
+          ['max',   max + 1],
+          ['width', width]
       ]
 
-      attributes << 'style'        << xf_index if xf_index != 0
-      attributes << 'hidden'       << 1        if hidden != 0
-      attributes << 'customWidth'  << 1        if custom_width
-      attributes << 'outlineLevel' << level    if level != 0
-      attributes << 'collapsed'    << 1        if collapsed != 0
+      attributes << ['style',        xf_index] if xf_index != 0
+      attributes << ['hidden',       1]        if hidden != 0
+      attributes << ['customWidth',  1]        if custom_width
+      attributes << ['outlineLevel', level]    if level != 0
+      attributes << ['collapsed',    1]        if collapsed != 0
       attributes
     end
 
@@ -6632,19 +6639,19 @@ module Writexlsx
       level     ||= 0
       xf_index = format ? format.get_xf_index : 0
 
-      attributes = ['r',  r + 1]
+      attributes = [['r',  r + 1]]
 
-      (attributes << 'spans'        << spans)    if spans
-      (attributes << 's'            << xf_index) if ptrue?(xf_index)
-      (attributes << 'customFormat' << 1    )    if ptrue?(format)
-      (attributes << 'ht'           << height)   if height != 15
-      (attributes << 'hidden'       << 1    )    if ptrue?(hidden)
-      (attributes << 'customHeight' << 1    )    if height != 15
-      (attributes << 'outlineLevel' << level)    if ptrue?(level)
-      (attributes << 'collapsed'    << 1    )    if ptrue?(collapsed)
+      attributes << ['spans',        spans]    if spans
+      attributes << ['s',            xf_index] if ptrue?(xf_index)
+      attributes << ['customFormat', 1]        if ptrue?(format)
+      attributes << ['ht',           height]   if height != 15
+      attributes << ['hidden',       1]        if ptrue?(hidden)
+      attributes << ['customHeight', 1]        if height != 15
+      attributes << ['outlineLevel', level]    if ptrue?(level)
+      attributes << ['collapsed',    1]        if ptrue?(collapsed)
 
       if @excel_version == 2010
-        attributes << 'x14ac:dyDescent' << '0.25'
+        attributes << ['x14ac:dyDescent', '0.25']
       end
       attributes
     end
@@ -6690,11 +6697,11 @@ module Writexlsx
       end
 
       attributes = []
-      (attributes << 'xSplit' << x_split) if x_split > 0
-      (attributes << 'ySplit' << y_split) if y_split > 0
-      attributes << 'topLeftCell' << top_left_cell
-      attributes << 'activePane'  << active_pane
-      attributes << 'state'       << state
+      attributes << ['xSplit',      x_split] if x_split > 0
+      attributes << ['ySplit',      y_split] if y_split > 0
+      attributes << ['topLeftCell', top_left_cell]
+      attributes << ['activePane',  active_pane]
+      attributes << ['state',       state]
 
       @writer.empty_tag('pane', attributes)
     end
@@ -6738,10 +6745,10 @@ module Writexlsx
       active_pane = set_active_pane_and_cell_selections(row, col, top_row, left_col, active_cell, sqref)
 
       attributes = []
-      (attributes << 'xSplit' << x_split) if x_split > 0
-      (attributes << 'ySplit' << y_split) if y_split > 0
-      attributes << 'topLeftCell' << top_left_cell
-      (attributes << 'activePane' << active_pane) if has_selection
+      attributes << ['xSplit', x_split] if x_split > 0
+      attributes << ['ySplit', y_split] if y_split > 0
+      attributes << ['topLeftCell', top_left_cell]
+      attributes << ['activePane', active_pane] if has_selection
 
       @writer.empty_tag('pane', attributes)
     end
@@ -6771,7 +6778,7 @@ module Writexlsx
     # Write the <sheetCalcPr> element for the worksheet calculation properties.
     #
     def write_sheet_calc_pr #:nodoc:
-      @writer.empty_tag('sheetCalcPr', ['fullCalcOnLoad', 1])
+      @writer.empty_tag('sheetCalcPr', [ ['fullCalcOnLoad', 1] ])
     end
 
     #
@@ -6779,8 +6786,8 @@ module Writexlsx
     #
     def write_phonetic_pr #:nodoc:
       attributes = [
-                    'fontId', 1,
-                    'type',   'noConversion'
+                    ['fontId', 1],
+                    ['type',   'noConversion']
                    ]
 
       @writer.empty_tag('phoneticPr', attributes)
@@ -6812,7 +6819,7 @@ module Writexlsx
     def write_some_elements(tag, container)
       return if container.empty?
 
-      @writer.tag_elements(tag, ['count', container.size]) do
+      @writer.tag_elements(tag, [ ['count', container.size] ]) do
         yield
       end
     end
@@ -6827,7 +6834,7 @@ module Writexlsx
       cell_1 = xl_rowcol_to_cell(row_min, col_min)
       cell_2 = xl_rowcol_to_cell(row_max, col_max)
 
-      @writer.empty_tag('mergeCell', ['ref', "#{cell_1}:#{cell_2}"])
+      @writer.empty_tag('mergeCell', [ ['ref', "#{cell_1}:#{cell_2}"] ])
     end
 
     #
@@ -6873,7 +6880,10 @@ module Writexlsx
 
       return if page_breaks.empty?
 
-      attributes = ['count', count, 'manualBreakCount', count]
+      attributes = [
+                    ['count', count],
+                    ['manualBreakCount', count]
+                   ]
 
       @writer.tag_elements(tag, attributes) do
         page_breaks.each { |num| write_brk(num, max) }
@@ -6884,9 +6894,9 @@ module Writexlsx
     #
     def write_brk(id, max) #:nodoc:
       attributes = [
-        'id',  id,
-        'max', max,
-        'man', 1
+        ['id',  id],
+        ['max', max],
+        ['man', 1]
       ]
 
       @writer.empty_tag('brk', attributes)
@@ -6898,7 +6908,9 @@ module Writexlsx
     def write_auto_filter #:nodoc:
       return unless autofilter_ref?
 
-      attributes = ['ref', @autofilter_ref]
+      attributes = [
+                    ['ref', @autofilter_ref]
+                   ]
 
       if filter_on?
         # Autofilter defined active filters.
@@ -6935,7 +6947,7 @@ module Writexlsx
     # Write the <filterColumn> element.
     #
     def write_filter_column(col_id, type, *filters) #:nodoc:
-      @writer.tag_elements('filterColumn', ['colId', col_id]) do
+      @writer.tag_elements('filterColumn', [ ['colId', col_id] ]) do
         if type == 1
           # Type == 1 is the new XLSX style filter.
           write_filters(*filters)
@@ -6952,7 +6964,7 @@ module Writexlsx
     def write_filters(*filters) #:nodoc:
       if filters.size == 1 && filters[0] == 'blanks'
         # Special case for blank cells only.
-        @writer.empty_tag('filters', ['blank', 1])
+        @writer.empty_tag('filters', [ ['blank', 1] ])
       else
         # General case.
         @writer.tag_elements('filters') do
@@ -6965,7 +6977,7 @@ module Writexlsx
     # Write the <filter> element.
     #
     def write_filter(val) #:nodoc:
-      @writer.empty_tag('filter', ['val', val])
+      @writer.empty_tag('filter', [ ['val', val] ])
     end
 
     #
@@ -6980,9 +6992,9 @@ module Writexlsx
 
         # Check if the "join" operand is "and" or "or".
         if tokens[2] == 0
-          attributes = ['and', 1]
+          attributes = [ ['and', 1] ]
         else
-          attributes = ['and', 0]
+          attributes = [ ['and', 0] ]
         end
 
         # Write the two custom filters.
@@ -7016,8 +7028,8 @@ module Writexlsx
 
       # The 'equal' operator is the default attribute and isn't stored.
       attributes = []
-      attributes << 'operator' << operator unless operator == 'equal'
-      attributes << 'val' << val
+      attributes << ['operator', operator] unless operator == 'equal'
+      attributes << ['val', val]
 
       @writer.empty_tag('customFilter', attributes)
     end
@@ -7095,7 +7107,10 @@ module Writexlsx
     def write_tab_color #:nodoc:
       return unless tab_color?
 
-      @writer.empty_tag('tabColor', ['rgb', get_palette_color(@tab_color)])
+      @writer.empty_tag('tabColor',
+                        [
+                         ['rgb', get_palette_color(@tab_color)]
+                        ])
     end
 
     #
@@ -7105,10 +7120,10 @@ module Writexlsx
       return unless outline_changed?
 
       attributes = []
-      attributes << "applyStyles"  << 1 if @outline_style != 0
-      attributes << "summaryBelow" << 0 if @outline_below == 0
-      attributes << "summaryRight" << 0 if @outline_right == 0
-      attributes << "showOutlineSymbols" << 0 if @outline_on == 0
+      attributes << ["applyStyles",  1] if @outline_style != 0
+      attributes << ["summaryBelow", 0] if @outline_below == 0
+      attributes << ["summaryRight", 0] if @outline_right == 0
+      attributes << ["showOutlineSymbols", 0] if @outline_on == 0
 
       @writer.empty_tag('outlinePr', attributes)
     end
@@ -7120,27 +7135,27 @@ module Writexlsx
       return unless protect?
 
       attributes = []
-      attributes << "password"         << @protect[:password] if ptrue?(@protect[:password])
-      attributes << "sheet"            << 1 if ptrue?(@protect[:sheet])
-      attributes << "content"          << 1 if ptrue?(@protect[:content])
-      attributes << "objects"          << 1 unless ptrue?(@protect[:objects])
-      attributes << "scenarios"        << 1 unless ptrue?(@protect[:scenarios])
-      attributes << "formatCells"      << 0 if ptrue?(@protect[:format_cells])
-      attributes << "formatColumns"    << 0 if ptrue?(@protect[:format_columns])
-      attributes << "formatRows"       << 0 if ptrue?(@protect[:format_rows])
-      attributes << "insertColumns"    << 0 if ptrue?(@protect[:insert_columns])
-      attributes << "insertRows"       << 0 if ptrue?(@protect[:insert_rows])
-      attributes << "insertHyperlinks" << 0 if ptrue?(@protect[:insert_hyperlinks])
-      attributes << "deleteColumns"    << 0 if ptrue?(@protect[:delete_columns])
-      attributes << "deleteRows"       << 0 if ptrue?(@protect[:delete_rows])
+      attributes << ["password",         @protect[:password]] if ptrue?(@protect[:password])
+      attributes << ["sheet",            1] if ptrue?(@protect[:sheet])
+      attributes << ["content",          1] if ptrue?(@protect[:content])
+      attributes << ["objects",          1] unless ptrue?(@protect[:objects])
+      attributes << ["scenarios",        1] unless ptrue?(@protect[:scenarios])
+      attributes << ["formatCells",      0] if ptrue?(@protect[:format_cells])
+      attributes << ["formatColumns",    0] if ptrue?(@protect[:format_columns])
+      attributes << ["formatRows",       0] if ptrue?(@protect[:format_rows])
+      attributes << ["insertColumns",    0] if ptrue?(@protect[:insert_columns])
+      attributes << ["insertRows",       0] if ptrue?(@protect[:insert_rows])
+      attributes << ["insertHyperlinks", 0] if ptrue?(@protect[:insert_hyperlinks])
+      attributes << ["deleteColumns",    0] if ptrue?(@protect[:delete_columns])
+      attributes << ["deleteRows",       0] if ptrue?(@protect[:delete_rows])
 
-      attributes << "selectLockedCells" << 1 unless ptrue?(@protect[:select_locked_cells])
+      attributes << ["selectLockedCells", 1] unless ptrue?(@protect[:select_locked_cells])
 
-      attributes << "sort"        << 0 if ptrue?(@protect[:sort])
-      attributes << "autoFilter"  << 0 if ptrue?(@protect[:autofilter])
-      attributes << "pivotTables" << 0 if ptrue?(@protect[:pivot_tables])
+      attributes << ["sort",        0] if ptrue?(@protect[:sort])
+      attributes << ["autoFilter",  0] if ptrue?(@protect[:autofilter])
+      attributes << ["pivotTables", 0] if ptrue?(@protect[:pivot_tables])
 
-      attributes << "selectUnlockedCells" << 1 unless ptrue?(@protect[:select_unlocked_cells])
+      attributes << ["selectUnlockedCells", 1] unless ptrue?(@protect[:select_unlocked_cells])
 
       @writer.empty_tag('sheetProtection', attributes)
     end
@@ -7172,7 +7187,7 @@ module Writexlsx
     def write_table_parts
       return if @tables.empty?
 
-      @writer.tag_elements('tableParts', ['count', tables_count]) do
+      @writer.tag_elements('tableParts', [ ['count', tables_count] ]) do
         tables_count.times { increment_rel_id_and_write_r_id('tablePart') }
       end
     end
@@ -7181,7 +7196,7 @@ module Writexlsx
     # Write the <tablePart> element.
     #
     def write_table_part(id)
-      @writer.empty_tag('tablePart', r_id_attributes(id))
+      @writer.empty_tag('tablePart', [r_id_attributes(id)])
     end
 
     def increment_rel_id_and_write_r_id(tag)
@@ -7190,7 +7205,7 @@ module Writexlsx
     end
 
     def write_r_id(tag, id)
-      @writer.empty_tag(tag, r_id_attributes(id))
+      @writer.empty_tag(tag, [r_id_attributes(id)])
     end
 
     #
@@ -7208,8 +7223,8 @@ module Writexlsx
 
     def write_ext_attributes
       [
-       'xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main",
-       'uri',       '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}'
+       ['xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main"],
+       ['uri',       '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}']
       ]
     end
 
@@ -7224,7 +7239,9 @@ module Writexlsx
     end
 
     def sparkline_groups_attributes  # :nodoc:
-      ['xmlns:xm', "#{OFFICE_URL}excel/2006/main"]
+      [
+       ['xmlns:xm', "#{OFFICE_URL}excel/2006/main"]
+      ]
     end
 
     #
@@ -7249,7 +7266,7 @@ module Writexlsx
     # Write the <conditionalFormatting> element.
     #
     def write_conditional_formatting(range, cond_formats) #:nodoc:
-      @writer.tag_elements('conditionalFormatting', ['sqref', range]) do
+      @writer.tag_elements('conditionalFormatting', [ ['sqref', range] ]) do
         cond_formats.each { |cond_format| cond_format.write_cf_rule }
       end
     end

@@ -32,7 +32,7 @@ EOS
 
   def test_attribute
     assert_equal(
-      "<foo x=\"1&gt;2\"/>", @obj.empty_tag("foo", ['x', '1>2'])
+      "<foo x=\"1&gt;2\"/>", @obj.empty_tag("foo", [ ['x', '1>2'] ])
     )
   end
 
@@ -52,8 +52,8 @@ EOS
 
   def test_data_element
     attributes = [
-      'name', '_xlnm.Print_Titles',
-      'localSheetId', 0
+      ['name', '_xlnm.Print_Titles'],
+      ['localSheetId', 0]
     ]
     expected =
       "<definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet1!$1:$1</definedName>"

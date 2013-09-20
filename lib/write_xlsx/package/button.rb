@@ -10,11 +10,12 @@ module Writexlsx
       attr_accessor :font, :macro, :vertices
 
       def v_shape_attributes(id, z_index)
-        v_shape_attributes_base(id, z_index) <<
-          'o:button'    << 't'               <<
-          'fillcolor'   << color             <<
-          'strokecolor' << 'windowText [64]' <<
-          'o:insetmode' << 'auto'
+        attributes = v_shape_attributes_base(id, z_index)
+        attributes << ['o:button',    't']
+        attributes << ['fillcolor',   color]
+        attributes << ['strokecolor', 'windowText [64]']
+        attributes << ['o:insetmode', 'auto']
+        attributes
       end
 
       def type
@@ -49,8 +50,8 @@ module Writexlsx
       # attributes for <v:fill> element.
       def fill_attributes
         [
-         'color2',             'buttonFace [67]',
-         'o:detectmouseclick', 't'
+         ['color2',             'buttonFace [67]'],
+         ['o:detectmouseclick', 't']
         ]
       end
 
@@ -59,8 +60,8 @@ module Writexlsx
       #
       def write_rotation_lock
         attributes = [
-                      'v:ext',    'edit',
-                      'rotation', 't'
+                      ['v:ext',    'edit'],
+                      ['rotation', 't']
                      ]
         @writer.empty_tag('o:lock', attributes)
       end
@@ -69,7 +70,10 @@ module Writexlsx
       # Write the <v:textbox> element.
       #
       def write_textbox
-        attributes = ['style', 'mso-direction-alt:auto', 'o:singleclick', 'f']
+        attributes = [
+                      ['style', 'mso-direction-alt:auto'],
+                      ['o:singleclick', 'f']
+                     ]
 
         @writer.tag_elements('v:textbox', attributes) do
           # Write the div element.
@@ -81,7 +85,7 @@ module Writexlsx
       # Write the <x:ClientData> element.
       #
       def write_client_data
-        attributes = ['ObjectType', 'Button']
+        attributes = [ ['ObjectType', 'Button'] ]
 
         @writer.tag_elements('x:ClientData', attributes) do
           # Write the x:Anchor element.
@@ -129,4 +133,3 @@ module Writexlsx
     end
   end
 end
-

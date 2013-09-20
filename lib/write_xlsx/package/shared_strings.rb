@@ -58,9 +58,9 @@ module Writexlsx
 
         attributes =
           [
-           'xmlns',       schema + '/spreadsheetml/2006/main',
-           'count',       total_count,
-           'uniqueCount', unique_count
+           ['xmlns',       schema + '/spreadsheetml/2006/main'],
+           ['count',       total_count],
+           ['uniqueCount', unique_count]
           ]
 
         @writer.tag_elements('sst', attributes) { yield }
@@ -100,7 +100,7 @@ module Writexlsx
         end
 
         # Add attribute to preserve leading or trailing whitespace.
-        attributes << 'xml:space' << 'preserve' if string =~ /\A\s|\s\Z/
+        attributes << ['xml:space', 'preserve'] if string =~ /\A\s|\s\Z/
 
         # Write any rich strings without further tags.
         if string =~ %r{^<r>} && string =~ %r{</r>$}

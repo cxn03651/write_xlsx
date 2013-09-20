@@ -14,17 +14,19 @@ module Writexlsx
       #
       def cell_attributes #:nodoc:
         xf_index = xf ? xf.get_xf_index : 0
-        attributes = ['r', xl_rowcol_to_cell(row, col)]
+        attributes = [
+                      ['r', xl_rowcol_to_cell(row, col)]
+                     ]
 
         # Add the cell format index.
         if xf_index != 0
-          attributes << 's' << xf_index
+          attributes << ['s', xf_index]
         elsif @worksheet.set_rows[row] && @worksheet.set_rows[row][1]
           row_xf = @worksheet.set_rows[row][1]
-          attributes << 's' << row_xf.get_xf_index
+          attributes << ['s', row_xf.get_xf_index]
         elsif @worksheet.col_formats[col]
           col_xf = @worksheet.col_formats[col]
-          attributes << 's' << col_xf.get_xf_index
+          attributes << ['s', col_xf.get_xf_index]
         end
         attributes
       end
@@ -63,7 +65,7 @@ module Writexlsx
 
       def write_cell
         attributes = cell_attributes
-        attributes << 't' << 's'
+        attributes << ['t', 's']
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_value(token)
         end
@@ -87,7 +89,7 @@ module Writexlsx
       def write_cell
         attributes = cell_attributes
         if @result &&  !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
-          attributes << 't' << 'str'
+          attributes << ['t', 'str']
         end
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_formula(token)

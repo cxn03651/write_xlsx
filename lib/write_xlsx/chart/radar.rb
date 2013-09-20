@@ -85,7 +85,7 @@ module Writexlsx
           val = 'filled'
         end
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('c:radarStyle', attributes)
       end

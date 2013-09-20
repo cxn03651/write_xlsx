@@ -128,23 +128,23 @@ module Writexlsx
           end
         end
 
-        attributes << 'type' << @validate
-        attributes << 'operator' << @criteria if @criteria != 'between'
+        attributes << ['type', @validate]
+        attributes << ['operator', @criteria] if @criteria != 'between'
 
         if @error_type
-          attributes << 'errorStyle' << 'warning' if @error_type == 1
-          attributes << 'errorStyle' << 'information' if @error_type == 2
+          attributes << ['errorStyle', 'warning'] if @error_type == 1
+          attributes << ['errorStyle', 'information'] if @error_type == 2
         end
-        attributes << 'allowBlank'       << 1 if @ignore_blank != 0
-        attributes << 'showDropDown'     << 1 if @dropdown     == 0
-        attributes << 'showInputMessage' << 1 if @show_input   != 0
-        attributes << 'showErrorMessage' << 1 if @show_error   != 0
+        attributes << ['allowBlank',       1] if @ignore_blank != 0
+        attributes << ['showDropDown',     1] if @dropdown     == 0
+        attributes << ['showInputMessage', 1] if @show_input   != 0
+        attributes << ['showErrorMessage', 1] if @show_error   != 0
 
-        attributes << 'errorTitle'  << @error_title   if @error_title
-        attributes << 'error'       << @error_message if @error_message
-        attributes << 'promptTitle' << @input_title   if @input_title
-        attributes << 'prompt'      << @input_message if @input_message
-        attributes << 'sqref'       << sqref
+        attributes << ['errorTitle',  @error_title]   if @error_title
+        attributes << ['error',       @error_message] if @error_message
+        attributes << ['promptTitle', @input_title]   if @input_title
+        attributes << ['prompt',      @input_message] if @input_message
+        attributes << ['sqref',       sqref]
       end
 
       def has_key?(key)

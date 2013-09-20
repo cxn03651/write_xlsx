@@ -110,12 +110,9 @@ module Writexlsx
         %Q{ #{key}="#{val}"}
       end
 
-      def key_vals(attr)
-        array = []
-        (0 .. attr.size-1).step(2) do |i|
-          array << key_val(attr[i], escape_attributes(attr[i+1]))
-        end
-        array.join('')
+      def key_vals(attribute)
+        attribute.
+          inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
       end
 
       def escape_attributes(str = '')

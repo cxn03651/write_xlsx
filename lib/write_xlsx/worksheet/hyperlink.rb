@@ -56,22 +56,25 @@ module Writexlsx
       def write_external_attributes(row, col, id)
         ref = xl_rowcol_to_cell(row, col)
 
-        attributes = ['ref', ref]
-        attributes += r_id_attributes(id)
+        attributes = [ ['ref', ref] ]
+        attributes << r_id_attributes(id)
 
-        attributes << 'location' << url_str if url_str
-        attributes << 'display'  << display if display
-        attributes << 'tooltip'  << tip     if tip
+        attributes << ['location', url_str] if url_str
+        attributes << ['display',  display] if display
+        attributes << ['tooltip',  tip]     if tip
         attributes
       end
 
       def write_internal_attributes(row, col)
         ref = xl_rowcol_to_cell(row, col)
 
-        attributes = ['ref', ref, 'location', url]
+        attributes = [
+                      ['ref', ref],
+                      ['location', url]
+                     ]
 
-        attributes << 'tooltip' << tip if tip
-        attributes << 'display' << str
+        attributes << ['tooltip', tip] if tip
+        attributes << ['display', str]
       end
     end
 

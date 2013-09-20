@@ -141,7 +141,7 @@ module Writexlsx
       def write_a_p_pr_legend
         rtl  = 0
 
-        attributes = ['rtl', rtl]
+        attributes = [ ['rtl', rtl] ]
 
         @writer.tag_elements('a:pPr', attributes) do
           # Write the a:defRPr element.
@@ -155,7 +155,7 @@ module Writexlsx
       def write_vary_colors
         val  = 1
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('c:varyColors', attributes)
       end
@@ -166,7 +166,7 @@ module Writexlsx
       def write_first_slice_ang
         val  = 0
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('c:firstSliceAng', attributes)
       end

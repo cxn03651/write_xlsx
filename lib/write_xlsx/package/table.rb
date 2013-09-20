@@ -286,21 +286,21 @@ module Writexlsx
         xmlns            = "#{schema}spreadsheetml/2006/main"
 
         attributes = [
-                      'xmlns',       xmlns,
-                      'id',          @id,
-                      'name',        @name,
-                      'displayName', @name,
-                      'ref',         @range
+                      ['xmlns',       xmlns],
+                      ['id',          @id],
+                      ['name',        @name],
+                      ['displayName', @name],
+                      ['ref',         @range]
                      ]
 
         unless ptrue?(@header_row_count)
-          attributes << 'headerRowCount' << 0
+          attributes << ['headerRowCount', 0]
         end
 
         if ptrue?(@totals_row_shown)
-          attributes << 'totalsRowCount' << 1
+          attributes << ['totalsRowCount', 1]
         else
-          attributes << 'totalsRowShown' << 0
+          attributes << ['totalsRowShown', 0]
         end
       end
 
@@ -310,7 +310,7 @@ module Writexlsx
       def write_auto_filter
         return unless ptrue?(@autofilter)
 
-        attributes = ['ref', @autofilter]
+        attributes = [ ['ref', @autofilter] ]
 
         @writer.empty_tag('autoFilter', attributes)
       end
@@ -321,7 +321,7 @@ module Writexlsx
       def write_table_columns
         count = @columns.size
 
-        attributes = ['count', count]
+        attributes = [ ['count', count] ]
 
         @writer.tag_elements('tableColumns', attributes) do
           @columns.each {|col_data| write_table_column(col_data)}
@@ -333,18 +333,18 @@ module Writexlsx
       #
       def write_table_column(col_data)
         attributes = [
-                      'id',   col_data.id,
-                      'name', col_data.name
+                      ['id',   col_data.id],
+                      ['name', col_data.name]
                      ]
 
         if ptrue?(col_data.total_string)
-          attributes << :totalsRowLabel << col_data.total_string
+          attributes << [:totalsRowLabel, col_data.total_string]
         elsif ptrue?(col_data.total_function)
-          attributes << :totalsRowFunction << col_data.total_function
+          attributes << [:totalsRowFunction, col_data.total_function]
         end
 
         if col_data.format
-          attributes << :dataDxfId << col_data.format
+          attributes << [:dataDxfId, col_data.format]
         end
 
         if ptrue?(col_data.formula)
@@ -362,11 +362,11 @@ module Writexlsx
       #
       def write_table_style_info
         attributes = [
-                      'name',              @style,
-                      'showFirstColumn',   @show_first_col,
-                      'showLastColumn',    @show_last_col,
-                      'showRowStripes',    @show_row_stripes,
-                      'showColumnStripes', @show_col_stripes
+                      ['name',              @style],
+                      ['showFirstColumn',   @show_first_col],
+                      ['showLastColumn',    @show_last_col],
+                      ['showRowStripes',    @show_row_stripes],
+                      ['showColumnStripes', @show_col_stripes]
                      ]
 
         @writer.empty_tag('tableStyleInfo', attributes)

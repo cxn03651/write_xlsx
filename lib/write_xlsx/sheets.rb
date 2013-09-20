@@ -215,14 +215,14 @@ module Writexlsx
 
     def write_sheet(writer, sheet, sheet_id) #:nodoc:
       attributes = [
-        'name',    sheet.name,
-        'sheetId', sheet_id
+        ['name',    sheet.name],
+        ['sheetId', sheet_id]
       ]
 
       if sheet.hidden?
-        attributes << 'state' << 'hidden'
+        attributes << ['state', 'hidden']
       end
-      attributes += r_id_attributes(sheet_id)
+      attributes << r_id_attributes(sheet_id)
       writer.empty_tag_encoded('sheet', attributes)
     end
   end

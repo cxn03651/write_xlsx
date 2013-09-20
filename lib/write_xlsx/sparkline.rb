@@ -113,27 +113,27 @@ module Writexlsx
       cust_min = cust_max_min(@min) if @min
 
       a = []
-      a << 'manualMax' << @max if @max && @max != 'group'
-      a << 'manualMin' << @min if @min && @min != 'group'
+      a << ['manualMax', @max] if @max && @max != 'group'
+      a << ['manualMin', @min] if @min && @min != 'group'
 
       # Ignore the default type attribute (line).
-      a << 'type'          << @type        if @type != 'line'
+      a << ['type',          @type]        if @type != 'line'
 
-      a << 'lineWeight'    << @weight      if @weight
-      a << 'dateAxis'      << 1            if @date_axis
-      a << 'displayEmptyCellsAs' << @empty if ptrue?(@empty)
+      a << ['lineWeight',    @weight]      if @weight
+      a << ['dateAxis',      1]            if @date_axis
+      a << ['displayEmptyCellsAs', @empty] if ptrue?(@empty)
 
-      a << 'markers'       << 1         if @markers
-      a << 'high'          << 1         if @high
-      a << 'low'           << 1         if @low
-      a << 'first'         << 1         if @first
-      a << 'last'          << 1         if @last
-      a << 'negative'      << 1         if @negative
-      a << 'displayXAxis'  << 1         if @axis
-      a << 'displayHidden' << 1         if @hidden
-      a << 'minAxisType'   << cust_min  if cust_min
-      a << 'maxAxisType'   << cust_max  if cust_max
-      a << 'rightToLeft'   << 1         if @reverse
+      a << ['markers',       1]         if @markers
+      a << ['high',          1]         if @high
+      a << ['low',           1]         if @low
+      a << ['first',         1]         if @first
+      a << ['last',          1]         if @last
+      a << ['negative',      1]         if @negative
+      a << ['displayXAxis',  1]         if @axis
+      a << ['displayHidden', 1]         if @hidden
+      a << ['minAxisType',   cust_min]  if cust_min
+      a << ['maxAxisType',   cust_max]  if cust_max
+      a << ['rightToLeft',   1]         if @reverse
       a
     end
 
@@ -272,9 +272,9 @@ module Writexlsx
     def write_spark_color(element, color)  # :nodoc:
       attr = []
 
-      attr << 'rgb'   << color[:_rgb]   if color[:_rgb]
-      attr << 'theme' << color[:_theme] if color[:_theme]
-      attr << 'tint'  << color[:_tint]  if color[:_tint]
+      attr << ['rgb',   color[:_rgb]]   if color[:_rgb]
+      attr << ['theme', color[:_theme]] if color[:_theme]
+      attr << ['tint',  color[:_tint]]  if color[:_tint]
 
       @writer.empty_tag(element, attr)
     end

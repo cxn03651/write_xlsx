@@ -60,13 +60,17 @@ module Writexlsx
       # Write the <cfvo> element.
       #
       def write_cfvo(type, val)
-        @writer.empty_tag('cfvo', ['type', type, 'val', val])
+        @writer.empty_tag('cfvo', [
+                                   ['type', type],
+                                   ['val', val]
+                                  ])
       end
 
       def attributes
-        attr = ['type' , type]
-        attr << 'dxfId'    << format   if format
-        attr << 'priority' << priority
+        attr = []
+        attr << ['type' , type]
+        attr << ['dxfId',    format]   if format
+        attr << ['priority', priority]
         attr
       end
 
@@ -476,7 +480,7 @@ module Writexlsx
 
     class CellIsFormat < ConditionalFormat
       def attributes
-        super << 'operator' << criteria
+        super << ['operator', criteria]
       end
 
       def write_cf_rule
@@ -494,10 +498,10 @@ module Writexlsx
     class AboveAverageFormat < ConditionalFormat
       def attributes
         attr = super
-        attr << 'aboveAverage' << 0 if criteria =~ /below/
-        attr << 'equalAverage' << 1 if criteria =~ /equal/
+        attr << ['aboveAverage', 0] if criteria =~ /below/
+        attr << ['equalAverage', 1] if criteria =~ /equal/
         if criteria =~ /([123]) std dev/
-          attr << 'stdDev'       << $~[1]
+          attr << ['stdDev', $~[1]]
         end
         attr
       end
@@ -506,9 +510,9 @@ module Writexlsx
     class Top10Format < ConditionalFormat
       def attributes
         attr = super
-        attr << 'percent' << 1             if criteria == '%'
-        attr << 'bottom'  << 1             if direction
-        attr << 'rank'    << (value || 10)
+        attr << ['percent', 1]             if criteria == '%'
+        attr << ['bottom',  1]             if direction
+        attr << ['rank',    (value || 10)]
         attr
       end
     end
@@ -516,8 +520,8 @@ module Writexlsx
     class TextOrWithFormat < ConditionalFormat
       def attributes
         attr = super
-        attr << 'operator' << criteria
-        attr << 'text'     << value
+        attr << ['operator', criteria]
+        attr << ['text',     value]
         attr
       end
 
@@ -528,7 +532,7 @@ module Writexlsx
 
     class TimePeriodFormat < ConditionalFormat
       def attributes
-        super << 'timePeriod' << criteria
+        super << ['timePeriod', criteria]
       end
 
       def write_cf_rule

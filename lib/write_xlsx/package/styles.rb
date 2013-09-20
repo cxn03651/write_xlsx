@@ -80,7 +80,7 @@ module Writexlsx
       def write_style_sheet
         xmlns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 
-        attributes = ['xmlns', xmlns]
+        attributes = [ ['xmlns', xmlns] ]
 
         @writer.tag_elements('styleSheet', attributes) { yield }
       end
@@ -93,7 +93,7 @@ module Writexlsx
 
         return if count == 0
 
-        attributes = ['count', count]
+        attributes = [ ['count', count] ]
 
         @writer.tag_elements('numFmts', attributes) do
           # Write the numFmts elements.
@@ -158,8 +158,8 @@ module Writexlsx
         end
 
         attributes = [
-          'numFmtId',   num_fmt_id,
-          'formatCode', format_code
+          ['numFmtId',   num_fmt_id],
+          ['formatCode', format_code]
         ]
 
         @writer.empty_tag('numFmt', attributes)
@@ -180,7 +180,7 @@ module Writexlsx
       # Write the <color> element.
       #
       def write_color(name, value)
-        attributes = [name, value]
+        attributes = [ [name, value] ]
 
         @writer.empty_tag('color', attributes)
       end
@@ -191,7 +191,7 @@ module Writexlsx
       def write_fills
         count = @fill_count
 
-        attributes = ['count', count]
+        attributes = [ ['count', count] ]
 
         @writer.tag_elements('fills', attributes) do
           # Write the default fill element.
@@ -210,7 +210,7 @@ module Writexlsx
       #
       def write_default_fill(pattern_type)
         @writer.tag_elements('fill') do
-          @writer.empty_tag('patternFill', ['patternType', pattern_type])
+          @writer.empty_tag('patternFill', [ ['patternType', pattern_type] ])
         end
       end
 
@@ -256,20 +256,20 @@ module Writexlsx
           if dxf_format && format.pattern <= 1
             attributes = []
           else
-            attributes = ['patternType', patterns[format.pattern]]
+            attributes = [ ['patternType', patterns[format.pattern]] ]
           end
 
           @writer.tag_elements('patternFill', attributes) do
             if fg_color && fg_color != 0
               fg_color = get_palette_color(fg_color)
-              @writer.empty_tag('fgColor', ['rgb', fg_color])
+              @writer.empty_tag('fgColor', [ ['rgb', fg_color] ])
             end
 
             if bg_color && bg_color != 0
               bg_color = get_palette_color(bg_color)
-              @writer.empty_tag('bgColor', ['rgb', bg_color])
+              @writer.empty_tag('bgColor', [ ['rgb', bg_color] ])
             else
-              @writer.empty_tag('bgColor', ['indexed', 64]) if !dxf_format
+              @writer.empty_tag('bgColor', [ ['indexed', 64] ]) if !dxf_format
             end
           end
         end
@@ -287,7 +287,7 @@ module Writexlsx
       end
 
       def write_format_elements(elements, count)
-        attributes = ['count', count]
+        attributes = [ [ 'count', count] ]
 
         @writer.tag_elements(elements, attributes) do
           # Write the border elements for format objects that have them.
@@ -303,12 +303,12 @@ module Writexlsx
 
         # Diagonal borders add attributes to the <border> element.
         if format.diag_type == 1
-          attributes << 'diagonalUp'   << 1
+          attributes << ['diagonalUp',   1]
         elsif format.diag_type == 2
-          attributes << 'diagonalDown' << 1
+          attributes << ['diagonalDown', 1]
         elsif format.diag_type == 3
-          attributes << 'diagonalUp'   << 1
-          attributes << 'diagonalDown' << 1
+          attributes << ['diagonalUp',   1]
+          attributes << ['diagonalDown', 1]
         end
 
         # Ensure that a default diag border is set if the diag type is set.
@@ -360,14 +360,14 @@ module Writexlsx
           slantDashDot
         )
 
-        attributes = [:style, border_styles[style]]
+        attributes = [ [:style, border_styles[style]] ]
 
         @writer.tag_elements(type, attributes) do
           if color != 0
             color = get_palette_color(color)
-            @writer.empty_tag('color', ['rgb', color])
+            @writer.empty_tag('color', [ ['rgb', color] ])
           else
-            @writer.empty_tag('color', ['auto', 1])
+            @writer.empty_tag('color', [ ['auto', 1] ])
           end
         end
       end
@@ -376,7 +376,7 @@ module Writexlsx
       # Write the <cellStyleXfs> element.
       #
       def write_cell_style_xfs
-        attributes = ['count', 1]
+        attributes = [ ['count', 1] ]
 
         @writer.tag_elements('cellStyleXfs', attributes) do
           # Write the style_xf element.
@@ -396,7 +396,7 @@ module Writexlsx
 
         formats.pop if last_format && last_format.font_only != 0
 
-        attributes = ['count', formats.size]
+        attributes = [ ['count', formats.size] ]
 
         @writer.tag_elements('cellXfs', attributes) do
           # Write the xf elements.
@@ -414,10 +414,10 @@ module Writexlsx
         border_id  = 0
 
         attributes = [
-          'numFmtId', num_fmt_id,
-          'fontId',   font_id,
-          'fillId',   fill_id,
-          'borderId', border_id
+          ['numFmtId', num_fmt_id],
+          ['fontId',   font_id],
+          ['fillId',   fill_id],
+          ['borderId', border_id]
         ]
 
         @writer.empty_tag('xf', attributes)
@@ -433,23 +433,23 @@ module Writexlsx
         has_protect = false
 
         attributes = [
-            'numFmtId', format.num_format_index,
-            'fontId'  , format.font_index,
-            'fillId'  , format.fill_index,
-            'borderId', format.border_index,
-            'xfId'    , 0
+            ['numFmtId', format.num_format_index],
+            ['fontId'  , format.font_index],
+            ['fillId'  , format.fill_index],
+            ['borderId', format.border_index],
+            ['xfId'    , 0]
         ]
 
-        attributes << 'applyNumberFormat' << 1 if format.num_format_index > 0
+        attributes << ['applyNumberFormat', 1] if format.num_format_index > 0
 
         # Add applyFont attribute if XF format uses a font element.
-        attributes << 'applyFont' << 1 if format.font_index > 0
+        attributes << ['applyFont', 1] if format.font_index > 0
 
         # Add applyFill attribute if XF format uses a fill element.
-        attributes << 'applyFill' << 1 if format.fill_index > 0
+        attributes << ['applyFill', 1] if format.fill_index > 0
 
         # Add applyBorder attribute if XF format uses a border element.
-        attributes << 'applyBorder' << 1 if format.border_index > 0
+        attributes << ['applyBorder', 1] if format.border_index > 0
 
         # Check if XF format has alignment properties set.
         apply_align, align = format.get_align_properties
@@ -458,13 +458,13 @@ module Writexlsx
         has_align = true if apply_align && !align.empty?
 
         # We can also have applyAlignment without a sub-element.
-        attributes << 'applyAlignment' << 1 if apply_align
+        attributes << ['applyAlignment', 1] if apply_align
 
         # Check for cell protection properties.
         protection = format.get_protection_properties
 
         if protection
-          attributes << 'applyProtection' << 1
+          attributes << ['applyProtection', 1]
           has_protect = true
         end
 
@@ -483,7 +483,7 @@ module Writexlsx
       # Write the <cellStyles> element.
       #
       def write_cell_styles
-        attributes = ['count', 1]
+        attributes = [ ['count', 1] ]
 
         @writer.tag_elements('cellStyles', attributes) do
           # Write the cellStyle element.
@@ -500,9 +500,9 @@ module Writexlsx
         builtin_id = 0
 
         attributes = [
-            'name',      name,
-            'xfId',      xf_id,
-            'builtinId', builtin_id
+            ['name',      name],
+            ['xfId',      xf_id],
+            ['builtinId', builtin_id]
         ]
 
         @writer.empty_tag('cellStyle', attributes)
@@ -516,7 +516,7 @@ module Writexlsx
 
         count = formats.size
 
-        attributes = ['count', count]
+        attributes = [ ['count', count] ]
 
         if !formats.empty?
           @writer.tag_elements('dxfs', attributes) do
@@ -548,9 +548,9 @@ module Writexlsx
         default_pivot_style = 'PivotStyleLight16'
 
         attributes = [
-            'count',             count,
-            'defaultTableStyle', default_table_style,
-            'defaultPivotStyle', default_pivot_style
+            ['count',             count],
+            ['defaultTableStyle', default_table_style],
+            ['defaultPivotStyle', default_pivot_style]
         ]
 
         @writer.empty_tag('tableStyles', attributes)
@@ -593,7 +593,7 @@ module Writexlsx
       def write_condense
         val  = 0
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('condense', attributes)
       end
@@ -604,7 +604,7 @@ module Writexlsx
       def write_extend
         val  = 0
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('extend', attributes)
       end

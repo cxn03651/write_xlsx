@@ -64,11 +64,11 @@ module Writexlsx
         xmlns_xsi      = 'http://www.w3.org/2001/XMLSchema-instance'
 
         attributes = [
-            'xmlns:cp',       xmlns_cp,
-            'xmlns:dc',       xmlns_dc,
-            'xmlns:dcterms',  xmlns_dcterms,
-            'xmlns:dcmitype', xmlns_dcmitype,
-            'xmlns:xsi',      xmlns_xsi
+            ['xmlns:cp',       xmlns_cp],
+            ['xmlns:dc',       xmlns_dc],
+            ['xmlns:dcterms',  xmlns_dcterms],
+            ['xmlns:dcmitype', xmlns_dcmitype],
+            ['xmlns:xsi',      xmlns_xsi]
         ]
 
         @writer.tag_elements('cp:coreProperties', attributes) { yield }
@@ -103,7 +103,7 @@ module Writexlsx
       end
 
       def write_dcterms(tag)
-        @writer.data_element(tag, dcterms_date, ['xsi:type', 'dcterms:W3CDTF'])
+        @writer.data_element(tag, dcterms_date, [ ['xsi:type', 'dcterms:W3CDTF'] ])
       end
 
       def dcterms_date

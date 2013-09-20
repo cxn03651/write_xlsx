@@ -74,8 +74,8 @@ module Writexlsx
         end
 
         attributes = [
-                      'formatCode',   @num_format,
-                      'sourceLinked', source_linked
+                      ['formatCode',   @num_format],
+                      ['sourceLinked', source_linked]
                      ]
 
         writer.empty_tag('c:numFmt', attributes)
@@ -106,8 +106,8 @@ module Writexlsx
         end
 
         attributes = [
-                      'formatCode',   @num_format,
-                      'sourceLinked', source_linked,
+                      ['formatCode',   @num_format],
+                      ['sourceLinked', source_linked]
                      ]
 
         writer.empty_tag('c:numFmt', attributes)

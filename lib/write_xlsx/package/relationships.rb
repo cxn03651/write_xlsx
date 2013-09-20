@@ -74,7 +74,9 @@ module Writexlsx
       # Write the <Relationships> element.
       #
       def write_relationships
-        attributes = ['xmlns', Package_schema]
+        attributes = [
+                      ['xmlns', Package_schema]
+                     ]
 
         @writer.tag_elements('Relationships', attributes) do
           @rels.each { |rel| write_relationship(*rel) }
@@ -86,13 +88,13 @@ module Writexlsx
       #
       def write_relationship(type, target, target_mode = nil)
         attributes = [
-          'Id',     "rId#{@id}",
-          'Type',   type,
-          'Target', target
+          ['Id',     "rId#{@id}"],
+          ['Type',   type],
+          ['Target', target]
         ]
         @id += 1
 
-        attributes << 'TargetMode' << target_mode if target_mode
+        attributes << ['TargetMode', target_mode] if target_mode
 
         @writer.empty_tag('Relationship', attributes)
       end

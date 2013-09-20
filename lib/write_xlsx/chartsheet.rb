@@ -176,8 +176,8 @@ module Writexlsx
       mc_preserve_attributes = 'mv:*'
 
       attributes = [
-                    'xmlns',   xmlns,
-                    'xmlns:r', xmlns_r
+                    ['xmlns',   xmlns],
+                    ['xmlns:r', xmlns_r]
                    ]
 
       @writer.start_tag('chartsheet', attributes)
@@ -190,7 +190,7 @@ module Writexlsx
 
       attributes = []
 
-      attributes << {'filterMode' => 1} if ptrue?(@filter_on)
+      attributes << ['filterMode', 1] if ptrue?(@filter_on)
 
       if ptrue?(@fit_page) || ptrue?(@tab_color)
         @writer.tag_elements('sheetPr', attributes) do

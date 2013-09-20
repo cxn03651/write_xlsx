@@ -118,9 +118,10 @@ module Writexlsx
       end
 
       def v_shape_attributes(id, z_index)
-        v_shape_attributes_base(id, z_index) <<
-          'fillcolor'   << color             <<
-          'o:insetmode' << 'auto'
+        attr = v_shape_attributes_base(id, z_index)
+        attr << ['fillcolor',   color]
+        attr << ['o:insetmode', 'auto']
+        attr
       end
 
       def type
@@ -158,7 +159,9 @@ module Writexlsx
       # Write the <v:fill> element.
       #
       def fill_attributes
-        ['color2', '#ffffe1']
+        [
+         ['color2', '#ffffe1']
+        ]
       end
 
       #
@@ -166,9 +169,9 @@ module Writexlsx
       #
       def write_shadow
         attributes = [
-            'on',       't',
-            'color',    'black',
-            'obscured', 't'
+            ['on',       't'],
+            ['color',    'black'],
+            ['obscured', 't']
         ]
 
         @writer.empty_tag('v:shadow', attributes)
@@ -178,7 +181,9 @@ module Writexlsx
       # Write the <v:textbox> element.
       #
       def write_textbox
-        attributes = ['style', 'mso-direction-alt:auto']
+        attributes = [
+                      ['style', 'mso-direction-alt:auto']
+                     ]
 
         @writer.tag_elements('v:textbox', attributes) do
           # Write the div element.
@@ -190,7 +195,9 @@ module Writexlsx
       # Write the <x:ClientData> element.
       #
       def write_client_data
-        attributes = ['ObjectType', 'Note']
+        attributes = [
+                      ['ObjectType', 'Note']
+                     ]
 
         @writer.tag_elements('x:ClientData', attributes) do
           @writer.empty_tag('x:MoveWithCells')
@@ -293,7 +300,9 @@ module Writexlsx
       def write_comments
         xmlns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 
-        attributes = [ 'xmlns', xmlns]
+        attributes = [
+                      ['xmlns', xmlns]
+                     ]
 
         @writer.tag_elements('comments', attributes) { yield }
       end
@@ -340,10 +349,10 @@ module Writexlsx
       #
       def write_comment(comment)
         ref       = xl_rowcol_to_cell( comment.row, comment.col )
-        attributes = ['ref', ref]
+        attributes = [ ['ref', ref] ]
 
         author_id = (@author_ids[comment.author] if comment.author) || 0
-        attributes << 'authorId' << author_id
+        attributes << ['authorId', author_id]
 
         @writer.tag_elements('comment', attributes) do
           write_text(comment.string)
@@ -378,7 +387,7 @@ module Writexlsx
       def write_text_t(text)
         attributes = []
 
-        (attributes << 'xml:space' << 'preserve') if text =~ /^\s/ || text =~ /\s$/
+        attributes << ['xml:space', 'preserve'] if text =~ /^\s/ || text =~ /\s$/
 
         @writer.data_element('t', text, attributes)
       end
@@ -405,7 +414,7 @@ module Writexlsx
       def write_sz
         val  = 8
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('sz', attributes)
       end
@@ -414,7 +423,7 @@ module Writexlsx
       # Write the <color> element.
       #
       def write_color
-        @writer.empty_tag('color', ['indexed', 81])
+        @writer.empty_tag('color', [ ['indexed', 81] ])
       end
 
       #
@@ -423,7 +432,7 @@ module Writexlsx
       def write_r_font
         val  = 'Tahoma'
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('rFont', attributes)
       end
@@ -434,7 +443,7 @@ module Writexlsx
       def write_family
         val  = 2
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('family', attributes)
       end

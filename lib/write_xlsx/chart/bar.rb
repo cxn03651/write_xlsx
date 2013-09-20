@@ -70,7 +70,7 @@ module Writexlsx
       def write_bar_dir
         val  = 'bar'
 
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('c:barDir', attributes)
       end

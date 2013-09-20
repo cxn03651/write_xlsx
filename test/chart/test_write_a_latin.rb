@@ -12,9 +12,9 @@ class TestWriteALatin < Test::Unit::TestCase
 
     result = @chart.__send__('write_a_latin',
                              [
-                              'typeface', 'Arial',
-                              'pitchFamily', 34,
-                              'charset', 0
+                              ['typeface', 'Arial'],
+                              ['pitchFamily', 34],
+                              ['charset', 0]
                              ]
                          )
     assert_equal(expected, result)

@@ -64,8 +64,8 @@ module Writexlsx
 
         schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
         attributes = [
-            'xmlns',     "#{schema}extended-properties",
-            'xmlns:vt',  "#{schema}docPropsVTypes"
+            ['xmlns',     "#{schema}extended-properties"],
+            ['xmlns:vt',  "#{schema}docPropsVTypes"]
         ]
 
         @writer.tag_elements('Properties', attributes) { yield }
@@ -122,8 +122,8 @@ module Writexlsx
       #
       def write_vt_vector(base_type, data)
         attributes = [
-          'size',     data.size,
-          'baseType', base_type
+          ['size',     data.size],
+          ['baseType', base_type]
         ]
 
         @writer.tag_elements('vt:vector', attributes) do

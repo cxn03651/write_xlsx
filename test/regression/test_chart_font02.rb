@@ -10,7 +10,7 @@ class TestRegressionChartFont02 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_chart_area02
+  def test_chart_font02
     @xlsx = 'chart_font02.xlsx'
     workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet

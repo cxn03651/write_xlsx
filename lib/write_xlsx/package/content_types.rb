@@ -159,7 +159,11 @@ module Writexlsx
       #
       def write_defaults
         @defaults.each do |a|
-          @writer.empty_tag('Default', ['Extension', a[0], 'ContentType', a[1]])
+          @writer.empty_tag('Default',
+                            [
+                             ['Extension', a[0]],
+                             ['ContentType', a[1]]
+                            ])
         end
       end
 
@@ -168,7 +172,11 @@ module Writexlsx
       #
       def write_overrides
         @overrides.each do |a|
-          @writer.empty_tag('Override', ['PartName', a[0], 'ContentType', a[1]])
+          @writer.empty_tag('Override',
+                            [
+                             ['PartName', a[0]],
+                             ['ContentType', a[1]]
+                            ])
         end
       end
 
@@ -177,7 +185,9 @@ module Writexlsx
       #
       def write_types
         xmlns = 'http://schemas.openxmlformats.org/package/2006/content-types'
-        attributes = ['xmlns', xmlns]
+        attributes = [
+                      ['xmlns', xmlns]
+                     ]
 
         @writer.tag_elements('Types', attributes) { yield }
       end
@@ -187,8 +197,8 @@ module Writexlsx
       #
       def write_default(extension, content_type)
         attributes = [
-          'Extension',   extension,
-          'ContentType', content_type
+          ['Extension',   extension],
+          ['ContentType', content_type]
         ]
 
         @writer.empty_tag('Default', attributes)
@@ -199,8 +209,8 @@ module Writexlsx
       #
       def write_override(part_name, content_type)
         attributes = [
-          'PartName',    part_name,
-          'ContentType', content_type
+          ['PartName',    part_name],
+          ['ContentType', content_type]
         ]
 
         @writer.empty_tag('Override', attributes)

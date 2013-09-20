@@ -95,18 +95,19 @@ module Writexlsx
         return unless @page_setup_changed
 
         attributes = []
-        attributes << 'paperSize'   << @paper_size    if @paper_size
-        attributes << 'scale'       << @scale         if @scale != 100
-        attributes << 'fitToWidth'  << @fit_width     if @fit_page && @fit_width != 1
-        attributes << 'fitToHeight' << @fit_height    if @fit_page && @fit_height != 1
-        attributes << 'pageOrder'   << "overThenDown" if @across
-        attributes << 'orientation'
-        if @orientation
-          attributes << 'portrait'
-        else
-          attributes << 'landscape'
-        end
-        attributes << 'useFirstPageNumber' << @page_start if ptrue?(@page_start)
+        attributes << ['paperSize',   @paper_size]    if @paper_size
+        attributes << ['scale',       @scale]         if @scale != 100
+        attributes << ['fitToWidth',  @fit_width]     if @fit_page && @fit_width != 1
+        attributes << ['fitToHeight', @fit_height]    if @fit_page && @fit_height != 1
+        attributes << ['pageOrder',   "overThenDown"] if @across
+        attributes << ['orientation',
+                       if @orientation
+                         'portrait'
+                       else
+                         'landscape'
+                       end
+                      ]
+        attributes << ['useFirstPageNumber', @page_start] if ptrue?(@page_start)
 
         writer.empty_tag('pageSetup', attributes)
       end
@@ -125,10 +126,10 @@ module Writexlsx
         return unless @print_options_changed
 
         attributes = []
-        attributes << 'horizontalCentered' << 1 if @hcenter
-        attributes << 'verticalCentered'   << 1 if @vcenter
-        attributes << 'headings'           << 1 if @print_headers
-        attributes << 'gridLines'          << 1 if @print_gridlines
+        attributes << ['horizontalCentered', 1] if @hcenter
+        attributes << ['verticalCentered',   1] if @vcenter
+        attributes << ['headings',           1] if @print_headers
+        attributes << ['gridLines',          1] if @print_gridlines
         writer.empty_tag('printOptions', attributes)
       end
 
@@ -162,12 +163,12 @@ module Writexlsx
 
       def margin_attributes    # :nodoc:
         [
-         'left',   @margin_left,
-         'right',  @margin_right,
-         'top',    @margin_top,
-         'bottom', @margin_bottom,
-         'header', @margin_header,
-         'footer', @margin_footer
+         ['left',   @margin_left],
+         ['right',  @margin_right],
+         ['top',    @margin_top],
+         ['bottom', @margin_bottom],
+         ['header', @margin_header],
+         ['footer', @margin_footer]
         ]
       end
     end

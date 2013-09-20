@@ -325,31 +325,31 @@ module Writexlsx
 
       continuous = 'centerContinuous'
 
-      align << 'horizontal' << 'left'        if @text_h_align == 1
-      align << 'horizontal' << 'center'      if @text_h_align == 2
-      align << 'horizontal' << 'right'       if @text_h_align == 3
-      align << 'horizontal' << 'fill'        if @text_h_align == 4
-      align << 'horizontal' << 'justify'     if @text_h_align == 5
-      align << 'horizontal' << continuous    if @text_h_align == 6
-      align << 'horizontal' << 'distributed' if @text_h_align == 7
+      align << ['horizontal', 'left']        if @text_h_align == 1
+      align << ['horizontal', 'center']      if @text_h_align == 2
+      align << ['horizontal', 'right']       if @text_h_align == 3
+      align << ['horizontal', 'fill']        if @text_h_align == 4
+      align << ['horizontal', 'justify']     if @text_h_align == 5
+      align << ['horizontal', continuous]    if @text_h_align == 6
+      align << ['horizontal', 'distributed'] if @text_h_align == 7
 
-      align << 'justifyLastLine' << 1 if @just_distrib != 0
+      align << ['justifyLastLine', 1] if @just_distrib != 0
 
       # Property 'vertical' => 'bottom' is a default. It sets applyAlignment
       # without an alignment sub-element.
-      align << 'vertical' << 'top'         if @text_v_align == 1
-      align << 'vertical' << 'center'      if @text_v_align == 2
-      align << 'vertical' << 'justify'     if @text_v_align == 4
-      align << 'vertical' << 'distributed' if @text_v_align == 5
+      align << ['vertical', 'top']         if @text_v_align == 1
+      align << ['vertical', 'center']      if @text_v_align == 2
+      align << ['vertical', 'justify']     if @text_v_align == 4
+      align << ['vertical', 'distributed'] if @text_v_align == 5
 
-      align << 'indent' <<       @indent   if @indent   != 0
-      align << 'textRotation' << @rotation if @rotation != 0
+      align << ['indent',       @indent]   if @indent   != 0
+      align << ['textRotation', @rotation] if @rotation != 0
 
-      align << 'wrapText' <<     1 if @text_wrap != 0
-      align << 'shrinkToFit' <<  1 if @shrink    != 0
+      align << ['wrapText',     1] if @text_wrap != 0
+      align << ['shrinkToFit',  1] if @shrink    != 0
 
-      align << 'readingOrder' << 1 if @reading_order == 1
-      align << 'readingOrder' << 2 if @reading_order == 2
+      align << ['readingOrder', 1] if @reading_order == 1
+      align << ['readingOrder', 2] if @reading_order == 2
 
       return changed, align
     end
@@ -360,8 +360,8 @@ module Writexlsx
     def get_protection_properties
       attributes = []
 
-      attributes << 'locked' << 0 unless ptrue?(@locked)
-      attributes << 'hidden' << 1 if     ptrue?(@hidden)
+      attributes << ['locked', 0] unless ptrue?(@locked)
+      attributes << ['hidden', 1] if     ptrue?(@hidden)
 
       attributes.empty? ? nil : attributes
     end
@@ -743,7 +743,7 @@ module Writexlsx
 
         write_font_shapes(writer)
 
-        writer.empty_tag('sz', ['val', size]) unless dxf_format
+        writer.empty_tag('sz', [ ['val', size] ]) unless dxf_format
 
         if ptrue?(theme)
           write_color(writer, 'theme', theme)
@@ -757,7 +757,7 @@ module Writexlsx
         end
 
         unless ptrue?(dxf_format)
-          writer.empty_tag('name',   ['val', @font])
+          writer.empty_tag('name', [ ['val', @font] ])
           write_font_family_scheme(writer)
         end
       end
@@ -766,7 +766,7 @@ module Writexlsx
     def write_font_rpr(writer, worksheet) #:nodoc:
       writer.tag_elements('rPr') do
         write_font_shapes(writer)
-        writer.empty_tag('sz', ['val', size])
+        writer.empty_tag('sz', [ ['val', size] ])
 
         if ptrue?(theme)
           write_color(writer, 'theme', theme)
@@ -777,7 +777,7 @@ module Writexlsx
           write_color(writer, 'theme', 1)
         end
 
-        writer.empty_tag('rFont',  ['val', @font])
+        writer.empty_tag('rFont', [ ['val', @font] ])
         write_font_family_scheme(writer)
       end
     end
@@ -799,10 +799,10 @@ module Writexlsx
     end
 
     def write_font_family_scheme(writer)
-      writer.empty_tag('family', ['val', @font_family])
+      writer.empty_tag('family', [ ['val', @font_family] ])
 
       if @font == 'Calibri' && !ptrue?(@hyperlink)
-        writer.empty_tag('scheme', ['val', @font_scheme])
+        writer.empty_tag('scheme', [ ['val', @font_scheme] ])
       end
     end
 
@@ -821,11 +821,11 @@ module Writexlsx
       # Handle the underline variants.
       case underline
       when 2
-        [val, 'double']
+        [ [val, 'double'] ]
       when 33
-        [val, 'singleAccounting']
+        [ [val, 'singleAccounting'] ]
       when 34
-        [val, 'doubleAccounting']
+        [ [val, 'doubleAccounting'] ]
       else
         []
       end
@@ -835,21 +835,21 @@ module Writexlsx
     # Write the <vertAlign> font sub-element.
     #
     def write_vert_align(writer, val) #:nodoc:
-      writer.empty_tag('vertAlign', ['val', val])
+      writer.empty_tag('vertAlign', [ ['val', val] ])
     end
 
     #
     # Write the <condense> element.
     #
     def write_condense(writer)
-      writer.empty_tag('condense', ['val', 0])
+      writer.empty_tag('condense', [ ['val', 0] ])
     end
 
     #
     # Write the <extend> element.
     #
     def write_extend(writer)
-      writer.empty_tag('extend', ['val', 0])
+      writer.empty_tag('extend', [ ['val', 0] ])
     end
   end
 end

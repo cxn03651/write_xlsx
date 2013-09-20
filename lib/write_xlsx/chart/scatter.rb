@@ -227,7 +227,7 @@ module Writexlsx
       # Write the <c:scatterStyle> element.
       #
       def write_scatter_style(val)
-        attributes = ['val', val]
+        attributes = [ ['val', val] ]
 
         @writer.empty_tag('c:scatterStyle', attributes)
       end
