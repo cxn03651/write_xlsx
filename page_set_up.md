@@ -15,10 +15,16 @@ The following methods are available for page set-up:
 * [set_landscape](#set_landscape)
 * [set_portrait](#set_portrait)
 * [set_page_view](#set_page_view)
-* [set_paper](#set_paper)
+* [paper=](#paper=)
 * [center_horizontally](#center_horizontally)
 * [center_vertically](#center_vertically)
-* [set_margins](#set_margins)
+* [margins=](#margins=)
+* [margins_left_right=](#margins_left_right=)
+* [margins_top_bottom=](#margins_top_bottom=)
+* [margin_left=](#margin_left=)
+* [margin_right=](#margin_right=)
+* [margin_top=](#margin_top=)
+* [margin_bottom=](#margin_bottom=)
 * [set_header](#set_header)
 * [set_footer](#set_footer)
 * [repeat_rows](#repeat_rows)
@@ -28,10 +34,20 @@ The following methods are available for page set-up:
 * [print_area](#print_area)
 * [print_across](#print_across)
 * [fit_to_pages](#fit_to_pages)
-* [set_start_page](#set_start_page)
-* [set_print_scale](#set_print_scale)
+* [start_page=](#start_page=)
+* [print_scale=](#print_scale=)
 * [set_h_pagebreaks](#set_h_pagebreaks)
 * [set_v_pagebreaks](#set_v_pagebreaks)
+* [set_paper](#set_paper)(deprecated)
+* [set_margins](#set_margins)(deprecated)
+* [set_margins_LR](#set_margins_LR)(deprecated)
+* [set_margins_TB](#set_margins_TB)(deprecated)
+* [set_margin_left](#set_margin_left)(deprecated)
+* [set_margin_right](#set_margin_right)(deprecated)
+* [set_margin_top](#set_margin_top)(deprecated)
+* [set_margin_bottom](#set_margin_bottom)(deprecated)
+* [set_start_page](#set_start_page)(deprecated)
+* [set_print_scale](#set_print_scale)(deprecated)
 
 A common requirement when working with WriteXLSX is to apply the same
 page set-up features to all of the worksheets in a workbook.
@@ -64,7 +80,7 @@ This method is used to display the worksheet in "Page View/Layout" mode.
 
     worksheet.set_page_view
 
-#### <a name="set_paper" class="anchor" href="#set_paper"><span class="octicon octicon-link" /></a>set_paper(index)
+#### <a name="paper=" class="anchor" href="#paper="><span class="octicon octicon-link" /></a>paper=(index)
 
 This method is used to set the paper format for the printed output of a worksheet.
 The following paper styles are available:
@@ -118,11 +134,15 @@ Note, it is likely that not all of these paper types will be available to the
 end user since it will depend on the paper formats that the user's printer
 supports. Therefore, it is best to stick to standard paper types.
 
-    worksheet.set_paper(1)    # US Letter
-    worksheet.set_paper(9)    # A4
+    worksheet.paper = 1    # US Letter
+    worksheet.paper = 9    # A4
 
 If you do not specify a paper type the worksheet will print using the printer's
 default paper.
+
+#### <a name="set_paper" class="anchor" href="#set_paper"><span class="octicon octicon-link" /></a>set_paper(index)
+
+deprecated. use [paper=](#paper=).
 
 #### <a name="center_horizontally" class="anchor" href="#center_horizontally"><span class="octicon octicon-link" /></a>center_horizontally()
 
@@ -136,18 +156,24 @@ Center the worksheet data vertically between the margins on the printed page:
 
     worksheet.center_vertically
 
-#### <a name="set_margins" class="anchor" href="#set_margins"><span class="octicon octicon-link" /></a>set_margins(inches)
+#### <a name="margins=" class="anchor" href="#margins="><span class="octicon octicon-link" /></a>margins=(inches)
 
 There are several methods available for setting the worksheet margins on the
 printed page:
 
-    set_margins()        # Set all margins to the same value
-    set_margins_LR()     # Set left and right margins to the same value
-    set_margins_TB()     # Set top and bottom margins to the same value
-    set_margin_left()    # Set left margin
-    set_margin_right()   # Set right margin
-    set_margin_top()     # Set top margin
-    set_margin_bottom()  # Set bottom margin
+[margins=()](#margins=)              # Set all margins to the same value
+
+[margins_left_right=()](#margins_left_right=)   # Set left and right margins to the same value
+
+[margins_top_bottom=()](#margins_top_bottom=)   # Set top and bottom margins to the same value
+
+[margin_left=()](#margin_left=)          # Set left margin
+
+[margin_right=()](#margin_right=)         # Set right margin
+
+[margin_top=()](#margin_top=)           # Set top margin
+
+[margin_bottom=()](#margin_bottom=)        # Set bottom margin
 
 All of these methods take a distance in inches as a parameter.
 Note: 1 inch = 25.4mm. ;-)
@@ -155,6 +181,58 @@ The default left and right margin is 0.7 inch. The default top and bottom margin
 is 0.75 inch.
 Note, these defaults are different from the defaults used in the binary file
 format by writeexcel gem.
+
+#### <a name="margins_left_right=" class="anchor" href="#margins_left_right="><span class="octicon octicon-link" /></a>margins_left_right=(inches)
+
+Set left and right margins to the same value.
+
+#### <a name="margins_top_bottom=" class="anchor" href="#margins_top_bottom="><span class="octicon octicon-link" /></a>margins_top_bottom=(inches)
+
+Set top and bottom margins to the same value.
+
+#### <a name="margin_left=" class="anchor" href="#margin_left="><span class="octicon octicon-link" /></a>margin_left=(inches)
+
+Set left margin to the same value.
+
+#### <a name="margin_right=" class="anchor" href="#margin_right="><span class="octicon octicon-link" /></a>margin_right=(inches)
+
+Set right margin to the same value.
+
+#### <a name="margin_top=" class="anchor" href="#margin_top="><span class="octicon octicon-link" /></a>margin_top=(inches)
+
+Set top margin to the same value.
+
+#### <a name="margin_bottom=" class="anchor" href="#margin_bottom="><span class="octicon octicon-link" /></a>margin_bottom=(inches)
+
+Set bottom margin to the same value.
+
+#### <a name="set_margins" class="anchor" href="#set_margins"><span class="octicon octicon-link" /></a>set_margins(inches)
+
+deprecated. use [margins=](#margins=)
+
+#### <a name="set_margins_LR" class="anchor" href="#set_margins_LR"><span class="octicon octicon-link" /></a>set_margins_LR(inches)
+
+deprecated. use [margins_left_right=](#margins_left_right=)
+
+#### <a name="set_margins_TB" class="anchor" href="#set_margins_TB"><span class="octicon octicon-link" /></a>set_margins_TB(inches)
+
+deprecated. use [margins_top_bottom=](#margins_top_bottom=)
+
+#### <a name="set_margin_left" class="anchor" href="#set_margin_left"><span class="octicon octicon-link" /></a>set_margin_left(inches)
+
+deprecated. use [margin_left=](#margin_left=)
+
+#### <a name="set_margin_right" class="anchor" href="#set_margin_right"><span class="octicon octicon-link" /></a>set_margin_right(inches)
+
+deprecated. use [margin_right=](#margin_right=)
+
+#### <a name="set_margin_top" class="anchor" href="#set_margin_top"><span class="octicon octicon-link" /></a>set_margin_top(inches)
+
+deprecated. use [margin_top=](#margin_top=)
+
+#### <a name="set_margin_bottom" class="anchor" href="#set_margin_bottom"><span class="octicon octicon-link" /></a>set_margin_bottom(inches)
+
+deprecated. use [margin_bottom=](#margin_bottom=)
 
 #### <a name="set_header" class="anchor" href="#set_header"><span class="octicon octicon-link" /></a>set_header(string, margin)
 
@@ -430,40 +508,48 @@ height be as long as necessary. To achieve this set the `height` to zero:
     worksheet1.fit_to_pages(1, 0)    # 1 page wide and as long as necessary
 
 Note that although it is valid to use both `fit_to_pages()` and
-`set_print_scale()` on the same worksheet only one of these options can be
+`print_scale=()` on the same worksheet only one of these options can be
 active at a time. The last method call made will set the active option.
 
 Note that `fit_to_pages()` will override any manual page breaks that are
 defined in the worksheet.
 
 Note: When using `fit_to_pages()` it may also be required to set the printer
-paper size using `set_paper()` or else Excel will default to "US Letter".
+paper size using `paper=()` or else Excel will default to "US Letter".
 
-#### <a name="set_start_page" class="anchor" href="#set_start_page"><span class="octicon octicon-link" /></a>set_start_page(start_page = 1)
+#### <a name="start_page=" class="anchor" href="#start_page="><span class="octicon octicon-link" /></a>start_page=(start_page = 1)
 
-The `set_start_page()` method is used to set the number of the starting page
+The `start_page=()` method is used to set the number of the starting page
 when the worksheet is printed out. The default value is 1.
 
     worksheet.set_start_page(2)
 
-#### <a name="set_print_scale" class="anchor" href="#set_print_scale"><span class="octicon octicon-link" /></a>set_print_scale(scale = 100)
+#### <a name="set_start_page" class="anchor" href="#set_start_page"><span class="octicon octicon-link" /></a>set_start_page(start_page = 1)
+
+deprecated. use [start_page=](#start_page=).
+
+#### <a name="print_scale=" class="anchor" href="#print_scale="><span class="octicon octicon-link" /></a>print_scale=(scale = 100)
 
 Set the scale factor of the printed page.
 Scale factors in the range `10 <= scale <= 400` are valid:
 
-    worksheet1.set_print_scale(50)
-    worksheet2.set_print_scale(75)
-    worksheet3.set_print_scale(300)
-    worksheet4.set_print_scale(400)
+    worksheet1.print_scale = 50
+    worksheet2.print_scale = 75
+    worksheet3.print_scale = 300
+    worksheet4.print_scale = 400
 
 The default scale factor is 100.
 
-Note, `set_print_scale()` does not affect the scale of the visible page in Excel.
-For that you should use `set_zoom()`.
+Note, `print_scale=()` does not affect the scale of the visible page in Excel.
+For that you should use `zoom=()`.
 
 Note also that although it is valid to use both `fit_to_pages()` and
-`set_print_scale()` on the same worksheet only one of these options can be
+`print_scale=()` on the same worksheet only one of these options can be
 active at a time. The last method call made will set the active option.
+
+#### <a name="set_print_scale" class="anchor" href="#set_print_scale"><span class="octicon octicon-link" /></a>set_print_scale(scale = 100)
+
+deprecated. use [print_scale=](#print_scale=).
 
 #### <a name="set_h_pagebreaks" class="anchor" href="#set_h_pagebreaks"><span class="octicon octicon-link" /></a>set_h_pagebreaks(breaks)
 
