@@ -45,7 +45,6 @@ module Writexlsx
     attr_reader :doc_properties  # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
     attr_reader :shared_strings  # :nodoc:
-    attr_accessor :table_count  # :nodoc:
     attr_reader :vba_project  # :nodoc:
     #
     # A new Excel workbook is created using the +new+ constructor
@@ -1210,6 +1209,9 @@ module Writexlsx
       # Add cached data to charts.
       add_chart_data
 
+      # Prepare the worksheet tables.
+      prepare_tables
+
       # Package the workbook.
       packager = Package::Packager.new(self)
       packager.set_package_dir(@tempdir)
@@ -1495,6 +1497,21 @@ module Writexlsx
       end
 
       add_font_format_for_cell_comments if num_comment_files > 0
+    end
+
+    #
+    # Set the table ids for the worksheet tables.
+    #
+    def prepare_tables
+      table_id = 0
+
+      sheets.each do |sheet|
+        table_count = sheet.tables_count
+        if table_count > 0
+          sheet.prepare_tables(table_id + 1)
+          table_id += table_count
+        end
+      end
     end
 
     def add_font_format_for_cell_comments

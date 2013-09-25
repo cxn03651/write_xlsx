@@ -11,7 +11,7 @@ class TestTableWriteTableColumn < Test::Unit::TestCase
   def test_table_write_table_column
     expected = '<tableColumn id="1" name="Column1"/>'
 
-    table = Writexlsx::Package::Table.new(@worksheet, 0, 1, 1, 2, 2)
+    table = Writexlsx::Package::Table.new(@worksheet, 1, 1, 2, 2)
     col_data = Writexlsx::Package::Table::ColumnData.new(1)
 
     table.__send__(:write_table_column, col_data)

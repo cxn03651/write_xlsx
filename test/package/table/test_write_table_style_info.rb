@@ -11,7 +11,7 @@ class TestTableWriteTableStyleInfo < Test::Unit::TestCase
   def test_table_write_table_style_info
     expected = '<tableStyleInfo name="TableStyleMedium9" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>'
 
-    table = Writexlsx::Package::Table.new(@worksheet, 0, 1, 1, 2, 2)
+    table = Writexlsx::Package::Table.new(@worksheet, 1, 1, 2, 2)
     table.instance_variable_set(:@style,            'TableStyleMedium9')
     table.instance_variable_set(:@show_first_col,   0)
     table.instance_variable_set(:@show_last_col,    0)

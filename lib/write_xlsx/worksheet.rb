@@ -4213,11 +4213,7 @@ module Writexlsx
     #
     def add_table(*args)
       # Table count is a member of Workbook, global to all Worksheet.
-      @workbook.table_count += 1
-      id = @workbook.table_count
-      table = Package::Table.new(self, id, *args)
-
-      @external_table_links << ['/table', "../tables/table#{id}.xml"]
+      table = Package::Table.new(self, *args)
       @tables << table
       table
     end
@@ -5744,6 +5740,23 @@ module Writexlsx
       end
       @vml_data_id = vml_data_id
       @vml_shape_id = vml_shape_id
+    end
+
+    #
+    # Set the table ids for the worksheet tables.
+    #
+    def prepare_tables(table_id)
+      id = table_id
+      tables.each do |table|
+        table.id = id
+
+        # Set the table name unless defined by the user.
+        table.name ||= "Table#{id}"
+
+        # Store the link used for the rels file.
+        @external_table_links << ['/table', "../tables/table#{id}.xml"]
+        id += 1
+      end
     end
 
     def num_comments_block

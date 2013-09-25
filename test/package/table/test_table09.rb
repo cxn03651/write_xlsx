@@ -29,6 +29,7 @@ class TestTable09 < Test::Unit::TestCase
                                        ]
                          }
                          )
+    @worksheet.__send__(:prepare_tables, 1)
 
     table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)

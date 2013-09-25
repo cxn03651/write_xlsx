@@ -12,7 +12,7 @@ class TestTableWriteAutoFilter01 < Test::Unit::TestCase
   def test_table_write_auto_filter
     expected = '<autoFilter ref="C3:F13"/>'
 
-    table = Writexlsx::Package::Table.new(@worksheet, 0, 1, 1, 2, 2)
+    table = Writexlsx::Package::Table.new(@worksheet, 1, 1, 2, 2)
     table.instance_variable_set(:@autofilter, 'C3:F13')
 
     table.__send__(:write_auto_filter)

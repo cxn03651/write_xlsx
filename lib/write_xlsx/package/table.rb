@@ -8,6 +8,9 @@ module Writexlsx
     class Table
       include Writexlsx::Utility
 
+      attr_accessor :id
+      attr_accessor :name
+
       class ColumnData
         attr_reader :id
         attr_accessor :name, :format, :formula
@@ -24,10 +27,9 @@ module Writexlsx
         end
       end
 
-      def initialize(worksheet, id, *args)
+      def initialize(worksheet, *args)
         @worksheet = worksheet
         @writer  = Package::XMLWriterSimple.new
-        @id      = id
 
         @row1, @row2, @col1, @col2, @param = handle_args(*args)
         @columns = []
@@ -264,12 +266,7 @@ module Writexlsx
       end
 
       def set_the_table_name
-        if @param[:name]
-          @name = @param[:name]
-        else
-          # Set a default name.
-          @name = "Table#{@id}"
-        end
+        @name = @param[:name] if @param[:name]
       end
 
       def set_the_table_and_autofilter_ranges
@@ -287,7 +284,7 @@ module Writexlsx
 
         attributes = [
                       ['xmlns',       xmlns],
-                      ['id',          @id],
+                      ['id',          id],
                       ['name',        @name],
                       ['displayName', @name],
                       ['ref',         @range]
