@@ -24,7 +24,7 @@ class TestRegressionChartAxis31 < Test::Unit::TestCase
             [ 3, 6, 9, 12, 15 ]
            ]
 
-    chart.set_y_axis(:crossing_position => 'on_tick')
+    chart.set_y_axis(:position_axis => 'on_tick')
 
     worksheet.write('A1', data)
 

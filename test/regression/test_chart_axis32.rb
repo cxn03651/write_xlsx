@@ -24,7 +24,7 @@ class TestRegressionChartAxis32 < Test::Unit::TestCase
             [ 3, 6, 9, 12, 15 ]
            ]
 
-    chart.set_x_axis(:crossing_position => 'between')
+    chart.set_x_axis(:position_axis => 'between')
 
     worksheet.write('A1', data)
 

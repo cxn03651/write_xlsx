@@ -1190,7 +1190,7 @@ module Writexlsx
         write_crossing(x_axis.crossing)
 
         # Write the c:crossBetween element.
-        write_cross_between(x_axis.crossing_position)
+        write_cross_between(x_axis.position_axis)
 
         # Write the c:majorUnit element.
         write_c_major_unit(y_axis.major_unit)

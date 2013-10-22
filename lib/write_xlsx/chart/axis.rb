@@ -11,7 +11,7 @@ module Writexlsx
       attr_accessor :defaults, :reverse
       attr_accessor :min, :max
       attr_accessor :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
-      attr_accessor :log_base, :crossing, :position, :crossing_position, :label_position, :visible
+      attr_accessor :log_base, :crossing, :position, :position_axis, :label_position, :visible
       attr_accessor :num_format, :num_format_linked, :num_font
       attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
 
@@ -31,7 +31,7 @@ module Writexlsx
         @major_unit_type   = args[:major_unit_type]
         @log_base          = args[:log_base]
         @crossing          = args[:crossing]
-        @crossing_position = args[:crossing_position]
+        @position_axis     = args[:position_axis]
         @label_position    = args[:label_position]
         @num_format        = args[:num_format]
         @num_format_linked = args[:num_format_linked]
@@ -52,14 +52,14 @@ module Writexlsx
         @position = @position.downcase[0, 1] if @position
 
         # Set the position for a category axis on or between the tick marks.
-        if @crossing_position
-          if @crossing_position == 'on_tick'
-            @crossing_position = 'midCat'
-          elsif @crossing_position == 'between'
+        if @position_axis
+          if @position_axis == 'on_tick'
+            @position_axis = 'midCat'
+          elsif @position_axis == 'between'
             # Doesn't neet to be modified.
           else
             # Otherwise use the default value.
-            @crossing_position = nil
+            @position_axis = nil
           end
         end
 
