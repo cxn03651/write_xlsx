@@ -354,6 +354,15 @@ For value axes it can have any value associated with the axis.
 If crossing is omitted (the default) the crossing will be set automatically
 by Excel based on the chart data.
 
+##### <a name="set_x_axis_position_axis" class="anchor" href="#set_x_axis_position_axis"><span class="octicon octicon-link" /></a>:position_axis
+
+Position the axis on or between the axis tick marks. (Applicable to category axes only.)
+
+There are two allowable values C<on_tick> and C<between>:
+
+    chart.set_x_axis( :position_axis => 'on_tick' )
+    chart.set_x_axis( :position_axis => 'between' )
+
 ##### <a name="set_x_axis_reverse" class="anchor" href="#set_x_axis_reverse"><span class="octicon octicon-link" /></a>:reverse
 Reverse the order of the axis categories or values.
 (Applicable to category and value axes.)
