@@ -212,8 +212,9 @@ module Writexlsx
     # Set the properties of the chart legend.
     #
     def set_legend(params)
-      @legend_position = params[:position] || 'right'
+      @legend_position      = params[:position] || 'right'
       @legend_delete_series = params[:delete_series]
+      @legend_font          = convert_font_args(params[:font])
     end
 
     #
@@ -681,7 +682,10 @@ module Writexlsx
       attributes << ['i',  font[:_italic]]    if font[:_italic]
       attributes << ['u',  'sng']             if font[:_underline]
 
-      attributes << ['baseline', font[:_baseline]]
+      # Turn off baseline when testing fonts that don't have it.
+      if font[:_baseline] != -1
+        attributes << ['baseline', font[:_baseline]]
+      end
       attributes
     end
 
@@ -1514,8 +1518,8 @@ module Writexlsx
     # Write the <c:legend> element.
     #
     def write_legend # :nodoc:
-      position      = @legend_position
-      overlay       = false
+      position = @legend_position
+      overlay  = false
 
       if @legend_delete_series && @legend_delete_series.kind_of?(Array)
         @delete_series = @legend_delete_series
@@ -1548,6 +1552,10 @@ module Writexlsx
         end if @delete_series
         # Write the c:layout element.
         write_layout
+        # Write the c:txPr element.
+        if ptrue?(@legend_font)
+          write_tx_pr(nil, @legend_font)
+        end
         # Write the c:overlay element.
         write_overlay if overlay
       end
