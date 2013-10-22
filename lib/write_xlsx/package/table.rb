@@ -8,9 +8,6 @@ module Writexlsx
     class Table
       include Writexlsx::Utility
 
-      attr_accessor :id
-      attr_accessor :name
-
       class ColumnData
         attr_reader :id
         attr_accessor :name, :format, :formula
@@ -26,6 +23,8 @@ module Writexlsx
           @user_data      = param[id-1] if param
         end
       end
+
+      attr_reader :id, :name
 
       def initialize(worksheet, *args)
         @worksheet = worksheet
@@ -146,6 +145,11 @@ module Writexlsx
           end
           i += 1
         end
+      end
+
+      def prepare(id)
+        @id = id
+        @name ||= "Table#{id}"
       end
 
       private
