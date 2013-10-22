@@ -1506,11 +1506,7 @@ module Writexlsx
       table_id = 0
 
       sheets.each do |sheet|
-        table_count = sheet.tables_count
-        if table_count > 0
-          sheet.prepare_tables(table_id + 1)
-          table_id += table_count
-        end
+        table_id += sheet.prepare_tables(table_id + 1)
       end
     end
 
