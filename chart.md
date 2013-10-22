@@ -519,6 +519,13 @@ This property takes an array as an argument and the series are zero indexed:
     # Delete/hide series index 0 and 2 from the legend.
     chart.set_legend(:delete_series => [0, 2])
 
+##### <a name="set_legend_font" class="anchor" href="#set_legend_font"><span class="octicon octicon-link" /></a>:font
+Set the font properties of the chart legend:
+
+    chart.set_legend(:font => { :bold => 1, :italic => 1 } )
+
+See the [CHART FONTS][] section below.
+
 #### <a name="set_chartarea" class="anchor" href="#set_chartarea"><span class="octicon octicon-link" /></a>set_chartarea()
 
 The `set_chartarea()` method is used to set the properties of the chart area.
