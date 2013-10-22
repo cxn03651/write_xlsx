@@ -5746,17 +5746,17 @@ module Writexlsx
     # Set the table ids for the worksheet tables.
     #
     def prepare_tables(table_id)
-      id = table_id
-      tables.each do |table|
-        table.id = id
+      if tables_count > 0
+        id = table_id
+        tables.each do |table|
+          table.prepare(id)
 
-        # Set the table name unless defined by the user.
-        table.name ||= "Table#{id}"
-
-        # Store the link used for the rels file.
-        @external_table_links << ['/table', "../tables/table#{id}.xml"]
-        id += 1
+          # Store the link used for the rels file.
+          @external_table_links << ['/table', "../tables/table#{id}.xml"]
+          id += 1
+        end
       end
+      tables_count || 0
     end
 
     def num_comments_block
