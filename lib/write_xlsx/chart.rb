@@ -118,6 +118,7 @@ module Writexlsx
       @y_offset          = 0
       @table             = nil
       @smooth_allowed    = 0
+      @cross_between     = 'between'
 
       set_default_properties
     end
@@ -1189,7 +1190,7 @@ module Writexlsx
         write_crossing(x_axis.crossing)
 
         # Write the c:crossBetween element.
-        write_cross_between
+        write_cross_between(x_axis.crossing_position)
 
         # Write the c:majorUnit element.
         write_c_major_unit(y_axis.major_unit)
@@ -1467,8 +1468,8 @@ module Writexlsx
     #
     # Write the <c:crossBetween> element.
     #
-    def write_cross_between # :nodoc:
-      val  = @cross_between || 'between'
+    def write_cross_between(val = nil) # :nodoc:
+      val ||= @cross_between
 
       @writer.empty_tag('c:crossBetween', [ ['val', val] ])
     end
