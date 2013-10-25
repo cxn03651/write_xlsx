@@ -1679,17 +1679,13 @@ module Writexlsx
           sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end
 
-        (0 .. image_count - 1).each do |index|
-          filename = sheet.images[index][2]
-
-          image_id, type, width, height, name = get_image_properties(filename)
-
+        sheet.images.each_with_index do |image, index|
+          image_id, type, width, height, name = get_image_properties(image[2])
           image_ref_id += 1
-
           sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type)
         end
 
-        (0..shape_count - 1).each do |index|
+        sheet.shapes.each_with_index do |shape, index|
           sheet.prepare_shape(index, drawing_id)
         end
 

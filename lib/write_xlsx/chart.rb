@@ -2124,9 +2124,7 @@ module Writexlsx
         # Write the c:ptCount element.
         write_pt_count(data.size)
 
-        (0..data.size - 1).each do |i|
-          token = data[i]
-
+        data.each_with_index do |token, i|
           # Write non-numeric data as 0.
           if token &&
               !(token.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
