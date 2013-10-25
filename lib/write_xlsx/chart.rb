@@ -1024,6 +1024,13 @@ module Writexlsx
     end
 
     #
+    # Write the <c:numLit> element for literal number list elements.
+    #
+    def write_num_lit(data)
+      write_num_base('c:numLit', data)
+    end
+
+    #
     # Write the <c:f> element.
     #
     def write_series_formula(formula) # :nodoc:
@@ -2116,7 +2123,11 @@ module Writexlsx
     # Write the <c:numCache> element.
     #
     def write_num_cache(data) # :nodoc:
-      @writer.tag_elements('c:numCache') do
+      write_num_base('c:numCache', data)
+    end
+
+    def write_num_base(tag, data)
+      @writer.tag_elements(tag) do
 
         # Write the c:formatCode element.
         write_format_code('General')
@@ -2363,7 +2374,13 @@ module Writexlsx
           write_no_end_cap
         end
 
-        if error_bars[:_type] != 'stdErr'
+        case error_bars[:_type]
+        when 'stdErr'
+          # Don't need to write a c:errValType tag.
+        when 'cust'
+          # Write the custom error tags.
+          write_custom_error(error_bars)
+        else
           # Write the c:val element.
           write_error_val(error_bars[:_value])
         end
@@ -2406,6 +2423,30 @@ module Writexlsx
     #
     def write_error_val(val)
       @writer.empty_tag('c:val', [ ['val', val] ])
+    end
+
+    #
+    # Write the custom error bars type.
+    #
+    def write_custom_error(error_bars)
+      if ptrue?(error_bars[:_plus_values])
+        # Write the c:plus element.
+        @writer.tag_elements('c:plus') do
+          if error_bars[:_plus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
+            write_num_ref(error_bars[:_plus_values], error_bars[:_plus_data], 'num')
+          else                                   # [1, 2, 3]
+            write_num_lit(error_bars[:_plus_values])
+          end
+        end
+        # Write the c:minus element.
+        @writer.tag_elements('c:minus') do
+          if error_bars[:_minus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
+            write_num_ref(error_bars[:_minus_values], error_bars[:_minus_data], 'num')
+          else                                   # [1, 2, 3]
+            write_num_lit(error_bars[:_minus_values])
+          end
+        end
+      end
     end
 
     #

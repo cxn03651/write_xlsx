@@ -160,17 +160,22 @@ class Series
 
     # Default values.
     error_bars = {
-      :_type      => 'fixedVal',
-      :_value     => 1,
-      :_endcap    => 1,
-      :_direction => 'both'
+      :_type         => 'fixedVal',
+      :_value        => 1,
+      :_endcap       => 1,
+      :_direction    => 'both',
+      :_plus_values  => [1],
+      :_minus_values => [1],
+      :_plus_data    => [],
+      :_minus_data   => []
     }
 
     types = {
       :fixed              => 'fixedVal',
       :percentage         => 'percentage',
       :standard_deviation => 'stdDev',
-      :standard_error     => 'stdErr'
+      :standard_error     => 'stdErr',
+      :custom             => 'cust'
     }
 
     # Check the error bars type.
@@ -202,6 +207,12 @@ class Series
         # Default to 'both'
       end
     end
+
+    # Set any custom values
+    error_bars[:_plus_values]  = params[:plus_values]  if params[:plus_values]
+    error_bars[:_minus_values] = params[:minus_values] if params[:minus_values]
+    error_bars[:_plus_data]    = params[:plus_data]    if params[:plus_data]
+    error_bars[:_minus_data]   = params[:minus_data]   if params[:minus_data]
 
     # Set the line properties for the error bars.
     error_bars[:_line] = line_properties(params[:line])
