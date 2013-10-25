@@ -358,7 +358,7 @@ by Excel based on the chart data.
 
 Position the axis on or between the axis tick marks. (Applicable to category axes only.)
 
-There are two allowable values C<on_tick> and C<between>:
+There are two allowable values on_tick and between:
 
     chart.set_x_axis( :position_axis => 'on_tick' )
     chart.set_x_axis( :position_axis => 'between' )
