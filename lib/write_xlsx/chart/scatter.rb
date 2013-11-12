@@ -255,7 +255,7 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.
-            if !series.marker || series.marker[:_defined] == 0
+            unless ptrue?(series.marker)
               series.marker = { :type => 'none', :_defined => 1 }
             end
           end
