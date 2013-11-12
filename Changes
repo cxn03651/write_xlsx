@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2013-11-13 v0.73.0
+   Added custom error bar option to charts.
+   Fix for tables added in non-sequential order.
+   Fix for scatter charts with markers on non-marker series.
+   Fix for charts with star style markers
+
 2013-09-21 v0.72.3.beta1
    speed up when script handles large number of cells.
 
