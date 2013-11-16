@@ -63,7 +63,7 @@ module Writexlsx
       def write_plot_area
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
-          write_layout
+          write_layout(@plotarea[:_layout], 'plot')
           # Write the subclass chart type element.
           write_chart_type
         end
@@ -99,7 +99,7 @@ module Writexlsx
           # Write the c:legendPos element.
           write_legend_pos(position)
           # Write the c:layout element.
-          write_layout
+          write_layout(@legend_layout, 'legend')
           # Write the c:overlay element.
           write_overlay if overlay != 0
           # Write the c:txPr element. Over-ridden.

@@ -215,6 +215,9 @@ module Writexlsx
       @legend_position      = params[:position] || 'right'
       @legend_delete_series = params[:delete_series]
       @legend_font          = convert_font_args(params[:font])
+
+      # Set the legend layout.
+      @legend_layout = layout_properties(params[:layout])
     end
 
     #
@@ -454,6 +457,29 @@ module Writexlsx
       id
     end
 
+    #
+    # Convert user defined layout properties to the format required internally.
+    #
+    def layout_properties(args, is_text = false)
+      return unless ptrue?(args)
+
+      properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
+
+      # Check for valid properties.
+      allowable = Hash.new
+      allowable[properties.size] = nil
+
+      # Set the layout properties
+      layout = Hash.new
+      properties.each do |property|
+        value = args[property]
+        # Convert to the format used by Excel for easier testing.
+        layout[property] = sprintf("%.17g", value)
+      end
+
+      layout
+    end
+
     private
 
     #
@@ -627,8 +653,12 @@ module Writexlsx
       # Set the fill properties for the chartarea.
       fill = fill_properties(arg[:fill])
 
-      area[:_line] = line
-      area[:_fill] = fill
+      # Set the plotarea layout.
+      layout = layout_properties(arg[:layout])
+
+      area[:_line]   = line
+      area[:_fill]   = fill
+      area[:_layout] = layout
 
       return area
     end
@@ -780,9 +810,9 @@ module Writexlsx
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
         if @title.formula
-          write_title_formula(@title, nil)
+          write_title_formula(@title, nil, nil, @title.layout, @title.overlay)
         elsif @title.name
-          write_title_rich(@title, nil)
+          write_title_rich(@title, nil, @title.layout, @title.overlay)
         end
 
         # Write the c:plotArea element.
@@ -817,7 +847,7 @@ module Writexlsx
     def write_plot_area_base(type = nil) # :nodoc:
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
-        write_layout
+        write_layout(@plotarea[:_layout], 'plot')
         # Write the subclass chart type elements for primary and secondary axes.
         write_chart_type(:primary_axes => 1)
         write_chart_type(:primary_axes => 0)
@@ -859,8 +889,36 @@ module Writexlsx
     #
     # Write the <c:layout> element.
     #
-    def write_layout # :nodoc:
-      @writer.empty_tag('c:layout')
+    def write_layout(layout = nil, type = nil) # :nodoc:
+      tag = 'c:layout'
+
+      if layout
+        @writer.tag_elements(tag)  { write_manual_layout(layout, type) }
+      else
+        @writer.empty_tag(tag)
+      end
+    end
+
+    #
+    # Write the <c:manualLayout> element.
+    #
+    def write_manual_layout(layout, type)
+      @writer.tag_elements('c:manualLayout') do
+        # Plotarea has a layoutTarget element.
+        @writer.empty_tag('c:layoutTarget', [ ['val', 'inner'] ]) if type == 'plot'
+
+        # Set the x, y positions.
+        @writer.empty_tag('c:xMode', [ ['val', 'edge'] ])
+        @writer.empty_tag('c:yMode', [ ['val', 'edge'] ])
+        @writer.empty_tag('c:x',     [ ['val', layout[:x]] ])
+        @writer.empty_tag('c:y',     [ ['val', layout[:y]] ])
+
+        # For plotarea and legend set the width and height.
+        if type != 'text'
+          @writer.empty_tag('c:w', [ ['val', layout[:width]] ])
+          @writer.empty_tag('c:h', [ ['val', layout[:height]] ])
+        end
+      end
     end
 
     #
@@ -1101,9 +1159,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis, horiz, @x_axis)
+          write_title_formula(x_axis, horiz, @x_axis, x_axis.layout)
         elsif x_axis.name
-          write_title_rich(x_axis, horiz)
+          write_title_rich(x_axis, horiz, x_axis.layout)
         end
 
         # Write the c:numFmt element.
@@ -1178,9 +1236,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if y_axis.formula
-          write_title_formula(y_axis, horiz)
+          write_title_formula(y_axis, horiz, nil, y_axis.layout)
         elsif y_axis.name
-          write_title_rich(y_axis, horiz)
+          write_title_rich(y_axis, horiz, y_axis.layout)
         end
 
         # Write the c:numberFormat element.
@@ -1254,9 +1312,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis, nil)
+          write_title_formula(x_axis, nil, nil, x_axis.layout)
         elsif x_axis.name
-          write_title_rich(x_axis, nil)
+          write_title_rich(x_axis, nil, x_axis.layout)
         end
         # Write the c:numFmt element.
         write_number_format(x_axis)
@@ -1558,7 +1616,7 @@ module Writexlsx
           write_legend_entry(index)
         end if @delete_series
         # Write the c:layout element.
-        write_layout
+        write_layout(@legend_layout, 'legend')
         # Write the c:txPr element.
         if ptrue?(@legend_font)
           write_tx_pr(nil, @legend_font)
@@ -1591,7 +1649,7 @@ module Writexlsx
     # Write the <c:overlay> element.
     #
     def write_overlay # :nodoc:
-      @writer.empty_tag('c:overlay', ['val', 1])
+      @writer.empty_tag('c:overlay', [ ['val', 1] ])
     end
 
     #
@@ -1660,24 +1718,28 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, horiz = nil) # :nodoc:
+    def write_title_rich(title, horiz = nil, layout = nil, overlay = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
         write_tx_rich(title, horiz)
         # Write the c:layout element.
-        write_layout
+        write_layout(layout, 'text')
+        # Write the c:overlay element.
+        write_overlay if overlay
       end
     end
 
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, horiz = nil, axis = nil) # :nodoc:
+    def write_title_formula(title, horiz = nil, axis = nil, layout = nil, overlay = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
         write_tx_formula(title.formula, axis ? axis.data_id : title.data_id)
         # Write the c:layout element.
-        write_layout
+        write_layout(layout, 'text')
+        # Write the c:overlay element.
+        write_overlay if overlay
         # Write the c:txPr element.
         write_tx_pr(horiz, axis ? axis.name_font : title.name_font)
       end

@@ -12,7 +12,7 @@ module Writexlsx
       attr_accessor :min, :max
       attr_accessor :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
       attr_accessor :log_base, :crossing, :position, :position_axis, :label_position, :visible
-      attr_accessor :num_format, :num_format_linked, :num_font
+      attr_accessor :num_format, :num_format_linked, :num_font, :layout
       attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
 
       #
@@ -66,6 +66,9 @@ module Writexlsx
         # Set the font properties if present.
         @num_font  = @chart.convert_font_args(args[:num_font])
         @name_font = @chart.convert_font_args(args[:name_font])
+
+        # Set the axis name layout.
+        @layout    = @chart.layout_properties(args[:name_layout], 1)
       end
 
       #
