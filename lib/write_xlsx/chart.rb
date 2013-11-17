@@ -809,7 +809,10 @@ module Writexlsx
     def write_chart # :nodoc:
       @writer.tag_elements('c:chart') do
         # Write the chart title elements.
-        if @title.formula
+        if @title.none
+          # Turn off the title.
+          write_auto_title_deleted
+        elsif @title.formula
           write_title_formula(@title, nil, nil, @title.layout, @title.overlay)
         elsif @title.name
           write_title_rich(@title, nil, @title.layout, @title.overlay)
@@ -1713,6 +1716,15 @@ module Writexlsx
     #
     def write_page_setup # :nodoc:
       @writer.empty_tag('c:pageSetup')
+    end
+
+    #
+    # Write the <c:autoTitleDeleted> element.
+    #
+    def write_auto_title_deleted
+      attributes = [ ['val', 1] ]
+
+      @writer.empty_tag('c:autoTitleDeleted', attributes)
     end
 
     #

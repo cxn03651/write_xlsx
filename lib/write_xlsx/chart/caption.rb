@@ -4,7 +4,7 @@ module Writexlsx
   class Chart
     class Caption
       attr_accessor :name, :formula, :data_id, :name_font
-      attr_reader :layout, :overlay
+      attr_reader :layout, :overlay, :none
 
       def initialize(chart)
         @chart = chart
@@ -15,7 +15,12 @@ module Writexlsx
         @data_id        = @chart.get_data_id(@formula, params[:data])
         @name_font      = @chart.convert_font_args(params[:name_font])
         @layout   = @chart.layout_properties(params[:layout], 1)
+
+        # Set the title overlay option.
         @overlay  = params[:overlay]
+
+        # Set the no automatic title option.
+        @none = params[:none]
       end
     end
   end
