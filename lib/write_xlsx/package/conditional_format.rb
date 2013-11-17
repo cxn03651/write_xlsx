@@ -326,7 +326,7 @@ module Writexlsx
         row1, row2 = row2, row1 if row1 > row2
         col1, col2 = col2, col1 if col1 > col2
 
-        [row1, row2, col1, col2, user_range, param]
+        [row1, row2, col1, col2, user_range, param.dup]
       end
 
       def param_for_conditional_formatting(*args)  # :nodoc:
