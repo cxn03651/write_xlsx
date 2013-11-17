@@ -212,7 +212,11 @@ module Writexlsx
     # Set the properties of the chart legend.
     #
     def set_legend(params)
-      @legend_position      = params[:position] || 'right'
+      if params[:none]
+        @legend_position = 'none'
+      else
+        @legend_position = params[:position] || 'right'
+      end
       @legend_delete_series = params[:delete_series]
       @legend_font          = convert_font_args(params[:font])
 
