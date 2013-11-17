@@ -253,6 +253,7 @@ The properties that can be set are:
 
     :name
     :name_font
+    :name_layout
     :num_font
     :num_format
     :min
@@ -289,6 +290,19 @@ Set the font properties for the axis title.
     chart.set_x_axis(:name_font => {:name => 'Arial', :size => 10})
 
 See the [CHART FONTS][] section below.
+
+##### <a name="set_x_axis_name_layout" class="anchor" href="#set_x_axis_name_layout"><span class="octicon octicon-link" /></a>:name_layout
+Set the x, y position of the axis title in chart relative units. (Applicable to category and value axes).
+
+    chart.set_x_axis(
+      :name        => 'X axis',
+      :name_layout => {
+        :x => 0.34,
+        :y => 0.85
+      }
+    }
+
+See the [CHART LAYOUT][] section below.
 
 ##### <a name="set_x_axis_num_font" class="anchor" href="#set_x_axis_num_font"><span class="octicon octicon-link" /></a>:num_font
 Set the font properties for the axis numbers.
@@ -496,6 +510,23 @@ The default is to have no chart title.
 Set the font properties for the chart title.
 See the [CHART FONTS][] section below.
 
+#### <a name="set_title_overlay" class="anchor" href="#set_title_overlay"><span class="octicon octicon-link" /></a>:overlay
+Allow the title to be overlaid on the chart. Generally used with the layout property below.
+
+#### <a name="set_title_layout" class="anchor" href="#set_title_layout"><span class="octicon octicon-link" /></a>:layout
+Set the x, y position of the title in chart relative units.
+
+    chart.set_title(
+      :name    => 'Title',
+      :overlay => 1,
+      :layout  => {
+        :x => 0.42,
+        :y => 0.14
+      }
+    }
+
+See the CHART LAYOUT section below.
+
 #### <a name="set_legend" class="anchor" href="#set_legend"><span class="octicon octicon-link" /></a>set_legend()
 
 The `set_legend()` method is used to set properties of the chart legend.
@@ -519,6 +550,20 @@ The available positions are:
     right
     overlay_left
     overlay_right
+
+##### <a name="set_legend_layout" class="anchor" href="#set_legend_layout"><span class="octicon octicon-link" /></a>:layout
+Set the x, y position of the legend in chart relative units:
+
+    chart.set_legend(
+      :layout => {
+        :x      => 0.80,
+        :y      => 0.37,
+        :width  => 0.12,
+        :height => 0.25
+      }
+    )
+
+See the CHART LAYOUT section below.
 
 ##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
 This allows you to remove 1 or more series from the the legend
@@ -1217,8 +1262,82 @@ the [set_x_axis()][] section of the documentation above.
 
 Some charts such as `Scatter` and `Stock` have two value axes.
 
+### <a name="chart_layout" class="anchor" href="#chart_layout"><span class="octicon octicon-link" /></a>CHART LAYOUT
+
+The position of the chart in the worksheet is controlled by the set_size method shown above.
+
+It is also possible to change the layout of the following chart sub-objects:
+
+    :plotarea
+    :legend
+    :title
+    :x_axis caption
+    :y_axis caption
+
+Here are some examples:
+
+    chart.set_plotarea(
+      :layout => {
+        :x      => 0.35,
+        :y      => 0.26,
+        :width  => 0.62,
+        :height => 0.50
+      }
+    )
+
+    chart.set_legend(
+      :layout => {
+        :x      => 0.80,
+        :y      => 0.37,
+        :width  => 0.12,
+        :height => 0.25
+      }
+    )
+
+    chartset_title(
+      :name   => 'Title',
+      :layout => {
+        :x      => 0.80,
+        :y      => 0.37,
+        :width  => 0.12,
+        :height => 0.25
+      }
+    )
+
+    chartset_x_axis(
+      :name        => 'X axis,
+      :name_layout => {
+        :x      => 0.80,
+        :y      => 0.37
+      }
+    )
+
+Note that it is only possible to change the width and height for the plotarea
+and legend objects. For the other text based objects the width and height are
+chaged by the font dimensions.
+
+The layout units must be a float in the range 0 < x <= 1 and are expressed
+as a percentage of the chart dimensions as shown below:
+
+![Chart object layout.](images/examples/layout.png)
+
+From this the layout units are calculated as follows:
+
+    layout:
+      width  = w / W
+      height = h / H
+      x      = a / W
+      y      = b / H
+
+These units area slightly cumbersome but are required by Excel so that the chart object positions
+remain relative to each other if the cahrt is resized by the user.
+
+Note that for plotarea the origin is the top left corner in the plotarea itself
+and does not take into account the axes.
+
 [CHART FONTS]: chart_fonts.html#chart_fonts
 [CHART FORMATTING]: chart.html#chart_formatting
+[CHART LAYOUT]: chart.html#chart_layout
 [SERIES OPTIONS]: chart.html#series_options
 [insert_chart()]: worksheet.html#insert_chart
 [set_x_axis()]: #set_x_axis
