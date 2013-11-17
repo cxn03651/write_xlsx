@@ -527,6 +527,14 @@ Set the x, y position of the title in chart relative units.
 
 See the CHART LAYOUT section below.
 
+#### <a name="set_title_none" class="anchor" href="#set_title_none"><span class="octicon octicon-link" /></a>none
+By default Excel adds an automatic chart title to charts with a single series and a user defined series name.
+The none option turns this default title off.
+It also turns off all other set_title option.
+
+    chart.set_title(:none => 1)
+
+
 #### <a name="set_legend" class="anchor" href="#set_legend"><span class="octicon octicon-link" /></a>set_legend()
 
 The `set_legend()` method is used to set properties of the chart legend.
