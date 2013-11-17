@@ -539,9 +539,17 @@ It also turns off all other set_title option.
 
 The `set_legend()` method is used to set properties of the chart legend.
 
-    chart.set_legend(:position => 'none')
-
 The properties that can be set are:
+
+##### <a name="set_legend_none" class="anchor" href="#set_legend_none"><span class="octicon octicon-link" /></a>:none
+
+The :none option turns off the chart legend. In Excel chart legend are on by default:
+
+    chart.set_legend(:none => 1)
+
+Note, for backward compatibility, it is also possible to turn off the legend via the :position property:
+
+    chart.set_legend(:position => 'none')
 
 ##### <a name="set_legend_position" class="anchor" href="#set_legend_position"><span class="octicon octicon-link" /></a>:position
 Set the position of the chart legend.
@@ -551,13 +559,13 @@ Set the position of the chart legend.
 The default legend position is right.
 The available positions are:
 
-    none
     top
     bottom
     left
     right
     overlay_left
     overlay_right
+    none
 
 ##### <a name="set_legend_layout" class="anchor" href="#set_legend_layout"><span class="octicon octicon-link" /></a>:layout
 Set the x, y position of the legend in chart relative units:
