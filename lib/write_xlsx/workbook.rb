@@ -682,6 +682,9 @@ module Writexlsx
     #
     # See the defined_name.rb program in the examples dir of the distro.
     #
+    # Refer to the following to see Excel's syntax rules for defined names:
+    # <http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names>
+    #
     def define_name(name, formula)
       sheet_index = nil
       sheetname   = ''
@@ -695,19 +698,27 @@ module Writexlsx
         sheet_index = -1   # Use -1 to indicate global names.
       end
 
-      # Warn if the sheet index wasn't found.
+      # Raise if the sheet index wasn't found.
       if !sheet_index
        raise "Unknown sheet name #{sheetname} in defined_name()\n"
       end
 
-      # Warn if the sheet name contains invalid chars as defined by Excel help.
-      if name !~ %r!^[a-zA-Z_\\][a-zA-Z_.]+!
-       raise "Invalid characters in name '#{name}' used in defined_name()\n"
+      # Raise if the name contains invalid chars as defined by Excel help.
+      # Refer to the following to see Excel's syntax rules for defined names:
+      # http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names
+      #
+      if name =~ /\A[-0-9 !"#\$%&'\(\)\*\+,\.:;<=>\?@\[\]\^`\{\}~]/ || name =~ /.+[- !"#\$%&'\(\)\*\+,\\:;<=>\?@\[\]\^`\{\}~]/
+        raise "Invalid characters in name '#{name}' used in defined_name()\n"
       end
 
-      # Warn if the sheet name looks like a cell name.
+      # Raise if the name looks like a cell name.
       if name =~ %r(^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$)
         raise "Invalid name '#{name}' looks like a cell name in defined_name()\n"
+      end
+
+      # Raise if the name looks like a R1C1
+      if name =~ /\A[rcRC]\Z/ || name =~ /\A[rcRC]\d+[rcRC]\d+\Z/
+        raise "Invalid name '#{name}' like a RC cell ref in defined_name()\n"
       end
 
       @defined_names.push([ name, sheet_index, formula.sub(/^=/, '') ])
