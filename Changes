@@ -1,5 +1,12 @@
 Change history of write_xlsx rubygem.
 
+2013-11-18 v0.74.0
+   Improved defined name validation.
+     Allow utf8 character etc.
+   Added Chart#set_title option to turn off automatic title.
+   Allow positioning of plotarea, legend, title and axis names.
+   Fix for modification of user params in conditional_formatting.
+
 2013-11-13 v0.73.0
    Added custom error bar option to charts.
    Fix for tables added in non-sequential order.
