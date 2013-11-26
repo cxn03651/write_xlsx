@@ -95,9 +95,17 @@ class Test::Unit::TestCase
 
     # Compare each file in the XLSX containers.
     exp_members.each_index do |i|
-      got_xml_str = got_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
-      exp_xml_str = exp_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
-
+      begin
+        got_str = got_members[i].get_input_stream.read
+        got_xml_str = got_str.gsub(%r!(\S)/>!, '\1 />')
+        #        exp_xml_str = exp_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
+        exp_str = exp_members[i].get_input_stream.read
+        exp_str.force_encoding("ASCII-8BIT") if got_str.encoding == Encoding::ASCII_8BIT
+        exp_xml_str = exp_str.gsub(%r!(\S)/>!, '\1 />')
+      rescue
+        p got_str.encoding
+        p exp_str.encoding
+      end
       # Remove dates and user specific data from the core.xml data.
       if exp_members[i].name == 'docProps/core.xml'
         if regression
