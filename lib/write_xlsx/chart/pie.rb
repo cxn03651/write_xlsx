@@ -81,7 +81,7 @@ module Writexlsx
         delete_series = @legend_delete_series || []
 
         if position =~ /^overlay_/
-          positon.sub!(/^overlay_/, '')
+          position.sub!(/^overlay_/, '')
           overlay = 1
         end
 
