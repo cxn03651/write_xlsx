@@ -260,6 +260,7 @@ The properties that can be set are:
     :max
     :minor_unit
     :major_unit
+    :interval_unit
     :crossing
     :reverse
     :log_base
@@ -349,6 +350,12 @@ Set the increment of the major units in the axis range.
 (Applicable to value axes only.)
 
     chart.set_x_axis(:major_unit => 2)
+
+##### <a name="set_x_axis_interval_unit" class="anchor" href="#set_x_axis_interval_unit"><span class="octicon octicon-link" /></a>:interval_unit
+Set the interval unit for a category axis.
+(Applicable  to category axes only.)
+
+    chart.set_x_axis(:interval_unit => 2)
 
 ##### <a name="set_x_axis_crossing" class="anchor" href="#set_x_axis_crossing"><span class="octicon octicon-link" /></a>:crossing
 Set the position where the y axis will cross the x axis.
