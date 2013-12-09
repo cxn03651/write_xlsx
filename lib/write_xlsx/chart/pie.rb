@@ -78,6 +78,7 @@ module Writexlsx
         position = @legend_position
         font     = @legend_font
         overlay  = 0
+        delete_series = @legend_delete_series || []
 
         if position =~ /^overlay_/
           positon.sub!(/^overlay_/, '')
@@ -99,6 +100,11 @@ module Writexlsx
         @writer.tag_elements('c:legend') do
           # Write the c:legendPos element.
           write_legend_pos(position)
+          # Remove series labels from the legend.
+          delete_series.each do |index|
+            # Write the c:legendEntry element.
+            write_legend_entry(index)
+          end
           # Write the c:layout element.
           write_layout(@legend_layout, 'legend')
           # Write the c:overlay element.
