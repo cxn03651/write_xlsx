@@ -76,6 +76,7 @@ module Writexlsx
       #
       def write_legend
         position = @legend_position
+        font     = @legend_font
         overlay  = 0
 
         if position =~ /^overlay_/
@@ -103,33 +104,36 @@ module Writexlsx
           # Write the c:overlay element.
           write_overlay if overlay != 0
           # Write the c:txPr element. Over-ridden.
-          write_tx_pr_legend
+          write_tx_pr_legend(0, font)
         end
       end
 
       #
       # Write the <c:txPr> element for legends.
       #
-      def write_tx_pr_legend
-        horiz = 0
+      def write_tx_pr_legend(horiz, font)
+        rotation = nil
+        if ptrue?(font) && font[:_rotation]
+          rotation = font[:_rotation]
+        end
 
         @writer.tag_elements('c:txPr') do
           # Write the a:bodyPr element.
-          write_a_body_pr(nil, horiz)
+          write_a_body_pr(rotation, horiz)
           # Write the a:lstStyle element.
           write_a_lst_style
           # Write the a:p element.
-          write_a_p_legend
+          write_a_p_legend(font)
         end
       end
 
       #
       # Write the <a:p> element for legends.
       #
-      def write_a_p_legend
+      def write_a_p_legend(font)
         @writer.tag_elements('a:p') do
           # Write the a:pPr element.
-          write_a_p_pr_legend
+          write_a_p_pr_legend(font)
           # Write the a:endParaRPr element.
           write_a_end_para_rpr
         end
@@ -138,14 +142,14 @@ module Writexlsx
       #
       # Write the <a:pPr> element for legends.
       #
-      def write_a_p_pr_legend
+      def write_a_p_pr_legend(font)
         rtl  = 0
 
         attributes = [ ['rtl', rtl] ]
 
         @writer.tag_elements('a:pPr', attributes) do
           # Write the a:defRPr element.
-          write_a_def_rpr
+          write_a_def_rpr(font)
         end
       end
 
