@@ -1,5 +1,7 @@
 # write_xlsx
 
+[![Gem Version](https://badge.fury.io/rb/write_xlsx.png)](http://badge.fury.io/rb/write_xlsx)
+
 gem to create a new file in the Excel 2007+ XLSX format, and you can use the
 same interface as writeexcel gem. write_xlsx is converted from Perl's module
 [Excel::Writer::XLSX-0.75](https://github.com/jmcnamara/excel-writer-xlsx) .
