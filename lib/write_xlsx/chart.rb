@@ -1788,9 +1788,13 @@ module Writexlsx
     # Write the <c:rich> element.
     #
     def write_rich(title, horiz) # :nodoc:
+      rotation = nil
+      if title.name_font && title.name_font[:_rotation]
+        rotation = title.name_font[:_rotation]
+      end
       @writer.tag_elements('c:rich') do
         # Write the a:bodyPr element.
-        write_a_body_pr(horiz)
+        write_a_body_pr(rotation, horiz)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
@@ -1801,28 +1805,11 @@ module Writexlsx
     #
     # Write the <a:bodyPr> element.
     #
-    def write_a_body_pr(horiz) # :nodoc:
-      rot   = -5400000
-      vert  = 'horz'
-
-      attributes = [
-                    ['rot',  rot],
-                    ['vert', vert]
-                   ]
-
-      attributes = [] unless ptrue?(horiz)
-
-      @writer.empty_tag('a:bodyPr', attributes)
-    end
-
-    #
-    # Write the <a:bodyPr> element for axis fonts.
-    #
-    def write_axis_body_pr(rot = nil, vert = nil)
+    def write_a_body_pr(rot, horiz = nil) # :nodoc:
+      rot = -5400000 if !rot && ptrue?(horiz)
       attributes = []
-
-      attributes << ['rot', rot]   if rot
-      attributes << ['vert', vert] if vert
+      attributes << ['rot',  rot]   if rot
+      attributes << ['vert', 'horz'] if ptrue?(horiz)
 
       @writer.empty_tag('a:bodyPr', attributes)
     end
@@ -1941,9 +1928,13 @@ module Writexlsx
     # Write the <c:txPr> element.
     #
     def write_tx_pr(horiz, font) # :nodoc:
+      rotation = nil
+      if font && font[:_rotation]
+        rotation = font[:_rotation]
+      end
       @writer.tag_elements('c:txPr') do
         # Write the a:bodyPr element.
-        write_a_body_pr(horiz)
+        write_a_body_pr(rotation, horiz)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
@@ -2394,7 +2385,7 @@ module Writexlsx
       return unless font
 
       @writer.tag_elements('c:txPr') do
-        write_axis_body_pr(font[:_rotation])
+        write_a_body_pr(font[:_rotation])
         write_a_lst_style
         @writer.tag_elements('a:p') do
           write_a_p_pr_rich(font)

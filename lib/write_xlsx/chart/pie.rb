@@ -115,7 +115,7 @@ module Writexlsx
 
         @writer.tag_elements('c:txPr') do
           # Write the a:bodyPr element.
-          write_a_body_pr(horiz)
+          write_a_body_pr(nil, horiz)
           # Write the a:lstStyle element.
           write_a_lst_style
           # Write the a:p element.
