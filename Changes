@@ -1,5 +1,10 @@
 Change history of write_xlsx rubygem.
 
+2013-12-09 v0.75.0
+   Added interval unit option for category axes.
+   Fix for axis name font rotation.
+   Fix for several minor issues with Pie chart legends.
+
 2013-11-18 v0.74.0
    Improved defined name validation.
      Allow utf8 character etc.
