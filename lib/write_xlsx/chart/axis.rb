@@ -12,7 +12,7 @@ module Writexlsx
       attr_accessor :min, :max
       attr_accessor :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
       attr_accessor :log_base, :crossing, :position, :position_axis, :label_position, :visible
-      attr_accessor :num_format, :num_format_linked, :num_font, :layout
+      attr_accessor :num_format, :num_format_linked, :num_font, :layout, :interval_unit
       attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
 
       #
@@ -35,6 +35,7 @@ module Writexlsx
         @label_position    = args[:label_position]
         @num_format        = args[:num_format]
         @num_format_linked = args[:num_format_linked]
+        @interval_unit     = args[:interval_unit]
         @visible           = args[:visible] || 1
 
         # Map major/minor_gridlines properties.

@@ -1195,6 +1195,8 @@ module Writexlsx
         write_label_align('ctr')
         # Write the c:labelOffset element.
         write_label_offset(100)
+        # Write the c:tickLblSkip element.
+        write_tick_lbl_skip(x_axis.interval_unit)
       end
     end
 
@@ -1343,6 +1345,8 @@ module Writexlsx
         write_auto(1)
         # Write the c:labelOffset element.
         write_label_offset(100)
+        # Write the c:tickLblSkip element.
+        write_tick_lbl_skip(x_axis.interval_unit)
         # Write the c:majorUnit element.
         write_c_major_unit(x_axis.major_unit)
         # Write the c:majorTimeUnit element.
@@ -1520,6 +1524,15 @@ module Writexlsx
     #
     def write_label_offset(val) # :nodoc:
       @writer.empty_tag('c:lblOffset', [ ['val', val] ])
+    end
+
+    #
+    # Write the <c:tickLblSkip> element.
+    #
+    def write_tick_lbl_skip(val) # :nodoc:
+      return unless val
+
+      @writer.empty_tag('c:tickLblSkip', [ ['val', val] ])
     end
 
     #
