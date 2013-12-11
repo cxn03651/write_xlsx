@@ -1,4 +1,10 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in write_xlsx.gemspec
-gemspec
+if RUBY_VERSION >= "1.9"
+  gem 'rubyzip'
+  group :development do
+    gem 'simplecov'
+  end
+else
+  gem 'rubyzip', '0.9.9'
+end

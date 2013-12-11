@@ -68,7 +68,8 @@ class Test::Unit::TestCase
 
   def entrys(xlsx)
     result = []
-    Zip::File.foreach(xlsx) { |entry| result << entry }
+    ruby_19 { Zip::File.foreach(xlsx) { |entry| result << entry } } ||
+    ruby_18 { Zip::ZipFile.foreach(xlsx) { |entry| result << entry } }
     result
   end
 
@@ -100,11 +101,13 @@ class Test::Unit::TestCase
         got_xml_str = got_str.gsub(%r!(\S)/>!, '\1 />')
         #        exp_xml_str = exp_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
         exp_str = exp_members[i].get_input_stream.read
-        exp_str.force_encoding("ASCII-8BIT") if got_str.encoding == Encoding::ASCII_8BIT
+        ruby_19 do
+          exp_str.force_encoding("ASCII-8BIT") if got_str.encoding == Encoding::ASCII_8BIT
+        end
         exp_xml_str = exp_str.gsub(%r!(\S)/>!, '\1 />')
       rescue
-        p got_str.encoding
-        p exp_str.encoding
+        p ruby_19 { got_str.encoding } || ruby_18 { got_str }
+        p ruby_19 { exp_str.encoding } || ruby_18 { exp_str }
       end
       # Remove dates and user specific data from the core.xml data.
       if exp_members[i].name == 'docProps/core.xml'
