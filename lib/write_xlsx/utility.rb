@@ -520,5 +520,13 @@ module Writexlsx
       raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
       hash[key.to_sym]
     end
+
+    def palette_color(index)
+      # Adjust the colour index.
+      idx = index - 8
+
+      rgb = @palette[idx]
+      sprintf("%02X%02X%02X", *rgb)
+    end
   end
 end

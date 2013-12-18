@@ -59,19 +59,12 @@ module Writexlsx
       # Convert from an Excel internal colour index to a XML style #RRGGBB index
       # based on the default or user defined values in the Workbook palette.
       #
-      def get_palette_color(index)
-        palette = @palette
-
-        # Handle colours in #XXXXXX RGB format.
-        return "FF#{$1.upcase}" if index =~ /^#([0-9A-F]{6})$/i
-
-        # Adjust the colour index.
-        index -= 8
-
-        # Palette is passed in from the Workbook class.
-        rgb = @palette[index]
-
-        sprintf("FF%02X%02X%02X", *rgb[0, 3])
+      def palette_color(index)
+      if index =~ /^#([0-9A-F]{6})$/i
+        "FF#{$1.upcase}"
+      else
+        "FF#{super(index)}"
+      end
       end
 
       #
@@ -261,12 +254,12 @@ module Writexlsx
 
           @writer.tag_elements('patternFill', attributes) do
             if fg_color && fg_color != 0
-              fg_color = get_palette_color(fg_color)
+              fg_color = palette_color(fg_color)
               @writer.empty_tag('fgColor', [ ['rgb', fg_color] ])
             end
 
             if bg_color && bg_color != 0
-              bg_color = get_palette_color(bg_color)
+              bg_color = palette_color(bg_color)
               @writer.empty_tag('bgColor', [ ['rgb', bg_color] ])
             else
               @writer.empty_tag('bgColor', [ ['indexed', 64] ]) if !dxf_format
@@ -364,7 +357,7 @@ module Writexlsx
 
         @writer.tag_elements(type, attributes) do
           if color != 0
-            color = get_palette_color(color)
+            color = palette_color(color)
             @writer.empty_tag('color', [ ['rgb', color] ])
           else
             @writer.empty_tag('color', [ ['auto', 1] ])

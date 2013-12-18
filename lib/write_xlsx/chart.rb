@@ -538,24 +538,7 @@ module Writexlsx
         raise "Unknown color '#{color}' used in chart formatting."
       end
 
-      get_palette_color(index)
-    end
-
-    #
-    # Convert from an Excel internal colour index to a XML style #RRGGBB index
-    # based on the default or user defined values in the Workbook palette.
-    # Note: This version doesn't add an alpha channel.
-    #
-    def get_palette_color(index) # :nodoc:
-      palette = @palette
-
-      # Adjust the colour index.
-      index -= 8
-
-      # Palette is passed in from the Workbook class.
-      rgb = palette[index]
-
-      sprintf("%02X%02X%02X", *rgb)
+      palette_color(index)
     end
 
     #

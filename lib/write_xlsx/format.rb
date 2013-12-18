@@ -750,7 +750,7 @@ module Writexlsx
         elsif ptrue?(@color_indexed)
           write_color(writer, 'indexed', @color_indexed)
         elsif ptrue?(@color)
-          color = worksheet.get_palette_color(@color)
+          color = worksheet.palette_color(@color)
           write_color(writer, 'rgb', color)
         elsif !ptrue?(dxf_format)
           write_color(writer, 'theme', 1)
@@ -771,7 +771,7 @@ module Writexlsx
         if ptrue?(theme)
           write_color(writer, 'theme', theme)
         elsif ptrue?(@color)
-          color = worksheet.get_palette_color(@color)
+          color = worksheet.palette_color(@color)
           write_color(writer, 'rgb', color)
         else
           write_color(writer, 'theme', 1)

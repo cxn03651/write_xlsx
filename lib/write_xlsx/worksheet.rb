@@ -302,6 +302,7 @@ module Writexlsx
       @colinfo = []
       @cell_data_table = {}
       @excel_version = 2007
+      @palette = workbook.palette
 
       @page_setup = PageSetup.new
 
@@ -5692,19 +5693,12 @@ module Writexlsx
     # Convert from an Excel internal colour index to a XML style #RRGGBB index
     # based on the default or user defined values in the Workbook palette.
     #
-    def get_palette_color(index) #:nodoc:
+    def palette_color(index) #:nodoc:
       if index =~ /^#([0-9A-F]{6})$/i
-        return "FF#{$~[1]}"
+        "FF#{$1.upcase}"
+      else
+        "FF#{super(index)}"
       end
-
-      # Adjust the colour index.
-      index -= 8
-
-      # Palette is passed in from the Workbook class.
-      rgb = @workbook.palette[index]
-
-      # TODO Add the alpha part to the RGB.
-      sprintf("FF%02X%02X%02X", *rgb[0, 3])
     end
 
     def buttons_data  # :nodoc:
@@ -7122,7 +7116,7 @@ module Writexlsx
 
       @writer.empty_tag('tabColor',
                         [
-                         ['rgb', get_palette_color(@tab_color)]
+                         ['rgb', palette_color(@tab_color)]
                         ])
     end
 

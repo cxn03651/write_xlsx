@@ -100,7 +100,7 @@ module Writexlsx
 
       # Override the style colours with user defined colors.
       [:series_color, :negative_color, :markers_color, :first_color, :last_color, :high_color, :low_color].each do |user_color|
-        set_spark_color(user_color, ptrue?(param[user_color]) ? ws.get_palette_color(param[user_color]) : nil)
+        set_spark_color(user_color, ptrue?(param[user_color]) ? ws.palette_color(param[user_color]) : nil)
       end
     end
 
