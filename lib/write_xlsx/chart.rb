@@ -439,27 +439,26 @@ module Writexlsx
     # If there is no user defined data then it will be populated by the parent
     # workbook in Workbook::_add_chart_data
     #
-    def get_data_id(formula, data) # :nodoc:
+    def data_id(full_formula, data) # :nodoc:
       # Ignore series without a range formula.
-      return unless formula
+      return unless full_formula
 
       # Strip the leading '=' from the formula.
-      formula = formula.sub(/^=/, '')
+      formula = full_formula.sub(/^=/, '')
 
       # Store the data id in a hash keyed by the formula and store the data
       # in a separate array with the same id.
-      if !@formula_ids.has_key?(formula)
-        # Haven't seen this formula before.
-        id = @formula_data.size
-
-        @formula_data << data
-        @formula_ids[formula] = id
-      else
+      if @formula_ids.has_key?(formula)
         # Formula already seen. Return existing id.
         id = @formula_ids[formula]
 
         # Store user defined data if it isn't already there.
-        @formula_data[id] = data unless @formula_data[id]
+        @formula_data[id] ||= data
+      else
+        # Haven't seen this formula before.
+        id = @formula_ids[formula] = @formula_data.size
+
+        @formula_data << data
       end
 
       id

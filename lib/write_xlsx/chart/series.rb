@@ -14,9 +14,9 @@ class Series
     @categories = aref_to_formula(params[:categories])
     @name, @name_formula =
       chart.process_names(params[:name], params[:name_formula])
-    @cat_data_id = chart.get_data_id(@categories, params[:categories_data])
-    @val_data_id = chart.get_data_id(@values, params[:values_data])
-    @name_id = chart.get_data_id(@name_formula, params[:name_data])
+    @cat_data_id = chart.data_id(@categories, params[:categories_data])
+    @val_data_id = chart.data_id(@values, params[:values_data])
+    @name_id = chart.data_id(@name_formula, params[:name_data])
     if params[:border]
       @line = line_properties(params[:border])
     else
