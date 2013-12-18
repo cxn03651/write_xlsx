@@ -561,11 +561,12 @@ module Writexlsx
     #
     # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
     #
-    def get_swe_line_pattern(val)
-      value   = val.downcase
-      default = 'solid'
+    def swe_line_pattern(val)
+      swe_line_pattern_hash[numeric_or_downcase(val)] || 'solid'
+    end
 
-      patterns = {
+    def swe_line_pattern_hash
+      {
         0              => 'solid',
         1              => 'dash',
         2              => 'dot',
@@ -585,18 +586,17 @@ module Writexlsx
         'medium-gray'  => 'solid',
         'light-gray'   => 'solid'
       }
-
-      patterns[value] || default
     end
 
     #
     # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
     #
-    def get_swe_line_weight(val)
-      value   = val.downcase
-      default = 1
+    def swe_line_weight(val)
+      swe_line_weight_hash[numeric_or_downcase(val)] || 1
+    end
 
-      weights = {
+    def swe_line_weight_hash
+      {
         1          => 0.25,
         2          => 1,
         3          => 2,
@@ -606,8 +606,10 @@ module Writexlsx
         'medium'   => 2,
         'wide'     => 3
       }
+    end
 
-      weights[value] || default
+    def numeric_or_downcase(val)
+      val.respond_to?(:coerce) ? val : val.downcase
     end
 
     #
@@ -632,13 +634,13 @@ module Writexlsx
 
       # Map deprecated Spreadsheet::WriteExcel line_weight.
       if arg[:line_weight]
-        width = get_swe_line_weight(arg[:line_weight])
+        width = swe_line_weight(arg[:line_weight])
         arg[:border] = { :width => width }
       end
 
       # Map deprecated Spreadsheet::WriteExcel line_pattern.
       if arg[:line_pattern]
-        pattern = get_swe_line_pattern(arg[:line_pattern])
+        pattern = swe_line_pattern(arg[:line_pattern])
         if pattern == 'none'
           arg[:border] = { :none => 1 }
         else
