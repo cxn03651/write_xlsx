@@ -2035,7 +2035,8 @@ module Writexlsx
       attributes = []
 
       # Add the line width as an attribute.
-      if width = line[:width]
+      if line[:width]
+        width = line[:width]
         # Round width to nearest 0.25, like Excel.
         width = ((width + 0.125) * 4).to_i / 4.0
 
@@ -2055,9 +2056,9 @@ module Writexlsx
           write_a_solid_fill(line)
         end
         # Write the line/dash type.
-        if type = line[:dash_type]
+        if line[:dash_type]
           # Write the a:prstDash element.
-          write_a_prst_dash(type)
+          write_a_prst_dash(line[:dash_type])
         end
       end
     end
