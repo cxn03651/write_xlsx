@@ -464,8 +464,8 @@ module Writexlsx
       end
     end
 
-    def get_color(color)
-      Format.get_color(color)
+    def color(color_code)
+      Format.color(color_code)
     end
 
     #
@@ -473,31 +473,31 @@ module Writexlsx
     # string into a number. Color range is 0..63 but we will restrict it
     # to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
     #
-    def self.get_color(color)
+    def self.color(color_code)
 
       colors = Colors::COLORS
 
-      if color.respond_to?(:to_str)
+      if color_code.respond_to?(:to_str)
         # Return RGB style colors for processing later.
-        return color if color =~ /^#[0-9A-F]{6}$/i
+        return color_code if color_code =~ /^#[0-9A-F]{6}$/i
 
         # Return the default color if undef,
-        return 0x00 unless color
+        return 0x00 unless color_code
 
         # or the color string converted to an integer,
-        return colors[color.downcase.to_sym] if colors[color.downcase.to_sym]
+        return colors[color_code.downcase.to_sym] if colors[color_code.downcase.to_sym]
 
         # or the default color if string is unrecognised,
-        return 0x00 if color =~ /\D/
+        return 0x00 if color_code =~ /\D/
       else
         # or an index < 8 mapped into the correct range,
-        return color + 8 if color < 8
+        return color_code + 8 if color_code < 8
 
         # or the default color if arg is outside range,
-        return 0x00 if color > 63
+        return 0x00 if color_code > 63
 
         # or an integer in the valid range
-        return color
+        return color_code
       end
     end
 
@@ -647,7 +647,7 @@ module Writexlsx
       # Check that the attribute exists
       # ........
       if method =~ /set\w+color$/    # for "set_property_color" methods
-        value = get_color(args[0])
+        value = color(args[0])
       else                            # for "set_xxx" methods
         value = args[0].nil? ? 1 : args[0]
       end

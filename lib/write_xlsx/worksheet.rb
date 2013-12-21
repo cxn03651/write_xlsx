@@ -942,7 +942,7 @@ module Writexlsx
     # See the tab_colors.rb program in the examples directory of the distro.
     #
     def tab_color=(color)
-      @tab_color = Colors.new.get_color(color)
+      @tab_color = Colors.new.color(color)
     end
 
     # This method is deprecated. use tab_color=().

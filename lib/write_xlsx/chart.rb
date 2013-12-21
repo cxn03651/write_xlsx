@@ -523,22 +523,15 @@ module Writexlsx
     #
     # Convert the user specified colour index or string to a rgb colour.
     #
-    def get_color(color) # :nodoc:
-      # Convert a HTML style #RRGGBB color.
-      if color and color =~ /^#[0-9a-fA-F]{6}$/
-        color = color.sub(/^#/, '')
-        return color.upcase
+    def color(color_code) # :nodoc:
+      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
+        # Convert a HTML style #RRGGBB color.
+        color_code.sub(/^#/, '').upcase
+      else
+        index = Format.color(color_code)
+        raise "Unknown color '#{color_code}' used in chart formatting." unless index
+        palette_color(index)
       end
-
-      index = Format.get_color(color)
-
-      # Set undefined colors to black.
-      unless index
-        index = 0x08
-        raise "Unknown color '#{color}' used in chart formatting."
-      end
-
-      palette_color(index)
     end
 
     #
@@ -2059,12 +2052,8 @@ module Writexlsx
     #
     def write_a_solid_fill(line) # :nodoc:
       @writer.tag_elements('a:solidFill') do
-        if line[:color]
-          color = get_color(line[:color])
-
-          # Write the a:srgbClr element.
-          write_a_srgb_clr(color)
-        end
+        # Write the a:srgbClr element.
+        write_a_srgb_clr(color(line[:color])) if line[:color]
       end
     end
 
