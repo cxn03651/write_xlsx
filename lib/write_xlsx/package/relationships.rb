@@ -32,20 +32,14 @@ module Writexlsx
       # Add container relationship to XLSX .rels xml files.
       #
       def add_document_relationship(type, target)
-        type   = Document_schema + type
-        target = target
-
-        @rels.push([type, target])
+        @rels.push([Document_schema + type, target])
       end
 
       #
       # Add container relationship to XLSX .rels xml files.
       #
       def add_package_relationship(type, target)
-        type   = Package_schema + type
-        target = target
-
-        @rels.push([type, target])
+        @rels.push([Package_schema + type, target])
       end
 
       #
@@ -53,19 +47,14 @@ module Writexlsx
       #
       def add_ms_package_relationship(type, target)
         schema = 'http://schemas.microsoft.com/office/2006/relationships'
-        type = schema + type
-
-        @rels.push([type, target])
+        @rels.push([schema + type, target])
       end
 
       #
       # Add worksheet relationship to sheet.rels xml files.
       #
       def add_worksheet_relationship(type, target, target_mode = nil)
-        type   = Document_schema + type
-        target = target
-
-        @rels.push([type, target, target_mode])
+        @rels.push([Document_schema + type, target, target_mode])
       end
 
       private
