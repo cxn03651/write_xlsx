@@ -418,7 +418,7 @@ module Writexlsx
 
           # Write the xdr:txBody element.
           if shape.text != 0
-            write_txBody(col_absolute, row_absolute, width, height, shape)
+            write_tx_body(col_absolute, row_absolute, width, height, shape)
           end
         end
       end
@@ -748,7 +748,7 @@ module Writexlsx
     #
     # Write the <xdr:txBody> element.
     #
-    def write_txBody(col_absolute, row_absolute, width, height, shape)
+    def write_tx_body(col_absolute, row_absolute, width, height, shape)
       attributes = [
                     [:vertOverflow, "clip"],
                     [:wrap,         "square"],
