@@ -649,7 +649,7 @@ module Writexlsx
       if method =~ /set\w+color$/    # for "set_property_color" methods
         value = get_color(args[0])
       else                            # for "set_xxx" methods
-        value = args[0].nil? ? 1 : args[0]
+        value = args[0] || 1
       end
 
       instance_variable_set(attribute, value)

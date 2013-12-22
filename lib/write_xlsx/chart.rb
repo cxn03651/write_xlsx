@@ -1350,15 +1350,11 @@ module Writexlsx
         # Write the c:majorUnit element.
         write_c_major_unit(x_axis.major_unit)
         # Write the c:majorTimeUnit element.
-        if !x_axis.major_unit.nil?
-          write_c_major_time_unit(x_axis.major_unit_type)
-        end
+        write_c_major_time_unit(x_axis.major_unit_type) if x_axis.major_unit
         # Write the c:minorUnit element.
         write_c_minor_unit(x_axis.minor_unit)
         # Write the c:minorTimeUnit element.
-        if !x_axis.minor_unit.nil?
-          write_c_minor_time_unit(x_axis.minor_unit_type)
-        end
+        write_c_minor_time_unit(x_axis.minor_unit_type) if x_axis.minor_unit
       end
     end
 
@@ -1419,18 +1415,14 @@ module Writexlsx
     # Write the <c:max> element.
     #
     def write_c_max(max = nil) # :nodoc:
-      return if max.nil?
-
-      @writer.empty_tag('c:max', [ ['val', max] ])
+      @writer.empty_tag('c:max', [ ['val', max] ]) if max
     end
 
     #
     # Write the <c:min> element.
     #
     def write_c_min(min = nil) # :nodoc:
-      return if min.nil?
-
-      @writer.empty_tag('c:min', [ ['val', min] ])
+      @writer.empty_tag('c:min', [ ['val', min] ]) if min
     end
 
     #

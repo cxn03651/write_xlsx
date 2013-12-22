@@ -777,9 +777,7 @@ module Writexlsx
       row_first, col_first, row_last, col_last = row_col_notation(args)
       active_cell = xl_rowcol_to_cell(row_first, col_first)
 
-      if row_last.nil?   # Single cell selection.
-        sqref = active_cell
-      else               # Range selection.
+      if row_last  # Range selection.
         # Swap last row/col for first row/col as necessary
         row_first, row_last = row_last, row_first if row_first > row_last
         col_first, col_last = col_last, col_first if col_first > col_last
@@ -790,6 +788,8 @@ module Writexlsx
         else
           sqref = xl_range(row_first, row_last, col_first, col_last)
         end
+      else          # Single cell selection.
+        sqref = active_cell
       end
 
       # Selection isn't set for cell A1.
@@ -3046,14 +3046,13 @@ module Writexlsx
     # worksheet method, see above.
     #
     def set_row(*args)
+      return unless args[0]
       row = args[0]
       height = args[1] || @default_height
       xf     = args[2]
       hidden = args[3] || 0
       level  = args[4] || 0
       collapsed = args[5] || 0
-
-      return if row.nil?
 
       # Get the default row height.
       default_height = @default_row_height
@@ -6551,9 +6550,7 @@ module Writexlsx
       custom_width = false if width.nil? && hidden == 0
       custom_width = false if width == 8.43
 
-      if width.nil?
-        width = hidden == 0 ? 8.43 : 0
-       end
+      width = hidden == 0 ? 8.43 : 0 unless width
 
       # Convert column width from user units to character width.
       if width && width < 1

@@ -256,9 +256,7 @@ class Series
     return nil unless labels
 
     position = labels[:position]
-    if position.nil? || position.empty?
-      labels.delete(:position)
-    else
+    if ptrue?(position)
       # Map user defined label positions to Excel positions.
       positions = {
         :center      => 'ctr',
@@ -274,6 +272,8 @@ class Series
       }
 
       labels[:position] = value_or_raise(positions, position, 'label position')
+    else
+      labels.delete(:position)
     end
 
     labels

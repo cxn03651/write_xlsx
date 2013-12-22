@@ -81,7 +81,7 @@ module Writexlsx
       attributes << [:editAs, 'oneCell'] if type == 2
 
       # Add attribute for shapes.
-      attributes << [:editAs, shape.edit_as] if shape && !shape.edit_as.nil?
+      attributes << [:editAs, shape.edit_as] if shape && shape.edit_as
 
       @writer.tag_elements('xdr:twoCellAnchor', attributes) do
         # Write the xdr:from element.
@@ -244,7 +244,7 @@ module Writexlsx
     # Write the <xdr:nvGraphicFramePr> element.
     #
     def write_nv_graphic_frame_pr(index, name = nil)
-      name = "Chart #{index}" if name.nil? || name.empty?
+      name = "Chart #{index}" unless ptrue?(name)
 
       @writer.tag_elements('xdr:nvGraphicFramePr') do
         # Write the xdr:cNvPr element.

@@ -874,7 +874,7 @@ module Writexlsx
     #
     def set_custom_color(index, red = 0, green = 0, blue = 0)
       # Match a HTML #xxyyzz style parameter
-      if !red.nil? && red =~ /^#(\w\w)(\w\w)(\w\w)/
+      if red =~ /^#(\w\w)(\w\w)(\w\w)/
         red   = $1.hex
         green = $2.hex
         blue  = $3.hex
@@ -1165,7 +1165,7 @@ module Writexlsx
     end
 
     def write_defined_names #:nodoc:
-      return if @defined_names.nil? || @defined_names.empty?
+      return unless ptrue?(@defined_names)
       @writer.tag_elements('definedNames') do
         @defined_names.each { |defined_name| write_defined_name(defined_name) }
       end

@@ -40,7 +40,7 @@ module ZipFileUtils
     Zip::ZipInputStream.open(src){ |is|
       loop do
         entry = is.get_next_entry()
-        break if entry.nil?()
+        break unless unless entry
         dir = File.dirname(entry.name)
         FileUtils.makedirs(dest+ '/' + dir)
         path = encode_path(dest + '/' + entry.name, options[:fs_encoding])
@@ -84,7 +84,7 @@ module ZipFileUtils
   end
 
   def self.encode_path(path, encode_s)
-    return path if encode_s.nil?()
+    return path unless encode_s
     case(encode_s)
     when('UTF-8')
       return path.toutf8()
