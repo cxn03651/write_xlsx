@@ -60,17 +60,6 @@ class Series
   end
 
   #
-  # Convert user defined fill properties to the structure required internally.
-  #
-  def fill_properties(fill) # :nodoc:
-    return { :_defined => 0 } unless fill
-
-    fill[:_defined] = 1
-
-    fill
-  end
-
-  #
   # Convert user defined marker properties to the structure required internally.
   #
   def marker_properties(marker) # :nodoc:

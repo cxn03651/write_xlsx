@@ -141,7 +141,7 @@ module Writexlsx
       def write_plot_area
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
-          write_layout(@plotarea[:_layout], 'plot')
+          write_layout(@plotarea.layout, 'plot')
 
           # Write the subclass chart type elements for primary and secondary axes
           write_chart_type(:primary_axes => 1)

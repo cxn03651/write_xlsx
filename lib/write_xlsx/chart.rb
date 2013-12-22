@@ -35,6 +35,106 @@ module Writexlsx
     end
   end
 
+  class ChartArea
+    include Writexlsx::Utility
+
+    attr_reader :line, :fill, :layout
+
+    def initialize(params = {})
+      line_weight  = params[:line_weight]
+      line_pattern = params[:line_pattern]
+      # Map deprecated Spreadsheet::WriteExcel line_weight.
+      if line_weight
+        width = swe_line_weight(line_weight)
+        params[:border] = { :width => width }
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line_pattern.
+      if line_pattern
+        pattern = swe_line_pattern(line_pattern)
+        if pattern == 'none'
+          params[:border] = { :none => 1 }
+        else
+          params[:border][:dash_type] = pattern
+        end
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line colour.
+      params[:border][:color] = params[:line_color] if params[:line_color]
+
+      # Handle Excel::Writer::XLSX style properties.
+
+      # Set the line properties for the chartarea.
+      @line = line_properties(params[:line])
+
+      # Allow 'border' as a synonym for 'line'.
+      @line = line_properties(params[:border]) if (params[:border])
+
+      @layout = layout_properties(params[:layout])
+
+      # Map deprecated Spreadsheet::WriteExcel fill colour.
+      @fill = params[:fill]
+      @fill = { :color => params[:color] } if params[:color]
+      @fill = fill_properties(@fill)
+    end
+
+    private
+
+    #
+    # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
+    #
+    def swe_line_pattern(val)
+      swe_line_pattern_hash[numeric_or_downcase(val)] || 'solid'
+    end
+
+    def swe_line_pattern_hash
+      {
+        0              => 'solid',
+        1              => 'dash',
+        2              => 'dot',
+        3              => 'dash_dot',
+        4              => 'long_dash_dot_dot',
+        5              => 'none',
+        6              => 'solid',
+        7              => 'solid',
+        8              => 'solid',
+        'solid'        => 'solid',
+        'dash'         => 'dash',
+        'dot'          => 'dot',
+        'dash-dot'     => 'dash_dot',
+        'dash-dot-dot' => 'long_dash_dot_dot',
+        'none'         => 'none',
+        'dark-gray'    => 'solid',
+        'medium-gray'  => 'solid',
+        'light-gray'   => 'solid'
+      }
+    end
+
+    #
+    # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
+    #
+    def swe_line_weight(val)
+      swe_line_weight_hash[numeric_or_downcase(val)] || 1
+    end
+
+    def swe_line_weight_hash
+      {
+        1          => 0.25,
+        2          => 1,
+        3          => 2,
+        4          => 3,
+        'hairline' => 0.25,
+        'narrow'   => 1,
+        'medium'   => 2,
+        'wide'     => 3
+      }
+    end
+
+    def numeric_or_downcase(val)
+      val.respond_to?(:coerce) ? val : val.downcase
+    end
+  end
+
   class Chart
     include Writexlsx::Utility
 
@@ -99,8 +199,8 @@ module Writexlsx
       @horiz_cat_axis    = 0
       @horiz_val_axis    = 1
       @protection        = 0
-      @chartarea         = {}
-      @plotarea          = {}
+      @chartarea         = ChartArea.new
+      @plotarea          = ChartArea.new
       @title             = Caption.new(self)
       @x_axis            = Axis.new(self)
       @y_axis            = Axis.new(self)
@@ -229,7 +329,7 @@ module Writexlsx
     #
     def set_plotarea(params)
       # Convert the user defined properties to internal properties.
-      @plotarea = area_properties(params)
+      @plotarea = ChartArea.new(params)
     end
 
     #
@@ -237,7 +337,7 @@ module Writexlsx
     #
     def set_chartarea(params)
       # Convert the user defined properties to internal properties.
-      @chartarea = area_properties(params)
+      @chartarea = ChartArea.new(params)
     end
 
     #
@@ -464,29 +564,6 @@ module Writexlsx
       id
     end
 
-    #
-    # Convert user defined layout properties to the format required internally.
-    #
-    def layout_properties(args, is_text = false)
-      return unless ptrue?(args)
-
-      properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
-
-      # Check for valid properties.
-      allowable = Hash.new
-      allowable[properties.size] = nil
-
-      # Set the layout properties
-      layout = Hash.new
-      properties.each do |property|
-        value = args[property]
-        # Convert to the format used by Excel for easier testing.
-        layout[property] = sprintf("%.17g", value)
-      end
-
-      layout
-    end
-
     private
 
     #
@@ -532,120 +609,6 @@ module Writexlsx
         raise "Unknown color '#{color_code}' used in chart formatting." unless index
         palette_color(index)
       end
-    end
-
-    #
-    # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
-    #
-    def swe_line_pattern(val)
-      swe_line_pattern_hash[numeric_or_downcase(val)] || 'solid'
-    end
-
-    def swe_line_pattern_hash
-      {
-        0              => 'solid',
-        1              => 'dash',
-        2              => 'dot',
-        3              => 'dash_dot',
-        4              => 'long_dash_dot_dot',
-        5              => 'none',
-        6              => 'solid',
-        7              => 'solid',
-        8              => 'solid',
-        'solid'        => 'solid',
-        'dash'         => 'dash',
-        'dot'          => 'dot',
-        'dash-dot'     => 'dash_dot',
-        'dash-dot-dot' => 'long_dash_dot_dot',
-        'none'         => 'none',
-        'dark-gray'    => 'solid',
-        'medium-gray'  => 'solid',
-        'light-gray'   => 'solid'
-      }
-    end
-
-    #
-    # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
-    #
-    def swe_line_weight(val)
-      swe_line_weight_hash[numeric_or_downcase(val)] || 1
-    end
-
-    def swe_line_weight_hash
-      {
-        1          => 0.25,
-        2          => 1,
-        3          => 2,
-        4          => 3,
-        'hairline' => 0.25,
-        'narrow'   => 1,
-        'medium'   => 2,
-        'wide'     => 3
-      }
-    end
-
-    def numeric_or_downcase(val)
-      val.respond_to?(:coerce) ? val : val.downcase
-    end
-
-    #
-    # Convert user defined fill properties to the structure required internally.
-    #
-    def fill_properties(fill) # :nodoc:
-      return { :_defined => 0 } unless fill
-
-      fill[:_defined] = 1
-
-      fill
-    end
-
-    #
-    # Convert user defined area properties to the structure required internally.
-    #
-    def area_properties(arg)  # :nodoc:
-      area = {}
-
-      # Map deprecated Spreadsheet::WriteExcel fill colour.
-      arg[:fill] = { :color => arg[:color] } if arg[:color]
-
-      # Map deprecated Spreadsheet::WriteExcel line_weight.
-      if arg[:line_weight]
-        width = swe_line_weight(arg[:line_weight])
-        arg[:border] = { :width => width }
-      end
-
-      # Map deprecated Spreadsheet::WriteExcel line_pattern.
-      if arg[:line_pattern]
-        pattern = swe_line_pattern(arg[:line_pattern])
-        if pattern == 'none'
-          arg[:border] = { :none => 1 }
-        else
-          arg[:border][:dash_type] = pattern
-        end
-      end
-
-      # Map deprecated Spreadsheet::WriteExcel line colour.
-      arg[:border][:color] = arg[:line_color] if arg[:line_color]
-
-      # Handle Excel::Writer::XLSX style properties.
-
-      # Set the line properties for the chartarea.
-      line = line_properties(arg[:line])
-
-      # Allow 'border' as a synonym for 'line'.
-      line = line_properties(arg[:border]) if (arg[:border])
-
-      # Set the fill properties for the chartarea.
-      fill = fill_properties(arg[:fill])
-
-      # Set the plotarea layout.
-      layout = layout_properties(arg[:layout])
-
-      area[:_line]   = line
-      area[:_fill]   = fill
-      area[:_layout] = layout
-
-      return area
     end
 
     #
@@ -835,7 +798,7 @@ module Writexlsx
     def write_plot_area_base(type = nil) # :nodoc:
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
-        write_layout(@plotarea[:_layout], 'plot')
+        write_layout(@plotarea.layout, 'plot')
         # Write the subclass chart type elements for primary and secondary axes.
         write_chart_type(:primary_axes => 1)
         write_chart_type(:primary_axes => 0)

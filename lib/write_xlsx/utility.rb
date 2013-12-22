@@ -345,6 +345,29 @@ module Writexlsx
     end
 
     #
+    # Convert user defined layout properties to the format required internally.
+    #
+    def layout_properties(args, is_text = false)
+      return unless ptrue?(args)
+
+      properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
+
+      # Check for valid properties.
+      allowable = Hash.new
+      allowable[properties.size] = nil
+
+      # Set the layout properties
+      layout = Hash.new
+      properties.each do |property|
+        value = args[property]
+        # Convert to the format used by Excel for easier testing.
+        layout[property] = sprintf("%.17g", value)
+      end
+
+      layout
+    end
+
+    #
     # Convert vertices from pixels to points.
     #
     def pixels_to_points(vertices)
@@ -514,6 +537,19 @@ module Writexlsx
       line[:_defined] = 1
 
       line
+    end
+
+    #
+    # Convert user defined fill properties to the structure required internally.
+    #
+    def fill_properties(fill) # :nodoc:
+      if fill
+        ret = fill.dup
+        ret[:_defined] = 1
+        ret
+      else
+        { :_defined => 0 }
+      end
     end
 
     def value_or_raise(hash, key, msg)
