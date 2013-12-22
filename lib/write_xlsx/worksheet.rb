@@ -2289,7 +2289,7 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      store_data_to_table(BlankCellData.new(self, row, col,  nil, xf))
+      store_data_to_table(BlankCellData.new(self, row, col, xf))
     end
 
     #
@@ -6676,7 +6676,7 @@ module Writexlsx
       return if @panes.empty?
 
       if @panes[4] == 2
-        write_split_panes(*(@panes))
+        write_split_panes
       else
         write_freeze_panes(*(@panes))
       end
@@ -6724,7 +6724,8 @@ module Writexlsx
     #
     # See also, implementers note for split_panes().
     #
-    def write_split_panes(row, col, top_row, left_col, type) #:nodoc:
+    def write_split_panes #:nodoc:
+      row, col, top_row, left_col = @panes
       has_selection = false
       y_split = row
       x_split = col

@@ -398,7 +398,7 @@ module Writexlsx
           write_nv_cxn_sp_pr(index, shape)
 
           # Write the xdr:spPr element.
-          write_xdr_sp_pr(index, col_absolute, row_absolute, width, height, shape)
+          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
         end
       else
         # Add attribute for shapes.
@@ -412,11 +412,11 @@ module Writexlsx
           write_nv_sp_pr(index, shape)
 
           # Write the xdr:spPr element.
-          write_xdr_sp_pr(index, col_absolute, row_absolute, width, height, shape)
+          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
 
           # Write the xdr:txBody element.
           if shape.text != 0
-            write_tx_body(col_absolute, row_absolute, width, height, shape)
+            write_tx_body(shape)
           end
         end
       end
@@ -583,7 +583,7 @@ module Writexlsx
     #
     # Write the <xdr:spPr> element for shapes.
     #
-    def write_xdr_sp_pr(index, col_absolute, row_absolute, width, height, shape)
+    def write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
       attributes = [ ['bwMode', 'auto'] ]
 
       @writer.tag_elements('xdr:spPr', attributes) do
@@ -746,7 +746,7 @@ module Writexlsx
     #
     # Write the <xdr:txBody> element.
     #
-    def write_tx_body(col_absolute, row_absolute, width, height, shape)
+    def write_tx_body(shape)
       attributes = [
                     [:vertOverflow, "clip"],
                     [:wrap,         "square"],

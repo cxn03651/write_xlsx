@@ -117,7 +117,7 @@ module Writexlsx
     end
 
     class BlankCellData < CellData # :nodoc:
-      def initialize(worksheet, row, col, index, xf)
+      def initialize(worksheet, row, col, xf)
         @worksheet = worksheet
         @row, @col, @xf = row, col, xf
       end
