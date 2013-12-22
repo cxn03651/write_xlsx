@@ -111,31 +111,29 @@ module Writexlsx
     # Write the <xdr:absoluteAnchor> element.
     #
     def write_absolute_anchor(index)
-      @writer.start_tag('xdr:absoluteAnchor')
+      @writer.tag_elements('xdr:absoluteAnchor') do
+        # Different co-ordinates for horizonatal (= 0) and vertical (= 1).
+        if !ptrue?(@orientation)
 
-      # Different co-ordinates for horizonatal (= 0) and vertical (= 1).
-      if !ptrue?(@orientation)
+          # Write the xdr:pos element.
+          write_pos(0, 0)
 
-        # Write the xdr:pos element.
-        write_pos(0, 0)
+          # Write the xdr:ext element.
+          write_ext(9308969, 6078325)
+        else
+          # Write the xdr:pos element.
+          write_pos(0, -47625)
 
-        # Write the xdr:ext element.
-        write_ext(9308969, 6078325)
-      else
-        # Write the xdr:pos element.
-        write_pos(0, -47625)
+          # Write the xdr:ext element.
+          write_ext(6162675, 6124575)
+        end
 
-        # Write the xdr:ext element.
-        write_ext(6162675, 6124575)
+        # Write the xdr:graphicFrame element.
+        write_graphic_frame(index)
+
+        # Write the xdr:clientData element.
+        write_client_data
       end
-
-      # Write the xdr:graphicFrame element.
-      write_graphic_frame(index)
-
-      # Write the xdr:clientData element.
-      write_client_data
-
-      @writer.end_tag('xdr:absoluteAnchor')
     end
 
       #

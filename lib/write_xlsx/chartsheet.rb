@@ -35,25 +35,25 @@ module Writexlsx
 
       write_xml_declaration do
         # Write the root chartsheet element.
-        write_chartsheet
-        # Write the worksheet properties.
-        write_sheet_pr
-        # Write the sheet view properties.
-        write_sheet_views
-        # Write the sheetProtection element.
-        write_sheet_protection
-        # Write the printOptions element.
-        write_print_options
-        # Write the worksheet page_margins.
-        write_page_margins
-        # Write the worksheet page setup.
-        write_page_setup
-        # Write the headerFooter element.
-        write_header_footer
-        # Write the drawing element.
-        write_drawings
-        # Close the worksheet tag.
-        @writer.end_tag('chartsheet')
+        write_chartsheet do
+          # Write the worksheet properties.
+          write_sheet_pr
+          # Write the sheet view properties.
+          write_sheet_views
+          # Write the sheetProtection element.
+          write_sheet_protection
+          # Write the printOptions element.
+          write_print_options
+          # Write the worksheet page_margins.
+          write_page_margins
+          # Write the worksheet page setup.
+          write_page_setup
+          # Write the headerFooter element.
+          write_header_footer
+          # Write the drawing element.
+          write_drawings
+          # Close the worksheet tag.
+        end
       end
     end
 
@@ -180,7 +180,9 @@ module Writexlsx
                     ['xmlns:r', xmlns_r]
                    ]
 
-      @writer.start_tag('chartsheet', attributes)
+      @writer.tag_elements('chartsheet', attributes) do
+        yield
+      end
     end
 
     #
