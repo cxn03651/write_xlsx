@@ -139,7 +139,7 @@ module Writexlsx
         gridline = { :_visible => args[:visible] }
 
         # Set the line properties for the gridline.
-        gridline[:_line] = @chart.line_properties(args[:line])
+        gridline[:_line] = line_properties(args[:line])
 
         gridline
       end
