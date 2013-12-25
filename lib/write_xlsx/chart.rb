@@ -1494,8 +1494,14 @@ module Writexlsx
     end
 
     def write_gridlines_base(tag, gridlines)  # :nodoc:
+      return unless gridlines
       return if gridlines.respond_to?(:[]) and !ptrue?(gridlines[:_visible])
-      write_lines_base(tag, gridlines)
+
+      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
+        @writer.tag_elements(tag) { write_sp_pr(gridlines) }
+      else
+        @writer.empty_tag(tag)
+      end
     end
 
     #
@@ -2110,21 +2116,24 @@ module Writexlsx
     # Write the <c:hiLowLines> element.
     #
     def write_hi_low_lines # :nodoc:
-      write_lines_base('c:hiLowLines', @hi_low_lines)
+      return unless @hi_low_lines
+      lines = @hi_low_lines
+      tag   = 'c:hiLowLines'
+
+      if lines[:_line] && ptrue?(lines[:_line][:_defined])
+        @writer.tag_elements(tag) { write_sp_pr(lines) }
+      else
+        @writer.empty_tag(tag)
+      end
     end
 
     #
     # Write the <c:dropLines> elent.
     #
     def write_drop_lines
-      write_lines_base('c:dropLines', @drop_lines)
-    end
-
-    #
-    # used from write_drop_lines and write_hi_low_lines
-    #
-    def write_lines_base(tag, lines)
-      return unless lines
+      return unless @drop_lines
+      lines = @drop_lines
+      tag   = 'c:dropLines'
 
       if lines[:_line] && ptrue?(lines[:_line][:_defined])
         @writer.tag_elements(tag) { write_sp_pr(lines) }
