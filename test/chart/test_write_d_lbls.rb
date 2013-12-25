@@ -5,7 +5,7 @@ require 'write_xlsx/chart'
 class TestWriteDLbls < Test::Unit::TestCase
   def setup
     @chart = Writexlsx::Chart.new('Pie')
-    @series = Writexlsx::Series.new(@chart)
+    @series = Writexlsx::Chart::Series.new(@chart)
   end
 
   def test_write_d_lbls_value_only
