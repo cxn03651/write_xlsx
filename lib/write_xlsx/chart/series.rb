@@ -170,7 +170,7 @@ module Writexlsx
         :_x_error_bars => params[:x_error_bars] ? Errorbars.new(params[:x_error_bars]) : nil,
         :_y_error_bars => params[:y_error_bars] ? Errorbars.new(params[:y_error_bars]) : nil
       }
-      @points = points_properties(params[:points])
+      @points = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]
       @labels = labels_properties(params[:data_labels])
       @invert_if_neg = params[:invert_if_negative]
       @x2_axis = params[:x2_axis]
@@ -197,35 +197,6 @@ module Writexlsx
       # If it isn't an array ref it is probably a formula already.
       return data unless data.kind_of?(Array)
       xl_range_formula(*data)
-    end
-
-    #
-    # Convert user defined points properties to structure required internally.
-    #
-    def points_properties(user_points = nil)
-      return unless user_points
-
-      points = []
-      user_points.each do |user_point|
-        if user_point
-          # Set the line properties for the point.
-          line = line_properties(user_point[:line])
-
-          # Allow 'border' as a synonym for 'line'.
-          if user_point[:border]
-            line = line_properties(user_point[:border])
-          end
-
-          # Set the fill properties for the chartarea.
-          fill = fill_properties(user_point[:fill])
-
-          point = {}
-          point[:_line] = line
-          point[:_fill] = fill
-        end
-        points << point
-      end
-      points
     end
 
     #
