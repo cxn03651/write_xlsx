@@ -12,14 +12,14 @@ module Writexlsx
       # Set the line properties for the marker..
       @line = line_properties(@line)
       # Allow 'border' as a synonym for 'line'.
-      @line = line_properties(@border) if @border
+      @line = line_properties(params[:border]) if params[:border]
 
       # Set the fill properties for the marker.
       @fill = fill_properties(@fill)
     end
   end
 
-  class Point
+  class Point < Chartline
   end
 
   class Trendline < Chartline
