@@ -21,7 +21,7 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @default_marker = {:type => 'none'}
+        @default_marker = Marker.new(:type => 'none')
         @smooth_allowed = 1
       end
 

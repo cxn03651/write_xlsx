@@ -105,9 +105,9 @@ module Writexlsx
 
             if series.marker.nil? || series.marker == 0
               if index % 4 == 2
-                series.marker = { :type => 'dot', :size => 3 }
+                series.marker = Marker.new(:type => 'dot', :size => 3)
               else
-                series.marker = { :type => 'none' }
+                series.marker = Marker.new(:type => 'none')
               end
             end
           end

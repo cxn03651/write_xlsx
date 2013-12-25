@@ -1906,13 +1906,13 @@ module Writexlsx
       marker ||= @default_marker
 
       return unless ptrue?(marker)
-      return if ptrue?(marker[:automatic])
+      return if ptrue?(marker.automatic?)
 
       @writer.tag_elements('c:marker') do
         # Write the c:symbol element.
-        write_symbol(marker[:type])
+        write_symbol(marker.type)
         # Write the c:size element.
-        size = marker[:size]
+        size = marker.size
         write_marker_size(size) if ptrue?(size)
         # Write the c:spPr element.
         write_sp_pr(marker)
@@ -2042,19 +2042,19 @@ module Writexlsx
 
       @writer.tag_elements('c:trendline') do
         # Write the c:name element.
-        write_name(trendline[:name])
+        write_name(trendline.name)
         # Write the c:spPr element.
         write_sp_pr(trendline)
         # Write the c:trendlineType element.
-        write_trendline_type(trendline[:type])
+        write_trendline_type(trendline.type)
         # Write the c:order element for polynomial trendlines.
-        write_trendline_order(trendline[:order]) if trendline[:type] == 'poly'
+        write_trendline_order(trendline.order) if trendline.type == 'poly'
         # Write the c:period element for moving average trendlines.
-        write_period(trendline[:period]) if trendline[:type] == 'movingAvg'
+        write_period(trendline.period) if trendline.type == 'movingAvg'
         # Write the c:forward element.
-        write_forward(trendline[:forward])
+        write_forward(trendline.forward)
         # Write the c:backward element.
-        write_backward(trendline[:backward])
+        write_backward(trendline.backward)
       end
     end
 
@@ -2387,17 +2387,17 @@ module Writexlsx
         write_err_dir(direction)
 
         # Write the c:errBarType element.
-        write_err_bar_type(error_bars[:_direction])
+        write_err_bar_type(error_bars.direction)
 
         # Write the c:errValType element.
-        write_err_val_type(error_bars[:_type])
+        write_err_val_type(error_bars.type)
 
-        unless ptrue?(error_bars[:_endcap])
+        unless ptrue?(error_bars.endcap)
           # Write the c:noEndCap element.
           write_no_end_cap
         end
 
-        case error_bars[:_type]
+        case error_bars.type
         when 'stdErr'
           # Don't need to write a c:errValType tag.
         when 'cust'
@@ -2405,7 +2405,7 @@ module Writexlsx
           write_custom_error(error_bars)
         else
           # Write the c:val element.
-          write_error_val(error_bars[:_value])
+          write_error_val(error_bars.value)
         end
 
         # Write the c:spPr element.
@@ -2452,21 +2452,21 @@ module Writexlsx
     # Write the custom error bars type.
     #
     def write_custom_error(error_bars)
-      if ptrue?(error_bars[:_plus_values])
+      if ptrue?(error_bars.plus_values)
         # Write the c:plus element.
         @writer.tag_elements('c:plus') do
-          if error_bars[:_plus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars[:_plus_values], error_bars[:_plus_data], 'num')
+          if error_bars.plus_values =~ /^=/   # '=Sheet1!$A$1:$A$5'
+            write_num_ref(error_bars.plus_values, error_bars.plus_data, 'num')
           else                                   # [1, 2, 3]
-            write_num_lit(error_bars[:_plus_values])
+            write_num_lit(error_bars.plus_values)
           end
         end
         # Write the c:minus element.
         @writer.tag_elements('c:minus') do
-          if error_bars[:_minus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars[:_minus_values], error_bars[:_minus_data], 'num')
+          if error_bars.minus_values =~ /^=/   # '=Sheet1!$A$1:$A$5'
+            write_num_ref(error_bars.minus_values, error_bars.minus_data, 'num')
           else                                   # [1, 2, 3]
-            write_num_lit(error_bars[:_minus_values])
+            write_num_lit(error_bars.minus_values)
           end
         end
       end
