@@ -511,9 +511,28 @@ module Writexlsx
     # Convert user defined line properties to the structure required internally.
     #
     def line_properties(line) # :nodoc:
-      return { :_defined => 0 } unless line
+      line_fill_properties(line) do
+        value_or_raise(dash_types, line[:dash_type], 'dash type')
+      end
+    end
 
-      dash_types = {
+    #
+    # Convert user defined fill properties to the structure required internally.
+    #
+    def fill_properties(fill) # :nodoc:
+      line_fill_properties(fill)
+    end
+
+    def line_fill_properties(params)
+      return { :_defined => 0 } unless params
+      ret = params.dup
+      ret[:dash_type] = yield if block_given? && ret[:dash_type]
+      ret[:_defined] = 1
+      ret
+    end
+
+    def dash_types
+      {
         :solid               => 'solid',
         :round_dot           => 'sysDot',
         :square_dot          => 'sysDash',
@@ -526,30 +545,6 @@ module Writexlsx
         :system_dash_dot     => 'sysDashDot',
         :system_dash_dot_dot => 'sysDashDotDot'
       }
-
-      # Check the dash type.
-      dash_type = line[:dash_type]
-
-      if dash_type
-        line[:dash_type] = value_or_raise(dash_types, dash_type, 'dash type')
-      end
-
-      line[:_defined] = 1
-
-      line
-    end
-
-    #
-    # Convert user defined fill properties to the structure required internally.
-    #
-    def fill_properties(fill) # :nodoc:
-      if fill
-        ret = fill.dup
-        ret[:_defined] = 1
-        ret
-      else
-        { :_defined => 0 }
-      end
     end
 
     def value_or_raise(hash, key, msg)
