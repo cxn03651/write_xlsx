@@ -1485,7 +1485,7 @@ module Writexlsx
       return unless gridlines
       return if gridlines.respond_to?(:[]) and !ptrue?(gridlines[:_visible])
 
-      if gridlines.line && ptrue?(gridlines.line[:_defined])
+      if gridlines.line_defined?
         @writer.tag_elements(tag) { write_sp_pr(gridlines) }
       else
         @writer.empty_tag(tag)
@@ -2117,7 +2117,7 @@ module Writexlsx
     def write_lines_base(lines, tag)
       return unless lines
 
-      if lines.line && ptrue?(lines.line[:_defined])
+      if lines.line_defined?
         @writer.tag_elements(tag) { write_sp_pr(lines) }
       else
         @writer.empty_tag(tag)
@@ -2516,7 +2516,7 @@ module Writexlsx
     end
 
     def write_bars_base(tag, format)
-      if ptrue?(format.line[:_defined]) || ptrue?(format.fill[:_defined])
+      if format.line_defined? || format.fill_defined?
         @writer.tag_elements(tag) { write_sp_pr(format) }
       else
         @writer.empty_tag(tag)

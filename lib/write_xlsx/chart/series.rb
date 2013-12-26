@@ -18,6 +18,14 @@ module Writexlsx
         # Set the fill properties for the marker.
         @fill = fill_properties(@fill)
       end
+
+      def line_defined?
+        line && ptrue?(line[:_defined])
+      end
+
+      def fill_defined?
+        fill && ptrue?(fill[:_defined])
+      end
     end
 
     class Point < Chartline
