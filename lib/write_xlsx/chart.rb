@@ -415,20 +415,14 @@ module Writexlsx
     # Set properties for the chart drop lines.
     #
     def set_drop_lines(params = {})
-      # Set the drop line properties.
-      line = line_properties(params[:line])
-
-      @drop_lines = { :_line => line }
+      @drop_lines = Chartline.new(params)
     end
 
     #
     # Set properties for the chart high-low lines.
     #
     def set_high_low_lines(params = {})
-      # Set the drop line properties.
-      line = line_properties(params[:line])
-
-      @hi_low_lines = { :_line => line }
+      @hi_low_lines = Chartline.new(params)
     end
 
     #
@@ -2114,7 +2108,7 @@ module Writexlsx
       lines = @hi_low_lines
       tag   = 'c:hiLowLines'
 
-      if lines[:_line] && ptrue?(lines[:_line][:_defined])
+      if lines.line && ptrue?(lines.line[:_defined])
         @writer.tag_elements(tag) { write_sp_pr(lines) }
       else
         @writer.empty_tag(tag)
@@ -2129,7 +2123,7 @@ module Writexlsx
       lines = @drop_lines
       tag   = 'c:dropLines'
 
-      if lines[:_line] && ptrue?(lines[:_line][:_defined])
+      if lines.line && ptrue?(lines.line[:_defined])
         @writer.tag_elements(tag) { write_sp_pr(lines) }
       else
         @writer.empty_tag(tag)

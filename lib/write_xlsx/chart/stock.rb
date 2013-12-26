@@ -27,7 +27,7 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @show_crosses = false
-        @hi_low_lines = {}
+        @hi_low_lines = Chartline.new({})
 
         # Override and reset the default axis values.
         @x_axis.defaults[:num_format] = 'dd/mm/yyyy'
