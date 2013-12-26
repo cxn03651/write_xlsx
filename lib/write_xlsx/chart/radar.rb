@@ -32,7 +32,7 @@ module Writexlsx
         super(subtype)
         @subtype = subtype || 'marker'
         if @subtype == 'marker'
-          @default_marker = { :type => 'none' }
+          @default_marker = Marker.new(:type => 'none')
         end
 
         # Override and reset the default axis values.

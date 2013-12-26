@@ -247,8 +247,8 @@ module Writexlsx
           @param[:min_color] ||= '#FF7128'
           @param[:max_color] ||= '#FFEF9C'
 
-          @param[:max_color] = get_palette_color( @param[:max_color] )
-          @param[:min_color] = get_palette_color( @param[:min_color] )
+          @param[:max_color] = palette_color( @param[:max_color] )
+          @param[:min_color] = palette_color( @param[:min_color] )
         when '3_color_scale'
           @param[:type] = 'colorScale'
 
@@ -265,9 +265,9 @@ module Writexlsx
           @param[:mid_color] ||= '#FFEB84'
           @param[:max_color] ||= '#63BE7B'
 
-          @param[:max_color] = get_palette_color(@param[:max_color])
-          @param[:mid_color] = get_palette_color(@param[:mid_color])
-          @param[:min_color] = get_palette_color(@param[:min_color])
+          @param[:max_color] = palette_color(@param[:max_color])
+          @param[:mid_color] = palette_color(@param[:mid_color])
+          @param[:min_color] = palette_color(@param[:min_color])
         when 'dataBar'
           # Color scales don't use any additional formatting.
           @param[:format] = nil
@@ -278,12 +278,12 @@ module Writexlsx
           @param[:max_value] ||= 0
           @param[:bar_color] ||= '#638EC6'
 
-          @param[:bar_color] = get_palette_color(@param[:bar_color])
+          @param[:bar_color] = palette_color(@param[:bar_color])
         end
       end
 
-      def get_palette_color(index)
-        @worksheet.get_palette_color(index)
+      def palette_color(index)
+        @worksheet.palette_color(index)
       end
 
       def range_start_cell_for_conditional_formatting(*args)  # :nodoc:

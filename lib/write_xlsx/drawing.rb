@@ -795,7 +795,7 @@ module Writexlsx
             @writer.tag_elements('a:rPr', attributes) do
               color = shape.format[:color]
               if color
-                color = shape.get_palette_color(color)
+                color = shape.palette_color(color)
                 color = color.sub(/^FF/, '')  # Remove leading FF from rgb for shape color.
               else
                 color = '000000'

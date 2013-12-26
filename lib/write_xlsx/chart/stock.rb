@@ -27,7 +27,7 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @show_crosses = false
-        @hi_low_lines = {}
+        @hi_low_lines = Chartline.new({})
 
         # Override and reset the default axis values.
         @x_axis.defaults[:num_format] = 'dd/mm/yyyy'
@@ -95,7 +95,7 @@ module Writexlsx
         array = []
         @series.each do |series|
           if index % 4 != 3
-            unless ptrue?(series.line[:_defined])
+            unless series.line_defined?
               series.line = {
                 :width    => 2.25,
                 :none     => 1,
@@ -105,9 +105,9 @@ module Writexlsx
 
             unless ptrue?(series.marker)
               if index % 4 == 2
-                series.marker = { :type => 'dot', :size => 3 }
+                series.marker = Marker.new(:type => 'dot', :size => 3)
               else
-                series.marker = { :type => 'none' }
+                series.marker = Marker.new(:type => 'none')
               end
             end
           end

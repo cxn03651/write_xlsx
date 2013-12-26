@@ -32,27 +32,21 @@ module Writexlsx
     # string into a number. Color range is 0..63 but we will restrict it
     # to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
     #
-    def get_color(color = nil) # :nodoc:
-      if color.respond_to?(:to_int) && color.respond_to?(:+)
+    def color(color_code = nil) # :nodoc:
+      if color_code.respond_to?(:to_int) && color_code.respond_to?(:+)
         # the default color if arg is outside range,
-        if color < 0 || 63 < color
+        if color_code < 0 || 63 < color_code
           0x7FFF
         # or an index < 8 mapped into the correct range,
-        elsif color < 8
-          (color + 8).to_i
+        elsif color_code < 8
+          (color_code + 8).to_i
         # or an integer in the valid range
         else
-          color.to_i
+          color_code.to_i
         end
-      elsif color.respond_to?(:to_sym)
-        color = color.downcase.to_sym if color.respond_to?(:to_str)
-        # or the color string converted to an integer,
-        if COLORS.has_key?(color)
-          COLORS[color]
-        # or the default color if string is unrecognised,
-        else
-          0x7FFF
-        end
+      elsif color_code.respond_to?(:to_sym)
+        color_code = color_code.downcase.to_sym if color_code.respond_to?(:to_str)
+        COLORS[color_code] || 0x7FFF
       else
         0x7FFF
       end

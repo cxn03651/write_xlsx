@@ -35,6 +35,106 @@ module Writexlsx
     end
   end
 
+  class ChartArea
+    include Writexlsx::Utility
+
+    attr_reader :line, :fill, :layout
+
+    def initialize(params = {})
+      line_weight  = params[:line_weight]
+      line_pattern = params[:line_pattern]
+      # Map deprecated Spreadsheet::WriteExcel line_weight.
+      if line_weight
+        width = swe_line_weight(line_weight)
+        params[:border] = { :width => width }
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line_pattern.
+      if line_pattern
+        pattern = swe_line_pattern(line_pattern)
+        if pattern == 'none'
+          params[:border] = { :none => 1 }
+        else
+          params[:border][:dash_type] = pattern
+        end
+      end
+
+      # Map deprecated Spreadsheet::WriteExcel line colour.
+      params[:border][:color] = params[:line_color] if params[:line_color]
+
+      # Handle Excel::Writer::XLSX style properties.
+
+      # Set the line properties for the chartarea.
+      @line = line_properties(params[:line])
+
+      # Allow 'border' as a synonym for 'line'.
+      @line = line_properties(params[:border]) if (params[:border])
+
+      @layout = layout_properties(params[:layout])
+
+      # Map deprecated Spreadsheet::WriteExcel fill colour.
+      @fill = params[:fill]
+      @fill = { :color => params[:color] } if params[:color]
+      @fill = fill_properties(@fill)
+    end
+
+    private
+
+    #
+    # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
+    #
+    def swe_line_pattern(val)
+      swe_line_pattern_hash[numeric_or_downcase(val)] || 'solid'
+    end
+
+    def swe_line_pattern_hash
+      {
+        0              => 'solid',
+        1              => 'dash',
+        2              => 'dot',
+        3              => 'dash_dot',
+        4              => 'long_dash_dot_dot',
+        5              => 'none',
+        6              => 'solid',
+        7              => 'solid',
+        8              => 'solid',
+        'solid'        => 'solid',
+        'dash'         => 'dash',
+        'dot'          => 'dot',
+        'dash-dot'     => 'dash_dot',
+        'dash-dot-dot' => 'long_dash_dot_dot',
+        'none'         => 'none',
+        'dark-gray'    => 'solid',
+        'medium-gray'  => 'solid',
+        'light-gray'   => 'solid'
+      }
+    end
+
+    #
+    # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
+    #
+    def swe_line_weight(val)
+      swe_line_weight_hash[numeric_or_downcase(val)] || 1
+    end
+
+    def swe_line_weight_hash
+      {
+        1          => 0.25,
+        2          => 1,
+        3          => 2,
+        4          => 3,
+        'hairline' => 0.25,
+        'narrow'   => 1,
+        'medium'   => 2,
+        'wide'     => 3
+      }
+    end
+
+    def numeric_or_downcase(val)
+      val.respond_to?(:coerce) ? val : val.downcase
+    end
+  end
+
   class Chart
     include Writexlsx::Utility
 
@@ -99,8 +199,8 @@ module Writexlsx
       @horiz_cat_axis    = 0
       @horiz_val_axis    = 1
       @protection        = 0
-      @chartarea         = {}
-      @plotarea          = {}
+      @chartarea         = ChartArea.new
+      @plotarea          = ChartArea.new
       @title             = Caption.new(self)
       @x_axis            = Axis.new(self)
       @y_axis            = Axis.new(self)
@@ -229,7 +329,7 @@ module Writexlsx
     #
     def set_plotarea(params)
       # Convert the user defined properties to internal properties.
-      @plotarea = area_properties(params)
+      @plotarea = ChartArea.new(params)
     end
 
     #
@@ -237,7 +337,7 @@ module Writexlsx
     #
     def set_chartarea(params)
       # Convert the user defined properties to internal properties.
-      @chartarea = area_properties(params)
+      @chartarea = ChartArea.new(params)
     end
 
     #
@@ -306,14 +406,8 @@ module Writexlsx
 
       # Set the up and down bar properties.
       @up_down_bars = {
-        :_up => {
-          :_line => line_properties(params[:up][:line]),
-          :_fill => line_properties(params[:up][:fill])
-        },
-        :_down => {
-          :_line => line_properties(params[:down][:line]),
-          :_fill => line_properties(params[:down][:fill])
-        }
+        :_up => Chartline.new(params[:up]),
+        :_down => Chartline.new(params[:down])
       }
     end
 
@@ -321,20 +415,14 @@ module Writexlsx
     # Set properties for the chart drop lines.
     #
     def set_drop_lines(params = {})
-      # Set the drop line properties.
-      line = line_properties(params[:line])
-
-      @drop_lines = { :_line => line }
+      @drop_lines = Chartline.new(params)
     end
 
     #
     # Set properties for the chart high-low lines.
     #
     def set_high_low_lines(params = {})
-      # Set the drop line properties.
-      line = line_properties(params[:line])
-
-      @hi_low_lines = { :_line => line }
+      @hi_low_lines = Chartline.new(params)
     end
 
     #
@@ -390,7 +478,21 @@ module Writexlsx
     #
     def convert_font_args(params)
       return unless params
-      font = {
+      font = params_to_font(params)
+
+      # Convert font size units.
+      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
+
+      # Convert rotation into 60,000ths of a degree.
+      if ptrue?(font[:_rotation])
+        font[:_rotation] = 60_000 * font[:_rotation].to_i
+      end
+
+      font
+    end
+
+    def params_to_font(params)
+      {
         :_name         => params[:name],
         :_color        => params[:color],
         :_size         => params[:size],
@@ -402,16 +504,6 @@ module Writexlsx
         :_baseline     => params[:baseline] || 0,
         :_rotation     => params[:rotation]
       }
-
-      # Convert font size units.
-      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
-
-      # Convert rotation into 60,000ths of a degree.
-      if ptrue?(font[:_rotation])
-        font[:_rotation] = 60_000 * font[:_rotation].to_i
-      end
-
-      font
     end
 
     #
@@ -435,53 +527,29 @@ module Writexlsx
     # If there is no user defined data then it will be populated by the parent
     # workbook in Workbook::_add_chart_data
     #
-    def get_data_id(formula, data) # :nodoc:
+    def data_id(full_formula, data) # :nodoc:
       # Ignore series without a range formula.
-      return unless formula
+      return unless full_formula
 
       # Strip the leading '=' from the formula.
-      formula = formula.sub(/^=/, '')
+      formula = full_formula.sub(/^=/, '')
 
       # Store the data id in a hash keyed by the formula and store the data
       # in a separate array with the same id.
-      if !@formula_ids.has_key?(formula)
-        # Haven't seen this formula before.
-        id = @formula_data.size
-
-        @formula_data << data
-        @formula_ids[formula] = id
-      else
+      if @formula_ids.has_key?(formula)
         # Formula already seen. Return existing id.
         id = @formula_ids[formula]
 
         # Store user defined data if it isn't already there.
-        @formula_data[id] = data unless @formula_data[id]
+        @formula_data[id] ||= data
+      else
+        # Haven't seen this formula before.
+        id = @formula_ids[formula] = @formula_data.size
+
+        @formula_data << data
       end
 
       id
-    end
-
-    #
-    # Convert user defined layout properties to the format required internally.
-    #
-    def layout_properties(args, is_text = false)
-      return unless ptrue?(args)
-
-      properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
-
-      # Check for valid properties.
-      allowable = Hash.new
-      allowable[properties.size] = nil
-
-      # Set the layout properties
-      layout = Hash.new
-      properties.each do |property|
-        value = args[property]
-        # Convert to the format used by Excel for easier testing.
-        layout[property] = sprintf("%.17g", value)
-      end
-
-      layout
     end
 
     private
@@ -520,151 +588,15 @@ module Writexlsx
     #
     # Convert the user specified colour index or string to a rgb colour.
     #
-    def get_color(color) # :nodoc:
-      # Convert a HTML style #RRGGBB color.
-      if color and color =~ /^#[0-9a-fA-F]{6}$/
-        color = color.sub(/^#/, '')
-        return color.upcase
+    def color(color_code) # :nodoc:
+      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
+        # Convert a HTML style #RRGGBB color.
+        color_code.sub(/^#/, '').upcase
+      else
+        index = Format.color(color_code)
+        raise "Unknown color '#{color_code}' used in chart formatting." unless index
+        palette_color(index)
       end
-
-      index = Format.get_color(color)
-
-      # Set undefined colors to black.
-      unless index
-        index = 0x08
-        raise "Unknown color '#{color}' used in chart formatting."
-      end
-
-      get_palette_color(index)
-    end
-
-    #
-    # Convert from an Excel internal colour index to a XML style #RRGGBB index
-    # based on the default or user defined values in the Workbook palette.
-    # Note: This version doesn't add an alpha channel.
-    #
-    def get_palette_color(index) # :nodoc:
-      palette = @palette
-
-      # Adjust the colour index.
-      index -= 8
-
-      # Palette is passed in from the Workbook class.
-      rgb = palette[index]
-
-      sprintf("%02X%02X%02X", *rgb)
-    end
-
-    #
-    # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
-    #
-    def get_swe_line_pattern(val)
-      value   = val.downcase
-      default = 'solid'
-
-      patterns = {
-        0              => 'solid',
-        1              => 'dash',
-        2              => 'dot',
-        3              => 'dash_dot',
-        4              => 'long_dash_dot_dot',
-        5              => 'none',
-        6              => 'solid',
-        7              => 'solid',
-        8              => 'solid',
-        'solid'        => 'solid',
-        'dash'         => 'dash',
-        'dot'          => 'dot',
-        'dash-dot'     => 'dash_dot',
-        'dash-dot-dot' => 'long_dash_dot_dot',
-        'none'         => 'none',
-        'dark-gray'    => 'solid',
-        'medium-gray'  => 'solid',
-        'light-gray'   => 'solid'
-      }
-
-      patterns[value] || default
-    end
-
-    #
-    # Get the Spreadsheet::WriteExcel line weight for backward compatibility.
-    #
-    def get_swe_line_weight(val)
-      value   = val.downcase
-      default = 1
-
-      weights = {
-        1          => 0.25,
-        2          => 1,
-        3          => 2,
-        4          => 3,
-        'hairline' => 0.25,
-        'narrow'   => 1,
-        'medium'   => 2,
-        'wide'     => 3
-      }
-
-      weights[value] || default
-    end
-
-    #
-    # Convert user defined fill properties to the structure required internally.
-    #
-    def fill_properties(fill) # :nodoc:
-      return { :_defined => 0 } unless fill
-
-      fill[:_defined] = 1
-
-      fill
-    end
-
-    #
-    # Convert user defined area properties to the structure required internally.
-    #
-    def area_properties(arg)  # :nodoc:
-      area = {}
-
-      # Map deprecated Spreadsheet::WriteExcel fill colour.
-      arg[:fill] = { :color => arg[:color] } if arg[:color]
-
-      # Map deprecated Spreadsheet::WriteExcel line_weight.
-      if arg[:line_weight]
-        width = get_swe_line_weight(arg[:line_weight])
-        arg[:border] = { :width => width }
-      end
-
-      # Map deprecated Spreadsheet::WriteExcel line_pattern.
-      if arg[:line_pattern]
-        pattern = get_swe_line_pattern(arg[:line_pattern])
-        if pattern == 'none'
-          arg[:border] = { :none => 1 }
-        else
-          arg[:border][:dash_type] = pattern
-        end
-      end
-
-      # Map deprecated Spreadsheet::WriteExcel line colour.
-      arg[:border][:color] = arg[:line_color] if arg[:line_color]
-
-      # Handle Excel::Writer::XLSX style properties.
-
-      # Set the line properties for the chartarea.
-      line = line_properties(arg[:line])
-
-      # Allow 'border' as a synonym for 'line'.
-      line = line_properties(arg[:border]) if (arg[:border])
-
-      # Set the fill properties for the chartarea.
-      fill = fill_properties(arg[:fill])
-
-      # Set the plotarea layout.
-      layout = layout_properties(arg[:layout])
-
-      area[:_line]   = line
-      area[:_fill]   = fill
-      area[:_layout] = layout
-
-      return area
     end
 
     #
@@ -854,7 +786,7 @@ module Writexlsx
     def write_plot_area_base(type = nil) # :nodoc:
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
-        write_layout(@plotarea[:_layout], 'plot')
+        write_layout(@plotarea.layout, 'plot')
         # Write the subclass chart type elements for primary and secondary axes.
         write_chart_type(:primary_axes => 1)
         write_chart_type(:primary_axes => 0)
@@ -1542,8 +1474,14 @@ module Writexlsx
     end
 
     def write_gridlines_base(tag, gridlines)  # :nodoc:
+      return unless gridlines
       return if gridlines.respond_to?(:[]) and !ptrue?(gridlines[:_visible])
-      write_lines_base(tag, gridlines)
+
+      if gridlines.line_defined?
+        @writer.tag_elements(tag) { write_sp_pr(gridlines) }
+      else
+        @writer.empty_tag(tag)
+      end
     end
 
     #
@@ -1954,13 +1892,13 @@ module Writexlsx
       marker ||= @default_marker
 
       return unless ptrue?(marker)
-      return if ptrue?(marker[:automatic])
+      return if ptrue?(marker.automatic?)
 
       @writer.tag_elements('c:marker') do
         # Write the c:symbol element.
-        write_symbol(marker[:type])
+        write_symbol(marker.type)
         # Write the c:size element.
-        size = marker[:size]
+        size = marker.size
         write_marker_size(size) if ptrue?(size)
         # Write the c:spPr element.
         write_sp_pr(marker)
@@ -1994,8 +1932,8 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      line = series.respond_to?(:line) ? series.line : series[:_line]
-      fill = series.respond_to?(:fill) ? series.fill : series[:_fill]
+      line = series.line
+      fill = series.fill
 
       return if (!line || !ptrue?(line[:_defined])) &&
         (!fill || !ptrue?(fill[:_defined]))
@@ -2023,7 +1961,8 @@ module Writexlsx
       attributes = []
 
       # Add the line width as an attribute.
-      if width = line[:width]
+      if line[:width]
+        width = line[:width]
         # Round width to nearest 0.25, like Excel.
         width = ((width + 0.125) * 4).to_i / 4.0
 
@@ -2043,9 +1982,9 @@ module Writexlsx
           write_a_solid_fill(line)
         end
         # Write the line/dash type.
-        if type = line[:dash_type]
+        if line[:dash_type]
           # Write the a:prstDash element.
-          write_a_prst_dash(type)
+          write_a_prst_dash(line[:dash_type])
         end
       end
     end
@@ -2062,12 +2001,8 @@ module Writexlsx
     #
     def write_a_solid_fill(line) # :nodoc:
       @writer.tag_elements('a:solidFill') do
-        if line[:color]
-          color = get_color(line[:color])
-
-          # Write the a:srgbClr element.
-          write_a_srgb_clr(color)
-        end
+        # Write the a:srgbClr element.
+        write_a_srgb_clr(color(line[:color])) if line[:color]
       end
     end
 
@@ -2093,19 +2028,19 @@ module Writexlsx
 
       @writer.tag_elements('c:trendline') do
         # Write the c:name element.
-        write_name(trendline[:name])
+        write_name(trendline.name)
         # Write the c:spPr element.
         write_sp_pr(trendline)
         # Write the c:trendlineType element.
-        write_trendline_type(trendline[:type])
+        write_trendline_type(trendline.type)
         # Write the c:order element for polynomial trendlines.
-        write_trendline_order(trendline[:order]) if trendline[:type] == 'poly'
+        write_trendline_order(trendline.order) if trendline.type == 'poly'
         # Write the c:period element for moving average trendlines.
-        write_period(trendline[:period]) if trendline[:type] == 'movingAvg'
+        write_period(trendline.period) if trendline.type == 'movingAvg'
         # Write the c:forward element.
-        write_forward(trendline[:forward])
+        write_forward(trendline.forward)
         # Write the c:backward element.
-        write_backward(trendline[:backward])
+        write_backward(trendline.backward)
       end
     end
 
@@ -2161,23 +2096,20 @@ module Writexlsx
     # Write the <c:hiLowLines> element.
     #
     def write_hi_low_lines # :nodoc:
-      write_lines_base('c:hiLowLines', @hi_low_lines)
+      write_lines_base(@hi_low_lines, 'c:hiLowLines')
     end
 
     #
     # Write the <c:dropLines> elent.
     #
     def write_drop_lines
-      write_lines_base('c:dropLines', @drop_lines)
+      write_lines_base(@drop_lines, 'c:dropLines')
     end
 
-    #
-    # used from write_drop_lines and write_hi_low_lines
-    #
-    def write_lines_base(tag, lines)
+    def write_lines_base(lines, tag)
       return unless lines
 
-      if lines[:_line] && ptrue?(lines[:_line][:_defined])
+      if lines.line_defined?
         @writer.tag_elements(tag) { write_sp_pr(lines) }
       else
         @writer.empty_tag(tag)
@@ -2438,17 +2370,17 @@ module Writexlsx
         write_err_dir(direction)
 
         # Write the c:errBarType element.
-        write_err_bar_type(error_bars[:_direction])
+        write_err_bar_type(error_bars.direction)
 
         # Write the c:errValType element.
-        write_err_val_type(error_bars[:_type])
+        write_err_val_type(error_bars.type)
 
-        unless ptrue?(error_bars[:_endcap])
+        unless ptrue?(error_bars.endcap)
           # Write the c:noEndCap element.
           write_no_end_cap
         end
 
-        case error_bars[:_type]
+        case error_bars.type
         when 'stdErr'
           # Don't need to write a c:errValType tag.
         when 'cust'
@@ -2456,7 +2388,7 @@ module Writexlsx
           write_custom_error(error_bars)
         else
           # Write the c:val element.
-          write_error_val(error_bars[:_value])
+          write_error_val(error_bars.value)
         end
 
         # Write the c:spPr element.
@@ -2503,23 +2435,23 @@ module Writexlsx
     # Write the custom error bars type.
     #
     def write_custom_error(error_bars)
-      if ptrue?(error_bars[:_plus_values])
-        # Write the c:plus element.
-        @writer.tag_elements('c:plus') do
-          if error_bars[:_plus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars[:_plus_values], error_bars[:_plus_data], 'num')
-          else                                   # [1, 2, 3]
-            write_num_lit(error_bars[:_plus_values])
-          end
-        end
-        # Write the c:minus element.
-        @writer.tag_elements('c:minus') do
-          if error_bars[:_minus_values] =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars[:_minus_values], error_bars[:_minus_data], 'num')
-          else                                   # [1, 2, 3]
-            write_num_lit(error_bars[:_minus_values])
-          end
-        end
+      if ptrue?(error_bars.plus_values)
+        write_custom_error_base('c:plus',  error_bars.plus_values,  error_bars.plus_data)
+        write_custom_error_base('c:minus', error_bars.minus_values, error_bars.minus_data)
+      end
+    end
+
+    def write_custom_error_base(tag, values, data)
+      @writer.tag_elements(tag) do
+        write_num_ref_or_lit(values, data)
+      end
+    end
+
+    def write_num_ref_or_lit(values, data)
+      if values =~ /^=/                     # '=Sheet1!$A$1:$A$5'
+        write_num_ref(values, data, 'num')
+      else                                  # [1, 2, 3]
+        write_num_lit(values)
       end
     end
 
@@ -2576,7 +2508,7 @@ module Writexlsx
     end
 
     def write_bars_base(tag, format)
-      if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
+      if format.line_defined? || format.fill_defined?
         @writer.tag_elements(tag) { write_sp_pr(format) }
       else
         @writer.empty_tag(tag)

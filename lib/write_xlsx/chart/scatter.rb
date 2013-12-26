@@ -34,6 +34,7 @@ module Writexlsx
     #
     class Scatter < self
       include Writexlsx::Utility
+      include Writexlsx::WriteDPtPoint
 
       def initialize(subtype)
         super(subtype)
@@ -141,7 +142,7 @@ module Writexlsx
       def write_plot_area
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
-          write_layout(@plotarea[:_layout], 'plot')
+          write_layout(@plotarea.layout, 'plot')
 
           # Write the subclass chart type elements for primary and secondary axes
           write_chart_type(:primary_axes => 1)
@@ -244,8 +245,8 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
-            if series.line[:_defined] == 0
-              series.line = { :width => 2.25, :none => 1, :_defined => 1 }
+            unless series.line_defined?
+              series.line = line_properties(:width => 2.25, :none => 1, :_defined => 1)
             end
           end
         end
@@ -256,23 +257,8 @@ module Writexlsx
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.
             unless ptrue?(series.marker)
-              series.marker = { :type => 'none', :_defined => 1 }
+              series.marker = Marker.new(:type => 'none', :_defined => 1)
             end
-          end
-        end
-      end
-
-      #
-      # Write an individual <c:dPt> element. Override the parent method to add
-      # markers.
-      #
-      def write_d_pt_point(index, point)
-        @writer.tag_elements('c:dPt') do
-          # Write the c:idx element.
-          write_idx(index)
-          @writer.tag_elements('c:marker') do
-            # Write the c:spPr element.
-            write_sp_pr(point)
           end
         end
       end

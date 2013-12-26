@@ -41,7 +41,7 @@ module Writexlsx
         # Map major/minor_gridlines properties.
         [:major_gridlines, :minor_gridlines].each do |lines|
           if args[lines] && ptrue?(args[lines][:visible])
-            instance_variable_set("@#{lines}", gridline_properties(args[lines]))
+            instance_variable_set("@#{lines}", Gridline.new(args[lines]))
           else
             instance_variable_set("@#{lines}", nil)
           end
@@ -129,19 +129,6 @@ module Writexlsx
                      ]
 
         writer.empty_tag('c:numFmt', attributes)
-      end
-
-      #
-      # Convert user defined gridline properties to the structure required internally.
-      #
-      def gridline_properties(args)
-        # Set the visible property for the gridline.
-        gridline = { :_visible => args[:visible] }
-
-        # Set the line properties for the gridline.
-        gridline[:_line] = @chart.line_properties(args[:line])
-
-        gridline
       end
     end
   end

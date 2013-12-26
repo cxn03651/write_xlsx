@@ -345,6 +345,29 @@ module Writexlsx
     end
 
     #
+    # Convert user defined layout properties to the format required internally.
+    #
+    def layout_properties(args, is_text = false)
+      return unless ptrue?(args)
+
+      properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
+
+      # Check for valid properties.
+      allowable = Hash.new
+      allowable[properties.size] = nil
+
+      # Set the layout properties
+      layout = Hash.new
+      properties.each do |property|
+        value = args[property]
+        # Convert to the format used by Excel for easier testing.
+        layout[property] = sprintf("%.17g", value)
+      end
+
+      layout
+    end
+
+    #
     # Convert vertices from pixels to points.
     #
     def pixels_to_points(vertices)
@@ -488,9 +511,28 @@ module Writexlsx
     # Convert user defined line properties to the structure required internally.
     #
     def line_properties(line) # :nodoc:
-      return { :_defined => 0 } unless line
+      line_fill_properties(line) do
+        value_or_raise(dash_types, line[:dash_type], 'dash type')
+      end
+    end
 
-      dash_types = {
+    #
+    # Convert user defined fill properties to the structure required internally.
+    #
+    def fill_properties(fill) # :nodoc:
+      line_fill_properties(fill)
+    end
+
+    def line_fill_properties(params)
+      return { :_defined => 0 } unless params
+      ret = params.dup
+      ret[:dash_type] = yield if block_given? && ret[:dash_type]
+      ret[:_defined] = 1
+      ret
+    end
+
+    def dash_types
+      {
         :solid               => 'solid',
         :round_dot           => 'sysDot',
         :square_dot          => 'sysDash',
@@ -503,22 +545,36 @@ module Writexlsx
         :system_dash_dot     => 'sysDashDot',
         :system_dash_dot_dot => 'sysDashDotDot'
       }
-
-      # Check the dash type.
-      dash_type = line[:dash_type]
-
-      if dash_type
-        line[:dash_type] = value_or_raise(dash_types, dash_type, 'dash type')
-      end
-
-      line[:_defined] = 1
-
-      line
     end
 
     def value_or_raise(hash, key, msg)
       raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
       hash[key.to_sym]
     end
+
+    def palette_color(index)
+      # Adjust the colour index.
+      idx = index - 8
+
+      rgb = @palette[idx]
+      sprintf("%02X%02X%02X", *rgb)
+    end
+  end
+
+  module WriteDPtPoint
+      #
+      # Write an individual <c:dPt> element. Override the parent method to add
+      # markers.
+      #
+      def write_d_pt_point(index, point)
+        @writer.tag_elements('c:dPt') do
+          # Write the c:idx element.
+          write_idx(index)
+          @writer.tag_elements('c:marker') do
+            # Write the c:spPr element.
+            write_sp_pr(point)
+          end
+        end
+      end
   end
 end

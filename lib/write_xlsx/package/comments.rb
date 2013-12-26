@@ -47,7 +47,7 @@ module Writexlsx
       end
 
       def backgrount_color(color)
-        color_id = Format.get_color(color)
+        color_id = Format.color(color)
 
         if color_id == 0
           @color = '#ffffe1'

@@ -8,7 +8,7 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values
-    series = Series.new(@chart)
+    series = Writexlsx::Chart::Series.new(@chart)
     series.instance_variable_set(:@categories, nil)
     series.instance_variable_set(:@values, '=Sheet1!$A$1:$A$5')
     series.instance_variable_set(:@name, nil)
@@ -40,7 +40,7 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_with_categories_and_values
-    series = Series.new(@chart)
+    series = Writexlsx::Chart::Series.new(@chart)
     series.instance_variable_set(:@categories, '=Sheet1!$A$1:$A$5')
     series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
     series.instance_variable_set(:@name, 'Text')
@@ -75,7 +75,7 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_only_values_checked_by_array
-    series = Series.new(@chart)
+    series = Writexlsx::Chart::Series.new(@chart)
     series.instance_variable_set(:@categories, nil)
     series.instance_variable_set(:@values, '=Sheet1!$A$1:$A$5')
     series.instance_variable_set(:@name, nil)
@@ -106,7 +106,7 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_both_checked_by_array
-    series = Series.new(@chart)
+    series = Writexlsx::Chart::Series.new(@chart)
     series.instance_variable_set(:@categories, '=Sheet1!$A$1:$A$5')
     series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
     series.instance_variable_set(:@name, 'Text')
@@ -141,7 +141,7 @@ class TestAddSeries < Test::Unit::TestCase
   end
 
   def test_add_series_secondary_axis
-    series = Series.new(@chart)
+    series = Writexlsx::Chart::Series.new(@chart)
     series.instance_variable_set(:@categories,  '=Sheet1!$A$1:$A$5')
     series.instance_variable_set(:@values, '=Sheet1!$B$1:$B$5')
     series.instance_variable_set(:@name, 'Text')

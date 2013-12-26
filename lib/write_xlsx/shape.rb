@@ -11,6 +11,7 @@ module Writexlsx
   # Converted to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
   #
   class Shape
+    include Writexlsx::Utility
 
     attr_reader :edit_as, :type, :drawing
     attr_reader :tx_box, :fill, :line, :format
@@ -143,21 +144,6 @@ module Writexlsx
     #
     def adjustments=(args)
       @adjustments = *args
-    end
-
-    #
-    # Convert from an Excel internal colour index to a XML style #RRGGBB index
-    # based on the default or user defined values in the Workbook palette.
-    # Note: This version doesn't add an alpha channel.
-    #
-    def get_palette_color(index)
-      # Adjust the colour index.
-      idx = index - 8
-
-      # Palette is passed in from the Workbook class.
-      rgb = @palette[idx]
-
-      sprintf("%02X%02X%02X", *rgb)
     end
 
     #
