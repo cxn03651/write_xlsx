@@ -406,14 +406,8 @@ module Writexlsx
 
       # Set the up and down bar properties.
       @up_down_bars = {
-        :_up => {
-          :_line => line_properties(params[:up][:line]),
-          :_fill => line_properties(params[:up][:fill])
-        },
-        :_down => {
-          :_line => line_properties(params[:down][:line]),
-          :_fill => line_properties(params[:down][:fill])
-        }
+        :_up => Chartline.new(params[:up]),
+        :_down => Chartline.new(params[:down])
       }
     end
 
@@ -2534,7 +2528,7 @@ module Writexlsx
     end
 
     def write_bars_base(tag, format)
-      if ptrue?(format[:_line][:_defined]) || ptrue?(format[:_fill][:_defined])
+      if ptrue?(format.line[:_defined]) || ptrue?(format.fill[:_defined])
         @writer.tag_elements(tag) { write_sp_pr(format) }
       else
         @writer.empty_tag(tag)
