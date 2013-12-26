@@ -2104,24 +2104,18 @@ module Writexlsx
     # Write the <c:hiLowLines> element.
     #
     def write_hi_low_lines # :nodoc:
-      return unless @hi_low_lines
-      lines = @hi_low_lines
-      tag   = 'c:hiLowLines'
-
-      if lines.line && ptrue?(lines.line[:_defined])
-        @writer.tag_elements(tag) { write_sp_pr(lines) }
-      else
-        @writer.empty_tag(tag)
-      end
+      write_lines_base(@hi_low_lines, 'c:hiLowLines')
     end
 
     #
     # Write the <c:dropLines> elent.
     #
     def write_drop_lines
-      return unless @drop_lines
-      lines = @drop_lines
-      tag   = 'c:dropLines'
+      write_lines_base(@drop_lines, 'c:dropLines')
+    end
+
+    def write_lines_base(lines, tag)
+      return unless lines
 
       if lines.line && ptrue?(lines.line[:_defined])
         @writer.tag_elements(tag) { write_sp_pr(lines) }
