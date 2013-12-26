@@ -1940,8 +1940,8 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      line = series.respond_to?(:line) ? series.line : series[:_line]
-      fill = series.respond_to?(:fill) ? series.fill : series[:_fill]
+      line = series.line
+      fill = series.fill
 
       return if (!line || !ptrue?(line[:_defined])) &&
         (!fill || !ptrue?(fill[:_defined]))
