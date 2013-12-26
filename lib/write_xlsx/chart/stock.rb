@@ -95,7 +95,7 @@ module Writexlsx
         array = []
         @series.each do |series|
           if index % 4 != 3
-            if series.line[:_defined].nil? || series.line[:_defined] == 0
+            unless series.line_defined?
               series.line = {
                 :width    => 2.25,
                 :none     => 1,

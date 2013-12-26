@@ -206,6 +206,10 @@ module Writexlsx
         true
       end
 
+      def line_defined?
+        line && ptrue?(line[:_defined])
+      end
+
       private
 
       #

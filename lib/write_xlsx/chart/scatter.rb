@@ -244,8 +244,8 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
-            if series.line[:_defined] == 0
-              series.line = { :width => 2.25, :none => 1, :_defined => 1 }
+            unless series.line_defined?
+              series.line = line_properties(:width => 2.25, :none => 1, :_defined => 1)
             end
           end
         end
