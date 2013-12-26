@@ -1485,7 +1485,7 @@ module Writexlsx
       return unless gridlines
       return if gridlines.respond_to?(:[]) and !ptrue?(gridlines[:_visible])
 
-      if gridlines[:_line] && ptrue?(gridlines[:_line][:_defined])
+      if gridlines.line && ptrue?(gridlines.line[:_defined])
         @writer.tag_elements(tag) { write_sp_pr(gridlines) }
       else
         @writer.empty_tag(tag)

@@ -23,6 +23,15 @@ module Writexlsx
     class Point < Chartline
     end
 
+    class Gridline < Chartline
+      attr_reader :visible
+
+      def initialize(params)
+        super(params)
+        @visible = params[:visible]
+      end
+    end
+
     class Trendline < Chartline
       attr_reader :name, :forward, :backward, :order, :period
 
