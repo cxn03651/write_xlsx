@@ -34,6 +34,7 @@ module Writexlsx
     #
     class Scatter < self
       include Writexlsx::Utility
+      include Writexlsx::WriteDPtPoint
 
       def initialize(subtype)
         super(subtype)
@@ -258,21 +259,6 @@ module Writexlsx
             unless ptrue?(series.marker)
               series.marker = Marker.new(:type => 'none', :_defined => 1)
             end
-          end
-        end
-      end
-
-      #
-      # Write an individual <c:dPt> element. Override the parent method to add
-      # markers.
-      #
-      def write_d_pt_point(index, point)
-        @writer.tag_elements('c:dPt') do
-          # Write the c:idx element.
-          write_idx(index)
-          @writer.tag_elements('c:marker') do
-            # Write the c:spPr element.
-            write_sp_pr(point)
           end
         end
       end
