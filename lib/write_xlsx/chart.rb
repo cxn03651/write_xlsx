@@ -2444,22 +2444,22 @@ module Writexlsx
     #
     def write_custom_error(error_bars)
       if ptrue?(error_bars.plus_values)
-        # Write the c:plus element.
-        @writer.tag_elements('c:plus') do
-          if error_bars.plus_values =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars.plus_values, error_bars.plus_data, 'num')
-          else                                   # [1, 2, 3]
-            write_num_lit(error_bars.plus_values)
-          end
-        end
-        # Write the c:minus element.
-        @writer.tag_elements('c:minus') do
-          if error_bars.minus_values =~ /^=/   # '=Sheet1!$A$1:$A$5'
-            write_num_ref(error_bars.minus_values, error_bars.minus_data, 'num')
-          else                                   # [1, 2, 3]
-            write_num_lit(error_bars.minus_values)
-          end
-        end
+        write_custom_error_base('c:plus',  error_bars.plus_values,  error_bars.plus_data)
+        write_custom_error_base('c:minus', error_bars.minus_values, error_bars.minus_data)
+      end
+    end
+
+    def write_custom_error_base(tag, values, data)
+      @writer.tag_elements(tag) do
+        write_num_ref_or_lit(values, data)
+      end
+    end
+
+    def write_num_ref_or_lit(values, data)
+      if values =~ /^=/                     # '=Sheet1!$A$1:$A$5'
+        write_num_ref(values, data, 'num')
+      else                                  # [1, 2, 3]
+        write_num_lit(values)
       end
     end
 
