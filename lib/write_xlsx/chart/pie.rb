@@ -28,13 +28,12 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @vary_data_color = 1
       end
 
       #
       # Override the virtual superclass method with a chart specific method.
       #
-      def write_chart_type(params = {})
+      def write_chart_type
         # Write the c:areaChart element.
         write_pie_chart
       end
@@ -76,41 +75,32 @@ module Writexlsx
       #
       def write_legend
         position = @legend_position
-        font     = @legend_font
-        overlay  = 0
+        allowed  = %w(right left top bottom)
         delete_series = @legend_delete_series || []
 
-        if position =~ /^overlay_/
-          position.sub!(/^overlay_/, '')
-          overlay = 1
+        if @legend_position =~ /^overlay_/
+          position = @legend_position.sub(/^overlay_/, '')
+          overlay = true
+        else
+          position = @legend_position
+          overlay = false
         end
 
-        allowed = {
-            'right'  => 'r',
-            'left'   => 'l',
-            'top'    => 't',
-            'bottom' => 'b'
-        }
-
         return if position == 'none'
-        return unless allowed.has_key?(position)
-
-        position = allowed[position]
+        return unless allowed.include?(position)
 
         @writer.tag_elements('c:legend') do
           # Write the c:legendPos element.
-          write_legend_pos(position)
+          write_legend_pos(position[0])
           # Remove series labels from the legend.
-          delete_series.each do |index|
-            # Write the c:legendEntry element.
-            write_legend_entry(index)
-          end
+          # Write the c:legendEntry element.
+          delete_series.each { |index| write_legend_entry(index) }
           # Write the c:layout element.
           write_layout(@legend_layout, 'legend')
           # Write the c:overlay element.
-          write_overlay if overlay != 0
+          write_overlay if overlay
           # Write the c:txPr element. Over-ridden.
-          write_tx_pr_legend(0, font)
+          write_tx_pr_legend(0, @legend_font)
         end
       end
 
@@ -149,11 +139,7 @@ module Writexlsx
       # Write the <a:pPr> element for legends.
       #
       def write_a_p_pr_legend(font)
-        rtl  = 0
-
-        attributes = [ ['rtl', rtl] ]
-
-        @writer.tag_elements('a:pPr', attributes) do
+        @writer.tag_elements('a:pPr', [ ['rtl', 0] ]) do
           # Write the a:defRPr element.
           write_a_def_rpr(font)
         end
@@ -163,22 +149,14 @@ module Writexlsx
       # Write the <c:varyColors> element.
       #
       def write_vary_colors
-        val  = 1
-
-        attributes = [ ['val', val] ]
-
-        @writer.empty_tag('c:varyColors', attributes)
+        @writer.empty_tag('c:varyColors', [ ['val', 1] ])
       end
 
       #
       # Write the <c:firstSliceAng> element.
       #
       def write_first_slice_ang
-        val  = 0
-
-        attributes = [ ['val', val] ]
-
-        @writer.empty_tag('c:firstSliceAng', attributes)
+        @writer.empty_tag('c:firstSliceAng', [ ['val', 0] ])
       end
     end
   end
