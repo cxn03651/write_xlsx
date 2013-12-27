@@ -84,7 +84,7 @@ module Writexlsx
       # Overridden to use write_date_axis() instead of write_cat_axis().
       #
       def write_plot_area
-        write_plot_area_base(:stock)
+        write_plot_area_base(&(Proc.new { |params| write_date_axis(params) }))
       end
 
       #

@@ -780,7 +780,7 @@ module Writexlsx
     #
 
     def write_plot_area   # :nodoc:
-      write_plot_area_base
+      write_plot_area_base(&(Proc.new { |params| write_cat_axis(params) }))
     end
 
     def write_plot_area_base(type = nil) # :nodoc:
@@ -797,7 +797,7 @@ module Writexlsx
           :y_axis   => @y_axis,
           :axis_ids => @axis_ids
         }
-        write_cat_or_date_axis(params, type)
+        yield(params)
         write_val_axis(params)
 
         # Write c:valAx and c:catAx elements for series using secondary axes.
@@ -807,21 +807,13 @@ module Writexlsx
           :axis_ids => @axis2_ids
         }
         write_val_axis(params)
-        write_cat_or_date_axis(params, type)
+        yield(params)
 
         # Write the c:dTable element.
         write_d_table
 
         # Write the c:spPr element for the plotarea formatting.
         write_sp_pr(@plotarea)
-      end
-    end
-
-    def write_cat_or_date_axis(params, type)
-      if type == :stock
-        write_date_axis(params)
-      else
-        write_cat_axis(params)
       end
     end
 
