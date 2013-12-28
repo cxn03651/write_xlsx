@@ -80,10 +80,7 @@ module Writexlsx
       #
       def write_radar_style
         val = 'marker'
-
-        if @subtype == 'filled'
-          val = 'filled'
-        end
+        val = 'filled' if @subtype == 'filled'
 
         attributes = [ ['val', val] ]
 

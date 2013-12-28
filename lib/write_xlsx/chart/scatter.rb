@@ -65,10 +65,9 @@ module Writexlsx
         return if series.empty?
 
         style   = 'lineMarker'
-        subtype = @subtype
 
         # Set the user defined chart subtype
-        case subtype
+        case @subtype
         when 'marker_only', 'straight_with_markers', 'straight'
           style = 'lineMarker'
         when 'smooth_with_markers', 'smooth'
@@ -228,9 +227,7 @@ module Writexlsx
       # Write the <c:scatterStyle> element.
       #
       def write_scatter_style(val)
-        attributes = [ ['val', val] ]
-
-        @writer.empty_tag('c:scatterStyle', attributes)
+        @writer.empty_tag('c:scatterStyle', [ ['val', val] ])
       end
 
       #
@@ -238,10 +235,8 @@ module Writexlsx
       # specified by the user.
       #
       def modify_series_formatting
-        subtype = @subtype
-
         # The default scatter style "markers only" requires a line type
-        if subtype == 'marker_only'
+        if @subtype == 'marker_only'
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
@@ -252,7 +247,7 @@ module Writexlsx
         end
 
         # Turn markers off for subtypes that don't have them
-        unless subtype =~ /marker/
+        unless @subtype =~ /marker/
           # Go through each series and define default values.
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.

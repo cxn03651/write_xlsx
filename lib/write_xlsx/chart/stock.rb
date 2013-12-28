@@ -91,27 +91,21 @@ module Writexlsx
       # Add default formatting to the series data.
       #
       def modify_series_formatting
-        index = 0
         array = []
-        @series.each do |series|
+        @series.each_with_index do |series, index|
           if index % 4 != 3
-            unless series.line_defined?
-              series.line = {
-                :width    => 2.25,
-                :none     => 1,
-                :_defined => 1
-              }
-            end
+            series.line = {
+              :width    => 2.25,
+              :none     => 1,
+              :_defined => 1
+            } unless series.line_defined?
 
-            unless ptrue?(series.marker)
-              if index % 4 == 2
-                series.marker = Marker.new(:type => 'dot', :size => 3)
-              else
-                series.marker = Marker.new(:type => 'none')
-              end
-            end
+            if index % 4 == 2
+              series.marker = Marker.new(:type => 'dot', :size => 3)
+            else
+              series.marker = Marker.new(:type => 'none')
+            end unless ptrue?(series.marker)
           end
-          index += 1
           array << series
         end
         @series = array

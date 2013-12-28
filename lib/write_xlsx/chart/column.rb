@@ -53,11 +53,7 @@ module Writexlsx
       # Write the <c:barDir> element.
       #
       def write_bar_dir
-        val  = 'col'
-
-        attributes = [ ['val', val] ]
-
-        @writer.empty_tag('c:barDir', attributes)
+        @writer.empty_tag('c:barDir', [ ['val', 'col'] ])
       end
 
       #
