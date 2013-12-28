@@ -1127,29 +1127,20 @@ module Writexlsx
     #
     # Write the <c:valAx> element. Usually the Y axis.
     #
-    # TODO. Maybe should have a _write_cat_val_axis method as well for scatter.
-    #
-    def write_val_axis(params, cat = false) # :nodoc:
+    def write_val_axis(params)
       axis_ids = params[:axis_ids]
-      position = params[:position] || @val_axis_position
-      horiz    = @horiz_val_axis
-      if cat
-        x_axis   = params[:y_axis]
-        y_axis   = params[:x_axis]
-        axis_ids_0 = axis_ids[1]
-        axis_ids_1 = axis_ids[0]
-      else
-        x_axis   = params[:x_axis]
-        y_axis   = params[:y_axis]
-        axis_ids_0 = axis_ids[0]
-        axis_ids_1 = axis_ids[1]
-      end
-
       return unless axis_ids && !axis_ids.empty?
 
-      # OVerwrite the default axis position with a user supplied value.
-      position = y_axis.position || position
+      x_axis   = params[:x_axis]
+      y_axis   = params[:y_axis]
+      axis_ids_0 = axis_ids[0]
+      axis_ids_1 = axis_ids[1]
+      position = y_axis.position || params[:position] || @val_axis_position
 
+      write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)
+    end
+
+    def write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)  # :nodoc:
       @writer.tag_elements('c:valAx') do
         write_axis_id(axis_ids_1)
 
@@ -1169,9 +1160,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if y_axis.formula
-          write_title_formula(y_axis, horiz, nil, y_axis.layout)
+          write_title_formula(y_axis, @horiz_val_axis, nil, y_axis.layout)
         elsif y_axis.name
-          write_title_rich(y_axis, horiz, y_axis.layout)
+          write_title_rich(y_axis, @horiz_val_axis, y_axis.layout)
         end
 
         # Write the c:numberFormat element.
@@ -1200,16 +1191,6 @@ module Writexlsx
         # Write the c:minorUnit element.
         write_c_minor_unit(y_axis.minor_unit)
       end
-    end
-
-    #
-    # Write the <c:valAx> element.
-    # This is for the second valAx in scatter plots.
-    #
-    # Usually the X axis.
-    #
-    def write_cat_val_axis(params) # :nodoc:
-      write_val_axis(params, true)
     end
 
     #

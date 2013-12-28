@@ -257,6 +257,25 @@ module Writexlsx
           end
         end
       end
+
+      #
+      # Write the <c:valAx> element.
+      # This is for the second valAx in scatter plots.
+      #
+      # Usually the X axis.
+      #
+      def write_cat_val_axis(params) # :nodoc:
+        axis_ids = params[:axis_ids]
+        return unless axis_ids && !axis_ids.empty?
+
+        x_axis   = params[:y_axis]
+        y_axis   = params[:x_axis]
+        axis_ids_0 = axis_ids[1]
+        axis_ids_1 = axis_ids[0]
+        position = y_axis.position || params[:position] || @val_axis_position
+
+        write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)
+      end
     end
   end
 end
