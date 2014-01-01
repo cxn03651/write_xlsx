@@ -5,22 +5,19 @@ module Writexlsx
     class Hyperlink   # :nodoc:
       include Writexlsx::Utility
 
-      attr_reader :url, :link_type, :str, :url_str
-      attr_accessor :tip, :display
+      attr_reader :str, :tip
 
-      def self.factory(url, str = nil)
-        if url =~ /^internal:/
-          InternalHyperlink.new(url, str)
-        elsif url =~ /^external:/
-          ExternalHyperlink.new(url, str)
+      def self.factory(url, str = nil, tip = nil)
+        if url =~ /^internal:(.+)/
+          InternalHyperlink.new($~[1], str, tip)
+        elsif url =~ /^external:(.+)/
+          ExternalHyperlink.new($~[1], str, tip)
         else
-          new(url, str)
+          new(url, str, tip)
         end
       end
 
-      def initialize(url, str = nil)
-        @link_type = 1
-
+      def initialize(url, str, tip)
         # The displayed string defaults to the url string.
         str ||= url.dup
 
@@ -51,38 +48,35 @@ module Writexlsx
         @url       = url
         @str       = str
         @url_str   = nil
+        @tip       = tip
       end
 
-      def write_external_attributes(row, col, id)
+      def attributes(row, col, id)
         ref = xl_rowcol_to_cell(row, col)
 
-        attributes = [ ['ref', ref] ]
-        attributes << r_id_attributes(id)
+        attr = [ ['ref', ref] ]
+        attr << r_id_attributes(id)
 
-        attributes << ['location', url_str] if url_str
-        attributes << ['display',  display] if display
-        attributes << ['tooltip',  tip]     if tip
-        attributes
+        attr << ['location', @url_str] if @url_str
+        attr << ['display',  @display] if @display
+        attr << ['tooltip',  @tip]     if @tip
+        attr
       end
 
-      def write_internal_attributes(row, col)
-        ref = xl_rowcol_to_cell(row, col)
+      def external_hyper_link
+        ['/hyperlink', @url, 'External']
+      end
 
-        attributes = [
-                      ['ref', ref],
-                      ['location', url]
-                     ]
-
-        attributes << ['tooltip', tip] if tip
-        attributes << ['display', str]
+      def display_on
+        @display = @url_str
       end
     end
 
     class InternalHyperlink < Hyperlink
-      def initialize(url, str)
-        @link_type = 2
-        @url = url.sub(/^internal:/, '')
+      undef external_hyper_link
 
+      def initialize(url, str, tip)
+        @url = url
         # The displayed string defaults to the url string.
         str ||= @url.dup
 
@@ -96,16 +90,23 @@ module Writexlsx
         if @url.bytesize > 255
           raise "URL '#{@url}' > 255 characters, it exceeds Excel's limit for URLS."
         end
+
+        @tip = tip
+      end
+
+      def attributes(row, col, dummy = nil)
+        attr = [
+                ['ref', xl_rowcol_to_cell(row, col)],
+                ['location', @url]
+               ]
+
+        attr << ['tooltip', @tip] if @tip
+        attr << ['display', @str]
       end
     end
 
     class ExternalHyperlink < Hyperlink
-      def initialize(url, str = nil)
-        @link_type = 1
-
-        # Remove the URI scheme from internal links.
-        url = url.sub(/^external:/, '')
-
+      def initialize(url, str, tip)
         # The displayed string defaults to the url string.
         str ||= url.dup
 
@@ -138,6 +139,7 @@ module Writexlsx
         @url       = url
         @str       = str
         @url_str   = url_str
+        @tip       = tip
       end
     end
   end

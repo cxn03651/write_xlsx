@@ -336,7 +336,6 @@ module Writexlsx
       @last_shape_id          = 1
       @rel_count              = 0
       @hlink_count            = 0
-      @hlink_refs             = []
       @external_hyper_links   = []
       @external_drawing_links = []
       @external_comment_links = []
@@ -2471,7 +2470,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_url(row, column, url [ , format, label ] )
+    #   write_url(row, column, url [ , format, label, tip ] )
     #
     # Write a hyperlink to a URL in the cell specified by +row+ and +column+.
     # The hyperlink is comprised of two elements: the visible label and
@@ -2559,22 +2558,15 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      hyperlink = Hyperlink.factory(url, str)
-      hyperlink.tip = tip
+      hyperlink = Hyperlink.factory(url, str, tip)
+      store_hyperlink(row, col, hyperlink)
 
-      @hlink_count += 1
-
-      if @hlink_count > 65_530
-        raise "URL '#{hyperlink.url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
+      if hyperlinks_count > 65_530
+        raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
 
       # Write the hyperlink string.
       write_string(row, col, hyperlink.str, xf)
-
-      # Store the hyperlink data in a separate structure.
-      @hyperlinks      ||= {}
-      @hyperlinks[row] ||= {}
-      @hyperlinks[row][col] = hyperlink
     end
 
     #
@@ -5762,6 +5754,16 @@ module Writexlsx
 
     private
 
+    def hyperlinks_count
+      @hyperlinks.keys.inject(0) { |s, n| s += @hyperlinks[n].keys.size }
+    end
+
+    def store_hyperlink(row, col, hyperlink)
+      @hyperlinks      ||= {}
+      @hyperlinks[row] ||= {}
+      @hyperlinks[row][col] = hyperlink
+    end
+
     def cell_format_of_rich_string(rich_strings)
       # If the last arg is a format we use it as the cell format.
       if rich_strings[-1].respond_to?(:xf_index)
@@ -7045,7 +7047,7 @@ module Writexlsx
     #
     def write_hyperlinks #:nodoc:
       return unless @hyperlinks
-
+      hlink_attributes = []
       @hyperlinks.keys.sort.each do |row_num|
         # Sort the hyperlinks into column order.
         col_nums = @hyperlinks[row_num].keys.sort
@@ -7056,54 +7058,32 @@ module Writexlsx
 
           # If the cell isn't a string then we have to add the url as
           # the string to display
-          if  ptrue?(@cell_data_table)          &&
+          if ptrue?(@cell_data_table)          &&
               ptrue?(@cell_data_table[row_num]) &&
               ptrue?(@cell_data_table[row_num][col_num])
             if @cell_data_table[row_num][col_num].display_url_string?
-              link.display = link.url_str
+              link.display_on
             end
           end
 
-          if link.link_type == 1
+          if link.respond_to?(:external_hyper_link)
             # External link with rel file relationship.
             @rel_count += 1
-            @hlink_refs << [link, row_num, col_num, @rel_count]
             # Links for use by the packager.
-            @external_hyper_links << ['/hyperlink', link.url, 'External']
-          else
-            # Internal link with rel file relationship.
-            @hlink_refs << [link, row_num, col_num]
+            @external_hyper_links << link.external_hyper_link
           end
+          hlink_attributes << link.attributes(row_num, col_num, @rel_count)
         end
       end
 
-      return if @hlink_refs.empty?
+      return if hlink_attributes.empty?
 
       # Write the hyperlink elements.
       @writer.tag_elements('hyperlinks') do
-        @hlink_refs.each do |aref|
-          case aref[0].link_type
-          when 1
-            write_hyperlink_external(*aref)
-          when 2
-            write_hyperlink_internal(*aref)
-          end
+        hlink_attributes.each do |attributes|
+          @writer.empty_tag('hyperlink', attributes)
         end
       end
-    end
-
-    #
-    # Write the <hyperlink> element for external links.
-    #
-    def write_hyperlink_external(link, row, col, id)  # :nodoc:
-      @writer.empty_tag('hyperlink', link.write_external_attributes(row, col, id))
-    end
-
-    #
-    # Write the <hyperlink> element for internal links.
-    #
-    def write_hyperlink_internal(link, row, col)  #:nodoc:
-      @writer.empty_tag('hyperlink', link.write_internal_attributes(row, col))
     end
 
     #
