@@ -27,23 +27,8 @@ module Writexlsx
         @horiz_val_axis    = 0
         @horiz_cat_axis    = 1
         @show_crosses      = false
-
         # Override and reset the default axis values.
-        if @x_axis.defaults
-          @x_axis.defaults[:major_gridlines] = { :visible => 1 }
-        else
-          @x_axis.defaults = { :major_gridlines => { :visible => 1 } }
-        end
-        if @y_axis.defaults
-          @y_axis.defaults[:major_gridlines] = { :visible => 0 }
-        else
-          @y_axis.defaults = { :major_gridlines => { :visible => 0 } }
-        end
-
-        if @subtype == 'percent_stacked'
-            @x_axis.defaults[:num_format] = '0%'
-        end
-
+        axis_defaults_set
         set_x_axis
         set_y_axis
       end
@@ -77,6 +62,22 @@ module Writexlsx
       #
       def write_err_dir(direction)
         # do nothing
+      end
+
+      private
+
+      def axis_defaults_set
+        if @x_axis.defaults
+          @x_axis.defaults[:major_gridlines] = { :visible => 1 }
+        else
+          @x_axis.defaults = { :major_gridlines => { :visible => 1 } }
+        end
+        if @y_axis.defaults
+          @y_axis.defaults[:major_gridlines] = { :visible => 0 }
+        else
+          @y_axis.defaults = { :major_gridlines => { :visible => 0 } }
+        end
+        @x_axis.defaults[:num_format] = '0%' if @subtype == 'percent_stacked'
       end
     end
   end
