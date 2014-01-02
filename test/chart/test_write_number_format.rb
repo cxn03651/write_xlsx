@@ -32,7 +32,7 @@ class TestWriteNumberFormat < Test::Unit::TestCase
     axis.num_format = 'General'
     axis.defaults   = { :num_format => 'General' }
 
-    expected = ''
+    expected = nil
     result = @chart.__send__('write_cat_number_format', axis)
     assert_equal(expected, result)
   end

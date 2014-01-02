@@ -65,14 +65,8 @@ module Writexlsx
         return if series.empty?
 
         style   = 'lineMarker'
-
         # Set the user defined chart subtype
-        case @subtype
-        when 'marker_only', 'straight_with_markers', 'straight'
-          style = 'lineMarker'
-        when 'smooth_with_markers', 'smooth'
-          style = 'smoothMarker'
-        end
+        style = 'smoothMarker' if ['smooth_with_markers', 'smooth'].include?(@subtype)
 
         # Add default formatting to the series data.
         modify_series_formatting
@@ -82,10 +76,8 @@ module Writexlsx
           write_scatter_style(style)
           # Write the series elements.
           series.each {|s| write_series(s)}
-
           # Write the c:marker element.
           write_marker_value
-
           # Write the c:axId elements
           write_axis_ids(params)
         end
