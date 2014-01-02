@@ -8,12 +8,12 @@ module Writexlsx
     class Axis < Caption
       include Writexlsx::Utility
 
-      attr_accessor :defaults, :reverse
-      attr_accessor :min, :max
-      attr_accessor :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
-      attr_accessor :log_base, :crossing, :position, :position_axis, :label_position, :visible
-      attr_accessor :num_format, :num_format_linked, :num_font, :layout, :interval_unit
-      attr_accessor :major_gridlines, :minor_gridlines, :major_tick_mark
+      attr_accessor :defaults
+      attr_accessor :min, :max, :num_format, :position, :major_tick_mark
+      attr_reader :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
+      attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
+      attr_reader :num_format_linked, :num_font, :layout, :interval_unit
+      attr_reader :major_gridlines, :minor_gridlines, :reverse
 
       #
       # Convert user defined axis values into axis instance.
@@ -22,22 +22,70 @@ module Writexlsx
         super
         args      = (defaults || {}).merge(params)
 
-        @reverse           = args[:reverse]
-        @min               = args[:min]
-        @max               = args[:max]
-        @minor_unit        = args[:minor_unit]
-        @major_unit        = args[:major_unit]
-        @minor_unit_type   = args[:minor_unit_type]
-        @major_unit_type   = args[:major_unit_type]
-        @log_base          = args[:log_base]
-        @crossing          = args[:crossing]
-        @position_axis     = args[:position_axis]
-        @label_position    = args[:label_position]
-        @num_format        = args[:num_format]
-        @num_format_linked = args[:num_format_linked]
-        @interval_unit     = args[:interval_unit]
+        [
+         :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
+         :major_unit_type, :log_base, :crossing, :position_axis, :label_position,
+         :num_format, :num_format_linked, :interval_unit, :major_tick_mark
+        ].each { |val| instance_variable_set("@#{val}", args[val]) }
         @visible           = args[:visible] || 1
 
+        set_major_minor_gridlines(args)
+        set_position(args)
+        set_position_axis
+        set_font_properties(args)
+        set_axis_name_layout(args)
+      end
+
+      #
+      # Write the <c:numberFormat> element. Note: It is assumed that if a user
+      # defined number format is supplied (i.e., non-default) then the sourceLinked
+      # attribute is 0. The user can override this if required.
+      #
+
+      def write_number_format(writer) # :nodoc:
+        writer.empty_tag('c:numFmt', num_fmt_attributes)
+      end
+
+      #
+      # Write the <c:numFmt> element. Special case handler for category axes which
+      # don't always have a number format.
+      #
+      def write_cat_number_format(writer, cat_has_num_fmt)
+        return unless user_defined_num_fmt_set? || cat_has_num_fmt
+
+        writer.empty_tag('c:numFmt', num_fmt_attributes)
+      end
+
+      private
+
+      def user_defined_num_fmt_set?
+        @defaults && @num_format != @defaults[:num_format]
+      end
+
+      def source_linked
+        value = 1
+
+        # Check if a user defined number format has been set.
+        if @defaults && @num_format != @defaults[:num_format]
+          value = 0
+        end
+
+        # User override of sourceLinked.
+        if @num_format_linked
+          value = 1
+        end
+
+        value
+      end
+
+      def num_fmt_attributes
+        [
+         ['formatCode',   @num_format],
+         ['sourceLinked', source_linked]
+        ]
+      end
+
+      def set_major_minor_gridlines(args)
         # Map major/minor_gridlines properties.
         [:major_gridlines, :minor_gridlines].each do |lines|
           if args[lines] && ptrue?(args[lines][:visible])
@@ -46,12 +94,15 @@ module Writexlsx
             instance_variable_set("@#{lines}", nil)
           end
         end
-        @major_tick_mark   = args[:major_tick_mark]
+      end
 
+      def set_position(args)
         # Only use the first letter of bottom, top, left or right.
         @position = args[:position]
         @position = @position.downcase[0, 1] if @position
+      end
 
+      def set_position_axis
         # Set the position for a category axis on or between the tick marks.
         if @position_axis
           if @position_axis == 'on_tick'
@@ -63,72 +114,15 @@ module Writexlsx
             @position_axis = nil
           end
         end
+      end
 
-        # Set the font properties if present.
+      def set_font_properties(args)
         @num_font  = @chart.convert_font_args(args[:num_font])
         @name_font = @chart.convert_font_args(args[:name_font])
+      end
 
-        # Set the axis name layout.
+      def set_axis_name_layout(args)
         @layout    = @chart.layout_properties(args[:name_layout], 1)
-      end
-
-      #
-      # Write the <c:numberFormat> element. Note: It is assumed that if a user
-      # defined number format is supplied (i.e., non-default) then the sourceLinked
-      # attribute is 0. The user can override this if required.
-      #
-
-      def write_number_format(writer) # :nodoc:
-        source_linked = 1
-
-        # Check if a user defined number format has been set.
-        if @defaults && @num_format != @defaults[:num_format]
-          source_linked = 0
-        end
-
-        # User override of sourceLinked.
-        if ptrue?(@num_format_linked)
-          source_linked = 1
-        end
-
-        attributes = [
-                      ['formatCode',   @num_format],
-                      ['sourceLinked', source_linked]
-                     ]
-
-        writer.empty_tag('c:numFmt', attributes)
-      end
-
-      #
-      # Write the <c:numFmt> element. Special case handler for category axes which
-      # don't always have a number format.
-      #
-      def write_cat_number_format(writer, cat_has_num_fmt)
-        source_linked  = 1
-        default_format = true
-
-        # Check if a user defined number format has been set.
-        if @defaults && @num_format != @defaults[:num_format]
-          source_linked  = 0
-          default_format = false
-        end
-
-        # User override of linkedSource.
-        if @num_format_linked
-          source_linked = 1
-        end
-
-        # Skip if cat doesn't have a num format (unless it is non-default).
-        if !cat_has_num_fmt && default_format
-          return ''
-        end
-
-        attributes = [
-                      ['formatCode',   @num_format],
-                      ['sourceLinked', source_linked]
-                     ]
-
-        writer.empty_tag('c:numFmt', attributes)
       end
     end
   end
