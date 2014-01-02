@@ -64,16 +64,8 @@ module Writexlsx
 
       def source_linked
         value = 1
-
-        # Check if a user defined number format has been set.
-        if @defaults && @num_format != @defaults[:num_format]
-          value = 0
-        end
-
-        # User override of sourceLinked.
-        if @num_format_linked
-          value = 1
-        end
+        value = 0 if user_defined_number_format_set?
+        value = 1 if @num_format_linked
 
         value
       end
