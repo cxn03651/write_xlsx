@@ -117,22 +117,11 @@ module Writexlsx
 
       def initialize(params)
         @type = types[params[:type].to_sym] || 'fixedVal'
-
-        # Set the value for error types that require it.
-        @value = params[:value] || 1
-
-        # Set the end-cap style.
-        @endcap = params[:end_style] || 1
+        @value = params[:value] || 1    # value for error types that require it.
+        @endcap = params[:end_style] || 1 # end-cap style.
 
         # Set the error bar direction.
-        case params[:direction]
-        when 'minus'
-          @direction = 'minus'
-        when 'plus'
-          @direction = 'plus'
-        else
-          @direction = 'both'
-        end
+        @direction = error_bar_direction(params[:direction])
 
         # Set any custom values
         @plus_values  = params[:plus_values]  || [1]
@@ -156,6 +145,17 @@ module Writexlsx
           :custom             => 'cust'
         }
       end
+
+      def error_bar_direction(direction)
+        case direction
+        when 'minus'
+          'minus'
+        when 'plus'
+          'plus'
+        else
+          'both'
+        end
+      end
     end
 
     class Series
@@ -163,36 +163,29 @@ module Writexlsx
 
       attr_reader :values, :categories, :name, :name_formula, :name_id
       attr_reader :cat_data_id, :val_data_id, :fill
-      attr_reader :trendline, :smooth, :labels, :invert_if_neg
+      attr_reader :trendline, :smooth, :labels, :invert_if_negative
       attr_reader :x2_axis, :y2_axis, :error_bars, :points
       attr_accessor :line, :marker
 
       def initialize(chart, params = {})
-        @values = aref_to_formula(params[:values])
+        @values     = aref_to_formula(params[:values])
         @categories = aref_to_formula(params[:categories])
         @name, @name_formula =
           chart.process_names(params[:name], params[:name_formula])
-        @cat_data_id = chart.data_id(@categories, params[:categories_data])
-        @val_data_id = chart.data_id(@values, params[:values_data])
-        @name_id = chart.data_id(@name_formula, params[:name_data])
-        if params[:border]
-          @line = line_properties(params[:border])
-        else
-          @line = line_properties(params[:line])
-        end
+
+        set_data_ids(chart, params)
+
+        @line = line_properties(params[:border] || params[:line])
         @fill = fill_properties(params[:fill])
-        @marker    = Marker.new(params[:marker]) if params[:marker]
-        @trendline = Trendline.new(params[:trendline]) if params[:trendline]
-        @smooth = params[:smooth]
-        @error_bars = {
-          :_x_error_bars => params[:x_error_bars] ? Errorbars.new(params[:x_error_bars]) : nil,
-          :_y_error_bars => params[:y_error_bars] ? Errorbars.new(params[:y_error_bars]) : nil
-        }
-        @points = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]
-        @labels = labels_properties(params[:data_labels])
-        @invert_if_neg = params[:invert_if_negative]
-        @x2_axis = params[:x2_axis]
-        @y2_axis = params[:y2_axis]
+
+        @marker     = Marker.new(params[:marker]) if params[:marker]
+        @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
+        @error_bars = errorbars(params[:x_error_bars], params[:y_error_bars])
+        @points     = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]
+        @labels     = labels_properties(params[:data_labels])
+
+        [:smooth, :invert_if_negative, :x2_axis, :y2_axis].
+          each { |key| instance_variable_set("@#{key}", params[key]) }
       end
 
       def ==(other)
@@ -221,6 +214,19 @@ module Writexlsx
         xl_range_formula(*data)
       end
 
+      def set_data_ids(chart, params)
+        @cat_data_id = chart.data_id(@categories, params[:categories_data])
+        @val_data_id = chart.data_id(@values, params[:values_data])
+        @name_id = chart.data_id(@name_formula, params[:name_data])
+      end
+
+      def errorbars(x, y)
+        {
+          :_x_error_bars => x ? Errorbars.new(x) : nil,
+          :_y_error_bars => y ? Errorbars.new(y) : nil
+        }
+      end
+
       #
       # Convert user defined labels properties to the structure required internally.
       #
@@ -232,23 +238,25 @@ module Writexlsx
           labels.delete(:position)
         else
           # Map user defined label positions to Excel positions.
-          positions = {
-            :center      => 'ctr',
-            :right       => 'r',
-            :left        => 'l',
-            :top         => 't',
-            :above       => 't',
-            :bottom      => 'b',
-            :below       => 'b',
-            :inside_end  => 'inEnd',
-            :outside_end => 'outEnd',
-            :best_fit    => 'bestFit'
-          }
-
           labels[:position] = value_or_raise(positions, position, 'label position')
         end
 
         labels
+      end
+
+      def positions
+        {
+          :center      => 'ctr',
+          :right       => 'r',
+          :left        => 'l',
+          :top         => 't',
+          :above       => 't',
+          :bottom      => 'b',
+          :below       => 'b',
+          :inside_end  => 'inEnd',
+          :outside_end => 'outEnd',
+          :best_fit    => 'bestFit'
+        }
       end
     end
   end

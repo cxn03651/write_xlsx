@@ -892,7 +892,7 @@ module Writexlsx
         # Write the c:marker element.
         write_marker(series.marker)
         # Write the c:invertIfNegative element.
-        write_c_invert_if_negative(series.invert_if_neg)
+        write_c_invert_if_negative(series.invert_if_negative)
         # Write the c:dPt element.
         write_d_pt(series.points)
         # Write the c:dLbls element.
