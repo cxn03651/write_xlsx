@@ -64,7 +64,7 @@ module Writexlsx
 
       def source_linked
         value = 1
-        value = 0 if user_defined_number_format_set?
+        value = 0 if user_defined_num_fmt_set?
         value = 1 if @num_format_linked
 
         value
