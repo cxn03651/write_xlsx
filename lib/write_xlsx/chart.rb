@@ -41,44 +41,42 @@ module Writexlsx
     attr_reader :line, :fill, :layout
 
     def initialize(params = {})
+      @layout = layout_properties(params[:layout])
+
+      # Allow 'border' as a synonym for 'line'.
+      border = params_to_border(params)
+
+      # Set the line properties for the chartarea.
+      @line = border ? line_properties(border) : line_properties(params[:line])
+
+      # Map deprecated Spreadsheet::WriteExcel fill colour.
+      fill = params[:color] ? { :color => params[:color] } : params[:fill]
+      @fill = fill_properties(fill)
+    end
+
+    private
+
+    def params_to_border(params)
       line_weight  = params[:line_weight]
-      line_pattern = params[:line_pattern]
+
       # Map deprecated Spreadsheet::WriteExcel line_weight.
-      if line_weight
-        width = swe_line_weight(line_weight)
-        params[:border] = { :width => width }
-      end
+      border       = params[:border]
+      border = { :width => swe_line_weight(line_weight) } if line_weight
 
       # Map deprecated Spreadsheet::WriteExcel line_pattern.
-      if line_pattern
-        pattern = swe_line_pattern(line_pattern)
+      if params[:line_pattern]
+        pattern = swe_line_pattern(params[:line_pattern])
         if pattern == 'none'
-          params[:border] = { :none => 1 }
+          border = { :none => 1 }
         else
-          params[:border][:dash_type] = pattern
+          border[:dash_type] = pattern
         end
       end
 
       # Map deprecated Spreadsheet::WriteExcel line colour.
-      params[:border][:color] = params[:line_color] if params[:line_color]
-
-      # Handle Excel::Writer::XLSX style properties.
-
-      # Set the line properties for the chartarea.
-      @line = line_properties(params[:line])
-
-      # Allow 'border' as a synonym for 'line'.
-      @line = line_properties(params[:border]) if (params[:border])
-
-      @layout = layout_properties(params[:layout])
-
-      # Map deprecated Spreadsheet::WriteExcel fill colour.
-      @fill = params[:fill]
-      @fill = { :color => params[:color] } if params[:color]
-      @fill = fill_properties(@fill)
+      border[:color] = params[:line_color] if params[:line_color]
+      border
     end
-
-    private
 
     #
     # Get the Spreadsheet::WriteExcel line pattern for backward compatibility.
@@ -181,45 +179,19 @@ module Writexlsx
 
       @subtype           = subtype
       @sheet_type        = 0x0200
-      @orientation       = 0x0
       @series            = []
       @embedded          = 0
       @id                = ''
       @series_index      = 0
       @style_id          = 2
-      @axis_ids          = []
-      @axis2_ids         = []
-      @cat_has_num_fmt   = false
-      @requires_category = 0
-      @legend_position   = 'right'
-      @cat_axis_position = 'b'
-      @val_axis_position = 'l'
       @formula_ids       = {}
       @formula_data      = []
-      @horiz_cat_axis    = 0
-      @horiz_val_axis    = 1
       @protection        = 0
       @chartarea         = ChartArea.new
       @plotarea          = ChartArea.new
       @title             = Caption.new(self)
-      @x_axis            = Axis.new(self)
-      @y_axis            = Axis.new(self)
-      @x2_axis           = Axis.new(self)
-      @y2_axis           = Axis.new(self)
       @name              = ''
-      @show_blanks       = 'gap'
-      @show_hidden_data  = false
-      @show_crosses      = true
-      @width             = 480
-      @height            = 288
-      @x_scale           = 1
-      @y_scale           = 1
-      @x_offset          = 0
-      @y_offset          = 0
       @table             = nil
-      @smooth_allowed    = 0
-      @cross_between     = 'between'
-
       set_default_properties
     end
 
@@ -528,7 +500,6 @@ module Writexlsx
     # workbook in Workbook::_add_chart_data
     #
     def data_id(full_formula, data) # :nodoc:
-      # Ignore series without a range formula.
       return unless full_formula
 
       # Strip the leading '=' from the formula.
@@ -539,13 +510,11 @@ module Writexlsx
       if @formula_ids.has_key?(formula)
         # Formula already seen. Return existing id.
         id = @formula_ids[formula]
-
         # Store user defined data if it isn't already there.
         @formula_data[id] ||= data
       else
         # Haven't seen this formula before.
         id = @formula_ids[formula] = @formula_data.size
-
         @formula_data << data
       end
 
@@ -553,6 +522,37 @@ module Writexlsx
     end
 
     private
+
+    def axis_setup
+      @axis_ids          = []
+      @axis2_ids         = []
+      @cat_has_num_fmt   = false
+      @requires_category = 0
+      @cat_axis_position = 'b'
+      @val_axis_position = 'l'
+      @horiz_cat_axis    = 0
+      @horiz_val_axis    = 1
+      @x_axis            = Axis.new(self)
+      @y_axis            = Axis.new(self)
+      @x2_axis           = Axis.new(self)
+      @y2_axis           = Axis.new(self)
+    end
+
+    def display_setup
+      @orientation       = 0x0
+      @width             = 480
+      @height            = 288
+      @x_scale           = 1
+      @y_scale           = 1
+      @x_offset          = 0
+      @y_offset          = 0
+      @legend_position   = 'right'
+      @smooth_allowed    = 0
+      @cross_between     = 'between'
+      @show_blanks       = 'gap'
+      @show_hidden_data  = false
+      @show_crosses      = true
+    end
 
     #
     # retun primary/secondary series by :primary_axes flag
@@ -672,30 +672,9 @@ module Writexlsx
     # Setup the default properties for a chart.
     #
     def set_default_properties # :nodoc:
-      # Set the default axis properties.
-      @x_axis.defaults = {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 0 }
-      }
-
-      @y_axis.defaults = {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 1 }
-      }
-
-      @x2_axis.defaults = {
-        :num_format     => 'General',
-        :label_position => 'none',
-        :crossing       => 'max',
-        :visible        => 0
-      }
-
-      @y2_axis.defaults = {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 0 },
-        :position        => 'right',
-        :visible         => 1
-      }
+      display_setup
+      axis_setup
+      set_axis_defaults
 
       set_x_axis
       set_y_axis
@@ -704,6 +683,44 @@ module Writexlsx
       set_y2_axis
     end
 
+    def set_axis_defaults
+      @x_axis.defaults  = x_axis_defaults
+      @y_axis.defaults  = y_axis_defaults
+      @x2_axis.defaults = x2_axis_defaults
+      @y2_axis.defaults = y2_axis_defaults
+    end
+
+    def x_axis_defaults
+      {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 0 }
+      }
+    end
+
+    def y_axis_defaults
+      {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 1 }
+      }
+    end
+
+    def x2_axis_defaults
+      {
+        :num_format     => 'General',
+        :label_position => 'none',
+        :crossing       => 'max',
+        :visible        => 0
+      }
+    end
+
+    def y2_axis_defaults
+      {
+        :num_format      => 'General',
+        :major_gridlines => { :visible => 0 },
+        :position        => 'right',
+        :visible         => 1
+      }
+    end
     #
     # Write the <c:chartSpace> element.
     #
@@ -1506,47 +1523,32 @@ module Writexlsx
     # Write the <c:legend> element.
     #
     def write_legend # :nodoc:
-      position = @legend_position
-      overlay  = false
+      position = @legend_position.sub(/^overlay_/, '')
+      return if position == 'none' || (not position_allowed.has_key?(position))
 
-      if @legend_delete_series && @legend_delete_series.kind_of?(Array)
-        @delete_series = @legend_delete_series
+      @delete_series = @legend_delete_series if @legend_delete_series.kind_of?(Array)
+      @writer.tag_elements('c:legend') do
+        # Write the c:legendPos element.
+        write_legend_pos(position_allowed[position])
+        # Remove series labels from the legend.
+        # Write the c:legendEntry element.
+        @delete_series.each { |i| write_legend_entry(i) } if @delete_series
+        # Write the c:layout element.
+        write_layout(@legend_layout, 'legend')
+        # Write the c:txPr element.
+        write_tx_pr(nil, @legend_font) if ptrue?(@legend_font)
+        # Write the c:overlay element.
+        write_overlay if @legend_position =~ /^overlay_/
       end
+    end
 
-      if position =~ /^overlay_/
-        position.sub!(/^overlay_/, '')
-        overlay = true if position
-      end
-
-      allowed = {
+    def position_allowed
+      {
         'right'  => 'r',
         'left'   => 'l',
         'top'    => 't',
         'bottom' => 'b'
       }
-
-      return if position == 'none'
-      return unless allowed.has_key?(position)
-
-      position = allowed[position]
-
-      @writer.tag_elements('c:legend') do
-        # Write the c:legendPos element.
-        write_legend_pos(position)
-        # Remove series labels from the legend.
-        @delete_series.each do |index|
-          # Write the c:legendEntry element.
-          write_legend_entry(index)
-        end if @delete_series
-        # Write the c:layout element.
-        write_layout(@legend_layout, 'legend')
-        # Write the c:txPr element.
-        if ptrue?(@legend_font)
-          write_tx_pr(nil, @legend_font)
-        end
-        # Write the c:overlay element.
-        write_overlay if overlay
-      end
     end
 
     #
