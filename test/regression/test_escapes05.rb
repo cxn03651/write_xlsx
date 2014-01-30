@@ -10,7 +10,7 @@ class TestRegressionEscapes05 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_chart_escapes05
+  def test_escapes05
     @xlsx = 'escapes05.xlsx'
     workbook    = WriteXLSX.new(@xlsx)
     worksheet1  = workbook.add_worksheet('Start')
