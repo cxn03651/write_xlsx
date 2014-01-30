@@ -1,4 +1,8 @@
 Change history of write_xlsx rubygem.
+2014-01-31 v0.76.0
+   Added date axis handling to charts.
+   Added support for non-contiguous chart ranges.
+   Fix to remove duplicate set_column() entries.
 
 2013-12-09 v0.75.0
    Added interval unit option for category axes.
