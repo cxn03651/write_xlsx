@@ -1567,6 +1567,14 @@ module Writexlsx
           # Skip if we couldn't parse the formula.
           next unless sheetname
 
+          # Handle non-contiguous ranges: (Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5).
+          # We don't try to parse the ranges. We just return an empty list.
+          if sheetname =~ /^\([^,]+,/
+            chart.formula_data[id] = []
+            seen_ranges[range] = []
+            next
+          end
+
           # Raise if the name is unknown since it indicates a user error in
           # a chart series formula.
           unless worksheets[sheetname]
