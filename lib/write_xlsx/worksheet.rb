@@ -299,7 +299,7 @@ module Writexlsx
       @workbook = workbook
       @index = index
       @name = name
-      @colinfo = []
+      @colinfo = {}
       @cell_data_table = {}
       @excel_version = 2007
       @palette = workbook.palette
@@ -730,8 +730,8 @@ module Writexlsx
 
       @outline_col_level = level if level > @outline_col_level
 
-      # Store the column data.
-      @colinfo << [firstcol, lastcol, width, format, hidden, level, collapsed]
+      # Store the column data based on the first column. Padded for sorting.
+      @colinfo[sprintf("%05d", firstcol)] = [firstcol, lastcol, width, format, hidden, level, collapsed]
 
       # Store the column change to allow optimisations.
       @col_size_changed = 1
@@ -6521,7 +6521,7 @@ module Writexlsx
       return if @colinfo.empty?
 
       @writer.tag_elements('cols') do
-        @colinfo.each {|col_info| write_col_info(col_info) }
+        @colinfo.keys.sort.each {|col| write_col_info(@colinfo[col]) }
       end
     end
 
