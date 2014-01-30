@@ -275,6 +275,9 @@ The properties that can be set are:
     :major_gridlines
     :minor_gridlines
     :visible
+    :date_axis
+    :minor_unit_type
+    :major_unit_type
 
 These are explained below.
 Some properties are only applicable to value or category axes, as indicated.
@@ -443,6 +446,35 @@ Configure the visibility of the axis.
 
     chart.set_x_axis(:visible => 0)
 
+##### <a name="set_x_axis_date_axis" class="anchor" href="#set_x_axis_date_axis"><span class="octicon octicon-link" /></a>:date_axis
+
+This option is used to treat a category axis with date or time data as a
+Date Axis. (Applicable to category axes only.)
+
+    chart.set_x_axis(:date_axis => 1)
+
+This option also allows you to set max and min values for a category axis
+which isn't allowed by Excel for non-date category axes.
+
+See [Date Category Axes][] for more details.
+
+##### <a name="set_x_axis_minor_unit_type" class="anchor" href="#set_x_axis_minor_unit_type"><span class="octicon octicon-link" /></a>:minor_unit_type
+
+For date_axis axes, see above, this option is used to set the type of the minor
+units. (Applicable to date category axes only.)
+
+    chart.set_x_axis(
+      :date_axis       => 1,
+      :minor_unit      => 4,
+      :minor_unit_type => 'month'
+    )
+
+The allowable values for this option are 'days', 'months' and 'years'.
+
+##### <a name="set_x_axis_major_unit_type" class="anchor" href="#set_x_axis_major_unit_type"><span class="octicon octicon-link" /></a>:major_unit_type
+
+Same as :minor_unit_type, see above, bur for major axes unit types.
+
 More than one property can be set in a call to `set_x_axis()`:
 
     chart.set_x_axis(
@@ -539,7 +571,7 @@ Set the x, y position of the title in chart relative units.
       }
     }
 
-See the CHART LAYOUT section below.
+See the [CHART LAYOUT][] section below.
 
 #### <a name="set_title_none" class="anchor" href="#set_title_none"><span class="octicon octicon-link" /></a>none
 By default Excel adds an automatic chart title to charts with a single series and a user defined series name.
@@ -1292,9 +1324,89 @@ the [set_x_axis()][] section of the documentation above.
 
 Some charts such as `Scatter` and `Stock` have two value axes.
 
+Date Axes are a special type of category axis which are explained below.
+
+#### <a name="date_category_axes" class="anchor" href="#date_category_axes"><span class="octicon octicon-link" /></a>Date Category Axes
+
+Date Category Axes are category axes that display time or date information.
+In WriteXLSX Date Category Axes are set using the date_axis option:
+
+    chart.set_x_axis(:date_axis => 1)
+
+In general you should also specify a number format for a date axis although
+Excel will usually default to the same format as the data being plotted:
+
+    chart.set_x_axis(
+      :date_axis  => 1,
+      :num_format => 'dd/mm/yyyy'
+    )
+
+Excel doesn't normally allow minimum and maximum values to be set for category
+axes. However, date axes are an exception.
+The min and max values should be set as Excel times or dates:
+
+    chart.set_x_axis(
+        :date_axis  => 1,
+        :min        => $worksheet->convert_date_time('2013-01-02T'),
+        :max        => $worksheet->convert_date_time('2013-01-09T'),
+        :num_format => 'dd/mm/yyyy'
+    )
+
+For date axes it is also possible to set the type of the major and minor units:
+
+    chart.set_x_axis(
+      :date_axis       => 1,
+      :minor_unit      => 4,
+      :minor_unit_type => 'months',
+      :major_unit      => 1,
+      :major_unit_type => 'years',
+      :num_format      => 'dd/mm/yyyy'
+    )
+
+#### <a name="secondary_axes" class="anchor" href="#secondary_axes"><span class="octicon octicon-link" /></a>Secondary Axes
+
+It is possible to add a secondary axis of the same type to a chart by setting
+the y2_axis or x2_axis property of the series:
+
+    #!/usr/bin/ruby
+
+    require 'write_xlsx'
+
+    workbook  = WriteXLSX.new('chart_secondary_axis.xlsx')
+    worksheet = workbook.add_worksheet
+
+    # Add the worksheet data that the charts will refer to.
+    data = [
+        [ 2,  3,  4,  5,  6,  7 ],
+        [ 10, 40, 50, 20, 10, 50 ]
+    ]
+
+    worksheet.write('A1', data)
+
+    # Create a new chart object. In this case an embedded chart.
+    chart = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure a series with a secondary axis
+    chart.add_series(
+      :values  => '=Sheet1!$A$1:$A$6',
+      :y2_axis => 1
+    )
+
+    chart.add_series(
+      :values => '=Sheet1!$B$1:$B$6'
+    )
+
+    # Insert the chart into the worksheet.
+    worksheet.insert_chart('D2', chart)
+
+Note, it isn't currently possible to add a secondary axis of a different
+chart type (for example line and column).
+
+
 [CHART FONTS]: chart_fonts.html#chart_fonts
 [CHART FORMATTING]: chart.html#chart_formatting
 [CHART LAYOUT]: chart_layout.html#chart_layout
 [SERIES OPTIONS]: chart.html#series_options
 [insert_chart()]: worksheet.html#insert_chart
 [set_x_axis()]: #set_x_axis
+[Date Category Axes]: #date_category_axes
