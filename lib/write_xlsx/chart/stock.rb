@@ -26,8 +26,9 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @show_crosses = false
-        @hi_low_lines = Chartline.new({})
+        @show_crosses  = false
+        @hi_low_lines  = Chartline.new({})
+        @date_category = true
 
         # Override and reset the default axis values.
         @x_axis.defaults[:num_format] = 'dd/mm/yyyy'
@@ -78,13 +79,6 @@ module Writexlsx
           # Write the c:axId elements
           write_axis_ids(params)
         end
-      end
-
-      #
-      # Overridden to use write_date_axis() instead of write_cat_axis().
-      #
-      def write_plot_area
-        write_plot_area_base(&(Proc.new { |params| write_date_axis(params) }))
       end
 
       #

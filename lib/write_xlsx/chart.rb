@@ -246,6 +246,7 @@ module Writexlsx
     # Set the properties of the x-axis.
     #
     def set_x_axis(params = {})
+      @date_category = true if ptrue?(params[:date_axis])
       @x_axis.merge_with_hash(params)
     end
 
@@ -256,6 +257,7 @@ module Writexlsx
     # The properties that can be set are the same as for set_x_axis,
     #
     def set_y_axis(params = {})
+      @date_category = true if ptrue?(params[:date_axis])
       @y_axis.merge_with_hash(params)
     end
 
@@ -263,6 +265,7 @@ module Writexlsx
     # Set the properties of the secondary X-axis.
     #
     def set_x2_axis(params = {})
+      @date_category = true if ptrue?(params[:date_axis])
       @x2_axis.merge_with_hash(params)
     end
 
@@ -270,6 +273,7 @@ module Writexlsx
     # Set the properties of the secondary Y-axis.
     #
     def set_y2_axis(params = {})
+      @date_category = true if ptrue?(params[:date_axis])
       @y2_axis.merge_with_hash(params)
     end
 
@@ -549,6 +553,7 @@ module Writexlsx
       @legend_position   = 'right'
       @smooth_allowed    = 0
       @cross_between     = 'between'
+      @date_category     = false
       @show_blanks       = 'gap'
       @show_hidden_data  = false
       @show_crosses      = true
@@ -795,12 +800,7 @@ module Writexlsx
     #
     # Write the <c:plotArea> element.
     #
-
     def write_plot_area   # :nodoc:
-      write_plot_area_base(&(Proc.new { |params| write_cat_axis(params) }))
-    end
-
-    def write_plot_area_base(type = nil) # :nodoc:
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
         write_layout(@plotarea.layout, 'plot')
@@ -808,23 +808,35 @@ module Writexlsx
         write_chart_type(:primary_axes => 1)
         write_chart_type(:primary_axes => 0)
 
-        # Write the c:catAx elements for series using primary axes.
+        # Write the category and value elements for the primary axes.
         params = {
           :x_axis   => @x_axis,
           :y_axis   => @y_axis,
           :axis_ids => @axis_ids
         }
-        yield(params)
+
+        if @date_category
+          write_date_axis(params)
+        else
+          write_cat_axis(params)
+        end
+
         write_val_axis(params)
 
-        # Write c:valAx and c:catAx elements for series using secondary axes.
+        # Write the category and value elements for the secondary axes.
         params = {
           :x_axis   => @x2_axis,
           :y_axis   => @y2_axis,
           :axis_ids => @axis2_ids
         }
+
         write_val_axis(params)
-        yield(params)
+
+        if @date_category
+          write_date_axis(params)
+        else
+          write_cat_axis(params)
+        end
 
         # Write the c:dTable element.
         write_d_table

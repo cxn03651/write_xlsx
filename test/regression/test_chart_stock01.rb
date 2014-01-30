@@ -61,12 +61,7 @@ class TestRegressionChartStock01 < Test::Unit::TestCase
                                 File.join(@regression_output, @xlsx),
                                 @xlsx,
                                 nil,
-                                {
-                                  'xl/charts/chart1.xml' => [ '<c:formatCode', ],
-
-                                  # Ignore the workbookView.
-                                  'xl/workbook.xml' => ['<workbookView']
-                                  }
+                                {'xl/charts/chart1.xml' => [ '<c:formatCode', ]}
                                 )
   end
 end
