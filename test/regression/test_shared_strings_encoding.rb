@@ -5,7 +5,7 @@ require 'helper'
 class TestRegressionSharedStringsEncoding < Test::Unit::TestCase
   def setup
     setup_dir_var
-    @f = File.open('klt.csv', "r:iso-8859-8")
+    @f = File.open(File.join(@test_dir, 'regression', 'klt.csv'), "r:iso-8859-8")
   end
 
   def teardown
