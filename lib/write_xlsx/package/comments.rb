@@ -20,17 +20,9 @@ module Writexlsx
         options ||= {}
         @workbook   = workbook
         @worksheet  = worksheet
-        @row        = row
-        @col        = col
+        @row, @col  = row, col
+        options_parse(row, col, options)
         @string     = string[0, STR_MAX]
-        @author     = options[:author]
-        @color      = backgrount_color(options[:color] || DEFAULT_COLOR)
-        @start_cell = options[:start_cell]
-        @start_row, @start_col = if @start_cell
-          substitute_cellref(@start_cell)
-        else
-          [ options[:start_row], options[:start_col] ]
-        end
         @start_row  ||= default_start_row(row)
         @start_col  ||= default_start_col(col)
         @visible    = options[:visible]
@@ -218,6 +210,26 @@ module Writexlsx
       def writer=(w)
         @writer = w
       end
+
+      private
+
+      def options_parse(row, col, options)
+        @color      = backgrount_color(options[:color] || DEFAULT_COLOR)
+        @author     = options[:author]
+        @start_cell = options[:start_cell]
+        @start_row, @start_col = if @start_cell
+          substitute_cellref(@start_cell)
+        else
+          [ options[:start_row], options[:start_col] ]
+        end
+        @visible    = options[:visible]
+        @x_offset   = options[:x_offset] || default_x_offset(col)
+        @y_offset   = options[:y_offset] || default_y_offset(row)
+        @x_scale    = options[:x_scale]  || 1
+        @y_scale    = options[:y_scale]  || 1
+        @width      = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
+        @height     = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+      end
     end
 
     class Comments
@@ -289,6 +301,7 @@ module Writexlsx
       end
 
       private
+
 
       def comments_visible?
         @worksheet.comments_visible?
