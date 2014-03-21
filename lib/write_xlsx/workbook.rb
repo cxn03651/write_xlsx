@@ -120,7 +120,6 @@ module Writexlsx
       @table_count         = 0
       @image_types         = {}
       @images              = []
-      @images_seen         = {}
 
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
@@ -1730,20 +1729,18 @@ module Writexlsx
     #
     def get_image_properties(filename)
       previous_images = []
+      images_seen = {}
       image_id = 1;
-      if @images_seen[filename]
+      if images_seen[filename]
         # We've processed this file already.
         index = images_seen[filename] - 1
-
-        # Increase image reference count.
-        image_data[index][0] += 1
       else
         # Open the image file and import the data.
         data = File.binread(filename)
         if data.unpack('x A3')[0] == 'PNG'
           # Test for PNGs.
           type, width, height = process_png(data)
-          image_types[:png] = 1
+          @image_types[:png] = 1
         elsif data.unpack('n')[0] == 0xFFD8
           # Test for JPEG files.
           type, width, height = process_jpg(data, filename)
@@ -1757,11 +1754,11 @@ module Writexlsx
           raise "Unsupported image format for file: #{filename}\n"
         end
 
-        @images << [ filename, type]
+        @images << [filename, type]
 
         # Also store new data for use in duplicate images.
         previous_images << [image_id, type, width, height]
-        @images_seen[filename] = image_id
+        images_seen[filename] = image_id
         image_id += 1
       end
 
