@@ -1,4 +1,7 @@
 Change history of write_xlsx rubygem.
+2014-03-21 v0.76.1
+   Fix for issue #7
+
 2014-01-31 v0.76.0
    Added date axis handling to charts.
    Added support for non-contiguous chart ranges.
