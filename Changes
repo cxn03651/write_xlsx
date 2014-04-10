@@ -1,4 +1,7 @@
 Change history of write_xlsx rubygem.
+2014-04-10 v0.76.3
+   dependency must be written in gemspec
+
 2014-04-10 v0.76.2
    Fix for issue #8
    use same rubyzip routine both in ruby-2+, 1.9+ and 1.8
