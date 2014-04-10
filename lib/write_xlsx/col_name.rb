@@ -17,7 +17,7 @@ class ColName
 
   def col_str_build(col)
     # Change from 0-indexed to 1 indexed.
-    col += 1
+    col = col.to_i + 1
     col_str = ''
 
     while col > 0
@@ -32,7 +32,7 @@ class ColName
       col_str = col_letter + col_str
 
       # Get the next order of magnitude.
-      col = ((col - 1) / 26).to_i
+      col = (col - 1) / 26
     end
 
     col_str
