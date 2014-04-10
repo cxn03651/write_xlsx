@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'rubygems'
-require 'simplecov' if RUBY_VERSION >= "1.9"
 require 'bundler'
-
-SimpleCov.start if RUBY_VERSION >= "1.9"
 
 begin
   Bundler.setup(:default, :development)
