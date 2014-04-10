@@ -9,8 +9,7 @@ require 'write_xlsx/format'
 require 'write_xlsx/shape'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart'
-ruby_18 { require 'write_xlsx/zip_file_utils' }
-ruby_19 { require 'zip' }
+require 'write_xlsx/zip_file_utils'
 require 'tmpdir'
 require 'tempfile'
 require 'digest/md5'
@@ -1232,13 +1231,7 @@ module Writexlsx
       packager = nil
 
       # Store the xlsx component files with the temp dir name removed.
-      ruby_19 do
-        # See https://github.com/randym/axlsx
-        Zip::OutputStream.open(@filename) do |zip|
-          write_parts(zip)
-        end
-      end ||
-      ruby_18 { ZipFileUtils.zip("#{@tempdir}", @filename) }
+      ZipFileUtils.zip("#{@tempdir}", @filename)
 
       IO.copy_stream(@filename, @fileobj) if @fileobj
       Writexlsx::Utility.delete_files(@tempdir)
