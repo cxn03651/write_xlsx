@@ -1,4 +1,7 @@
 Change history of write_xlsx rubygem.
+2014-05-12 v0.77.0
+   Fix for incorrect chart offsets in insert_chart() and set_size().
+
 2014-04-10 v0.76.3
    dependency must be written in gemspec
 

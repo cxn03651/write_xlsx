@@ -1,5 +1,5 @@
 require 'write_xlsx/workbook'
 
 class WriteXLSX < Writexlsx::Workbook
-  VERSION = "0.76.3"
+  VERSION = "0.77.0"
 end
