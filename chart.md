@@ -628,7 +628,7 @@ Set the x, y position of the legend in chart relative units:
 See the CHART LAYOUT section below.
 
 ##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
-This allows you to remove 1 or more series from the the legend
+This allows you to remove 1 or more series from the legend
 (the series will still display on the chart).
 This property takes an array as an argument and the series are zero indexed:
 

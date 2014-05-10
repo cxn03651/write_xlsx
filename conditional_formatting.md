@@ -45,7 +45,7 @@ See also the note about
 ["Cell notation"](worksheet.html#cell-notation)
 for more information.
 
-Using A1 style notation is is also possible to specify non-contiguous ranges,
+Using A1 style notation is also possible to specify non-contiguous ranges,
 separated by a comma. For example:
 
     worksheet.conditional_formatting('A1:D5,A8:D12', {...})
