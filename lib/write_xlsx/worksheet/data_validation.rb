@@ -49,6 +49,14 @@ module Writexlsx
         @error_type = has_key?(:error_type) ? error_type_hash[@error_type.downcase] : 0
 
         convert_date_time_value_if_required
+        # Check that the input title doesn't exceed the maximum length.
+        if @input_title && @input_title.length > 32
+          raise "Length of input title '#{@input_title}' exceeds Excel's limit of 32"
+        end
+        # Check that the input message doesn't exceed the maximum length.
+        if @input_message && @input_message.length > 255
+          raise "Length of input message '#{@input_message}' exceeds Excel's limit of 255"
+        end
         set_some_defaults
 
       # A (for now) undocumented parameter to pass additional cell ranges.
