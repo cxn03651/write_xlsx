@@ -1306,7 +1306,7 @@ module Writexlsx
     #
     def set_margins(margin)
       put_deprecate_message("#{self}.set_margins")
-      self::margin = margin
+      self::margins = margin
     end
 
     #
