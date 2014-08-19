@@ -7,6 +7,8 @@ module Writexlsx
 
       attr_reader :str, :tip
 
+      MAXIMUM_URLS_SIZE = 255
+
       def self.factory(url, str = nil, tip = nil)
         if url =~ /^internal:(.+)/
           InternalHyperlink.new($~[1], str, tip)
@@ -87,8 +89,8 @@ module Writexlsx
         @url_str = @str.dup
 
         # Excel limits escaped URL to 255 characters.
-        if @url.bytesize > 255
-          raise "URL '#{@url}' > 255 characters, it exceeds Excel's limit for URLS."
+        if @url.bytesize > MAXIMUM_URLS_SIZE
+          raise "URL '#{@url}' > #{MAXIMUM_URLS_SIZE} characters, it exceeds Excel's limit for URLS."
         end
 
         @tip = tip

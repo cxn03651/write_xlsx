@@ -1680,13 +1680,13 @@ module Writexlsx
       elsif token =~ /^\d+$/
         write_number(*args)
       # Match http, https or ftp URL
-      elsif token =~ %r|^[fh]tt?ps?://|
+      elsif token =~ %r|\A[fh]tt?ps?://|
         write_url(*args)
       # Match mailto:
-      elsif token =~ %r|^mailto:|
+      elsif token =~ %r|\Amailto:|
         write_url(*args)
       # Match internal or external sheet link
-      elsif token =~ %r!^(?:in|ex)ternal:!
+      elsif token =~ %r!\A(?:in|ex)ternal:!
         write_url(*args)
       # Match formula
       elsif token =~ /^=/
