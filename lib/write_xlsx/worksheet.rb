@@ -3216,21 +3216,22 @@ module Writexlsx
         others << format
       end
 
-      if type == 'string'
+      case type
+      when 'string'
         write_string(row_first, col_first, token, format, *others)
-      elsif type == 'number'
+      when 'number'
         write_number(row_first, col_first, token, format, *others)
-      elsif type == 'blank'
+      when 'blank'
         write_blank(row_first, col_first, *others)
-      elsif type == 'date_time'
+      when 'date_time'
         write_date_time(row_first, col_first, token, format, *others)
-      elsif type == 'rich_string'
+      when 'rich_string'
         write_rich_string(row_first, col_first, *others)
-      elsif type == 'url'
+      when 'url'
         write_url(row_first, col_first, token, format, *others)
-      elsif type == 'formula'
+      when 'formula'
         write_formula(row_first, col_first, token, format, *others)
-      elsif type == 'array_formula'
+      when 'array_formula'
         write_formula_array(row_first, col_first, *others)
       else
         raise "Unknown type '#{type}'"
