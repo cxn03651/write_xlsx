@@ -1,4 +1,7 @@
 Change history of write_xlsx rubygem.
+2014-08-19 v0.77.2
+   Fix for issue #16.
+
 2014-07-02 v0.77.1
    Fix for issue #14. thanks leonid-pavlov.
 
