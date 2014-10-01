@@ -353,8 +353,11 @@ module Writexlsx
       properties = is_text ? [:x, :y] : [:x, :y, :width, :height]
 
       # Check for valid properties.
-      allowable = Hash.new
-      allowable[properties.size] = nil
+      args.keys.each do |key|
+        unless properties.include?(key.to_sym)
+            raise "Property '#{key}' not allowed in layout options\n"
+        end
+      end
 
       # Set the layout properties
       layout = Hash.new
