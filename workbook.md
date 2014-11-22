@@ -21,6 +21,7 @@ The following methods are available through a new workbook.
 * [set_custom_color](#set_custom_color)
 * [sheets](#sheets)
 * [set_1904](#set_1904)
+* [set_calc_mode](#set_calc_mode)
 
 #### <a name="new" class="anchor" href="#new"><span class="octicon octicon-link" /></a>new
 
@@ -120,6 +121,7 @@ The available types are:
     column
     line
     pie
+    doughnut
     scatter
     stock
 
@@ -387,6 +389,24 @@ See also [DATES AND TIME IN EXCEL][] for more information about working with Exc
 
 In general you probably won't need to use `set_1904()`.
 
+
+#### <a name="set_calc_mode" class="anchor" href="#set_calc_mode"><span class="octicon octicon-link" /></a>set_calc_mode()
+
++Set the calculation mode for formulas in the workbook. This is mainly of use for workbooks with slow formulas where you want to allow the user to calculate them manually.
+
+The mode parameter can be one of the following strings:
+
+:auto
+
+The default. Excel will re-calculate formulas when a formula or a value affecting the formula changes.
+
+:manual
+
+Only re-calculate formulas when the user requires it. Generally by pressing F9.
+
+:auto_except_tables
+
+Excel will automatically re-calculate formulas except for tables.
 
 [CELL NOTATION]: worksheet.html#cell-notation
 [CELL FORMATTING]: cell_formatting.html#cell_formatting

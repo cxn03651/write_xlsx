@@ -57,6 +57,9 @@ Currently the supported chart types are:
 * pie
     <p>Creates a Pie style chart. See WriteXLSX::Chart::Pie.</p>
 
+* doughnut
+    <p>Creates a Doughnut style chart. See WriteXLSX::Chart::Doughnut.</p>
+
 * scatter
     <p>Creates a Scatter style chart. See WriteXLSX::Chart::Scatter.</p>
 
@@ -943,7 +946,7 @@ Several of these properties can be set in one go:
     )
 
 Trendlines cannot be added to series in a stacked chart or pie chart, radar
-chart or (when implemented) to 3D, surface, or doughnut charts.
+chart, doughnut or (when implemented) to 3D, or surface charts.
 
 ##### <a name="series_error_bars" class="anchor" href="#series_error_bars"><span class="octicon octicon-link" /></a>Error Bars
 
@@ -1092,7 +1095,7 @@ Valid positions are:
     best_fit        # Pie chart mainly.
 
 The percentage property is used to turn on the display of data labels as
-a Percentage for a series. It is mainly used for pie charts.
+a Percentage for a series. It is mainly used for pie and doughnut charts.
 
     chart.add_series(
         :values      => '=Sheet1!$B$1:$B$5',
@@ -1116,7 +1119,7 @@ adjusted automatically.
 
 In general formatting is applied to an entire series in a chart. However,
 it is occasionally required to format individual points in a series.
-In particular this is required for Pie charts where each segment is represented
+In particular this is required for Pie and Doughnut charts where each segment is represented
 by a point.
 
 In these cases it is possible to use the points property of `add_series()`:

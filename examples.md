@@ -51,6 +51,10 @@ A demo of line style charts.
 A demo of pie style charts.
 ![Output from chart_pie.rb](images/examples/chart_pie.jpg)
 
+#### <a name="chart_doughnut" class="anchor" href="#chart_doughnut"><span class="octicon octicon-link" /></a>chart_doughnut
+A demo of doughnut style charts.
+![Output from chart_doughnut.rb](images/examples/chart_doughnut.jpg)
+
 #### <a name="chart_radar" class="anchor" href="#chart_radar"><span class="octicon octicon-link" /></a>chart_radar
 A demo of radar style charts.
 ![Output from chart_radar.rb](images/examples/chart_radar.jpg)
