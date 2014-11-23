@@ -64,7 +64,10 @@ module Writexlsx
 
         vml = Package::Vml.new
         vml.set_xml_writer("#{dir}/vmlDrawing#{index+1}.vml")
-        vml.assemble_xml_file(sheet)
+        vml.assemble_xml_file(
+                              sheet.vml_data_id, sheet.vml_shape_id,
+                              sheet.sorted_comments, sheet.buttons_data
+                              )
       end
     end
 

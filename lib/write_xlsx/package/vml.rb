@@ -16,26 +16,28 @@ module Writexlsx
         @writer.set_xml_writer(filename)
       end
 
-      def assemble_xml_file(worksheet)
+      def assemble_xml_file(
+                            data_id, vml_shape_id, comments_data,
+                            buttons_data, header_images_data = nil
+                            )
         return unless @writer
 
         write_xml_namespace do
           # Write the o:shapelayout element.
-          write_shapelayout(worksheet.vml_data_id)
+          write_shapelayout(data_id)
 
           z_index = 1
-          vml_shape_id = worksheet.vml_shape_id
-          unless worksheet.buttons_data.empty?
+          unless buttons_data.empty?
             vml_shape_id, z_index =
               write_shape_type_and_shape(
-                                         worksheet.buttons_data,
+                                         buttons_data,
                                          vml_shape_id, z_index) do
               write_button_shapetype
             end
           end
-          unless worksheet.sorted_comments.empty?
+          unless comments_data.empty?
             write_shape_type_and_shape(
-                                       worksheet.sorted_comments,
+                                       comments_data,
                                        vml_shape_id, z_index) do
               write_comment_shapetype
             end
