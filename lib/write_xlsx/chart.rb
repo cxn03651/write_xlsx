@@ -156,6 +156,9 @@ module Writexlsx
       when 'Column'
         require 'write_xlsx/chart/column'
         Chart::Column.new(subtype)
+      when 'Doughnut'
+        require 'write_xlsx/chart/doughnut'
+        Chart::Doughnut.new(subtype)
       when 'Line'
         require 'write_xlsx/chart/line'
         Chart::Line.new(subtype)
@@ -1926,7 +1929,7 @@ module Writexlsx
         (!fill || !ptrue?(fill[:_defined]))
 
       @writer.tag_elements('c:spPr') do
-        # Write the fill elements for solid charts such as pie and bar.
+        # Write the fill elements for solid charts such as pie/doughnut and bar.
         if fill && fill[:_defined] != 0
           if ptrue?(fill[:none])
             # Write the a:noFill element.

@@ -745,7 +745,9 @@ module Writexlsx
 
         writer.empty_tag('sz', [ ['val', size] ]) unless dxf_format
 
-        if ptrue?(theme)
+        if theme == -1
+          # Ignore for excel2003_style
+        elsif ptrue?(theme)
           write_color(writer, 'theme', theme)
         elsif ptrue?(@color_indexed)
           write_color(writer, 'indexed', @color_indexed)
@@ -799,7 +801,9 @@ module Writexlsx
     end
 
     def write_font_family_scheme(writer)
-      writer.empty_tag('family', [ ['val', @font_family] ])
+      if ptrue?(@font_family)
+          writer.empty_tag('family', [ ['val', @font_family] ])
+      end
 
       if @font == 'Calibri' && !ptrue?(@hyperlink)
         writer.empty_tag('scheme', [ ['val', @font_scheme] ])

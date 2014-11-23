@@ -12,7 +12,7 @@ module Writexlsx
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
       attr_writer :across                                                   # :nodoc:
       attr_accessor :orientation, :print_options_changed  # :nodoc:
-      attr_accessor :header, :footer, :header_footer_changed
+      attr_accessor :header, :footer, :header_footer_changed, :header_footer_aligns
       attr_writer :page_start
 
       def initialize # :nodoc:
@@ -136,13 +136,20 @@ module Writexlsx
       #
       # Write the <headerFooter> element.
       #
-      def write_header_footer(writer) #:nodoc:
-        return unless @header_footer_changed
+      def write_header_footer(writer, excel2003_style) #:nodoc:
+        tag = 'headerFooter'
+        attributes = []
+        attributes << ['alignWithMargins', 0] if @header_footer_aligns
 
-        writer.tag_elements('headerFooter') do
-          write_odd_header(writer) if @header && @header != ''
-          write_odd_footer(writer) if @footer && @footer != ''
+        if @header_footer_changed
+          writer.tag_elements(tag, attributes) do
+            write_odd_header(writer) if @header && @header != ''
+            write_odd_footer(writer) if @footer && @footer != ''
+          end
+        elsif excel2003_style
+          writer.empty_tag(tag, attributes)
         end
+
       end
 
       private

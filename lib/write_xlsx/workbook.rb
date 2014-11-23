@@ -46,6 +46,7 @@ module Writexlsx
     attr_reader :image_types, :images  # :nodoc:
     attr_reader :shared_strings  # :nodoc:
     attr_reader :vba_project  # :nodoc:
+    attr_reader :excel2003_style # :nodoc:
     #
     # A new Excel workbook is created using the +new+ constructor
     # which accepts either a filename or an IO object as a parameter.
@@ -87,12 +88,14 @@ module Writexlsx
     #     formats = { :font => 'Arial', :size => 10.5 }
     #     workbook = WriteXLSX.new('file.xlsx', formats)
     #
-    def initialize(file, default_formats = {})
+    def initialize(file, *option_params)
+      options, default_formats = process_workbook_options(*option_params)
       @writer = Package::XMLWriterSimple.new
 
-      @tempdir  = File.join(Dir.tmpdir, Digest::MD5.hexdigest(Time.now.to_s))
+      @tempdir = options[:tempdir] ||
+        File.join(Dir.tmpdir, Digest::MD5.hexdigest(Time.now.to_s))
       setup_filename(file)
-      @date_1904           = false
+      @date_1904           = options[:date_1904] || false
       @activesheet         = 0
       @firstsheet          = 0
       @selected            = 0
@@ -110,12 +113,13 @@ module Writexlsx
       @custom_colors       = []
       @doc_properties      = {}
       @local_time          = Time.now
-      @optimization        = 0
+      @optimization        = options[:optimization] || 0
       @x_window            = 240
       @y_window            = 15
       @window_width        = 16095
       @window_height       = 9660
       @tab_ratio           = 500
+      @excel2003_style     = options[:excel2003_style] || false
       @table_count         = 0
       @image_types         = {}
       @images              = []
@@ -123,7 +127,17 @@ module Writexlsx
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
 
-      add_format(default_formats.merge(:xf_index => 0))
+      # Formula calculation default settings.
+      @calc_id             = 124519
+      @calc_mode           = 'auto'
+      @calc_on_load        = true
+
+      if @excel2003_style
+        add_format(default_formats
+                     .merge(:xf_index => 0, :font_family => 0, :font => 'Arial', :size => 10, :theme => -1))
+      else
+        add_format(default_formats.merge(:xf_index => 0))
+      end
       set_color_palette
     end
 
@@ -404,7 +418,13 @@ module Writexlsx
     # See the {Format Class's rdoc}[Format.html] for more details about
     # Format properties and how to set them.
     #
-    def add_format(properties = {})
+    def add_format(property_hash = {})
+      properties = {}
+      if @excel2003_style
+        properties.update(:font => 'Arial', :size => 10, :theme => -1)
+      end
+      properties.update(property_hash)
+
       format = Format.new(@formats, properties)
 
       @formats.formats.push(format)    # Store format reference
@@ -814,6 +834,23 @@ module Writexlsx
     end
 
     #
+    # set_calc_mode()
+    #
+    # Set the Excel caclcuation mode for the workbook.
+    #
+    def set_calc_mode(mode, calc_id = nil)
+      @calc_mode = mode || 'auto'
+
+      if mode == 'manual'
+          @calc_on_load = false
+      elsif mode == 'auto_except_tables'
+        @calc_mode = 'autoNoTable'
+      end
+
+      @calc_id = calc_id if calc_id
+    end
+
+    #
     # Change the RGB components of the elements in the colour palette.
     #
     # The set_custom_color method can be used to override one of the built-in
@@ -1139,10 +1176,18 @@ module Writexlsx
     end
 
     def write_calc_pr #:nodoc:
-      attributes = [
-                    ['calcId', 124519],
-                    ['fullCalcOnLoad', 1]
-                   ]
+      attributes = [ ['calcId', @calc_id] ]
+
+      case @calc_mode
+      when 'manual'
+        attributes << ['calcMode', 'manual']
+        attributes << ['calcOnSave', 0]
+      when 'autoNoTable'
+        attributes << ['calcMode', 'autoNoTable']
+      end
+
+      attributes << ['fullCalcOnLoad', 1] if @calc_on_load
+
       @writer.empty_tag('calcPr', attributes)
     end
 

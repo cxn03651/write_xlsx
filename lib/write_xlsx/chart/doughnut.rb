@@ -1,0 +1,90 @@
+# -*- coding: utf-8 -*-
+###############################################################################
+#
+# Doughnut - A class for writing Excel Doughnut charts.
+#
+# Used in conjunction with Excel::Writer::XLSX::Chart.
+#
+# See formatting note in Excel::Writer::XLSX::Chart.
+#
+# Copyright 2000-2014, John McNamara, jmcnamara@cpan.org
+# Convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+#
+
+require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/chart'
+require 'write_xlsx/chart/pie'
+require 'write_xlsx/utility'
+
+module Writexlsx
+  class Chart
+    class Doughnut < Pie
+      include Writexlsx::Utility
+
+      def initialize(subtype)
+        super(subtype)
+        @vary_data_color = 1
+        @hole_size       = 50
+        @rotation        = 0
+      end
+
+      #
+      # set_hole_size
+      #
+      # Set the Doughnut chart hole size.
+      #
+      def set_hole_size(size)
+        return unless size
+
+        if size >= 10 && size <= 90
+          @hole_size = size
+        else
+          raise "Hole size $size outside Excel range: 10 <= size <= 90";
+        end
+      end
+
+      private
+
+      #
+      # write_chart_type
+      #
+      # Override the virtual superclass method with a chart specific method.
+      #
+      def write_chart_type
+        # Write the c:doughnutChart element.
+        write_doughnut_chart
+      end
+
+      #
+      # write_doughnut_chart
+      #
+      # Write the <c:doughnutChart> element. Over-ridden method to remove axis_id code
+      # since Doughnut charts don't require val and cat axes.
+      #
+      def write_doughnut_chart
+        @writer.tag_elements('c:doughnutChart') do
+          # Write the c:varyColors element.
+          write_vary_colors
+
+          # Write the series elements.
+          @series.each { |s| write_ser(s) }
+
+          # Write the c:firstSliceAng element.
+          write_first_slice_ang
+
+          # Write the c:holeSize element.
+          write_hole_size
+        end
+      end
+
+      #
+      # write_hole_size
+      #
+      # Write the <c:holeSize> element.
+      #
+      def write_hole_size
+        @writer.empty_tag('c:holeSize', [ ['val', @hole_size] ])
+      end
+    end
+  end
+end
