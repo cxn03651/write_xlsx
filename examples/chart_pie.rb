@@ -60,7 +60,7 @@ worksheet.insert_chart('C2', chart1, 25, 10)
 # Create an example Pie chart like above.
 chart2 = workbook.add_chart(:type => 'pie', :embedded => 1)
 
-# Configure the series and add user defined segment colours.
+# Configure the series.
 chart2.add_series(
                   :name       => 'Pie sales data',
                   :categories => '=Sheet1!$A$2:$A$4',
