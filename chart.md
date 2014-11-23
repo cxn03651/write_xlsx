@@ -29,6 +29,8 @@ To create a simple Excel file with a chart using WriteXLSX:
         values     => '=Sheet1!$B$2:$B$7'
     )
 
+    workbook.close
+
 ### <a name="description" class="anchor" href="#description"><span class="octicon octicon-link" /></a>DESCRIPTION
 
 The Chart module is an abstract base class for modules that implement charts
@@ -1402,6 +1404,8 @@ the y2_axis or x2_axis property of the series:
 
     # Insert the chart into the worksheet.
     worksheet.insert_chart('D2', chart)
+
+    workbook.close
 
 Note, it isn't currently possible to add a secondary axis of a different
 chart type (for example line and column).
