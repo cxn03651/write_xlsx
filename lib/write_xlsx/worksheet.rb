@@ -352,7 +352,10 @@ module Writexlsx
       @outline_row_level = 0
       @outline_col_level = 0
 
+      @original_row_height    = 15
       @default_row_height     = 15
+      @default_row_pixels     = 20
+      @default_col_pixels     = 64
       @default_row_rezoed     = 0
 
       @merge = []
@@ -365,6 +368,17 @@ module Writexlsx
 
       @cond_formats = {}
       @dxf_priority = 1
+
+      if excel2003_style?
+        @original_row_height      = 12.75
+        @default_row_height       = 12.75
+        @default_row_pixels       = 17
+        self::margins_left_right  = 0.75
+        self::margins_top_bottom  = 1
+        @page_setup.margin_header = 0.5
+        @page_setup.margin_footer = 0.5
+        @page_setup.header_footer_aligns = 1
+      end
     end
 
     def set_xml_writer(filename) #:nodoc:
@@ -381,6 +395,8 @@ module Writexlsx
           write_cols
           write_sheet_data
           write_sheet_protection
+          # write_sheet_calc_pr
+          write_phonetic_pr if excel2003_style?
           write_auto_filter
           write_merge_cells
           write_conditional_formats
@@ -3087,10 +3103,10 @@ module Writexlsx
     # Set the default row properties
     #
     def set_default_row(height = nil, zero_height = nil)
-      height      ||= 15
+      height      ||= @original_row_height
       zero_height ||= 0
 
-      if height != 15
+      if height != @original_row_height
         @default_row_height = height
 
         # Store the row change to allow optimisations.
@@ -5601,7 +5617,7 @@ module Writexlsx
         x_abs = (0 .. col_start-1).inject(0) {|sum, col| sum += size_col(col)}
       else
         # Optimisation for when the column widths haven't changed.
-        x_abs = 64 * col_start
+        x_abs = @default_col_pixels * col_start
       end
       x_abs += x1
 
@@ -5611,7 +5627,7 @@ module Writexlsx
         y_abs = (0 .. row_start-1).inject(0) {|sum, row| sum += size_row(row)}
       else
         # Optimisation for when the row heights haven't changed.
-        y_abs = 20 * row_start
+        y_abs = @default_row_pixels * row_start
       end
       y_abs += y1
 
@@ -5679,6 +5695,10 @@ module Writexlsx
 
     def date_1904? #:nodoc:
       @workbook.date_1904?
+    end
+
+    def excel2003_style? # :nodoc:
+      @workbook.excel2003_style
     end
 
     #
@@ -6087,7 +6107,7 @@ module Writexlsx
           pixels = (width * MAX_DIGIT_WIDTH + 0.5).to_i + PADDING
         end
       else
-        pixels = 64
+        pixels = @default_col_pixels
       end
       pixels
     end
@@ -6279,8 +6299,8 @@ module Writexlsx
       end
 
       # Ensure that a width and height have been set.
-      default_width  = 64
-      default_height = 20
+      default_width  = @default_col_pixels
+      default_height = @default_row_pixels
       params[:width]  = default_width  if !params[:width]
       params[:height] = default_height if !params[:height]
 
@@ -6498,7 +6518,7 @@ module Writexlsx
       attributes = [
                     ['defaultRowHeight', @default_row_height]
                    ]
-      if @default_row_height != 15
+      if @default_row_height != @original_row_height
         attributes << ['customHeight', 1]
       end
 
@@ -6651,9 +6671,9 @@ module Writexlsx
       attributes << ['spans',        spans]    if spans
       attributes << ['s',            xf_index] if ptrue?(xf_index)
       attributes << ['customFormat', 1]        if ptrue?(format)
-      attributes << ['ht',           height]   if height != 15
+      attributes << ['ht',           height]   if height != @original_row_height
       attributes << ['hidden',       1]        if ptrue?(hidden)
-      attributes << ['customHeight', 1]        if height != 15
+      attributes << ['customHeight', 1]        if height != @original_row_height
       attributes << ['outlineLevel', level]    if ptrue?(level)
       attributes << ['collapsed',    1]        if ptrue?(collapsed)
 
@@ -6794,7 +6814,7 @@ module Writexlsx
     #
     def write_phonetic_pr #:nodoc:
       attributes = [
-                    ['fontId', 1],
+                    ['fontId', 0],
                     ['type',   'noConversion']
                    ]
 
@@ -6856,7 +6876,7 @@ module Writexlsx
     # Write the <headerFooter> element.
     #
     def write_header_footer #:nodoc:
-      @page_setup.write_header_footer(@writer)
+      @page_setup.write_header_footer(@writer, excel2003_style?)
     end
 
     #

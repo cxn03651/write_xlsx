@@ -28,6 +28,20 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
+        @vary_data_color = 1
+        @rotation        = 0
+      end
+
+      #
+      # Set the Pie/Doughnut chart rotation: the angle of the first slice.
+      #
+      def set_rotation(rotation)
+        return unless rotation
+        if rotation >= 0 && rotation <= 360
+          @rotation = rotation
+        else
+          raise "Chart rotation $rotation outside range: 0 <= rotation <= 360"
+        end
       end
 
       #
@@ -55,7 +69,7 @@ module Writexlsx
 
       #
       # Over-ridden method to remove the cat_axis() and val_axis() code since
-      # Pie charts don't require those axes.
+      # Pie/Doughnut charts don't require those axes.
       #
       # Write the <c:plotArea> element.
       #
@@ -156,7 +170,7 @@ module Writexlsx
       # Write the <c:firstSliceAng> element.
       #
       def write_first_slice_ang
-        @writer.empty_tag('c:firstSliceAng', [ ['val', 0] ])
+        @writer.empty_tag('c:firstSliceAng', [ ['val', @rotation] ])
       end
     end
   end

@@ -562,6 +562,32 @@ module Writexlsx
       rgb = @palette[idx]
       sprintf("%02X%02X%02X", *rgb)
     end
+
+    #
+    # Workbook の生成時のオプションハッシュを解析する
+    #
+    def process_workbook_options(*params)
+      case params.size
+      when 0
+        [{}, {}]
+      when 1 # one hash
+        options_keys = [:tempdir, :date_1904, :optimization, :excel2003_style]
+
+        hash = params.first
+        options = hash.reject{|k,v| !options_keys.include?(k)}
+
+        default_format_properties =
+          hash[:default_format_properties] ||
+          hash.reject{|k,v| options_keys.include?(k)}
+
+        [options, default_format_properties.dup]
+      when 2 # array which includes options and default_format_properties
+        options, default_format_properties = params
+        default_format_properties ||= {}
+
+        [options.dup, default_format_properties.dup]
+      end
+    end
   end
 
   module WriteDPtPoint

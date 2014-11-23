@@ -1,4 +1,11 @@
 Change history of write_xlsx rubygem.
+2014-11-22 v0.78.0
+   Added Doughnut chart with set_rotation and set_hole_size methods.
+   Added set_rotation method to Pie charts.
+   Added set_calc_mode method to control automatic calculation of
+   formulas when worksheet is opened.
+
+
 2014-08-19 v0.77.2
    Fix for issue #16.
 
