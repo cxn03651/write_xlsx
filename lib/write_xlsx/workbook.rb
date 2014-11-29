@@ -985,7 +985,7 @@ module Writexlsx
     end
 
     def num_vml_files
-      @worksheets.select { |sheet| sheet.has_vml? }.count
+      @worksheets.select { |sheet| sheet.has_vml? || sheet.has_header_vml? }.count
     end
 
     def num_comment_files
@@ -1534,18 +1534,32 @@ module Writexlsx
       comment_id     = 0
       vml_drawing_id = 0
       vml_data_id    = 1
+      vml_header_id  = 0
       vml_shape_id   = 1024
+      comment_files  = 0
 
-      @worksheets.select { |sheet| sheet.has_vml? }.each do |sheet|
-        comment_id += 1 if sheet.has_comments?
-        vml_drawing_id += 1
+      @worksheets.each do |sheet|
+        next if !sheet.has_vml? && !sheet.has_header_vml?
+        if sheet.has_vml?
+          if sheet.has_comments?
+            comment_files += 1
+            comment_id    += 1
+          end
+          vml_drawing_id += 1
 
-        sheet.prepare_vml_objects(vml_data_id, vml_shape_id,
-                                  vml_drawing_id, comment_id)
+          sheet.prepare_vml_objects(vml_data_id, vml_shape_id,
+                                    vml_drawing_id, comment_id)
 
-        # Each VML file should start with a shape id incremented by 1024.
-        vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
-        vml_shape_id += 1024 * ( 1 + sheet.num_comments_block )
+          # Each VML file should start with a shape id incremented by 1024.
+          vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
+          vml_shape_id += 1024 * ( 1 + sheet.num_comments_block )
+        end
+
+        if sheet.has_header_vml?
+          vml_header_id  += 1
+          vml_drawing_id += 1
+          sheet.prepare_header_vml_objects(vml_header_id, vml_drawing_id)
+        end
       end
 
       add_font_format_for_cell_comments if num_comment_files > 0
@@ -1730,27 +1744,69 @@ module Writexlsx
         chart_count = sheet.charts.size
         image_count = sheet.images.size
         shape_count = sheet.shapes.size
-        next if chart_count + image_count + shape_count == 0
+        header_image_count = sheet.header_images.size
+        footer_image_count = sheet.footer_images.size
+        has_drawing = false
 
-        drawing_id += 1
+        # Check that some image or drawing needs to be processed.
+        next if chart_count + image_count + shape_count + header_image_count + footer_image_count == 0
 
+        # Don't increase the drawing_id header/footer images.
+        if chart_count + image_count + shape_count > 0
+          drawing_id += 1
+          has_drawing = true
+        end
+
+        # Prepare the worksheet charts.
         sheet.charts.each_with_index do |chart, index|
           chart_ref_id += 1
           sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end
 
+        # Prepare the worksheet images.
         sheet.images.each_with_index do |image, index|
-          image_id, type, width, height, name = get_image_properties(image[2])
+          type, width, height, name, x_dpi, y_dpi = get_image_properties(image[2])
           image_ref_id += 1
-          sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type)
+          sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type, x_dpi, y_dpi)
         end
 
+        # Prepare the worksheet shapes.
         sheet.shapes.each_with_index do |shape, index|
           sheet.prepare_shape(index, drawing_id)
         end
 
-        drawing = sheet.drawing
-        @drawings << drawing
+        # Prepare the header images.
+        header_image_count.times do |index|
+          filename = sheet.header_images[index][0]
+          position = sheet.header_images[index][1]
+
+          type, width, height, name, x_dpi, y_dpi =
+            get_image_properties(filename)
+
+          image_ref_id += 1
+
+          sheet.prepare_header_image(image_ref_id, width, height,
+                                     name, type, position, x_dpi, y_dpi)
+        end
+
+        # Prepare the footer images.
+        footer_image_count.times do |index|
+          filename = sheet.footer_images[index][0]
+          position = sheet.footer_images[index][1]
+
+          type, width, height, name, x_dpi, y_dpi =
+            get_image_properties(filename)
+
+          image_ref_id += 1
+
+          sheet.prepare_header_image(image_ref_id, width, height,
+                                     name, type, position, x_dpi, y_dpi)
+        end
+
+        if has_drawing
+          drawing = sheet.drawing
+          @drawings << drawing
+        end
       end
 
       # Sort the workbook charts references into the order that the were
@@ -1766,41 +1822,32 @@ module Writexlsx
     # any duplicates.
     #
     def get_image_properties(filename)
-      previous_images = []
-      images_seen = {}
-      image_id = 1;
-      if images_seen[filename]
-        # We've processed this file already.
-        index = images_seen[filename] - 1
+      # Note the image_id, and previous_images mechanism isn't currently used.
+      x_dpi = 96
+      y_dpi = 96
+
+      # Open the image file and import the data.
+      data = File.binread(filename)
+      if data.unpack('x A3')[0] == 'PNG'
+        # Test for PNGs.
+        type, width, height, x_dpi, y_dpi = process_png(data)
+        @image_types[:png] = 1
+      elsif data.unpack('n')[0] == 0xFFD8
+        # Test for JPEG files.
+        type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
+        @image_types[:jpeg] = 1
+      elsif data.unpack('A2')[0] == 'BM'
+        # Test for BMPs.
+        type, width, height = process_bmp(data, filename)
+        @image_types[:bmp] = 1
       else
-        # Open the image file and import the data.
-        data = File.binread(filename)
-        if data.unpack('x A3')[0] == 'PNG'
-          # Test for PNGs.
-          type, width, height = process_png(data)
-          @image_types[:png] = 1
-        elsif data.unpack('n')[0] == 0xFFD8
-          # Test for JPEG files.
-          type, width, height = process_jpg(data, filename)
-          @image_types[:jpeg] = 1
-        elsif data.unpack('A2')[0] == 'BM'
-          # Test for BMPs.
-          type, width, height = process_bmp(data, filename)
-          @image_types[:bmp] = 1
-        else
-          # TODO. Add Image::Size to support other types.
-          raise "Unsupported image format for file: #{filename}\n"
-        end
-
-        @images << [filename, type]
-
-        # Also store new data for use in duplicate images.
-        previous_images << [image_id, type, width, height]
-        images_seen[filename] = image_id
-        image_id += 1
+        # TODO. Add Image::Size to support other types.
+        raise "Unsupported image format for file: #{filename}\n"
       end
 
-      [image_id, type, width, height, File.basename(filename)]
+      @images << [filename, type]
+
+      [type, width, height, File.basename(filename), x_dpi, y_dpi]
     end
 
     #
@@ -1808,27 +1855,75 @@ module Writexlsx
     #
     def process_png(data)
       type   = 'png'
-      width  = data[16, 4].unpack("N")[0]
-      height = data[20, 4].unpack("N")[0]
+      width  = 0
+      height = 0
+      x_dip  = 96
+      y_dpi  = 96
 
-      [type, width, height]
+      offset = 8
+      data_length = data.size
+
+      # Search through the image data to read the height and width in th the
+      # IHDR element. Also read the DPI in the pHYs element.
+      while offset < data_length
+
+        length = data[offset + 0, 4].unpack("N")[0]
+        png_type   = data[offset + 4, 4].unpack("A4")[0]
+
+        case png_type
+        when "IHDR"
+          width  = data[offset +  8, 4].unpack("N")[0]
+          height = data[offset + 12, 4].unpack("N")[0]
+        when "pHYs"
+          x_ppu = data[offset +  8, 4].unpack("N")[0]
+          y_ppu = data[offset + 12, 4].unpack("N")[0]
+          units = data[offset + 16, 1].unpack("C")[0]
+
+          if units == 1
+            x_dpi = x_ppu * 0.0254
+            y_dpi = y_ppu * 0.0254
+          end
+        end
+
+        offset = offset + length + 12
+
+        break if png_type == "IEND"
+      end
+      raise "#{filename}: no size data found in png image.\n" unless height
+
+      [type, width, height, x_dpi, y_dpi]
     end
 
     def process_jpg(data, filename)
       type     = 'jpeg'
+      x_dpi    = 96
+      y_dpi    = 96
+
       offset = 2
       data_length = data.bytesize
 
-      # Search through the image data to find the 0xFFC0 marker. The height and
-      # width are contained in the data for that sub element.
+      # Search through the image data to read the height and width in the
+      # 0xFFC0/C2 element. Also read the DPI in the 0xFFE0 element.
       while offset < data_length
-        marker  = data[offset,   2].unpack("n")[0]
+        marker  = data[offset+0, 2].unpack("n")[0]
         length  = data[offset+2, 2].unpack("n")[0]
 
         if marker == 0xFFC0 || marker == 0xFFC2
           height = data[offset+5, 2].unpack("n")[0]
           width  = data[offset+7, 2].unpack("n")[0]
-          break
+        end
+        if marker == 0xFFE0
+          units     = data[offset + 11, 1].unpack("C")[0]
+          x_density = data[offset + 12, 2].unpack("n")[0]
+          y_density = data[offset + 14, 2].unpack("n")[0]
+
+          if units == 1
+            x_dpi = x_density
+            y_dpi = y_density
+          elsif units == 2
+            x_dpi = x_density * 2.54
+            y_dpi = y_density * 2.54
+          end
         end
 
         offset += length + 2
@@ -1836,7 +1931,7 @@ module Writexlsx
       end
 
       raise "#{filename}: no size data found in jpeg image.\n" unless height
-      [type, width, height]
+      [type, width, height, x_dpi, y_dpi]
     end
 
     # Extract width and height information from a BMP file.

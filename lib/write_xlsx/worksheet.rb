@@ -285,7 +285,10 @@ module Writexlsx
 
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
+    attr_reader :header_images, :footer_images # :nodoc:
+    attr_reader :vml_drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
+    attr_reader :vml_header_id # :nodoc:
     attr_reader :autofilter_area # :nodoc:
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
     attr_reader :vml_shape_id # :nodoc:
@@ -342,12 +345,15 @@ module Writexlsx
       @external_vml_links     = []
       @external_table_links   = []
       @drawing_links          = []
+      @vml_drawing_links      = []
       @charts                 = []
       @images                 = []
       @tables                 = []
       @sparklines             = []
       @shapes                 = []
       @shape_hash             = {}
+      @header_images          = []
+      @footer_images          = []
 
       @outline_row_level = 0
       @outline_col_level = 0
@@ -360,9 +366,11 @@ module Writexlsx
 
       @merge = []
 
-      @has_vml  = false
+      @has_vml        = false
+      @has_header_vml = false
       @comments = Package::Comments.new(self)
       @buttons_array          = []
+      @header_images_array    = []
 
       @validations = []
 
@@ -377,7 +385,7 @@ module Writexlsx
         self::margins_top_bottom  = 1
         @page_setup.margin_header = 0.5
         @page_setup.margin_footer = 0.5
-        @page_setup.header_footer_aligns = 1
+        @page_setup.header_footer_aligns = false
       end
     end
 
@@ -410,6 +418,7 @@ module Writexlsx
           write_col_breaks
           write_drawings
           write_legacy_drawing
+          write_legacy_drawing_hf
           write_table_parts
           write_ext_sparklines
         end
@@ -1186,11 +1195,46 @@ module Writexlsx
     # See, also the headers.rb program in the examples directory of the
     # distribution.
     #
-    def set_header(string = '', margin = 0.3)
+    def set_header(string = '', margin = 0.3, options = {})
       raise 'Header string must be less than 255 characters' if string.length >= 255
+      # Replace the Excel placeholder &[Picture] with the internal &G.
+      @page_setup.header = string.gsub(/&\[Picture\]/, '&G')
 
-      @page_setup.header                = string
-      @page_setup.margin_header         = margin
+      if string.size >= 255
+        raise 'Header string must be less than 255 characters'
+      end
+
+      if options[:align_with_margins]
+        @page_setup.header_footer_aligns = options[:align_with_margins]
+      end
+
+      if options[:scale_with_doc]
+        @page_setup.header_footer_scales = options[:scale_with_doc]
+      end
+
+      # Reset the array in case the function is called more than once.
+      @header_images = []
+
+      [
+       [:image_left, 'LH'], [:image_center, 'CH'], [:image_right, 'RH']
+      ].each do |p|
+        if options[p.first]
+          @header_images << [options[p.first], p.last]
+        end
+      end
+
+      # placeholeder /&G/ の数
+      placeholder_count = @page_setup.header.scan(/&G/).count
+
+      image_count = @header_images.count
+
+      if image_count != placeholder_count
+        raise "Number of header image (#{image_count}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.header}"
+      end
+
+      @has_header_vml = true if image_count > 0
+
+      @page_setup.margin_header         = margin || 0.3
       @page_setup.header_footer_changed = true
     end
 
@@ -1199,10 +1243,48 @@ module Writexlsx
     #
     # The syntax of the set_footer() method is the same as set_header()
     #
-    def set_footer(string = '', margin = 0.3)
+    def set_footer(string = '', margin = 0.3, options = {})
       raise 'Footer string must be less than 255 characters' if string.length >= 255
 
-      @page_setup.footer                = string
+      @page_setup.footer                = string.dup
+
+      # Replace the Excel placeholder &[Picture] with the internal &G.
+      @page_setup.footer = string.gsub(/&\[Picture\]/, '&G')
+
+      if string.size >= 255
+        raise 'Header string must be less than 255 characters'
+      end
+
+      if options[:align_with_margins]
+        @page_setup.header_footer_aligns = options[:align_with_margins]
+      end
+
+      if options[:scale_with_doc]
+        @page_setup.header_footer_scales = options[:scale_with_doc]
+      end
+
+      # Reset the array in case the function is called more than once.
+      @footer_images = []
+
+      [
+       [:image_left, 'LF'], [:image_center, 'CF'], [:image_right, 'RF']
+      ].each do |p|
+        if options[p.first]
+          @footer_images << [options[p.first], p.last]
+        end
+      end
+
+      # placeholeder /&G/ の数
+      placeholder_count = @page_setup.footer.scan(/&G/).count
+
+      image_count = @footer_images.count
+
+      if image_count != placeholder_count
+        raise "Number of footer image (#{image_count}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.footer}"
+      end
+
+      @has_header_vml = true if image_count > 0
+
       @page_setup.margin_footer         = margin
       @page_setup.header_footer_changed = true
     end
@@ -5473,6 +5555,10 @@ module Writexlsx
       @has_vml
     end
 
+    def has_header_vml?  # :nodoc:
+      @has_header_vml
+    end
+
     def has_comments? # :nodoc:
       !@comments.empty?
     end
@@ -5575,7 +5661,7 @@ module Writexlsx
     #   |  1  |(A1)._______|______      |
     #   |     |    |              |     |
     #   |     |    |              |     |
-    #   +-----+----|    BITMAP    |-----+
+    #   +-----+----|    Object    |-----+
     #   |     |    |              |     |
     #   |  2  |    |______________.     |
     #   |     |            |        (B2)|
@@ -5717,6 +5803,10 @@ module Writexlsx
       @buttons_array
     end
 
+    def header_images_data  # :nodoc:
+      @header_images_array
+    end
+
     def external_links
       [
        @external_hyper_links,
@@ -5746,6 +5836,14 @@ module Writexlsx
       end
       @vml_data_id = vml_data_id
       @vml_shape_id = vml_shape_id
+    end
+
+    #
+    # Setup external linkage for VML header/footer images.
+    #
+    def prepare_header_vml_objects(vml_header_id, vml_drawing_id)
+      @vml_header_id = vml_header_id
+      @external_vml_links << ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
     end
 
     #
@@ -6073,7 +6171,7 @@ module Writexlsx
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height) #:nodoc:
+    def position_object_emus(col_start, row_start, x1, y1, width, height, x_dpi = 96, y_dpi = 96) #:nodoc:
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
         position_object_pixels(col_start, row_start, x1, y1, width, height)
 
@@ -6136,7 +6234,9 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, image_id, drawing_id, width, height, name, image_type) #:nodoc:
+    def prepare_image(index, image_id, drawing_id, width, height, name, image_type, x_dpi = 96, y_dpi = 96) #:nodoc:
+      x_dpi ||= 96
+      y_dpi ||= 96
       drawing_type = 2
       drawing
 
@@ -6144,6 +6244,9 @@ module Writexlsx
 
       width  *= x_scale
       height *= y_scale
+
+      width  *= 96.0 / x_dpi
+      height *= 96.0 / y_dpi
 
       dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
 
@@ -6162,12 +6265,21 @@ module Writexlsx
       else
         drawing = @drawing
       end
-
       drawing.add_drawing_object(drawing_type, dimensions, width, height, name)
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
     public :prepare_image
+
+    def prepare_header_image(image_id, width, height, name, image_type, position, x_dpi, y_dpi)
+      # Strip the extension from the filename.
+      body = name.dup
+      body[/\.[^\.]+$/, 0] = ''
+
+      @header_images_array << [width, height, body, position, x_dpi, y_dpi]
+      @vml_drawing_links   << ['/image', "../media/image#{image_id}.#{image_type}" ]
+    end
+    public :prepare_header_image
 
     #
     # :call-seq:
@@ -7178,6 +7290,19 @@ module Writexlsx
     #
     def write_legacy_drawing #:nodoc:
       increment_rel_id_and_write_r_id('legacyDrawing') if has_vml?
+    end
+
+    #
+    # Write the <legacyDrawingHF> element.
+    #
+    def write_legacy_drawing_hf # :nodoc:
+      return unless has_header_vml?
+
+      # Increment the relationship id for any drawings or comments.
+      @rel_count += 1
+
+      attributes = [ ['r:id', "rId#{@rel_count}"] ]
+      @writer.empty_tag('legacyDrawingHF', attributes)
     end
 
     #

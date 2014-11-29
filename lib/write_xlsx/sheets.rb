@@ -58,16 +58,30 @@ module Writexlsx
 
     def write_vml_files(package_dir)
       dir = "#{package_dir}/xl/drawings"
-      self.select { |sheet| sheet.has_vml? }.
-        each_with_index do |sheet, index|
+      index = 1
+      self.each do |sheet|
+        next if !sheet.has_vml? and !sheet.has_header_vml?
         FileUtils.mkdir_p(dir)
 
-        vml = Package::Vml.new
-        vml.set_xml_writer("#{dir}/vmlDrawing#{index+1}.vml")
-        vml.assemble_xml_file(
-                              sheet.vml_data_id, sheet.vml_shape_id,
-                              sheet.sorted_comments, sheet.buttons_data
-                              )
+        if sheet.has_vml?
+          vml = Package::Vml.new
+          vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
+          vml.assemble_xml_file(
+                                sheet.vml_data_id, sheet.vml_shape_id,
+                                sheet.sorted_comments, sheet.buttons_data
+                                )
+          index += 1
+        end
+        if sheet.has_header_vml?
+          vml = Package::Vml.new
+          vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
+          vml.assemble_xml_file(
+                                sheet.vml_header_id, sheet.vml_header_id * 1024,
+                                [], [], sheet.header_images_data
+                                )
+          write_vml_drawing_rels_files(package_dir, sheet, index)
+          index += 1
+        end
       end
     end
 
@@ -126,6 +140,22 @@ module Writexlsx
         rels.set_xml_writer("#{dir}/drawing#{index}.xml.rels")
         rels.assemble_xml_file
       end
+    end
+
+    def write_vml_drawing_rels_files(package_dir, worksheet, index)
+      # Create the drawing .rels dir.
+      dir = "#{package_dir}/xl/drawings/_rels"
+      FileUtils.mkdir_p(dir)
+
+      rels = Package::Relationships.new
+
+      worksheet.vml_drawing_links.each do |drawing_data|
+        rels.add_document_relationship(*drawing_data)
+      end
+
+      # Create the .rels file such as /xl/drawings/_rels/vmlDrawing1.vml.rels.
+      rels.set_xml_writer("#{dir}/vmlDrawing#{index}.vml.rels")
+      rels.assemble_xml_file
     end
 
     def write_worksheet_rels_files(package_dir)

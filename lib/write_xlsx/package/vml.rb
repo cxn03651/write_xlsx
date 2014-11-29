@@ -18,7 +18,7 @@ module Writexlsx
 
       def assemble_xml_file(
                             data_id, vml_shape_id, comments_data,
-                            buttons_data, header_images_data = nil
+                            buttons_data, header_images_data = []
                             )
         return unless @writer
 
@@ -40,6 +40,16 @@ module Writexlsx
                                        comments_data,
                                        vml_shape_id, z_index) do
               write_comment_shapetype
+            end
+          end
+          unless header_images_data.empty?
+            write_image_shapetype
+            index = 1
+            header_images_data.each do |image|
+              # Write the v:shape element.
+              vml_shape_id += 1
+              write_image_shape(vml_shape_id, index, image)
+              index += 1
             end
           end
         end
@@ -147,6 +157,43 @@ module Writexlsx
       end
 
       #
+      # Write the <v:shapetype> element.
+      #
+      def write_image_shapetype
+        id               = '_x0000_t75'
+        coordsize        = '21600,21600'
+        spt              = 75
+        o_preferrelative = 't'
+        path             = 'm@4@5l@4@11@9@11@9@5xe'
+        filled           = 'f'
+        stroked          = 'f'
+
+        attributes = [
+                      ['id',               id],
+                      ['coordsize',        coordsize],
+                      ['o:spt',            spt],
+                      ['o:preferrelative', o_preferrelative],
+                      ['path',             path],
+                      ['filled',           filled],
+                      ['stroked',          stroked]
+                     ]
+
+        @writer.tag_elements('v:shapetype', attributes) do
+          # Write the v:stroke element.
+          write_stroke
+
+          # Write the v:formulas element.
+          write_formulas
+
+          # Write the v:path element.
+          write_image_path
+
+          # Write the o:lock element.
+          write_aspect_ratio_lock
+        end
+      end
+
+      #
       # Write the <v:path> element.
       #
       def write_button_path
@@ -161,6 +208,23 @@ module Writexlsx
       end
 
       #
+      # Write the <v:path> element.
+      #
+      def write_image_path
+        extrusionok     = 'f'
+        gradientshapeok = 't'
+        connecttype     = 'rect'
+
+        attributes = [
+                      ['o:extrusionok',   extrusionok],
+                      ['gradientshapeok', gradientshapeok],
+                      ['o:connecttype',   connecttype]
+                     ]
+
+        @writer.empty_tag('v:path', attributes)
+      end
+
+      #
       # Write the <o:lock> element.
       #
       def write_shapetype_lock
@@ -169,6 +233,127 @@ module Writexlsx
                       ['shapetype', 't']
                      ]
         @writer.empty_tag('o:lock', attributes)
+      end
+
+      #
+      # Write the <o:lock> element.
+      #
+      def write_rotation_lock
+        attributes = [
+                      ['v:ext',    'edit'],
+                      ['rotation', 't']
+                     ]
+        @writer.empty_tag('o:lock', attributes)
+      end
+
+      #
+      # Write the <o:lock> element.
+      #
+      def write_aspect_ratio_lock
+        ext         = 'edit'
+        aspectratio = 't'
+
+        attributes = [
+                      ['v:ext',       ext],
+                      ['aspectratio', aspectratio]
+                     ]
+
+        @writer.empty_tag('o:lock', attributes)
+      end
+
+      #
+      # Write the <v:shape> element.
+      #
+      def write_image_shape(id, index, image_data)
+        type       = '#_x0000_t75'
+
+        # Set the shape index.
+        shape_index = "_x0000_s#{id}"
+
+        # Get the image parameters
+        width    = image_data[0]
+        height   = image_data[1]
+        name     = image_data[2]
+        position = image_data[3]
+        x_dpi    = image_data[4]
+        y_dpi    = image_data[5]
+
+        # Scale the height/width by the resolution, relative to 72dpi.
+        width  = width  * 72.0 / x_dpi
+        height = height * 72.0 / y_dpi
+
+        # Excel uses a rounding based around 72 and 96 dpi.
+        width  = 72/96.0 * (width  * 96/72.0 + 0.25).to_i
+        height = 72/96.0 * (height * 96/72.0 + 0.25).to_i
+
+        if (width - width.to_i).abs < 0.1
+          width = width.to_i
+        end
+        if (height - height.to_i).abs < 0.1
+          height = height.to_i
+        end
+
+        style = [
+                 "position:absolute", "margin-left:0", "margin-top:0",
+                 "width:#{width}pt", "height:#{height}pt",
+                 "z-index:#{index}"
+                ].join(';')
+        attributes = [
+                      ['id',     position],
+                      ['o:spid', "_x0000_s#{id}"],
+                      ['type',   type],
+                      ['style',  style]
+                     ]
+
+        @writer.tag_elements('v:shape', attributes) do
+          # Write the v:imagedata element.
+          write_imagedata(index, name)
+
+          # Write the o:lock element.
+          write_rotation_lock
+        end
+      end
+
+      #
+      # Write the <v:imagedata> element.
+      #
+      def write_imagedata(index, o_title)
+        attributes = [
+                      ['o:relid', "rId#{index}"],
+                      ['o:title', o_title]
+                     ]
+
+        @writer.empty_tag('v:imagedata', attributes)
+      end
+
+      #
+      # Write the <v:formulas> element.
+      #
+      def write_formulas
+        @writer.tag_elements('v:formulas') do
+          # Write the v:f elements.
+          write_f('if lineDrawn pixelLineWidth 0')
+          write_f('sum @0 1 0')
+          write_f('sum 0 0 @1')
+          write_f('prod @2 1 2')
+          write_f('prod @3 21600 pixelWidth')
+          write_f('prod @3 21600 pixelHeight')
+          write_f('sum @0 0 1')
+          write_f('prod @6 1 2')
+          write_f('prod @7 21600 pixelWidth')
+          write_f('sum @8 21600 0')
+          write_f('prod @7 21600 pixelHeight')
+          write_f('sum @10 21600 0')
+        end
+      end
+
+      #
+      # Write the <v:f> element.
+      #
+      def write_f(eqn)
+        attributes = [ ['eqn', eqn] ]
+
+        @writer.empty_tag('v:f', attributes)
       end
     end
   end

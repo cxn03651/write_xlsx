@@ -86,7 +86,7 @@ module Writexlsx
       @writer.tag_elements('xdr:twoCellAnchor', attributes) do
         # Write the xdr:from element.
         write_from(col_from, row_from, col_from_offset, row_from_offset)
-        # Write the xdr:from element.
+        # Write the xdr:to element.
         write_to(col_to, row_to, col_to_offset, row_to_offset)
 
         if type == 1
