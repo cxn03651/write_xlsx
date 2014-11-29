@@ -132,7 +132,7 @@ class Test::Unit::TestCase
         exp_xml_str = exp_xml_str.
           sub(/horizontalDpi="200" /, '').
           sub(/verticalDpi="200" /, '').
-          sub(/(<pageSetup.* )r:id="rId1"/, '\1').
+          sub(/(<pageSetup[^>]* )r:id="rId1"/, '\1').
           sub(/ +\/>/, ' />')
       end
 
