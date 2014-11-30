@@ -1,4 +1,10 @@
 Change history of write_xlsx rubygem.
+2014-11-30 v0.80.0
+   Chart Data Label enhancements. Added number formatting, font handling
+   (Excel::Writer::XLSX issue #106), separator (Same issue #107) and legend key.
+   Added chart specific handling of data label positions since not all
+   positions are available for all chart types. Excel::Writer::XLSX Issue #110.
+
 2014-11-29 v0.79.0
    Added option to add images to headers and footers.
    Added option to not scale heaader/footer with page.
