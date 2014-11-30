@@ -1,4 +1,11 @@
 Change history of write_xlsx rubygem.
+2014-11-29 v0.79.0
+   Added option to add images to headers and footers.
+   Added option to not scale heaader/footer with page.
+   Fixed issue where non 96dpi images weren’t scaled properly in Excel.
+   Fix for issue where X axis title formula was overwritten by the
+   Y axis title.
+
 2014-11-22 v0.78.0
    Added Doughnut chart with set_rotation and set_hole_size methods.
    Added set_rotation method to Pie charts.
