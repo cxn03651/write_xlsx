@@ -39,6 +39,15 @@ module Writexlsx
         end
 
         set_y_axis
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'outside_end'
+        @label_positions = {
+          'center'      => 'ctr',
+          'inside_base' => 'inBase',
+          'inside_end'  => 'inEnd',
+          'outside_end' => 'outEnd'
+        }
       end
 
       #

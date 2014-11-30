@@ -41,6 +41,10 @@ module Writexlsx
 
         # Hardcode major_tick_mark for now untill there is an accessor.
         @y_axis.major_tick_mark = 'cross'
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'center'
+        @label_positions = { 'center' => 'ctr' }
       end
 
       #

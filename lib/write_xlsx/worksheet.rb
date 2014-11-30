@@ -1489,7 +1489,7 @@ module Writexlsx
       area = "$#{row_min}:$#{row_max}"
 
       # Build up the print titles "Sheet1!$1:$2"
-      sheetname = quote_sheetname(name)
+      sheetname = quote_sheetname(@name)
       @page_setup.repeat_rows = "#{sheetname}!#{area}"
     end
 
@@ -7515,7 +7515,7 @@ module Writexlsx
       end
 
       # Build up the print area range "Sheet1!$A$1:$C$13".
-      "#{quote_sheetname(name)}!#{area}"
+      "#{quote_sheetname(@name)}!#{area}"
     end
 
     #
@@ -7524,8 +7524,15 @@ module Writexlsx
     # TODO. We need to handle more special cases.
     #
     def quote_sheetname(sheetname) #:nodoc:
-      return sheetname if sheetname =~ /^Sheet\d+$/
-      return "'#{sheetname}'"
+      # Use Excel's conventions and quote the sheet name if it comtains any
+      # non-word character or if it isn't already quoted.
+      name = sheetname.dup
+      if name =~ /\W/ && !(name =~ /^'/)
+        # Double quote and single quoted strings.
+        name = name.gsub(/'/, "''")
+        name = "'#{name}'"
+      end
+      name
     end
 
     def fit_page? #:nodoc:

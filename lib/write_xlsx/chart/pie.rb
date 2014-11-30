@@ -30,6 +30,16 @@ module Writexlsx
         super(subtype)
         @vary_data_color = 1
         @rotation        = 0
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'best_fit'
+        @label_positions = {
+          'center'      => 'ctr',
+          'inside_base' => 'inBase',
+          'inside_end'  => 'inEnd',
+          'outside_end' => 'outEnd',
+          'best_fit'    => 'bestFit'
+        }
       end
 
       #

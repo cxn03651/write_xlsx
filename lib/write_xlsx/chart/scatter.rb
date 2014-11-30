@@ -43,6 +43,19 @@ module Writexlsx
         @horiz_val_axis    = 0
         @val_axis_position = 'b'
         @smooth_allowed    = 1
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'right'
+        @label_positions = {
+          'center'      => 'ctr',
+          'right'       => 'r',
+          'left'        => 'l',
+          'above'       => 't',
+          'below'       => 'b',
+          # For backward compatibility.
+          'top'         => 't',
+          'bottom'      => 'b'
+        }
       end
 
       #

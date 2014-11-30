@@ -32,6 +32,10 @@ module Writexlsx
         end
 
         set_y_axis
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'center'
+        @label_positions = { 'center' => 'ctr' }
       end
 
       #

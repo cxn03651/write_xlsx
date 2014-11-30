@@ -551,7 +551,7 @@ module Writexlsx
     end
 
     def value_or_raise(hash, key, msg)
-      raise "Unknown #{msg} '#{key}'" unless hash[key.to_sym]
+      raise "Unknown #{msg} '#{key}'" if hash[key.to_sym].nil?
       hash[key.to_sym]
     end
 

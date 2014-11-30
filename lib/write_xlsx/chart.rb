@@ -141,6 +141,7 @@ module Writexlsx
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
     attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
     attr_reader :width, :height  # :nodoc:
+    attr_reader :label_positions, :label_position_default
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -1393,6 +1394,20 @@ module Writexlsx
     end
 
     #
+    # Write the <c:numberFormat> element for data labels.
+    #
+    def write_data_label_number_format(format_code)
+      source_linked = 0
+
+      attributes = [
+                    ['formatCode',   format_code],
+                    ['sourceLinked', source_linked]
+                   ]
+
+      @writer.empty_tag('c:numFmt', attributes)
+    end
+
+    #
     # Write the <c:majorTickMark> element.
     #
     def write_major_tick_mark(val)
@@ -2232,8 +2247,14 @@ module Writexlsx
       return unless labels
 
       @writer.tag_elements('c:dLbls') do
+        # Write the c:numFmt element.
+        write_data_label_number_format(labels[:num_format]) if labels[:num_format]
+        # Write the data label font elements.
+        write_axis_font(labels[:font]) if labels[:font]
         # Write the c:dLblPos element.
-        write_d_lbl_pos(labels[:position]) if labels[:position]
+        write_d_lbl_pos(labels[:position]) if ptrue?(labels[:position])
+        # Write the c:showLegendKey element.
+        write_show_legend_key if labels[:legend_key]
         # Write the c:showVal element.
         write_show_val if labels[:value]
         # Write the c:showCatName element.
@@ -2242,9 +2263,18 @@ module Writexlsx
         write_show_ser_name if labels[:series_name]
         # Write the c:showPercent element.
         write_show_percent if labels[:percentage]
+        # Write the c:separator element.
+        write_separator(labels[:separator]) if labels[:separator]
         # Write the c:showLeaderLines element.
         write_show_leader_lines if labels[:leader_lines]
       end
+    end
+
+    #
+    # Write the <c:showLegendKey> element.
+    #
+    def write_show_legend_key
+      @writer.empty_tag('c:showLegendKey', [ ['val', 1] ])
     end
 
     #
@@ -2273,6 +2303,13 @@ module Writexlsx
     #
     def write_show_percent
       @writer.empty_tag('c:showPercent', [ ['val', 1] ])
+    end
+
+    #
+    # Write the <c:separator> element.
+    #
+    def write_separator(data)
+      @writer.data_element('c:separator', data)
     end
 
     #

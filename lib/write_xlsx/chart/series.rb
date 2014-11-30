@@ -168,12 +168,13 @@ module Writexlsx
       attr_accessor :line, :marker
 
       def initialize(chart, params = {})
+        @chart      = chart
         @values     = aref_to_formula(params[:values])
         @categories = aref_to_formula(params[:categories])
         @name, @name_formula =
           chart.process_names(params[:name], params[:name_formula])
 
-        set_data_ids(chart, params)
+        set_data_ids(params)
 
         @line = line_properties(params[:border] || params[:line])
         @fill = fill_properties(params[:fill])
@@ -182,6 +183,9 @@ module Writexlsx
         @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
         @error_bars = errorbars(params[:x_error_bars], params[:y_error_bars])
         @points     = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]
+
+        @label_positions = chart.label_positions
+        @label_position_default = chart.label_position_default
         @labels     = labels_properties(params[:data_labels])
 
         [:smooth, :invert_if_negative, :x2_axis, :y2_axis].
@@ -214,10 +218,10 @@ module Writexlsx
         xl_range_formula(*data)
       end
 
-      def set_data_ids(chart, params)
-        @cat_data_id = chart.data_id(@categories, params[:categories_data])
-        @val_data_id = chart.data_id(@values, params[:values_data])
-        @name_id = chart.data_id(@name_formula, params[:name_data])
+      def set_data_ids(params)
+        @cat_data_id = @chart.data_id(@categories, params[:categories_data])
+        @val_data_id = @chart.data_id(@values, params[:values_data])
+        @name_id = @chart.data_id(@name_formula, params[:name_data])
       end
 
       def errorbars(x, y)
@@ -233,31 +237,39 @@ module Writexlsx
       def labels_properties(labels) # :nodoc:
         return nil unless labels
 
+        # Map user defined label positions to Excel positions.
         position = labels[:position]
-        if position.nil? || position.empty?
-          labels.delete(:position)
-        else
-          # Map user defined label positions to Excel positions.
-          labels[:position] = value_or_raise(positions, position, 'label position')
+        if ptrue?(position)
+          if @label_positions[position]
+            if position == @label_position_default
+              labels[:position] = nil
+            else
+              labels[:position] = @label_positions[position]
+            end
+          else
+            raise "Unsupported label position '#{position}' for this chart type"
+          end
+        end
+
+        # Map the user defined label separator to the Excel separator.
+        separators = {
+          ","  => ", ",
+          ";"  => "; ",
+          "."  => ". ",
+          "\n" => "\n",
+          " "  => " "
+        }
+        separator = labels[:separator]
+        unless separator.nil? || separator.empty?
+          raise "unsuppoted label separator #{separator}" unless separators[separator]
+          labels[:separator] = separators[separator]
+        end
+
+        if labels[:font]
+          labels[:font] = @chart.convert_font_args(labels[:font])
         end
 
         labels
-      end
-
-      def positions
-        {
-          :center      => 'ctr',
-          :right       => 'r',
-          :left        => 'l',
-          :top         => 't',
-          :above       => 't',
-          :bottom      => 'b',
-          :below       => 'b',
-          :inside_base => 'inBase',
-          :inside_end  => 'inEnd',
-          :outside_end => 'outEnd',
-          :best_fit    => 'bestFit'
-        }
       end
     end
   end

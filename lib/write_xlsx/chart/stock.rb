@@ -35,6 +35,19 @@ module Writexlsx
         @x2_axis.defaults[:num_format] = 'dd/mm/yyyy'
         set_x_axis
         set_x2_axis
+
+        # Set the available data label positions for this chart type.
+        @label_position_default = 'right'
+        @label_positions = {
+          'center'      => 'ctr',
+          'right'       => 'r',
+          'left'        => 'l',
+          'above'       => 't',
+          'below'       => 'b',
+          # For backward compatibility.
+          'top'         => 't',
+          'bottom'      => 'b',
+        }
       end
 
       #
