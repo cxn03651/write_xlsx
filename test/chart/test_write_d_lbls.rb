@@ -4,7 +4,24 @@ require 'write_xlsx/chart'
 
 class TestWriteDLbls < Test::Unit::TestCase
   def setup
-    @chart = Writexlsx::Chart.new('Pie')
+    @chart = Writexlsx::Chart.new('Line')
+    @chart.instance_variable_set(
+                                 :@label_positions,
+                                 {
+                                   'center'      => 'ctr',
+                                   'right'       => 'r',
+                                   'left'        => 'l',
+                                   'top'         => 't',
+                                   'above'       => 't',
+                                   'bottom'      => 'b',
+                                   'below'       => 'b',
+                                   'inside_base' => 'inBase',
+                                   'inside_end'  => 'inEnd',
+                                   'outside_end' => 'outEnd',
+                                   'best_fit'    => 'bestFit'
+                                 }
+                                 )
+    @chart.instance_variable_set(:@label_position_default, '')
     @series = Writexlsx::Chart::Series.new(@chart)
   end
 
