@@ -337,6 +337,19 @@ See
 "[set_num_format()"](format.html#set_num_format)
 in WriteXLSX for more information.
 
+##### <a name="set_x_axis_line" class="anchor" href="#set_x_axis_line"><span class="octicon octicon-link" /></a>:line
+Set the properties of the axis line type such as color and width.
+See the [CHART FORMATTING][] section below.
+
+    chart.set_x_axis(:line => { :none => 1 })
+
+##### <a name="set_x_axis_fill" class="anchor" href="#set_x_axis_fill"><span class="octicon octicon-link" /></a>:fill
+Set the fill properties of the axis such as color.
+See the [CHART FORMATTING][] section below.
+Note, in the Excel the axis fill is applied to the area of the numbers of
+the axis and not to the area of the axis bounding box.
+That background is set from the chartarea fill.
+
 ##### <a name="set_x_axis_min" class="anchor" href="#set_x_axis_min"><span class="octicon octicon-link" /></a>:min
 Set the minimum value for the axis range.
 (Applicable to value axes only.)
@@ -943,7 +956,7 @@ Several of these properties can be set in one go:
     )
 
 Trendlines cannot be added to series in a stacked chart or pie chart, radar
-chart or (when implemented) to 3D, surface, or doughnut charts.
+chart, doughnut or (when implemented) to 3D, or surface charts.
 
 ##### <a name="series_error_bars" class="anchor" href="#series_error_bars"><span class="octicon octicon-link" /></a>Error Bars
 
@@ -1046,8 +1059,12 @@ The following properties can be set for data_labels formats in a chart.
     :category
     :series_name
     :position
-    :leader_lines
     :percentage
+    :leader_lines
+    :separator
+    :legend_key
+    :num_format
+    :font
 
 The value property turns on the Value data label for a series.
 
@@ -1077,19 +1094,22 @@ The position property is used to position the data label for a series.
         :data_labels => { :value => 1, :position => 'center' }
     )
 
-Valid positions are:
+In Excel the data label positions vary for different chart types. The allowable positions are:
+    |  Position     |  Line     |  Bar      |  Pie      |  Area     |
+    |               |  Scatter  |  Column   |  Doughnut |  Radar    |
+    |               |  Stock    |           |           |           |
+    |---------------|-----------|-----------|-----------|-----------|
+    |  center       |  Yes      |  Yes      |  Yes      |  Yes*     |
+    |  right        |  Yes*     |           |           |           |
+    |  left         |  Yes      |           |           |           |
+    |  above        |  Yes      |           |           |           |
+    |  below        |  Yes      |           |           |           |
+    |  inside_base  |           |  Yes      |           |           |
+    |  inside_end   |           |  Yes      |  Yes      |           |
+    |  outside_end  |           |  Yes*     |  Yes      |           |
+    |  best_fit     |           |           |  Yes*     |           |
 
-    center
-    right
-    left
-    top
-    bottom
-    above           # Same as top
-    below           # Same as bottom
-    inside_base     # Mainly for Column/Bar charts.
-    inside_end      # Pie chart mainly.
-    outside_end     # Pie chart mainly.
-    best_fit        # Pie chart mainly.
+Note: The * indicates the default position for each chart type in Excel, if a position isn't specified.
 
 The percentage property is used to turn on the display of data labels as
 a Percentage for a series. It is mainly used for pie charts.
@@ -1111,6 +1131,55 @@ in Excel or WriteXLSX.
 Due to an Excel limitation (or design) leader lines only appear if the data
 label is moved manually or if the data labels are very close and need to be
 adjusted automatically.
+
+The separator property is used to change the separator between multiple data label items:
+
+    chart.add_series(
+        :values      => '=Sheet1!$B$1:$B$5',
+        :data_labels => { :percentage => 1 },
+        :data_labels => { :value => 1, :category => 1, :separator => "\n" }
+    )
+
+The separator value must be one of the following strings:
+
+            ','
+            ';'
+            '.'
+            "\n"
+            ' '
+
+The legend_key property is used to turn on Legend Key for the data label for a series:
+
+    chart.add_series(
+        :values      => '=Sheet1!$B$1:$B$5',
+        :data_labels => { :value => 1, :legend_key => 1 }
+    )
+
+
+The num_format property is used to set the number format for the data labels.
+
+    chart.add_series(
+        :values      => '=Sheet1!$A$1:$A$5',
+        :data_labels => { :value => 1, :num_format => '#,##0.00' }
+    )
+
+The number format is similar to the Worksheet Cell Format num_format apart from the fact that a
+format index cannot be used.
+The explicit format string must be used as shown above.
+
+
+The font property is used to set the font properties of the data labels in a series:
+
+    chartadd_series(
+        :values      => '=Sheet1!$A$1:$A$5',
+        :data_labels => {
+            :value => 1,
+            :font  => { :name => 'Consolas' }
+        }
+    )
+
+See the [CHART FONTS][] section below.
+
 
 ##### <a name="points" class="anchor" href="#points"><span class="octicon octicon-link" /></a>Points
 

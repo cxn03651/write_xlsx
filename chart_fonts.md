@@ -5,8 +5,8 @@ title: Chart Fonts
 ### <a name="chart_fonts" class="anchor" href="#chart_fonts"><span class="octicon octicon-link" /></a>CHART FONTS
 
 The following font properties can be set for any chart object that they apply to
-(and that are supported by WriteXLSX) such as chart titles, axis labels
-and axis numbering.
+(and that are supported by WriteXLSX) such as chart titles, axis labels,
+axis numbering and data labels.
 They correspond to the equivalent Worksheet cell Format object properties.
 See [FORMAT METHODS][] for more information.
 
