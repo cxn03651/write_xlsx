@@ -14,7 +14,7 @@ module Writexlsx
       attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
       attr_reader :major_gridlines, :minor_gridlines, :reverse
-
+      attr_reader :line, :fill
       #
       # Convert user defined axis values into axis instance.
       #
@@ -25,7 +25,8 @@ module Writexlsx
         [
          :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
          :major_unit_type, :log_base, :crossing, :position_axis, :label_position,
-         :num_format, :num_format_linked, :interval_unit, :major_tick_mark
+         :num_format, :num_format_linked, :interval_unit, :major_tick_mark,
+         :line, :fill
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
         @visible           = args[:visible] || 1
 
@@ -34,6 +35,8 @@ module Writexlsx
         set_position_axis
         set_font_properties(args)
         set_axis_name_layout(args)
+        set_axis_line(args)
+        set_axis_fill(args)
       end
 
       #
@@ -115,6 +118,14 @@ module Writexlsx
 
       def set_axis_name_layout(args)
         @layout    = @chart.layout_properties(args[:name_layout], 1)
+      end
+
+      def set_axis_line(args)
+        @line = @chart.line_properties(args[:line])
+      end
+
+      def set_axis_fill(args)
+        @fill = @chart.fill_properties(args[:fill])
       end
     end
   end

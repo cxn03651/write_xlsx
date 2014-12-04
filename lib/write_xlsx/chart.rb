@@ -1137,6 +1137,9 @@ module Writexlsx
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis.label_position)
 
+        # Write the c:spPr element for the axis line.
+        write_sp_pr(x_axis)
+
         # Write the axis font elements.
         write_axis_font(x_axis.num_font)
 
@@ -1204,8 +1207,11 @@ module Writexlsx
         # Write the c:majorTickMark element.
         write_major_tick_mark(y_axis.major_tick_mark)
 
-        # Write the tickLblPos element.
+        # Write the c:tickLblPos element.
         write_tick_label_pos(y_axis.label_position)
+
+        # Write the c:spPr element for the axis line.
+        write_sp_pr(y_axis)
 
         # Write the axis font elements.
         write_axis_font(y_axis.num_font)
@@ -1270,6 +1276,8 @@ module Writexlsx
 
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis.label_position)
+        # Write the c:spPr element for the axis line.
+        write_sp_pr(x_axis)
         # Write the font elements.
         write_axis_font(x_axis.num_font)
         # Write the c:crossAx element.
