@@ -1,4 +1,7 @@
 Change history of write_xlsx rubygem.
+2014-12-04 v0.81.0
+   Add chart axis line and fill properties.
+
 2014-11-30 v0.80.0
    Chart Data Label enhancements. Added number formatting, font handling
    (Excel::Writer::XLSX issue #106), separator (Same issue #107) and legend key.
