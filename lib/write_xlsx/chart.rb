@@ -241,9 +241,27 @@ module Writexlsx
 
       @series << Series.new(self, params)
 
+      # Set the secondary axis properties.
+      x2_axis = params[:x2_axis]
+      y2_axis = params[:y2_axis]
+
       # Set the gap and overlap for Bar/Column charts.
-      @series_gap     = params[:gap]     if params[:gap]
-      @series_overlap = params[:overlap] if params[:overlap]
+      if params[:gap]
+        if ptrue?(y2_axis)
+          @series_gap_2 = params[:gap]
+        else
+          @series_gap_1 = params[:gap]
+        end
+      end
+
+      # Set the overlap for Bar/Column charts.
+      if params[:overlap]
+        if ptrue?(y2_axis)
+          @series_overlap_2 = params[:overlap]
+        else
+          @series_overlap_1 = params[:overlap]
+        end
+      end
     end
 
     #
@@ -428,7 +446,7 @@ module Writexlsx
 
       # Set a default overlap for stacked charts.
       if @subtype =~ /stacked/
-        @series_overlap = 100 unless @series_overlap
+        @series_overlap_1 = 100 unless @series_overlap_1
       end
 
       @writer.tag_elements('c:barChart') do
@@ -442,8 +460,17 @@ module Writexlsx
         # write the c:marker element.
         write_marker_value
 
-        # Write the c:gapWidth element.
-        write_gap_width(@series_gap)
+        if ptrue?(params[:primary_axes])
+          # Write the c:gapWidth element.
+          write_gap_width(@series_gap_1)
+          # Write the c:overlap element.
+          write_overlap(@series_overlap_1)
+        else
+          # Write the c:gapWidth element.
+          write_gap_width(@series_gap_2)
+          # Write the c:overlap element.
+          write_overlap(@series_overlap_2)
+        end
 
         # write the c:overlap element.
         write_overlap(@series_overlap)
