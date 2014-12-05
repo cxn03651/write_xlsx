@@ -11,6 +11,7 @@ Gem::Specification.new do |gem|
   gem.description   = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.summary       = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.homepage = "http://github.com/cxn03651/write_xlsx#readme"
+  gem.license       = 'MIT'
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
