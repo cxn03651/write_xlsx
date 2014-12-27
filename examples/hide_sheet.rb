@@ -8,7 +8,6 @@
 # reverse('c'), April 2005, John McNamara, jmcnamara@cpan.org
 # convert to ruby by Hideo, Nakamura, cxn03651@msj.biglobe.ne.jp
 #
-require 'rubygems'
 require 'write_xlsx'
 
 workbook   = WriteXLSX.new('hide_sheet.xlsx')

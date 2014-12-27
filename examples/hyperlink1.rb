@@ -11,7 +11,6 @@
 # convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
 #
 
-require 'rubygems'
 require 'write_xlsx'
 
 # Create a new workbook and add a worksheet

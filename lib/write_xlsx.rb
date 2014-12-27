@@ -34,7 +34,6 @@ require 'write_xlsx/workbook'
 # To write a string, a formatted string, a number and a formula to the
 # first worksheet in an Excel XMLX spreadsheet called ruby.xlsx:
 #
-#   require 'rubygems'
 #   require 'write_xlsx'
 #
 #   # Create a new Excel workbook

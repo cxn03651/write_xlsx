@@ -15,7 +15,6 @@
 # convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
 #
 
-require 'rubygems'
 require 'write_xlsx'
 
 # Note the file extension should be .xlsm.

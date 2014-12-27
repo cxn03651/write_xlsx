@@ -10,7 +10,6 @@
 # converted to Ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
 #
 
-require 'rubygems'
 require 'write_xlsx'
 
 workbook  = WriteXLSX.new('shape8.xlsx')

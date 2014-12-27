@@ -12,7 +12,6 @@
 # reverse('ｩ'), September 2007, John McNamara, jmcnamara@cpan.org
 #
 
-require 'rubygems'
 require 'write_xlsx'
 
 workbook = WriteXLSX.new( 'autofilter.xlsx' )

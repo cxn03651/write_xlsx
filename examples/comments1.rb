@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 # -*- coding: utf-8 -*-
-require 'rubygems'
 require 'write_xlsx'
 
 workbook  = WriteXLSX.new('comments1.xlsx')
