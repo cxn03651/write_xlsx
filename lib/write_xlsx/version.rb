@@ -1,5 +1,1 @@
-require 'write_xlsx/workbook'
-
-class WriteXLSX < Writexlsx::Workbook
-  VERSION = "0.81.0"
-end
+WriteXLSX_VERSION = "0.81.0"
