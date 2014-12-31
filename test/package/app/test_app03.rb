@@ -4,7 +4,7 @@ require 'write_xlsx/package/app'
 
 class TestApp03 < Test::Unit::TestCase
   def test_assemble_xml_file
-    @obj = Writexlsx::Package::App.new
+    @obj = Writexlsx::Package::App.new(nil)
     @obj.add_part_name('Sheet1')
     @obj.add_part_name('Sheet1!Print_Titles')
     @obj.add_heading_pair(['Worksheets', 1])
