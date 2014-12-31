@@ -8,8 +8,9 @@ module Writexlsx
 
       include Writexlsx::Utility
 
-      def initialize
+      def initialize(workbook)
         @writer = Package::XMLWriterSimple.new
+        @workbook      = workbook
         @part_names    = []
         @heading_pairs = []
         @properties    = {}
@@ -37,8 +38,45 @@ module Writexlsx
         end
       end
 
+      def add_worksheet_heading_pairs
+        add_heading_pair(
+          [
+            'Worksheets',
+            @workbook.worksheets.reject {|s| s.is_chartsheet?}.count
+          ]
+        )
+      end
+
+      def add_chartsheet_heading_pairs
+        add_heading_pair(['Charts', @workbook.chartsheet_count])
+      end
+
+      def add_worksheet_part_names
+        @workbook.worksheets.
+          reject { |sheet| sheet.is_chartsheet? }.
+          each   { |sheet| add_part_name(sheet.name) }
+      end
+
+      def add_chartsheet_part_names
+        @workbook.worksheets.
+          select { |sheet| sheet.is_chartsheet? }.
+          each   { |sheet| add_part_name(sheet.name) }
+      end
+
       def add_part_name(part_name)
         @part_names.push(part_name)
+      end
+
+      def add_named_range_heading_pairs
+        range_count = @workbook.named_ranges.size
+
+        if range_count != 0
+          add_heading_pair([ 'Named Ranges', range_count ])
+        end
+      end
+
+      def add_named_ranges_parts
+        @workbook.named_ranges.each { |named_range| add_part_name(named_range) }
       end
 
       def add_heading_pair(heading_pair)

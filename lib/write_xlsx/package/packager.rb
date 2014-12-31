@@ -136,37 +136,25 @@ module Writexlsx
       # Write the app.xml file.
       #
       def write_app_file
-        dir        = @package_dir
-        properties = @workbook.doc_properties
-        app        = Package::App.new
-
-        FileUtils.mkdir_p("#{@package_dir}/docProps")
+        app = Package::App.new(@workbook)
 
         # Add the Worksheet heading pairs.
-        app.add_heading_pair(['Worksheets', @workbook.worksheets.reject {|s| s.is_chartsheet?}.count])
-
+        app.add_worksheet_heading_pairs
         # Add the Chartsheet heading pairs.
-        app.add_heading_pair(['Charts', @workbook.chartsheet_count])
+        app.add_chartsheet_heading_pairs
 
         # Add the Worksheet parts.
-        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
-          each { |sheet| app.add_part_name(sheet.name) }
-
+        app.add_worksheet_part_names
         # Add the Chartsheet parts.
-        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
-          each { |sheet| app.add_part_name(sheet.name) }
-
+        app.add_chartsheet_part_names
         # Add the Named Range heading pairs.
-        range_count = @workbook.named_ranges.size
-        if range_count != 0
-          app.add_heading_pair([ 'Named Ranges', range_count ])
-        end
-
+        app.add_named_range_heading_pairs
         # Add the Named Ranges parts.
-        @workbook.named_ranges.each { |named_range| app.add_part_name(named_range) }
+        app.add_named_ranges_parts
 
-        app.set_properties(properties)
+        app.set_properties(@workbook.doc_properties)
 
+        FileUtils.mkdir_p("#{@package_dir}/docProps")
         app.set_xml_writer("#{@package_dir}/docProps/app.xml")
         app.assemble_xml_file
       end
