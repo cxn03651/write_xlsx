@@ -852,7 +852,7 @@ module Writexlsx
           write_cat_axis(params)
         end
 
-        write_val_axis(params)
+        write_val_axis(@x_axis, @y_axis, @axis_ids)
 
         # Write the category and value elements for the secondary axes.
         params = {
@@ -861,7 +861,7 @@ module Writexlsx
           :axis_ids => @axis2_ids
         }
 
-        write_val_axis(params)
+        write_val_axis(@x2_axis, @y2_axis, @axis2_ids)
 
         if @date_category
           write_date_axis(params)
@@ -1190,17 +1190,15 @@ module Writexlsx
     #
     # Write the <c:valAx> element. Usually the Y axis.
     #
-    def write_val_axis(params)
-      axis_ids = params[:axis_ids]
+    def write_val_axis(x_axis, y_axis, axis_ids, position = nil)
       return unless axis_ids && !axis_ids.empty?
 
-      x_axis   = params[:x_axis]
-      y_axis   = params[:y_axis]
-      axis_ids_0 = axis_ids[0]
-      axis_ids_1 = axis_ids[1]
-      position = y_axis.position || params[:position] || @val_axis_position
-
-      write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)
+      write_val_axis_base(
+        x_axis, y_axis,
+        axis_ids[0],
+        axis_ids[1],
+        y_axis.position || position || @val_axis_position
+      )
     end
 
     def write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)  # :nodoc:

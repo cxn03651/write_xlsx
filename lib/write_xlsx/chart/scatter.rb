@@ -153,36 +153,18 @@ module Writexlsx
           write_chart_type(:primary_axes => 0)
 
           # Write c:catAx and c:valAx elements for series using primary axes
-          write_cat_val_axis(
-                             :x_axis   => @x_axis,
-                             :y_axis   => @y_axis,
-                             :axis_ids => @axis_ids,
-                             :position => 'b'
-                             )
+          write_cat_val_axis(@x_axis, @y_axis, @axis_ids, 'b')
+
           tmp = @horiz_val_axis
           @horiz_val_axis = 1
-          write_val_axis(
-                         :x_axis   => @x_axis,
-                         :y_axis   => @y_axis,
-                         :axis_ids => @axis_ids,
-                         :position => 'l'
-                         )
+          write_val_axis(@x_axis, @y_axis, @axis_ids, 'l')
           @horiz_val_axis = tmp
 
           # Write c:valAx and c:catAx elements for series using secondary axes
-          write_cat_val_axis(
-                             :x_axis   => @x2_axis,
-                             :y_axis   => @y2_axis,
-                             :axis_ids => @axis2_ids,
-                             :position => 'b'
-                             )
+          write_cat_val_axis(@x2_axis, @y2_axis, @axis2_ids, 'b')
+
           @horiz_val_axis = 1
-          write_val_axis(
-                         :x_axis   => @x2_axis,
-                         :y_axis   => @y2_axis,
-                         :axis_ids => @axis2_ids,
-                         :position => 'l'
-                         )
+          write_val_axis(@x2_axis, @y2_axis, @axis2_ids, 'l')
 
           # Write the c:spPr element for the plotarea formatting.
           write_sp_pr(@plotarea)
@@ -269,17 +251,15 @@ module Writexlsx
       #
       # Usually the X axis.
       #
-      def write_cat_val_axis(params) # :nodoc:
-        axis_ids = params[:axis_ids]
+      def write_cat_val_axis(x_axis, y_axis, axis_ids, position) # :nodoc:
         return unless axis_ids && !axis_ids.empty?
 
-        x_axis   = params[:y_axis]
-        y_axis   = params[:x_axis]
-        axis_ids_0 = axis_ids[1]
-        axis_ids_1 = axis_ids[0]
-        position = y_axis.position || params[:position] || @val_axis_position
-
-        write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)
+        write_val_axis_base(
+          y_axis, x_axis,
+          axis_ids[1],
+          axis_ids[0],
+          x_axis.position || position || @val_axis_position
+        )
       end
     end
   end
