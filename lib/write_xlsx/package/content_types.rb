@@ -196,11 +196,7 @@ module Writexlsx
       #
       def write_defaults
         @defaults.each do |a|
-          @writer.empty_tag('Default',
-                            [
-                             ['Extension', a[0]],
-                             ['ContentType', a[1]]
-                            ])
+          write_default_or_override('Default', 'Extension', a)
         end
       end
 
@@ -209,12 +205,16 @@ module Writexlsx
       #
       def write_overrides
         @overrides.each do |a|
-          @writer.empty_tag('Override',
-                            [
-                             ['PartName', a[0]],
-                             ['ContentType', a[1]]
-                            ])
+          write_default_or_override('Override', 'PartName', a)
         end
+      end
+
+      def write_default_or_override(tag, param0, a)
+        @writer.empty_tag(tag,
+          [
+            [param0, a[0]],
+            ['ContentType', a[1]]
+          ])
       end
 
       #
