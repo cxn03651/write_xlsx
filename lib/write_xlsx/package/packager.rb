@@ -176,30 +176,18 @@ module Writexlsx
       # Write the ContentTypes.xml file.
       #
       def write_content_types_file
-        content = Package::ContentTypes.new
+        content = Package::ContentTypes.new(@workbook)
 
-        content.add_image_types(@workbook.image_types)
-        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
-          each_with_index do |sheet, index|
-          content.add_worksheet_name("sheet#{index+1}")
-        end
-        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
-          each_with_index do |sheet, index|
-          content.add_chartsheet_name("sheet#{index+1}")
-        end
-
-        (1 .. @workbook.charts.size).each { |i| content.add_chart_name("chart#{i}") }
-        (1 .. @workbook.drawings.size).each { |i| content.add_drawing_name("drawing#{i}") }
-
+        content.add_image_types
+        content.add_worksheet_names
+        content.add_chartsheet_names
+        content.add_chart_names
+        content.add_drawing_names
         content.add_vml_name if @workbook.num_vml_files > 0
-
-        (1 .. @table_count).each { |i| content.add_table_name("table#{i}") }
-
-        (1 .. @workbook.num_comment_files).each { |i| content.add_comment_name("comments#{i}") }
-
+        content.add_table_names(@table_count)
+        content.add_comment_names
         # Add the sharedString rel if there is string data in the workbook.
         content.add_shared_strings unless @workbook.shared_strings_empty?
-
         # Add vbaProject if present.
         content.add_vba_project if @workbook.vba_project
 

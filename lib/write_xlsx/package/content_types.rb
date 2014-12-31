@@ -11,8 +11,9 @@ module Writexlsx
       App_package  = 'application/vnd.openxmlformats-package.'
       App_document = 'application/vnd.openxmlformats-officedocument.'
 
-      def initialize
+      def initialize(workbook)
         @writer = Package::XMLWriterSimple.new
+        @workbook  = workbook
         @defaults  = [
           [ 'rels', "#{App_package}relationships+xml" ],
           [ 'xml', 'application/xml' ]
@@ -52,6 +53,13 @@ module Writexlsx
         @overrides.push([part_name, content_type])
       end
 
+      def add_worksheet_names
+        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
+          each_with_index do |sheet, index|
+          add_worksheet_name("sheet#{index+1}")
+        end
+      end
+
       #
       # Add the name of a worksheet to the ContentTypes overrides.
       #
@@ -59,6 +67,13 @@ module Writexlsx
         worksheet_name = "/xl/worksheets/#{name}.xml"
 
         add_override(worksheet_name, "#{App_document}spreadsheetml.worksheet+xml")
+      end
+
+      def add_chartsheet_names
+        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
+          each_with_index do |sheet, index|
+          add_chartsheet_name("sheet#{index+1}")
+        end
       end
 
       #
@@ -70,6 +85,10 @@ module Writexlsx
         add_override(chartsheet_name, "#{App_document}spreadsheetml.chartsheet+xml")
       end
 
+      def add_chart_names
+        (1 .. @workbook.charts.size).each { |i| add_chart_name("chart#{i}") }
+      end
+
       #
       # Add the name of a chart to the ContentTypes overrides.
       #
@@ -77,6 +96,12 @@ module Writexlsx
         chart_name = "/xl/charts/#{name}.xml"
 
         add_override(chart_name, "#{App_document}drawingml.chart+xml")
+      end
+
+      def add_drawing_names
+        (1 .. @workbook.drawings.size).each do |i|
+          add_drawing_name("drawing#{i}")
+        end
       end
 
       #
@@ -93,6 +118,12 @@ module Writexlsx
       #
       def add_vml_name
         add_default('vml', "#{App_document}vmlDrawing")
+      end
+
+      def add_comment_names
+        (1 .. @workbook.num_comment_files).each do |i|
+          add_comment_name("comments#{i}")
+        end
       end
 
       #
@@ -121,8 +152,14 @@ module Writexlsx
       #
       # Add the image default types.
       #
-      def add_image_types(types)
-        types.each_key { |type| add_default(type, "image/#{type}") }
+      def add_image_types
+        @workbook.image_types.each_key do |type|
+          add_default(type, "image/#{type}")
+        end
+      end
+
+      def add_table_names(table_count)
+        (1 .. table_count).each { |i| add_table_name("table#{i}") }
       end
 
       #

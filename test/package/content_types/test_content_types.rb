@@ -4,7 +4,7 @@ require 'write_xlsx/package/content_types'
 
 class TestContentTypes < Test::Unit::TestCase
   def test_assemble_xml_file
-    @obj = Writexlsx::Package::ContentTypes.new
+    @obj = Writexlsx::Package::ContentTypes.new(nil)
     @obj.add_worksheet_name('sheet1')
     @obj.add_default('jpeg', 'image/jpeg')
     @obj.add_shared_strings
