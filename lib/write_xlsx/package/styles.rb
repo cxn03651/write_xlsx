@@ -292,6 +292,27 @@ module Writexlsx
       # Write the <border> element.
       #
       def write_border(format, dxf_format = nil)
+        # Ensure that a default diag border is set if the diag type is set.
+        format.diag_border = 1 if format.diag_type != 0 && format.diag_border == 0
+        # Write the start border tag.
+        @writer.tag_elements('border', border_attributes(format)) do
+          # Write the <border> sub elements.
+          write_sub_border('left',   format.left,   format.left_color)
+          write_sub_border('right',  format.right,  format.right_color)
+          write_sub_border('top',    format.top,    format.top_color)
+          write_sub_border('bottom', format.bottom, format.bottom_color)
+
+          # Condition DXF formats don't allow diagonal borders
+          if dxf_format
+            write_sub_border('vertical')
+            write_sub_border('horizontal')
+          else
+            write_sub_border('diagonal', format.diag_border, format.diag_color)
+          end
+        end
+      end
+
+      def border_attributes(format)
         attributes = []
 
         # Diagonal borders add attributes to the <border> element.
@@ -303,28 +324,7 @@ module Writexlsx
           attributes << ['diagonalUp',   1]
           attributes << ['diagonalDown', 1]
         end
-
-        # Ensure that a default diag border is set if the diag type is set.
-        format.diag_border = 1 if format.diag_type != 0 && format.diag_border == 0
-
-        # Write the start border tag.
-        @writer.tag_elements('border', attributes) do
-          # Write the <border> sub elements.
-          write_sub_border('left',   format.left,   format.left_color)
-          write_sub_border('right',  format.right,  format.right_color)
-          write_sub_border('top',    format.top,    format.top_color)
-          write_sub_border('bottom', format.bottom, format.bottom_color)
-
-          # Condition DXF formats don't allow diagonal borders
-          if !dxf_format
-            write_sub_border('diagonal', format.diag_border, format.diag_color)
-          end
-
-          if dxf_format
-            write_sub_border('vertical')
-            write_sub_border('horizontal')
-          end
-        end
+        attributes
       end
 
       #
