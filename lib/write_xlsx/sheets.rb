@@ -197,8 +197,6 @@ module Writexlsx
       self.collect { |sheet| sheet.name }.index(name)
     end
 
-    private
-
     def worksheets
       self.reject { |worksheet| worksheet.is_chartsheet? }
     end
@@ -206,6 +204,8 @@ module Writexlsx
     def chartsheets
       self.select { |worksheet| worksheet.is_chartsheet? }
     end
+
+    private
 
     def sheet_chart_count(type)
       case type

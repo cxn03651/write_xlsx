@@ -971,6 +971,10 @@ module Writexlsx
       @worksheets.chartsheet_count
     end
 
+    def non_chartsheet_count
+      @worksheets.worksheets.count
+    end
+
     def style_properties
       [
        @xf_formats,
@@ -990,6 +994,14 @@ module Writexlsx
 
     def num_comment_files
       @worksheets.select { |sheet| sheet.has_comments? }.count
+    end
+
+    def chartsheets
+      @worksheets.chartsheets
+    end
+
+    def non_chartsheets
+      @worksheets.worksheets
     end
 
     private

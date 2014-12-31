@@ -54,8 +54,7 @@ module Writexlsx
       end
 
       def add_worksheet_names
-        @workbook.worksheets.reject { |sheet| sheet.is_chartsheet? }.
-          each_with_index do |sheet, index|
+        @workbook.non_chartsheet_count.times do |index|
           add_worksheet_name("sheet#{index+1}")
         end
       end
@@ -70,8 +69,7 @@ module Writexlsx
       end
 
       def add_chartsheet_names
-        @workbook.worksheets.select { |sheet| sheet.is_chartsheet? }.
-          each_with_index do |sheet, index|
+        @workbook.chartsheet_count.times do |index|
           add_chartsheet_name("sheet#{index+1}")
         end
       end
