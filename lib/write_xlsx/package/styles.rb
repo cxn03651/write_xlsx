@@ -422,9 +422,27 @@ module Writexlsx
       # Write the <xf> element.
       #
       def write_xf(format)
-        has_align   = false
-        has_protect = false
+        # Check if XF format has alignment properties set.
+        apply_align, align = format.get_align_properties
 
+        # Check for cell protection properties.
+        protection = format.get_protection_properties
+
+        # Check if an alignment sub-element should be written.
+        has_align = apply_align && !align.empty?
+
+        # Write XF with sub-elements if required.
+        if has_align || protection
+          @writer.tag_elements('xf', xf_attributes(format)) do
+            @writer.empty_tag('alignment',  align)      if has_align
+            @writer.empty_tag('protection', protection) if protection
+          end
+        else
+          @writer.empty_tag('xf', xf_attributes(format))
+        end
+      end
+
+      def xf_attributes(format)
         attributes = [
             ['numFmtId', format.num_format_index],
             ['fontId'  , format.font_index],
@@ -432,44 +450,21 @@ module Writexlsx
             ['borderId', format.border_index],
             ['xfId'    , 0]
         ]
-
         attributes << ['applyNumberFormat', 1] if format.num_format_index > 0
-
         # Add applyFont attribute if XF format uses a font element.
         attributes << ['applyFont', 1] if format.font_index > 0
-
         # Add applyFill attribute if XF format uses a fill element.
         attributes << ['applyFill', 1] if format.fill_index > 0
-
         # Add applyBorder attribute if XF format uses a border element.
         attributes << ['applyBorder', 1] if format.border_index > 0
 
         # Check if XF format has alignment properties set.
         apply_align, align = format.get_align_properties
-
-        # Check if an alignment sub-element should be written.
-        has_align = true if apply_align && !align.empty?
-
         # We can also have applyAlignment without a sub-element.
         attributes << ['applyAlignment', 1] if apply_align
+        attributes << ['applyProtection', 1] if format.get_protection_properties
 
-        # Check for cell protection properties.
-        protection = format.get_protection_properties
-
-        if protection
-          attributes << ['applyProtection', 1]
-          has_protect = true
-        end
-
-        # Write XF with sub-elements if required.
-        if has_align || has_protect
-          @writer.tag_elements('xf', attributes) do
-            @writer.empty_tag('alignment',  align)      if has_align
-            @writer.empty_tag('protection', protection) if has_protect
-          end
-        else
-          @writer.empty_tag('xf', attributes)
-        end
+        attributes
       end
 
       #
