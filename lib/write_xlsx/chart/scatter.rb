@@ -102,28 +102,8 @@ module Writexlsx
       # Write the <c:ser> element.
       #
       def write_ser(series)
-        index = @series_index
-        @series_index += 1
-
         @writer.tag_elements('c:ser') do
-          # Write the c:idx element.
-          write_idx(index)
-          # Write the c:order element.
-          write_order(index)
-          # Write the series name.
-          write_series_name(series)
-          # Write the c:spPr element.
-          write_sp_pr(series)
-          # Write the c:marker element.
-          write_marker(series.marker)
-          # Write the c:dPt element.
-          write_d_pt(series.points)
-          # Write the c:dLbls element.
-          write_d_lbls(series.labels)
-          # Write the c:trendline element.
-          write_trendline(series.trendline)
-          # Write the c:errBars element.
-          write_error_bars(series.error_bars)
+          write_ser_base(series)
           # Write the c:xVal element.
           write_x_val(series)
           # Write the c:yVal element.
@@ -135,6 +115,7 @@ module Writexlsx
             write_c_smooth(series.smooth)
           end
         end
+        @series_index += 1
       end
 
       #

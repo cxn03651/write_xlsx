@@ -937,30 +937,10 @@ module Writexlsx
     # Write the <c:ser> element.
     #
     def write_ser(series) # :nodoc:
-      index = @series_index
-      @series_index += 1
-
       @writer.tag_elements('c:ser') do
-        # Write the c:idx element.
-        write_idx(index)
-        # Write the c:order element.
-        write_order(index)
-        # Write the series name.
-        write_series_name(series)
-        # Write the c:spPr element.
-        write_sp_pr(series)
-        # Write the c:marker element.
-        write_marker(series.marker)
-        # Write the c:invertIfNegative element.
-        write_c_invert_if_negative(series.invert_if_negative)
-        # Write the c:dPt element.
-        write_d_pt(series.points)
-        # Write the c:dLbls element.
-        write_d_lbls(series.labels)
-        # Write the c:trendline element.
-        write_trendline(series.trendline)
-        # Write the c:errBars element.
-        write_error_bars(series.error_bars)
+        write_ser_base(series) do
+          write_c_invert_if_negative(series.invert_if_negative)
+        end
         # Write the c:cat element.
         write_cat(series)
         # Write the c:val element.
@@ -968,6 +948,31 @@ module Writexlsx
         # Write the c:smooth element.
         write_c_smooth(series.smooth) if ptrue?(@smooth_allowed)
       end
+      @series_index += 1
+    end
+
+    def write_ser_base(series)
+      # Write the c:idx element.
+      write_idx(@series_index)
+      # Write the c:order element.
+      write_order(@series_index)
+      # Write the series name.
+      write_series_name(series)
+      # Write the c:spPr element.
+      write_sp_pr(series)
+      # Write the c:marker element.
+      write_marker(series.marker)
+
+      yield if block_given?
+
+      # Write the c:dPt element.
+      write_d_pt(series.points)
+      # Write the c:dLbls element.
+      write_d_lbls(series.labels)
+      # Write the c:trendline element.
+      write_trendline(series.trendline)
+      # Write the c:errBars element.
+      write_error_bars(series.error_bars)
     end
 
     #
