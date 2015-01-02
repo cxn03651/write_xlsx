@@ -196,11 +196,65 @@ module Writexlsx
         end
       end
 
+      PATTERNS = %w(
+        none
+        solid
+        mediumGray
+        darkGray
+        lightGray
+        darkHorizontal
+        darkVertical
+        darkDown
+        darkUp
+        darkGrid
+        darkTrellis
+        lightHorizontal
+        lightVertical
+        lightDown
+        lightUp
+        lightGrid
+        lightTrellis
+        gray125
+        gray0625
+      )
+
       #
       # Write the <fill> element.
       #
       def write_fill(format, dxf_format = nil)
-        pattern    = format.pattern
+        @writer.tag_elements('fill' ) do
+          write_fill_base(format, dxf_format)
+        end
+      end
+
+      def write_fill_base(format, dxf_format)
+        # The "none" pattern is handled differently for dxf formats.
+        if dxf_format && format.pattern <= 1
+          attributes = []
+        else
+          attributes = [ ['patternType', PATTERNS[format.pattern]] ]
+        end
+
+        @writer.tag_elements('patternFill', attributes) do
+          write_pattern_fill(format, dxf_format)
+        end
+      end
+
+      def write_pattern_fill(format, dxf_format)
+        bg_color, fg_color = bg_and_fg_color(format, dxf_format)
+
+        if fg_color && fg_color != 0
+          @writer.empty_tag('fgColor', [ ['rgb', palette_color(fg_color)] ])
+        end
+
+        if bg_color && bg_color != 0
+          @writer.empty_tag('bgColor', [ ['rgb', palette_color(bg_color)] ])
+        else
+          @writer.empty_tag('bgColor', [ ['indexed', 64] ]) if !dxf_format
+        end
+      end
+
+      def bg_and_fg_color(format, dxf_format)
         bg_color   = format.bg_color
         fg_color   = format.fg_color
 
@@ -211,50 +265,7 @@ module Writexlsx
           fg_color = format.dxf_fg_color
         end
 
-        patterns = %w(
-          none
-          solid
-          mediumGray
-          darkGray
-          lightGray
-          darkHorizontal
-          darkVertical
-          darkDown
-          darkUp
-          darkGrid
-          darkTrellis
-          lightHorizontal
-          lightVertical
-          lightDown
-          lightUp
-          lightGrid
-          lightTrellis
-          gray125
-          gray0625
-        )
-
-        @writer.tag_elements('fill' ) do
-          # The "none" pattern is handled differently for dxf formats.
-          if dxf_format && format.pattern <= 1
-            attributes = []
-          else
-            attributes = [ ['patternType', patterns[format.pattern]] ]
-          end
-
-          @writer.tag_elements('patternFill', attributes) do
-            if fg_color && fg_color != 0
-              fg_color = palette_color(fg_color)
-              @writer.empty_tag('fgColor', [ ['rgb', fg_color] ])
-            end
-
-            if bg_color && bg_color != 0
-              bg_color = palette_color(bg_color)
-              @writer.empty_tag('bgColor', [ ['rgb', bg_color] ])
-            else
-              @writer.empty_tag('bgColor', [ ['indexed', 64] ]) if !dxf_format
-            end
-          end
-        end
+        [bg_color, fg_color]
       end
 
       #
@@ -281,24 +292,33 @@ module Writexlsx
       # Write the <border> element.
       #
       def write_border(format, dxf_format = nil)
-        # Ensure that a default diag border is set if the diag type is set.
-        format.diag_border = 1 if format.diag_type != 0 && format.diag_border == 0
         # Write the start border tag.
         @writer.tag_elements('border', border_attributes(format)) do
-          # Write the <border> sub elements.
-          write_sub_border('left',   format.left,   format.left_color)
-          write_sub_border('right',  format.right,  format.right_color)
-          write_sub_border('top',    format.top,    format.top_color)
-          write_sub_border('bottom', format.bottom, format.bottom_color)
-
-          # Condition DXF formats don't allow diagonal borders
-          if dxf_format
-            write_sub_border('vertical')
-            write_sub_border('horizontal')
-          else
-            write_sub_border('diagonal', format.diag_border, format.diag_color)
-          end
+          write_border_base(format, dxf_format)
         end
+      end
+
+      def write_border_base(format, dxf_format)
+        # Write the <border> sub elements.
+        write_border_sub_elements(format)
+
+        # Condition DXF formats don't allow diagonal borders
+        if dxf_format
+          write_sub_border('vertical')
+          write_sub_border('horizontal')
+        else
+          # Ensure that a default diag border is set if the diag type is set.
+          format.diag_border = 1 if format.diag_type != 0 && format.diag_border == 0
+
+          write_sub_border('diagonal', format.diag_border, format.diag_color)
+        end
+      end
+
+      def write_border_sub_elements(format)
+        write_sub_border('left',   format.left,   format.left_color)
+        write_sub_border('right',  format.right,  format.right_color)
+        write_sub_border('top',    format.top,    format.top_color)
+        write_sub_border('bottom', format.bottom, format.bottom_color)
       end
 
       def border_attributes(format)
@@ -316,6 +336,23 @@ module Writexlsx
         attributes
       end
 
+      BORDER_STYLES = %w(
+        none
+        thin
+        medium
+        dashed
+        dotted
+        thick
+        double
+        hair
+        mediumDashed
+        dashDot
+        mediumDashDot
+        dashDotDot
+        mediumDashDotDot
+        slantDashDot
+      )
+
       #
       # Write the <border> sub elements such as <right>, <top>, etc.
       #
@@ -325,24 +362,7 @@ module Writexlsx
           return
         end
 
-        border_styles = %w(
-          none
-          thin
-          medium
-          dashed
-          dotted
-          thick
-          double
-          hair
-          mediumDashed
-          dashDot
-          mediumDashDot
-          dashDotDot
-          mediumDashDotDot
-          slantDashDot
-        )
-
-        attributes = [ [:style, border_styles[style]] ]
+        attributes = [ [:style, BORDER_STYLES[style]] ]
 
         @writer.tag_elements(type, attributes) do
           if color != 0
@@ -502,30 +522,30 @@ module Writexlsx
       # Write the <dxfs> element.
       #
       def write_dxfs
-        formats = @dxf_formats
+        attributes = [ ['count', @dxf_formats.count] ]
 
-        count = formats.size
-
-        attributes = [ ['count', count] ]
-
-        if !formats.empty?
+        if @dxf_formats.empty?
+          @writer.empty_tag('dxfs', attributes)
+        else
           @writer.tag_elements('dxfs', attributes) do
             # Write the font elements for format objects that have them.
             @dxf_formats.each do |format|
-              @writer.tag_elements('dxf') do
-                format.write_font(@writer, self, 1) if format.has_dxf_font?
-
-                if format.num_format_index != 0
-                  write_num_fmt(format.num_format_index, format.num_format)
-                end
-
-                write_fill(format, 1)    if format.has_dxf_fill?
-                write_border(format, 1)  if format.has_dxf_border?
-              end
+              write_dxf(format)
             end
           end
-        else
-          @writer.empty_tag('dxfs', attributes)
+        end
+      end
+
+      def write_dxf(format)
+        @writer.tag_elements('dxf') do
+          format.write_font(@writer, self, 1) if format.has_dxf_font?
+
+          if format.num_format_index != 0
+            write_num_fmt(format.num_format_index, format.num_format)
+          end
+
+          write_fill(format, 1)    if format.has_dxf_fill?
+          write_border(format, 1)  if format.has_dxf_border?
         end
       end
 
