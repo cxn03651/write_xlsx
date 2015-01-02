@@ -784,6 +784,31 @@ module Writexlsx
       end
     end
 
+    def xf_attributes
+      attributes = [
+        ['numFmtId', num_format_index],
+        ['fontId'  , font_index],
+        ['fillId'  , fill_index],
+        ['borderId', border_index],
+        ['xfId'    , 0]
+      ]
+      attributes << ['applyNumberFormat', 1] if num_format_index > 0
+      # Add applyFont attribute if XF format uses a font element.
+      attributes << ['applyFont', 1] if font_index > 0
+      # Add applyFill attribute if XF format uses a fill element.
+      attributes << ['applyFill', 1] if fill_index > 0
+      # Add applyBorder attribute if XF format uses a border element.
+      attributes << ['applyBorder', 1] if border_index > 0
+
+      # Check if XF format has alignment properties set.
+      apply_align, align = get_align_properties
+      # We can also have applyAlignment without a sub-element.
+      attributes << ['applyAlignment', 1] if apply_align
+      attributes << ['applyProtection', 1] if get_protection_properties
+
+      attributes
+    end
+
     private
 
     def write_font_shapes(writer)

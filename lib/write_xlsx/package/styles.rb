@@ -455,38 +455,13 @@ module Writexlsx
 
         # Write XF with sub-elements if required.
         if has_align || protection
-          @writer.tag_elements('xf', xf_attributes(format)) do
+          @writer.tag_elements('xf', format.xf_attributes) do
             @writer.empty_tag('alignment',  align)      if has_align
             @writer.empty_tag('protection', protection) if protection
           end
         else
-          @writer.empty_tag('xf', xf_attributes(format))
+          @writer.empty_tag('xf', format.xf_attributes)
         end
-      end
-
-      def xf_attributes(format)
-        attributes = [
-            ['numFmtId', format.num_format_index],
-            ['fontId'  , format.font_index],
-            ['fillId'  , format.fill_index],
-            ['borderId', format.border_index],
-            ['xfId'    , 0]
-        ]
-        attributes << ['applyNumberFormat', 1] if format.num_format_index > 0
-        # Add applyFont attribute if XF format uses a font element.
-        attributes << ['applyFont', 1] if format.font_index > 0
-        # Add applyFill attribute if XF format uses a fill element.
-        attributes << ['applyFill', 1] if format.fill_index > 0
-        # Add applyBorder attribute if XF format uses a border element.
-        attributes << ['applyBorder', 1] if format.border_index > 0
-
-        # Check if XF format has alignment properties set.
-        apply_align, align = format.get_align_properties
-        # We can also have applyAlignment without a sub-element.
-        attributes << ['applyAlignment', 1] if apply_align
-        attributes << ['applyProtection', 1] if format.get_protection_properties
-
-        attributes
       end
 
       #
