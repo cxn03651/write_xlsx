@@ -23,18 +23,7 @@ module Writexlsx
 
       def assemble_xml_file
         write_xml_declaration do
-          write_cp_core_properties do
-            write_dc_title
-            write_dc_subject
-            write_dc_creator
-            write_cp_keywords
-            write_dc_description
-            write_cp_last_modified_by
-            write_dcterms_created
-            write_dcterms_modified
-            write_cp_category
-            write_cp_content_status
-          end
+          write_cp_core_properties { write_cp_core_properties_base }
         end
       end
 
@@ -43,6 +32,19 @@ module Writexlsx
       end
 
       private
+
+      def write_cp_core_properties_base
+        write_dc_title
+        write_dc_subject
+        write_dc_creator
+        write_cp_keywords
+        write_dc_description
+        write_cp_last_modified_by
+        write_dcterms_created
+        write_dcterms_modified
+        write_cp_category
+        write_cp_content_status
+      end
 
       #
       # Convert a localtime() date to a ISO 8601 style "2010-01-01T00:00:00Z" date.
