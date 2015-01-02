@@ -557,16 +557,15 @@ module Writexlsx
       #
       # Write the <mruColors> element for the most recently used colours.
       #
-      def write_mru_colors(*args)
-        custom_colors = args
-
+      def write_mru_colors(custom_colors)
         # Limit the mruColors to the last 10.
         count = custom_colors.size
+        # array[-10, 10] returns array which contains last 10 items.
         custom_colors = custom_colors[-10, 10] if count > 10
 
         @writer.tag_elements('mruColors') do
           # Write the custom colors in reverse order.
-          @custom_colors.reverse.each do |color|
+          custom_colors.reverse.each do |color|
             write_color('rgb', color)
           end
         end
