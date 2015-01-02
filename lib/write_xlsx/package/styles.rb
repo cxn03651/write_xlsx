@@ -293,7 +293,7 @@ module Writexlsx
       #
       def write_border(format, dxf_format = nil)
         # Write the start border tag.
-        @writer.tag_elements('border', border_attributes(format)) do
+        @writer.tag_elements('border', format.border_attributes) do
           write_border_base(format, dxf_format)
         end
       end
@@ -319,21 +319,6 @@ module Writexlsx
         write_sub_border('right',  format.right,  format.right_color)
         write_sub_border('top',    format.top,    format.top_color)
         write_sub_border('bottom', format.bottom, format.bottom_color)
-      end
-
-      def border_attributes(format)
-        attributes = []
-
-        # Diagonal borders add attributes to the <border> element.
-        if format.diag_type == 1
-          attributes << ['diagonalUp',   1]
-        elsif format.diag_type == 2
-          attributes << ['diagonalDown', 1]
-        elsif format.diag_type == 3
-          attributes << ['diagonalUp',   1]
-          attributes << ['diagonalDown', 1]
-        end
-        attributes
       end
 
       BORDER_STYLES = %w(

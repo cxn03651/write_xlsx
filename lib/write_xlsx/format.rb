@@ -784,6 +784,21 @@ module Writexlsx
       end
     end
 
+    def border_attributes
+      attributes = []
+
+      # Diagonal borders add attributes to the <border> element.
+      if diag_type == 1
+        attributes << ['diagonalUp',   1]
+      elsif diag_type == 2
+        attributes << ['diagonalDown', 1]
+      elsif diag_type == 3
+        attributes << ['diagonalUp',   1]
+        attributes << ['diagonalDown', 1]
+      end
+      attributes
+    end
+
     def xf_attributes
       attributes = [
         ['numFmtId', num_format_index],
