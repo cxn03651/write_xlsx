@@ -60,9 +60,7 @@ module Writexlsx
       # Write the <styleSheet> element.
       #
       def write_style_sheet
-        xmlns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
-
-        attributes = [ ['xmlns', xmlns] ]
+        attributes = [ ['xmlns', XMLWriterSimple::XMLNS] ]
 
         @writer.tag_elements('styleSheet', attributes) { yield }
       end

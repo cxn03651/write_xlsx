@@ -311,11 +311,7 @@ module Writexlsx
       # Write the <comments> element.
       #
       def write_comments
-        xmlns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
-
-        attributes = [
-                      ['xmlns', xmlns]
-                     ]
+        attributes = [ ['xmlns', XMLWriterSimple::XMLNS] ]
 
         @writer.tag_elements('comments', attributes) { yield }
       end

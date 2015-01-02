@@ -7,6 +7,8 @@ require 'stringio'
 module Writexlsx
   module Package
     class XMLWriterSimple
+      XMLNS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
+
       def initialize
         @io = StringIO.new
       end
