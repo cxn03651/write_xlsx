@@ -85,57 +85,51 @@ module Writexlsx
         end
       end
 
+      FORMAT_CODES = {
+        0  => 'General',
+        1  => '0',
+        2  => '0.00',
+        3  => '#,##0',
+        4  => '#,##0.00',
+        5  => '($#,##0_);($#,##0)',
+        6  => '($#,##0_);[Red]($#,##0)',
+        7  => '($#,##0.00_);($#,##0.00)',
+        8  => '($#,##0.00_);[Red]($#,##0.00)',
+        9  => '0%',
+        10 => '0.00%',
+        11 => '0.00E+00',
+        12 => '# ?/?',
+        13 => '# ??/??',
+        14 => 'm/d/yy',
+        15 => 'd-mmm-yy',
+        16 => 'd-mmm',
+        17 => 'mmm-yy',
+        18 => 'h:mm AM/PM',
+        19 => 'h:mm:ss AM/PM',
+        20 => 'h:mm',
+        21 => 'h:mm:ss',
+        22 => 'm/d/yy h:mm',
+        37 => '(#,##0_);(#,##0)',
+        38 => '(#,##0_);[Red](#,##0)',
+        39 => '(#,##0.00_);(#,##0.00)',
+        40 => '(#,##0.00_);[Red](#,##0.00)',
+        41 => '_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)',
+        42 => '_($* #,##0_);_($* (#,##0);_($* "-"_);_(@_)',
+        43 => '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)',
+        44 => '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)',
+        45 => 'mm:ss',
+        46 => '[h]:mm:ss',
+        47 => 'mm:ss.0',
+        48 => '##0.0E+0',
+        49 => '@'
+      }
+
       #
       # Write the <numFmt> element.
       #
       def write_num_fmt(num_fmt_id, format_code)
-        format_codes = {
-          0  => 'General',
-          1  => '0',
-          2  => '0.00',
-          3  => '#,##0',
-          4  => '#,##0.00',
-          5  => '($#,##0_);($#,##0)',
-          6  => '($#,##0_);[Red]($#,##0)',
-          7  => '($#,##0.00_);($#,##0.00)',
-          8  => '($#,##0.00_);[Red]($#,##0.00)',
-          9  => '0%',
-          10 => '0.00%',
-          11 => '0.00E+00',
-          12 => '# ?/?',
-          13 => '# ??/??',
-          14 => 'm/d/yy',
-          15 => 'd-mmm-yy',
-          16 => 'd-mmm',
-          17 => 'mmm-yy',
-          18 => 'h:mm AM/PM',
-          19 => 'h:mm:ss AM/PM',
-          20 => 'h:mm',
-          21 => 'h:mm:ss',
-          22 => 'm/d/yy h:mm',
-          37 => '(#,##0_);(#,##0)',
-          38 => '(#,##0_);[Red](#,##0)',
-          39 => '(#,##0.00_);(#,##0.00)',
-          40 => '(#,##0.00_);[Red](#,##0.00)',
-          41 => '_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)',
-          42 => '_($* #,##0_);_($* (#,##0);_($* "-"_);_(@_)',
-          43 => '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)',
-          44 => '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)',
-          45 => 'mm:ss',
-          46 => '[h]:mm:ss',
-          47 => 'mm:ss.0',
-          48 => '##0.0E+0',
-          49 => '@'
-        }
-
         # Set the format code for built-in number formats.
-        if num_fmt_id < 164
-          if format_codes[num_fmt_id]
-            format_code = format_codes[num_fmt_id]
-          else
-            format_code = 'General'
-          end
-        end
+        format_code = FORMAT_CODES[num_fmt_id] || 'General' if num_fmt_id < 164
 
         attributes = [
           ['numFmtId',   num_fmt_id],
@@ -150,9 +144,13 @@ module Writexlsx
       #
       def write_fonts
         write_format_elements('fonts', @font_count) do
-          @xf_formats.each do |format|
-            format.write_font(@writer, self) if format.has_font?
-          end
+          write_font_base
+        end
+      end
+
+      def write_font_base
+        @xf_formats.each do |format|
+          format.write_font(@writer, self) if format.has_font?
         end
       end
 
@@ -169,19 +167,21 @@ module Writexlsx
       # Write the <fills> element.
       #
       def write_fills
-        count = @fill_count
-
-        attributes = [ ['count', count] ]
+        attributes = [ ['count', @fill_count] ]
 
         @writer.tag_elements('fills', attributes) do
-          # Write the default fill element.
-          write_default_fill('none')
-          write_default_fill('gray125')
+          write_fills_base
+        end
+      end
 
-          # Write the fill elements for format objects that have them.
-          @xf_formats.each do |format|
-            write_fill(format) if format.has_fill?
-          end
+      def write_fills_base
+        # Write the default fill element.
+        write_default_fill('none')
+        write_default_fill('gray125')
+
+        # Write the fill elements for format objects that have them.
+        @xf_formats.each do |format|
+          write_fill(format) if format.has_fill?
         end
       end
 
@@ -271,9 +271,13 @@ module Writexlsx
       #
       def write_borders
         write_format_elements('borders', @border_count) do
-          @xf_formats.each do |format|
-            write_border(format) if format.has_border?
-          end
+          write_borders_base
+        end
+      end
+
+      def write_borders_base
+        @xf_formats.each do |format|
+          write_border(format) if format.has_border?
         end
       end
 
@@ -393,16 +397,11 @@ module Writexlsx
       # Write the style <xf> element.
       #
       def write_style_xf
-        num_fmt_id = 0
-        font_id    = 0
-        fill_id    = 0
-        border_id  = 0
-
         attributes = [
-          ['numFmtId', num_fmt_id],
-          ['fontId',   font_id],
-          ['fillId',   fill_id],
-          ['borderId', border_id]
+          ['numFmtId', 0],
+          ['fontId',   0],
+          ['fillId',   0],
+          ['borderId', 0]
         ]
 
         @writer.empty_tag('xf', attributes)
@@ -463,14 +462,10 @@ module Writexlsx
       # Write the <cellStyle> element.
       #
       def write_cell_style
-        name       = 'Normal'
-        xf_id      = 0
-        builtin_id = 0
-
         attributes = [
-            ['name',      name],
-            ['xfId',      xf_id],
-            ['builtinId', builtin_id]
+            ['name',      'Normal'],
+            ['xfId',      0],
+            ['builtinId', 0]
         ]
 
         @writer.empty_tag('cellStyle', attributes)
@@ -511,14 +506,10 @@ module Writexlsx
       # Write the <tableStyles> element.
       #
       def write_table_styles
-        count               = 0
-        default_table_style = 'TableStyleMedium9'
-        default_pivot_style = 'PivotStyleLight16'
-
         attributes = [
-            ['count',             count],
-            ['defaultTableStyle', default_table_style],
-            ['defaultPivotStyle', default_pivot_style]
+            ['count',             0],
+            ['defaultTableStyle', 'TableStyleMedium9'],
+            ['defaultPivotStyle', 'PivotStyleLight16']
         ]
 
         @writer.empty_tag('tableStyles', attributes)
@@ -528,8 +519,6 @@ module Writexlsx
       # Write the <colors> element.
       #
       def write_colors
-        custom_colors = @custom_colors
-
         return if @custom_colors.empty?
 
         @writer.tag_elements( 'colors' ) do
@@ -558,9 +547,7 @@ module Writexlsx
       # Write the <condense> element.
       #
       def write_condense
-        val  = 0
-
-        attributes = [ ['val', val] ]
+        attributes = [ ['val', 0] ]
 
         @writer.empty_tag('condense', attributes)
       end
@@ -569,9 +556,7 @@ module Writexlsx
       # Write the <extend> element.
       #
       def write_extend
-        val  = 0
-
-        attributes = [ ['val', val] ]
+        attributes = [ ['val', 0] ]
 
         @writer.empty_tag('extend', attributes)
       end
