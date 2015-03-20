@@ -142,6 +142,7 @@ module Writexlsx
     attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
     attr_reader :width, :height  # :nodoc:
     attr_reader :label_positions, :label_position_default
+    attr_writer :date_category
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -1182,7 +1183,7 @@ module Writexlsx
           write_crossing(y_axis.crossing)
         end
         # Write the c:auto element.
-        write_auto(1)
+        write_auto(1) unless x_axis.text_axis
         # Write the c:labelAlign element.
         write_label_align('ctr')
         # Write the c:labelOffset element.

@@ -14,7 +14,7 @@ module Writexlsx
       attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
       attr_reader :major_gridlines, :minor_gridlines, :reverse
-      attr_reader :line, :fill
+      attr_reader :line, :fill, :text_axis
       #
       # Convert user defined axis values into axis instance.
       #
@@ -37,6 +37,10 @@ module Writexlsx
         set_axis_name_layout(args)
         set_axis_line(args)
         set_axis_fill(args)
+        if ptrue?(args[:text_axis])
+          @chart.date_category = false
+          @text_axis = true
+        end
       end
 
       #
