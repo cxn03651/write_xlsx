@@ -31,9 +31,9 @@ class TestWriteStyle < Test::Unit::TestCase
     assert_equal(expected, result)
   end
 
-  def test_write_style_with_outside_range_43
+  def test_write_style_with_outside_range_49
     expected = ''
-    @chart.set_style(43)
+    @chart.set_style(49)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string
     assert_equal(expected, result)
