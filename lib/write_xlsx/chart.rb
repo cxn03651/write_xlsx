@@ -343,7 +343,7 @@ module Writexlsx
     # Set on of the 42 built-in Excel chart styles. The default style is 2.
     #
     def set_style(style_id = 2)
-      style_id = 2 if style_id < 0 || style_id > 42
+      style_id = 2 if style_id < 0 || style_id > 48
       @style_id = style_id
     end
 
