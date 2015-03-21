@@ -519,7 +519,12 @@ module Writexlsx
     #
     def process_names(name = nil, name_formula = nil) # :nodoc:
       # Name looks like a formula, use it to set name_formula.
-      if name && name =~ /^=[^!]+!\$/
+      if name.respond_to?(:to_ary)
+        cell = xl_rowcol_to_cell(name[1], name[2], 1, 1)
+        name_formula = "#{quote_sheetname(name[0])}!#{cell}"
+        name = ''
+      elsif
+        name && name =~ /^=[^!]+!\$/
         name_formula = name
         name         = ''
       end

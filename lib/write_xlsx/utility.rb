@@ -75,6 +75,23 @@ module Writexlsx
       "=#{sheetname}!#{range1}:#{range2}"
     end
 
+    #
+    # Sheetnames used in references should be quoted if they contain any spaces,
+    # special characters or if the look like something that isn't a sheet name.
+    # TODO. We need to handle more special cases.
+    #
+    def quote_sheetname(sheetname) #:nodoc:
+      # Use Excel's conventions and quote the sheet name if it comtains any
+      # non-word character or if it isn't already quoted.
+      name = sheetname.dup
+      if name =~ /\W/ && !(name =~ /^'/)
+        # Double quote and single quoted strings.
+        name = name.gsub(/'/, "''")
+        name = "'#{name}'"
+      end
+      name
+    end
+
     def check_dimensions(row, col)
       if !row || row >= ROW_MAX || !col || col >= COL_MAX
         raise WriteXLSXDimensionError
