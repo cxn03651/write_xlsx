@@ -142,7 +142,7 @@ module Writexlsx
     attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
     attr_reader :width, :height  # :nodoc:
     attr_reader :label_positions, :label_position_default
-    attr_writer :date_category
+    attr_writer :date_category, :already_inserted
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -560,6 +560,10 @@ module Writexlsx
       end
 
       id
+    end
+
+    def already_inserted?
+      @already_inserted
     end
 
     private
