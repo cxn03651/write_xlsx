@@ -101,10 +101,8 @@ module Writexlsx
             # Handle the function for the total row.
             if user_data[:total_function]
               handle_the_function_for_the_table_row(
-                                                    @row2, col_data, col_num,
-                                                    user_data[:total_function],
-                                                    user_data[:format]
-                                                    )
+                @row2, col_data, col_num, user_data
+              )
             elsif user_data[:total_string]
               total_label_only(
                                @row2, col_num, col_data, user_data[:total_string], user_data[:format]
@@ -212,8 +210,8 @@ module Writexlsx
         end
       end
 
-      def handle_the_function_for_the_table_row(row2, col_data, col_num, total_function, format)
-        function = total_function.downcase.gsub(/[_\s]/, '')
+      def handle_the_function_for_the_table_row(row2, col_data, col_num, user_data)
+        function = user_data[:total_function].downcase.gsub(/[_\s]/, '')
 
         function = 'countNums' if function == 'countnums'
         function = 'stdDev'    if function == 'stddev'
@@ -221,7 +219,7 @@ module Writexlsx
         col_data.total_function = function
 
         formula = table_function_to_formula(function, col_data.name)
-        @worksheet.write_formula(row2, col_num, formula, format)
+        @worksheet.write_formula(row2, col_num, formula, user_data[:format], user_data[:total_value])
       end
 
       #
