@@ -133,6 +133,9 @@ class Test::Unit::TestCase
           sub(/verticalDpi="200" /, '').
           sub(/(<pageSetup[^>]* )r:id="rId1"/, '\1').
           sub(/ +\/>/, ' />')
+        got_xml_str = got_xml_str.
+          sub(/horizontalDpi="200" /, '').
+          sub(/verticalDpi="200" /, '')
       end
 
       # Remove Chart pageMargin dimensions which are almost always different.
