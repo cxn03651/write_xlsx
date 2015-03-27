@@ -14,6 +14,7 @@ module Writexlsx
       attr_accessor :orientation, :print_options_changed  # :nodoc:
       attr_accessor :header, :footer, :header_footer_changed, :header_footer_aligns, :header_footer_scales
       attr_writer :page_start
+      attr_writer :horizontal_dpi, :vertical_dpi
 
       def initialize # :nodoc:
         @margin_left = 0.7
@@ -110,6 +111,10 @@ module Writexlsx
                        end
                       ]
         attributes << ['useFirstPageNumber', @page_start] if ptrue?(@page_start)
+
+        # Set the DPI. Mainly only for testing.
+        attributes << ['horizontalDpi',  @horizontal_dpi] if @horizontal_dpi
+        attributes << ['verticalDpi',    @vertical_dpi]   if @vertical_dpi
 
         writer.empty_tag('pageSetup', attributes)
       end

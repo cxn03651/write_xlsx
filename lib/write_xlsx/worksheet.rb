@@ -5877,6 +5877,14 @@ module Writexlsx
       @tables.size
     end
 
+    def horizontal_dpi=(val)
+      @page_setup.horizontal_dpi = val
+    end
+
+    def vertical_dpi=(val)
+      @page_setup.vertical_dpi = val
+    end
+
     private
 
     def hyperlinks_count
