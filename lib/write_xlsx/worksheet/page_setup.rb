@@ -98,11 +98,12 @@ module Writexlsx
         return unless @page_setup_changed
 
         attributes = []
-        attributes << ['paperSize',   @paper_size]    if @paper_size
-        attributes << ['scale',       @scale]         if @scale != 100
-        attributes << ['fitToWidth',  @fit_width]     if @fit_page && @fit_width != 1
-        attributes << ['fitToHeight', @fit_height]    if @fit_page && @fit_height != 1
-        attributes << ['pageOrder',   "overThenDown"] if @across
+        attributes << ['paperSize',       @paper_size]    if @paper_size
+        attributes << ['scale',           @scale]         if @scale != 100
+        attributes << ['fitToWidth',      @fit_width]     if @fit_page && @fit_width != 1
+        attributes << ['fitToHeight',     @fit_height]    if @fit_page && @fit_height != 1
+        attributes << ['pageOrder',       "overThenDown"] if @across
+        attributes << ['firstPageNumber', @page_start]    if @page_start && @page_start > 1
         attributes << ['orientation',
                        if @orientation
                          'portrait'
@@ -110,7 +111,7 @@ module Writexlsx
                          'landscape'
                        end
                       ]
-        attributes << ['useFirstPageNumber', @page_start] if ptrue?(@page_start)
+        attributes << ['useFirstPageNumber', 1] if ptrue?(@page_start)
 
         # Set the DPI. Mainly only for testing.
         attributes << ['horizontalDpi',  @horizontal_dpi] if @horizontal_dpi
