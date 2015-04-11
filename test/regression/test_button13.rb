@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionButton07 < Test::Unit::TestCase
+class TestRegressionButton13 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,22 +10,21 @@ class TestRegressionButton07 < Test::Unit::TestCase
     File.delete(@xlsx) if File.exist?(@xlsx)
   end
 
-  def test_button07
+  def test_button13
     @xlsx = 'button07.xlsm'
     workbook  = WriteXLSX.new(@xlsx)
     worksheet = workbook.add_worksheet
 
-    workbook.set_vba_name('ThisWorkbook')
-    worksheet.set_vba_name('Sheet1')
-
     workbook.set_vba_name
     worksheet.set_vba_name
 
-    worksheet.insert_button('C2', {
-                              :macro   => 'say_hello',
-                              :caption => 'Hello'
-                            }
-                            )
+    worksheet.insert_button(
+      'C2',
+      {
+        :macro   => 'say_hello',
+        :caption => 'Hello'
+      }
+    )
 
     workbook.add_vba_project(File.join(@regression_output, 'vbaProject02.bin'))
 

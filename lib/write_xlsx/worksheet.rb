@@ -5885,6 +5885,17 @@ module Writexlsx
       @page_setup.vertical_dpi = val
     end
 
+    #
+    # set the vba name for the worksheet
+    #
+    def set_vba_name(vba_codename = nil)
+      if vba_codename
+        @vba_codename = vba_codename
+      else
+        @vba_codename = @name
+      end
+    end
+
     private
 
     def hyperlinks_count
