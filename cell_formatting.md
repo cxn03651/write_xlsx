@@ -81,6 +81,9 @@ that can be applied and the equivalent object method:
                Top color         top_color       set_top_color()
                Left color        left_color      set_left_color()
                Right color       right_color     set_right_color()
+               Diagional type    diag_type       set_diag_type()
+               Diagional border  diag_border     set_diag_border()
+               Diagional color   diag_color      set_diag_color()
 
 There are two ways of setting Format properties: by using the object method
 interface or by setting the property directly. For example, a typical use of

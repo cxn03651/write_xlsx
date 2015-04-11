@@ -45,6 +45,9 @@ The following Format methods are available:
 * [set_top_color](#set_border_color)
 * [set_left_color](#set_border_color)
 * [set_right_color](#set_border_color)
+* [set_diag_type](#set_diag_type)
+* [set_diag_border](#set_diag_border)
+* [set_diag_color](#set_diag_color)
 
 The above methods can also be applied directly as properties.
 For example `format.set_bold()` is equivalent to
@@ -639,6 +642,48 @@ the bottom, top, left and right. These can be set to the same colour using
 `set_border_color()` or individually using the relevant method calls shown
 above. Examples of the border styles and colours are shown in the 'Borders'
 worksheet created by [formats.rb][].
+
+
+#### <a name="set_diag_type" class="anchor" href="#set_diag_type"><span class="octicon octicon-link" /></a>set_diag_type()
+
+    Default state:      Diagonal border is off.
+    Default action:     None.
+    Valid args:         1-3, See below.
+
+Set the diagonal border type for the cell. Three types of diagonal
+borders are available in Excel:
+
+    1: From bottom left to top right.
+    2: From top left to bottom right.
+    3: Same as 1 and 2 combined.
+
+For example:
+
+    format.set_diag_type(3)
+
+
+#### <a name="set_diag_border" class="anchor" href="#set_diag_border"><span class="octicon octicon-link" /></a>set_diag_border()
+
+    Default state:      Border is off
+    Default action:     Set border type 1
+    Valid args:         0-13, See below.
+
+Set the diagonal border style. Same as the parmater to [set_border](#set_border) above.
+
+
+#### <a name="set_diag_color" class="anchor" href="#set_diag_color"><span class="octicon octicon-link" /></a>set_diag_color()
+
+    Default state:      Color is off
+    Default action:     Undefined
+    Valid args:         See set_color()
+
+
+Set the colour of the diagonal cell border:
+
+    format.set_diag_type(3)
+    format.set_diag_border(7)
+    format.set_diag_color('red')
+
 
 #### <a name="copy" class="anchor" href="#copy"><span class="octicon octicon-link" /></a>copy(format)
 
