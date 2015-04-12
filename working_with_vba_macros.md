@@ -14,7 +14,7 @@ differentiate between the two file formats since files containing
 macros are usually subject to additional security checks.
 
 The `vbaProject.bin` file is a binary OLE COM container.  This was the
-format used in older C<xls> versions of Excel prior to Excel 2007.
+format used in older `xls` versions of Excel prior to Excel 2007.
 Unlike all of the other components of an xlsx/xlsm file the data isn't
 stored in XML format.  Instead the functions and macros as stored as
 pre-parsed binary format.  As such it wouldn't be feasible to define

@@ -265,7 +265,11 @@ The supported totals row SUBTOTAL functions are:
 
 User defined functions or formulas aren't supported.
 
-+It is also possible to set a calculated value for the C<total_function> using the C<total_value> sub property. This is only necessary when creating workbooks for applications that cannot calculate the value of formulas automatically. This is similar to setting the C<value> optional property in C<write_formula()>:
++It is also possible to set a calculated value for the
+`total_function` using the `total_value` sub property. This is only
+necessary when creating workbooks for applications that cannot
+calculate the value of formulas automatically. This is similar to
+setting the `value` optional property in `write_formula`:
 
     worksheet10.add_table(
         'B3:F8',
