@@ -1,4 +1,20 @@
 Change history of write_xlsx rubygem.
+2015-04-12 v0.82.0
+   Added extra documentation on how to handle VBA macros and added
+   automatic and manual setting of workbook and worksheet VBA codenames.
+
+   Fix for set_start_page() for values > 1.
+
+   Fix to copy user defined chart properties, such as trendlines,
+   so that they aren't overwritten.
+
+   Added column funtion_value option to add_table to allow
+   function value to be set.
+
+   Allow explicit text categories in charts.
+
+   Fix for column/bar gap/overlap on y2 axis.
+
 2014-12-28 v0.81.1
    use test-unit gem instead of test/unit.
 
