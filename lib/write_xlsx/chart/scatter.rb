@@ -59,6 +59,13 @@ module Writexlsx
       end
 
       #
+      # Override parent method to add a warning.
+      #
+      def combine(chart)
+        raise 'Combined chart not currently supported with scatter chart as the primary chart'
+      end
+
+      #
       # Override the virtual superclass method with a chart specific method.
       #
       def write_chart_type(params)
@@ -129,11 +136,11 @@ module Writexlsx
           # Write the c:layout element.
           write_layout(@plotarea.layout, 'plot')
 
-          # Write the subclass chart type elements for primary and secondary axes
+          # Write the subclass chart type elements for primary and secondary axes.
           write_chart_type(:primary_axes => 1)
           write_chart_type(:primary_axes => 0)
 
-          # Write c:catAx and c:valAx elements for series using primary axes
+          # Write c:catAx and c:valAx elements for series using primary axes.
           write_cat_val_axis(@x_axis, @y_axis, @axis_ids, 'b')
 
           tmp = @horiz_val_axis
@@ -141,7 +148,7 @@ module Writexlsx
           write_val_axis(@x_axis, @y_axis, @axis_ids, 'l')
           @horiz_val_axis = tmp
 
-          # Write c:valAx and c:catAx elements for series using secondary axes
+          # Write c:valAx and c:catAx elements for series using secondary axes.
           write_cat_val_axis(@x2_axis, @y2_axis, @axis2_ids, 'b')
 
           @horiz_val_axis = 1

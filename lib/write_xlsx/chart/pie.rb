@@ -43,6 +43,13 @@ module Writexlsx
       end
 
       #
+      # Override parent method to add a warning.
+      #
+      def combine(chart)
+        raise "Combined chart not currently supported for Pie charts"
+      end
+
+      #
       # Set the Pie/Doughnut chart rotation: the angle of the first slice.
       #
       def set_rotation(rotation)

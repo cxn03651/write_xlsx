@@ -141,8 +141,11 @@ module Writexlsx
     attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
     attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
     attr_reader :width, :height  # :nodoc:
-    attr_reader :label_positions, :label_position_default
+    attr_reader :label_positions, :label_position_default, :combined # :nodoc:
     attr_writer :date_category, :already_inserted
+    attr_writer :series_index
+    attr_writer :writer
+    attr_reader :x2_axis, :y2_axis, :axis2_ids
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -186,7 +189,7 @@ module Writexlsx
       @sheet_type        = 0x0200
       @series            = []
       @embedded          = 0
-      @id                = ''
+      @id                = -1
       @series_index      = 0
       @style_id          = 2
       @formula_ids       = {}
@@ -198,6 +201,8 @@ module Writexlsx
       @name              = ''
       @table             = nil
       set_default_properties
+      @combined          = nil
+      @is_secondary      = false
     end
 
     def set_xml_writer(filename)   # :nodoc:
@@ -245,6 +250,11 @@ module Writexlsx
       # Set the secondary axis properties.
       x2_axis = params[:x2_axis]
       y2_axis = params[:y2_axis]
+
+      # Store secondary status for combined charts.
+      if ptrue?(x2_axis) || ptrue?(y2_axis)
+        @is_secondary = true
+      end
 
       # Set the gap and overlap for Bar/Column charts.
       if params[:gap]
@@ -425,6 +435,13 @@ module Writexlsx
     end
 
     #
+    # Add another chart to create a combined chart.
+    #
+    def combine(chart)
+      @combined = chart
+    end
+
+    #
     # Setup the default configuration data for an embedded chart.
     #
     def set_embedded_config_data
@@ -566,6 +583,10 @@ module Writexlsx
       @already_inserted
     end
 
+    def is_secondary?
+      @is_secondary
+    end
+
     private
 
     def axis_setup
@@ -673,11 +694,11 @@ module Writexlsx
     end
 
     def ids
-      chart_id   = 1 + @id
+      chart_id   = 5001 + @id
       axis_count = 1 + @axis2_ids.size + @axis_ids.size
 
-      id1 = sprintf('5%03d%04d', chart_id, axis_count)
-      id2 = sprintf('5%03d%04d', chart_id, axis_count + 1)
+      id1 = sprintf('%04d%04d', chart_id, axis_count)
+      id2 = sprintf('%04d%04d', chart_id, axis_count + 1)
 
       [id1, id2]
     end
@@ -842,12 +863,34 @@ module Writexlsx
     # Write the <c:plotArea> element.
     #
     def write_plot_area   # :nodoc:
+      second_chart = @combined
       @writer.tag_elements('c:plotArea') do
         # Write the c:layout element.
         write_layout(@plotarea.layout, 'plot')
         # Write the subclass chart type elements for primary and secondary axes.
         write_chart_type(:primary_axes => 1)
         write_chart_type(:primary_axes => 0)
+
+        # Configure a combined chart if present.
+        if second_chart
+
+          # Secondary axis has unique id otherwise use same as primary.
+          if second_chart.is_secondary?
+            second_chart.id = 1000 + @id
+          else
+            second_chart.id = @id
+          end
+
+          # Share the same writer for writing.
+          second_chart.writer = @writer
+
+          # Share series index with primary chart.
+          second_chart.series_index = @series_index
+
+          # Write the subclass chart type elements for combined chart.
+          second_chart.write_chart_type(:primary_axes => 1)
+          second_chart.write_chart_type(:primary_axes => 0)
+        end
 
         # Write the category and value elements for the primary axes.
         params = {
@@ -872,6 +915,22 @@ module Writexlsx
         }
 
         write_val_axis(@x2_axis, @y2_axis, @axis2_ids)
+
+        # Write the secondary axis for the secondary chart.
+        if second_chart && second_chart.is_secondary?
+
+          params = {
+            :x_axis   => second_chart.x2_axis,
+            :y_axis   => second_chart.y2_axis,
+            :axis_ids => second_chart.axis2_ids
+          }
+
+          second_chart.write_val_axis(
+            second_chart.x2_axis,
+            second_chart.y2_axis,
+            second_chart.axis2_ids
+          )
+        end
 
         if @date_category
           write_date_axis(params)
@@ -1215,6 +1274,7 @@ module Writexlsx
         y_axis.position || position || @val_axis_position
       )
     end
+    public :write_val_axis
 
     def write_val_axis_base(x_axis, y_axis, axis_ids_0, axis_ids_1, position)  # :nodoc:
       @writer.tag_elements('c:valAx') do

@@ -43,6 +43,19 @@ module Writexlsx
       end
 
       #
+      # Override parent method to add an extra check that is required for Bar
+      # charts to ensure that their combined chart is on a secondary axis.
+      #
+      def combine(chart)
+
+        unless chart.is_secondary?
+          raise 'Charts combined with Bar charts must be on a secondary axis'
+        end
+
+        super
+      end
+
+      #
       # Override the virtual superclass method with a chart specific method.
       #
       def write_chart_type(params)

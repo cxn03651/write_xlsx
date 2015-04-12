@@ -2877,10 +2877,11 @@ module Writexlsx
       raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
       raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
 
-      if chart.already_inserted?
+      if chart.already_inserted? || (chart.combined && chart.combined.already_inserted?)
         raise "Chart cannot be inserted in a worksheet more than once"
       else
-        chart.already_inserted = true
+        chart.already_inserted          = true
+        chart.combined.already_inserted = true if chart.combined
       end
 
       # Use the values set with chart.set_size, if any.

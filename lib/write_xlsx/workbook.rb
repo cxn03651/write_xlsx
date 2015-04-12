@@ -1639,7 +1639,9 @@ module Writexlsx
       # Map worksheet names to worksheet objects.
       @worksheets.each { |worksheet| worksheets[worksheet.name] = worksheet }
 
-      @charts.each do |chart|
+      # Build an array of the worksheet charts including any combined charts.
+      @charts.collect { |chart| [chart, chart.combined] }.flatten.compact.
+        each do |chart|
         chart.formula_ids.each do |range, id|
           # Skip if the series has user defined data.
           if chart.formula_data[id]
@@ -1850,7 +1852,8 @@ module Writexlsx
 
       # Sort the workbook charts references into the order that the were
       # written from the worksheets above.
-      @charts = @charts.sort_by { |chart| chart.id }
+      @charts = @charts.select { |chart| chart.id != -1 }.
+        sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
     end
