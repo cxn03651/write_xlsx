@@ -3,7 +3,7 @@
 
 #######################################################################
 #
-# A demo of an Column chart with a data table on the X-axis using
+# A demo of a Column chart with a data table on the X-axis using
 # WriteXLSX.
 #
 # reverse ('(c)'), December 2012, John McNamara, jmcnamara@cpan.org
