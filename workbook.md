@@ -14,6 +14,7 @@ The following methods are available through a new workbook.
 * [add_chart](#add_chart)
 * [add_shape](#add_shape)
 * [add_vba_project](#add_vba_project)
+* [add_vba_name](#add_vba_name)
 * [close](#close)
 * [set_properties](#set_properties)
 * [define_name](#define_name)
@@ -209,7 +210,16 @@ It is advisable to follow the same convention.
 
 See also the
 [`macros.rb`](examples.html#macros)
-example file.
+example file and the ["WORKING WITH VBA MACROS"](working_with_vba_macros.html#working_with_vba_macros).
+
+
+#### <a name="add_vba_name" class="anchor" href="#add_vba_name"><span class="octicon octicon-link" /></a>add_vba_name
+
+The `set_vba_name` method can be used to set the VBA codename for the workbook.
+This is sometimes required when a `vbaProject macro` included via `add_vba_project` refers to the workbook.
+The default Excel VBA name of `ThisWorkbook` is used if a user defined name isn't specified.
+See also ["WORKING WITH VBA MACROS"](working_with_vba_macros.html#working_with_vba_macros).
+
 
 #### <a name="close" class="anchor" href="#close"><span class="octicon octicon-link" /></a>close
 
@@ -407,6 +417,7 @@ Only re-calculate formulas when the user requires it. Generally by pressing F9.
 :auto_except_tables
 
 Excel will automatically re-calculate formulas except for tables.
+
 
 [CELL NOTATION]: worksheet.html#cell-notation
 [CELL FORMATTING]: cell_formatting.html#cell_formatting
