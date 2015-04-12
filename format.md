@@ -649,7 +649,8 @@ worksheet created by [formats.rb][].
     Default action:     None.
     Valid args:         1-3, See below.
 
-Set the diagonal border type for the cell. Three types of diagonal borders are available in Excel:
+Set the diagonal border type for the cell. Three types of diagonal
+borders are available in Excel:
 
     1: From bottom left to top right.
     2: From top left to bottom right.
