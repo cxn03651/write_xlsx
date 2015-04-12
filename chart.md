@@ -281,6 +281,7 @@ The properties that can be set are:
     :minor_gridlines
     :visible
     :date_axis
+    :text_axis
     :minor_unit_type
     :major_unit_type
 
@@ -471,14 +472,21 @@ Date Axis. (Applicable to category axes only.)
 
     chart.set_x_axis(:date_axis => 1)
 
-This option also allows you to set max and min values for a category axis
+This option also allows you to set `max` and `min` values for a category axis
 which isn't allowed by Excel for non-date category axes.
 
 See [Date Category Axes][] for more details.
 
+##### <a name="set_x_axis_text_axis" class="anchor" href="#set_x_axis_text_axis"><span class="octicon octicon-link" /></a>:text_axis
+
+This option is used to treat a category axis explicitly as a Text
+Axis. (Applicable to category axes only.)
+
+    chart.set_x_axis(:text_axis => 1)
+
 ##### <a name="set_x_axis_minor_unit_type" class="anchor" href="#set_x_axis_minor_unit_type"><span class="octicon octicon-link" /></a>:minor_unit_type
 
-For date_axis axes, see above, this option is used to set the type of the minor
+For `date_axis` axes, see above, this option is used to set the type of the minor
 units. (Applicable to date category axes only.)
 
     chart.set_x_axis(
