@@ -93,7 +93,7 @@ module Writexlsx
       @writer = Package::XMLWriterSimple.new
 
       @tempdir = options[:tempdir] ||
-        File.join(Dir.tmpdir, Digest::MD5.hexdigest(Time.now.to_s))
+        File.join(Dir.tmpdir, Digest::MD5.hexdigest("#{Time.now.to_f.to_s}-#{Process.pid}"))
       setup_filename(file)
       @date_1904           = options[:date_1904] || false
       @activesheet         = 0
