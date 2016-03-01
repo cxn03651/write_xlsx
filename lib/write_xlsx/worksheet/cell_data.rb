@@ -87,9 +87,19 @@ module Writexlsx
       end
 
       def write_cell
+        truefalse = {'TRUE' => 1, 'FALSE' => 0}
+        error_code = ['#DIV/0!', '#N/A', '#NAME?', '#NULL!', '#NUM!', '#REF!', '#VALUE!']
+
         attributes = cell_attributes
         if @result &&  !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
-          attributes << ['t', 'str']
+          if truefalse[@result]
+            attributes << ['t', 'b']
+            @result = truefalse[@result]
+          elsif error_code.include?(@result)
+            attributes << ['t', 'e']
+          else
+             attributes << ['t', 'str']
+          end
         end
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_formula(token)
