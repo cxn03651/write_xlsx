@@ -641,6 +641,7 @@ module Writexlsx
       # Check for no data in the series.
       return 'none' unless data
       return 'none' if data.empty?
+      return 'multi_str' if data.first.kind_of?(Array)
 
       # If the token isn't a number assume it is a string.
       data.each do |token|
@@ -1089,6 +1090,10 @@ module Writexlsx
           @cat_has_num_fmt = false
           # Write the c:strRef element.
           write_str_ref(formula, data, type)
+        elsif type == 'multi_str'
+          @cat_has_num_fmt = false
+          # Write the c:multiLvLStrRef element.
+          write_multi_lvl_str_ref(formula, data)
         else
           @cat_has_num_fmt = true
           # Write the c:numRef element.
@@ -1144,6 +1149,32 @@ module Writexlsx
     #
     def write_str_ref(formula, data, type) # :nodoc:
       write_num_or_str_ref('c:strRef', formula, data, type)
+    end
+
+    #
+    # Write the <c:multiLvLStrRef> element.
+    #
+    def write_multi_lvl_str_ref(formula, data)
+      return if data.empty?
+
+      @writer.tag_elements('c:multiLvlStrRef') do
+        # Write the c:f element.
+        write_series_formula(formula)
+
+        @writer.tag_elements('c:multiLvlStrCache') do
+
+          # Write the c:ptCount element.
+          write_pt_count(data.last.size)
+
+          # Write the data arrays in reverse order.
+          data.reverse.each do |arr|
+            @writer.tag_elements('c:lvl') do
+              # Write the c:pt element.
+              arr.each_with_index {|a, i| write_pt(i, a)}
+            end
+          end
+        end
+      end
     end
 
     #
