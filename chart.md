@@ -284,6 +284,8 @@ The properties that can be set are:
     :text_axis
     :minor_unit_type
     :major_unit_type
+    :display_units
+    :display_units_visible
 
 These are explained below.
 Some properties are only applicable to value or category axes, as indicated.
@@ -508,6 +510,36 @@ More than one property can be set in a call to `set_x_axis()`:
         :min  => 10,
         :max  => 80
     )
+
+##### <a name="set_x_axis_display_units" class="anchor" href="#set_x_axis_display_units"><span class="octicon octicon-link" /></a>:display_units
+
+Set the display units for the axis. This can be useful if the axis numbers
+are very large but you don't want to represent them in scientific notation.
+(Applicable to value axes only.) The available display units are:
+
+     hundreds
+     thousands
+     ten_thousands
+     hundred_thousands
+     millions
+     ten_millions
+     hundred_millions
+     billions
+     trillions
+
+ Example:
+
+     chart.set_x_axis(:display_units => 'thousands')
+     chart.set_y_axis(:display_units => 'millions')
+
+##### <a name="set_x_axis_display_units_visible" class="anchor" href="#set_x_axis_display_units_visible"><span class="octicon octicon-link" /></a>:display_units_visible
+
+Control the visibility of the display units turned on by the previous option.
+This option is on by default. (Applicable to value axes only.)::
+
+     chart.set_x_axis(:display_units         => 'thousands',
+                      :display_units_visible => 0 )
+
 
 #### <a name="set_y_axis" class="anchor" href="#set_y_axis"><span class="octicon octicon-link" /></a>set_y_axis()
 
