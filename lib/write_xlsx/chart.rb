@@ -2686,7 +2686,7 @@ module Writexlsx
 
       @writer.tag_elements('c:dispUnits') do
         @writer.empty_tag('c:builtInUnit', attributes)
-        if display
+        if ptrue?(display)
           @writer.tag_elements('c:dispUnitsLbl') do
             @writer.empty_tag('c:layout')
           end

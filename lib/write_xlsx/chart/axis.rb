@@ -25,14 +25,15 @@ module Writexlsx
 
         [
           :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
-          :major_unit_type, :display_units_visible, :log_base, :crossing,
-          :position_axis, :label_position, :num_format, :num_format_linked,
-          :interval_unit, :major_tick_mark, :line, :fill
+          :major_unit_type, :log_base, :crossing, :position_axis,
+          :label_position, :num_format, :num_format_linked, :interval_unit,
+          :major_tick_mark, :line, :fill
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
         @visible           = args[:visible] || 1
 
         set_major_minor_gridlines(args)
         set_display_units(args)
+        set_display_units_visible(args)
         set_position(args)
         set_position_axis
         set_font_properties(args)
@@ -127,6 +128,14 @@ module Writexlsx
 
       def set_display_units(args)
         @display_units = get_display_units(args[:display_units])
+      end
+
+      def set_display_units_visible(args)
+        if args[:display_units_visible]
+          @display_units_visible = args[:display_units_visible]
+        else
+          @display_units_visible = 1;
+        end
       end
 
       def set_position(args)

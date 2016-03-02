@@ -26,7 +26,7 @@ class TestRegressionChartDisplayUnits04 < Test::Unit::TestCase
     worksheet.write('A1', data)
 
     chart.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart.set_y_axis(:display_units => 'ten_thousands')
+    chart.set_y_axis(:display_units => 'ten_thousands', :display_units_visible => 0)
 
     worksheet.insert_chart('E9', chart)
 
