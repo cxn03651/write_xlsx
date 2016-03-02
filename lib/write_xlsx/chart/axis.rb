@@ -11,6 +11,7 @@ module Writexlsx
       attr_accessor :defaults
       attr_accessor :min, :max, :num_format, :position, :major_tick_mark
       attr_reader :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
+      attr_reader :display_units_visible, :display_units
       attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
       attr_reader :major_gridlines, :minor_gridlines, :reverse
@@ -23,14 +24,15 @@ module Writexlsx
         args      = (defaults || {}).merge(params)
 
         [
-         :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
-         :major_unit_type, :log_base, :crossing, :position_axis, :label_position,
-         :num_format, :num_format_linked, :interval_unit, :major_tick_mark,
-         :line, :fill
+          :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
+          :major_unit_type, :display_units_visible, :log_base, :crossing,
+          :position_axis, :label_position, :num_format, :num_format_linked,
+          :interval_unit, :major_tick_mark, :line, :fill
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
         @visible           = args[:visible] || 1
 
         set_major_minor_gridlines(args)
+        set_display_units(args)
         set_position(args)
         set_position_axis
         set_font_properties(args)
@@ -93,6 +95,38 @@ module Writexlsx
             instance_variable_set("@#{lines}", nil)
           end
         end
+      end
+
+      #
+      #
+      # Convert user defined display units to internal units.
+      #
+      def get_display_units(display_units)
+
+        return unless ptrue?(display_units)
+
+        types = {
+          'hundreds'          => 'hundreds',
+          'thousands'         => 'thousands',
+          'ten_thousands'     => 'tenThousands',
+          'hundred_thousands' => 'hundredThousands',
+          'millions'          => 'millions',
+          'ten_millions'      => 'tenMillions',
+          'hundred_millions'  => 'hundredMillions',
+          'billions'          => 'billions',
+          'trillions'         => 'trillions'
+        }
+
+        if types[display_units]
+          return types[display_units]
+        else
+          # warn "Unknown display_units type '$display_units'\n"
+          return
+        end
+      end
+
+      def set_display_units(args)
+        @display_units = get_display_units(args[:display_units])
       end
 
       def set_position(args)

@@ -1360,6 +1360,9 @@ module Writexlsx
 
         # Write the c:minorUnit element.
         write_c_minor_unit(y_axis.minor_unit)
+
+        # Write the c:dispUnits element.
+        write_disp_units(y_axis.display_units, y_axis.display_units_visible)
       end
     end
 
@@ -2671,6 +2674,24 @@ module Writexlsx
       attributes = [ ['val', 1] ]
 
       @writer.empty_tag('c:smooth', attributes)
+    end
+
+    #
+    # Write the <c:dispUnits> element.
+    #
+    def write_disp_units(units, display)
+      return unless ptrue?(units)
+
+      attributes = [ ['val', units] ]
+
+      @writer.tag_elements('c:dispUnits') do
+        @writer.empty_tag('c:builtInUnit', attributes)
+        if display
+          @writer.tag_elements('c:dispUnitsLbl') do
+            @writer.empty_tag('c:layout')
+          end
+        end
+     end
     end
 
     def write_bars_base(tag, format)
