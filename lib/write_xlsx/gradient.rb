@@ -15,32 +15,41 @@ module Writexlsx
       # Check the colors array exists and is valid.
       raise "Gradient must include colors array" unless ptrue?(args[:colors])
       # Check the colors array has the right number of entries.
-      raise "Gradient colors array must include 3 values" unless args[:colors].size == 3
+      raise "Gradient colors array must include at least 2 values" if args[:colors].size < 2
 
       gradient[:colors] = args[:colors]
 
       if ptrue?(args[:positions])
         # Check the positions array has the right number of entries.
-        raise "Gradient positions array must include 3 values" unless args[:positions].size == 3
+        raise "Gradient positions not equal to numbers of colors" unless args[:positions].size == args[:colors].size
 
         # Check the positions are in the correct range.
         args[:positions].each do |pos|
           if pos < 0 || pos > 100
-            raise "Gradient position '#{pos} must be in range 0 < pos < 100"
+            raise "Gradient position '#{pos} must be in range 0 <= pos <= 100"
           end
         end
         gradient[:positions] = args[:positions]
       else
         # Use the default gradient positions.
-        gradient[:positions] = [ 0, 50, 100 ]
+        case args[:colors].size
+        when 2
+          gradient[:positions] = [0, 100]
+        when 3
+          gradient[:positions] = [0, 50, 100]
+        when 4
+          gradient[:positions] = [0, 33, 66, 100]
+        else
+          raise "Must specify gradient positions"
+        end
       end
 
       # Set the gradient angle.
       if args[:angle]
         angle = args[:angle]
 
-        if angle < 0 || angle > 100
-          raise "Gradient angle '#{angle} must be in range 0 < pos < 100"
+        if angle < 0 || angle > 359.9
+          raise "Gradient angle '#{angle} must be in range 0 <= pos < 360"
         end
         gradient[:angle] = angle
       else

@@ -2744,7 +2744,7 @@ module Writexlsx
       colors    = gradient[:colors]
 
       @writer.tag_elements('a:gsLst') do
-        (0..2).each do |i|
+        (0..colors.size-1).each do |i|
           pos = (positions[i] * 1000).to_i
 
           attributes = [ ['pos', pos] ]
