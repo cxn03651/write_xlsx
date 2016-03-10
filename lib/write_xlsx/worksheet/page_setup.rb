@@ -11,7 +11,7 @@ module Writexlsx
       attr_accessor :hbreaks, :vbreaks, :scale                                # :nodoc:
       attr_accessor :fit_page, :fit_width, :fit_height, :page_setup_changed   # :nodoc:
       attr_writer :across                                                   # :nodoc:
-      attr_accessor :orientation, :print_options_changed  # :nodoc:
+      attr_accessor :orientation, :print_options_changed, :black_white  # :nodoc:
       attr_accessor :header, :footer, :header_footer_changed, :header_footer_aligns, :header_footer_scales
       attr_writer :page_start
       attr_writer :horizontal_dpi, :vertical_dpi
@@ -105,12 +105,13 @@ module Writexlsx
         attributes << ['pageOrder',       "overThenDown"] if @across
         attributes << ['firstPageNumber', @page_start]    if @page_start && @page_start > 1
         attributes << ['orientation',
-                       if @orientation
-                         'portrait'
-                       else
-                         'landscape'
-                       end
-                      ]
+          if @orientation
+            'portrait'
+          else
+            'landscape'
+          end
+        ]
+        attributes << ['blackAndWhite', 1]      if @black_white
         attributes << ['useFirstPageNumber', 1] if ptrue?(@page_start)
 
         # Set the DPI. Mainly only for testing.

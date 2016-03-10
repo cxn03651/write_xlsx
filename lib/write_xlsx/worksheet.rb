@@ -1625,6 +1625,13 @@ module Writexlsx
       self::print_scale = (scale)
     end
 
+     #
+     # Set the option to print the worksheet in black and white.
+     #
+     def print_black_and_white
+       @page_setup.black_white = true
+    end
+
     #
     # Display the worksheet right to left for some eastern versions of Excel.
     #
