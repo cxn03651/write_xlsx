@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/gradient'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart/axis'
 require 'write_xlsx/chart/caption'
@@ -37,8 +38,9 @@ module Writexlsx
 
   class ChartArea
     include Writexlsx::Utility
+    include Writexlsx::Gradient
 
-    attr_reader :line, :fill, :layout
+    attr_reader :line, :fill, :gradient, :layout
 
     def initialize(params = {})
       @layout = layout_properties(params[:layout])
@@ -49,9 +51,16 @@ module Writexlsx
       # Set the line properties for the chartarea.
       @line = border ? line_properties(border) : line_properties(params[:line])
 
+      # Set the gradient fill properties for the series.
+      @gradient = gradient_properties(params[:gradient])
+
       # Map deprecated Spreadsheet::WriteExcel fill colour.
       fill = params[:color] ? { :color => params[:color] } : params[:fill]
       @fill = fill_properties(fill)
+
+      if ptrue?(@gradient)
+        @fill = nil
+      end
     end
 
     private
@@ -2079,11 +2088,12 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      line = series.line
-      fill = series.fill
+      line     = series.line
+      fill     = series.fill
+      gradient = series.gradient if series.respond_to?(:gradient)
 
       return if (!line || !ptrue?(line[:_defined])) &&
-        (!fill || !ptrue?(fill[:_defined]))
+        (!fill || !ptrue?(fill[:_defined])) && !gradient
 
       @writer.tag_elements('c:spPr') do
         # Write the fill elements for solid charts such as pie/doughnut and bar.
@@ -2095,6 +2105,10 @@ module Writexlsx
             # Write the a:solidFill element.
             write_a_solid_fill(fill)
           end
+        end
+        if ptrue?(gradient)
+          # Write the a:gradFill element.
+          write_a_grad_fill(gradient)
         end
         # Write the a:ln element.
         write_a_ln(line) if line && ptrue?(line[:_defined])
@@ -2692,6 +2706,127 @@ module Writexlsx
           end
         end
      end
+    end
+
+    #
+    # Write the <a:gradFill> element.
+    #
+    def write_a_grad_fill(gradient)
+      attributes = [
+        ['flip',        'none'],
+        ['rotWithShape', 1]
+      ]
+      attributes = [] if gradient[:type] == 'linear'
+
+      @writer.tag_elements('a:gradFill', attributes) do
+
+        # Write the a:gsLst element.
+        write_a_gs_lst(gradient)
+
+        if gradient[:type] == 'linear'
+          # Write the a:lin element.
+          write_a_lin(gradient[:angle])
+        else
+          # Write the a:path element.
+          write_a_path(gradient[:type])
+
+          # Write the a:tileRect element.
+          write_a_tile_rect(gradient[:type])
+        end
+      end
+    end
+
+    #
+    # Write the <a:gsLst> element.
+    #
+    def write_a_gs_lst(gradient)
+      positions = gradient[:positions]
+      colors    = gradient[:colors]
+
+      @writer.tag_elements('a:gsLst') do
+        (0..2).each do |i|
+          pos = (positions[i] * 1000).to_i
+
+          attributes = [ ['pos', pos] ]
+          @writer.tag_elements('a:gs', attributes) do
+
+            color = color(colors[i])
+
+            # Write the a:srgbClr element.
+            # TODO: Wait for a feature request to support transparency.
+            write_a_srgb_clr( color );
+          end
+        end
+      end
+    end
+
+    #
+    # Write the <a:lin> element.
+    #
+    def write_a_lin(angle)
+     scaled = 0
+
+     angle = (60000 * angle).to_i
+
+     attributes = [
+         ['ang',    angle],
+         ['scaled', scaled]
+      ]
+
+      @writer.empty_tag('a:lin', attributes)
+    end
+
+    #
+    # Write the <a:path> element.
+    #
+    def write_a_path(type)
+      attributes = [ ['path', type] ]
+
+      @writer.tag_elements('a:path', attributes) do
+        # Write the a:fillToRect element.
+        write_a_fill_to_rect(type)
+      end
+    end
+
+    #
+    # Write the <a:fillToRect> element.
+    #
+    def write_a_fill_to_rect(type)
+      attributes = []
+
+      if type ==  'shape'
+        attributes = [
+          ['l' , 50000],
+          ['t' , 50000],
+          ['r' , 50000],
+          ['b' , 50000]
+        ]
+      else
+        attributes = [
+          ['l', 100000],
+          ['t', 100000]
+        ]
+      end
+
+      @writer.empty_tag('a:fillToRect', attributes)
+    end
+
+    #
+    # Write the <a:tileRect> element.
+    #
+    def write_a_tile_rect(type)
+      attributes = []
+
+      if type == 'shape'
+        attributes = []
+      else
+        attributes = [
+          ['r', -100000],
+          ['b', -100000]
+        ]
+      end
+
+      @writer.empty_tag('a:tileRect', attributes)
     end
 
     def write_bars_base(tag, format)

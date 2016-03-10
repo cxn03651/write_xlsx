@@ -2,8 +2,11 @@
 
 module Writexlsx
   class Chart
+    require 'write_xlsx/gradient'
+
     class Chartline
       include Writexlsx::Utility
+      include Writexlsx::Gradient
 
       attr_reader :line, :fill, :type
 
@@ -15,8 +18,12 @@ module Writexlsx
         # Allow 'border' as a synonym for 'line'.
         @line = line_properties(params[:border]) if params[:border]
 
+        # Set the gradient fill properties for the series.
+        @gradient = gradient_properties(params[:gradient])
+
         # Set the fill properties for the marker.
         @fill = fill_properties(@fill)
+        @fill = nil if ptrue?(@gradient)
       end
 
       def line_defined?
@@ -160,9 +167,10 @@ module Writexlsx
 
     class Series
       include Writexlsx::Utility
+      include Writexlsx::Gradient
 
       attr_reader :values, :categories, :name, :name_formula, :name_id
-      attr_reader :cat_data_id, :val_data_id, :fill
+      attr_reader :cat_data_id, :val_data_id, :fill, :gradient
       attr_reader :trendline, :smooth, :labels, :invert_if_negative
       attr_reader :x2_axis, :y2_axis, :error_bars, :points
       attr_accessor :line, :marker
@@ -178,6 +186,9 @@ module Writexlsx
 
         @line = line_properties(params[:border] || params[:line])
         @fill = fill_properties(params[:fill])
+
+        @gradient   = gradient_properties(params[:gradient])
+        @fill       = nil if ptrue?(@gradient)
 
         @marker     = Marker.new(params[:marker]) if params[:marker]
         @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
@@ -195,7 +206,7 @@ module Writexlsx
       def ==(other)
         methods = %w[categories values name name_formula name_id
                  cat_data_id val_data_id
-                 line fill marker trendline
+                 line fill gradient marker trendline
                  smooth labels invert_if_neg x2_axis y2_axis error_bars points ]
         methods.each do |method|
           return false unless self.instance_variable_get("@#{method}") == other.instance_variable_get("@#{method}")
