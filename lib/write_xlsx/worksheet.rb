@@ -1700,7 +1700,6 @@ module Writexlsx
     #
     def start_page=(page_start)
       @page_setup.page_start = page_start
-      @custom_start = 1
     end
 
     def set_start_page(page_start)
