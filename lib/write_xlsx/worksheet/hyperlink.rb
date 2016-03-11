@@ -27,20 +27,7 @@ module Writexlsx
         str.sub!(/^mailto:/, '')
 
         # Escape URL unless it looks already escaped.
-        unless url =~ /%[0-9a-fA-F]{2}/
-          # Escape the URL escape symbol.
-          url = url.gsub(/%/, "%25")
-
-          # Escape whitespae in URL.
-          url = url.gsub(/[\s\x00]/, '%20')
-
-          # Escape other special characters in URL.
-          re = /(["<>\[\]`^{}])/
-          while re =~ url
-            match = $~[1]
-            url = url.sub(re, sprintf("%%%x", match.ord))
-          end
-        end
+        url = escape_url(url)
 
         # Excel limits escaped URL to 255 characters.
         if url.bytesize > 255
@@ -71,6 +58,27 @@ module Writexlsx
 
       def display_on
         @display = @url_str
+      end
+
+      private
+
+      def escape_url(url)
+        unless url =~ /%[0-9a-fA-F]{2}/
+          # Escape the URL escape symbol.
+          url = url.gsub(/%/, "%25")
+
+          # Escape whitespae in URL.
+          url = url.gsub(/[\s\x00]/, '%20')
+
+          # Escape other special characters in URL.
+          re = /(["<>\[\]`^{}])/
+          while re =~ url
+            match = $~[1]
+            url = url.sub(re, sprintf("%%%x", match.ord))
+          end
+        end
+
+        url
       end
     end
 
@@ -118,6 +126,9 @@ module Writexlsx
 
         # Strip the mailto header.
         str.sub!(/^mailto:/, '')
+
+        # Escape URL unless it looks already escaped.
+        url = escape_url(url)
 
         # External Workbook links need to be modified into the right format.
         # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
