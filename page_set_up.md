@@ -36,6 +36,7 @@ The following methods are available for page set-up:
 * [fit_to_pages](#fit_to_pages)
 * [start_page=](#start_page=)
 * [print_scale=](#print_scale=)
+* [print_black_and_white](#print_black_and_white)
 * [set_h_pagebreaks](#set_h_pagebreaks)
 * [set_v_pagebreaks](#set_v_pagebreaks)
 * [set_paper](#set_paper)(deprecated)
@@ -550,6 +551,13 @@ active at a time. The last method call made will set the active option.
 #### <a name="set_print_scale" class="anchor" href="#set_print_scale"><span class="octicon octicon-link" /></a>set_print_scale(scale = 100)
 
 deprecated. use [print_scale=](#print_scale=).
+
+#### <a name="print_black_and_white" class="anchor" href="#print_black_and_white"><span class="octicon octicon-link" /></a>print_black_and_white ####
+
+Set the option to print the worksheet in black and white:
+
+    worksheet.print_black_and_white
+
 
 #### <a name="set_h_pagebreaks" class="anchor" href="#set_h_pagebreaks"><span class="octicon octicon-link" /></a>set_h_pagebreaks(breaks)
 

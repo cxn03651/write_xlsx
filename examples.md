@@ -78,6 +78,14 @@ A demo of a chart with a data table on the axis.
 A demo of charts with data highlighting options.
 ![Output from chart_data_tools.rb](images/examples/chart_data_tools.jpg)
 
+#### <a name="chart_clustered" class="anchor" href="#chart_clustered"><span class="octicon octicon-link" /></a>chart_clustered
+A demo of charts with a clustered axis.
+![Output from chart_clustered.rb](images/examples/chart_clustered.jpg)
+
+#### <a name="chart_styles" class="anchor" href="#chart_styles"><span class="octicon octicon-link" /></a>chart_styles
+A demo of the available chart styles.
+![Output from chart_styles.rb](images/examples/chart_styles.jpg)
+
 #### <a name="colors" class="anchor" href="#colors"><span class="octicon octicon-link" /></a>colors
 A demo of the color palette and named colors.
 ![Output from colors.rb](images/examples/colors.jpg)
