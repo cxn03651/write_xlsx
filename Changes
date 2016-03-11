@@ -1,4 +1,13 @@
 Change history of write_xlsx rubygem.
+
+2016-03-11 v0.84.0
+   Added support for chart axis display units (thousands, million, etc.).
+   Added option to set printing in black and white.
+   Added chart styles example.
+   Added gradient fill support.
+   Added support for clustered charts.
+   Added support for boolean error codes.
+
 2015-04-12 v0.83.0
    Added option to combine two different chart types. For example to
    create a Pareto chart.
