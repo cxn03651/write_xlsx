@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2016-06-01 v0.85.0
+   Fix url encoding of links to external files and dirs.
+
 2016-03-11 v0.84.0
    Added support for chart axis display units (thousands, million, etc.).
    Added option to set printing in black and white.
