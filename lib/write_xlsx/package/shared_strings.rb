@@ -9,14 +9,15 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize
-        @writer  = Package::XMLWriterSimple.new
-        @strings = [] # string table
-        @count   = {} # => count
+        @writer        = Package::XMLWriterSimple.new
+        @strings       = [] # string table
+        @strings_index = {} # string table index
+        @count         = {} # count
       end
 
       def index(string, params = {})
         add(string) unless params[:only_query]
-        @strings.index(string)
+        @strings_index[string]
       end
 
       def add(string)
@@ -25,6 +26,7 @@ module Writexlsx
           @count[str] += 1
         else
           @strings << str
+          @strings_index[str] = @strings.size - 1
           @count[str] = 1
         end
       end
