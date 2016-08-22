@@ -73,7 +73,7 @@ module Writexlsx
       # Write the sst string elements.
       #
       def write_sst_strings
-        @string_by_index.sort_by {|key, _value| key}.each { |_index, string| write_si(string) }
+        @string_by_index.values.each { |string| write_si(string) }
       end
 
       #
