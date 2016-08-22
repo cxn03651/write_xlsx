@@ -10,14 +10,13 @@ module Writexlsx
 
       def initialize
         @writer  = Package::XMLWriterSimple.new
-        @string_by_index = {}
-        @index_by_string = {}
+        @strings = [] # string table
         @count   = {} # => count
       end
 
       def index(string, params = {})
         add(string) unless params[:only_query]
-        @index_by_string[string]
+        @strings.index(string)
       end
 
       def add(string)
@@ -25,19 +24,17 @@ module Writexlsx
         if @count[str]
           @count[str] += 1
         else
-          new_index = @string_by_index.size
-          @string_by_index[new_index] = string
-          @index_by_string[string] = new_index
+          @strings << str
           @count[str] = 1
         end
       end
 
       def string(index)
-        @string_by_index[index].dup
+        @strings[index].dup
       end
 
       def empty?
-        @string_by_index.empty?
+        @strings.empty?
       end
 
       def set_xml_writer(filename)
@@ -73,7 +70,7 @@ module Writexlsx
       # Write the sst string elements.
       #
       def write_sst_strings
-        @string_by_index.values.each { |string| write_si(string) }
+        @strings.each { |string| write_si(string) }
       end
 
       #
@@ -127,7 +124,7 @@ module Writexlsx
       end
 
       def unique_count
-        @string_by_index.size
+        @strings.size
       end
     end
   end
