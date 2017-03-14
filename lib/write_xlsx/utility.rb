@@ -259,9 +259,9 @@ module Writexlsx
     def substitute_cellref(cell, *args)       #:nodoc:
       return [*args] if cell.respond_to?(:coerce) # Numeric
 
-      cell.upcase!
+      normalized_cell = cell.upcase
 
-      case cell
+      case normalized_cell
       # Convert a column range: 'A:A' or 'B:G'.
       # A range such as A:A is equivalent to A1:65536, so add rows as required
       when /\$?([A-Z]{1,3}):\$?([A-Z]{1,3})/
@@ -278,7 +278,7 @@ module Writexlsx
         row1, col1 =  xl_cell_to_rowcol($1)
         return [row1, col1, *args]
       else
-        raise("Unknown cell reference #{cell}")
+        raise("Unknown cell reference #{normalized_cell}")
       end
     end
 
