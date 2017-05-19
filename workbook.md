@@ -67,6 +67,11 @@ And you can also pass default format properties.
 
 See the [CELL FORMATTING][] section for more details about Format properties and how to set them.
 
+You can also pass directory path in which write_xlsx store temporary files.
+
+    workbook = WriteXLSX.new(filename, :tempdir => './temp/', ...)
+
+
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
 #### <a name="add_worksheet" class="anchor" href="#add_worksheet"><span class="octicon octicon-link" /></a>add_worksheet(sheetname = '')
