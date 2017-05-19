@@ -292,7 +292,7 @@ program in the examples dir of the distro.
 Refer to the following to see Excel's syntax rules for defined names:
 http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names
 
-#### <a name="set_tempdir" class="anchor" href="#set_tempdir"><span class="octicon octicon-link" /></a>set_tempdir
+#### <a name="set_tempdir" class="anchor" href="#set_tempdir"><span class="octicon octicon-link" /></a>set_tempdir(tempdir)
 
 WriteXLSX stores worksheet data in temporary files prior to assembling the final workbook.
 
