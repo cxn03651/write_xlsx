@@ -92,9 +92,9 @@ module Writexlsx
       options, default_formats = process_workbook_options(*option_params)
       @writer = Package::XMLWriterSimple.new
 
+      @file                = file
       @tempdir = options[:tempdir] ||
         File.join(Dir.tmpdir, Digest::MD5.hexdigest("#{Time.now.to_f.to_s}-#{Process.pid}"))
-      setup_filename(file)
       @date_1904           = options[:date_1904] || false
       @activesheet         = 0
       @firstsheet          = 0
@@ -229,6 +229,10 @@ module Writexlsx
     #
     def get_1904
       @date_1904
+    end
+
+    def set_tempdir(dir)
+      @tempdir = dir.dup
     end
 
     #
@@ -1017,16 +1021,30 @@ module Writexlsx
 
     private
 
-    def setup_filename(file) #:nodoc:
-      if file.respond_to?(:to_str) && file != ''
-        @filename = file
+    def filename
+      setup_filename unless @filename
+      @filename
+    end
+
+    def fileobj
+      setup_filename unless @fileobj
+      @fileobj
+    end
+
+    def setup_filename #:nodoc:
+      if @file.respond_to?(:to_str) && @file != ''
+        @filename = @file
         @fileobj  = nil
-      elsif file.respond_to?(:write)
-        @filename = File.join(@tempdir, Digest::MD5.hexdigest(Time.now.to_s) + '.xlsx.tmp')
-        @fileobj  = file
+      elsif @file.respond_to?(:write)
+        @filename = File.join(tempdir, Digest::MD5.hexdigest(Time.now.to_s) + '.xlsx.tmp')
+        @fileobj  = @file
       else
-        raise "'file' must be valid filename String of IO object."
+        raise "'#{@file}' must be valid filename String of IO object."
       end
+    end
+
+    def tempdir
+      @tempdir
     end
 
     #
@@ -1292,22 +1310,22 @@ module Writexlsx
 
       # Package the workbook.
       packager = Package::Packager.new(self)
-      packager.set_package_dir(@tempdir)
+      packager.set_package_dir(tempdir)
       packager.create_package
 
       # Free up the Packager object.
       packager = nil
 
       # Store the xlsx component files with the temp dir name removed.
-      ZipFileUtils.zip("#{@tempdir}", @filename)
+      ZipFileUtils.zip("#{tempdir}", filename)
 
-      IO.copy_stream(@filename, @fileobj) if @fileobj
-      Writexlsx::Utility.delete_files(@tempdir)
+      IO.copy_stream(filename, fileobj) if fileobj
+      Writexlsx::Utility.delete_files(tempdir)
     end
 
     def write_parts(zip)
       parts.each do |part|
-        zip.put_next_entry(zip_entry_for_part(part.sub(Regexp.new("#{@tempdir}/?"), '')))
+        zip.put_next_entry(zip_entry_for_part(part.sub(Regexp.new("#{tempdir}/?"), '')))
         zip.puts(File.read(part))
       end
     end
@@ -1320,7 +1338,7 @@ module Writexlsx
     # files
     #
     def parts
-      Dir.glob(File.join(@tempdir, "**", "*"), File::FNM_DOTMATCH).select {|f| File.file?(f)}
+      Dir.glob(File.join(tempdir, "**", "*"), File::FNM_DOTMATCH).select {|f| File.file?(f)}
     end
 
     #
