@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2017-11-05 v0.85.2
+   Fix frozen string litterals problems #30
+
 2017-05-19 v0.85.1
    Fix for missing method Workbook#set_tempdir
 
