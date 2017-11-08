@@ -53,3 +53,6 @@ To write a string, a formatted string, a number and a formula to the first works
     # Write a number and a formula using A1 notation
     worksheet.write('A3', 1.2345 )
     worksheet.write('A4', '=SIN(PI()/4)')
+
+    # Write xlsx file to disk.
+    workbook.close
