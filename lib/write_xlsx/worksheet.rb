@@ -2225,6 +2225,7 @@ module Writexlsx
     def write_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, str, xf = row_col_notation(args)
+      str &&= str.to_s
       raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
 
       # Check that row and col are valid and store max and min values

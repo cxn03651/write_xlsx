@@ -59,6 +59,12 @@ class TestWriteMethods < Test::Unit::TestCase
     end
   end
 
+  def test_write_string_with_non_string_value
+    assert_nothing_raised do
+      @worksheet.write_string(0, 0, 1)
+    end
+  end
+
   def test_write_string_with_insufficient_args_raise_InsufficientArgumentError
     assert_raise(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_string()
