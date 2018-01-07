@@ -1917,7 +1917,7 @@ module Writexlsx
       type   = 'png'
       width  = 0
       height = 0
-      x_dip  = 96
+      x_dpi  = 96
       y_dpi  = 96
 
       offset = 8
