@@ -1019,6 +1019,14 @@ module Writexlsx
       @worksheets.worksheets
     end
 
+    def firstsheet #:nodoc:
+      @firstsheet ||= 0
+    end
+
+    def activesheet #:nodoc:
+      @activesheet ||= 0
+    end
+
     private
 
     def filename
@@ -1270,14 +1278,6 @@ module Writexlsx
       str
     end
 
-    def firstsheet #:nodoc:
-      @firstsheet ||= 0
-    end
-
-    def activesheet #:nodoc:
-      @activesheet ||= 0
-    end
-
     # for test
     def defined_names #:nodoc:
       @defined_names ||= []
@@ -1291,9 +1291,10 @@ module Writexlsx
       add_worksheet if @worksheets.empty?
 
       # Ensure that at least one worksheet has been selected.
-      @worksheets.first.select if @activesheet == 0
+      @worksheets.visible_first.select if @activesheet == 0
 
       # Set the active sheet.
+      @activesheet = @worksheets.visible_first.index if @activesheet == 0
       @worksheets[@activesheet].activate
 
       # Prepare the worksheet VML elements such as comments and buttons.

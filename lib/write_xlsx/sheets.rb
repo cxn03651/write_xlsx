@@ -205,6 +205,10 @@ module Writexlsx
       self.select { |worksheet| worksheet.is_chartsheet? }
     end
 
+    def visible_first
+      self.reject { |worksheet| worksheet.hidden? }.first
+    end
+
     private
 
     def sheet_chart_count(type)

@@ -509,8 +509,8 @@ module Writexlsx
     def hide
       @hidden = true
       @selected = false
-      @workbook.activesheet = 0
-      @workbook.firstsheet  = 0
+      @workbook.activesheet = 0 if @workbook.activesheet == @index
+      @workbook.firstsheet  = 0 if @workbook.firstsheet  == @index
     end
 
     def hidden? # :nodoc:
