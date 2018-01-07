@@ -2711,6 +2711,19 @@ EOS
     compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
   end
 
+  def test_hide_first_sheet
+    @xlsx = 'hide_first_sheet.xlsx'
+    workbook   = WriteXLSX.new(@xlsx)
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+
+    worksheet2.activate
+    worksheet1.hide
+
+    workbook.close
+    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+  end
+
   def test_hide_sheet
     @xlsx = 'hide_sheet.xlsx'
     workbook   = WriteXLSX.new(@xlsx)
