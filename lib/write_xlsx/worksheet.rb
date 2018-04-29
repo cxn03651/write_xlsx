@@ -1783,15 +1783,6 @@ module Writexlsx
         write_number(*args)
       elsif token =~ /^\d+$/
         write_number(*args)
-      # Match http, https or ftp URL
-      elsif token =~ %r|\A[fh]tt?ps?://|
-        write_url(*args)
-      # Match mailto:
-      elsif token =~ %r|\Amailto:|
-        write_url(*args)
-      # Match internal or external sheet link
-      elsif token =~ %r!\A(?:in|ex)ternal:!
-        write_url(*args)
       # Match formula
       elsif token =~ /^=/
         write_formula(*args)
@@ -1802,6 +1793,19 @@ module Writexlsx
       elsif token == ''
         row_col_args.delete_at(2)     # remove the empty string from the parameter list
         write_blank(*row_col_args)
+      elsif @workbook.strings_to_urls
+        # Match http, https or ftp URL
+        if token =~ %r|\A[fh]tt?ps?://|
+          write_url(*args)
+        # Match mailto:
+        elsif token =~ %r|\Amailto:|
+          write_url(*args)
+        # Match internal or external sheet link
+        elsif token =~ %r!\A(?:in|ex)ternal:!
+          write_url(*args)
+        else
+          write_string(*args)
+        end
       else
         write_string(*args)
       end

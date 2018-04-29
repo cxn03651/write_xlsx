@@ -47,6 +47,7 @@ module Writexlsx
     attr_reader :shared_strings  # :nodoc:
     attr_reader :vba_project  # :nodoc:
     attr_reader :excel2003_style # :nodoc:
+    attr_reader :strings_to_urls # :nodoc:
     #
     # A new Excel workbook is created using the +new+ constructor
     # which accepts either a filename or an IO object as a parameter.
@@ -123,6 +124,7 @@ module Writexlsx
       @table_count         = 0
       @image_types         = {}
       @images              = []
+      @strings_to_urls     = (options[:strings_to_urls].nil? || options[:strings_to_urls]) ? true : false
 
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
