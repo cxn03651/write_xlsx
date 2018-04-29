@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2018-04-29 v0.85.3
+   Added option to store hyperlink strings as string (urls_as_strings).
+
 2018-01-07 v0.85.3
    Fix hide first sheet problem #37
 
