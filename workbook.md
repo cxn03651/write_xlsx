@@ -71,9 +71,9 @@ You can also pass directory path in which write_xlsx store temporary files.
 
     workbook = WriteXLSX.new(filename, tempdir: './temp/', ...)
 
-To write url/link string as string (not hyperlink), pass urls_as_strings option.
+To write url/link string as string (not hyperlink), pass strings_as_urls option.
 
-    workbook = WriteXLSX.new(filename, urls_as_strings: true, ...)
+    workbook = WriteXLSX.new(filename, strings_as_urls: false, ...)
 
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
