@@ -1,1 +1,1 @@
-WriteXLSX_VERSION = "0.85.4"
+WriteXLSX_VERSION = "0.85.5"
