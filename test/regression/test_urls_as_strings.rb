@@ -12,7 +12,7 @@ class TestUrlsAsStrings < Test::Unit::TestCase
 
   def test_urls_as_strings
     @xlsx = 'urls_as_strings.xlsx'
-    workbook = WriteXLSX.new(@xlsx, urls_as_strings: true)
+    workbook = WriteXLSX.new(@xlsx, strings_to_urls: false)
     worksheet = workbook.add_worksheet
     worksheet.write('A1', 'http://www.write_xlsx.com')
     worksheet.write('A2', 'mailto:write_xlsx@example.com')
