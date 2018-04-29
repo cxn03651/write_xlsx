@@ -586,7 +586,7 @@ module Writexlsx
       when 0
         [{}, {}]
       when 1 # one hash
-        options_keys = [:tempdir, :date_1904, :optimization, :excel2003_style]
+        options_keys = [:tempdir, :date_1904, :optimization, :excel2003_style, :strings_to_urls]
 
         hash = params.first
         options = hash.reject{|k,v| !options_keys.include?(k)}
