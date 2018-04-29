@@ -63,14 +63,17 @@ You can pass a  IO object to the new constructor.:
 
 And you can also pass default format properties.
 
-    workbook = WriteXLSX.new(filename, :font => 'Courier New', :size => 11)
+    workbook = WriteXLSX.new(filename, font: 'Courier New', size: 11)
 
 See the [CELL FORMATTING][] section for more details about Format properties and how to set them.
 
 You can also pass directory path in which write_xlsx store temporary files.
 
-    workbook = WriteXLSX.new(filename, :tempdir => './temp/', ...)
+    workbook = WriteXLSX.new(filename, tempdir: './temp/', ...)
 
+To write url/link string as string (not hyperlink), pass urls_as_strings option.
+
+    workbook = WriteXLSX.new(filename, urls_as_strings: true, ...)
 
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
