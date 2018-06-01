@@ -5849,10 +5849,11 @@ module Writexlsx
 
       # The VML o:idmap data id contains a comma separated range when there is
       # more than one 1024 block of comments, like this: data="1,2".
+      data = "#{vml_data_id}"
       (1 .. num_comments_block).each do |i|
-        vml_data_id = "#{vml_data_id},#{vml_data_id + i}"
+        data += ",#{vml_data_id + i}"
       end
-      @vml_data_id = vml_data_id
+      @vml_data_id = data
       @vml_shape_id = vml_shape_id
     end
 
