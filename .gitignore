@@ -1,4 +1,7 @@
 TAGS
+GPATH
+GRTAGS
+GTAGS
 *.gem
 .bundle
 .config
