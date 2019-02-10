@@ -92,7 +92,7 @@ module Writexlsx
 
       def close
         if @filename
-          File.open(@filename, "wb") { |f| f << string }
+          File.open(@filename, "wb:utf-8:utf-8") { |f| f << string }
         end
         @io.close
       end

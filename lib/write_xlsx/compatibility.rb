@@ -45,7 +45,7 @@ end
 
 unless File.respond_to?(:binread)
   def File.binread(file) #:nodoc:
-    File.open(file,"rb") { |f| f.read }
+    File.open(file,"rb:utf-8:utf-8") { |f| f.read }
   end
 end
 
