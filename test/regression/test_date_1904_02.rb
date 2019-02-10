@@ -7,12 +7,12 @@ class TestRegressionDate1904_02 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_date_1904_02
     @xlsx = 'date_1904_02.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
 
     workbook.set_1904
 
@@ -29,11 +29,6 @@ class TestRegressionDate1904_02 < Test::Unit::TestCase
     worksheet.write_date_time('A6', '4641-11-27T', format)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                nil
-                                )
+    compare_for_regression
   end
 end

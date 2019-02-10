@@ -7,12 +7,12 @@ class TestRegressionSetPrintScale01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_set_print_scale01
     @xlsx = 'set_print_scale01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
 	worksheet.print_scale = 110
@@ -21,7 +21,7 @@ class TestRegressionSetPrintScale01 < Test::Unit::TestCase
     worksheet.write('A1', 'Foo')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [
                                  'xl/printerSettings/printerSettings1.bin',
                                  'xl/worksheets/_rels/sheet1.xml.rels'

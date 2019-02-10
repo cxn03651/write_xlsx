@@ -13,6 +13,9 @@ require 'test-unit'
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'write_xlsx'
+require 'stringio'
+require 'tempfile'
+
 
 class Writexlsx::Workbook
   #
@@ -28,6 +31,11 @@ class Test::Unit::TestCase
     @test_dir = File.dirname(__FILE__)
     @perl_output  = File.join(@test_dir, 'perl_output')
     @regression_output  = File.join(@test_dir, 'regression', 'xlsx_files')
+    @io = StringIO.new
+  end
+
+  def expected_xlsx
+    File.join(@regression_output, @xlsx)
   end
 
   def expected_to_array(lines)
@@ -66,6 +74,18 @@ class Test::Unit::TestCase
     result = []
     Zip::ZipFile.foreach(xlsx) { |entry| result << entry }
     result
+  end
+
+  def compare_for_regression(ignore_members = nil, ignore_elements = nil)
+    store_to_tempfile
+    compare_xlsx(expected_xlsx, @tempfile.path, ignore_members, ignore_elements, true)
+  end
+
+  def store_to_tempfile
+    @tempfile = Tempfile.open(@xlsx)
+    @tempfile.binmode
+    @tempfile.write(@io.string)
+    @tempfile.close
   end
 
   def compare_xlsx_for_regression(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil)

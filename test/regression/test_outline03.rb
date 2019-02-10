@@ -7,12 +7,12 @@ class TestRegressionOutline03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_outline03
     @xlsx = 'outline03.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet3  = workbook.add_worksheet('Outline Columns')
 
     # Add a general format
@@ -43,17 +43,15 @@ class TestRegressionOutline03 < Test::Unit::TestCase
     worksheet3.write('H6', '=SUM(H2:H5)', bold, 1015)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [
-                                 'xl/calcChain.xml',
-                                 '[Content_Types].xml',
-                                 'xl/_rels/workbook.xml.rels'
-                                ],
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      [
+        'xl/calcChain.xml',
+        '[Content_Types].xml',
+        'xl/_rels/workbook.xml.rels'
+      ],
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

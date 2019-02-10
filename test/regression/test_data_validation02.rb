@@ -7,12 +7,12 @@ class TestDataValidation02 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_data_validation02
     @xlsx = 'data_validation02.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.data_validation('C2',
@@ -22,6 +22,6 @@ class TestDataValidation02 < Test::Unit::TestCase
                               input_message: 'This is the input message'
                               )
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

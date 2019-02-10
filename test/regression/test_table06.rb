@@ -7,12 +7,12 @@ class TestRegressionTable06 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_table06
     @xlsx = 'table06.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Set the column width to match the taget worksheet.
@@ -36,6 +36,6 @@ class TestRegressionTable06 < Test::Unit::TestCase
     worksheet.insert_image('A4', File.join(@test_dir, 'regression', 'images/blue.png'))
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

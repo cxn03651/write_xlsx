@@ -7,12 +7,12 @@ class TestRegressionChartsheet07 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chartsheet07
     @xlsx = 'chartsheet07.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'bar')
 
@@ -37,21 +37,19 @@ class TestRegressionChartsheet07 < Test::Unit::TestCase
     chart.set_portrait
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                %w[
-                                    xl/printerSettings/printerSettings1.bin
-                                    xl/chartsheets/_rels/sheet1.xml.rels
-                                   ],
-                                {
-                                  '[Content_Types].xml'       => ['<Default Extension="bin"'],
-                                  'xl/workbook.xml'           => ['<workbookView'],
-                                  'xl/chartsheets/sheet1.xml' => [
-                                                                  '<pageSetup',
-                                                                  '<drawing',    # Id is wrong due to missing printerbin.
-                                                                 ]
-                                }
-                                )
+    compare_for_regression(
+      %w[
+        xl/printerSettings/printerSettings1.bin
+        xl/chartsheets/_rels/sheet1.xml.rels
+      ],
+      {
+        '[Content_Types].xml'       => ['<Default Extension="bin"'],
+        'xl/workbook.xml'           => ['<workbookView'],
+        'xl/chartsheets/sheet1.xml' => [
+          '<pageSetup',
+          '<drawing',    # Id is wrong due to missing printerbin.
+        ]
+      }
+    )
   end
 end

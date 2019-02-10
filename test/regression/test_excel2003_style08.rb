@@ -7,12 +7,12 @@ class TestRegressionExcel2003Style08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_excel2003_style08
     @xlsx = 'excel2003_style08.xlsx'
-    workbook    = WriteXLSX.new(@xlsx, :excel2003_style => true)
+    workbook    = WriteXLSX.new(@io, :excel2003_style => true)
     worksheet   = workbook.add_worksheet
 
     courier = workbook.add_format(:font => 'Courier', :size => 8, :font_family => 3)
@@ -21,6 +21,6 @@ class TestRegressionExcel2003Style08 < Test::Unit::TestCase
     worksheet.write('A2', 'Bar', courier)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

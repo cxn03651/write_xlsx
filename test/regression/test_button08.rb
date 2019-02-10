@@ -7,12 +7,12 @@ class TestRegressionButton08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_button08
     @xlsx = 'button08.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -23,6 +23,6 @@ class TestRegressionButton08 < Test::Unit::TestCase
     worksheet2.comments_author = 'John'
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

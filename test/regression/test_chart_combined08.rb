@@ -7,12 +7,12 @@ class TestRegressionChartCombined08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_combined08
     @xlsx = 'chart_combined08.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart1    = workbook.add_chart(:type => 'column',  :embedded => 1)
     chart2    = workbook.add_chart(:type => 'scatter', :embedded => 1)
@@ -45,7 +45,7 @@ class TestRegressionChartCombined08 < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart1)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
       [],
       { 'xl/charts/chart1.xml' => [
           '<c:dispBlanksAs',

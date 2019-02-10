@@ -7,12 +7,12 @@ class TestRegressionChartBlank05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_blank05
     @xlsx = 'chart_blank05.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'line')
 
@@ -36,11 +36,9 @@ class TestRegressionChartBlank05 < Test::Unit::TestCase
     chart.show_blanks_as('span')
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                { 'xl/drawings/drawing1.xml' => ['xdr:ext'] }
-                                )
+    compare_for_regression(
+      nil,
+      { 'xl/drawings/drawing1.xml' => ['xdr:ext'] }
+    )
   end
 end

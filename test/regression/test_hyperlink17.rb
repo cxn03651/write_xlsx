@@ -7,19 +7,19 @@ class TestRegressionHyperlink17 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_hyperlink17
     @xlsx = 'hyperlink17.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Test URL with whitespace.
     worksheet.write_url('A1', 'http://google.com/some link')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 {},
                                 { 'xl/workbook.xml' => ['<workbookView'] }
                                 )

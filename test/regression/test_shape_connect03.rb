@@ -7,12 +7,12 @@ class TestRegressionShapeConnect03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_shape_connect03
     @xlsx = 'shape_connect03.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Add a circle, with centered text. c is for circle, not center
@@ -73,6 +73,6 @@ class TestRegressionShapeConnect03 < Test::Unit::TestCase
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

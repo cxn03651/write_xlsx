@@ -7,12 +7,12 @@ class TestRegressionImage08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_image08
     @xlsx = 'image08.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.insert_image('B3',
@@ -21,6 +21,6 @@ class TestRegressionImage08 < Test::Unit::TestCase
                            )
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

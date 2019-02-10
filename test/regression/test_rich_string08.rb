@@ -7,12 +7,12 @@ class TestRegressionRichString08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_rich_string08
     @xlsx = 'rich_string08.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     bold   = workbook.add_format(:bold   => 1)
@@ -24,6 +24,6 @@ class TestRegressionRichString08 < Test::Unit::TestCase
     worksheet.write_rich_string('A3', 'ab', bold, 'cd', 'efg', format)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

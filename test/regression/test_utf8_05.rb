@@ -7,18 +7,18 @@ class TestRegressionUtf8_05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_utf8_05
     @xlsx = 'utf8_05.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.write('A1', '="Café"', nil, 'Café')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
                                 {'xl/workbook.xml' => ['<workbookView']}
                                 )

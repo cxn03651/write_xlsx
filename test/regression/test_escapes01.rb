@@ -7,12 +7,12 @@ class TestRegressionEscapes01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_escapes01
     @xlsx = 'escapes01.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet('5&4')
 
     worksheet.write_formula('A1', %q{=IF(1>2,0,1)},            nil, 1)
@@ -25,13 +25,11 @@ class TestRegressionEscapes01 < Test::Unit::TestCase
     worksheet.write_string('A8', %q{"&<>})
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

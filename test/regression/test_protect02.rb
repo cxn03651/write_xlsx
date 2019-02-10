@@ -7,12 +7,12 @@ class TestRegressionProtect02 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_protect02
     @xlsx = 'protect02.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     unlocked = workbook.add_format(:locked => 0, :hidden => 0)
@@ -25,6 +25,6 @@ class TestRegressionProtect02 < Test::Unit::TestCase
     worksheet.write('A3', 3, hidden)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

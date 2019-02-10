@@ -7,12 +7,12 @@ class TestRegressionDefinedName01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_defined_name01
     @xlsx = 'defined_name01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet('Sheet 3')
@@ -33,15 +33,13 @@ class TestRegressionDefinedName01 < Test::Unit::TestCase
     workbook.define_name("_Fog",          "=Sheet1!$A$1")
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                ["xl/printerSettings/printerSettings1.bin",
-                                 "xl/worksheets/_rels/sheet1.xml.rels"],
-                                {
-                                  '[Content_Types].xml' => ['<Default Extension="bin"'],
-                                  'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
-                                }
-                                )
+    compare_for_regression(
+      ["xl/printerSettings/printerSettings1.bin",
+       "xl/worksheets/_rels/sheet1.xml.rels"],
+      {
+        '[Content_Types].xml' => ['<Default Extension="bin"'],
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
+      }
+    )
   end
 end

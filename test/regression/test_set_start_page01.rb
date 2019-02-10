@@ -7,12 +7,12 @@ class TestRegressionSetStartPage01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_set_start_page01
     @xlsx = 'set_start_page01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.start_page = 1
@@ -23,7 +23,7 @@ class TestRegressionSetStartPage01 < Test::Unit::TestCase
     worksheet.write('A1', 'Foo')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [],
                                 {
                                   'xl/worksheets/sheet1.xml' => ['<pageMargins']

@@ -7,12 +7,12 @@ class TestRegressionSelection02 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_selection02
     @xlsx = 'selection02.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -28,6 +28,6 @@ class TestRegressionSelection02 < Test::Unit::TestCase
     worksheet6.set_selection('G7:C4')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

@@ -7,12 +7,12 @@ class TestRegressionChartFormat20 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_format20
     @xlsx = 'chart_format20.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart1      = workbook.add_chart(:type => 'line', :embedded => 1)
     chart2      = workbook.add_chart(:type => 'line', :embedded => 1)
@@ -49,7 +49,6 @@ class TestRegressionChartFormat20 < Test::Unit::TestCase
     worksheet.insert_chart('E25', chart2)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

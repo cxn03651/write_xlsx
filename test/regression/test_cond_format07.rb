@@ -7,12 +7,12 @@ class TestRegressionCondFormat07 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_cond_format07
     @xlsx = 'cond_format07.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # We manually set the indices to get the same order as the target file.
@@ -53,10 +53,9 @@ class TestRegressionCondFormat07 < Test::Unit::TestCase
                                      )
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                { 'xl/workbook.xml' => ['<workbookView'] })
+    compare_for_regression(
+      nil,
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

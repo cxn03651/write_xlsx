@@ -7,12 +7,12 @@ class TestRegressionExcel2003Style03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_excel2003_style03
     @xlsx = 'excel2003_style03.xlsx'
-    workbook    = WriteXLSX.new(@xlsx, :excel2003_style => true)
+    workbook    = WriteXLSX.new(@io, :excel2003_style => true)
     worksheet   = workbook.add_worksheet
 
     worksheet.paper = 9
@@ -26,7 +26,7 @@ class TestRegressionExcel2003Style03 < Test::Unit::TestCase
     worksheet.write('A2', 'Bar', bold)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [
                                  'xl/printerSettings/printerSettings1.bin',
                                  'xl/worksheets/_rels/sheet1.xml.rels'

@@ -8,13 +8,13 @@ class TestExampleMatch < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close
   end
 
   def test_a_simple
     @xlsx = 'a_simple.xlsx'
     # Create a new workbook called simple.xls and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # The general syntax is write(row, column, token). Note that row and
@@ -43,12 +43,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write(10, 0, 'http://www.ruby-lang.org/', hyperlink_format)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_array_formula
     @xlsx = 'array_formula.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Write some test data.
@@ -65,12 +66,13 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.write_array_formula('A5:A7', '{=TREND(C5:C7,B5:B7)}')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_autofilter
     @xlsx = 'autofilter.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
 
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
@@ -236,12 +238,13 @@ class TestExampleMatch < Test::Unit::TestCase
     end
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_scatter06
     @xlsx = 'chart_scatter06.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'scatter', :embedded => 1)
 
@@ -273,7 +276,8 @@ class TestExampleMatch < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def autofilter_data
@@ -334,7 +338,7 @@ EOS
 
   def test_chart_area
     @xlsx = 'chart_area.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -379,12 +383,13 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_bar
     @xlsx = 'chart_bar.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -429,12 +434,13 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_column
     @xlsx = 'chart_column.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -479,12 +485,13 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_doughnut
     @xlsx = 'chart_doughnut.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -595,12 +602,13 @@ EOS
     worksheet.insert_chart('C50', chart4, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_line
     @xlsx = 'chart_line.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -645,12 +653,13 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_pie
     @xlsx = 'chart_pie.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -711,12 +720,13 @@ EOS
 
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_radar
     @xlsx = 'chart_radar.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -829,12 +839,13 @@ EOS
     worksheet.insert_chart('D34', chart3, 25, 11)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_scatter
     @xlsx = 'chart_scatter.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -879,12 +890,13 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_stock
     @xlsx = 'chart_stock.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     bold        = workbook.add_format(:bold => 1)
     date_format = workbook.add_format(:num_format => 'dd/mm/yyyy')
@@ -935,12 +947,13 @@ EOS
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_secondary_axis
     @xlsx = 'chart_secondary_axis.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -981,24 +994,26 @@ EOS
     worksheet.insert_chart('D2', chart, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_comments1
     @xlsx = 'comments1.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.write('A1', 'Hello')
     worksheet.write_comment('A1', 'This is a comment')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_comments2
     @xlsx = 'comments2.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
 
     text_wrap  = workbook.add_format( :text_wrap => 1, :valign => 'top' )
     worksheet1 = workbook.add_worksheet
@@ -1328,12 +1343,13 @@ EOS
     worksheet8.write_comment( 'C6', comment )
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_conditional_format
     @xlsx = 'conditional_format.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -1627,12 +1643,13 @@ EOS
                                       )
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_data_validate
     @xlsx = 'data_validate.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Add a format for the header cells.
@@ -1894,12 +1911,13 @@ EOS
                               })
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_date_time
     @xlsx = 'date_time.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -1968,12 +1986,13 @@ EOS
     worksheet.write(row, 1, 'Invalid date. Written as string.', bold)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_defined_name
     @xlsx = 'defined_name.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -1995,12 +2014,13 @@ EOS
     end
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_demo
     @xlsx = 'demo.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet('Demo')
     worksheet2 = workbook.add_worksheet('Another sheet')
     worksheet3 = workbook.add_worksheet('And another')
@@ -2094,12 +2114,13 @@ EOS
     worksheet.write('A19', "Multiple worksheets")
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_diag_border
     @xlsx = 'diag_border.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet()
 
 
@@ -2119,12 +2140,13 @@ EOS
     worksheet.write('B12', 'Text', format4)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_fit_to_pages
     @xlsx = 'fit_to_pages.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -2144,12 +2166,13 @@ EOS
     worksheet4.fit_to_pages(1, 0)   # 1 page wide and as long as necessary
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_formats
     @xlsx = 'formats.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
 
     # Some common formats
     center = workbook.add_format(:align => 'center')
@@ -2626,12 +2649,13 @@ EOS
     alignment(workbook, center, heading, colors)
     misc(workbook, center, heading, colors)
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_headers
     @xlsx = 'headers.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     preview  = 'Select Print Preview to see the header and footer'
 
 
@@ -2708,12 +2732,13 @@ EOS
     worksheet5.write('A1', preview)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_hide_first_sheet
     @xlsx = 'hide_first_sheet.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -2721,12 +2746,13 @@ EOS
     worksheet1.hide
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_hide_sheet
     @xlsx = 'hide_sheet.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -2743,13 +2769,14 @@ EOS
     worksheet3.write(0, 0, 'Sheet2 is hidden')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_hyperlink
     @xlsx = 'hyperlink.xlsx'
     # Create a new workbook and add a worksheet
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
 
     worksheet = workbook.add_worksheet('Hyperlinks')
 
@@ -2790,12 +2817,13 @@ EOS
     worksheet.write_string('A11', 'http://www.perl.com/')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_indent
     @xlsx = 'indent.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
 
     worksheet = workbook.add_worksheet
     indent1   = workbook.add_format(:indent => 1)
@@ -2807,13 +2835,14 @@ EOS
     worksheet.write('A2', "This text is indented 2 levels", indent2)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge1
     @xlsx = 'merge1.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2828,13 +2857,14 @@ EOS
     worksheet.write_blank(2, 2, format)
     worksheet.write_blank(2, 3, format)
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge2
     # Create a new workbook and add a worksheet
     @xlsx = 'merge2.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2859,14 +2889,15 @@ EOS
     worksheet.write_blank(2, 2, format)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge3
     @xlsx = 'merge3.xlsx'
 
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet()
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2892,13 +2923,14 @@ EOS
     worksheet.merge_range('B7:D8', 'http://www.perl.com', format)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge4
     @xlsx = 'merge4.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -2962,13 +2994,14 @@ EOS
     worksheet.merge_range('B11:D12', 'Justified: ' << 'so on and ' * 18, format4)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge5
     @xlsx = 'merge5.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -3021,13 +3054,14 @@ EOS
     worksheet.merge_range( 'F4:F9', 'Rotation -90°', format3 )
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_merge6
     @xlsx = 'merge6.xlsx'
     # Create a new workbook and add a worksheet
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Increase the cell size of the merged cells to highlight the formatting.
@@ -3059,13 +3093,14 @@ EOS
     worksheet.merge_range('B6:D7', "UTF-8: A Unicode smiley #{smiley}", format)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_outline
     @xlsx = 'outline.xlsx'
     # Create a new workbook and add some worksheets
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet('Outlined Rows')
     worksheet2 = workbook.add_worksheet('Collapsed Rows')
     worksheet3 = workbook.add_worksheet('Outline Columns')
@@ -3247,12 +3282,13 @@ EOS
     worksheet4.set_row(12, nil, nil, nil, 1)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_outline_collapsed
     @xlsx = 'outline_collapsed.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet('Outlined Rows')
     worksheet2 = workbook.add_worksheet('Collapsed Rows 1')
     worksheet3 = workbook.add_worksheet('Collapsed Rows 2')
@@ -3394,7 +3430,8 @@ EOS
     worksheet6.write('H6', '=SUM(H2:H5)', bold)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   #
@@ -3437,7 +3474,7 @@ EOS
 
   def test_panes
     @xlsx = 'panes.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
 
     worksheet1 = workbook.add_worksheet('Panes 1')
     worksheet2 = workbook.add_worksheet('Panes 2')
@@ -3530,12 +3567,13 @@ EOS
     end
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_print_scale
     @xlsx = 'print_scale.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -3550,12 +3588,13 @@ EOS
     worksheet3.print_scale = 200
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_properties
     @xlsx = 'properties.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     workbook.set_properties(
@@ -3574,12 +3613,13 @@ EOS
     worksheet.write('A1', "Select 'Office Button -> Prepare -> Properties' to see the file properties.")
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_protection
     @xlsx = 'protection.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Create some format objects
@@ -3607,12 +3647,13 @@ EOS
     worksheet.write('A6', 'to remove the worksheet protection.')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_regions
     @xlsx = 'regions.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
 
     # Add some worksheets
     north = workbook.add_worksheet('North')
@@ -3646,12 +3687,13 @@ EOS
     south.set_selection(0, 1)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_rich_strings
     @xlsx = 'rich_strings.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.set_column('A:A', 30)
@@ -3678,12 +3720,13 @@ EOS
         italic, 'j = k', superc, '(n-1)', center)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_right_to_left
     @xlsx = 'right_to_left.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -3692,12 +3735,13 @@ EOS
     worksheet1.write(0, 0, 'Hello')    #  A1, B1, C1, ...
     worksheet2.write(0, 0, 'Hello')    # ..., C1, B1, A1
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape1
     @xlsx = 'shape1.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Add a circle, with centered text.
@@ -3715,12 +3759,13 @@ EOS
     worksheet.insert_shape('D8', plus)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape2
     @xlsx = 'shape2.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.hide_gridlines(2)
@@ -3758,12 +3803,13 @@ EOS
     worksheet.insert_shape('A1', decor, 250, 50)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape3
     @xlsx = 'shape3.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     normal = workbook.add_shape(
@@ -3780,12 +3826,13 @@ EOS
     worksheet.insert_shape('A1', normal, 250, 50, 3, 2)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape4
     @xlsx = 'shape4.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     worksheet.hide_gridlines(2)
 
@@ -3824,12 +3871,13 @@ EOS
     stencil.text = 'Now its a circle'
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape5
     @xlsx = 'shape5.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     s1 = workbook.add_shape(
@@ -3862,12 +3910,13 @@ EOS
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape6
     @xlsx = 'shape6.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     s1 = workbook.add_shape(
@@ -3900,12 +3949,13 @@ EOS
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape7
     @xlsx = 'shape7.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Add a circle, with centered text. c is for circle, not center.
@@ -3964,12 +4014,13 @@ EOS
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape8
     @xlsx = 'shape8.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Add a circle, with centered text. c is for circle, not center.
@@ -4027,12 +4078,13 @@ EOS
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_shape_all
     @xlsx = 'shape_all.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet  = nil
     last_sheet = ''
     row        = 0
@@ -4062,7 +4114,8 @@ EOS
     end
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def shapes_list
@@ -4259,7 +4312,7 @@ EOS
 
   def test_stats
     @xlsx = 'stats.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet('Test data')
 
     # Set the column width for column 1
@@ -4313,12 +4366,13 @@ EOS
     worksheet.write(10, 1, '=KURT(B2:I2)')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_stats_ext
     @xlsx = 'stats_ext.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet('Test results')
     worksheet2 = workbook.add_worksheet('Data')
 
@@ -4377,12 +4431,13 @@ EOS
     worksheet2.write(8, 1, 24.8, numformat)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_stocks
     @xlsx = 'stocks.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Set the column width for columns 1, 2, 3 and 4
@@ -4437,12 +4492,13 @@ EOS
     worksheet.write(3, 3, 0, f_change)          # 0 in the font color (black)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_tab_colors
     @xlsx = 'tab_colors.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
 
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
@@ -4455,12 +4511,13 @@ EOS
     worksheet4.tab_color = 0x35    # Orange
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_tables
     @xlsx = 'tables.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet1  = workbook.add_worksheet
     worksheet2  = workbook.add_worksheet
     worksheet3  = workbook.add_worksheet
@@ -4796,12 +4853,13 @@ EOS
                           )
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_sparklines1
     @xlsx = 'sparklines1.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Some sample data to plot.
@@ -4844,12 +4902,13 @@ EOS
                             )
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_sparklines2
     @xlsx = 'sparklines2.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     bold       = workbook.add_format(:bold => 1)
@@ -5221,12 +5280,13 @@ EOS
     worksheet2.write_col('A1', data)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_add_vba_project
     @xlsx = 'add_vba_project.xlsm'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.set_column('A:A', 50)
@@ -5243,12 +5303,13 @@ EOS
     worksheet.write('B6', '=MyFunction(7)')
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_hide_row_col
     @xlsx = 'hide_row_col.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Write some data
@@ -5265,12 +5326,13 @@ EOS
     worksheet.set_column('G:XFD', nil, nil, 1)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_data_table
     @xlsx = 'chart_data_table.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -5349,12 +5411,13 @@ EOS
     worksheet.insert_chart('D18', chart2, 25, 11)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_data_tools
     @xlsx = 'chart_data_tools.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -5544,12 +5607,13 @@ EOS
     worksheet.insert_chart('D82', chart6, 25, 10)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_combined
     @xlsx = 'chart_combined.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     bold      = workbook.add_format(:bold => 1)
 
@@ -5642,12 +5706,13 @@ EOS
     worksheet.insert_chart('E18', column_chart2)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
   def test_chart_pareto
     @xlsx = 'chart_pareto.xlsx'
-    workbook = WriteXLSX.new(@xlsx)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     # Formats used in the workbook.
@@ -5716,6 +5781,7 @@ EOS
     worksheet.insert_chart('F2', column_chart)
 
     workbook.close
-    compare_xlsx(File.join(@perl_output, @xlsx), @xlsx)
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 end

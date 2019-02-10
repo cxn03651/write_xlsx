@@ -6,13 +6,9 @@ class TestRegressionChartsheet06 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_chartsheet06
     @xlsx = 'chartsheet06.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'bar')
 
@@ -36,13 +32,11 @@ class TestRegressionChartsheet06 < Test::Unit::TestCase
     chart.tab_color = 'red'
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      nil,
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

@@ -7,12 +7,12 @@ class TestRegressionTutorial01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_tutorial01
     @xlsx = 'tutorial01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     expenses = [
@@ -30,7 +30,7 @@ class TestRegressionTutorial01 < Test::Unit::TestCase
     worksheet.write(expenses.size, 1, '=SUM(B1:B4)', nil, 1450)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
                                 {}
                                 )

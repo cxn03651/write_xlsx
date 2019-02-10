@@ -7,12 +7,12 @@ class TestRegressionHeaderImage06 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_header_image06
     @xlsx = 'header_image06.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -21,7 +21,7 @@ class TestRegressionHeaderImage06 < Test::Unit::TestCase
 
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [],
                                 {
                                   'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ],

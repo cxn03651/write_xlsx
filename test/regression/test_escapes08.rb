@@ -7,12 +7,12 @@ class TestRegressionEscapes08 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_escapes08
     @xlsx = 'escapes08.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
 
     # Test an already escaped string.
@@ -22,9 +22,6 @@ class TestRegressionEscapes08 < Test::Unit::TestCase
                         )
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx
-                                )
+    compare_for_regression
   end
 end

@@ -7,12 +7,12 @@ class TestRegressionTable14 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_table14
     @xlsx = 'table14.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     format1 = workbook.add_format(:num_format => '0.00;[Red]0.00',       :dxf_index => 2)
     format2 = workbook.add_format(:num_format => '0.00_ ;\-0.00\ ',      :dxf_index => 1)
@@ -43,7 +43,7 @@ class TestRegressionTable14 < Test::Unit::TestCase
                         )
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 nil,
                                 {  'xl/workbook.xml' => ['<workbookView'] }
                                 )

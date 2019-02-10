@@ -7,12 +7,12 @@ class TestRegressionQuoteName01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_quote_name01
     @xlsx = 'quote_name01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
 
     data = [
             [1, 2, 3,  4,  5],
@@ -43,6 +43,6 @@ class TestRegressionQuoteName01 < Test::Unit::TestCase
     end
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

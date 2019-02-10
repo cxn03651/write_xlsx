@@ -7,12 +7,12 @@ class TestRegressionOutline04 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_outline04
     @xlsx = 'outline04.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet4  = workbook.add_worksheet('Outline levels')
 
     # Example 4: Show all possible outline levels.
@@ -39,17 +39,15 @@ class TestRegressionOutline04 < Test::Unit::TestCase
     worksheet4.set_row(12, nil, nil, nil, 1)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [
-                                 'xl/calcChain.xml',
-                                 '[Content_Types].xml',
-                                 'xl/_rels/workbook.xml.rels'
-                                ],
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      [
+        'xl/calcChain.xml',
+        '[Content_Types].xml',
+        'xl/_rels/workbook.xml.rels'
+      ],
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

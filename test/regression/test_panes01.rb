@@ -7,12 +7,12 @@ class TestRegressionPanes01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_panes01
     @xlsx = 'panes01.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet01 = workbook.add_worksheet
     worksheet02 = workbook.add_worksheet
     worksheet03 = workbook.add_worksheet
@@ -56,11 +56,6 @@ class TestRegressionPanes01 < Test::Unit::TestCase
     worksheet13.split_panes(45, 54.14)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                nil
-                                )
+    compare_for_regression
   end
 end

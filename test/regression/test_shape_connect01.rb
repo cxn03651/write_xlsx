@@ -7,12 +7,12 @@ class TestRegressionShapeConnect01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_shape_connect01
     @xlsx = 'shape_connect01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     format    = workbook.add_format(:font => 'Arial', :size => 8)
 
@@ -41,6 +41,6 @@ class TestRegressionShapeConnect01 < Test::Unit::TestCase
     worksheet.insert_shape('A1', cxn_shape, 0, 0)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

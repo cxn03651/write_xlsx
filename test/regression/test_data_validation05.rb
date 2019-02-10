@@ -6,13 +6,9 @@ class TestDataValidation05 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_data_validation05
     @xlsx = 'data_validation02.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     values = [

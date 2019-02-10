@@ -6,13 +6,9 @@ class TestRegressionMergeCells01 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_merge_cells01
     @xlsx = 'merge_cells01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     format    = workbook.add_format(:align => 'center')
 
@@ -24,6 +20,6 @@ class TestRegressionMergeCells01 < Test::Unit::TestCase
     worksheet.merge_range('D1:D2', 'col4', format)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

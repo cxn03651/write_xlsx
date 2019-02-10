@@ -7,12 +7,12 @@ class TestRegressionOutline06 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_outline06
     @xlsx = 'outline06.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet1  = workbook.add_worksheet('Outlined Rows')
 
     worksheet1.outline_settings(0, 0, 0, 1)
@@ -73,17 +73,15 @@ class TestRegressionOutline06 < Test::Unit::TestCase
     worksheet1.write('B12', '=SUBTOTAL(9,B2:B10)', bold, 6400)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [
-                                 'xl/calcChain.xml',
-                                 '[Content_Types].xml',
-                                 'xl/_rels/workbook.xml.rels'
-                                ],
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      [
+        'xl/calcChain.xml',
+        '[Content_Types].xml',
+        'xl/_rels/workbook.xml.rels'
+      ],
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

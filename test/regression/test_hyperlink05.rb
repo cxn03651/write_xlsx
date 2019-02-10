@@ -7,12 +7,12 @@ class TestRegressionHyperlink05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_hyperlink05
     @xlsx = 'hyperlink05.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.write_url('A1',  'http://www.perl.org/')
@@ -21,6 +21,6 @@ class TestRegressionHyperlink05 < Test::Unit::TestCase
     worksheet.write_url('A7',  'http://www.cpan.org/', 'CPAN', nil, 'Download')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

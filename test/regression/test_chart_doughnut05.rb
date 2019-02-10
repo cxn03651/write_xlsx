@@ -7,12 +7,12 @@ class TestRegressionChartDoughnut05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_doughnut05
     @xlsx = 'chart_doughnut05.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
 
@@ -33,10 +33,6 @@ class TestRegressionChartDoughnut05 < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                nil
-                                )
+    compare_for_regression
   end
 end

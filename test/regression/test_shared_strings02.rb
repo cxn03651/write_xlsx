@@ -7,12 +7,12 @@ class TestRegressionSharedStrings02 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_shared_strings02
     @xlsx = 'shared_strings02.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
     # Test that the Excel/Unicode escape for control characters, _xHHHH_ is
@@ -37,11 +37,9 @@ class TestRegressionSharedStrings02 < Test::Unit::TestCase
     worksheet.write_col(0, 0, strings)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                {'xl/workbook.xml' => ['<workbookView']}
-                                )
+    compare_for_regression(
+      nil,
+      {'xl/workbook.xml' => ['<workbookView']}
+    )
   end
 end

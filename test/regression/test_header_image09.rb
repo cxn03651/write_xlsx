@@ -6,13 +6,9 @@ class TestRegressionHeaderImage09 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_header_image09
     @xlsx = 'header_image09.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
@@ -25,12 +21,12 @@ class TestRegressionHeaderImage09 < Test::Unit::TestCase
     worksheet2.set_header('&L&G', nil, { :image_left   => 'test/regression/images/red.jpg' })
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
-                                [],
-                                {
-                                  'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ],
-                                  'xl/worksheets/sheet2.xml' => [ '<pageMargins', '<pageSetup' ],
-                                }
-                                )
+    compare_for_regression(
+      [],
+      {
+        'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ],
+        'xl/worksheets/sheet2.xml' => [ '<pageMargins', '<pageSetup' ],
+      }
+    )
   end
 end

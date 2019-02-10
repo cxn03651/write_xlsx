@@ -7,12 +7,12 @@ class TestRegressionChartScatter07 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_scatter07
     @xlsx = 'chart_scatter07.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(
                                      :type     => 'scatter',
@@ -47,14 +47,13 @@ class TestRegressionChartScatter07 < Test::Unit::TestCase
 
     workbook.close
 
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                {
-                                  'xl/charts/chart1.xml' => ['<c:pageMargins'],
-                                  'xl/workbook.xml'      => [ '<fileVersion' ]
-                                }
-                                )
+    compare_for_regression(
+      nil,
+      {
+        'xl/charts/chart1.xml' => ['<c:pageMargins'],
+        'xl/workbook.xml'      => [ '<fileVersion' ]
+      }
+    )
 
   end
 end

@@ -7,12 +7,12 @@ class TestChartGridlines03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_gridlines03
     @xlsx = 'chart_gridlines03.xlsx'
-    workbook    =  WriteXLSX.new(@xlsx)
+    workbook    =  WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
     data_format = workbook.add_format(:num_format => 14)
@@ -55,11 +55,9 @@ class TestChartGridlines03 < Test::Unit::TestCase
     worksheet.insert_chart('E9',  chart)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [],
-                                {'xl/charts/chart1.xml' => ['<c:formatCode', '<c:pageMargins']}
-                                )
+    compare_for_regression(
+      [],
+      {'xl/charts/chart1.xml' => ['<c:formatCode', '<c:pageMargins']}
+    )
   end
 end

@@ -33,7 +33,7 @@ class TestRegressionDefinedName04 < Test::Unit::TestCase
 
   def test_defined_name04
     @xlsx = 'defined_name04.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
 
     # Test for valid Excel defined names.
@@ -45,11 +45,6 @@ class TestRegressionDefinedName04 < Test::Unit::TestCase
     workbook.define_name( %q(a),        %q(=Sheet1!$A$6) )
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                nil
-                                )
+    compare_for_regression
   end
 end

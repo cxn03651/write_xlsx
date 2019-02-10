@@ -7,12 +7,12 @@ class TestRegressionHeader03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_header03
     @xlsx = 'header03.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
     worksheet.set_footer('&L&P', nil,
@@ -22,7 +22,7 @@ class TestRegressionHeader03 < Test::Unit::TestCase
 
     workbook.close
 
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [],
                                 {
                                   'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ]

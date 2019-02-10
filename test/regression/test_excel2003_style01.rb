@@ -7,15 +7,15 @@ class TestRegressionExcel2003Style01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_excel2003_style01
     @xlsx = 'excel2003_style01.xlsx'
-    workbook    = WriteXLSX.new(@xlsx, :excel2003_style => true)
+    workbook    = WriteXLSX.new(@io, :excel2003_style => true)
     worksheet   = workbook.add_worksheet
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

@@ -7,12 +7,12 @@ class TestRegressionOutline05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_outline05
     @xlsx = 'outline05.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet2  = workbook.add_worksheet('Collapsed Rows')
 
     # Add a general format
@@ -74,17 +74,15 @@ class TestRegressionOutline05 < Test::Unit::TestCase
     worksheet2.write('B12', '=SUBTOTAL(9,B2:B10)', bold, 6400)
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [
-                                 'xl/calcChain.xml',
-                                 '[Content_Types].xml',
-                                 'xl/_rels/workbook.xml.rels'
-                                ],
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      [
+        'xl/calcChain.xml',
+        '[Content_Types].xml',
+        'xl/_rels/workbook.xml.rels'
+      ],
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

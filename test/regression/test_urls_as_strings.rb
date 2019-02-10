@@ -7,12 +7,12 @@ class TestUrlsAsStrings < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_urls_as_strings
     @xlsx = 'urls_as_strings.xlsx'
-    workbook = WriteXLSX.new(@xlsx, strings_to_urls: false)
+    workbook = WriteXLSX.new(@io, strings_to_urls: false)
     worksheet = workbook.add_worksheet
     worksheet.write('A1', 'http://www.write_xlsx.com')
     worksheet.write('A2', 'mailto:write_xlsx@example.com')
@@ -20,6 +20,6 @@ class TestUrlsAsStrings < Test::Unit::TestCase
     worksheet.write('A4', 'internal:Sheet1!A1'  )
     worksheet.write('A5', 'external:c:\foo.xlsx')
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

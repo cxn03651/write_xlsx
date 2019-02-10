@@ -6,13 +6,9 @@ class TestRegressionButton13 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_button13
     @xlsx = 'button07.xlsm'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     workbook.set_vba_name
@@ -29,6 +25,6 @@ class TestRegressionButton13 < Test::Unit::TestCase
     workbook.add_vba_project(File.join(@regression_output, 'vbaProject02.bin'))
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

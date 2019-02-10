@@ -6,13 +6,9 @@ class TestRegressionChartDate01 < Test::Unit::TestCase
     setup_dir_var
   end
 
-  def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
-  end
-
   def test_chart_date01
     @xlsx = 'chart_date01.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'line', :embedded => 1)
     date_format = workbook.add_format(:num_format => 14)
@@ -49,7 +45,7 @@ class TestRegressionChartDate01 < Test::Unit::TestCase
     worksheet.insert_chart('E9', chart)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 nil,
                                 {'xl/charts/chart1.xml' => ['<c:formatCode']}
                                 )

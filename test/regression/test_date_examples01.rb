@@ -7,12 +7,12 @@ class TestDateExamples01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_date_examples01
     @xlsx = 'date_examples01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.set_column('A:A', 30)
@@ -40,7 +40,7 @@ class TestDateExamples01 < Test::Unit::TestCase
     worksheet.write('A7', number, format7)    #   Feb 28 2013 12:00 PM
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                  ['xl/calcChain.xml', '\[Content_Types\].xml', 'xl/_rels/workbook.xml.rels'],
                  {}
                  )

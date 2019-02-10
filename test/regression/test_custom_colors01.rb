@@ -7,12 +7,12 @@ class TestRegressionCustomColors01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_custom_colors01
     @xlsx = 'custom_colors01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     workbook.set_custom_color(40, '#26DA55')
@@ -28,6 +28,6 @@ class TestRegressionCustomColors01 < Test::Unit::TestCase
     worksheet.write('A3', 'Foo', color3)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

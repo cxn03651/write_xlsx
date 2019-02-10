@@ -7,12 +7,12 @@ class TestRegressionUtf8_06 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_utf8_06
     @xlsx = 'utf8_06.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     bold   = workbook.add_format(:bold   => 1)
@@ -23,6 +23,6 @@ class TestRegressionUtf8_06 < Test::Unit::TestCase
     worksheet.write_rich_string('A3', 'Caf', bold, 'é')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

@@ -7,12 +7,12 @@ class TestRegressionCondFormat04 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_cond_format04
     @xlsx = 'cond_format04.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     format1 = workbook.add_format(:num_format => 2,       :dxf_index => 1)
@@ -42,10 +42,9 @@ class TestRegressionCondFormat04 < Test::Unit::TestCase
                                      )
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                { 'xl/workbook.xml' => ['<workbookView'] })
+    compare_for_regression(
+      nil,
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

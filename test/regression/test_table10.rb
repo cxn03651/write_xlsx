@@ -7,12 +7,12 @@ class TestRegressionTable10 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_table10
     @xlsx = 'table10.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     format    = workbook.add_format(:num_format => 2)
 
@@ -60,7 +60,7 @@ class TestRegressionTable10 < Test::Unit::TestCase
                         )
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                                 [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
                                 {  'xl/workbook.xml' => ['<workbookView'] }
                                 )

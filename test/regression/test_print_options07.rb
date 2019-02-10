@@ -7,12 +7,12 @@ class TestPrintOptions07 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_print_options07
     @xlsx = 'print_options07.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.write(0, 0, 'Foo')
@@ -23,9 +23,7 @@ class TestPrintOptions07 < Test::Unit::TestCase
     worksheet.print_black_and_white
 
     workbook.close
-    compare_xlsx_for_regression(
-      File.join(@regression_output, @xlsx),
-      @xlsx,
+    compare_for_regression(
       [],
       {'xl/worksheets/sheet1.xml' => ['<pageMargins']}
     )

@@ -7,12 +7,12 @@ class TestAutofilter00 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_autofilter00
     @xlsx = 'autofilter00.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     data = []
@@ -20,7 +20,7 @@ class TestAutofilter00 < Test::Unit::TestCase
     worksheet.write('A1', [data])
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
                  nil,
                  {'xl/workbook.xml' => ['<workbookView']}
                  )

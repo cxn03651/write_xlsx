@@ -7,12 +7,12 @@ class TestRegressionEscapes03 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_escapes03
     @xlsx = 'escapes03.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
     bold   = workbook.add_format(:bold   => 1)
@@ -23,12 +23,11 @@ class TestRegressionEscapes03 < Test::Unit::TestCase
     worksheet.write_rich_string('A3', 'a', bold, %q{b"<>'c}, 'defg')
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                {
-                                  'xl/workbook.xml' => ['<workbookView']
-                                }
-                                )
+    compare_for_regression(
+      nil,
+      {
+        'xl/workbook.xml' => ['<workbookView']
+      }
+    )
   end
 end

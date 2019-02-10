@@ -7,12 +7,12 @@ class TestRegressionChartBar14 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_bar14
     @xlsx = 'chart_bar14.xlsx'
-    workbook   = WriteXLSX.new(@xlsx)
+    workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
@@ -49,15 +49,13 @@ class TestRegressionChartBar14 < Test::Unit::TestCase
     worksheet2.insert_chart('F25', chart2)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                {
-                                  'xl/charts/chart1.xml' => ['<c:pageMargins'],
-                                  'xl/charts/chart2.xml' => ['<c:pageMargins'],
-                                  'xl/charts/chart3.xml' => ['<c:pageMargins']
-                                  }
-                                )
+    compare_for_regression(
+      nil,
+      {
+        'xl/charts/chart1.xml' => ['<c:pageMargins'],
+        'xl/charts/chart2.xml' => ['<c:pageMargins'],
+        'xl/charts/chart3.xml' => ['<c:pageMargins']
+      }
+    )
   end
 end
-

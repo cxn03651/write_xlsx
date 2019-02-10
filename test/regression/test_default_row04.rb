@@ -7,12 +7,12 @@ class TestRegressionDefaultRow04 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_default_row04
     @xlsx = 'default_row04.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.set_default_row(24)
@@ -26,6 +26,6 @@ class TestRegressionDefaultRow04 < Test::Unit::TestCase
     worksheet.comments_author = 'John'
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

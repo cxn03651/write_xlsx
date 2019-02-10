@@ -7,12 +7,12 @@ class TestRegressionFormulaResults01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_formula_results01
     @xlsx = 'formula_results01.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.write_formula('A1',  '1+1',                 nil, 2)
@@ -29,7 +29,7 @@ class TestRegressionFormulaResults01 < Test::Unit::TestCase
     worksheet.write_formula('A12', '1/0',                 nil, '#DIV/0!')
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx,
+    compare_for_regression(
       [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
       {}
     )

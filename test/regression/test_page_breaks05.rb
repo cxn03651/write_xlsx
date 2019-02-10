@@ -7,12 +7,12 @@ class TestBreaks05 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_page_breaks05
     @xlsx = 'page_breaks05.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     worksheet.set_v_pagebreaks(8, 3, 1, 0)
@@ -20,17 +20,15 @@ class TestBreaks05 < Test::Unit::TestCase
     worksheet.write('A1', 'Foo')
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                [
-                                 'xl/printerSettings/printerSettings1.bin',
-                                 'xl/worksheets/_rels/sheet1.xml.rels'
-                                ],
-                                {
-                                 '[Content_Types].xml'      => ['<Default Extension="bin"'],
-                                 'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
-                                }
-                                )
+    compare_for_regression(
+      [
+        'xl/printerSettings/printerSettings1.bin',
+        'xl/worksheets/_rels/sheet1.xml.rels'
+      ],
+      {
+        '[Content_Types].xml'      => ['<Default Extension="bin"'],
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
+      }
+    )
   end
 end

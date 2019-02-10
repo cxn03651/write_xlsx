@@ -7,12 +7,12 @@ class TestRegressionFormat12 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_format12
     @xlsx = 'format12.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     top_left_bottom = workbook.add_format(
@@ -36,6 +36,6 @@ class TestRegressionFormat12 < Test::Unit::TestCase
     worksheet.write('F2', 'test', top_bottom)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx), @xlsx)
+    compare_for_regression
   end
 end

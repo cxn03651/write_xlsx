@@ -7,12 +7,12 @@ class TestRegressionChartBar11 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_chart_bar11
     @xlsx = 'chart_bar11.xlsx'
-    workbook  = WriteXLSX.new(@xlsx)
+    workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart1    = workbook.add_chart(:type => 'bar', :embedded => 1)
     chart2    = workbook.add_chart(:type => 'bar', :embedded => 1)
@@ -43,29 +43,27 @@ class TestRegressionChartBar11 < Test::Unit::TestCase
     worksheet.insert_chart('L32', chart3)
 
     workbook.close
-    compare_xlsx_for_regression(File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                {
-                                  # Ignore the page margins.
-                                  'xl/charts/chart1.xml' => [
-                                                             '<c:axId',
-                                                             '<c:crossAx',
-                                                             '<c:pageMargins'
-                                                            ],
+    compare_for_regression(
+      nil,
+      {
+        # Ignore the page margins.
+        'xl/charts/chart1.xml' => [
+          '<c:axId',
+          '<c:crossAx',
+          '<c:pageMargins'
+        ],
 
-                                  'xl/charts/chart2.xml' => [
-                                                             '<c:axId',
-                                                             '<c:crossAx',
-                                                             '<c:pageMargins'
-                                                            ],
-                                  'xl/charts/chart3.xml' => [
-                                                             '<c:axId',
-                                                             '<c:crossAx',
-                                                             '<c:pageMargins'
-    ]
-                                }
-                                )
+        'xl/charts/chart2.xml' => [
+          '<c:axId',
+          '<c:crossAx',
+          '<c:pageMargins'
+        ],
+        'xl/charts/chart3.xml' => [
+          '<c:axId',
+          '<c:crossAx',
+          '<c:pageMargins'
+        ]
+      }
+    )
   end
 end
-

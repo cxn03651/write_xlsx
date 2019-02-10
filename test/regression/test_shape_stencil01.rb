@@ -7,12 +7,12 @@ class TestRegressionShapeStencil01 < Test::Unit::TestCase
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    @tempfile.close(true)
   end
 
   def test_shape_stencil01
     @xlsx = 'shape_stencil01.xlsx'
-    workbook    = WriteXLSX.new(@xlsx)
+    workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     worksheet.hide_gridlines(2)
 
@@ -34,11 +34,6 @@ class TestRegressionShapeStencil01 < Test::Unit::TestCase
     end
 
     workbook.close
-    compare_xlsx_for_regression(
-                                File.join(@regression_output, @xlsx),
-                                @xlsx,
-                                nil,
-                                nil
-                                )
+    compare_for_regression
   end
 end
