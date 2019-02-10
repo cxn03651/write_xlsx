@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2019-02-10 v0.85.6
+   Fix work well in ms windows.
+
 2018-04-29 v0.85.5
    Added option to store hyperlink strings as string (strings_as_urls: false).
 
