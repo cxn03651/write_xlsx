@@ -658,6 +658,10 @@ module Writexlsx
       attributes
     end
 
+    def force_text_format?
+      @num_format == 49 # Text format ('@')
+    end
+
     private
 
     def write_font_shapes(writer)

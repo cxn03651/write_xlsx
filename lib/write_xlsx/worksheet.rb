@@ -878,8 +878,11 @@ module Writexlsx
       token = row_col_args[2] || ''
       token = token.to_s if token.instance_of?(Time)
 
+      fmt = row_col_args[3]
+      if fmt.respond_to?(:force_text_format?) && fmt.force_text_format?
+        write_string(*args) # Force text format
       # Match an array ref.
-      if token.respond_to?(:to_ary)
+      elsif token.respond_to?(:to_ary)
         write_row(*args)
       elsif token.respond_to?(:coerce)  # Numeric
         write_number(*args)
