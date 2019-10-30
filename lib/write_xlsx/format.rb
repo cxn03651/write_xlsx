@@ -287,11 +287,10 @@ module Writexlsx
 
           # Create a sub to set the property.
           if value.respond_to?(:to_str) || !value.respond_to?(:+)
-            s = "set_#{key}('#{value}')"
+            send("set_#{key}", value.to_s)
           else
-            s = "set_#{key}(#{value})"
+            send("set_#{key}", value)
           end
-          eval s
         end
       end
     end
