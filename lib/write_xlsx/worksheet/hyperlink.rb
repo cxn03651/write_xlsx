@@ -24,7 +24,7 @@ module Writexlsx
         str ||= url.dup
 
         # Strip the mailto header.
-        str.sub!(/^mailto:/, '')
+        normalized_str = str.sub(/^mailto:/, '')
 
         # Escape URL unless it looks already escaped.
         url = escape_url(url)
@@ -35,7 +35,7 @@ module Writexlsx
         end
 
         @url       = url
-        @str       = str
+        @str       = normalized_str
         @url_str   = nil
         @tip       = tip
       end
