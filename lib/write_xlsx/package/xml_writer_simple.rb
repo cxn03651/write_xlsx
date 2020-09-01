@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 #
 # XMLWriterSimple
 #
@@ -29,10 +30,9 @@ module Writexlsx
       end
 
       def tag_elements_str(tag, attributes = [])
-        str = ''
-        str << start_tag_str(tag, attributes)
-        str << yield
-        str << end_tag_str(tag)
+        str = start_tag_str(tag, attributes) +
+              yield +
+              end_tag_str(tag)
       end
 
       def start_tag(tag, attr = [])
@@ -65,7 +65,7 @@ module Writexlsx
       end
 
       def data_element(tag, data, attr = [])
-        tag_elements(tag, attr) { io_write("#{escape_data(data)}") }
+        tag_elements(tag, attr) { io_write(escape_data(data)) }
       end
 
       #

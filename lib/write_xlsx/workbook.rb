@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
 require 'write_xlsx/sheets'
@@ -972,8 +973,9 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def shared_string_index(str, params = {}) #:nodoc:
-      @shared_strings.index(str, params)
+    EMPTY_HASH = {}.freeze
+    def shared_string_index(str) #:nodoc:
+      @shared_strings.index(str, EMPTY_HASH)
     end
 
     def str_unique   # :nodoc:

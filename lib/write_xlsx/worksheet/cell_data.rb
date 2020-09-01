@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
 
 module Writexlsx
   class Worksheet
@@ -63,9 +64,10 @@ module Writexlsx
         { :sst_id => token }
       end
 
+      TYPE_STR_ATTRS = ['t', 's'].freeze
       def write_cell
         attributes = cell_attributes
-        attributes << ['t', 's']
+        attributes << TYPE_STR_ATTRS
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_value(token)
         end

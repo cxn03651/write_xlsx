@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/button'
 require 'write_xlsx/colors'
@@ -2188,7 +2189,7 @@ module Writexlsx
     def write_number(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, num, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, num].include?(nil)
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || num.nil?
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
@@ -2230,13 +2231,13 @@ module Writexlsx
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, str, xf = row_col_notation(args)
       str &&= str.to_s
-      raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || str.nil?
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      index = shared_string_index(str[0, STR_MAX])
+      index = shared_string_index(str.length > STR_MAX ? str[0, STR_MAX] : str)
 
       store_data_to_table(StringCellData.new(self, row, col, index, xf))
     end
@@ -7510,8 +7511,8 @@ module Writexlsx
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
     #
-    def shared_string_index(str, params = {}) #:nodoc:
-      @workbook.shared_string_index(str, params)
+    def shared_string_index(str) #:nodoc:
+      @workbook.shared_string_index(str)
     end
 
     #
