@@ -23,11 +23,11 @@ class TestXMLWriterSimple < Test::Unit::TestCase
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <foo/>
 EOS
-    assert_equal(expected, @obj.xml_decl << @obj.empty_tag('foo') << "\n")
+    assert_equal(expected, @obj.xml_decl + @obj.empty_tag('foo') + "\n")
   end
 
   def test_start_end_tag
-    assert_equal("<foo></foo>", @obj.start_tag('foo') << @obj.end_tag('foo'))
+    assert_equal("<foo></foo>", @obj.start_tag('foo') + @obj.end_tag('foo'))
   end
 
   def test_attribute
@@ -39,7 +39,7 @@ EOS
   def test_character_data
     assert_equal(
       "<foo>&lt;tag&gt;&amp;amp;&lt;/tag&gt;</foo>",
-      @obj.start_tag('foo') << @obj.characters("<tag>&amp;</tag>") << @obj.end_tag('foo')
+      @obj.start_tag('foo') + @obj.characters("<tag>&amp;</tag>") + @obj.end_tag('foo')
     )
   end
 

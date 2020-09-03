@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 require 'write_xlsx/col_name'
 
 module Writexlsx
@@ -303,11 +304,12 @@ module Writexlsx
       writer.empty_tag('color', attributes)
     end
 
+    PERL_TRUE_VALUES = [false, nil, 0, "0", "", [], {}].freeze
     #
     # return perl's boolean result
     #
     def ptrue?(value)
-      if [false, nil, 0, "0", "", [], {}].include?(value)
+      if PERL_TRUE_VALUES.include?(value)
         false
       else
         true
