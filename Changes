@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2020-09-03 v0.85.8
+   apply pull-request #58 and #52
+
 2019-06-20 v0.85.7
    apply pull-request #26
 
