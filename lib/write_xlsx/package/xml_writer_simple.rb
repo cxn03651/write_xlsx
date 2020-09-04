@@ -118,7 +118,7 @@ module Writexlsx
       end
 
       def escape_attributes(str = '')
-        return str if !(str =~ /["&<>]/)
+        return str if !(str.to_s =~ /["&<>]/)
 
         str.
           gsub(/&/, "&amp;").
@@ -128,7 +128,7 @@ module Writexlsx
       end
 
       def escape_data(str = '')
-        if str =~ /[&<>]/
+        if str.to_s =~ /[&<>]/
           str.gsub(/&/, '&amp;').
             gsub(/</, '&lt;').
             gsub(/>/, '&gt;')

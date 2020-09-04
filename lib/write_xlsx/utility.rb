@@ -244,7 +244,7 @@ module Writexlsx
 
     # Check for a cell reference in A1 notation and substitute row and column
     def row_col_notation(args)   # :nodoc:
-      if args[0] =~ /^\D/
+      if args[0].to_s =~ /^\D/
         substitute_cellref(*args)
       else
         args

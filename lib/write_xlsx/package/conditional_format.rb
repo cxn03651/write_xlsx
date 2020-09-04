@@ -306,7 +306,7 @@ module Writexlsx
 
       def row_col_param_for_conditional_formatting(*args)
         # Check for a cell reference in A1 notation and substitute row and column
-        if args[0] =~ /^\D/
+        if args[0].to_s =~ /^\D/
           # Check for a user defined multiple range like B3:K6,B8:K11.
           user_range = args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '') if args[0] =~ /,/
         end
@@ -383,7 +383,7 @@ module Writexlsx
       end
 
       def convert_date_time_if_required(val)
-        if val =~ /T/
+        if val.to_s =~ /T/
           date_time = convert_date_time(val)
           raise "Invalid date/time value '#{val}' in conditional_formatting()" unless date_time
           date_time

@@ -721,7 +721,7 @@ module Writexlsx
     #
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      if args[0] =~ /^\D/
+      if args[0].to_s =~ /^\D/
         row1, firstcol, row2, lastcol, *data = substitute_cellref(*args)
       else
         firstcol, lastcol, *data = args
@@ -5811,7 +5811,7 @@ module Writexlsx
     # based on the default or user defined values in the Workbook palette.
     #
     def palette_color(index) #:nodoc:
-      if index =~ /^#([0-9A-F]{6})$/i
+      if index.to_s =~ /^#([0-9A-F]{6})$/i
         "FF#{$1.upcase}"
       else
         "FF#{super(index)}"
@@ -6100,7 +6100,7 @@ module Writexlsx
       # Special handling of "Top" filter expressions.
       if tokens[0] =~ /^top|bottom$/i
         value = tokens[1]
-        if (value =~ /\D/ or value.to_i < 1 or value.to_i > 500)
+        if (value.to_s =~ /\D/ or value.to_i < 1 or value.to_i > 500)
           raise "The value '#{value}' in expression '#{expression}' " +
           "must be in the range 1 to 500"
         end
@@ -6129,7 +6129,7 @@ module Writexlsx
       end
 
       # Special handling for Blanks/NonBlanks.
-      if (token =~ /^blanks|nonblanks$/i)
+      if (token.to_s =~ /^blanks|nonblanks$/i)
         # Only allow Equals or NotEqual in this context.
         if (operator != 2 and operator != 5)
           raise "The operator '#{tokens[1]}' in expression '#{expression}' " +
@@ -6157,7 +6157,7 @@ module Writexlsx
 
       # if the string token contains an Excel match character then change the
       # operator type to indicate a non "simple" equality.
-      if (operator == 2 and token =~ /[*?]/)
+      if (operator == 2 and token.to_s =~ /[*?]/)
         operator = 22
       end
 
@@ -7635,7 +7635,7 @@ module Writexlsx
 
     def prepare_filter_column(col) # :nodoc:
       # Check for a column reference in A1 notation and substitute.
-      if col =~ /^\D/
+      if col.to_s =~ /^\D/
         col_letter = col
 
         # Convert col ref to a cell ref and then to a col number.
