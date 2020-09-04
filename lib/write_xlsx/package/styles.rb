@@ -49,7 +49,7 @@ module Writexlsx
       # based on the default or user defined values in the Workbook palette.
       #
       def palette_color(index)
-      if index =~ /^#([0-9A-F]{6})$/i
+      if index.to_s =~ /^#([0-9A-F]{6})$/i
         "FF#{$1.upcase}"
       else
         "FF#{super(index)}"

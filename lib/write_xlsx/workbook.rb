@@ -926,7 +926,7 @@ module Writexlsx
     #
     def set_custom_color(index, red = 0, green = 0, blue = 0)
       # Match a HTML #xxyyzz style parameter
-      if red =~ /^#(\w\w)(\w\w)(\w\w)/
+      if red.to_s =~ /^#(\w\w)(\w\w)(\w\w)/
         red   = $1.hex
         green = $2.hex
         blue  = $3.hex

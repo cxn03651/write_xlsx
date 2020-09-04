@@ -2631,7 +2631,7 @@ module Writexlsx
     end
 
     def write_num_ref_or_lit(values, data)
-      if values =~ /^=/                     # '=Sheet1!$A$1:$A$5'
+      if values.to_s =~ /^=/                     # '=Sheet1!$A$1:$A$5'
         write_num_ref(values, data, 'num')
       else                                  # [1, 2, 3]
         write_num_lit(values)

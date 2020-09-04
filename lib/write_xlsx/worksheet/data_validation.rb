@@ -282,7 +282,7 @@ module Writexlsx
 
       def convert_date_time_value(key)  # :nodoc:
         value = instance_variable_get("@#{key}")
-        if value && value =~ /T/
+        if value && value.to_s =~ /T/
           date_time = convert_date_time(value)
           instance_variable_set("@#{key}", date_time) if date_time
           date_time
