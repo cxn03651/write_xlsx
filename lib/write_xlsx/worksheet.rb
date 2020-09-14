@@ -6789,8 +6789,11 @@ module Writexlsx
     end
 
     def write_cell_column_dimension(row_num)  # :nodoc:
+      row_data = @cell_data_table[row_num]
       (@dim_colmin .. @dim_colmax).each do |col_num|
-        @cell_data_table[row_num][col_num].write_cell if @cell_data_table[row_num][col_num]
+        if (value = row_data[col_num])
+          value.write_cell
+        end
       end
     end
 
