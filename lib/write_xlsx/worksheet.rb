@@ -2528,6 +2528,57 @@ module Writexlsx
       end
     end
 
+    def update_format_with_params(*args)
+      row, col, params = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || params.nil?
+
+      # Check that row and col are valid and store max and min values
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
+
+      # keep original value of cell
+      if @cell_data_table.dig(row, col).nil? 
+        format = @workbook.add_format(params)
+        write_blank(row, col, format)
+      elsif @cell_data_table[row][col].xf.nil?
+        format = @workbook.add_format(params)
+        cell_data = @cell_data_table[row][col]
+        if cell_data.is_a? FormulaCellData
+          value = "=#{cell_data.token}"
+        elsif cell_data.is_a? FormulaArrayCellData
+          value = "{=#{cell_data.token}}"
+        elsif cell_data.is_a? StringCellData
+          value = @workbook.shared_strings.string(cell_data.data[:sst_id])
+        else
+          value = cell_data.data
+        end
+        write(row, col, value, format)
+      else
+        cell_data = @cell_data_table[row][col]
+        cell_data.xf.set_format_properties(params)
+      end
+    end
+
+    def update_range_format_with_params(*args)
+      row_first, col_first, row_last, col_last, params = row_col_notation(args)
+
+      raise WriteXLSXInsufficientArgumentError if [row_first, col_first, row_last, col_last, params].include?(nil)
+
+      # Swap last row/col with first row/col as necessary
+      row_first,  row_last  = row_last,  row_first  if row_first > row_last
+      col_first, col_last = col_last, col_first if col_first > col_last
+
+      # Check that column number is valid and store the max value
+      check_dimensions(row_last, col_last)
+      store_row_col_max_min_values(row_last, col_last)
+
+      (row_first..row_last).each do |row|
+        (col_first..col_last).each do |col|
+          update_format_with_params(row, col, params)
+        end
+      end
+    end
+
     #
     # The outline_settings() method is used to control the appearance of
     # outlines in Excel. Outlines are described in
