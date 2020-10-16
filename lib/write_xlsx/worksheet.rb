@@ -2565,6 +2565,7 @@ module Writexlsx
           format = @workbook.add_format
           cell_data = @cell_data_table[row][col]
           format.copy(cell_data.xf)
+          format.set_format_properties(params)
         end
         # keep original value of cell
         if cell_data.is_a? FormulaCellData

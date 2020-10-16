@@ -78,6 +78,8 @@ class TestUpdateFormatMethods < Test::Unit::TestCase
     @worksheet.update_format_with_params(0, 0, bold: 0)
     assert_not_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][0].xf, 
                      @worksheet.instance_variable_get(:@cell_data_table)[0][1].xf )
+    assert_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][0].xf.bold, 0)
+    assert_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][1].xf.bold, 1)
   end
 
   def test_update_range_format_with_params_with_insufficient_args_raise_InsufficientArgumentError
