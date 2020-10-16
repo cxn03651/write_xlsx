@@ -2554,7 +2554,7 @@ module Writexlsx
       store_row_col_max_min_values(row, col)
 
       # keep original value of cell
-      if @cell_data_table.dig(row, col).nil? 
+      if @cell_data_table[row].nil? || @cell_data_table[row][col].nil?
         format = @workbook.add_format(params)
         write_blank(row, col, format)
       elsif @cell_data_table[row][col].xf.nil?
