@@ -2541,9 +2541,8 @@ module Writexlsx
     #
     # If the cell doesn't have CellData object, this method create a CellData 
     # using write_blank method.
-    # If the cell has CellData but no Format object, this method fetch contents
-    # of cell from the CellData object and recreate CellData using write method.
-    # otherwise this method just update parameters of existing Format object.
+    # If the cell has CellData, this method fetch contents and format of cell from 
+    # the CellData object and recreate CellData using write method.
     #
     def update_format_with_params(*args)
       row, col, params = row_col_notation(args)
@@ -2553,13 +2552,21 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      # keep original value of cell
+      format = nil
+      cell_data = nil
       if @cell_data_table[row].nil? || @cell_data_table[row][col].nil?
         format = @workbook.add_format(params)
         write_blank(row, col, format)
-      elsif @cell_data_table[row][col].xf.nil?
-        format = @workbook.add_format(params)
-        cell_data = @cell_data_table[row][col]
+      else
+        if @cell_data_table[row][col].xf.nil?
+          format = @workbook.add_format(params)
+          cell_data = @cell_data_table[row][col]
+        else
+          format = @workbook.add_format
+          cell_data = @cell_data_table[row][col]
+          format.copy(cell_data.xf)
+        end
+        # keep original value of cell
         if cell_data.is_a? FormulaCellData
           value = "=#{cell_data.token}"
         elsif cell_data.is_a? FormulaArrayCellData
@@ -2570,9 +2577,6 @@ module Writexlsx
           value = cell_data.data
         end
         write(row, col, value, format)
-      else
-        cell_data = @cell_data_table[row][col]
-        cell_data.xf.set_format_properties(params)
       end
     end
 
