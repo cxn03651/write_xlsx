@@ -2528,6 +2528,23 @@ module Writexlsx
       end
     end
 
+    #
+    # :call-seq:
+    #   update_format_with_params(row, col, format_params)
+    #
+    # Update formatting of the cell to the specified row and column (zero indexed).
+    #
+    #     worksheet.update_format_with_params(0, 0, color: 'red')
+    #
+    # This method is used to update formatting of the cell keeping cell contents 
+    # and formatting.
+    #
+    # If the cell doesn't have CellData object, this method create a CellData 
+    # using write_blank method.
+    # If the cell has CellData but no Format object, this method fetch contents
+    # of cell from the CellData object and recreate CellData using write method.
+    # otherwise this method just update parameters of existing Format object.
+    #
     def update_format_with_params(*args)
       row, col, params = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || params.nil?
@@ -2559,6 +2576,18 @@ module Writexlsx
       end
     end
 
+    #
+    # :call-seq:
+    #   update_range_format_with_params(row_first, col_first, row_last, col_last, format_params)
+    #
+    # Update formatting of cells in range to the specified row and column (zero indexed).
+    #
+    #     worksheet.update_range_format_with_params(0, 0, 3, 3, color: 'red')
+    #
+    # This method is used to update formatting of multiple cells keeping cells' contents 
+    # and formatting.
+    #
+    #
     def update_range_format_with_params(*args)
       row_first, col_first, row_last, col_last, params = row_col_notation(args)
 
