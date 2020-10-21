@@ -506,7 +506,7 @@ module Writexlsx
     def set_align(location)
       return unless location             # No default
 
-      location.downcase!
+      location = location.downcase
 
       set_text_h_align(1) if location == 'left'
       set_text_h_align(2) if location == 'centre'
