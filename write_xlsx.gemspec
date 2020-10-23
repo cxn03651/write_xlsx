@@ -7,7 +7,7 @@ Gem::Specification.new do |gem|
   gem.name          = "write_xlsx"
   gem.version       = WriteXLSX_VERSION
   gem.authors       = ["Hideo NAKAMURA"]
-  gem.email         = ["cxn03651@msj.biglobe.ne.jp"]
+  gem.email         = ["nakamura.hideo@gmail.com"]
   gem.description   = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.summary       = "write_xlsx is a gem to create a new file in the Excel 2007+ XLSX format."
   gem.homepage = "http://github.com/cxn03651/write_xlsx#readme"

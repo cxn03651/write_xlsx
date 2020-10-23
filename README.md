@@ -84,7 +84,7 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 ## Copyright
 Original Perl module was written by John McNamara(jmcnamara@cpan.org).
 
-Converted to ruby by Hideo NAKAMURA(cxn03651@msj.biglobe.ne.jp)
+Converted to ruby by Hideo NAKAMURA(nakamrua.hideo@gmail.com)
 Copyright (c) 2012-2018 Hideo NAKAMURA.
 
 See LICENSE.txt for further details.
