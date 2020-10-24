@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2020-10-23 v0.85.11
+   Added Worksheet#update_range_format_with_params
+
 2020-10-23 v0.85.10
    Fix frozen string litterals problems in Format#set_align
 
