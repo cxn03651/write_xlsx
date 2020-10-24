@@ -24,6 +24,7 @@ The following methods are available through a new worksheet:
 * [write_url_range](#write_url_range)
 * [write_formula](#write_formula)
 * [write_comment](#write_comment)
+* [update_range_format_with_params](#update_range_format_with_params)
 * [show_comments](#show_comments)
 * [set_comments_author](#set_comments_author)
 * [insert_image](#insert_image)
@@ -780,6 +781,19 @@ by Excel if the text wrap property is set or large fonts are used in the cell.
 This means that the height of the row is unknown to the module at run time and
 thus the comment box is stretched with the row. Use the `set_row()` method to
 specify the row height explicitly and avoid this problem.
+
+#### <a name="update_range_format_with_params" class="anchor" href="#update_range_format_with_params"><span class="octicon octicon-link" /></a>update_range_format_with_params()
+
+The `update_range_format_with_params()` method is used to update formatting of the cell keeping cell contents and formatting.
+
+If the cell doesn't have CellData object, this method create a CellData using write_blank method. If the cell has CellData but no Format object, this method fetch contents of cell from the CellData object and recreate CellData using write method. Otherwise this method just update parameters of existing Format object.
+
+    worksheet.update_range_format_with_params('B5:B9', additional_format_params)
+
+See also the
+[`update_range_format_with_params.rb`](examle.html#update_range_format_with_params)
+program in the examples directory of the distro.
+
 
 #### <a name="show_comments" class="anchor" href="#show_comments"><span class="octicon octicon-link" /></a>show_comments
 
