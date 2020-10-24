@@ -257,3 +257,7 @@ Example of how to set worksheet tab colors.
 #### <a name="tables" class="anchor" href="#tables"><span class="octicon octicon-link" /></a>tables
 Add Excel tables to a worksheet.
 ![Output from tables.rb](images/examples/tables.jpg)
+
+#### <a name="update_range_format_with_params" class="anchor" href="#update_range_format_with_params"><span class="octicon octicon-link" /></a>update_range_format_with_params
+update formatting of the cell keeping cell contents and formatting.
+![Output from update_range_format_with_params.rb](images/examples/update_range_format_with_params.png)
