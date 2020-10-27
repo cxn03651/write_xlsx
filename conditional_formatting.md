@@ -73,6 +73,7 @@ Other, less commonly used parameters are:
     :mid_color
     :max_color
     :bar_color
+    :stop_if_true
 
 Additional parameters which are used for specific conditional format types
 are shown in the relevant sections below.
@@ -560,6 +561,11 @@ The properties are used as follows:
 
 The color can be specifies as an WriteXLSX color index or, more usefully,
 as a HTML style RGB hex number, as shown above.
+
+#### <a name="stop_if_true" class="anchor" href="#stop_if_true"><span class="octicon octicon-link" /></a>:stop_if_true
+
+The `:stop_if_true` parameter, if set to a true value, will enable the "stop if true" feature on the conditional formatting rule, so that subsequent rules are not examined for any cell on which the conditions for this rule are met.
+
 
 #### <a name="conditional_formatting_examples" class="anchor" href="#conditional_formatting_examples"><span class="octicon octicon-link" /></a>Conditional Formatting Examples
 
