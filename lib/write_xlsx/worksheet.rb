@@ -296,6 +296,7 @@ module Writexlsx
     attr_reader :comments, :comments_author # :nodoc:
     attr_accessor :dxf_priority # :nodoc:
     attr_reader :vba_codename # :nodoc:
+    attr_writer :excel_version
 
     def initialize(workbook, index, name) #:nodoc:
       @writer = Package::XMLWriterSimple.new
