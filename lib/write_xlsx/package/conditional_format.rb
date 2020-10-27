@@ -71,6 +71,7 @@ module Writexlsx
         attr << ['type' , type]
         attr << ['dxfId',    format]   if format
         attr << ['priority', priority]
+        attr << ['stopIfTrue', 1] if stop_if_true
         attr
       end
 
@@ -84,6 +85,10 @@ module Writexlsx
 
       def priority
         @param[:priority]
+      end
+
+      def stop_if_true
+        @param[:stop_if_true]
       end
 
       def criteria
@@ -401,6 +406,7 @@ module Writexlsx
          :value,
          :minimum,
          :maximum,
+         :stop_if_true,
          :min_type,
          :mid_type,
          :max_type,
