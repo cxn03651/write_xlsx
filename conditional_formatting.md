@@ -524,10 +524,12 @@ The properties are used as follows:
 
 The available min/mid/max types are:
 
+    min        (for min_type only)
     num
     percent
     percentile
     formula
+    max        (for max_type only)
 
 ##### <a name="min_mid_max_value" class="anchor" href="#min_mid_max_value"><span class="octicon octicon-link" /></a>:min_value, :mid_value, :max_value
 
