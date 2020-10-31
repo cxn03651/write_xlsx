@@ -266,6 +266,7 @@ The properties that can be set are:
     :keywords
     :comments
     :status
+    :hyperlink_base
 
 See also the
 [`properties.rb`](examples.html#properties)
