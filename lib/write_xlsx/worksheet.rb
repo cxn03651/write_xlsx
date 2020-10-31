@@ -4917,9 +4917,8 @@ module Writexlsx
     #     :custom
     #
     # +:any+ is used to specify that the type of data is unrestricted.
-    # This is the same as not applying a data validation. It is only
-    # provided for completeness and isn't used very often in the
-    # context of WriteXLSX.
+    # This is usefl to display an input message without restricting the data
+    # that can be entered.
     #
     # +:integer+ restricts the cell to integer values. Excel refers to this
     # as 'whole number'.

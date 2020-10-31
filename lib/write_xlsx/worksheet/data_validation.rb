@@ -32,11 +32,17 @@ module Writexlsx
         @value = @minimum if @minimum
 
         @validate = valid_validation_type[@validate.downcase]
-        if @validate == 'none'
+
+        # No action is required for validate type 'any'
+        # unless there are input messages.
+        if @validate == 'none' && !@input_message && !@input_title
           @validate_none = true
           return
         end
-        if ['list', 'custom'].include?(@validate)
+
+        # The any, list and custom validations don't have a criteria
+        # so we use a default of 'between'
+        if ['none', 'list', 'custom'].include?(@validate)
           @criteria  = 'between'
           @maximum   = nil
         end
@@ -59,7 +65,7 @@ module Writexlsx
         end
         set_some_defaults
 
-      # A (for now) undocumented parameter to pass additional cell ranges.
+        # A (for now) undocumented parameter to pass additional cell ranges.
         @other_cells.each { |cells| @cells << cells } if has_key?(:other_cells)
       end
 
@@ -82,11 +88,15 @@ module Writexlsx
       #
       def write_data_validation(writer) #:nodoc:
         @writer = writer
-        @writer.tag_elements('dataValidation', attributes) do
-          # Write the formula1 element.
-          write_formula_1(@value)
-          # Write the formula2 element.
-          write_formula_2(@maximum) if @maximum
+        if @validate == 'none'
+          @writer.empty_tag('dataValidation', attributes)
+        else
+          @writer.tag_elements('dataValidation', attributes) do
+            # Write the formula1 element.
+            write_formula_1(@value)
+            # Write the formula2 element.
+            write_formula_2(@maximum) if @maximum
+          end
         end
       end
 
@@ -136,8 +146,10 @@ module Writexlsx
           end
         end
 
-        attributes << ['type', @validate]
-        attributes << ['operator', @criteria] if @criteria != 'between'
+        if @validate != 'none'
+          attributes << ['type', @validate]
+          attributes << ['operator', @criteria] if @criteria != 'between'
+        end
 
         if @error_type
           attributes << ['errorStyle', 'warning'] if @error_type == 1
