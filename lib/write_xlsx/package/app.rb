@@ -32,6 +32,7 @@ module Writexlsx
             write_company
             write_links_up_to_date
             write_shared_doc
+            write_hyperlink_base
             write_hyperlinks_changed
             write_app_version
           end
@@ -218,6 +219,17 @@ module Writexlsx
         data = 'false'
 
         @writer.data_element('SharedDoc', data)
+      end
+
+      #
+      # Write the <HyperlinkBase> element.
+      #
+      def write_hyperlink_base
+        data = @properties[:hyperlink_base]
+
+        return unless data
+
+        @writer.data_element('HyperlinkBase', data)
       end
 
       #
