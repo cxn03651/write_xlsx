@@ -272,7 +272,7 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
     assert_equal(expected, result)
   end
 
-  def test_write_data_validation_validate_any
+  def test_write_data_validation_validate_any_value_on_its_own_shouldnt_produce_a_DV_record
     @worksheet.data_validation('B5', :validate => 'any')
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -523,6 +523,19 @@ class TestWriteDataValidation02 < Test::Unit::TestCase
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="2"><dataValidation type="whole" operator="greaterThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>10</formula1></dataValidation><dataValidation type="whole" operator="lessThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="C10"><formula1>10</formula1></dataValidation></dataValidations>'
+    assert_equal(expected, result)
+  end
+
+  def test_write_data_validations_any_with_an_input_message_should_produce_a_DV_record
+    @worksheet.data_validation(
+      'B5',
+      :validate      => 'any',
+      :input_title   => 'Input title January',
+      :input_message => 'Input message February'
+    )
+    @worksheet.__send__('write_data_validations')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<dataValidations count="1"><dataValidation allowBlank="1" showInputMessage="1" showErrorMessage="1" promptTitle="Input title January" prompt="Input message February" sqref="B5"/></dataValidations>'
     assert_equal(expected, result)
   end
 end
