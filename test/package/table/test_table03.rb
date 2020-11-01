@@ -20,7 +20,7 @@ class TestTable03 < Test::Unit::TestCase
                            :banded_columns => 1
                          }
                          )
-    @worksheet.__send__(:prepare_tables, 1)
+    @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)

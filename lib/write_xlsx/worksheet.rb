@@ -5970,11 +5970,17 @@ module Writexlsx
     #
     # Set the table ids for the worksheet tables.
     #
-    def prepare_tables(table_id)
+    def prepare_tables(table_id, seen)
       if tables_count > 0
         id = table_id
         tables.each do |table|
           table.prepare(id)
+
+          if seen[table.name]
+            raise "error: invalid duplicate table name '#{table.name}' found."
+          else
+            seen[table.name] = 1
+          end
 
           # Store the link used for the rels file.
           @external_table_links << ['/table', "../tables/table#{id}.xml"]

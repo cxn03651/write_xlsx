@@ -12,7 +12,7 @@ class TestTable02 < Test::Unit::TestCase
   def test_table02
     # Set the table properties.
     @worksheet.add_table('D4:I15', :style => 'Table Style Light 17')
-    @worksheet.__send__(:prepare_tables, 1)
+    @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)

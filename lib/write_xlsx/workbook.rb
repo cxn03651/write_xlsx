@@ -1633,9 +1633,10 @@ module Writexlsx
     #
     def prepare_tables
       table_id = 0
+      seen     = {}
 
       sheets.each do |sheet|
-        table_id += sheet.prepare_tables(table_id + 1)
+        table_id += sheet.prepare_tables(table_id + 1, seen)
       end
     end
 

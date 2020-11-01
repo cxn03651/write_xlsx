@@ -12,9 +12,9 @@ class TestTable01 < Test::Unit::TestCase
   def test_table01
     # Set the table properties.
     @worksheet.add_table('C3:F13')
-    @worksheet.__send__(:prepare_tables, 1)
-
     table = @worksheet.tables[0]
+
+    @worksheet.__send__(:prepare_tables, 1, {})
     table.__send__(:assemble_xml_file)
 
     result = got_to_array(table.instance_variable_get(:@writer).string)

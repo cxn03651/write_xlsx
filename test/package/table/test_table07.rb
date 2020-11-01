@@ -17,7 +17,7 @@ class TestTable07 < Test::Unit::TestCase
                            :total_row => 1
                          }
                          )
-    @worksheet.__send__(:prepare_tables, 1)
+    @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
     table.__send__(:assemble_xml_file)
