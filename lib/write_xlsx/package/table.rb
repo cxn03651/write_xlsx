@@ -10,7 +10,7 @@ module Writexlsx
 
       class ColumnData
         attr_reader :id
-        attr_accessor :name, :format, :formula
+        attr_accessor :name, :format, :formula, :name_format
         attr_accessor :total_string, :total_function
 
         def initialize(id, param = {})
@@ -20,6 +20,7 @@ module Writexlsx
           @total_function = ''
           @formula        = ''
           @format         = nil
+          @name_format    = nil
           @user_data      = param[id-1] if param
         end
       end
@@ -93,10 +94,14 @@ module Writexlsx
             if user_data[:header] && !user_data[:header].empty?
               col_data.name = user_data[:header]
             end
+
+            # Get the header format if defined.
+            col_data.name_format = user_data[:header_format]
+            
             # Handle the column formula.
             handle_the_column_formula(
-                                      col_data, col_num, user_data[:formula], user_data[:format]
-                                      )
+              col_data, col_num, user_data[:formula], user_data[:format]
+            )
 
             # Handle the function for the total row.
             if user_data[:total_function]
@@ -123,7 +128,9 @@ module Writexlsx
 
       def write_the_column_headers_to_the_worksheet(col_num, col_data)
         if @param[:header_row] != 0
-          @worksheet.write_string(@row1, col_num, col_data.name)
+          @worksheet.write_string(
+            @row1, col_num, col_data.name, col_data.name_format
+          )
         end
       end
 

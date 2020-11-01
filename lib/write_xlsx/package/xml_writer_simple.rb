@@ -118,13 +118,14 @@ module Writexlsx
       end
 
       def escape_attributes(str = '')
-        return str if !(str.to_s =~ /["&<>]/)
+        return str if !(str.to_s =~ /["&<>\n]/)
 
         str.
           gsub(/&/, "&amp;").
           gsub(/"/, "&quot;").
           gsub(/</, "&lt;").
-          gsub(/>/, "&gt;")
+          gsub(/>/, "&gt;").
+          gsub(/\n/, "&#xA;")
       end
 
       def escape_data(str = '')

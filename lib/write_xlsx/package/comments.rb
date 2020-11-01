@@ -41,11 +41,13 @@ module Writexlsx
       def backgrount_color(color)
         color_id = Format.color(color)
 
-        if color_id == 0
+        if color_id.to_s =~ /^#[0-9A-F]{6}/i
+          @color = color_id.to_s
+        elsif color_id == 0
           @color = '#ffffe1'
         else
           rgb = @workbook.palette[color_id - 8]
-          @color = "##{rgb_color(rgb)} [#{color_id}]\n"
+          @color = "##{rgb_color(rgb)} [#{color_id}]"
         end
       end
 

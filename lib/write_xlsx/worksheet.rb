@@ -4289,7 +4289,7 @@ module Writexlsx
     #     :header
     #     :formula
     #     :total_string
-    #     :total_function
+    #     :
     #     :format
     #
     # The column data must be specified as an array of hash. For example to
