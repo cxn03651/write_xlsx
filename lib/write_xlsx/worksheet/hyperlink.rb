@@ -26,17 +26,20 @@ module Writexlsx
         # Strip the mailto header.
         normalized_str = str.sub(/^mailto:/, '')
 
+        # Split url into the link and optional anchor/location.
+        url, @url_str = url.split(/#/)
+        url  ||= ''
+
         # Escape URL unless it looks already escaped.
         url = escape_url(url)
 
-        # Excel limits escaped URL to 255 characters.
-        if url.bytesize > 255
-          raise "URL '#{url}' > 255 characters, it exceeds Excel's limit for URLS."
+        # Excel limits the escaped URL and location/anchor to 255 characters.
+        if url.bytesize > 255 || (!@url_str.nil? && @url_str.bytesize > 255)
+          raise "Ignoring URL '#{url}' where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
         end
 
         @url       = url
         @str       = normalized_str
-        @url_str   = nil
         @tip       = tip
       end
 
@@ -144,14 +147,15 @@ module Writexlsx
 
         # Convert a ./dir/file.xlsx link to dir/file.xlsx.
         url = url.sub(%r!^.\\!, '')
+        @url_str   = url_str
 
-        # Excel limits escaped URL to 255 characters.
-        if url.bytesize > 255
-          raise "URL '#{url}' > 255 characters, it exceeds Excel's limit for URLS."
+        # Excel limits the escaped URL and location/anchor to 255 characters.
+        if url.bytesize > 255 || (!@url_str.nil? && @url_str.bytesize > 255)
+          raise "Ignoring URL '#{url}' where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
         end
+
         @url       = url
         @str       = str
-        @url_str   = url_str
         @tip       = tip
       end
     end
