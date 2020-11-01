@@ -735,11 +735,10 @@ This option is used to set the height of the cell comment box explicitly in pixe
 
 ##### Option: color
 This option is used to set the background colour of cell comment box.
-You can use one of the named colours recognised by WriteXLSX or a colour index.
-See [COLOURS IN EXCEL][].
+You can use one of the named colours recognised by WriteXLSX or a Html style `#RRGGBB` colour. See [WORKING WITH COLOURS][].
 
     worksheet.write_comment('C3', 'Hello', :color => 'green')
-    worksheet.write_comment('C4', 'Hello', :color => 0x35)      # Orange
+    worksheet.write_comment('C4', 'Hello', :color => '#FF6600')   # Orange
 
 ##### Option: start_cell
 This option is used to set the cell in which the comment will appear.
@@ -1596,11 +1595,11 @@ In Excel this option is found under Tools->Options->View.
 
 The `set_tab_color()` method is used to change the colour of the worksheet tab.
 You can use one of the standard colour names provided by the Format object
-or a colour index.
+or a Html style `#RRGGBB` colour.
 See [COLOURS IN EXCEL][] and the `set_custom_color()` method.
 
     worksheet1.set_tab_color('red')
-    worksheet2.set_tab_color(0x0C)
+    worksheet2.set_tab_color('FF6600')
 
 See the
 [`tab_colors.rb`](examples.html#tab_colors)
