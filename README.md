@@ -5,11 +5,11 @@
 
 gem to create a new file in the Excel 2007+ XLSX format, and you can use the
 same interface as writeexcel gem. write_xlsx is converted from Perl's module
-[Excel::Writer::XLSX-0.84](https://github.com/jmcnamara/excel-writer-xlsx) .
+[Excel::Writer::XLSX-0.86](https://github.com/jmcnamara/excel-writer-xlsx) .
 
 ## Description
 
-Reference doc : http://cxn03651.github.io/write_xlsx/
+Reference doc : https://cxn03651.github.io/write_xlsx/
 
 The WriteXLSX supports the following features:
 * Multiple worksheets
@@ -85,13 +85,13 @@ the first worksheet in an Excel XML spreadsheet called ruby.xlsx:
 Original Perl module was written by John McNamara(jmcnamara@cpan.org).
 
 Converted to ruby by Hideo NAKAMURA(nakamrua.hideo@gmail.com)
-Copyright (c) 2012-2018 Hideo NAKAMURA.
+Copyright (c) 2012-2020 Hideo NAKAMURA.
 
 See LICENSE.txt for further details.
 
 ## Contributing to write_xlsx
 
-* repsitory: http://github.com/cxn03651/write_xlsx
+* repsitory: https://github.com/cxn03651/write_xlsx
 * Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
 * Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
 * Fork the project
