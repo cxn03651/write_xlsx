@@ -543,6 +543,13 @@ module Writexlsx
       line_fill_properties(fill)
     end
 
+    #
+    # Convert user defined pattern properties to the structure required internally.
+    #
+    def pattern_properties(pattern) # :nodoc:
+      pattern
+    end
+    
     def line_fill_properties(params)
       return { :_defined => 0 } unless params
       ret = params.dup

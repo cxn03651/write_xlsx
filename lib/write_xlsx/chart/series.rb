@@ -170,7 +170,7 @@ module Writexlsx
       include Writexlsx::Gradient
 
       attr_reader :values, :categories, :name, :name_formula, :name_id
-      attr_reader :cat_data_id, :val_data_id, :fill, :gradient
+      attr_reader :cat_data_id, :val_data_id, :fill, :pattern, :gradient
       attr_reader :trendline, :smooth, :labels, :invert_if_negative
       attr_reader :x2_axis, :y2_axis, :error_bars, :points
       attr_accessor :line, :marker
@@ -184,12 +184,16 @@ module Writexlsx
 
         set_data_ids(params)
 
-        @line = line_properties(params[:border] || params[:line])
-        @fill = fill_properties(params[:fill])
-
+        @line       = line_properties(params[:border] || params[:line])
+        @fill       = fill_properties(params[:fill])
+        @pattern    = pattern_properties(params[:pattern])
         @gradient   = gradient_properties(params[:gradient])
-        @fill       = nil if ptrue?(@gradient)
-
+        @fill       = nil if ptrue?(@pattern)
+        if ptrue?(@gradient)
+          @pattern = nil
+          @fill    = nil
+        end
+        
         @marker     = Marker.new(params[:marker]) if params[:marker]
         @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
         @error_bars = errorbars(params[:x_error_bars], params[:y_error_bars])

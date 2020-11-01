@@ -2090,10 +2090,11 @@ module Writexlsx
     def write_sp_pr(series) # :nodoc:
       line     = series.line
       fill     = series.fill
+      pattern  = series.pattern  if series.respond_to?(:pattern)
       gradient = series.gradient if series.respond_to?(:gradient)
 
       return if (!line || !ptrue?(line[:_defined])) &&
-        (!fill || !ptrue?(fill[:_defined])) && !gradient
+        (!fill || !ptrue?(fill[:_defined])) && !pattern && !gradient
 
       @writer.tag_elements('c:spPr') do
         # Write the fill elements for solid charts such as pie/doughnut and bar.
@@ -2105,6 +2106,9 @@ module Writexlsx
             # Write the a:solidFill element.
             write_a_solid_fill(fill)
           end
+        end
+        if ptrue?(pattern)
+          write_a_patt_fill(pattern)
         end
         if ptrue?(gradient)
           # Write the a:gradFill element.
@@ -2827,6 +2831,26 @@ module Writexlsx
       end
 
       @writer.empty_tag('a:tileRect', attributes)
+    end
+
+    #
+    # Write the <a:pattFill> element.
+    #
+    def write_a_patt_fill(pattern)
+      attributes = [ ['prst', pattern[:pattern]] ]
+
+      @writer.tag_elements('a:pattFill', attributes) do
+        write_a_fg_clr(pattern[:fg_color])
+        write_a_bg_clr(pattern[:bg_color])
+      end
+    end
+
+    def write_a_fg_clr(color)
+      @writer.tag_elements('a:fgClr') { write_a_srgb_clr(color) }
+    end
+
+    def write_a_bg_clr(color)
+      @writer.tag_elements('a:bgClr') { write_a_srgb_clr(color) }
     end
 
     def write_bars_base(tag, format)
