@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartPattern02 < Test::Unit::TestCase
+class TestRegressionChartPattern05 < Test::Unit::TestCase
   def setup
     setup_dir_var
   end
@@ -10,14 +10,14 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     @tempfile.close(true)
   end
 
-  def test_chart_pattern02
-    @xlsx = 'chart_pattern02.xlsx'
+  def test_chart_pattern05
+    @xlsx = 'chart_pattern05.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'column', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [86421504, 86423040])
+    chart.instance_variable_set(:@axis_ids, [110902272, 110756608])
 
     data = [
       [2, 2, 2],
@@ -35,7 +35,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$A$1:$A$3',
       :pattern => {
-        :pattern  => 'percent_5',
+        :pattern  => 'percent_25',
         :fg_color => '#C00000',
         :bg_color => '#FFFFFF'
       }
@@ -44,16 +44,15 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$B$1:$B$3',
       :pattern => {
-        :pattern  => 'percent_50',
-        :fg_color => '#FF0000',
-        :bg_color => '#FFFFFF'
+        :pattern  => 'percent_75',
+        :fg_color => '#FF0000'
       }
     )
 
     chart.add_series(
       :values  => '=Sheet1!$C$1:$C$3',
       :pattern => {
-        :pattern  => 'light_downward_diagonal',
+        :pattern  => 'dark_upward_diagonal',
         :fg_color => '#FFC000'
       }
     )
@@ -61,7 +60,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$D$1:$D$3',
       :pattern => {
-        :pattern  => 'light_vertical',
+        :pattern  => 'narrow_horizontal',
         :fg_color => '#FFFF00'
       }
     )
@@ -69,7 +68,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$E$1:$E$3',
       :pattern => {
-        :pattern  => 'dashed_downward_diagonal',
+        :pattern  => 'dashed_vertical',
         :fg_color => '#92D050'
       }
     )
@@ -77,7 +76,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$F$1:$F$3',
       :pattern => {
-        :pattern  => 'zigzag',
+        :pattern  => 'horizontal_brick',
         :fg_color => '#00B050'
       }
     )
@@ -85,7 +84,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$G$1:$G$3',
       :pattern => {
-        :pattern  => 'divot',
+        :pattern  => 'shingle',
         :fg_color => '#00B0F0'
       }
     )
@@ -93,7 +92,7 @@ class TestRegressionChartPattern02 < Test::Unit::TestCase
     chart.add_series(
       :values  => '=Sheet1!$H$1:$H$3',
       :pattern => {
-        :pattern  => 'small_grid',
+        :pattern  => 'large_check',
         :fg_color => '#0070C0'
       }
     )

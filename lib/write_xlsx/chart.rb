@@ -2846,11 +2846,11 @@ module Writexlsx
     end
 
     def write_a_fg_clr(color)
-      @writer.tag_elements('a:fgClr') { write_a_srgb_clr(color) }
+      @writer.tag_elements('a:fgClr') { write_a_srgb_clr(color(color)) }
     end
 
     def write_a_bg_clr(color)
-      @writer.tag_elements('a:bgClr') { write_a_srgb_clr(color) }
+      @writer.tag_elements('a:bgClr') { write_a_srgb_clr(color(color)) }
     end
 
     def write_bars_base(tag, format)
