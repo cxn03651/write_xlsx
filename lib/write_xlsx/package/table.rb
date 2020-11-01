@@ -277,8 +277,22 @@ module Writexlsx
       def set_the_table_name
         if @param[:name]
           name = @param[:name]
+
+          # Raise if the name contains invalid chars as defined by Excel help.
+          if name !~ /^[\w\\][\w\\.]*$/ || name =~ /^\d/
+            raise "Invalid character in name '#{name} used in add_table()"
+          end
+
+          # Raise if the name looks like a cell name.
+          if name =~ /^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$/
+            ralse "Invalid name '#{name}' looks like a cell name in add_table()"
+          end
+
+          # Raise if the name looks like a R1C1.
+          if name =~ /^[rcRC]$/ || name =~ /^[rcRC]\d+[rcRC]\d+$/
+            raise "Invalid name '#{name}' like a RC cell ref in add_table()"
+          end          
           
-          raise "Name '#{name} in add_table cannot contain spaces" if name =~ /\s/
           @name = @param[:name]
         end
       end
