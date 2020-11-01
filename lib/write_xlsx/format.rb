@@ -844,6 +844,10 @@ module Writexlsx
           writer.empty_tag('family', [ ['val', @font_family] ])
       end
 
+      if ptrue?(@font_charset)
+        writer.empty_tag('charset', [ ['val', @font_charset] ])
+      end
+
       if @font == 'Calibri' && !ptrue?(@hyperlink)
         writer.empty_tag('scheme', [ ['val', @font_scheme] ])
       end
