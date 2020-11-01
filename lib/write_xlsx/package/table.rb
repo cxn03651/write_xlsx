@@ -275,7 +275,12 @@ module Writexlsx
       end
 
       def set_the_table_name
-        @name = @param[:name] if @param[:name]
+        if @param[:name]
+          name = @param[:name]
+          
+          raise "Name '#{name} in add_table cannot contain spaces" if name =~ /\s/
+          @name = @param[:name]
+        end
       end
 
       def set_the_table_and_autofilter_ranges
