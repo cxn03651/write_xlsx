@@ -17,9 +17,9 @@ class TestRegressionImage32 < Test::Unit::TestCase
 
     # Negative offset should be ignored.
     worksheet.insert_image(
-      'A1',
+      'B1',
       File.join(@test_dir, 'regression', 'images/red.png'),
-      -1, -1
+      -100, -100
     )
 
     workbook.close

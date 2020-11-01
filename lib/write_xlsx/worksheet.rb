@@ -5802,14 +5802,21 @@ module Writexlsx
     #    width        # Width of object frame.
     #    height       # Height of object frame.
     def position_object_pixels(col_start, row_start, x1, y1, width, height) #:nodoc:
-    # Ensure that the image isn't shifted off the page at top left.
-      if col_start == 0 && x1 < 0
-        x1 = 0
+      # Adjust start column for negative offsets.
+      while x1 < 0 && col_start > 0
+        x1 += size_col(col_start - 1)
+        col_start -= 1
       end
 
-      if row_start == 0 && y1 < 0
-        y1 = 0
+      # Adjust start row for negative offsets.
+      while y1 < 0 && row_start > 0
+        y1 += size_row(row_start - 1)
+        row_start -= 1
       end
+      
+      # Ensure that the image isn't shifted off the page at top left.
+      x1 = 0 if x1 < 0
+      y1 = 0 if y1 < 0
       
       # Calculate the absolute x offset of the top-left vertex.
       if @col_size_changed
@@ -5830,18 +5837,6 @@ module Writexlsx
       end
       y_abs += y1
 
-      # Adjust start column for negative offsets.
-      while x1 < 0
-        x1 += size_col(col_start - 1)
-        col_start -= 1
-      end
-
-      # Adjust start row for negative offsets.
-      while y1 < 0
-        y1 += size_row(row_start - 1)
-        row_start -= 1
-      end
-      
       # Adjust start column for offsets that are greater than the col width.
       x1, col_start = adjust_column_offset(x1, col_start)
 
