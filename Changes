@@ -1,5 +1,22 @@
 Change history of write_xlsx rubygem.
 
+2020-11-01 v0.86.0
+   Fix for images with negative offsets.
+
+   Allow hyperlinks longer than 255 characters when the link and anchor
+   are each less than or equal to 255 characters.
+
+   Added hyperlink_base document property.
+
+   Added option to allow data validation input messages with the ‘any’
+   validate parameter.
+
+   Added "stop if true" feature to conditional formatting.
+
+   Added better support and documentation for html colours throughout
+   the module. The use of the Excel97 colour palette is supported for
+   backward compatibility but deprecated.
+
 2020-10-23 v0.85.11
    Added Worksheet#update_range_format_with_params
 
