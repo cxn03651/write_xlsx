@@ -178,6 +178,7 @@ The sub-properties that can be set are:
     :total_function
     :total_value
     :format
+    :header_format
 
 The column data must be specified as an array of hash.
 For example to override the default 'Column n' style table headers:
@@ -287,9 +288,10 @@ setting the `value` optional property in `write_formula`:
     )
 
 
-Format can also be applied to columns:
+Formatting can also be applied to columns, to the column data using `format` and to the header using `header_format`:
 
     currency_format = workbook.add_format(:num_format => '$#,##0')
+    bold            = workbook.add_format(:bold => true)
 
     worksheet.add_table(
         'B3:D8',
@@ -305,6 +307,7 @@ Format can also be applied to columns:
                 },
                 {
                     :header         => 'Quarter 2',
+                    :header_format  => bold,
                     :total_function => 'sum',
                     :format         => currency_format,
                 }
@@ -313,7 +316,6 @@ Format can also be applied to columns:
     )
 
 Standard WriteXLSX format objects can be used. However, they should be limited
-to numerical formats. Overriding other table formatting may produce inconsistent results.
-
+to numerical formats for the columns and simple formatting like text wrap for the headers. Overriding other table formatting may produce inconsistent results.
 
 [CELL NOTATION]: worksheet.html#cell-notation
