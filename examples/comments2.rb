@@ -247,7 +247,7 @@ cell_text = 'This cell comment has a different colour.'
 comment = 'Hello.'
 
 worksheet6.write( 'C9', cell_text, text_wrap )
-worksheet6.write_comment( 'C9', comment, :color => 0x35 )
+worksheet6.write_comment( 'C9', comment, :color => '#FF6600' )
 
 
 ###############################################################################

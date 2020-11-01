@@ -19,13 +19,13 @@ worksheet = workbook.add_worksheet
 
 # Add a format for the header cells.
 header_format = workbook.add_format(
-                                            :border      => 1,
-                                            :bg_color    => 43,
-                                            :bold        => 1,
-                                            :text_wrap   => 1,
-                                            :valign      => 'vcenter',
-                                            :indent      => 1
-                                         )
+  :border      => 1,
+  :bg_color    => '#C6EFCE',
+  :bold        => 1,
+  :text_wrap   => 1,
+  :valign      => 'vcenter',
+  :indent      => 1
+)
 
 # Set up layout of the worksheet.
 worksheet.set_column('A:A', 68)

@@ -126,4 +126,51 @@ worksheet2.write(0, 3, "Name",  heading)
   end
 end
 
+
+#
+# Demonstrate the Html colors.
+#
+
+colors = {
+  '#000000' => 'black',
+  '#0000FF' => 'blue',
+  '#800000' => 'brown',
+  '#00FFFF' => 'cyan',
+  '#808080' => 'gray',
+  '#008000' => 'green',
+  '#00FF00' => 'lime',
+  '#FF00FF' => 'magenta',
+  '#000080' => 'navy',
+  '#FF6600' => 'orange',
+  '#FF00FF' => 'pink',
+  '#800080' => 'purple',
+  '#FF0000' => 'red',
+  '#C0C0C0' => 'silver',
+  '#FFFFFF' => 'white',
+  '#FFFF00' => 'yellow'
+}
+
+worksheet3 = workbook.add_worksheet('Html colors')
+
+worksheet3.set_column(0, 3, 15)
+
+worksheet3.write(0, 0, "Html",  heading)
+worksheet3.write(0, 1, "Name",  heading)
+worksheet3.write(0, 2, "Color", heading)
+
+i = 1
+
+colors.each do |html_color, color|
+  format = workbook.add_format(
+    :fg_color => html_color,
+    :pattern  => 1,
+    :border   => 1
+  )
+  
+  worksheet3.write(i + 1, 1, html_color, center)
+  worksheet3.write(i + 1, 2, color,      center)
+  worksheet3.write(i + 1, 3, '',         format)
+  i += 1
+end
+
 workbook.close
