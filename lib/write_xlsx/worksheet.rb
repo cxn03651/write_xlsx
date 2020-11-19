@@ -1798,8 +1798,11 @@ module Writexlsx
       row_col_args = row_col_notation(args)
       token = row_col_args[2] || ''
 
+      fmt = row_col_args[3]
+      if Format.is_a?(Writexlsx::Format) && fmt.force_text_format?
+        write_string(*args) # Force text format
       # Match an array ref.
-      if token.respond_to?(:to_ary)
+      elsif token.respond_to?(:to_ary)
         write_row(*args)
       elsif token.respond_to?(:coerce)  # Numeric
         write_number(*args)
