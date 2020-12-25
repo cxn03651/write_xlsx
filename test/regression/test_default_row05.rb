@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionDefaultRow05 < Test::Unit::TestCase
+class TestRegressionDefaultRow05 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -25,7 +25,7 @@ class TestRegressionDefaultRow05 < Test::Unit::TestCase
     (1..19).to_a.reject { |x| x == 9 }.each do |row|
       worksheet.set_row(row, 24)
     end
-    
+
     workbook.close
     compare_for_regression
   end

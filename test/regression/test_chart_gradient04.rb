@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestChartGradient04 < Test::Unit::TestCase
+class TestChartGradient04 < Minitest::Test
   def setup
     setup_dir_var
   end

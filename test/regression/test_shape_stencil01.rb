@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionShapeStencil01 < Test::Unit::TestCase
+class TestRegressionShapeStencil01 < Minitest::Test
   def setup
     setup_dir_var
   end

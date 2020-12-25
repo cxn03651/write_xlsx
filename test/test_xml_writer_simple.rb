@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/xml_writer_simple'
 
-class TestXMLWriterSimple < Test::Unit::TestCase
+class TestXMLWriterSimple < Minitest::Test
   def setup
     @obj = Writexlsx::Package::XMLWriterSimple.new
   end

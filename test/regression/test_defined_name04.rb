@@ -2,7 +2,7 @@
 require 'helper'
 require 'stringio'
 
-class TestRegressionDefinedName04 < Test::Unit::TestCase
+class TestRegressionDefinedName04 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -15,20 +15,20 @@ class TestRegressionDefinedName04 < Test::Unit::TestCase
     workbook = WriteXLSX.new(StringIO.new)
     worksheet = workbook.add_worksheet
 
-    assert_raise(RuntimeError) { workbook.define_name('.abc', '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('GFG$', '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('A1',   '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('XFD1048576', '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('A A',  '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('1A',   '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('c',    '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('r',    '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('C',    '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('R',    '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('R1',   '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('C1',   '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('R1C1',   '=Sheet1!$B$1') }
-    assert_raise(RuntimeError) { workbook.define_name('R13C99',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('.abc', '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('GFG$', '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('A1',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('XFD1048576', '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('A A',  '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('1A',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('c',    '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('r',    '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('C',    '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('R',    '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('R1',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('C1',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('R1C1',   '=Sheet1!$B$1') }
+    assert_raises(RuntimeError) { workbook.define_name('R13C99',   '=Sheet1!$B$1') }
   end
 
   def test_defined_name04

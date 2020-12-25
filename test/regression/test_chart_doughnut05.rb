@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartDoughnut05 < Test::Unit::TestCase
+class TestRegressionChartDoughnut05 < Minitest::Test
   def setup
     setup_dir_var
   end

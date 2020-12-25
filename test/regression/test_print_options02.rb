@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestPrintOptions02 < Test::Unit::TestCase
+class TestPrintOptions02 < Minitest::Test
   def setup
     setup_dir_var
   end

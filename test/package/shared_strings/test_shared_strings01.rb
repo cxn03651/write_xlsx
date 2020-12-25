@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/shared_strings'
 
-class TestSharedStrings01 < Test::Unit::TestCase
+class TestSharedStrings01 < Minitest::Test
   def test_shared_strings01
     @obj = Writexlsx::Package::SharedStrings.new
     @obj.index('neptune')

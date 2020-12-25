@@ -4,7 +4,7 @@ require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
 require 'stringio'
 
-class TestWriteAutofilter < Test::Unit::TestCase
+class TestWriteAutofilter < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
   end

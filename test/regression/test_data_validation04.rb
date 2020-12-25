@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestDataValidation04 < Test::Unit::TestCase
+class TestDataValidation04 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -21,7 +21,7 @@ class TestDataValidation04 < Test::Unit::TestCase
              ]
 
     input_title = 'a' * 33
-    e = assert_raise(RuntimeError) do
+    e = assert_raises(RuntimeError) do
       worksheet.data_validation('D6',
                                 validate:      'list',
                                 value:         values,

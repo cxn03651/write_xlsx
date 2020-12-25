@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/drawing'
 
-class TestWriteCNvGraphicFramePr < Test::Unit::TestCase
+class TestWriteCNvGraphicFramePr < Minitest::Test
   def setup
     @drawing = Writexlsx::Drawing.new
   end

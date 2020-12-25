@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/app'
 
-class TestApp03 < Test::Unit::TestCase
+class TestApp03 < Minitest::Test
   def test_assemble_xml_file
     @obj = Writexlsx::Package::App.new(nil)
     @obj.add_part_name('Sheet1')

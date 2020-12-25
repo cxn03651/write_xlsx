@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/chart'
 
-class TestWriteNumberFormat < Test::Unit::TestCase
+class TestWriteNumberFormat < Minitest::Test
   def setup
     @chart = Writexlsx::Chart.new('Bar')
   end
@@ -32,9 +32,8 @@ class TestWriteNumberFormat < Test::Unit::TestCase
     axis.num_format = 'General'
     axis.defaults   = { :num_format => 'General' }
 
-    expected = nil
     result = @chart.__send__('write_cat_number_format', axis)
-    assert_equal(expected, result)
+    assert_nil(result)
   end
 
   def test_write_number_format04

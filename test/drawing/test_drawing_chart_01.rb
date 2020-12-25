@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/drawing'
 
-class DrawingChart011 < Test::Unit::TestCase
+class DrawingChart011 < Minitest::Test
   def test_drawing_chart_01
     @obj = Writexlsx::Drawing.new
     @obj.add_drawing_object(1, 4, 8, 457200, 104775, 12, 22, 152400, 180975)

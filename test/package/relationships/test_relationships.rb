@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/relationships'
 
-class TestRelationships < Test::Unit::TestCase
+class TestRelationships < Minitest::Test
   def test_assemble_xml_file
     @obj = Writexlsx::Package::Relationships.new
     @obj.add_document_relationship('/worksheet',     'worksheets/sheet1.xml')

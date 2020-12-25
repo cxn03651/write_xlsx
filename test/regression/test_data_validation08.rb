@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestDataValidation08 < Test::Unit::TestCase
+class TestDataValidation08 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -18,7 +18,7 @@ class TestDataValidation08 < Test::Unit::TestCase
       input_message: 'This is the input message'
     )
     workbook.close
-    
+
     compare_for_regression
   end
 end

@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/comments'
 
-class TestWriteTextT < Test::Unit::TestCase
+class TestWriteTextT < Minitest::Test
   def setup
     @comment = Writexlsx::Package::Comments.new(nil)
   end

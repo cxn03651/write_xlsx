@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/drawing'
 
-class TestWriteAGraphicFrameLocks < Test::Unit::TestCase
+class TestWriteAGraphicFrameLocks < Minitest::Test
   def setup
     @drawing = Writexlsx::Drawing.new
   end

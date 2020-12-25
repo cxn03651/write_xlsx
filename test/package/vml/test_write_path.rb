@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWritePath < Test::Unit::TestCase
+class TestWritePath < Minitest::Test
   def test_write_path
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_comment_path', 't', 'rect')

@@ -4,7 +4,7 @@ require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
 require 'stringio'
 
-class TestWriteRow < Test::Unit::TestCase
+class TestWriteRow < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')

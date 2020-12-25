@@ -15,7 +15,7 @@ class CalcSpansTC
   end
 end
 
-class TestCalculateSpans < Test::Unit::TestCase
+class TestCalculateSpans < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')

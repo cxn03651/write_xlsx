@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWriteDiv < Test::Unit::TestCase
+class TestWriteDiv < Minitest::Test
   def test_write_div
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_div', 'left')

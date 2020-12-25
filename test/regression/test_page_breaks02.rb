@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestBreaks02 < Test::Unit::TestCase
+class TestBreaks02 < Minitest::Test
   def setup
     setup_dir_var
   end

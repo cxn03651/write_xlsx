@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/chart'
 
-class TestProcessNames < Test::Unit::TestCase
+class TestProcessNames < Minitest::Test
   def setup
     @chart = Writexlsx::Chart.new('Bar')
   end

@@ -8,7 +8,7 @@ rescue Bundler::BundlerError => e
   $stderr.puts "Run `bundle install` to install missing gems"
   exit e.status_code
 end
-require 'test-unit'
+require 'minitest/autorun'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -26,7 +26,7 @@ class Writexlsx::Workbook
   end
 end
 
-class Test::Unit::TestCase
+class Minitest::Test
   def setup_dir_var
     @test_dir = File.dirname(__FILE__)
     @perl_output  = File.join(@test_dir, 'perl_output')

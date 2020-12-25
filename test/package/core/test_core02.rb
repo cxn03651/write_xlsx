@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/core'
 
-class TestCore02 < Test::Unit::TestCase
+class TestCore02 < Minitest::Test
   def test_assemble_xml_file
     properties = {
       :title    => 'This is an example spreadsheet',

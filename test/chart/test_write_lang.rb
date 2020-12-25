@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/chart'
 
-class TestWriteLang < Test::Unit::TestCase
+class TestWriteLang < Minitest::Test
   def setup
     @chart = Writexlsx::Chart.new('Bar')
   end

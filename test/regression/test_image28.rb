@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionImage28 < Test::Unit::TestCase
+class TestRegressionImage28 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -16,7 +16,7 @@ class TestRegressionImage28 < Test::Unit::TestCase
     worksheet = workbook.add_worksheet
 
     worksheet.insert_image(
-      0, 6, 
+      0, 6,
       File.join(@test_dir, 'regression', 'images/red_208.png'),
       46, 1
     )

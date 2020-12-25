@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartSize02 < Test::Unit::TestCase
+class TestRegressionChartSize02 < Minitest::Test
   def setup
     setup_dir_var
   end

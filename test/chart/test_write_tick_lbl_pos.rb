@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/chart'
 
-class TestWriteTickLabelPos < Test::Unit::TestCase
+class TestWriteTickLabelPos < Minitest::Test
   def setup
     @chart = Writexlsx::Chart.new('Bar')
   end

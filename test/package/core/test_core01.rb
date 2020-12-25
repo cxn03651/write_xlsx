@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/core'
 
-class TestCore01 < Test::Unit::TestCase
+class TestCore01 < Minitest::Test
   def test_assemble_xml_file
     properties = {
       :author   => 'A User',

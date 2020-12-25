@@ -4,7 +4,7 @@ require 'write_xlsx/workbook'
 require 'write_xlsx/package/styles'
 require 'stringio'
 
-class TestStyles06 < Test::Unit::TestCase
+class TestStyles06 < Minitest::Test
   def test_styles_06
     workbook = WriteXLSX.new(StringIO.new)
 

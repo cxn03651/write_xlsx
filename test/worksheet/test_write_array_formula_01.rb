@@ -4,17 +4,10 @@ require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
 require 'stringio'
 
-class TestWriteArrayFormula01 < Test::Unit::TestCase
+class TestWriteArrayFormula01 < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
-  end
-
-  def test_write_array_formula_does_not_change_formula
-    formula = '{=TREND(C1:C3,B1:B3)}'.freeze
-    assert_nothing_raised do
-      @worksheet.write_array_formula('A1:A3', formula)
-    end
   end
 
   def test_write_array_formula

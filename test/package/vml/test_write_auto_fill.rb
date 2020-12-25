@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWriteAutoFill < Test::Unit::TestCase
+class TestWriteAutoFill < Minitest::Test
   def test_write_auto_fill
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_auto_fill')

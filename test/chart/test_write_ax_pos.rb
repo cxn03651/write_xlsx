@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/chart'
 
-class TestAxPos < Test::Unit::TestCase
+class TestAxPos < Minitest::Test
   def setup
     @chart = Writexlsx::Chart.new('Bar')
   end

@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx'
 
-class TestExampleMatch < Test::Unit::TestCase
+class TestExampleMatch < Minitest::Test
   def setup
     setup_dir_var
   end

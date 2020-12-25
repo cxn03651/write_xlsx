@@ -6,7 +6,7 @@ require 'write_xlsx/shape'
 require 'write_xlsx/drawing'
 require 'stringio'
 
-class DrawingShape04 < Test::Unit::TestCase
+class DrawingShape04 < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')

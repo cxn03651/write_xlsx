@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/table'
 
-class TestTableWriteTableColumn < Test::Unit::TestCase
+class TestTableWriteTableColumn < Minitest::Test
   def setup
     workbook = WriteXLSX.new(StringIO.new)
     @worksheet = workbook.add_worksheet

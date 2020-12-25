@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/relationships'
 
-class TestSheetRels < Test::Unit::TestCase
+class TestSheetRels < Minitest::Test
   def test_sheet_rels
     @obj = Writexlsx::Package::Relationships.new
     @obj.add_worksheet_relationship('/hyperlink', 'www.foo.com', 'External')

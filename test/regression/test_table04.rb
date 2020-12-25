@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionTable04 < Test::Unit::TestCase
+class TestRegressionTable04 < Minitest::Test
   def setup
     setup_dir_var
   end

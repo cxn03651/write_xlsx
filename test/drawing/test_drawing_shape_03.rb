@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/shape'
 require 'write_xlsx/drawing'
 
-class DrawingShape03 < Test::Unit::TestCase
+class DrawingShape03 < Minitest::Test
   def test_drawing_shape_03
     shape = Writexlsx::Shape.new
     # Set shape properties via []= method

@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWriteShapelayout < Test::Unit::TestCase
+class TestWriteShapelayout < Minitest::Test
   def test_write_shapelayout
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_shapelayout', 1)

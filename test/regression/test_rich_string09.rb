@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionRichString09 < Test::Unit::TestCase
+class TestRegressionRichString09 < Minitest::Test
   def setup
     setup_dir_var
   end

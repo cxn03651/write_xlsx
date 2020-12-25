@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestDefinedName < Test::Unit::TestCase
+class TestDefinedName < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
   end

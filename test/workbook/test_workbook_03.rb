@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'stringio'
 
-class TestWorkbook03 < Test::Unit::TestCase
+class TestWorkbook03 < Minitest::Test
   def test_workbook_03
     workbook = Writexlsx::Workbook.new(StringIO.new)
     workbook.add_worksheet('Non Default Name')

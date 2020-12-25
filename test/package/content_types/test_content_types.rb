@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/content_types'
 
-class TestContentTypes < Test::Unit::TestCase
+class TestContentTypes < Minitest::Test
   def test_assemble_xml_file
     @obj = Writexlsx::Package::ContentTypes.new(nil)
     @obj.add_worksheet_name('sheet1')

@@ -6,7 +6,7 @@ class ForTest
   include Writexlsx::Utility
 end
 
-class TestOptionHashForWorkbook < Test::Unit::TestCase
+class TestOptionHashForWorkbook < Minitest::Test
   def setup
     @obj = ForTest.new
     @options = {

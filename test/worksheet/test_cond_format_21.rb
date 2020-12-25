@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestCondFormat21 < Test::Unit::TestCase
+class TestCondFormat21 < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
@@ -46,7 +46,7 @@ class TestCondFormat21 < Test::Unit::TestCase
     expected = expected_to_array(expected_xml)
     assert_equal(expected, result)
   end
-  
+
   def expected_xml
     <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>

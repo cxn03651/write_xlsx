@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionAutofilter07 < Test::Unit::TestCase
+class TestRegressionAutofilter07 < Minitest::Test
   def setup
     setup_dir_var
   end

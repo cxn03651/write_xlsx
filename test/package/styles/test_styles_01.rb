@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestStyles01 < Test::Unit::TestCase
+class TestStyles01 < Minitest::Test
   def test_styles_01
     workbook = WriteXLSX.new(StringIO.new)
     workbook.__send__('prepare_format_properties')

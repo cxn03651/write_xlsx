@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/content_types'
 
-class TestWriteDefault < Test::Unit::TestCase
+class TestWriteDefault < Minitest::Test
   def test_assemble_xml_file
     @obj = Writexlsx::Package::ContentTypes.new(nil)
     @obj.__send__('write_default', 'xml', 'application/xml')

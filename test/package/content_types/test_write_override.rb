@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/package/content_types'
 
-class TestWriteOverride < Test::Unit::TestCase
+class TestWriteOverride < Minitest::Test
   def test_assemble_xml_file
     @obj = Writexlsx::Package::ContentTypes.new(nil)
     @obj.__send__('write_override', '/docProps/core.xml', 'app...')

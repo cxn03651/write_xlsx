@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWriteShapetype < Test::Unit::TestCase
+class TestWriteShapetype < Minitest::Test
   def test_write_shapetype
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_comment_shapetype')

@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestGetChartRange < Test::Unit::TestCase
+class TestGetChartRange < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
   end
@@ -46,14 +46,12 @@ class TestGetChartRange < Test::Unit::TestCase
   def test_get_chart_range_sheet_name_with_invalid_range
     formula  = ''
     result = @workbook.__send__('get_chart_range', formula)
-    expected = nil
-    assert_equal(expected, result)
+    assert_nil(result)
   end
 
   def test_get_chart_range_sheet_name_with_invalid_2d_range
     formula  = 'Sheet1!$B$1:$F$5'
     result = @workbook.__send__('get_chart_range', formula)
-    expected = nil
-    assert_equal(expected, result)
+    assert_nil(result)
   end
 end

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionHeaderImage14 < Test::Unit::TestCase
+class TestRegressionHeaderImage14 < Minitest::Test
   def setup
     setup_dir_var
   end

@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'
 
-class TestWriteStroke < Test::Unit::TestCase
+class TestWriteStroke < Minitest::Test
   def test_write_stroke
     vml = Writexlsx::Package::Vml.new
     vml.__send__('write_stroke')

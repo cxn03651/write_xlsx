@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestConvertDateTime02 < Test::Unit::TestCase
+class TestConvertDateTime02 < Minitest::Test
   def test_convert_date_time
     data_for_test.split(/\n/).each do |line|
       workbook = WriteXLSX.new(StringIO.new)

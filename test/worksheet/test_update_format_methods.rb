@@ -3,30 +3,21 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestUpdateFormatMethods < Test::Unit::TestCase
+class TestUpdateFormatMethods < Minitest::Test
   def setup
     @workbook = WriteXLSX.new(StringIO.new)
     @worksheet = @workbook.add_worksheet('')
   end
 
   def test_update_format_with_params_with_insufficient_args_raise_InsufficientArgumentError
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_format_with_params
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_format_with_params(0)
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_format_with_params('A1')
-    end
-  end
-
-  def test_update_format_with_params_with_valid_arg_not_raise
-    assert_nothing_raised do
-      @worksheet.update_format_with_params(0, 0, color: 'red', border: 2)
-    end
-    assert_nothing_raised do
-      @worksheet.update_format_with_params('B2', align: 'center')
     end
   end
 
@@ -76,36 +67,25 @@ class TestUpdateFormatMethods < Test::Unit::TestCase
     format = @workbook.add_format(bold: 1)
     @worksheet.write_row(0, 0, ['', '', '', '', ''], format)
     @worksheet.update_format_with_params(0, 0, bold: 0)
-    assert_not_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][0].xf, 
-                     @worksheet.instance_variable_get(:@cell_data_table)[0][1].xf )
     assert_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][0].xf.bold, 0)
     assert_equal(@worksheet.instance_variable_get(:@cell_data_table)[0][1].xf.bold, 1)
   end
 
   def test_update_range_format_with_params_with_insufficient_args_raise_InsufficientArgumentError
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_range_format_with_params
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_range_format_with_params(0, 0)
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_range_format_with_params('A1')
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_range_format_with_params(0, 0, 3, 3)
     end
-    assert_raise(WriteXLSXInsufficientArgumentError) do
+    assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.update_range_format_with_params('A2:C2')
-    end
-  end
-
-  def test_update_range_format_with_params_with_valid_arg_not_raise
-    assert_nothing_raised do
-      @worksheet.update_range_format_with_params(0, 0, 3, 3, bold: 1)
-    end
-    assert_nothing_raised do
-      @worksheet.update_range_format_with_params('A2:D5', bold: 1)
     end
   end
 end

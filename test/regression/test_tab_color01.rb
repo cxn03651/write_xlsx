@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionTabColor01 < Test::Unit::TestCase
+class TestRegressionTabColor01 < Minitest::Test
   def setup
     setup_dir_var
   end

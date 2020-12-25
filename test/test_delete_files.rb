@@ -2,19 +2,19 @@
 require 'helper'
 require 'write_xlsx'
 
-class TestDeleteFiles < Test::Unit::TestCase
+class TestDeleteFiles < Minitest::Test
   def setup
     @dir_path = 'test_delete_empty_directory'
     Writexlsx::Utility.delete_files(@dir_path) if FileTest.exist?(@dir_path)
   end
-  
+
   def test_delete_empty_directory
     Dir.mkdir(@dir_path)
     assert(FileTest.exist?(@dir_path))
     Writexlsx::Utility.delete_files(@dir_path)
     assert(!FileTest.exist?(@dir_path))
   end
-  
+
   def test_delete_directory_and_one_file
     filename = 'test_file'
     Dir.mkdir(@dir_path)

@@ -3,7 +3,7 @@ require 'helper'
 require 'write_xlsx'
 require 'stringio'
 
-class TestChartsheet < Test::Unit::TestCase
+class TestChartsheet < Minitest::Test
   def setup
     workbook = WriteXLSX.new(StringIO.new)
     @chartsheet = Writexlsx::Chartsheet.new(workbook, 1, '')

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionShapeConnect03 < Test::Unit::TestCase
+class TestRegressionShapeConnect03 < Minitest::Test
   def setup
     setup_dir_var
   end
