@@ -8,22 +8,30 @@ module Writexlsx
       include Writexlsx::Utility
       include Writexlsx::Gradient
 
-      attr_reader :line, :fill, :type
+      attr_reader :line, :fill, :type, :gradient, :pattern
 
       def initialize(params)
         @line      = params[:line]
         @fill      = params[:fill]
+        @pattern   = params[:pattern]
+        @gradient  = params[:gradient]
         # Set the line properties for the marker..
         @line = line_properties(@line)
         # Allow 'border' as a synonym for 'line'.
         @line = line_properties(params[:border]) if params[:border]
-
-        # Set the gradient fill properties for the series.
-        @gradient = gradient_properties(params[:gradient])
-
         # Set the fill properties for the marker.
         @fill = fill_properties(@fill)
+        # Set the pattern properties for the series.
+        @pattern = pattern_properties(@pattern)
+        # Set the gradient fill properties for the series.
+        @gradient = gradient_properties(@gradient)
+        # Pattern fill overrides solid fill.
         @fill = nil if ptrue?(@gradient)
+        # Gradient fill overrides solid and pattern fills.
+        if ptrue?(@gradient)
+          @pattern = nil
+          @fill    = nil
+        end
       end
 
       def line_defined?
@@ -188,13 +196,17 @@ module Writexlsx
         @fill       = fill_properties(params[:fill])
         @pattern    = pattern_properties(params[:pattern])
         @gradient   = gradient_properties(params[:gradient])
+        # Pattern fill overrides solid fill.
         @fill       = nil if ptrue?(@pattern)
+        # Gradient fill overrides solid and patter fills.
         if ptrue?(@gradient)
           @pattern = nil
           @fill    = nil
         end
-        
+
+        # Set the marker properties for the series.
         @marker     = Marker.new(params[:marker]) if params[:marker]
+        # Set the trendline properties for the series.
         @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
         @error_bars = errorbars(params[:x_error_bars], params[:y_error_bars])
         @points     = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]

@@ -40,7 +40,7 @@ module Writexlsx
     include Writexlsx::Utility
     include Writexlsx::Gradient
 
-    attr_reader :line, :fill, :gradient, :layout
+    attr_reader :line, :fill, :pattern, :gradient, :layout
 
     def initialize(params = {})
       @layout = layout_properties(params[:layout])
@@ -51,6 +51,9 @@ module Writexlsx
       # Set the line properties for the chartarea.
       @line = border ? line_properties(border) : line_properties(params[:line])
 
+      # Set the pattern properties for the series.
+      @pattern = pattern_properties(params[:pattern])
+
       # Set the gradient fill properties for the series.
       @gradient = gradient_properties(params[:gradient])
 
@@ -58,8 +61,15 @@ module Writexlsx
       fill = params[:color] ? { :color => params[:color] } : params[:fill]
       @fill = fill_properties(fill)
 
-      if ptrue?(@gradient)
+      # Pattern fill overrides solid fill.
+      if ptrue?(@pattern)
         @fill = nil
+      end
+
+      # Gradient fill overrides solid and pattern fills.
+      if ptrue?(@gradient)
+        @pattern = nil
+        @fill    = nil
       end
     end
 
