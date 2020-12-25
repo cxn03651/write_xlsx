@@ -1308,6 +1308,8 @@ module Writexlsx
         write_label_offset(100)
         # Write the c:tickLblSkip element.
         write_tick_lbl_skip(x_axis.interval_unit)
+        # Write the c:tickMarkSkip element.
+        write_tick_mark_skip(x_axis.interval_tick)
       end
     end
 
@@ -1446,6 +1448,8 @@ module Writexlsx
         write_label_offset(100)
         # Write the c:tickLblSkip element.
         write_tick_lbl_skip(x_axis.interval_unit)
+        # Write the c:tickMarkSkip element.
+        write_tick_mark_skip(x_axis.interval_tick)
         # Write the c:majorUnit element.
         write_c_major_unit(x_axis.major_unit)
         # Write the c:majorTimeUnit element.
@@ -1638,6 +1642,15 @@ module Writexlsx
       return unless val
 
       @writer.empty_tag('c:tickLblSkip', [ ['val', val] ])
+    end
+
+    #
+    # Write the <c:tickMarkSkip> element.
+    #
+    def write_tick_mark_skip(val)  # :nodoc:
+      return unless val
+
+      @writer.empty_tag( 'c:tickMarkSkip', [ ['val', val] ])
     end
 
     #

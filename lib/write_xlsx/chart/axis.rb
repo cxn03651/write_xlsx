@@ -14,7 +14,7 @@ module Writexlsx
       attr_reader :display_units_visible, :display_units
       attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
-      attr_reader :major_gridlines, :minor_gridlines, :reverse
+      attr_reader :interval_tick, :major_gridlines, :minor_gridlines, :reverse
       attr_reader :line, :fill, :text_axis
       #
       # Convert user defined axis values into axis instance.
@@ -27,7 +27,7 @@ module Writexlsx
           :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
           :major_unit_type, :log_base, :crossing, :position_axis,
           :label_position, :num_format, :num_format_linked, :interval_unit,
-          :major_tick_mark, :line, :fill
+          :interval_tick, :major_tick_mark, :line, :fill
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
         @visible           = args[:visible] || 1
 
