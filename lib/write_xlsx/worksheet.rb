@@ -2530,6 +2530,26 @@ module Writexlsx
     end
 
     #
+    # write_boolean(row, col, val, format)
+    #
+    # Write a boolean value to the specified row and column (zero indexed).
+    #
+    def write_boolean(*args)
+      row, col, val, xf = row_col_notation(args)
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil?
+
+      val = val ? 1 : 0  # Boolean value.
+      # xf : cell format.
+      type = 'l'                 # The data type
+
+      # Check that row and col are valid and store max and min values
+      check_dimensions(row, col)
+      store_row_col_max_min_values(row, col)
+
+      store_data_to_table(BooleanCellData.new(self, row, col, val, xf))
+    end
+
+    #
     # :call-seq:
     #   update_format_with_params(row, col, format_params)
     #
@@ -2537,12 +2557,12 @@ module Writexlsx
     #
     #     worksheet.update_format_with_params(0, 0, color: 'red')
     #
-    # This method is used to update formatting of the cell keeping cell contents 
+    # This method is used to update formatting of the cell keeping cell contents
     # and formatting.
     #
-    # If the cell doesn't have CellData object, this method create a CellData 
+    # If the cell doesn't have CellData object, this method create a CellData
     # using write_blank method.
-    # If the cell has CellData, this method fetch contents and format of cell from 
+    # If the cell has CellData, this method fetch contents and format of cell from
     # the CellData object and recreate CellData using write method.
     #
     def update_format_with_params(*args)
@@ -2590,7 +2610,7 @@ module Writexlsx
     #
     #     worksheet.update_range_format_with_params(0, 0, 3, 3, color: 'red')
     #
-    # This method is used to update formatting of multiple cells keeping cells' contents 
+    # This method is used to update formatting of multiple cells keeping cells' contents
     # and formatting.
     #
     #
@@ -5813,11 +5833,11 @@ module Writexlsx
         y1 += size_row(row_start - 1)
         row_start -= 1
       end
-      
+
       # Ensure that the image isn't shifted off the page at top left.
       x1 = 0 if x1 < 0
       y1 = 0 if y1 < 0
-      
+
       # Calculate the absolute x offset of the top-left vertex.
       if @col_size_changed
         x_abs = (0 .. col_start-1).inject(0) {|sum, col| sum += size_col(col)}

@@ -128,6 +128,27 @@ module Writexlsx
       end
     end
 
+    class BooleanCellData < CellData # :nodoc:
+      def initialize(worksheet, row, col, val, xf)
+        @worksheet = worksheet
+        @row, @col, @token, @xf = row, col, val, xf
+      end
+
+      def data
+        @token
+      end
+
+      def write_cell
+        attributes = cell_attributes
+
+        attributes << ['t', 'b']
+        @worksheet.writer.tag_elements('c', attributes) do
+          @worksheet.write_cell_value(token)
+        end
+      end
+    end
+
+
     class BlankCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, xf)
         @worksheet = worksheet
