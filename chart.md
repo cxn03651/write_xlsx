@@ -268,6 +268,8 @@ The properties that can be set are:
     :name_layout
     :num_font
     :num_format
+    :pattern
+    :gradient
     :min
     :max
     :minor_unit
@@ -357,6 +359,14 @@ See the [CHART FORMATTING][] section below.
 Note, in the Excel the axis fill is applied to the area of the numbers of
 the axis and not to the area of the axis bounding box.
 That background is set from the chartarea fill.
+
+##### <a name="set_x_axis_pattern" class="anchor" href="#set_x_axis_pattern"><span class="octicon octicon-link" /></a>:pattern
+Set the pattern properties of the axis such as color.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_x_axis_gradient" class="anchor" href="#set_x_axis_gradient"><span class="octicon octicon-link" /></a>:gradient
+Set the gradient properties of the axis such as color.
+See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_x_axis_min" class="anchor" href="#set_x_axis_min"><span class="octicon octicon-link" /></a>:min
 Set the minimum value for the axis range.
@@ -740,6 +750,14 @@ See the [CHART FORMATTING][] section below.
 Set the fill properties of the chartarea such as colour.
 See the [CHART FORMATTING][] section below.
 
+##### <a name="set_chartarea_pattern" class="anchor" href="#set_chartarea_pattern"><span class="octicon octicon-link" /></a>:pattern
+Set the pattern fill properties of the chartarea such as colour.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_chartarea_gradient" class="anchor" href="#set_chartarea_gradient"><span class="octicon octicon-link" /></a>:gradient
+Set the gradient fill properties of the chartarea such as colour.
+See the [CHART FORMATTING][] section below.
+
 #### <a name="set_plotarea" class="anchor" href="#set_plotarea"><span class="octicon octicon-link" /></a>set_plotarea()
 
 The `set_plotarea()` method is used to set properties of the plot area of a chart.
@@ -757,6 +775,14 @@ See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_plotarea_fill" class="anchor" href="#set_plotarea_fill"><span class="octicon octicon-link" /></a>:fill
 Set the fill properties of the plotarea such as colour.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_plotarea_pattern" class="anchor" href="#set_plotarea_pattern"><span class="octicon octicon-link" /></a>:pattern
+Set the pattern fill properties of the plotarea such as colour.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_plotarea_gradient" class="anchor" href="#set_plotarea_gradient"><span class="octicon octicon-link" /></a>:gradient
+Set the gradient fill properties of the plotarea such as colour.
 See the [CHART FORMATTING][] section below.
 
 #### <a name="set_style" class="anchor" href="#set_style"><span class="octicon octicon-link" /></a>set_style()
@@ -791,7 +817,7 @@ the difference between the first and last data series.
 
     chart.set_up_down_bars
 
-It is possible to format the up and down bars to add fill and border properties
+It is possible to format the up and down bars to add fill, pattern, gradient and border properties
 if required.
 See the [CHART FORMATTING][] section below.
 
@@ -872,6 +898,8 @@ The following properties can be set for marker formats in a chart.
     :size
     :border
     :fill
+    :pattern
+    :gradient
 
 The type property sets the type of marker that is used with a series.
 
@@ -1303,6 +1331,8 @@ elements documented above.
     :line
     :border
     :fill
+    :pattern
+    :gradient
 
 Chart formatting properties are generally set using hash.
 
@@ -1405,7 +1435,7 @@ It can be used as a descriptive substitute for line in chart types such as Bar
 and Column that have a border and fill style rather than a line style.
 In general chart objects with a border property will also have a fill property.
 
-#### <a name="fill_formatting" class="anchor" href="#fill_formatting"><span class="octicon octicon-link" /></a>:fill
+## <a name="solid_fill" class="anchor" href="#solid_fill"><span class="octicon octicon-link" /></a>Solid Fill
 
 The fill format is used to specify filled areas of chart objects such as
 the interior of a column or the background of the chart itself.
@@ -1442,6 +1472,158 @@ The fill format is generally used in conjunction with a border format which has 
         :border     => { :color => 'red' },
         :fill       => { :color => 'yellow' }
     )
+
+## <a name="pattern_fill" class="anchor" href="#pattern_fill"><span class="octicon octicon-link" /></a>Pattern Fill
+
+The pattern fill format is used to specify pattern filled areas of chart objects such as the interior of a column or the background of the chart itself.
+
+The following properties can be set for C<pattern> fill formats in a chart:
+
+    :pattern:   the pattern to be applied (required)
+    :fg_color:  the foreground color of the pattern (required)
+    :bg_color:  the background color (optional, defaults to white)
+
+
+For example:
+
+    chart.set_plotarea(
+        :pattern => {
+            :pattern  => 'percent_5',
+            :fg_color => 'red',
+            :bg_color => 'yellow'
+        }
+    )
+
+The following patterns can be applied:
+
+    percent_5
+    percent_10
+    percent_20
+    percent_25
+    percent_30
+    percent_40
+    percent_50
+    percent_60
+    percent_70
+    percent_75
+    percent_80
+    percent_90
+    light_downward_diagonal
+    light_upward_diagonal
+    dark_downward_diagonal
+    dark_upward_diagonal
+    wide_downward_diagonal
+    wide_upward_diagonal
+    light_vertical
+    light_horizontal
+    narrow_vertical
+    narrow_horizontal
+    dark_vertical
+    dark_horizontal
+    dashed_downward_diagonal
+    dashed_upward_diagonal
+    dashed_horizontal
+    dashed_vertical
+    small_confetti
+    large_confetti
+    zigzag
+    wave
+    diagonal_brick
+    horizontal_brick
+    weave
+    plaid
+    divot
+    dotted_grid
+    dotted_diamond
+    shingle
+    trellis
+    sphere
+    small_grid
+    large_grid
+    small_check
+    large_check
+    outlined_diamond
+    solid_diamond
+
+
+The foreground color, fg_color, is a required parameter and can be a Html style #RRGGBB string or a limited number of named colors. The available colours are shown in the main documentation.
+
+The background color, bg_color, is optional and defaults to black.
+
+If a pattern fill is used on a chart object it overrides the solid fill properties of the object.
+
+
+## <a name="gradient_fill" class="anchor" href="#gradient_fill"><span class="octicon octicon-link" /></a>Gradient Fill
+
+The gradient fill format is used to specify gradient filled areas of chart objects such as the interior of a column or the background of the chart itself.
+
+
+The following properties can be set for gradient fill formats in a chart:
+
+    :colors:    a list of colors
+    :positions: an optional list of positions for the colors
+    :type:      the optional type of gradient fill
+    :angle:     the optional angle of the linear fill
+
+The colors property sets a list of colors that define the gradient:
+
+    chart.set_plotarea(
+      :gradient => { :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ] }
+    )
+
+Excel allows between 2 and 10 colors in a gradient but it is unlikely that you will require more than 2 or 3.
+
+As with solid or pattern fill it is also possible to set the colors of a gradient with a Html style #RRGGBB string or a limited number of named colors. The available colours are shown in the main documentation:
+
+    chart.add_series(
+      :values   => '=Sheet1!$A$1:$A$5',
+      :gradient => { :colors => [ 'red', 'green' ] }
+    )
+
+The positions defines an optional list of positions, between 0 and 100, of
+where the colors in the gradient are located. Default values are provided for
+colors lists of between 2 and 4 but they can be specified if required:
+
+    chart.add_series(
+      :values   => '=Sheet1!$A$1:$A$5',
+      :gradient => {
+        :colors    => [ '#DDEBCF', '#156B13' ],
+        :positions => [ 10,        90 ],
+      }
+    )
+
+The type> property can have one of the following values:
+
+    linear        (the default)
+    radial
+    rectangular
+    path
+
+For example:
+
+    chart.add_series(
+      :values   => '=Sheet1!$A$1:$A$5',
+      :gradient => {
+        :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ],
+        :type   => 'radial'
+      }
+    )
+
+If type isn't specified it defaults to linear.
+
+For a linear fill the angle of the gradient can also be specified:
+
+    chart.add_series(
+      :values   => '=Sheet1!$A$1:$A$5',
+      :gradient => {
+        :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ],
+        :angle => 30
+      }
+    )
+
+The default angle is 90 degrees.
+
+If gradient fill is used on a chart object it overrides the solid fill and pattern fill properties of the object.
 
 #### <a name="values_and_category_axes" class="anchor" href="#value_and_category_axes"><span class="octicon octicon-link" /></a>Value and Category Axes
 
