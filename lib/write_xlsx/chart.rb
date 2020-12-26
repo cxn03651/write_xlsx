@@ -2187,18 +2187,38 @@ module Writexlsx
     #
     # Write the <a:solidFill> element.
     #
-    def write_a_solid_fill(line) # :nodoc:
+    def write_a_solid_fill(fill) # :nodoc:
       @writer.tag_elements('a:solidFill') do
-        # Write the a:srgbClr element.
-        write_a_srgb_clr(color(line[:color])) if line[:color]
+        if fill[:color]
+          # Write the a:srgbClr element.
+          write_a_srgb_clr(color(fill[:color]), fill[:transparency])
+        end
       end
     end
 
     #
     # Write the <a:srgbClr> element.
     #
-    def write_a_srgb_clr(val) # :nodoc:
-      @writer.empty_tag('a:srgbClr', [ ['val', val] ])
+    def write_a_srgb_clr(color, transparency = nil) # :nodoc:
+      tag        = 'a:srgbClr'
+      attributes = [ ['val', color] ]
+
+      if ptrue?(transparency)
+        @writer.tag_elements(tag, attributes) do
+          write_a_alpha(transparency)
+        end
+      else
+        @writer.empty_tag(tag, attributes)
+      end
+     end
+
+    #
+    # Write the <a:alpha> element.
+    #
+    def write_a_alpha(val)
+      val = (100 - val.to_i) * 1000
+
+      @writer.empty_tag('a:alpha', [ ['val', val] ])
     end
 
     #
