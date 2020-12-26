@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2020-12-26 v0.88.0
+
+   Added transparency option to solid fills in chart areas.
+
+   Added options to configure chart axis tick placement.
+
 2020-12-26 v0.87.0
 
    Added chart pattern and gradient fills.
