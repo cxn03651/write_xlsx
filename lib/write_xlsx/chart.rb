@@ -1285,6 +1285,9 @@ module Writexlsx
         # Write the c:majorTickMark element.
         write_major_tick_mark(x_axis.major_tick_mark)
 
+        # Write the c:minorTickMark element.
+        write_minor_tick_mark(x_axis.minor_tick_mark)
+
         # Write the c:tickLblPos element.
         write_tick_label_pos(x_axis.label_position)
 
@@ -1358,6 +1361,9 @@ module Writexlsx
 
         # Write the c:majorTickMark element.
         write_major_tick_mark(y_axis.major_tick_mark)
+
+        # Write the c:minorTickMark element.
+        write_minor_tick_mark(y_axis.minor_tick_mark)
 
         # Write the c:tickLblPos element.
         write_tick_label_pos(y_axis.label_position)
@@ -1579,6 +1585,15 @@ module Writexlsx
       return unless ptrue?(val)
 
       @writer.empty_tag('c:majorTickMark', [ ['val', val] ])
+    end
+
+    #
+    # Write the <c:minorTickMark> element.
+    #
+    def write_minor_tick_mark(val)
+      return unless ptrue?(val)
+
+      @writer.empty_tag('c:minorTickMark', [ ['val', val] ])
     end
 
     #

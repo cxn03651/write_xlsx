@@ -9,7 +9,8 @@ module Writexlsx
       include Writexlsx::Utility
 
       attr_accessor :defaults
-      attr_accessor :min, :max, :num_format, :position, :major_tick_mark
+      attr_accessor :min, :max, :num_format, :position
+      attr_accessor :major_tick_mark, :minor_tick_mark
       attr_reader :minor_unit, :major_unit, :minor_unit_type, :major_unit_type
       attr_reader :display_units_visible, :display_units
       attr_reader :log_base, :crossing, :position_axis, :label_position, :visible
@@ -27,11 +28,11 @@ module Writexlsx
           :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
           :major_unit_type, :log_base, :crossing, :position_axis,
           :label_position, :num_format, :num_format_linked, :interval_unit,
-          :interval_tick, :major_tick_mark, :line, :fill
+          :interval_tick, :line, :fill
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
-        @visible           = args[:visible] || 1
-
         set_major_minor_gridlines(args)
+
+        @visible           = args[:visible] || 1
         set_display_units(args)
         set_display_units_visible(args)
         set_position(args)
@@ -44,6 +45,10 @@ module Writexlsx
           @chart.date_category = false
           @text_axis = true
         end
+
+        # Set the tick marker types.
+        @major_tick_mark = get_tick_type(params[:major_tick_mark])
+        @minor_tick_mark = get_tick_type(params[:minor_tick_mark])
       end
 
       #
@@ -126,6 +131,26 @@ module Writexlsx
         end
       end
 
+      #
+      # Convert user tick types to internal units.
+      #
+      def get_tick_type(tick_type)
+        return if !ptrue?(tick_type)
+
+        types = {
+          'outside' => 'out',
+          'inside'  => 'in',
+          'none'    => 'none',
+          'cross'   => 'cross'
+        }
+
+        if(types[tick_type])
+          return types[tick_type]
+        else
+          raise "Unknown tick_type type '#{tick_type}'\n"
+        end
+      end
+
       def set_display_units(args)
         @display_units = get_display_units(args[:display_units])
       end
@@ -134,7 +159,7 @@ module Writexlsx
         if args[:display_units_visible]
           @display_units_visible = args[:display_units_visible]
         else
-          @display_units_visible = 1;
+          @display_units_visible = 1
         end
       end
 

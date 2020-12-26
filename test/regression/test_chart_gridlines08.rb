@@ -20,11 +20,10 @@ class TestChartGridlines08 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [60019072, 60020608])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ],
-           ]
-
+      [ 1, 2, 3, 4,  5 ],
+      [ 2, 4, 6, 8,  10 ],
+      [ 3, 6, 9, 12, 15 ],
+    ]
 
     worksheet.write('A1', data)
 
@@ -33,12 +32,10 @@ class TestChartGridlines08 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     chart.set_y_axis(
-                     :major_gridlines => { :visible => 1 },
-                     :minor_gridlines => { :visible => 1 }
-                     )
-
-    chart.instance_variable_get(:@y_axis).
-      instance_variable_set(:@major_tick_mark, 'cross')
+      :major_gridlines => { :visible => 1 },
+      :minor_gridlines => { :visible => 1 },
+      :major_tick_mark => 'cross'
+    )
 
     worksheet.insert_chart('E9',  chart)
 
