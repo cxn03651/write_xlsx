@@ -1,5 +1,18 @@
 Change history of write_xlsx rubygem.
 
+2020-12-26 v0.87.0
+
+   Added chart pattern and gradient fills.
+
+   Added option to set chart tick interval.
+
+   Add checks for valid and non-duplicate worksheet table names.
+
+   Added support for table header formatting and a fix for wrapped lines in
+   the header.
+
+   use minitest instead of test-unit
+
 2020-11-01 v0.86.0
    Fix for images with negative offsets.
 
