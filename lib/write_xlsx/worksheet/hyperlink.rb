@@ -27,8 +27,13 @@ module Writexlsx
         normalized_str = str.sub(/^mailto:/, '')
 
         # Split url into the link and optional anchor/location.
-        url, @url_str = url.split(/#/)
+        url, *anchors = url.split(/#/)
         url  ||= ''
+        if anchors.empty?
+          @url_str = nil
+        else
+          @url_str = anchors.join('#')
+        end
 
         # Escape URL unless it looks already escaped.
         url = escape_url(url)
