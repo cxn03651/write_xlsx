@@ -555,7 +555,7 @@ In which case it is assumed that the URL was escaped correctly by the user and w
 
 See also, the note about [CELL NOTATION][].
 
-#### <a name="write_formul" class="anchor" href="#write_formul"><span class="octicon octicon-link" /></a>write_formula(row, column, formula, format = nil, value = nil)
+#### <a name="write_formula" class="anchor" href="#write_formula"><span class="octicon octicon-link" /></a>write_formula(row, column, formula, format = nil, value = nil)
 
 Write a formula or function to the cell specified by `row` and `column`:
 
