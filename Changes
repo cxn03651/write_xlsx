@@ -1,5 +1,10 @@
 Change history of write_xlsx rubygem.
 
+2020-12-27 v0.89.0
+
+   Added write_boolean() worksheet method to write Excel boolean values.
+
+
 2020-12-26 v0.88.0
 
    Added transparency option to solid fills in chart areas.
