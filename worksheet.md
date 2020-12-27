@@ -23,6 +23,7 @@ The following methods are available through a new worksheet:
 * [write_url](#write_url)
 * [write_url_range](#write_url_range)
 * [write_formula](#write_formula)
+* [write_boolean](#write_boolean)
 * [write_comment](#write_comment)
 * [update_range_format_with_params](#update_range_format_with_params)
 * [show_comments](#show_comments)
@@ -617,7 +618,7 @@ This is occasionally necessary when working with non-Excel applications that don
     worksheet.write_array_formula('A1:A3', '{=TREND(C1:C3,B1:B3)}', format, 105)
     worksheet.write_number('A2', 12, format)
     worksheet.write_number('A3', 14, format)
-    
+
 In addition, some early versions of Excel 2007 don't calculate the values of array formulas when they aren't supplied.
 Installing the latest Office Service Pack should fix this issue.
 
@@ -626,6 +627,21 @@ See also the
 program in the examples directory of the distro.
 
 Note: Array formulas are not supported by writeexcel gem.
+
+#### <a name="write_boolean" class="anchor" href="#write_boolean"><span class="octicon octicon-link" /></a>write_boolean(row, col, value, format)
+
+Write an Excel boolean value to the cell specified by row and column:
+
+    worksheet.write_boolean('A1', 1             )  # TRUE
+    worksheet.write_boolean('A2', 0             )  # TRUE
+    worksheet.write_boolean('A3', false         )  # FALSE
+    worksheet.write_boolean('A4', nil           )  # FALSE
+    worksheet.write_boolean('A5', false, format )  # FALSE, with format.
+
+A value that is true or false using Ruby's rules will be written as an Excel boolean TRUE or FALSE value.
+
+See the note about [CELL NOTATION][].
+
 
 #### <a name="store_formula" class="anchor" href="#store_formula"><span class="octicon octicon-link" /></a>store_formula(formula)
 
