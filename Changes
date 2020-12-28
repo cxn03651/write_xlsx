@@ -1,5 +1,18 @@
 Change history of write_xlsx rubygem.
 
+2020-12-28 v0.90.0
+
+   Added worksheet_by_name() workbook method to retrieve a worksheet
+   in a workbook by name.
+
+   Fixed issue where internal file creation and modification dates where
+   in the local timezone instead of UTC.
+
+   Fixed issue with "external:" urls with space in sheetname.
+
+   Fixed issue where Unicode full-width number strings were treated as
+   numbers in write().
+
 2020-12-27 v0.89.0
 
    Added write_boolean() worksheet method to write Excel boolean values.
