@@ -14,7 +14,7 @@ module Writexlsx
       def initialize
         @writer = Package::XMLWriterSimple.new
         @properties = {}
-        @localtime  = [Time.now]
+        @createtime  = [Time.now.gmtime]
       end
 
       def set_xml_writer(filename)
@@ -47,12 +47,14 @@ module Writexlsx
       end
 
       #
-      # Convert a localtime() date to a ISO 8601 style "2010-01-01T00:00:00Z" date.
+      # Convert a gmtime/localtime() date to a ISO 8601 style
+      # "2010-01-01T00:00:00Z" date. Excel always treats this as
+      # a utc date/time.
       #
-      def localtime_to_iso8601_date(local_time = nil)
-        local_time ||= Time.now
+      def datetime_to_iso8601_date(gm_time = nil)
+        gm_time ||= Time.now.gmtime
 
-        local_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+        gm_time.strftime('%Y-%m-%dT%H:%M:%SZ')
       end
 
       #
@@ -109,7 +111,7 @@ module Writexlsx
       end
 
       def dcterms_date
-        localtime_to_iso8601_date(@properties[:created])
+        datetime_to_iso8601_date(@properties[:created])
       end
 
       #
