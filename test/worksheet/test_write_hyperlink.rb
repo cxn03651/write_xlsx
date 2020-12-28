@@ -9,13 +9,6 @@ class TestWriteHyperlink < Minitest::Test
     @worksheet = @workbook.add_worksheet('')
   end
 
-  def test_attributes
-    hyperlink = Writexlsx::Worksheet::Hyperlink.factory('')
-    result    = hyperlink.attributes(0, 0, 1)
-    expected  = [ ['ref', 'A1'], ['r:id', 'rId1']]
-    assert_equal(expected, result)
-  end
-
   def test_write_hyperlink_internal_sheet2
     hyperlink = Writexlsx::Worksheet::Hyperlink.factory('internal:Sheet2!A1', 'Sheet2!A1')
     result = hyperlink.attributes(0, 0)

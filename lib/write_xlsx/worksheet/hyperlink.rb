@@ -129,14 +129,11 @@ module Writexlsx
         # Strip the mailto header.
         str.sub!(/^mailto:/, '')
 
+        # Split url into the link and optional anchor/location.
+        url, url_str = url.split(/#/, 2)
+
         # Escape URL unless it looks already escaped.
         url = escape_url(url)
-
-        # External Workbook links need to be modified into the right format.
-        # The URL will look something like 'c:\temp\file.xlsx#Sheet!A1'.
-        # We need the part to the left of the # as the URL and the part to
-        # the right as the "location" string (if it exists).
-        url, url_str = url.split(/#/)
 
         # Add the file:/// URI to the url if non-local.
         if url =~ %r![:]! ||        # Windows style "C:/" link.
