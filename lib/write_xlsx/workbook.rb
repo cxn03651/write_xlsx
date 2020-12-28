@@ -204,6 +204,14 @@ module Writexlsx
     end
 
     #
+    # Return a worksheet object in the workbook using the sheetname.
+    #
+    def worksheet_by_name(sheetname = nil)
+      sheets.select { |s| s.name == sheetname }.first
+    end
+    alias get_worksheet_by_name worksheet_by_name
+
+    #
     # Set the date system: false = 1900 (the default), true = 1904
     #
     # Excel stores dates as real numbers where the integer part stores
@@ -806,7 +814,7 @@ module Writexlsx
       end
 
       # Set the creation time unless specified by the user.
-      params[:created] = @local_time unless params.has_key?(:created)
+      params[:created] = @createtime unless params.has_key?(:created)
 
       @doc_properties = params.dup
     end
