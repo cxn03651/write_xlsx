@@ -21,6 +21,7 @@ The following methods are available through a new workbook.
 * [set_tempdir](#set_tempdir)
 * [set_custom_color](#set_custom_color)
 * [sheets](#sheets)
+* [worksheet_by_name](#worksheet_by_name)
 * [set_1904](#set_1904)
 * [set_calc_mode](#set_calc_mode)
 
@@ -346,6 +347,12 @@ The following example returns the first and last worksheet in a workbook:
     workbook.sheets(0, -1).each do |worksheet|
         # Do something
     end
+
+#### <a name="worksheet_by_name" class="anchor" href="#worksheet_by_name"><span class="octicon octicon-link" /></a>worksheet_by_name
+
+The worksheet_by_name function return a worksheet or chartsheet object in the workbook using the sheetname:
+
+    worksheet = workbook.worksheet_by_name('Sheet1')
 
 #### <a name="set_1904" class="anchor" href="#set_1904"><span class="octicon octicon-link" /></a>set_1904()
 
