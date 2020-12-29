@@ -17,6 +17,7 @@ The following methods are available through a new workbook.
 * [add_vba_name](#add_vba_name)
 * [close](#close)
 * [set_properties](#set_properties)
+* [set_custom_properties](#set_custom_properties)
 * [define_name](#define_name)
 * [set_tempdir](#set_tempdir)
 * [set_custom_color](#set_custom_color)
@@ -272,6 +273,43 @@ The properties that can be set are:
 See also the
 [`properties.rb`](examples.html#properties)
 program in the examples directory of the distro.
+
+#### <a name="set_custom_properties" class="anchor" href="#set_custom_properties"><span class="octicon octicon-link" /></a>set_custom_properties
+
+The set_custom_property method can be used to set custom document properties not covered by the set_properties method above. These properties are visible when you use the < Office Button -> Prepare -> Properties -> Advanced Properties -> Custom > option in Excel and are also available to external applications that read or index Windows files.
+
+The set_custom_property method takes 3 parameters:
+
+    workbook.set_custom_property(name, value, type)
+
+Where the available types are:
+
+    text
+    date
+    number
+    bool
+
+For example:
+
+    workbook.set_custom_property('Checked by',      'Eve',                  'text'  )
+    workbook.set_custom_property('Date completed',  '2016-12-12T23:00:00Z', 'date'  )
+    workbook.set_custom_property('Document number', '12345' ,               'number')
+    workbook.set_custom_property('Reference',       '1.2345',               'number')
+    workbook.set_custom_property('Has review',      1,                      'bool'  )
+    workbook.set_custom_property('Has sign off',    0,                      'bool'  )
+    workbook.set_custom_property('Department',      'some_string',          'text'  )
+    workbook.set_custom_property('Scale',           '1.2345678901234',      'number')
+
+Dates should by in ISO8601 <yyyy-mm-ddThh:mm:ss.sssZ> date format in Zulu time, as shown above.
+
+The text and number types are optional since they can usually be inferred from the data:
+
+    workbook.set_custom_property('Checked by', 'Eve'   )
+    workbook.set_custom_property('Reference',  '1.2345')
+
+
+The C<name> and C<value> (for text types) are limited to 255 characters by Excel.
+
 
 #### <a name="define_name" class="anchor" href="#define_name"><span class="octicon octicon-link" /></a>define_name
 
