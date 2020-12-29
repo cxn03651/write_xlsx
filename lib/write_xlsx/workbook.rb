@@ -824,7 +824,7 @@ module Writexlsx
     # Set a user defined custom document property.
     #
     def set_custom_property(name, value, type = 'text')
-      if !ptrue?(name) || !ptrue?(value)
+      if !name || !value
         return -1
       end
 

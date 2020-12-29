@@ -67,12 +67,58 @@ module Writexlsx
           if type == 'text'
             # Write the vt:lpwstr element.
             write_vt_lpwstr(value)
+          elsif type == 'date'
+            # Write the vt:filetime element.
+            write_vt_filetime(value)
+          elsif type == 'num_int'
+            # Write the vt:i4 element.
+            write_vt_i4(value)
+          elsif type == 'num_real'
+            # Write the vt:r8 element.
+            write_vt_r8(value)
+          elsif type == 'bool'
+            # Write the vt:bool element.
+            write_vt_bool(value)
           end
         end
       end
 
       def write_vt_lpwstr(data)
         @writer.data_element('vt:lpwstr', data)
+      end
+
+      #
+      # Write the <vt:i4> element.
+      #
+      def write_vt_i4(data)
+        @writer.data_element('vt:i4', data)
+      end
+
+      #
+      # Write the <vt:r8> element.
+      #
+      def write_vt_r8(data)
+        @writer.data_element('vt:r8', data)
+      end
+
+      #
+      # Write the <vt:bool> element.
+      #
+      def write_vt_bool(data)
+        if ptrue?(data)
+          data = 'true'
+        else
+          data = 'false'
+        end
+
+        @writer.data_element('vt:bool', data)
+    end
+
+      #
+      # Write the <vt:filetime> element.
+      #
+      def write_vt_filetime(data)
+        @writer.data_element('vt:filetime', data)
       end
     end
   end
