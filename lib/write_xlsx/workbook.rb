@@ -823,9 +823,44 @@ module Writexlsx
     #
     # Set a user defined custom document property.
     #
-    def set_custom_property(name, value, type = 'text')
-      if !name || !value
-        return -1
+    def set_custom_property(name, value, type = nil)
+    # Valid types.
+      valid_type = {
+        'text'       => 1,
+        'date'       => 1,
+        'number'     => 1,
+        'number_int' => 1,
+        'bool'       => 1,
+      }
+
+      if !name || (type != 'bool' && !value)
+        raise "The name and value parameters must be defined in set_custom_property()"
+      end
+
+      # Determine the type for strings and numbers if it hasn't been specified.
+      if !ptrue?(type)
+        if value =~ /^\d+$/
+            type = 'number_int'
+        elsif value =~
+            /^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/
+          type = 'number'
+        else
+          type = 'text'
+        end
+      end
+
+      # Check for valid validation types.
+      if !valid_type[type]
+        raise "Unknown custom type '$type' in set_custom_property()"
+      end
+
+      #  Check for strings longer than Excel's limit of 255 chars.
+      if type == 'text' && value.length > 255
+        raise "Length of text custom value '$value' exceeds Excel's limit of 255 in set_custom_property()"
+      end
+
+      if type == 'bool'
+        value = value ? 1 : 0
       end
 
       @custom_properties << [name, value, type]

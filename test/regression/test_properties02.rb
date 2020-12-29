@@ -20,9 +20,6 @@ class TestRegressionProperties02 < Minitest::Test
     )
 
     workbook.close
-    compare_for_regression(
-      nil,
-      { 'xl/workbook.xml' => ['<workbookView'] }
-    )
+    compare_for_regression
   end
 end

@@ -64,21 +64,21 @@ module Writexlsx
         ]
 
         @writer.tag_elements('property', attributes) do
-          if type == 'text'
-            # Write the vt:lpwstr element.
-            write_vt_lpwstr(value)
-          elsif type == 'date'
+          if type == 'date'
             # Write the vt:filetime element.
             write_vt_filetime(value)
-          elsif type == 'num_int'
-            # Write the vt:i4 element.
-            write_vt_i4(value)
-          elsif type == 'num_real'
+          elsif type == 'number'
             # Write the vt:r8 element.
             write_vt_r8(value)
+          elsif type == 'number_int'
+            # Write the vt:i4 element.
+            write_vt_i4(value)
           elsif type == 'bool'
             # Write the vt:bool element.
             write_vt_bool(value)
+          else
+            # Write the vt:lpwstr element.
+            write_vt_lpwstr(value)
           end
         end
       end

@@ -21,9 +21,6 @@ class TestRegressionProperties03 < Minitest::Test
     worksheet.write('A1', "Select 'Office Button -> Prepare -> Properties' to see the file properties.")
 
     workbook.close
-    compare_for_regression(
-      nil,
-      { 'xl/workbook.xml' => ['<workbookView'] }
-    )
+    compare_for_regression
   end
 end
