@@ -1,5 +1,9 @@
 Change history of write_xlsx rubygem.
 
+2020-12-30 v0.92.0
+
+   Fix for insert_image issue when handling images with zero dpi.
+
 2020-12-30 v0.91.0
 
    Add set_custom_property() workbook method to set custom document
