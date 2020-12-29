@@ -1970,6 +1970,10 @@ module Writexlsx
 
       @images << [filename, type]
 
+      # Set a default dpi for images with 0 dpi.
+      x_dpi = 96 if x_dpi == 0
+      y_dpi = 96 if y_dpi == 0
+
       [type, width, height, File.basename(filename), x_dpi, y_dpi]
     end
 
