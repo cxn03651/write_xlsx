@@ -178,6 +178,16 @@ module Writexlsx
         add_default('bin', 'application/vnd.ms-office.vbaProject')
       end
 
+      #
+      # Add the name of a table to the ContentTypes overrides.
+      #
+      def add_custom_properties
+        custom = "/docProps/custom.xml"
+
+        add_override(custom, "#{App_document}custom-properties+xml")
+      end
+
+
       private
 
       def change_the_workbook_xml_content_type_from_xlsx_to_xlsm

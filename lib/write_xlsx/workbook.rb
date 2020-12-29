@@ -44,6 +44,7 @@ module Writexlsx
     attr_reader :worksheets, :charts, :drawings  # :nodoc:
     attr_reader :named_ranges   # :nodoc:
     attr_reader :doc_properties  # :nodoc:
+    attr_reader :custom_properties # :nodoc:
     attr_reader :image_types, :images  # :nodoc:
     attr_reader :shared_strings  # :nodoc:
     attr_reader :vba_project  # :nodoc:
@@ -114,7 +115,7 @@ module Writexlsx
       @named_ranges        = []
       @custom_colors       = []
       @doc_properties      = {}
-      @local_time          = Time.now
+      @custom_properties   = []
       @optimization        = options[:optimization] || 0
       @x_window            = 240
       @y_window            = 15
@@ -818,6 +819,18 @@ module Writexlsx
 
       @doc_properties = params.dup
     end
+
+    #
+    # Set a user defined custom document property.
+    #
+    def set_custom_property(name, value, type = 'text')
+      if !ptrue?(name) || !ptrue?(value)
+        return -1
+      end
+
+      @custom_properties << [name, value, type]
+    end
+
 
     #
     # The add_vba_project method can be used to add macros or functions to an

@@ -5,6 +5,7 @@ require 'write_xlsx/package/app'
 require 'write_xlsx/package/comments'
 require 'write_xlsx/package/content_types'
 require 'write_xlsx/package/core'
+require 'write_xlsx/package/custom'
 require 'write_xlsx/package/relationships'
 require 'write_xlsx/package/shared_strings'
 require 'write_xlsx/package/styles'
@@ -44,6 +45,7 @@ module Writexlsx
         write_shared_strings_file
         write_app_file
         write_core_file
+        write_custom_file
         write_content_types_file
         write_styles_file
         write_theme_file
@@ -173,6 +175,22 @@ module Writexlsx
       end
 
       #
+      # Write the custom.xml file.
+      #
+      def write_custom_file
+        properties = @workbook.custom_properties
+        custom     = Package::Custom.new
+
+        return if properties.empty?
+
+        FileUtils.mkdir_p("#{@package_dir}/docProps")
+
+        custom.set_properties(properties)
+        custom.set_xml_writer("#{@package_dir}/docProps/custom.xml")
+        custom.assemble_xml_file
+      end
+
+      #
       # Write the ContentTypes.xml file.
       #
       def write_content_types_file
@@ -190,6 +208,8 @@ module Writexlsx
         content.add_shared_strings unless @workbook.shared_strings_empty?
         # Add vbaProject if present.
         content.add_vba_project if @workbook.vba_project
+        # Add the custom properties if present.
+        content.add_custom_properties unless @workbook.custom_properties.empty?
 
         content.set_xml_writer("#{@package_dir}/[Content_Types].xml")
         content.assemble_xml_file
@@ -239,9 +259,15 @@ module Writexlsx
         FileUtils.mkdir_p("#{@package_dir}/_rels")
 
         rels.add_document_relationship('/officeDocument', 'xl/workbook.xml')
+
         rels.add_package_relationship('/metadata/core-properties',
             'docProps/core.xml')
+
         rels.add_document_relationship('/extended-properties', 'docProps/app.xml')
+
+        unless @workbook.custom_properties.empty?
+          rels.add_document_relationship('/custom-properties', 'docProps/custom.xml')
+        end
         rels.set_xml_writer("#{@package_dir}/_rels/.rels" )
         rels.assemble_xml_file
       end
