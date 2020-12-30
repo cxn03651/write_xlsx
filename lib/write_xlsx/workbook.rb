@@ -760,6 +760,25 @@ module Writexlsx
     end
 
     #
+    # Set the workbook size.
+    #
+    def set_size(width = nil, height = nil)
+      if ptrue?(width)
+        # Convert to twips at 96 dpi.
+        @window_width = width.to_i * 1440 / 96
+      else
+        @window_width = 16095
+      end
+
+      if ptrue?(height)
+        # Convert to twips at 96 dpi.
+        @window_height = height.to_i * 1440 / 96
+      else
+        @window_height = 9660
+      end
+    end
+
+    #
     # The set_properties method can be used to set the document properties
     # of the Excel file created by WriteXLSX. These properties are visible
     # when you use the Office Button -> Prepare -> Properties option in Excel
