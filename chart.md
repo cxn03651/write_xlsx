@@ -963,12 +963,15 @@ such as a moving average or a polynomial fit.
 The following properties can be set for trendlines in a chart series.
 
     :type
-    :order       (for polynomial trends)
-    :period      (for moving average)
-    :forward     (for all except moving average)
-    :backward    (for all except moving average)
+    :order             (for polynomial trends)
+    :period            (for moving average)
+    :forward           (for all except moving average)
+    :backward          (for all except moving average)
     :name
     :line
+    :intercept         (for exponential, linear and plynomial only)
+    :display_equation  (for all except moving average)
+    :display_r_squared (for all except moving average)
 
 The type property sets the type of trendline in the series.
 
@@ -1025,28 +1028,63 @@ If it isn't specified the Excel default name will be displayed.
 This is usually a combination of the trendline type and the series name.
 
     chart.add_series(
-        :values    => '=Sheet1!$B$1:$B$5',
-        :trendline => {
-            :type => 'linear',
-            :name => 'Interpolated trend',
+      :values    => '=Sheet1!$B$1:$B$5',
+      :trendline => {
+        :type => 'linear',
+        :name => 'Interpolated trend',
+      }
+    )
+
+The intercept property sets the point where the trendline crosses the Y (value) axis:
+
+    chart.add_series(
+      :values    => '=Sheet1!$B$1:$B$5',
+      :trendline => {
+        :type      => 'linear',
+        :intercept => 0.8
         }
     )
+
+
+The display_equation property displays the trendline equation on the chart.
+
+    chart.add_series(
+      :values    => '=Sheet1!$B$1:$B$5',
+      :trendline => {
+        :type             => 'linear',
+        :display_equation => 1
+      }
+    )
+
+The display_r_squared property displays the R squared value of the trendline on the chart.
+
+    chart.add_series(
+      :values    => '=Sheet1!$B$1:$B$5',
+      :trendline => {
+        :type              => 'linear',
+        :display_r_squared => 1
+      }
+    )
+
 
 Several of these properties can be set in one go:
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :trendline  => {
-            :type     => 'linear',
-            :name     => 'My trend name',
-            :forward  => 0.5,
-            :backward => 0.5,
-            :line     => {
-                :color     => 'red',
-                :width     => 1,
-                :dash_type => 'long_dash',
-            }
+      :values    => '=Sheet1!$B$1:$B$5',
+      :trendline => {
+        :type              => 'linear',
+        :name              => 'My trend name',
+        :forward           => 0.5,
+        :backward          => 0.5,
+        :intercept         => 1.5,
+        :display_equeation => 1,
+        :display_r_squared => 1,
+        :line              => {
+          :color     => 'red',
+          :width     => 1,
+          :dash_type => 'long_dash'
         }
+      }
     )
 
 Trendlines cannot be added to series in a stacked chart or pie chart, radar
