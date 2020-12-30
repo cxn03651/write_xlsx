@@ -1,5 +1,9 @@
 Change history of write_xlsx rubygem.
 
+2020-12-31 v0.96.0
+
+   Added icon sets to conditional formatting.
+
 2020-12-30 v0.95.0
 
    Added workbook set_size() method.
