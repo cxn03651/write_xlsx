@@ -2264,6 +2264,10 @@ module Writexlsx
         write_forward(trendline.forward)
         # Write the c:backward element.
         write_backward(trendline.backward)
+        if trendline.display_r_squared
+          # Write the c:dispRSqr element.
+          write_disp_rsqr
+        end
         if trendline.display_equation
           # Write the c:dispEq element.
           write_disp_eq
@@ -2328,6 +2332,12 @@ module Writexlsx
       @writer.empty_tag('c:dispEq', [ ['val', 1] ])
     end
 
+    #
+    # Write the <c:dispRSqr> element.
+    #
+    def write_disp_rsqr
+      @writer.empty_tag('c:dispRSqr', [ ['val', 1] ])
+    end
 
     #
     # Write the <c:trendlineLbl> element.
