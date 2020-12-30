@@ -272,6 +272,10 @@ module Writexlsx
         raise  "Must specify ':categories' in add_series for this chart type"
       end
 
+      if @series.size == 255
+        raise "The maximum number of series that can be added to an Excel Chart is 255."
+      end
+
       @series << Series.new(self, params)
 
       # Set the secondary axis properties.
