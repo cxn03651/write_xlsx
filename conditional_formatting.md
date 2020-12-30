@@ -74,6 +74,10 @@ Other, less commonly used parameters are:
     :max_color
     :bar_color
     :stop_if_true
+    :icon_style
+    :icons
+    :reverse_icons
+    :icons_only
 
 Additional parameters which are used for specific conditional format types
 are shown in the relevant sections below.
@@ -131,7 +135,12 @@ Allowable type values and their associated parameters are:
 
     formula         criteria
 
-All conditional formatting types have a format parameter, see below.
+    icon_set        icon_style
+                    reverse_icons
+                    icons
+                    icons_only
+
+All conditional formatting types, apart from `icon_set` have a `format` parameter, see below.
 Other types and parameters such as icon sets will be added in time.
 
 ##### <a name="type_cell" class="anchor" href="#type_cell"><span class="octicon octicon-link" /></a>:type => 'cell'
@@ -569,6 +578,100 @@ as a HTML style RGB hex number, as shown above.
 The `:stop_if_true` parameter, if set to a true value, will enable the "stop if true" feature on the conditional formatting rule, so that subsequent rules are not examined for any cell on which the conditions for this rule are met.
 
 
+#### <a name="icon_set" class="anchor" href="#icon_set"><span class="octicon octicon-link" /></a>:icon_set
+
+The `icon_set` type is used to specify a conditional format with a set of icons such as traffic lights or arrows:
+
+    worksheet.conditional_formatting( 'A1:C1',
+        {
+            :type         => 'icon_set',
+            :icon_style   => '3_traffic_lights'
+        }
+    )
+
+The icon set style is specified by the `icon_style` parameter. Valid options are:
+
+    3_arrows
+    3_arrows_gray
+    3_flags
+    3_signs
+    3_symbols
+    3_symbols_circled
+    3_traffic_lights
+    3_traffic_lights_rimmed
+
+    4_arrows
+    4_arrows_gray
+    4_ratings
+    4_red_to_black
+    4_traffic_lights
+
+    5_arrows
+    5_arrows_gray
+    5_quarters
+    5_ratings
+
+The criteria, type and value of each icon can be specified using the `icon` array of hash refs with optional `criteria`, `type` and `value` parameters:
+
+    worksheet.conditional_formatting( 'A1:D1',
+        {
+            :type         => 'icon_set',
+            :icon_style   => '4_red_to_black',
+            :icons        => [ {:criteria => '>',  :type => 'number',     :value => 90},
+                              {:criteria => '>=', :type => 'percentile', :value => 50},
+                              {:criteria => '>',  :type => 'percent',    :value => 25}
+                            ]
+        }
+    )
+
+
+The `icons criteria` parameter should be either `< >= >` or `< > >`. The default `criteria` is `< >= >`.
+
+The `icons type` parameter should be one of the following values:
+
+    number
+    percentile
+    percent
+    formula
+
+The default `type` is `percent`.
+
+The `icons value` parameter can be a value or formula:
+
+    worksheet.conditional_formatting( 'A1:D1',
+        {
+            :type         => 'icon_set',
+            :icon_style   => '4_red_to_black',
+            :icons        => [ {:value => 90},
+                              {:value => 50},
+                              {:value => 25}
+                            ]
+        }
+    )
+
+Note: The `icons` parameters should start with the highest value and with each subsequent one being lower. The default `value` is `(n * 100) / number_of_icons`. The lowest number icon in an icon set has properties defined by Excel. Therefore in a `n` icon set, there is no `n-1` hash of parameters.
+
+The order of the icons can be reversed using the `reverse_icons` parameter:
+
+    worksheet.conditional_formatting( 'A1:C1',
+        {
+            :type          => 'icon_set',
+            :icon_style    => '3_arrows',
+            :reverse_icons => 1
+        }
+    )
+
+The icons can be displayed without the cell value using the `icons_only` parameter:
+
+    worksheet.conditional_formatting( 'A1:C1',
+        {
+            :type         => 'icon_set',
+            :icon_style   => '3_flags',
+            :icons_only   => 1
+        }
+    )
+
+
 #### <a name="conditional_formatting_examples" class="anchor" href="#conditional_formatting_examples"><span class="octicon octicon-link" /></a>Conditional Formatting Examples
 
 Example 1. Highlight cells greater than an integer value.
@@ -578,7 +681,7 @@ Example 1. Highlight cells greater than an integer value.
             :type     => 'cell',
             :criteria => 'greater than',
             :value    => 5,
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -589,7 +692,7 @@ Example 2. Highlight cells greater than a value in a reference cell.
             :type     => 'cell',
             :criteria => 'greater than',
             :value    => '$H$1',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -600,7 +703,7 @@ Example 3. Highlight cells greater than a certain date:
             :type     => 'date',
             :criteria => 'greater than',
             :value    => '2011-01-01T',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -610,7 +713,7 @@ Example 4. Highlight cells with a date in the last seven days:
         {
             :type     => 'time_period',
             :criteria => 'last 7 days',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -621,7 +724,7 @@ Example 5. Highlight cells with strings starting with the letter b:
             :type     => 'text',
             :criteria => 'begins with',
             :value    => 'b',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -630,7 +733,7 @@ Example 6. Highlight cells that are 1 std deviation above the average for the ra
     worksheet.conditional_formatting('A1:F10',
         {
             :type     => 'average',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -639,7 +742,7 @@ Example 7. Highlight duplicate cells in a range:
     worksheet.conditional_formatting('A1:F10',
         {
             :type     => 'duplicate',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -648,7 +751,7 @@ Example 8. Highlight unique cells in a range.
     worksheet.conditional_formatting('A1:F10',
         {
             :type     => 'unique',
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -658,7 +761,7 @@ Example 9. Highlight the top 10 cells.
         {
             :type     => 'top',
             :value    => 10,
-            :format   => format,
+            :format   => format
         }
     )
 
@@ -667,9 +770,19 @@ Example 10. Highlight blank cells.
     worksheet.conditional_formatting('A1:F10',
         {
             :type     => 'blanks',
-            :format   => format,
+            :format   => format
         }
     )
+
+Example 11. Set traffic light icons in 3 cells:
+
+    worksheet.conditional_formatting( 'A1:C1',
+        {
+            :type         => 'icon_set',
+            :icon_style   => '3_traffic_lights'
+        }
+    )
+
 
 See also the
 [`conditional_format.rb`](examples.html#conditional_format)
