@@ -32,8 +32,9 @@ module Writexlsx
         @writer  = Package::XMLWriterSimple.new
 
         @row1, @row2, @col1, @col2, @param = handle_args(*args)
-        @columns = []
+        @columns     = []
         @col_formats = []
+        @seen_name   = {}
 
         # Set the data range rows (without the header and footer).
         @first_data_row = @row1
@@ -95,9 +96,15 @@ module Writexlsx
               col_data.name = user_data[:header]
             end
 
+            # Excel requires unique case insensitive header names.
+            if @seen_name[col_data.name.downcase]
+              raise "add_table() contains duplicate name: '#{col_data.name}'"
+            else
+              @seen_name[col_data.name.downcase] = true
+            end
             # Get the header format if defined.
             col_data.name_format = user_data[:header_format]
-            
+
             # Handle the column formula.
             handle_the_column_formula(
               col_data, col_num, user_data[:formula], user_data[:format]
@@ -291,8 +298,8 @@ module Writexlsx
           # Raise if the name looks like a R1C1.
           if name =~ /^[rcRC]$/ || name =~ /^[rcRC]\d+[rcRC]\d+$/
             raise "Invalid name '#{name}' like a RC cell ref in add_table()"
-          end          
-          
+          end
+
           @name = @param[:name]
         end
       end
