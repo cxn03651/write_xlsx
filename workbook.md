@@ -16,6 +16,7 @@ The following methods are available through a new workbook.
 * [add_vba_project](#add_vba_project)
 * [add_vba_name](#add_vba_name)
 * [close](#close)
+* [set_size](#set_size)
 * [set_properties](#set_properties)
 * [set_custom_properties](#set_custom_properties)
 * [define_name](#define_name)
@@ -241,6 +242,21 @@ An explicit `close()` is required if the file must be closed prior to performing
 on it such as copying it, reading its size or attaching it to an email.
 
 In general, if you create a file with a size of 0 bytes or you fail to create a file you need to call `close()`.
+
+#### <a name="set_size" class="anchor" href="#set_size"><span class="octicon octicon-link" /></a>set_size
+
+The `set_size` method can be used to set the size of a workbook window.
+
+    workbook.set_size(1200, 800)
+
+The Excel window size was used in Excel 2007 to define the width and height of
+a workbook window within the Multiple Document Interface (MDI).
+In later versions of Excel for Windows this interface was dropped.
+This method is currectly only useful when setting the window size in Excel for Mac 2011.
+The units are pixels and the default size is 1073 x 644.
+
+Note, this doesn't equate exactly to the Excel for Mac pixel size
+since it is based on the original Excel 2007 for Windows sizing.
 
 #### <a name="set_properties" class="anchor" href="#set_properties"><span class="octicon octicon-link" /></a>set_properties
 
