@@ -2264,6 +2264,10 @@ module Writexlsx
         write_forward(trendline.forward)
         # Write the c:backward element.
         write_backward(trendline.backward)
+        if trendline.intercept
+          # Write the c:intercept element.
+          write_intercept(trendline.intercept)
+        end
         if trendline.display_r_squared
           # Write the c:dispRSqr element.
           write_disp_rsqr
@@ -2323,6 +2327,13 @@ module Writexlsx
       return unless val
 
       @writer.empty_tag('c:backward', [ ['val', val] ])
+    end
+
+    #
+    # Write the <c:intercept> element.
+    #
+    def write_intercept(val)
+      @writer.empty_tag('c:intercept', [ ['val', val] ])
     end
 
     #
