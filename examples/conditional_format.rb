@@ -26,12 +26,6 @@ format2 = workbook.add_format(
     :color    => '#006100'
 )
 
-# Blue fill with dark blue text.
-format3 = workbook.add_format(
-    :bg_color => '#C6CEFF',
-    :color    => '#0000FF'
-)
-
 # Some sample data to run the conditional formatting against.
 data = [
     [ 34, 72,  38, 30, 75, 48, 75, 66, 84, 86 ],
@@ -226,19 +220,18 @@ worksheet6.conditional_formatting('B3:K6,B9:K12',
 #
 caption = 'Examples of color scales and data bars. Default colors.'
 
-# Use different sample data for examples 7 and 8
-data7 = 1 .. 12
+data = 1 .. 12
 
 worksheet7.write('A1', caption)
 
 worksheet7.write('B2', "2 Color Scale")
-worksheet7.write_col('B3', data7)
+worksheet7.write_col('B3', data)
 
 worksheet7.write('D2', "3 Color Scale")
-worksheet7.write_col('D3', data7)
+worksheet7.write_col('D3', data)
 
 worksheet7.write('F2', "Data Bars")
-worksheet7.write_col('F3', data7)
+worksheet7.write_col('F3', data)
 
 
 worksheet7.conditional_formatting('B3:B14',
@@ -266,16 +259,18 @@ worksheet7.conditional_formatting('F3:F14',
 #
 caption = 'Examples of color scales and data bars. Modified colors.'
 
+data = 1..12
+
 worksheet8.write('A1', caption)
 
 worksheet8.write('B2', "2 Color Scale")
-worksheet8.write_col('B3', data7)
+worksheet8.write_col('B3', data)
 
 worksheet8.write('D2', "3 Color Scale")
-worksheet8.write_col('D3', data7)
+worksheet8.write_col('D3', data)
 
 worksheet8.write('F2', "Data Bars")
-worksheet8.write_col('F3', data7)
+worksheet8.write_col('F3', data)
 
 
 worksheet8.conditional_formatting('B3:B14',
@@ -304,47 +299,79 @@ worksheet8.conditional_formatting('F3:F14',
 
 ###############################################################################
 #
-# Example 9
+# Example 9.
 #
-caption = 'Cells with values >= 100 are always in blue. ' +
-  'Otherwise, cells with values >= 50 are in light red ' +
-  'and values < 50 are in light green.'
+caption = 'Examples of conditional formats with icon sets.'
 
-# Write the data.
+data = [
+  [1, 2, 3],
+  [1, 2, 3],
+  [1, 2, 3],
+  [1, 2, 3],
+  [1, 2, 3, 4],
+  [1, 2, 3, 4, 5],
+  [1, 2, 3, 4, 5]
+]
+
 worksheet9.write('A1', caption)
 worksheet9.write_col('B3', data)
 
-# Write a conditional format over a range.
-# Use stopIfTrue to prevent previous formats from being used
-# if the conditions of this format are met.
-worksheet9.conditional_formatting('B3:K12',
-    {
-        :type         => 'cell',
-        :criteria     => '>=',
-        :value        => 100,
-        :format       => format3,
-        :stop_if_true => 1
-    }
+worksheet9.conditional_formatting(
+  'B3:D3',
+  {
+    :type       => 'icon_set',
+    :icon_style => '3_traffic_lights'
+  }
 )
 
-# Write another conditional format over the same range.
-worksheet9.conditional_formatting('B3:K12',
-    {
-        :type     => 'cell',
-        :criteria => '>=',
-        :value    => 50,
-        :format   => format1
-    }
+worksheet9.conditional_formatting(
+  'B4:D4',
+  {
+    :type          => 'icon_set',
+    :icon_style    => '3_traffic_lights',
+    :reverse_icons => 1
+  }
 )
 
-# Write another conditional format over the same range.
-worksheet9.conditional_formatting('B3:K12',
-    {
-        :type     => 'cell',
-        :criteria => '<',
-        :value    => 50,
-        :format   => format2
-    }
+worksheet9.conditional_formatting(
+  'B5:D5',
+  {
+    :type        => 'icon_set',
+    :icon_style  => '3_traffic_lights',
+    :icons_only  => 1
+  }
+)
+
+worksheet9.conditional_formatting(
+  'B6:D6',
+  {
+    :type        => 'icon_set',
+    :icon_style  => '3_arrows'
+  }
+)
+
+worksheet9.conditional_formatting(
+  'B7:E8',
+  {
+    :type        => 'icon_set',
+    :icon_style  => '4_arrows'
+  }
+)
+
+worksheet9.conditional_formatting(
+  'B8:F8',
+  {
+    :type        => 'icon_set',
+    :icon_style  => '5_arrows'
+  }
+)
+
+worksheet9.conditional_formatting(
+  'B9:F9',
+  {
+    :type        => 'icon_set',
+    :icon_style  => '5_ratings'
+  }
 )
 
 workbook.close

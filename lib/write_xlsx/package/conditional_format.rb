@@ -7,8 +7,8 @@ module Writexlsx
 
       def self.factory(worksheet, *args)
         range, param  =
-          Package::ConditionalFormat.new(worksheet, nil, nil).
-          range_param_for_conditional_formatting(*args)
+               Package::ConditionalFormat.new(worksheet, nil, nil).
+                 range_param_for_conditional_formatting(*args)
 
         case param[:type]
         when 'cellIs'
@@ -29,6 +29,8 @@ module Writexlsx
           DataBarFormat.new(worksheet, range, param)
         when 'expression'
           ExpressionFormat.new(worksheet, range, param)
+        when 'iconSet'
+          IconSetFormat.new(worksheet, range, param)
         else # when 'duplicateValues', 'uniqueValues'
           ConditionalFormat.new(worksheet, range, param)
         end
@@ -59,11 +61,15 @@ module Writexlsx
       #
       # Write the <cfvo> element.
       #
-      def write_cfvo(type, val)
-        @writer.empty_tag('cfvo', [
-                                   ['type', type],
-                                   ['val', val]
-                                  ])
+      def write_cfvo(type, value, criteria = nil)
+        attributes = [
+            ['type', type],
+            ['val',  value]
+        ]
+
+        attributes << ['gte', 0] if ptrue?(criteria)
+
+        @writer.empty_tag('cfvo', attributes)
       end
 
       def attributes
@@ -152,6 +158,26 @@ module Writexlsx
 
       def bar_color
         @param[:bar_color]
+      end
+
+      def icon_style
+        @param[:icon_style]
+      end
+
+      def total_icons
+        @param[:total_icons]
+      end
+
+      def icons
+        @param[:icons]
+      end
+
+      def icons_only
+        @param[:icons_only]
+      end
+
+      def reverse_icons
+        @param[:reverse_icons]
       end
 
       def range_param_for_conditional_formatting(*args)  # :nodoc:
@@ -293,7 +319,7 @@ module Writexlsx
 
       def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
         row1, row2, col1, col2, user_range, param =
-          row_col_param_for_conditional_formatting(*args)
+                                            row_col_param_for_conditional_formatting(*args)
         # If the first and last cell are the same write a single cell.
         if row1 == row2 && col1 == col2
           range = xl_rowcol_to_cell(row1, col1)
@@ -336,7 +362,7 @@ module Writexlsx
 
       def param_for_conditional_formatting(*args)  # :nodoc:
         dummy, dummy, dummy, dummy, dummy, @param =
-          row_col_param_for_conditional_formatting(*args)
+                                           row_col_param_for_conditional_formatting(*args)
         check_conditional_formatting_parameters(@param)
 
         @param[:format] = @param[:format].get_dxf_index if @param[:format]
@@ -347,8 +373,8 @@ module Writexlsx
       def check_conditional_formatting_parameters(param)  # :nodoc:
         # Check for valid input parameters.
         unless (param.keys.uniq - valid_parameter_for_conditional_formatting).empty? &&
-            param.has_key?(:type)                                   &&
-            valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
+               param.has_key?(:type)                                   &&
+               valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
           raise WriteXLSXOptionParameterError, "Invalid type : #{param[:type]}"
         end
 
@@ -367,6 +393,32 @@ module Writexlsx
           param[:value]   = convert_date_time_if_required(param[:value])
           param[:minimum] = convert_date_time_if_required(param[:minimum])
           param[:maximum] = convert_date_time_if_required(param[:maximum])
+        end
+
+        # Set properties for icon sets.
+        if param[:type] == 'iconSet'
+          if !param[:icon_style]
+            raise "The 'icon_style' parameter must be specified when " +
+                  "'type' == 'icon_set' in conditional_formatting()"
+          end
+
+          # Check for valid icon styles.
+          if !icon_set_styles[param[:icon_style]]
+            raise "Unknown icon style '$param->{icon_style}' for parameter " +
+                  "'icon_style' in conditional_formatting()"
+          else
+            param[:icon_style] = icon_set_styles[param[:icon_style]]
+          end
+
+          # Set the number of icons for the icon style.
+          param[:total_icons] = 3
+          if param[:icon_style] =~ /^4/
+            param[:total_icons] = 4
+          elsif param[:icon_style] =~ /^5/
+            param[:total_icons] = 5
+          end
+
+          param[:icons] = set_icon_properties(param[:total_icons], param[:icons])
         end
 
         # 'Between' and 'Not between' criteria require 2 values.
@@ -400,23 +452,27 @@ module Writexlsx
       # List of valid input parameters for conditional_formatting.
       def valid_parameter_for_conditional_formatting
         [
-         :type,
-         :format,
-         :criteria,
-         :value,
-         :minimum,
-         :maximum,
-         :stop_if_true,
-         :min_type,
-         :mid_type,
-         :max_type,
-         :min_value,
-         :mid_value,
-         :max_value,
-         :min_color,
-         :mid_color,
-         :max_color,
-         :bar_color
+          :type,
+          :format,
+          :criteria,
+          :value,
+          :minimum,
+          :maximum,
+          :stop_if_true,
+          :min_type,
+          :mid_type,
+          :max_type,
+          :min_value,
+          :mid_value,
+          :max_value,
+          :min_color,
+          :mid_color,
+          :max_color,
+          :bar_color,
+          :icon_style,
+          :reverse_icons,
+          :icons_only,
+          :icons
         ]
       end
 
@@ -440,7 +496,8 @@ module Writexlsx
           '2_color_scale' => '2_color_scale',
           '3_color_scale' => '3_color_scale',
           'data_bar'      => 'dataBar',
-          'formula'       => 'expression'
+          'formula'       => 'expression',
+          'icon_set'      => 'iconSet'
         }
       end
 
@@ -477,6 +534,100 @@ module Writexlsx
           'this month'               => 'thisMonth',
           'next month'               => 'nextMonth'
         }
+      end
+
+      # List of valid icon styles.
+      def icon_set_styles
+        {
+          "3_arrows"                => "3Arrows",            # 1
+          "3_flags"                 => "3Flags",             # 2
+          "3_traffic_lights_rimmed" => "3TrafficLights2",    # 3
+          "3_symbols_circled"       => "3Symbols",           # 4
+          "4_arrows"                => "4Arrows",            # 5
+          "4_red_to_black"          => "4RedToBlack",        # 6
+          "4_traffic_lights"        => "4TrafficLights",     # 7
+          "5_arrows_gray"           => "5ArrowsGray",        # 8
+          "5_quarters"              => "5Quarters",          # 9
+          "3_arrows_gray"           => "3ArrowsGray",        # 10
+          "3_traffic_lights"        => "3TrafficLights",     # 11
+          "3_signs"                 => "3Signs",             # 12
+          "3_symbols"               => "3Symbols2",          # 13
+          "4_arrows_gray"           => "4ArrowsGray",        # 14
+          "4_ratings"               => "4Rating",            # 15
+          "5_arrows"                => "5Arrows",            # 16
+          "5_ratings"               => "5Rating",            # 17
+        }
+      end
+
+      #
+      # Set the sub-properites for icons.
+      #
+      def set_icon_properties(total_icons, user_props)
+        props       = []
+
+        # Set the default icon properties.
+        total_icons.times do
+          props << {
+            :criteria => 0,
+            :value    => 0,
+            :type     => 'percent'
+          }
+        end
+
+        # Set the default icon values based on the number of icons.
+        if total_icons == 3
+          props[0][:value] = 67
+          props[1][:value] = 33
+        elsif total_icons == 4
+          props[0][:value] = 75
+          props[1][:value] = 50
+          props[2][:value] = 25
+        elsif total_icons == 5
+          props[0][:value] = 80
+          props[1][:value] = 60
+          props[2][:value] = 40
+          props[3][:value] = 20
+        end
+
+        # Overwrite default properties with user defined properties.
+        if user_props
+
+          # Ensure we don't set user properties for lowest icon.
+          max_data = user_props.size
+          max_data = total_icons -1 if max_data >= total_icons
+
+          (0..max_data - 1).each do |i|
+            # Set the user defined 'value' property.
+            if user_props[i][:value]
+              props[i][:value] = user_props[i][:value].to_s.sub(/^=/, '')
+            end
+
+            # Set the user defined 'type' property.
+            if user_props[i][:type]
+
+              type = user_props[i][:type]
+
+              if type != 'percent' && type != 'percentile' &&
+                 type != 'number'  && type != 'formula'
+                raise "Unknown icon property type '$props->{type}' for sub-" +
+                      "property 'type' in conditional_formatting()"
+              else
+                props[i][:type] = type
+
+                if props[i][:type] == 'number'
+                  props[i][:type] = 'num'
+                end
+              end
+            end
+
+            # Set the user defined 'criteria' property.
+            if user_props[i][:criteria] && user_props[i][:criteria] == '>'
+              props[i][:criteria] = 1
+            end
+
+          end
+        end
+        props
       end
 
       def date_1904?
@@ -597,6 +748,34 @@ module Writexlsx
     class ExpressionFormat < ConditionalFormat
       def write_cf_rule
         write_cf_rule_formula_tag(criteria)
+      end
+    end
+
+    class IconSetFormat < ConditionalFormat
+      def write_cf_rule
+        @writer.tag_elements('cfRule', attributes) do
+          write_icon_set
+        end
+      end
+
+      #
+      # Write the <iconSet> element.
+      #
+      def write_icon_set
+        attributes = []
+        # Don't set attribute for default style.
+        attributes = [ ['iconSet', icon_style] ] if icon_style != '3TrafficLights'
+        attributes << ['showValue', 0]           if icons_only
+        attributes << ['reverse', 1]             if reverse_icons
+
+        @writer.tag_elements('iconSet', attributes) do
+          # Write the properties for different icon styles.
+          if icons
+            icons.reverse.each do |icon|
+              write_cfvo(icon[:type], icon[:value], icon[:criteria])
+            end
+          end
+        end
       end
     end
   end
