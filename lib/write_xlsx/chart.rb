@@ -21,12 +21,19 @@ module Writexlsx
       @font       = convert_font_args(params[:font])
     end
 
+    def palette=(palette)
+      @palette = palette
+    end
+
     def write_d_table(writer)
-      writer.tag_elements('c:dTable') do
-        writer.empty_tag('c:showHorzBorder', attributes) if ptrue?(horizontal)
-        writer.empty_tag('c:showVertBorder', attributes) if ptrue?(vertical)
-        writer.empty_tag('c:showOutline',    attributes) if ptrue?(outline)
-        writer.empty_tag('c:showKeys',       attributes) if ptrue?(show_keys)
+      @writer = writer
+      @writer.tag_elements('c:dTable') do
+        @writer.empty_tag('c:showHorzBorder', attributes) if ptrue?(horizontal)
+        @writer.empty_tag('c:showVertBorder', attributes) if ptrue?(vertical)
+        @writer.empty_tag('c:showOutline',    attributes) if ptrue?(outline)
+        @writer.empty_tag('c:showKeys',       attributes) if ptrue?(show_keys)
+        # Write the table font.
+        write_tx_pr(nil, font)                            if ptrue?(font)
       end
     end
 
@@ -418,6 +425,7 @@ module Writexlsx
     #
     def set_table(params = {})
       @table = Table.new(params)
+      @table.palette = @palette
     end
 
     #
@@ -641,20 +649,6 @@ module Writexlsx
     end
 
     #
-    # Convert the user specified colour index or string to a rgb colour.
-    #
-    def color(color_code) # :nodoc:
-      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
-        # Convert a HTML style #RRGGBB color.
-        color_code.sub(/^#/, '').upcase
-      else
-        index = Format.color(color_code)
-        raise "Unknown color '#{color_code}' used in chart formatting." unless index
-        palette_color(index)
-      end
-    end
-
-    #
     # Returns series which use the primary axes.
     #
     def get_primary_axes_series
@@ -691,38 +685,6 @@ module Writexlsx
       [id1, id2]
     end
 
-    #
-    # Get the font style attributes from a font hash.
-    #
-    def get_font_style_attributes(font)
-      return [] unless font
-
-      attributes = []
-      attributes << ['sz', font[:_size]]      if ptrue?(font[:_size])
-      attributes << ['b',  font[:_bold]]      if font[:_bold]
-      attributes << ['i',  font[:_italic]]    if font[:_italic]
-      attributes << ['u',  'sng']             if font[:_underline]
-
-      # Turn off baseline when testing fonts that don't have it.
-      if font[:_baseline] != -1
-        attributes << ['baseline', font[:_baseline]]
-      end
-      attributes
-    end
-
-    #
-    # Get the font latin attributes from a font hash.
-    #
-    def get_font_latin_attributes(font)
-      return [] unless font
-
-      attributes = []
-      attributes << ['typeface', font[:_name]]            if ptrue?(font[:_name])
-      attributes << ['pitchFamily', font[:_pitch_family]] if font[:_pitch_family]
-      attributes << ['charset', font[:_charset]]          if font[:_charset]
-
-      attributes
-    end
     #
     # Setup the default properties for a chart.
     #
@@ -1906,26 +1868,6 @@ module Writexlsx
         write_a_p_rich(title)
       end
     end
-
-    #
-    # Write the <a:bodyPr> element.
-    #
-    def write_a_body_pr(rot, horiz = nil) # :nodoc:
-      rot = -5400000 if !rot && ptrue?(horiz)
-      attributes = []
-      attributes << ['rot',  rot]   if rot
-      attributes << ['vert', 'horz'] if ptrue?(horiz)
-
-      @writer.empty_tag('a:bodyPr', attributes)
-    end
-
-    #
-    # Write the <a:lstStyle> element.
-    #
-    def write_a_lst_style # :nodoc:
-      @writer.empty_tag('a:lstStyle')
-    end
-
     #
     # Write the <a:p> element for rich string titles.
     #
@@ -1939,46 +1881,10 @@ module Writexlsx
     end
 
     #
-    # Write the <a:p> element for formula titles.
-    #
-    def write_a_p_formula(font = nil) # :nodoc:
-      @writer.tag_elements('a:p') do
-        # Write the a:pPr element.
-        write_a_p_pr_formula(font)
-        # Write the a:endParaRPr element.
-        write_a_end_para_rpr
-      end
-    end
-
-    #
     # Write the <a:pPr> element for rich string titles.
     #
     def write_a_p_pr_rich(font) # :nodoc:
       @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
-    end
-
-    #
-    # Write the <a:pPr> element for formula titles.
-    #
-    def write_a_p_pr_formula(font) # :nodoc:
-      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
-    end
-
-    #
-    # Write the <a:defRPr> element.
-    #
-    def write_a_def_rpr(font = nil) # :nodoc:
-      write_def_rpr_r_pr_common(
-                                font,
-                                get_font_style_attributes(font),
-                                'a:defRPr')
-    end
-
-    #
-    # Write the <a:endParaRPr> element.
-    #
-    def write_a_end_para_rpr # :nodoc:
-      @writer.empty_tag('a:endParaRPr', [ ['lang', 'en-US'] ])
     end
 
     #
@@ -2004,47 +1910,11 @@ module Writexlsx
       write_def_rpr_r_pr_common(font, attributes, 'a:rPr')
     end
 
-    def write_def_rpr_r_pr_common(font, style_attributes, tag)  # :nodoc:
-      latin_attributes = get_font_latin_attributes(font)
-      has_color = ptrue?(font) && ptrue?(font[:_color])
-
-      if !latin_attributes.empty? || has_color
-        @writer.tag_elements(tag, style_attributes) do
-          if has_color
-            write_a_solid_fill(:color => font[:_color])
-          end
-          if !latin_attributes.empty?
-            write_a_latin(latin_attributes)
-          end
-        end
-      else
-        @writer.empty_tag(tag, style_attributes)
-      end
-    end
-
     #
     # Write the <a:t> element.
     #
     def write_a_t(title) # :nodoc:
       @writer.data_element('a:t', title)
-    end
-
-    #
-    # Write the <c:txPr> element.
-    #
-    def write_tx_pr(horiz, font) # :nodoc:
-      rotation = nil
-      if font && font[:_rotation]
-        rotation = font[:_rotation]
-      end
-      @writer.tag_elements('c:txPr') do
-        # Write the a:bodyPr element.
-        write_a_body_pr(rotation, horiz)
-        # Write the a:lstStyle element.
-        write_a_lst_style
-        # Write the a:p element.
-        write_a_p_formula(font)
-      end
     end
 
     #
@@ -2166,34 +2036,6 @@ module Writexlsx
     def write_a_no_fill # :nodoc:
       @writer.empty_tag('a:noFill')
     end
-
-    #
-    # Write the <a:solidFill> element.
-    #
-    def write_a_solid_fill(fill) # :nodoc:
-      @writer.tag_elements('a:solidFill') do
-        if fill[:color]
-          # Write the a:srgbClr element.
-          write_a_srgb_clr(color(fill[:color]), fill[:transparency])
-        end
-      end
-    end
-
-    #
-    # Write the <a:srgbClr> element.
-    #
-    def write_a_srgb_clr(color, transparency = nil) # :nodoc:
-      tag        = 'a:srgbClr'
-      attributes = [ ['val', color] ]
-
-      if ptrue?(transparency)
-        @writer.tag_elements(tag, attributes) do
-          write_a_alpha(transparency)
-        end
-      else
-        @writer.empty_tag(tag, attributes)
-      end
-     end
 
     #
     # Write the <a:alpha> element.

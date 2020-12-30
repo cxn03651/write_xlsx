@@ -723,6 +723,173 @@ module Writexlsx
         :_rotation     => params[:rotation]
       }
     end
+
+    #
+    # Write the <c:txPr> element.
+    #
+    def write_tx_pr(horiz, font) # :nodoc:
+      rotation = nil
+      if font && font[:_rotation]
+        rotation = font[:_rotation]
+      end
+      @writer.tag_elements('c:txPr') do
+        # Write the a:bodyPr element.
+        write_a_body_pr(rotation, horiz)
+        # Write the a:lstStyle element.
+        write_a_lst_style
+        # Write the a:p element.
+        write_a_p_formula(font)
+      end
+    end
+
+    #
+    # Write the <a:bodyPr> element.
+    #
+    def write_a_body_pr(rot, horiz = nil) # :nodoc:
+      rot = -5400000 if !rot && ptrue?(horiz)
+      attributes = []
+      attributes << ['rot',  rot]   if rot
+      attributes << ['vert', 'horz'] if ptrue?(horiz)
+
+      @writer.empty_tag('a:bodyPr', attributes)
+    end
+
+    #
+    # Write the <a:lstStyle> element.
+    #
+    def write_a_lst_style # :nodoc:
+      @writer.empty_tag('a:lstStyle')
+    end
+
+    #
+    # Write the <a:p> element for formula titles.
+    #
+    def write_a_p_formula(font = nil) # :nodoc:
+      @writer.tag_elements('a:p') do
+        # Write the a:pPr element.
+        write_a_p_pr_formula(font)
+        # Write the a:endParaRPr element.
+        write_a_end_para_rpr
+      end
+    end
+
+    #
+    # Write the <a:pPr> element for formula titles.
+    #
+    def write_a_p_pr_formula(font) # :nodoc:
+      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
+    end
+
+    #
+    # Write the <a:defRPr> element.
+    #
+    def write_a_def_rpr(font = nil) # :nodoc:
+      write_def_rpr_r_pr_common(
+        font,
+        get_font_style_attributes(font),
+        'a:defRPr'
+      )
+    end
+
+    def write_def_rpr_r_pr_common(font, style_attributes, tag)  # :nodoc:
+      latin_attributes = get_font_latin_attributes(font)
+      has_color = ptrue?(font) && ptrue?(font[:_color])
+
+      if !latin_attributes.empty? || has_color
+        @writer.tag_elements(tag, style_attributes) do
+          if has_color
+            write_a_solid_fill(:color => font[:_color])
+          end
+          if !latin_attributes.empty?
+            write_a_latin(latin_attributes)
+          end
+        end
+      else
+        @writer.empty_tag(tag, style_attributes)
+      end
+    end
+
+    #
+    # Get the font latin attributes from a font hash.
+    #
+    def get_font_latin_attributes(font)
+      return [] unless font
+
+      attributes = []
+      attributes << ['typeface', font[:_name]]            if ptrue?(font[:_name])
+      attributes << ['pitchFamily', font[:_pitch_family]] if font[:_pitch_family]
+      attributes << ['charset', font[:_charset]]          if font[:_charset]
+
+      attributes
+    end
+
+    #
+    # Write the <a:solidFill> element.
+    #
+    def write_a_solid_fill(fill) # :nodoc:
+      @writer.tag_elements('a:solidFill') do
+        if fill[:color]
+          # Write the a:srgbClr element.
+          write_a_srgb_clr(color(fill[:color]), fill[:transparency])
+        end
+      end
+    end
+
+    #
+    # Write the <a:srgbClr> element.
+    #
+    def write_a_srgb_clr(color, transparency = nil) # :nodoc:
+      tag        = 'a:srgbClr'
+      attributes = [ ['val', color] ]
+
+      if ptrue?(transparency)
+        @writer.tag_elements(tag, attributes) do
+          write_a_alpha(transparency)
+        end
+      else
+        @writer.empty_tag(tag, attributes)
+      end
+     end
+
+    #
+    # Convert the user specified colour index or string to a rgb colour.
+    #
+    def color(color_code) # :nodoc:
+      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
+        # Convert a HTML style #RRGGBB color.
+        color_code.sub(/^#/, '').upcase
+      else
+        index = Format.color(color_code)
+        raise "Unknown color '#{color_code}' used in chart formatting." unless index
+        palette_color(index)
+      end
+    end
+
+    #
+    # Get the font style attributes from a font hash.
+    #
+    def get_font_style_attributes(font)
+      return [] unless font
+
+      attributes = []
+      attributes << ['sz', font[:_size]]      if ptrue?(font[:_size])
+      attributes << ['b',  font[:_bold]]      if font[:_bold]
+      attributes << ['i',  font[:_italic]]    if font[:_italic]
+      attributes << ['u',  'sng']             if font[:_underline]
+
+      # Turn off baseline when testing fonts that don't have it.
+      if font[:_baseline] != -1
+        attributes << ['baseline', font[:_baseline]]
+      end
+      attributes
+    end
+
+    #
+    # Write the <a:endParaRPr> element.
+    #
+    def write_a_end_para_rpr # :nodoc:
+      @writer.empty_tag('a:endParaRPr', [ ['lang', 'en-US'] ])
+    end
   end
 
   module WriteDPtPoint
