@@ -803,12 +803,14 @@ the data used to plot the chart.
 
 The available options, with default values are:
 
-    :vertical   => 1,    # Display vertical lines in the table.
-    :horizontal => 1,    # Display horizontal lines in the table.
-    :outline    => 1,    # Display an outline in the table.
-    :show_keys  => 0     # Show the legend keys with the table data.
+    :vertical   => 1,  # Display vertical lines in the table.
+    :horizontal => 1,  # Display horizontal lines in the table.
+    :outline    => 1,  # Display an outline in the table.
+    :show_keys  => 0   # Show the legend keys with the table data.
+    :font       => {}  # Standard chart font properties.
 
 The data table can only be shown with Bar, Column, Line, Area and stock charts.
+For font properties see the [CHART FONTS][] section below.
 
 #### <a name="set_up_down_bars" class="anchor" href="#set_up_down_bars"><span class="octicon octicon-link" /></a>set_up_down_bars()
 
@@ -1302,11 +1304,21 @@ The explicit format string must be used as shown above.
 
 The font property is used to set the font properties of the data labels in a series:
 
-    chartadd_series(
+    chart.add_series(
         :values      => '=Sheet1!$A$1:$A$5',
         :data_labels => {
             :value => 1,
             :font  => { :name => 'Consolas' }
+        }
+    )
+
+The font property is also used to rotate the data labels in a series:
+
+    chart.add_series(
+        :values      => '=Sheet1!$A$1:$A$5',
+        :data_labels => {
+            :value => 1,
+            :font  => { :rotate => 45 }
         }
     )
 
