@@ -538,4 +538,31 @@ class TestWriteDataValidation02 < Minitest::Test
     expected = '<dataValidations count="1"><dataValidation allowBlank="1" showInputMessage="1" showErrorMessage="1" promptTitle="Input title January" prompt="Input message February" sqref="B5"/></dataValidations>'
     assert_equal(expected, result)
   end
+
+  def test_write_data_validation_length_validation
+    @worksheet.data_validation(
+      'A1',
+      :validate => 'length',
+      :criteria => 'between',
+      :minimum  => 5,
+      :maximum  => 10
+    )
+    @worksheet.__send__('write_data_validations')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<dataValidations count="1"><dataValidation type="textLength" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A1"><formula1>5</formula1><formula2>10</formula2></dataValidation></dataValidations>'
+    assert_equal(expected, result)
+  end
+
+  def test_write_data_validation_length_validation_2
+    @worksheet.data_validation(
+      'A1',
+      :validate => 'length',
+      :criteria => '>',
+      :value    => 5
+    )
+    @worksheet.__send__('write_data_validations')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<dataValidations count="1"><dataValidation type="textLength" operator="greaterThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A1"><formula1>5</formula1></dataValidation></dataValidations>'
+    assert_equal(expected, result)
+  end
 end
