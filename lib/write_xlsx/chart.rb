@@ -518,39 +518,6 @@ module Writexlsx
     end
 
     #
-    # Convert user defined font values into private hash values.
-    #
-    def convert_font_args(params)
-      return unless params
-      font = params_to_font(params)
-
-      # Convert font size units.
-      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
-
-      # Convert rotation into 60,000ths of a degree.
-      if ptrue?(font[:_rotation])
-        font[:_rotation] = 60_000 * font[:_rotation].to_i
-      end
-
-      font
-    end
-
-    def params_to_font(params)
-      {
-        :_name         => params[:name],
-        :_color        => params[:color],
-        :_size         => params[:size],
-        :_bold         => params[:bold],
-        :_italic       => params[:italic],
-        :_underline    => params[:underline],
-        :_pitch_family => params[:pitch_family],
-        :_charset      => params[:charset],
-        :_baseline     => params[:baseline] || 0,
-        :_rotation     => params[:rotation]
-      }
-    end
-
-    #
     # Switch name and name_formula parameters if required.
     #
     def process_names(name = nil, name_formula = nil) # :nodoc:

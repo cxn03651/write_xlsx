@@ -297,7 +297,7 @@ module Writexlsx
         end
 
         if labels[:font]
-          labels[:font] = @chart.convert_font_args(labels[:font])
+          labels[:font] = convert_font_args(labels[:font])
         end
 
         labels

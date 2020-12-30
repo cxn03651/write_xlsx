@@ -320,7 +320,7 @@ module Writexlsx
       invalids = params.keys - valid_keys
       unless invalids.empty?
         raise WriteXLSXOptionParameterError,
-          "Unknown parameter '#{invalids.join(', ')}' in #{method}."
+              "Unknown parameter '#{invalids.join(', ')}' in #{method}."
       end
       true
     end
@@ -372,7 +372,7 @@ module Writexlsx
       # Check for valid properties.
       args.keys.each do |key|
         unless properties.include?(key.to_sym)
-            raise "Property '#{key}' not allowed in layout options\n"
+          raise "Property '#{key}' not allowed in layout options\n"
         end
       end
 
@@ -405,9 +405,9 @@ module Writexlsx
 
     def v_shape_attributes_base(id, z_index)
       [
-       ['id',          "_x0000_s#{id}"],
-       ['type',        type],
-       ['style',       (v_shape_style_base(z_index, vertices) + style_addition).join]
+        ['id',          "_x0000_s#{id}"],
+        ['type',        type],
+        ['style',       (v_shape_style_base(z_index, vertices) + style_addition).join]
       ]
     end
 
@@ -425,17 +425,17 @@ module Writexlsx
 
     def shape_style_base(left_str, top_str, width_str, height_str, z_index_str)
       [
-       'position:absolute;',
-       'margin-left:',
-       left_str, 'pt;',
-       'margin-top:',
-       top_str, 'pt;',
-       'width:',
-       width_str, 'pt;',
-       'height:',
-       height_str, 'pt;',
-       'z-index:',
-       z_index_str, ';'
+        'position:absolute;',
+        'margin-left:',
+        left_str, 'pt;',
+        'margin-top:',
+        top_str, 'pt;',
+        'width:',
+        width_str, 'pt;',
+        'height:',
+        height_str, 'pt;',
+        'z-index:',
+        z_index_str, ';'
       ]
     end
 
@@ -500,10 +500,10 @@ module Writexlsx
       color   = '#000000'
 
       attributes = [
-                    ['face',  face],
-                    ['size',  size],
-                    ['color', color]
-                   ]
+        ['face',  face],
+        ['size',  size],
+        ['color', color]
+      ]
       @writer.data_element('font', caption, attributes)
     end
 
@@ -612,7 +612,7 @@ module Writexlsx
         'small_check'               => 'smCheck',
         'large_check'               => 'lgCheck',
         'outlined_diamond'          => 'openDmnd',
-        'solid_diamond'             => 'solidDmnd'        
+        'solid_diamond'             => 'solidDmnd'
       }
 
       # Check for valid types.
@@ -627,7 +627,7 @@ module Writexlsx
 
       pattern
     end
-    
+
     def line_fill_properties(params)
       return { :_defined => 0 } unless params
       ret = params.dup
@@ -690,22 +690,55 @@ module Writexlsx
         [options.dup, default_format_properties.dup]
       end
     end
+
+    #
+    # Convert user defined font values into private hash values.
+    #
+    def convert_font_args(params)
+      return unless params
+      font = params_to_font(params)
+
+      # Convert font size units.
+      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
+
+      # Convert rotation into 60,000ths of a degree.
+      if ptrue?(font[:_rotation])
+        font[:_rotation] = 60_000 * font[:_rotation].to_i
+      end
+
+      font
+    end
+
+    def params_to_font(params)
+      {
+        :_name         => params[:name],
+        :_color        => params[:color],
+        :_size         => params[:size],
+        :_bold         => params[:bold],
+        :_italic       => params[:italic],
+        :_underline    => params[:underline],
+        :_pitch_family => params[:pitch_family],
+        :_charset      => params[:charset],
+        :_baseline     => params[:baseline] || 0,
+        :_rotation     => params[:rotation]
+      }
+    end
   end
 
   module WriteDPtPoint
-      #
-      # Write an individual <c:dPt> element. Override the parent method to add
-      # markers.
-      #
-      def write_d_pt_point(index, point)
-        @writer.tag_elements('c:dPt') do
-          # Write the c:idx element.
-          write_idx(index)
-          @writer.tag_elements('c:marker') do
-            # Write the c:spPr element.
-            write_sp_pr(point)
-          end
+    #
+    # Write an individual <c:dPt> element. Override the parent method to add
+    # markers.
+    #
+    def write_d_pt_point(index, point)
+      @writer.tag_elements('c:dPt') do
+        # Write the c:idx element.
+        write_idx(index)
+        @writer.tag_elements('c:marker') do
+          # Write the c:spPr element.
+          write_sp_pr(point)
         end
       end
+    end
   end
 end

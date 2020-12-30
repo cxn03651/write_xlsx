@@ -184,8 +184,8 @@ module Writexlsx
       end
 
       def set_font_properties(args)
-        @num_font  = @chart.convert_font_args(args[:num_font])
-        @name_font = @chart.convert_font_args(args[:name_font])
+        @num_font  = convert_font_args(args[:num_font])
+        @name_font = convert_font_args(args[:name_font])
       end
 
       def set_axis_name_layout(args)

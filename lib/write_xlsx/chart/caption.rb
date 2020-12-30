@@ -3,6 +3,8 @@
 module Writexlsx
   class Chart
     class Caption
+      include Writexlsx::Utility
+
       attr_accessor :name, :formula, :data_id, :name_font
       attr_reader :layout, :overlay, :none
 
@@ -13,7 +15,7 @@ module Writexlsx
       def merge_with_hash(params) # :nodoc:
         @name, @formula = @chart.process_names(params[:name], params[:name_formula])
         @data_id        = @chart.data_id(@formula, params[:data])
-        @name_font      = @chart.convert_font_args(params[:name_font])
+        @name_font      = convert_font_args(params[:name_font])
         @layout   = @chart.layout_properties(params[:layout], 1)
 
         # Set the title overlay option.
