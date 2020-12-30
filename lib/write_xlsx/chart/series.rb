@@ -57,16 +57,18 @@ module Writexlsx
 
     class Trendline < Chartline
       attr_reader :name, :forward, :backward, :order, :period
+      attr_reader :display_equation
 
       def initialize(params)
         super(params)
 
-        @name     = params[:name]
-        @forward  = params[:forward]
-        @backward = params[:backward]
-        @order    = params[:order]
-        @period   = params[:period]
-        @type     = value_or_raise(types, params[:type], 'trendline type')
+        @name             = params[:name]
+        @forward          = params[:forward]
+        @backward         = params[:backward]
+        @order            = params[:order]
+        @period           = params[:period]
+        @display_equation = params[:display_equation]
+        @type             = value_or_raise(types, params[:type], 'trendline type')
       end
 
       private

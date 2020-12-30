@@ -2264,6 +2264,12 @@ module Writexlsx
         write_forward(trendline.forward)
         # Write the c:backward element.
         write_backward(trendline.backward)
+        if trendline.display_equation
+          # Write the c:dispEq element.
+          write_disp_eq
+          # Write the c:trendlineLbl element.
+          write_trendline_lbl
+        end
       end
     end
 
@@ -2313,6 +2319,41 @@ module Writexlsx
       return unless val
 
       @writer.empty_tag('c:backward', [ ['val', val] ])
+    end
+
+    #
+    # Write the <c:dispEq> element.
+    #
+    def write_disp_eq
+      @writer.empty_tag('c:dispEq', [ ['val', 1] ])
+    end
+
+
+    #
+    # Write the <c:trendlineLbl> element.
+    #
+    def write_trendline_lbl
+      @writer.tag_elements('c:trendlineLbl') do
+        # Write the c:layout element.
+        write_layout
+        # Write the c:numFmt element.
+        write_trendline_num_fmt
+      end
+    end
+
+    #
+    # Write the <c:numFmt> element.
+    #
+    def write_trendline_num_fmt
+      format_code   = 'General'
+      source_linked = 0
+
+      attributes = [
+        ['formatCode',   format_code],
+        ['sourceLinked', source_linked]
+      ]
+
+      @writer.empty_tag('c:numFmt', attributes)
     end
 
     #
