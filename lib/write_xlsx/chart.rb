@@ -10,7 +10,7 @@ module Writexlsx
   class Table
     include Writexlsx::Utility
 
-    attr_reader :horizontal, :vertical, :outline, :show_keys
+    attr_reader :horizontal, :vertical, :outline, :show_keys, :font
 
     def initialize(params = {})
       @horizontal, @vertical, @outline, @show_keys = true, true, true, false
@@ -18,6 +18,7 @@ module Writexlsx
       @vertical   = params[:vertical]   if params.has_key?(:vertical)
       @outline    = params[:outline]    if params.has_key?(:outline)
       @show_keys  = params[:show_keys]  if params.has_key?(:show_keys)
+      @font       = convert_font_args(params[:font])
     end
 
     def write_d_table(writer)
