@@ -18,6 +18,7 @@ module Writexlsx
         @fill_count       = 0
         @custom_colors    = []
         @dxf_formats      = []
+        @has_hyperlink    = 0
       end
 
       def set_xml_writer(filename)
@@ -150,7 +151,10 @@ module Writexlsx
 
       def write_font_base
         @xf_formats.each do |format|
-          format.write_font(@writer, self) if format.has_font?
+          if format.has_font?
+            format.write_font(@writer, self)
+            @has_hyperlink = 1 if ptrue?(format.hyperlink)
+          end
         end
       end
 
@@ -365,11 +369,17 @@ module Writexlsx
       # Write the <cellStyleXfs> element.
       #
       def write_cell_style_xfs
-        attributes = [ ['count', 1] ]
+        count = ptrue?(@has_hyperlink) ? 2 : 1
+
+        attributes = [ ['count', count] ]
 
         @writer.tag_elements('cellStyleXfs', attributes) do
           # Write the style_xf element.
-          write_style_xf
+          write_style_xf(0, 0)
+
+          if ptrue?(@has_hyperlink)
+            write_style_xf(1, 1)
+          end
         end
       end
 
@@ -396,15 +406,27 @@ module Writexlsx
       #
       # Write the style <xf> element.
       #
-      def write_style_xf
+      def write_style_xf(is_hyperlink, font_id)
         attributes = [
           ['numFmtId', 0],
-          ['fontId',   0],
+          ['fontId',   font_id],
           ['fillId',   0],
           ['borderId', 0]
         ]
 
-        @writer.empty_tag('xf', attributes)
+        if ptrue?(is_hyperlink)
+          attributes << ['applyNumberFormat', 0]
+          attributes << ['applyFill',         0]
+          attributes << ['applyBorder',       0]
+          attributes << ['applyAlignment',    0]
+          attributes << ['applyProtection',   0]
+          @writer.tag_elements('xf', attributes) do
+            @writer.empty_tag('alignment',  [ ['vertical', 'top'] ])
+            @writer.empty_tag('protection', [ ['locked',   0] ])
+          end
+        else
+          @writer.empty_tag('xf', attributes)
+        end
       end
 
       private
@@ -450,22 +472,27 @@ module Writexlsx
       # Write the <cellStyles> element.
       #
       def write_cell_styles
-        attributes = [ ['count', 1] ]
+        count = ptrue?(@has_hyperlink) ? 2 : 1
+
+        attributes = [ ['count', count] ]
 
         @writer.tag_elements('cellStyles', attributes) do
           # Write the cellStyle element.
-          write_cell_style
+          if ptrue?(@has_hyperlink)
+            write_cell_style('Hyperlink', 1, 8)
+          end
+          write_cell_style('Normal', 0, 0)
         end
       end
 
       #
       # Write the <cellStyle> element.
       #
-      def write_cell_style
+      def write_cell_style(name, xf_id, builtin_id)
         attributes = [
-            ['name',      'Normal'],
-            ['xfId',      0],
-            ['builtinId', 0]
+            ['name',      name],
+            ['xfId',      xf_id],
+            ['builtinId', builtin_id]
         ]
 
         @writer.empty_tag('cellStyle', attributes)

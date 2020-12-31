@@ -163,7 +163,7 @@ module Writexlsx
     include Writexlsx::Utility
 
     attr_reader :xf_index, :dxf_index, :num_format   # :nodoc:
-    attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink   # :nodoc:
+    attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink, :xf_id   # :nodoc:
     attr_reader :diag_type, :diag_color, :font_only, :color, :color_indexed   # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color   # :nodoc:
     attr_reader :font_scheme   # :nodoc:
@@ -200,6 +200,7 @@ module Writexlsx
       @font_extend    = 0
       @theme          = 0
       @hyperlink      = 0
+      @xf_id          = 0
 
       @hidden         = 0
       @locked         = 1
@@ -396,7 +397,8 @@ module Writexlsx
         @font,
         @italic,
         @size,
-        @underline
+        @underline,
+        @theme
       ].join(':')
     end
 
@@ -593,15 +595,14 @@ module Writexlsx
     end
 
     #
-    # Set the properties for the hyperlink style. TODO. This doesn't currently
-    # work. Fix it when styles are supported.
+    # Set the properties for the hyperlink style.
     #
-    def set_hyperlink
+    def set_hyperlink(value)
       @hyperlink = 1
+      @xf_id     = 1
 
       set_underline(1)
       set_theme(10)
-      set_align('top')
     end
 
     def set_font_info(fonts)
@@ -804,11 +805,11 @@ module Writexlsx
         ['fontId'  , font_index],
         ['fillId'  , fill_index],
         ['borderId', border_index],
-        ['xfId'    , 0]
+        ['xfId'    , xf_id]
       ]
       attributes << ['applyNumberFormat', 1] if num_format_index > 0
       # Add applyFont attribute if XF format uses a font element.
-      attributes << ['applyFont', 1] if font_index > 0
+      attributes << ['applyFont', 1] if font_index > 0 && !ptrue?(hyperlink)
       # Add applyFill attribute if XF format uses a fill element.
       attributes << ['applyFill', 1] if fill_index > 0
       # Add applyBorder attribute if XF format uses a border element.
@@ -817,8 +818,10 @@ module Writexlsx
       # Check if XF format has alignment properties set.
       apply_align, align = get_align_properties
       # We can also have applyAlignment without a sub-element.
-      attributes << ['applyAlignment', 1] if apply_align
-      attributes << ['applyProtection', 1] if get_protection_properties
+      attributes << ['applyAlignment', 1] if apply_align || ptrue?(hyperlink)
+      if get_protection_properties || ptrue?(hyperlink)
+        attributes << ['applyProtection', 1]
+      end
 
       attributes
     end
