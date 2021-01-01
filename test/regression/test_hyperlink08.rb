@@ -15,6 +15,9 @@ class TestRegressionHyperlink08 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
+    # Turn off default URL format for testing.
+    worksheet.instance_variable_set(:@default_url_format, nil)
+
     worksheet.write_url('A1',  'external://VBOXSVR/share/foo.xlsx', 'J:/foo.xlsx')
     worksheet.write_url('A3',  'external:foo.xlsx')
 

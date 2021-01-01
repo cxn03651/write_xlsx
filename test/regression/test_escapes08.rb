@@ -15,6 +15,9 @@ class TestRegressionEscapes08 < Minitest::Test
     workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
 
+    # Turn off default URL format for testing.
+    worksheet.instance_variable_set(:@default_url_format, nil)
+
     # Test an already escaped string.
     worksheet.write_url(
                         'A1',

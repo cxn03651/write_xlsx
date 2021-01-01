@@ -22,13 +22,6 @@ worksheet = workbook.add_worksheet('Hyperlinks')
 worksheet.set_column('A:A', 30)
 worksheet.set_selection('B1')
 
-
-# Add the standard url link format.
-url_format = workbook.add_format(
-    :color     => 'blue',
-    :underline => 1
-)
-
 # Add a sample format.
 red_format = workbook.add_format(
     :color     => 'red',
@@ -45,11 +38,11 @@ tip = 'Get the latest Perl news here.'
 
 
 # Write some hyperlinks
-worksheet.write('A1', 'http://www.perl.com/', url_format)
-worksheet.write('A3', 'http://www.perl.com/', url_format, str)
-worksheet.write('A5', 'http://www.perl.com/', url_format, str, tip)
+worksheet.write('A1', 'http://www.perl.com/')
+worksheet.write('A3', 'http://www.perl.com/', nil, str)
+worksheet.write('A5', 'http://www.perl.com/', nil, str, tip)
 worksheet.write('A7', 'http://www.perl.com/', red_format)
-worksheet.write('A9', 'mailto:jmcnamara@cpan.org', url_format, 'Mail me')
+worksheet.write('A9', 'mailto:jmcnamara@cpan.org', nil, 'Mail me')
 
 # Write a URL that isn't a hyperlink
 worksheet.write_string('A11', 'http://www.perl.com/')

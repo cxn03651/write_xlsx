@@ -50,6 +50,8 @@ module Writexlsx
     attr_reader :vba_project  # :nodoc:
     attr_reader :excel2003_style # :nodoc:
     attr_reader :strings_to_urls # :nodoc:
+    attr_reader :default_url_format # :nodoc:
+
     #
     # A new Excel workbook is created using the +new+ constructor
     # which accepts either a filename or an IO object as a parameter.
@@ -142,6 +144,10 @@ module Writexlsx
       else
         add_format(default_formats.merge(:xf_index => 0))
       end
+
+      # Add a default URL format.
+      @default_url_format = add_format(:hyperlink => 1)
+
       set_color_palette
     end
 
@@ -943,6 +949,16 @@ module Writexlsx
 
       @calc_id = calc_id if calc_id
     end
+
+    #
+    # Get the default url format used when a user defined format isn't specified
+    # with write_url(). The format is the hyperlink style defined by Excel for the
+    # default theme.
+    #
+    def default_url_format
+      @default_url_format
+    end
+    alias get_default_url_format default_url_format
 
     #
     # Change the RGB components of the elements in the colour palette.

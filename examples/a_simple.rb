@@ -34,11 +34,6 @@ worksheet.write(7, 0, '=A3 + A6')
 worksheet.write(8, 0, '=IF(A5>3,"Yes", "No")')
 
 # Write a hyperlink
-hyperlink_format = workbook.add_format(
-                     :color     => 'blue',
-                     :underline => 1
-                                      )
-
-worksheet.write(10, 0, 'http://www.ruby-lang.org/', hyperlink_format)
+worksheet.write(10, 0, 'http://www.ruby-lang.org/')
 
 workbook.close

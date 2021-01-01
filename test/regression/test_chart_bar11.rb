@@ -24,6 +24,9 @@ class TestRegressionChartBar11 < Minitest::Test
             [3, 6, 9, 12, 15]
            ]
 
+    # Turn off default URL format for testing.
+    worksheet.instance_variable_set(:@default_url_format, nil)
+
     worksheet.write('A1', data)
     worksheet.write('A7', 'http://www.perl.com/')
     worksheet.write('A8', 'http://www.perl.org/')

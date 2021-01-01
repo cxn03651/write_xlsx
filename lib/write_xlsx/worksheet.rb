@@ -308,6 +308,7 @@ module Writexlsx
       @cell_data_table = {}
       @excel_version = 2007
       @palette = workbook.palette
+      @default_url_format = workbook.default_url_format
 
       @page_setup = PageSetup.new
 
@@ -2780,6 +2781,9 @@ module Writexlsx
       if hyperlinks_count > 65_530
         raise "URL '#{url}' added but number of URLS is over Excel's limit of 65,530 URLS per worksheet."
       end
+
+      # Add the default URL format.
+      xf = @default_url_format unless xf
 
       # Write the hyperlink string.
       write_string(row, col, hyperlink.str, xf)

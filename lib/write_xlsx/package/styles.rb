@@ -10,15 +10,16 @@ module Writexlsx
 
       def initialize
         @writer = Package::XMLWriterSimple.new
-        @xf_formats       = nil
-        @palette          = []
-        @font_count       = 0
-        @num_format_count = 0
-        @border_count     = 0
-        @fill_count       = 0
-        @custom_colors    = []
-        @dxf_formats      = []
-        @has_hyperlink    = 0
+        @xf_formats        = nil
+        @palette           = []
+        @font_count        = 0
+        @num_format_count  = 0
+        @border_count      = 0
+        @fill_count        = 0
+        @custom_colors     = []
+        @dxf_formats       = []
+        @has_hyperlink     = 0
+        @hyperlink_font_id = 0
       end
 
       def set_xml_writer(filename)
@@ -34,7 +35,10 @@ module Writexlsx
       #
       # Pass in the Format objects and other properties used to set the styles.
       #
-      def set_style_properties(xf_formats, palette, font_count, num_format_count, border_count, fill_count, custom_colors, dxf_formats)
+      def set_style_properties(
+            xf_formats, palette, font_count, num_format_count, border_count,
+            fill_count, custom_colors, dxf_formats
+          )
         @xf_formats       = xf_formats
         @palette          = palette
         @font_count       = font_count
@@ -153,7 +157,8 @@ module Writexlsx
         @xf_formats.each do |format|
           if format.has_font?
             format.write_font(@writer, self)
-            @has_hyperlink = 1 if ptrue?(format.hyperlink)
+            @has_hyperlink     = 1 if ptrue?(format.hyperlink)
+            @hyperlink_font_id = format.font_index unless ptrue?(@hyperlink_font_id)
           end
         end
       end
@@ -378,7 +383,7 @@ module Writexlsx
           write_style_xf(0, 0)
 
           if ptrue?(@has_hyperlink)
-            write_style_xf(1, 1)
+            write_style_xf(1, @hyperlink_font_id)
           end
         end
       end
@@ -406,7 +411,7 @@ module Writexlsx
       #
       # Write the style <xf> element.
       #
-      def write_style_xf(is_hyperlink, font_id)
+      def write_style_xf(has_hyperlink, font_id)
         attributes = [
           ['numFmtId', 0],
           ['fontId',   font_id],
@@ -414,7 +419,7 @@ module Writexlsx
           ['borderId', 0]
         ]
 
-        if ptrue?(is_hyperlink)
+        if ptrue?(has_hyperlink)
           attributes << ['applyNumberFormat', 0]
           attributes << ['applyFill',         0]
           attributes << ['applyBorder',       0]

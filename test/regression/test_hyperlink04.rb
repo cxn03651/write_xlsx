@@ -17,6 +17,9 @@ class TestRegressionHyperlink04 < Minitest::Test
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet('Data Sheet')
 
+    # Turn off default URL format for testing.
+    worksheet1.instance_variable_set(:@default_url_format, nil)
+
     worksheet1.write_url('A1',  "internal:Sheet2!A1")
     worksheet1.write_url('A3',  "internal:Sheet2!A1:A5")
     worksheet1.write_url('A5',  "internal:'Data Sheet'!D5", 'Some text')

@@ -22,4 +22,29 @@ class TestRegressionHyperlink28 < Minitest::Test
 
     compare_for_regression
   end
+
+  def test_hyperlink28_2
+    @xlsx = 'hyperlink28.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.write_url('A1', 'http://www.perl.org/')
+
+    workbook.close
+
+    compare_for_regression
+  end
+
+  def test_hyperlink28_3
+    @xlsx = 'hyperlink28.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+    format    = workbook.get_default_url_format
+
+    worksheet.write_url('A1', 'http://www.perl.org/', format)
+
+    workbook.close
+
+    compare_for_regression
+  end
 end

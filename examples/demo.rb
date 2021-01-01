@@ -27,11 +27,6 @@ heading = workbook.add_format(
     :align => 'vcenter'
 )
 
-hyperlink_format = workbook.add_format(
-    :color => 'blue',
-    :underline => 1
-)
-
 headings = ['Features of WriteXLSX', '']
 worksheet.write_row('A1', headings, heading)
 
@@ -81,7 +76,7 @@ worksheet.write('B8', '=SIN(PI()/4)')
 # Hyperlinks
 #
 worksheet.write('A9', "Hyperlinks")
-worksheet.write('B9', 'http://www.ruby-lang.org/', hyperlink_format)
+worksheet.write('B9', 'http://www.ruby-lang.org/')
 
 #######################################################################
 #
@@ -99,4 +94,3 @@ worksheet.write('A18', "Page/printer setup")
 worksheet.write('A19', "Multiple worksheets")
 
 workbook.close
-

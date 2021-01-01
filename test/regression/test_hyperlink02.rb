@@ -15,6 +15,9 @@ class TestRegressionHyperlink02 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
+    # Turn off default URL format for testing.
+    worksheet.instance_variable_set(:@default_url_format, nil)
+
     worksheet.write('A1', 'http://www.perl.org/')
     worksheet.write('D4', 'http://www.perl.org/')
     worksheet.write('A8', 'http://www.perl.org/')

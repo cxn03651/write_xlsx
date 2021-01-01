@@ -595,14 +595,15 @@ module Writexlsx
     end
 
     #
-    # Set the properties for the hyperlink style.
+    # Set the properties for the hyperlink style. This isn't a public method. To
+    # be fixed when styles are supported.
     #
-    def set_hyperlink(value)
-      @hyperlink = 1
-      @xf_id     = 1
+    def set_hyperlink(hyperlink)
+      @xf_id = 1
 
       set_underline(1)
       set_theme(10)
+      @hyperlink = hyperlink
     end
 
     def set_font_info(fonts)
@@ -809,7 +810,7 @@ module Writexlsx
       ]
       attributes << ['applyNumberFormat', 1] if num_format_index > 0
       # Add applyFont attribute if XF format uses a font element.
-      attributes << ['applyFont', 1] if font_index > 0 && !ptrue?(hyperlink)
+      attributes << ['applyFont', 1] if font_index > 0 && !ptrue?(@hyperlink)
       # Add applyFill attribute if XF format uses a fill element.
       attributes << ['applyFill', 1] if fill_index > 0
       # Add applyBorder attribute if XF format uses a border element.
@@ -818,7 +819,7 @@ module Writexlsx
       # Check if XF format has alignment properties set.
       apply_align, align = get_align_properties
       # We can also have applyAlignment without a sub-element.
-      attributes << ['applyAlignment', 1] if apply_align || ptrue?(hyperlink)
+      attributes << ['applyAlignment', 1] if apply_align || ptrue?(@hyperlink)
       if get_protection_properties || ptrue?(hyperlink)
         attributes << ['applyProtection', 1]
       end

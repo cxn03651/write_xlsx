@@ -21,6 +21,9 @@ class TestRegressionTable03 < Minitest::Test
     # Add the table.
     worksheet.add_table('C3:F13')
 
+    # Turn off default URL format for testing.
+    worksheet.instance_variable_set(:@default_url_format, nil)
+
     # Add a link to check rId handling.
     worksheet.write('A1', 'http://perl.com/')
 

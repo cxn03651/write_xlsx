@@ -22,7 +22,12 @@ class Writexlsx::Workbook
   # Set the default index for each format. This is mainly used for testing.
   #
   def set_default_xf_indices #:nodoc:
-    @formats.formats.each { |format| format.get_xf_index }
+    # Delete the default url format.
+    @formats.formats.delete_at(1)
+
+    @formats.formats.each do |format|
+      format.get_xf_index
+    end
   end
 end
 
