@@ -96,6 +96,8 @@ module Writexlsx
           write_layout(@plotarea.layout, 'plot')
           # Write the subclass chart type element.
           write_chart_type
+          # Write the c:spPr eleent for the plotarea formatting.
+          write_sp_pr(@plotarea)
         end
       end
 

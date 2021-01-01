@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartChartArea05 < Minitest::Test
+class TestRegressionChartChartArea06 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -10,11 +10,11 @@ class TestRegressionChartChartArea05 < Minitest::Test
     @tempfile.close(true)
   end
 
-  def test_chart_chartarea05
-    @xlsx = 'chart_chartarea05.xlsx'
+  def test_chart_chartarea06
+    @xlsx = 'chart_chartarea06.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
 
     data = [
       [ 2,  4,  6],
