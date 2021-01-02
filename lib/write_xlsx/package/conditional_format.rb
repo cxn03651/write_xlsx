@@ -62,10 +62,8 @@ module Writexlsx
       # Write the <cfvo> element.
       #
       def write_cfvo(type, value, criteria = nil)
-        attributes = [
-            ['type', type],
-            ['val',  value]
-        ]
+        attributes = [ ['type', type] ]
+        attributes << [ 'val', value] if value
 
         attributes << ['gte', 0] if ptrue?(criteria)
 
@@ -160,6 +158,30 @@ module Writexlsx
         @param[:bar_color]
       end
 
+      def bar_border_color
+        @param[:bar_border_color]
+      end
+
+      def bar_negative_color
+        @param[:bar_negative_color]
+      end
+
+      def bar_negative_color_same
+        @param[:bar_negative_color_same]
+      end
+
+      def bar_no_border
+        @param[:bar_no_border]
+      end
+
+      def bar_axis_position
+        @param[:bar_axis_position]
+      end
+
+      def bar_axis_color
+        @param[:bar_axis_color]
+      end
+
       def icon_style
         @param[:icon_style]
       end
@@ -178,6 +200,10 @@ module Writexlsx
 
       def reverse_icons
         @param[:reverse_icons]
+      end
+
+      def bar_only
+        @param[:bar_only]
       end
 
       def range_param_for_conditional_formatting(*args)  # :nodoc:
@@ -300,17 +326,68 @@ module Writexlsx
           @param[:mid_color] = palette_color(@param[:mid_color])
           @param[:min_color] = palette_color(@param[:min_color])
         when 'dataBar'
-          # Color scales don't use any additional formatting.
+          # Excel 2007 data bars don't use any additional formatting.
           @param[:format] = nil
 
-          @param[:min_type]  ||= 'min'
-          @param[:max_type]  ||= 'max'
-          @param[:min_value] ||= 0
-          @param[:max_value] ||= 0
-          @param[:bar_color] ||= '#638EC6'
+          if !@param[:min_type]
+            @param[:min_type]     = 'min'
+            @param[:x14_min_type] = 'autoMin'
+          else
+            @param[:x14_min_type] = @param[:min_type]
+          end
+          if !@param[:max_type]
+            @param[:max_type]     = 'max'
+            @param[:x14_max_type] = 'autoMax'
+          else
+            @param[:x14_max_type] = @param[:max_type]
+          end
 
-          @param[:bar_color] = palette_color(@param[:bar_color])
+          @param[:min_value]                      ||= 0
+          @param[:max_value]                      ||= 0
+          @param[:bar_color]                      ||= '#638EC6'
+          @param[:bar_border_color]               ||= @param[:bar_color]
+          @param[:bar_only]                       ||= 0
+          @param[:bar_no_border]                  ||= 0
+          @param[:bar_solid]                      ||= 0
+          @param[:bar_direction]                  ||= ''
+          @param[:bar_negative_color]             ||= '#FF0000'
+          @param[:bar_negative_border_color]      ||= '#FF0000'
+          @param[:bar_negative_color_same]        ||= 0
+          @param[:bar_negative_border_color_same] ||= 0
+          @param[:bar_axis_position]              ||= ''
+          @param[:bar_axis_color]                 ||= '#000000'
+
+          @param[:bar_color] =
+            palette_color(@param[:bar_color])
+          @param[:bar_border_color] =
+            palette_color(@param[:bar_border_color])
+          @param[:bar_negative_color] =
+            palette_color(@param[:bar_negative_color])
+          @param[:bar_negative_border_color] =
+            palette_color(@param[:bar_negative_border_color])
+          @param[:bar_axis_color] =
+            palette_color(@param[:bar_axis_color])
         end
+
+        # Adjust for 2010 style data_bar parameters.
+        if ptrue?(@param[:is_data_bar_2010])
+          @worksheet.excel_version = 2010
+
+          if @param[:min_type] == 'min' && @param[:min_value] == 0
+            @param[:min_value] = nil
+          end
+          if @param[:max_type] == 'max' && @param[:max_value] == 0
+            @param[:max_value] = nil
+          end
+
+          # Store range for Excel 2010 data bars.
+          @param[:range] = range
+        end
+
+        # Strip the leading = from formulas.
+        @param[:min_value] = @param[:min_value].to_s.sub(/^=/, '') if @param[:min_value]
+        @param[:mid_value] = @param[:mid_value].to_s.sub(/^=/, '') if @param[:mid_value]
+        @param[:max_value] = @param[:max_value].to_s.sub(/^=/, '') if @param[:max_value]
       end
 
       def palette_color(index)
@@ -367,14 +444,27 @@ module Writexlsx
 
         @param[:format] = @param[:format].get_dxf_index if @param[:format]
         @param[:priority] = @worksheet.dxf_priority
+
+        # Check for 2010 style data_bar parameters.
+        %i(data_bar_2010 bar_solid bar_border_color bar_negative_color
+           bar_negative_color_same bar_negative_border_color
+           bar_negative_border_color_same bar_no_border
+           bar_axis_position bar_axis_color bar_direction
+        ).each do |key|
+          if @param[key]
+            @param[:is_data_bar_2010] = 1
+            break
+          end
+        end
+
         @worksheet.dxf_priority += 1
       end
 
       def check_conditional_formatting_parameters(param)  # :nodoc:
         # Check for valid input parameters.
-        unless (param.keys.uniq - valid_parameter_for_conditional_formatting).empty? &&
-               param.has_key?(:type)                                   &&
-               valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
+        if !(param.keys.uniq - valid_parameter_for_conditional_formatting).empty? ||
+           !param.has_key?(:type) ||
+           !valid_type_for_conditional_formatting.has_key?(param[:type].downcase)
           raise WriteXLSXOptionParameterError, "Invalid type : #{param[:type]}"
         end
 
@@ -469,10 +559,22 @@ module Writexlsx
           :mid_color,
           :max_color,
           :bar_color,
+          :bar_negative_color,
+          :bar_negative_color_same,
+          :bar_solid,
+          :bar_border_color,
+          :bar_negative_border_color,
+          :bar_negative_border_color_same,
+          :bar_no_border,
+          :bar_direction,
+          :bar_axis_position,
+          :bar_axis_color,
+          :bar_only,
           :icon_style,
           :reverse_icons,
           :icons_only,
-          :icons
+          :icons,
+          :data_bar_2010
         ]
       end
 
@@ -729,6 +831,9 @@ module Writexlsx
       def write_cf_rule
         @writer.tag_elements('cfRule', attributes) do
           write_data_bar
+          if ptrue?(@param[:is_data_bar_2010])
+            write_data_bar_ext(@param)
+          end
         end
       end
 
@@ -736,11 +841,40 @@ module Writexlsx
       # Write the <dataBar> element.
       #
       def write_data_bar
-        @writer.tag_elements('dataBar') do
+        attributes = []
+
+        if ptrue?(bar_only)
+          attributes << ['showValue', 0]
+        end
+        @writer.tag_elements('dataBar',attributes) do
           write_cfvo(min_type, min_value)
           write_cfvo(max_type, max_value)
 
           write_color(@writer, 'rgb', bar_color)
+        end
+      end
+
+      #
+      # Write the <extLst> dataBar extension element.
+      #
+      def write_data_bar_ext(param)
+        # Create a pseudo GUID for each unique Excel 2010 data bar.
+        worksheet_count = @worksheet.index + 1
+        data_bar_count  = @worksheet.data_bars_2010.size + 1
+
+        guid = sprintf(
+          "{DA7ABA51-AAAA-BBBB-%04X-%012X}",
+          worksheet_count, data_bar_count
+        )
+
+        # Store the 2010 data bar parameters to write the extLst elements.
+        param[:guid] = guid
+        @worksheet.data_bars_2010 << param
+
+        @writer.tag_elements('extLst') do
+          @worksheet.write_ext('{B025F937-C7B1-47D3-B67F-A62EFF666E3E}') do
+            @writer.data_element('x14:id', guid)
+          end
         end
       end
     end

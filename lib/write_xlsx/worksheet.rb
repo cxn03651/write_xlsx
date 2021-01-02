@@ -294,7 +294,7 @@ module Writexlsx
     attr_reader :writer, :set_rows, :col_formats # :nodoc:
     attr_reader :vml_shape_id # :nodoc:
     attr_reader :comments, :comments_author # :nodoc:
-    attr_accessor :dxf_priority # :nodoc:
+    attr_accessor :data_bars_2010, :dxf_priority # :nodoc:
     attr_reader :vba_codename # :nodoc:
     attr_writer :excel_version
 
@@ -377,8 +377,9 @@ module Writexlsx
 
       @validations = []
 
-      @cond_formats = {}
-      @dxf_priority = 1
+      @cond_formats   = {}
+      @data_bars_2010 = []
+      @dxf_priority   = 1
 
       if excel2003_style?
         @original_row_height      = 12.75
@@ -423,7 +424,7 @@ module Writexlsx
           write_legacy_drawing
           write_legacy_drawing_hf
           write_table_parts
-          write_ext_sparklines
+          write_ext_list
         end
       end
     end
@@ -6041,6 +6042,26 @@ module Writexlsx
       end
     end
 
+    def write_ext(url)
+      attributes = [
+        ['xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main"],
+        ['uri',       url]
+      ]
+      @writer.tag_elements('ext', attributes) do
+        yield
+      end
+    end
+
+    def write_sparkline_groups
+      # Write the x14:sparklineGroups element.
+      @writer.tag_elements('x14:sparklineGroups', sparkline_groups_attributes) do
+        # Write the sparkline elements.
+        @sparklines.reverse.each do |sparkline|
+          sparkline.write_sparkline_group(@writer)
+        end
+      end
+    end
+
     private
 
     def hyperlinks_count
@@ -6652,9 +6673,10 @@ module Writexlsx
     def write_worksheet_attributes #:nodoc:
       schema = 'http://schemas.openxmlformats.org/'
       attributes = [
-                    ['xmlns',    "#{schema}spreadsheetml/2006/main"],
-                    ['xmlns:r',  "#{schema}officeDocument/2006/relationships"]
-                   ]
+        ['xmlns',    "#{schema}spreadsheetml/2006/main"],
+        ['xmlns:r',  "#{schema}officeDocument/2006/relationships"]
+      ]
+
       if @excel_version == 2010
         attributes << ['xmlns:mc',     "#{schema}markup-compatibility/2006"]
         attributes << ['xmlns:x14ac',  "#{OFFICE_URL}spreadsheetml/2009/9/ac"]
@@ -7510,31 +7532,229 @@ module Writexlsx
     end
 
     #
-    # Write the <extLst> element and sparkline subelements.
+    # Write the <extLst> element for data bars and sparklines.
     #
-    def write_ext_sparklines  # :nodoc:
-      @writer.tag_elements('extLst') { write_ext } unless @sparklines.empty?
-    end
+    def write_ext_list  # :nodoc:
+      return if @data_bars_2010.empty? && @sparklines.empty?
 
-    def write_ext
-      @writer.tag_elements('ext', write_ext_attributes) do
-        write_sparkline_groups
+      @writer.tag_elements('extLst') do
+        write_ext_list_data_bars  if @data_bars_2010.size > 0
+        write_ext_list_sparklines if @sparklines.size > 0
       end
     end
 
-    def write_ext_attributes
-      [
-       ['xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main"],
-       ['uri',       '{05C60535-1F16-4fd2-B633-F4F36F0B64E0}']
-      ]
+    #
+    # Write the Excel 2010 data_bar subelements.
+    #
+    def write_ext_list_data_bars
+      # Write the ext element.
+      write_ext('{78C0D931-6437-407d-A8EE-F0AAD7539E65}') do
+
+        @writer.tag_elements('x14:conditionalFormattings') do
+          # Write each of the Excel 2010 conditional formatting data bar elements.
+          @data_bars_2010.each do |data_bar|
+            # Write the x14:conditionalFormatting element.
+            write_conditional_formatting_2010(data_bar)
+          end
+        end
+      end
+    end
+    #
+    # Write the <x14:conditionalFormatting> element.
+    #
+    def write_conditional_formatting_2010(data_bar)
+      xmlns_xm = 'http://schemas.microsoft.com/office/excel/2006/main'
+
+      attributes = [ ['xmlns:xm', xmlns_xm] ]
+
+      @writer.tag_elements('x14:conditionalFormatting', attributes) do
+
+        # Write the '<x14:cfRule element.
+        write_x14_cf_rule(data_bar)
+
+        # Write the x14:dataBar element.
+        write_x14_data_bar(data_bar)
+
+        # Write the x14 max and min data bars.
+        write_x14_cfvo(data_bar[:x14_min_type], data_bar[:min_value])
+        write_x14_cfvo(data_bar[:x14_max_type], data_bar[:max_value])
+
+        # Write the x14:borderColor element.
+        if !ptrue?(data_bar[:bar_no_border])
+          write_x14_border_color(data_bar[:bar_border_color])
+        end
+
+        # Write the x14:negativeFillColor element.
+        if !ptrue?(data_bar[:bar_negative_color_same])
+          write_x14_negative_fill_color(data_bar[:bar_negative_color])
+        end
+
+        # Write the x14:negativeBorderColor element.
+        if !ptrue?(data_bar[:bar_no_border]) &&
+           !ptrue?(data_bar[:bar_negative_border_color_same])
+          write_x14_negative_border_color(
+            data_bar[:bar_negative_border_color])
+        end
+
+        # Write the x14:axisColor element.
+        if data_bar[:bar_axis_position] != 'none'
+          write_x14_axis_color(data_bar[:bar_axis_color])
+        end
+
+        # Write closing elements.
+        @writer.end_tag('x14:dataBar')
+        @writer.end_tag('x14:cfRule')
+
+        # Add the conditional format range.
+        @writer.data_element('xm:sqref', data_bar[:range])
+      end
     end
 
-    def write_sparkline_groups
-      # Write the x14:sparklineGroups element.
-      @writer.tag_elements('x14:sparklineGroups', sparkline_groups_attributes) do
-        # Write the sparkline elements.
-        @sparklines.reverse.each do |sparkline|
-          sparkline.write_sparkline_group(@writer)
+    #
+    # Write the <cfvo> element.
+    #
+    def write_x14_cfvo(type, value)
+      attributes = [ ['type', type ] ]
+
+      if %w(min max autoMin autoMax).include?(type)
+        @writer.empty_tag('x14:cfvo', attributes)
+      else
+        @writer.tag_elements('x14:cfvo', attributes) do
+          @writer.data_element('xm:f', value)
+        end
+      end
+    end
+
+    #
+    # Write the <'<x14:cfRule> element.
+    #
+    def write_x14_cf_rule(data_bar)
+      type = 'dataBar'
+      id   = data_bar[:guid]
+
+      attributes = [
+        ['type', type],
+        ['id',   id]
+      ]
+
+      @writer.start_tag('x14:cfRule', attributes)
+
+    end
+
+    #
+    # Write the <x14:dataBar> element.
+    #
+    def write_x14_data_bar(data_bar)
+      min_length = 0
+      max_length = 100
+
+      attributes = [
+        ['minLength', min_length],
+        ['maxLength', max_length]
+      ]
+
+      attributes << ['border',   1] if !ptrue?(data_bar[:bar_no_border])
+      attributes << ['gradient', 0] if ptrue?(data_bar[:bar_solid])
+
+      if data_bar[:bar_direction] == 'left'
+        attributes << ['direction', 'leftToRight']
+      end
+      if data_bar[:bar_direction] == 'right'
+        attributes << ['direction', 'rightToLeft']
+      end
+
+      if ptrue?(data_bar[:bar_negative_color_same])
+        attributes << ['negativeBarColorSameAsPositive', 1]
+      end
+
+      if !ptrue?(data_bar[:bar_no_border]) &&
+         !ptrue?(data_bar[:bar_negative_border_color_same])
+        attributes << ['negativeBarBorderColorSameAsPositive', 0]
+      end
+
+      if data_bar[:bar_axis_position] == 'middle'
+        attributes << ['axisPosition', 'middle']
+      end
+
+      if data_bar[:bar_axis_position] == 'none'
+        attributes << ['axisPosition', 'none']
+      end
+
+      @writer.start_tag('x14:dataBar', attributes)
+    end
+
+    #
+    # Write the <x14:borderColor> element.
+    #
+    def write_x14_border_color(rgb)
+      attributes = [ ['rgb', rgb]  ]
+
+      @writer.empty_tag('x14:borderColor', attributes)
+    end
+
+    #
+    # Write the <x14:negativeFillColor> element.
+    #
+    def write_x14_negative_fill_color(rgb)
+      attributes = [ ['rgb', rgb] ]
+
+      @writer.empty_tag('x14:negativeFillColor', attributes)
+    end
+
+    #
+    # Write the <x14:negativeBorderColor> element.
+    #
+    def write_x14_negative_border_color(rgb)
+      attributes = [ ['rgb', rgb] ]
+
+      @writer.empty_tag('x14:negativeBorderColor', attributes)
+    end
+
+    #
+    # Write the <x14:axisColor> element.
+    #
+    def write_x14_axis_color(rgb)
+      attributes = [ ['rgb', rgb] ]
+
+      @writer.empty_tag('x14:axisColor', attributes)
+    end
+
+    #
+    # Write the sparkline subelements.
+    #
+    def write_ext_list_sparklines
+      # Write the ext element.
+      write_ext('{05C60535-1F16-4fd2-B633-F4F36F0B64E0}') do
+
+        # Write the x14:sparklineGroups element.
+        write_sparkline_groups
+
+        #      # Write the sparkline elements.
+        #       @sparklines.reverse.each do |sparkline|
+        #         # Write the x14:sparklineGroup element.
+        # #        sparkline.write_sparkline_group(@writer)
+
+        #         @writer.end_tag('x14:sparklineGroup')
+        #       end
+
+        #       @writer.end_tag('x14:sparklineGroups')
+      end
+    end
+
+    #
+    # Write the <x14:sparklines> element and <x14:sparkline> subelements.
+    #
+    def write_sparklines(sparkline)
+      # Write the sparkline elements.
+      @writer.tag_elements('x14:sparklines') do
+        (0..sparkline[:count]-1).each do |i|
+          range    = sparkline[:ranges][i]
+          location = sparkline[:locations][i]
+
+          @writer.tag_elements('x14:sparkline') do
+            @writer.data_element('xm:f', range)
+            @writer.data_element('xm:sqref', location)
+          end
         end
       end
     end
