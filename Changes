@@ -1,5 +1,16 @@
 Change history of write_xlsx rubygem.
 
+2021-01-02 v0.97.0
+
+   Added Excel 2010 data bar features such as solid fills and control over
+   the display of negative values.
+
+   Added default formatting for hyperlinks if none is specified. The format
+   is the Excel hyperlink style so links change colour after they are
+   clicked.
+
+   Fixed missing plotarea formatting in pie/doughnut charts.
+
 2020-12-31 v0.96.0
 
    Added icon sets to conditional formatting.
