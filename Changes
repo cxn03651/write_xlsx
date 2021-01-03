@@ -1,5 +1,9 @@
 Change history of write_xlsx rubygem.
 
+2021-01-03 v0.98.0
+
+   fixed for autofilter rule with blanks plus another filter.
+
 2021-01-02 v0.97.0
 
    Added Excel 2010 data bar features such as solid fills and control over
