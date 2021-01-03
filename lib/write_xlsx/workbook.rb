@@ -2064,16 +2064,20 @@ module Writexlsx
       offset = 2
       data_length = data.bytesize
 
-      # Search through the image data to read the height and width in the
-      # 0xFFC0/C2 element. Also read the DPI in the 0xFFE0 element.
+      # Search through the image data to read the JPEG markers.
       while offset < data_length
         marker  = data[offset+0, 2].unpack("n")[0]
         length  = data[offset+2, 2].unpack("n")[0]
 
-        if marker == 0xFFC0 || marker == 0xFFC2
+        # Read the height and width in the 0xFFCn elements
+        # (Except C4, C8 and CC which aren't SOF markers).
+        if (marker & 0xFFF0) == 0xFFC0 &&
+           marker != 0xFFC4 && marker != 0xFFCC
           height = data[offset+5, 2].unpack("n")[0]
           width  = data[offset+7, 2].unpack("n")[0]
         end
+
+        # Read the DPI in the 0xFFE0 element.
         if marker == 0xFFE0
           units     = data[offset + 11, 1].unpack("C")[0]
           x_density = data[offset + 12, 2].unpack("n")[0]
