@@ -478,12 +478,12 @@ module Writexlsx
 
       colors = Colors::COLORS
 
+      # Return the default color if nil,
+      return 0x00 unless color_code
+
       if color_code.respond_to?(:to_str)
         # Return RGB style colors for processing later.
         return color_code if color_code =~ /^#[0-9A-F]{6}$/i
-
-        # Return the default color if undef,
-        return 0x00 unless color_code
 
         # or the color string converted to an integer,
         return colors[color_code.downcase.to_sym] if colors[color_code.downcase.to_sym]
