@@ -7294,7 +7294,7 @@ module Writexlsx
     # Write the <filters> element.
     #
     def write_filters(*filters) #:nodoc:
-      non_blanks = filters.reject { |filter| filter =~ /^blanks$/ }
+      non_blanks = filters.reject { |filter| filter =~ /^blanks$/i }
       attributes = []
 
       if filters != non_blanks
@@ -7307,7 +7307,7 @@ module Writexlsx
       else
         # General case.
         @writer.tag_elements('filters', attributes) do
-          non_blanks.each { |filter| write_filter(filter) }
+          non_blanks.sort.each { |filter| write_filter(filter) }
         end
       end
     end
