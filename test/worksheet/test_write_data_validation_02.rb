@@ -565,4 +565,21 @@ class TestWriteDataValidation02 < Minitest::Test
     expected = '<dataValidations count="1"><dataValidation type="textLength" operator="greaterThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A1"><formula1>5</formula1></dataValidation></dataValidations>'
     assert_equal(expected, result)
   end
+
+  def test_write_data_validation_date_auto_between
+    @workbook.instance_variable_set(:@date_1904, 0)
+
+    @worksheet.data_validation(
+      'B5',
+      :validate => 'date',
+      :criteria => 'between',
+      :minimum  => '2018-01-01T',
+      :maximum  => '=TODAY()'
+    )
+
+    @worksheet.__send__('write_data_validations')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<dataValidations count="1"><dataValidation type="date" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="B5"><formula1>43101</formula1><formula2>TODAY()</formula2></dataValidation></dataValidations>'
+    assert_equal(expected, result)
+  end
 end

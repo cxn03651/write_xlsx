@@ -219,10 +219,17 @@ module Writexlsx
       end
 
       def convert_date_time_value_if_required
-        @date_1904 = date_1904?
         if @validate == 'date' || @validate == 'time'
-          unless convert_date_time_value(:value) && convert_date_time_value(:maximum)
-            raise WriteXLSXOptionParameterError, "Invalid date/time value."
+          date_time = convert_date_time(@value)
+          if date_time
+            @value = date_time
+          end
+
+          if @maximum
+            date_time = convert_date_time(@maximum)
+            if date_time
+              @maximum = date_time
+            end
           end
         end
       end
@@ -290,17 +297,6 @@ module Writexlsx
           'less than or equal to'       => 'lessThanOrEqual',
           '<='                          => 'lessThanOrEqual'
         }
-      end
-
-      def convert_date_time_value(key)  # :nodoc:
-        value = instance_variable_get("@#{key}")
-        if value && value.to_s =~ /T/
-          date_time = convert_date_time(value)
-          instance_variable_set("@#{key}", date_time) if date_time
-          date_time
-        else
-          true
-        end
       end
 
       def date_1904?

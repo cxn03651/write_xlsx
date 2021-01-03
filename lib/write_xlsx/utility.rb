@@ -119,7 +119,7 @@ module Writexlsx
     #            nil if the date is invalid.
     #
     def convert_date_time(date_time_string)       #:nodoc:
-      date_time = date_time_string.sub(/^\s+/, '').sub(/\s+$/, '').sub(/Z$/, '')
+      date_time = date_time_string.to_s.sub(/^\s+/, '').sub(/\s+$/, '').sub(/Z$/, '')
 
       # Check for invalid date char.
       return nil if date_time =~ /[^0-9T:\-\.Z]/
