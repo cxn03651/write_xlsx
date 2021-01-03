@@ -60,7 +60,7 @@ the `set_row()` and `set_column()` worksheet methods:
     set_row(row, height, format, hidden, level, collapsed)
     set_column(first_col, last_col, width, format, hidden, level, collapsed)
 
-The following example sets an outline level of 1 for rows 1 and 2
+The following example sets an outline level of 1 for rows 2 and 3
 (zero-indexed) and columns B to G.
 The parameters `height` and `XF` are assigned default values since they are
 undefined:

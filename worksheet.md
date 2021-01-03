@@ -697,6 +697,8 @@ However, should you need greater control over the format of the cell comment the
     :start_col
     :x_offset
     :y_offset
+    :font
+    :font_size
 
 ##### Option: author
 This option is used to indicate who is the author of the cell comment.
@@ -786,7 +788,16 @@ This option is used to change the y offset, in pixels, of a comment within a cel
 
     worksheet.write_comment('C3', comment, :x_offset => 30)
 
-You can apply as many of these options as you require.
+##### Option: font
+This option is used to change the font used in the comment from 'Tahoma' which is the default.
+
+    worksheet.write_comment('C3', comment, font => 'Calibri')
+
+##### Option: font_size
+
+This option is used to change the font size used in the comment from 8 which is the default.
+
+    worksheet.write_comment('C3', comment, font_size => 20)
 
 ###### Note about using options that adjust the position of the cell comment such as `:start_cell`, `:start_row`, `:start_col`, `:x_offset` and `:y_offset`:
 Excel only displays offset cell comments when they are displayed as "visible".
@@ -1294,7 +1305,7 @@ The `level` parameter is used to set the outline level of the row.
 Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
 Adjacent rows with the same outline level are grouped together into a single outline.
 
-The following example sets an outline level of 1 for rows 1 and 2 (zero-indexed):
+The following example sets an outline level of 1 for rows 2 and 3 (zero-indexed):
 
     worksheet.set_row(1, nil, nil, 0, 1)
     worksheet.set_row(2, nil, nil, 0, 1)

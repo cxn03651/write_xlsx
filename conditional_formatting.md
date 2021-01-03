@@ -73,11 +73,23 @@ Other, less commonly used parameters are:
     :mid_color
     :max_color
     :bar_color
-    :stop_if_true
+    :bar_only
+    :bar_solid
+    :bar_negative_color
+    :bar_negative_border_color
+    :bar_negative_color_same
+    :bar_negative_border_color_same
+    :bar_no_border
+    :bar_direction
+    :bar_axis_position
+    :bar_axis_color
+    :data_bar_2010
     :icon_style
     :icons
     :reverse_icons
     :icons_only
+    :stop_if_true
+    :multi_range
 
 Additional parameters which are used for specific conditional format types
 are shown in the relevant sections below.
@@ -96,52 +108,87 @@ Allowable type values and their associated parameters are:
                     value
                     minimum
                     maximum
+                    format
 
     date            criteria
                     value
                     minimum
                     maximum
+                    format
 
     time_period     criteria
+                    format
 
     text            criteria
                     value
+                    format
 
     average         criteria
+                    format
 
-    duplicate       (none)
+    duplicate       format
 
-    unique          (none)
+    unique          format
 
     top             criteria
                     value
+                    format
 
     bottom          criteria
                     value
+                    format
 
-    blanks          (none)
+    blanks          format
 
-    no_blanks       (none)
+    no_blanks       format
 
-    errors          (none)
+    errors          format
 
-    no_errors       (none)
-
-    2_color_scale   (none)
-
-    3_color_scale   (none)
-
-    data_bar        (none)
+    no_errors       format
 
     formula         criteria
+                    format
+
+    2_color_scale   min_type
+                    max_type
+                    min_value
+                    max_value
+                    min_color
+                    max_color
+
+    3_color_scale   min_type
+                    mid_type
+                    max_type
+                    min_value
+                    mid_value
+                    max_value
+                    min_color
+                    mid_color
+                    max_color
+
+    data_bar        min_type
+                    max_type
+                    min_value
+                    max_value
+                    bar_only
+                    bar_color
+                    bar_solid*
+                    bar_negative_color*
+                    bar_negative_border_color*
+                    bar_negative_color_same*
+                    bar_negative_border_color_same*
+                    bar_no_border*
+                    bar_direction*
+                    bar_axis_position*
+                    bar_axis_color*
+                    data_bar_2010*
 
     icon_set        icon_style
                     reverse_icons
                     icons
                     icons_only
 
-All conditional formatting types, apart from `icon_set` have a `format` parameter, see below.
-Other types and parameters such as icon sets will be added in time.
+Data bar parameters marked wth (*) are only available in Excel 2010 and later. Files that use these properties can still be opened in Excel 2007 but the data bars will be displayed without them.
 
 ##### <a name="type_cell" class="anchor" href="#type_cell"><span class="octicon octicon-link" /></a>:type => 'cell'
 
@@ -459,6 +506,21 @@ The `no_errors` type is used to highlight non error cells in a range:
         }
     )
 
+##### <a name="type_formula" class="anchor" href="#type_formula"><span class="octicon octicon-link" /></a>:type => 'formula'
+
+The `formula` type is used to specify a conditional format based on a user
+defined formula:
+
+    worksheet.conditional_formatting('A1:A4',
+        {
+            :type     => 'formula',
+            :criteria => '=$A$1 > 5',
+            :format   => format,
+        }
+    )
+
+The formula is specified in the `criteria`.
+
 ##### <a name="type_2_color_scale" class="anchor" href="#type_2_color_scale"><span class="octicon octicon-link" /></a>:type => '2_color_scale'
 
 The `2_color_scale` type is used to specify Excel's "2 Color Scale"
@@ -498,23 +560,30 @@ The `data_bar` type is used to specify Excel's "Data Bar" style conditional form
         }
     )
 
-This conditional type can be modified with `:min_type`, `:max_type`,
-`:min_value`, `:max_value` and `:bar_color`, see below.
+This data bar conditional type can be modified with the following parameters, which are explained in the sections below. These properties were available in the original xlsx file specification used in Excel 2007:
 
-##### <a name="type_formula" class="anchor" href="#type_formula"><span class="octicon octicon-link" /></a>:type => 'formula'
+    :min_type
+    :max_type
+    :min_value
+    :max_value
+    :bar_color
+    :bar_only
 
-The `formula` type is used to specify a conditional format based on a user
-defined formula:
+In Excel 2010 additional data bar properties were added such as solid (non-gradient) bars and control over how negative values are displayed. These properties can be set using the following parameters:
 
-    worksheet.conditional_formatting('A1:A4',
-        {
-            :type     => 'formula',
-            :criteria => '=$A$1 > 5',
-            :format   => format,
-        }
-    )
+    :bar_solid
+    :bar_negative_color
+    :bar_border_color
+    :bar_negative_border_color
+    :bar_negative_color_same
+    :bar_negative_border_color_same
+    :bar_no_border
+    :bar_direction
+    :bar_axis_position
+    :bar_axis_color
+    :data_bar_2010
 
-The `formula` is specified in the criteria.
+Files that use these Excel 2010 properties can still be opened in Excel 2007 but the data bars will be displayed without them.
 
 ##### <a name="min_mid_max_type" class="anchor" href="#min_mid_max_type"><span class="octicon octicon-link" /></a>:min_type, :mid_type, :max_type
 
@@ -572,6 +641,136 @@ The properties are used as follows:
 
 The color can be specifies as an WriteXLSX color index or, more usefully,
 as a HTML style RGB hex number, as shown above.
+
+##### <a name="bar_only" class="anchor" href="#bar_only"><span class="octicon octicon-link" /></a>:bar_only
+
+The `bar_only` parameter property displays a bar data but not the data in the cells:
+
+    worksheet.conditional_formatting(
+      'D3:D14',
+      {
+        :type     => 'data_bar',
+        :bar_only => 1
+      }
+    )
+
+
+##### <a name="bar_solid" class="anchor" href="#bar_solid"><span class="octicon octicon-link" /></a>:bar_solid
+
+The C<bar_solid> parameter turns on a solid (non-gradient) fill for data bars:
+
+    worksheet.conditional_formatting(
+      'H3:H14',
+      {
+        :type      => 'data_bar',
+        :bar_solid => 1
+      }
+    )
+
+Note, this property is only visible in Excel 2010 and later.
+
+##### <a name="bar_negative_color" class="anchor" href="#bar_negative_color"><span class="octicon octicon-link" /></a>:bar_negative_color
+
+The `bar_negative_color` parameter is used to set the color fill for the negative portion of a data bar.
+
+The color can be specified as an WriteXLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_border_color" class="anchor" href="#bar_border_color"><span class="octicon octicon-link" /></a>:bar_border_color
+
+The `bar_border_color` parameter is used to set the border color of a data bar.
+
+The color can be specified as an WriteXLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_negative_border_color" class="anchor" href="#bar_negative_border_color"><span class="octicon octicon-link" /></a>:bar_negative_border_color
+
+The `bar_negative_border_color` parameter is used to set the border color of the negative portion of a data bar.
+
+The color can be specified as an WriteXLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_negative_color_same" class="anchor" href="#bar_negative_color_same"><span class="octicon octicon-link" /></a>:bar_negative_color_same
+
+The C<bar_negative_color_same> parameter sets the fill color for the negative portion of a data bar to be the same as the fill color for the positive portion of the data bar:
+
+    worksheet.conditional_formatting(
+      'N3:N14',
+      {
+        :type                           => 'data_bar',
+        :bar_negative_color_same        => 1,
+        :bar_negative_border_color_same => 1
+      }
+    )
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_negative_border_color_same" class="anchor" href="#bar_negative_border_color_same"><span class="octicon octicon-link" /></a>:bar_negative_border_color_same
+
+The `bar_negative_border_color_same` parameter sets the border color for the negative portion of a data bar to be the same as the border color for the positive portion of the data bar.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_no_border" class="anchor" href="#bar_no_border"><span class="octicon octicon-link" /></a>:bar_no_border
+
+The `bar_no_border` parameter turns off the border of a data bar.
+
+
+Note, this property is only visible in Excel 2010 and later, however the default in Excel 2007 is not to have a border.
+
+
+##### <a name="bar_direction" class="anchor" href="#bar_direction"><span class="octicon octicon-link" /></a>:bar_direction
+
+The `bar_direction` parameter sets the direction for data bars. This property can be either `left` for left-to-right or `right` for right-to-left. If the property isn't set then Excel will adjust the position automatically based on the context:
+
+    worksheet.conditional_formatting(
+      'J3:J14',
+      {
+        :type          => 'data_bar',
+        :bar_direction => 'right'
+      }
+    )
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_axis_position" class="anchor" href="#bar_axis_position"><span class="octicon octicon-link" /></a>:bar_axis_position
+
+The `bar_axis_position` parameter sets the position within the cells for the axis that is shown in data bars when there are negative values to display. The property can be either `middle` or `none`. If the property isn't set then Excel will position the axis based on the range of positive and negative values.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="bar_axis_color" class="anchor" href="#bar_axis_color"><span class="octicon octicon-link" /></a>:bar_axis_color
+
+The `bar_axis_color` parameter sets the color for the axis that is shown in data bars when there are negative values to display.
+
+The color can be specified as an WriteXLSX color index or as a HTML style RGB hex number, as shown in the other examples.
+
+Note, this property is only visible in Excel 2010 and later.
+
+
+##### <a name="data_bar_2010" class="anchor" href="#data_bar_2010"><span class="octicon octicon-link" /></a>:data_bar_2010
+
+The C<data_bar_2010> parameter sets Excel 2010 style data bars even when Excel 2010 specific properties aren't used. This can be used to create consistency across all the data bar formatting in a worksheet:
+
+    worksheet->conditional_formatting(
+      'L3:L14',
+      {
+        :type          => 'data_bar',
+        :data_bar_2010 => 1
+      }
+    )
+
+Note, this property is only visible in Excel 2010 and later.
 
 #### <a name="stop_if_true" class="anchor" href="#stop_if_true"><span class="octicon octicon-link" /></a>:stop_if_true
 

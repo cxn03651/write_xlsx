@@ -26,6 +26,7 @@ The following methods are available through a new workbook.
 * [worksheet_by_name](#worksheet_by_name)
 * [set_1904](#set_1904)
 * [set_calc_mode](#set_calc_mode)
+* [default_url_format](#default_url_format)
 
 #### <a name="new" class="anchor" href="#new"><span class="octicon octicon-link" /></a>new
 
@@ -442,6 +443,14 @@ Only re-calculate formulas when the user requires it. Generally by pressing F9.
 :auto_except_tables
 
 Excel will automatically re-calculate formulas except for tables.
+
+
+#### <a name="default_url_format" class="anchor" href="#default_url_format"><span class="octicon octicon-link" /></a>default_url_format
+
+The `default_url_format()` method gets a copy of the default url format used when a user defined format isn't specified with the worksheet `write_url()` method. The format is the hyperlink style defined by Excel for the default theme:
+
+    url_format = workbook.default_url_format
+
 
 
 [CELL NOTATION]: worksheet.html#cell-notation
