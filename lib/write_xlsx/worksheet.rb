@@ -7294,13 +7294,20 @@ module Writexlsx
     # Write the <filters> element.
     #
     def write_filters(*filters) #:nodoc:
-      if filters.size == 1 && filters[0] == 'blanks'
+      non_blanks = filters.reject { |filter| filter =~ /^blanks$/ }
+      attributes = []
+
+      if filters != non_blanks
+        attributes = [ ['blank', 1] ]
+      end
+
+      if filters.size == 1 && non_blanks.empty?
         # Special case for blank cells only.
-        @writer.empty_tag('filters', [ ['blank', 1] ])
+        @writer.empty_tag('filters', attributes)
       else
         # General case.
-        @writer.tag_elements('filters') do
-          filters.each { |filter| write_filter(filter) }
+        @writer.tag_elements('filters', attributes) do
+          non_blanks.each { |filter| write_filter(filter) }
         end
       end
     end
