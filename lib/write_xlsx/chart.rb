@@ -1697,10 +1697,11 @@ module Writexlsx
 
     def position_allowed
       {
-        'right'  => 'r',
-        'left'   => 'l',
-        'top'    => 't',
-        'bottom' => 'b'
+        'right'     => 'r',
+        'left'      => 'l',
+        'top'       => 't',
+        'bottom'    => 'b',
+        'top_right' => 'tr'
       }
     end
 
