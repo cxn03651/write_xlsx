@@ -749,7 +749,15 @@ module Writexlsx
             write_formula_tag(maximum)
           end
         else
-          write_cf_rule_formula_tag(value)
+          quoted_value = value.to_s
+          numeric_regex = /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/
+          # String "Cell" values must be quoted, apart from ranges.
+          if !(quoted_value =~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/) &&
+             !(quoted_value =~ numeric_regex) &&
+             !(quoted_value =~ /^".*"$/)
+            quoted_value = (%Q!"#{value}"!)
+          end
+          write_cf_rule_formula_tag(quoted_value)
         end
       end
     end
