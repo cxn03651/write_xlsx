@@ -42,7 +42,16 @@ class TestWriteSheetView < Minitest::Test
     assert_equal(expected, result)
   end
 
-  def test_write_sheet_view_tab_selected_and_hide_gridlines_another
+  def test_write_sheet_view_tab_selected_and_hide_gridlines_1
+    @worksheet.select
+    @worksheet.hide_gridlines(1)
+    @worksheet.__send__('write_sheet_view')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<sheetView tabSelected="1" workbookViewId="0"/>'
+    assert_equal(expected, result)
+  end
+
+  def test_write_sheet_view_tab_selected_and_hide_gridlines_2
     @worksheet.select
     @worksheet.hide_gridlines(2)
     @worksheet.__send__('write_sheet_view')
