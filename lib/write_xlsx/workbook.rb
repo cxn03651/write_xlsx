@@ -123,7 +123,7 @@ module Writexlsx
       @y_window            = 15
       @window_width        = 16095
       @window_height       = 9660
-      @tab_ratio           = 500
+      @tab_ratio           = 600
       @excel2003_style     = options[:excel2003_style] || false
       @table_count         = 0
       @image_types         = {}
@@ -785,6 +785,19 @@ module Writexlsx
     end
 
     #
+    # Set the ratio of space for worksheet tabs.
+    #
+    def set_tab_ratio(tab_ratio = nil)
+      return if !tab_ratio
+
+      if tab_ratio < 0 || tab_ratio > 100
+        raise "Tab ratio outside range: 0 <= zoom <= 100"
+      else
+        @tab_ratio = (tab_ratio * 10).to_i
+      end
+    end
+
+    #
     # The set_properties method can be used to set the document properties
     # of the Excel file created by WriteXLSX. These properties are visible
     # when you use the Office Button -> Prepare -> Properties option in Excel
@@ -1308,7 +1321,7 @@ module Writexlsx
                     ['windowWidth',   @window_width],
                     ['windowHeight',  @window_height]
                    ]
-      if @tab_ratio != 500
+      if @tab_ratio != 600
         attributes << ['tabRatio', @tab_ratio]
       end
       if @firstsheet > 0

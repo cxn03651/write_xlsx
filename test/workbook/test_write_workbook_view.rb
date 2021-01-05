@@ -78,4 +78,40 @@ class TestGetChartRange < Minitest::Test
 
     assert_equal(expected, result)
   end
+
+  def test_set_tab_ratio_wirhout_param
+    expected = '<workbookView xWindow="240" yWindow="15" windowWidth="16095" windowHeight="9660"/>'
+
+    @workbook.set_tab_ratio
+    result   = @workbook.__send__('write_workbook_view')
+
+    assert_equal(expected, result)
+  end
+
+  def test_set_tab_ratio_with_34_6
+    expected = '<workbookView xWindow="240" yWindow="15" windowWidth="16095" windowHeight="9660" tabRatio="346"/>'
+
+    @workbook.set_tab_ratio(34.6)
+    result   = @workbook.__send__('write_workbook_view')
+
+    assert_equal(expected, result)
+  end
+
+  def test_set_tab_ratio_with_0
+    expected = '<workbookView xWindow="240" yWindow="15" windowWidth="16095" windowHeight="9660" tabRatio="0"/>'
+
+    @workbook.set_tab_ratio(0)
+    result   = @workbook.__send__('write_workbook_view')
+
+    assert_equal(expected, result)
+  end
+
+  def test_set_tab_ratio_with_100
+    expected = '<workbookView xWindow="240" yWindow="15" windowWidth="16095" windowHeight="9660" tabRatio="1000"/>'
+
+    @workbook.set_tab_ratio(100)
+    result   = @workbook.__send__('write_workbook_view')
+
+    assert_equal(expected, result)
+  end
 end
