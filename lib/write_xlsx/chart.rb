@@ -1234,7 +1234,7 @@ module Writexlsx
         # Write the c:auto element.
         write_auto(1) unless x_axis.text_axis
         # Write the c:labelAlign element.
-        write_label_align('ctr')
+        write_label_align(x_axis.label_align)
         # Write the c:labelOffset element.
         write_label_offset(100)
         # Write the c:tickLblSkip element.
@@ -1568,6 +1568,12 @@ module Writexlsx
     # Write the <c:labelAlign> element.
     #
     def write_label_align(val) # :nodoc:
+      val ||= 'ctr'
+      if val == 'right'
+        val = 'r'
+      elsif val == 'left'
+        val = 'l'
+      end
       @writer.empty_tag('c:lblAlgn', [ ['val', val] ])
     end
 
