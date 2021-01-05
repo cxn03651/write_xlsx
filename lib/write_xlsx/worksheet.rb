@@ -312,14 +312,15 @@ module Writexlsx
 
       @page_setup = PageSetup.new
 
-      @screen_gridlines = true
-      @show_zeros = true
-      @dim_rowmin = nil
-      @dim_rowmax = nil
-      @dim_colmin = nil
-      @dim_colmax = nil
-      @selections = []
-      @panes = []
+      @screen_gridlines     = true
+      @show_zeros           = true
+      @dim_rowmin           = nil
+      @dim_rowmax           = nil
+      @dim_colmin           = nil
+      @dim_colmax           = nil
+      @selections           = []
+      @panes                = []
+      @hide_row_col_headers = 0
 
       @tab_color  = 0
 
@@ -5345,6 +5346,13 @@ module Writexlsx
     end
 
     #
+    # Set the option to hide the row and column headers in Excel.
+    #
+    def hide_row_col_headers
+      @hide_row_col_headers = 1
+    end
+
+    #
     # The fit_to_pages() method is used to fit the printed area to a specific
     # number of pages both vertically and horizontally. If the printed area
     # exceeds the specified number of pages it will be scaled down to fit.
@@ -6757,8 +6765,11 @@ module Writexlsx
 
     def write_sheet_view #:nodoc:
       attributes = []
-      # Hide screen gridlines if required
+      # Hide screen gridlines if required.
       attributes << ['showGridLines', 0] unless @screen_gridlines
+
+      # Hide the row/column headers.
+      attributes << ['showRowColHeaders', 0] if ptrue?(@hide_row_col_headers)
 
       # Hide zeroes in cells.
       attributes << ['showZeros', 0] unless show_zeros?

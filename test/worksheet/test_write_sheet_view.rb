@@ -59,4 +59,13 @@ class TestWriteSheetView < Minitest::Test
     expected = '<sheetView showGridLines="0" tabSelected="1" workbookViewId="0"/>'
     assert_equal(expected, result)
   end
+
+  def test_write_sheet_view_hide_row_col_headings
+    @worksheet.select
+    @worksheet.hide_row_col_headers
+    @worksheet.__send__('write_sheet_view')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<sheetView showRowColHeaders="0" tabSelected="1" workbookViewId="0"/>'
+    assert_equal(expected, result)
+  end
 end
