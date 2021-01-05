@@ -107,15 +107,15 @@ module Writexlsx
       # Write the <c:legend> element.
       #
       def write_legend
-        position = @legend_position
+        position = @legend.position
         allowed  = %w(right left top bottom)
-        delete_series = @legend_delete_series || []
+        delete_series = @legend.delete_series || []
 
-        if @legend_position =~ /^overlay_/
-          position = @legend_position.sub(/^overlay_/, '')
+        if @legend.position =~ /^overlay_/
+          position = @legend.position.sub(/^overlay_/, '')
           overlay = true
         else
-          position = @legend_position
+          position = @legend.position
           overlay = false
         end
 
@@ -129,11 +129,13 @@ module Writexlsx
           # Write the c:legendEntry element.
           delete_series.each { |index| write_legend_entry(index) }
           # Write the c:layout element.
-          write_layout(@legend_layout, 'legend')
+          write_layout(@legend.layout, 'legend')
           # Write the c:overlay element.
           write_overlay if overlay
+          # Write the c:spPr element.
+          write_sp_pr(@legend)
           # Write the c:txPr element. Over-ridden.
-          write_tx_pr_legend(0, @legend_font)
+          write_tx_pr_legend(0, @legend.font)
         end
       end
 

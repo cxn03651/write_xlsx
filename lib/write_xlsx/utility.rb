@@ -362,6 +362,64 @@ module Writexlsx
     end
 
     #
+    # Convert user defined legend properties to the structure required internally.
+    #
+    def legend_properties(params)
+      legend = Writexlsx::Chart::Legend.new
+
+      legend.position      = params[:position] || 'right'
+      legend.delete_series = params[:delete_series]
+      legend.font          = convert_font_args(params[:font])
+
+      # Set the legend layout.
+      legend.layout = layout_properties(params[:layout])
+
+      # Turn off the legend.
+      if params[:none]
+        legend.position = 'none'
+      end
+
+      # Set the line properties for the legend.
+      line = line_properties(params[:line])
+
+      # Allow 'border' as a synonym for 'line'.
+      if params[:border]
+        line = line_properties(params[:border])
+      end
+
+      # Set the fill properties for the legend.
+      fill = fill_properties(params[:fill])
+
+      # Set the pattern properties for the legend.
+      pattern = pattern_properties(params[:pattern])
+
+      # Set the gradient fill properties for the legend.
+      gradient = gradient_properties(params[:gradient])
+
+      # Pattern fill overrides solid fill.
+      if pattern
+        fill = nil
+      end
+
+      # Gradient fill overrides solid and pattern fills.
+      if gradient
+        pattern = nil
+        fill    = nil
+      end
+
+      # Set the legend layout.
+      layout = layout_properties(params[:layout])
+
+      legend.line     = line
+      legend.fill     = fill
+      legend.pattern  = pattern
+      legend.gradient = gradient
+      legend.layout   = layout
+
+      @legend = legend
+    end
+
+    #
     # Convert user defined layout properties to the format required internally.
     #
     def layout_properties(args, is_text = false)

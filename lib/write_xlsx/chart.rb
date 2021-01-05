@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/gradient'
+require 'write_xlsx/chart/legend'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart/axis'
 require 'write_xlsx/chart/caption'
@@ -162,6 +163,7 @@ module Writexlsx
 
   class Chart
     include Writexlsx::Utility
+    include Writexlsx::Gradient
 
     attr_accessor :id, :name   # :nodoc:
     attr_writer :index, :palette, :protection   # :nodoc:
@@ -352,16 +354,8 @@ module Writexlsx
     # Set the properties of the chart legend.
     #
     def set_legend(params)
-      if params[:none]
-        @legend_position = 'none'
-      else
-        @legend_position = params[:position] || 'right'
-      end
-      @legend_delete_series = params[:delete_series]
-      @legend_font          = convert_font_args(params[:font])
-
-      # Set the legend layout.
-      @legend_layout = layout_properties(params[:layout])
+      # Convert the user default properties to internal properties.
+      legend_properties(params)
     end
 
     #
@@ -611,7 +605,7 @@ module Writexlsx
       @y_scale           = 1
       @x_offset          = 0
       @y_offset          = 0
-      @legend_position   = 'right'
+      @legend            = Legend.new
       @smooth_allowed    = 0
       @cross_between     = 'between'
       @date_category     = false
@@ -1676,10 +1670,10 @@ module Writexlsx
     # Write the <c:legend> element.
     #
     def write_legend # :nodoc:
-      position = @legend_position.sub(/^overlay_/, '')
+      position = @legend.position.sub(/^overlay_/, '')
       return if position == 'none' || (not position_allowed.has_key?(position))
 
-      @delete_series = @legend_delete_series if @legend_delete_series.kind_of?(Array)
+      @delete_series = @legend.delete_series if @legend.delete_series.kind_of?(Array)
       @writer.tag_elements('c:legend') do
         # Write the c:legendPos element.
         write_legend_pos(position_allowed[position])
@@ -1687,11 +1681,13 @@ module Writexlsx
         # Write the c:legendEntry element.
         @delete_series.each { |i| write_legend_entry(i) } if @delete_series
         # Write the c:layout element.
-        write_layout(@legend_layout, 'legend')
-        # Write the c:txPr element.
-        write_tx_pr(nil, @legend_font) if ptrue?(@legend_font)
+        write_layout(@legend.layout, 'legend')
         # Write the c:overlay element.
-        write_overlay if @legend_position =~ /^overlay_/
+        write_overlay if @legend.position =~ /^overlay_/
+        # Write the c:spPr element.
+        write_sp_pr(@legend)
+        # Write the c:txPr element.
+        write_tx_pr(nil, @legend.font) if ptrue?(@legend.font)
       end
     end
 
