@@ -57,11 +57,39 @@ module Writexlsx
       end
     end
 
-    def protect(password = '', options = {})
+    def protect(password = '', user_options = nil, options = {})
+      # Objects are default on for chartsheets.
+      if user_options
+        if user_options.has_key?(:objects)
+          if ptrue?(user_options[:objects])
+            options[:objects] = 0
+          else
+            options[:objects] = 1
+          end
+        else
+          options[:objects] = 0
+        end
+
+        if user_options.has_key?(:content)
+          options[:content] = user_options[:content]
+        else
+          options[:content] = 1
+        end
+      else
+        options[:objects] = 0
+        options[:content] = 1
+      end
+
+      # Is objects and content are off then the chartsheet isn't locked.
+      # except if it has a password.
+      if password == '' && ptrue?(options[:objects]) && !ptrue?(options[:content])
+        return
+      end
+
       @chart.protection = 1
 
+      # Turn off worksheet defaults.
       options[:sheet]     = 0
-      options[:content]   = 1
       options[:scenarios] = 1
 
       super(password, options)
