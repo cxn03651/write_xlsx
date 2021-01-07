@@ -14,28 +14,29 @@ module Writexlsx
       DEFAULT_HEIGHT = 74
 
       attr_reader :row, :col, :string, :color, :vertices
+      attr_reader :font_size, :font_family
       attr_accessor :author, :visible
 
       def initialize(workbook, worksheet, row, col, string, options = {})
         options ||= {}
-        @workbook   = workbook
-        @worksheet  = worksheet
-        @row, @col  = row, col
+        @workbook    = workbook
+        @worksheet   = worksheet
+        @row, @col   = row, col
         options_parse(row, col, options)
-        @string     = string[0, STR_MAX]
-        @start_row  ||= default_start_row(row)
-        @start_col  ||= default_start_col(col)
-        @visible    = options[:visible]
-        @x_offset   = options[:x_offset] || default_x_offset(col)
-        @y_offset   = options[:y_offset] || default_y_offset(row)
-        @x_scale    = options[:x_scale]  || 1
-        @y_scale    = options[:y_scale]  || 1
-        @width      = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
-        @height     = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
-        @vertices   = @worksheet.position_object_pixels(
-                                             @start_col, @start_row, @x_offset, @y_offset,
-                                             @width, @height
-                                             ) << [@width, @height]
+        @string      = string[0, STR_MAX]
+        @start_row   ||= default_start_row(row)
+        @start_col   ||= default_start_col(col)
+        @visible     = options[:visible]
+        @x_offset    = options[:x_offset] || default_x_offset(col)
+        @y_offset    = options[:y_offset] || default_y_offset(row)
+        @x_scale     = options[:x_scale]  || 1
+        @y_scale     = options[:y_scale]  || 1
+        @width       = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
+        @height      = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+        @vertices    = @worksheet.position_object_pixels(
+          @start_col, @start_row, @x_offset, @y_offset,
+          @width, @height
+        ) << [@width, @height]
       end
 
       def backgrount_color(color)
@@ -213,24 +214,31 @@ module Writexlsx
         @writer = w
       end
 
+      def font_name
+        @font
+      end
+
       private
 
       def options_parse(row, col, options)
-        @color      = backgrount_color(options[:color] || DEFAULT_COLOR)
-        @author     = options[:author]
-        @start_cell = options[:start_cell]
+        @color       = backgrount_color(options[:color] || DEFAULT_COLOR)
+        @author      = options[:author]
+        @start_cell  = options[:start_cell]
         @start_row, @start_col = if @start_cell
           substitute_cellref(@start_cell)
         else
           [ options[:start_row], options[:start_col] ]
         end
-        @visible    = options[:visible]
-        @x_offset   = options[:x_offset] || default_x_offset(col)
-        @y_offset   = options[:y_offset] || default_y_offset(row)
-        @x_scale    = options[:x_scale]  || 1
-        @y_scale    = options[:y_scale]  || 1
-        @width      = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
-        @height     = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+        @visible     = options[:visible]
+        @x_offset    = options[:x_offset]       || default_x_offset(col)
+        @y_offset    = options[:y_offset]       || default_y_offset(row)
+        @x_scale     = options[:x_scale]        || 1
+        @y_scale     = options[:y_scale]        || 1
+        @font        = options[:font]           || 'Tahoma'
+        @font_size   = options[:font_size]      || 8
+        @font_family = options[:font_family]    || 2
+        @width       = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
+        @height      = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
       end
     end
 
@@ -366,36 +374,37 @@ module Writexlsx
         attributes << ['authorId', author_id]
 
         @writer.tag_elements('comment', attributes) do
-          write_text(comment.string)
+          write_text(comment)
         end
       end
 
       #
       # Write the <text> element.
       #
-      def write_text(text)
+      def write_text(comment)
         @writer.tag_elements('text') do
           # Write the text r element.
-          write_text_r(text)
+          write_text_r(comment)
         end
       end
 
       #
       # Write the <r> element.
       #
-      def write_text_r(text)
+      def write_text_r(comment)
         @writer.tag_elements('r') do
           # Write the rPr element.
-          write_r_pr
+          write_r_pr(comment)
           # Write the text r element.
-          write_text_t(text)
+          write_text_t(comment)
         end
       end
 
       #
       # Write the text <t> element.
       #
-      def write_text_t(text)
+      def write_text_t(comment)
+        text = comment.string
         attributes = []
 
         attributes << ['xml:space', 'preserve'] if text =~ /^\s/ || text =~ /\s$/
@@ -406,25 +415,23 @@ module Writexlsx
       #
       # Write the <rPr> element.
       #
-      def write_r_pr
+      def write_r_pr(comment)
         @writer.tag_elements('rPr') do
           # Write the sz element.
-          write_sz
+          write_sz(comment.font_size)
           # Write the color element.
           write_color
           # Write the rFont element.
-          write_r_font
+          write_r_font(comment.font_name)
           # Write the family element.
-          write_family
+          write_family(comment.font_family)
         end
       end
 
       #
       # Write the <sz> element.
       #
-      def write_sz
-        val  = 8
-
+      def write_sz(val)
         attributes = [ ['val', val] ]
 
         @writer.empty_tag('sz', attributes)
@@ -440,9 +447,7 @@ module Writexlsx
       #
       # Write the <rFont> element.
       #
-      def write_r_font
-        val  = 'Tahoma'
-
+      def write_r_font(val)
         attributes = [ ['val', val] ]
 
         @writer.empty_tag('rFont', attributes)
@@ -451,9 +456,7 @@ module Writexlsx
       #
       # Write the <family> element.
       #
-      def write_family
-        val  = 2
-
+      def write_family(val)
         attributes = [ ['val', val] ]
 
         @writer.empty_tag('family', attributes)
