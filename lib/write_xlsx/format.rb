@@ -180,7 +180,7 @@ module Writexlsx
       @xf_index       = nil
       @dxf_index      = nil
 
-      @num_format     = 0
+      @num_format     = 'General'
       @num_format_index = 0
       @font_index     = 0
       @font           = 'Calibri'

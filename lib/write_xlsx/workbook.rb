@@ -1525,8 +1525,16 @@ module Writexlsx
         # string but would evaluate to zero.
         #
         if num_format.to_s =~ /^\d+$/ && num_format.to_s !~ /^0+\d/
+          # Number format '0' is indexed as 1 in Excel.
+          if num_format == 0
+            num_format = 1
+          end
           # Index to a built-in number format.
           format.num_format_index = num_format
+          next
+        elsif num_format.to_s == 'General'
+          # The 'General' format has an number format index of 0.
+          format.num_format_index = 0
           next
         end
 
