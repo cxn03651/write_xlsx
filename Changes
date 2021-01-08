@@ -1,5 +1,28 @@
 Change history of write_xlsx rubygem.
 
+2021-01-08 v0.99.0
+
+   Added font and font_size parameters to write_comment().
+
+   Allow formulas in date field of data_validation().
+
+   Added top_left chart legend position.
+
+   Added legend formatting options.
+
+   Added set_tab_ratio() method to set the ratio between the worksheet tabs
+   and the horizontal slider.
+
+   Added worksheet hide_row_col_headers() method to turn off worksheet row
+   and column headings.
+
+   Add functionality to align chart category axis labels.
+
+   Fix for issue with special characters in worksheet table functions.
+
+   Fix handling of 'num_format': '0' in duplicate formats.
+
+
 2021-01-03 v0.98.0
 
    fixed for autofilter rule with blanks plus another filter.
