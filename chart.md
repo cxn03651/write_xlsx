@@ -691,19 +691,47 @@ Set the position of the chart legend.
 
     chart.set_legend(:position => 'bottom')
 
-The default legend position is right.
+The default legend position is `right`.
 The available positions are:
 
     top
     bottom
     left
     right
+    top_right
     overlay_left
     overlay_right
+    overlay_top_right
     none
 
+##### <a name="set_legend_border" class="anchor" href="#set_legend_border"><span class="octicon octicon-link" /></a>:border
+Set the border properties of the legend such as colour and style.
+
+##### <a name="set_legend_fill" class="anchor" href="#set_legend_fill"><span class="octicon octicon-link" /></a>:fill
+Set the fill properties of the legend such as colour.
+
+##### <a name="set_legend_pattern" class="anchor" href="#set_legend_pattern"><span class="octicon octicon-link" /></a>:pattern
+Set the pattern fill properties of the legend.
+
+##### <a name="set_legend_gradient" class="anchor" href="#set_legend_gradient"><span class="octicon octicon-link" /></a>:gradient
+Set the gradient fill properties of the legend.
+
+##### <a name="set_legend_font" class="anchor" href="#set_legend_font"><span class="octicon octicon-link" /></a>:font
+Set the font properties of the chart legend.
+
+    chart.set_legend(
+      :font => { :bold => 1, :italic -> 1 }
+    )
+
+##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
+This allows you to remove 1 or more series from the legend (the series will still display on the chart). This property takes an array as an argument and the series are zero indexed:
+
+    # Delete/hide series index 0 and 2 from the legend.
+    chart.set_legend(:delete_series => [0, 2])
+
 ##### <a name="set_legend_layout" class="anchor" href="#set_legend_layout"><span class="octicon octicon-link" /></a>:layout
-Set the x, y position of the legend in chart relative units:
+
+Set the `(x, y)` position of the legend in chart relative units:
 
     chart.set_legend(
       :layout => {
@@ -715,21 +743,6 @@ Set the x, y position of the legend in chart relative units:
     )
 
 See the CHART LAYOUT section below.
-
-##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
-This allows you to remove 1 or more series from the legend
-(the series will still display on the chart).
-This property takes an array as an argument and the series are zero indexed:
-
-    # Delete/hide series index 0 and 2 from the legend.
-    chart.set_legend(:delete_series => [0, 2])
-
-##### <a name="set_legend_font" class="anchor" href="#set_legend_font"><span class="octicon octicon-link" /></a>:font
-Set the font properties of the chart legend:
-
-    chart.set_legend(:font => { :bold => 1, :italic => 1 } )
-
-See the [CHART FONTS][] section below.
 
 #### <a name="set_chartarea" class="anchor" href="#set_chartarea"><span class="octicon octicon-link" /></a>set_chartarea()
 
@@ -784,6 +797,18 @@ See the [CHART FORMATTING][] section below.
 ##### <a name="set_plotarea_gradient" class="anchor" href="#set_plotarea_gradient"><span class="octicon octicon-link" /></a>:gradient
 Set the gradient fill properties of the plotarea such as colour.
 See the [CHART FORMATTING][] section below.
+
+##### <a name="set_plotarea_layout" class="anchor" href="#set_plotarea_layout"><span class="octicon octicon-link" /></a>:layout
+Set the (x, y) position of the plotarea in chart relative units:
+
+    chart.set_plotarea(
+      :layout => {
+        :x      => 0.35,
+        :y      => 0.26,
+        :width  => 0.62,
+        :height => 0.50
+      }
+    )
 
 #### <a name="set_style" class="anchor" href="#set_style"><span class="octicon octicon-link" /></a>set_style()
 
@@ -1416,6 +1441,7 @@ The following properties can be set for line formats in a chart.
     :color
     :width
     :dash_type
+    :transparency
 
 The none property is uses to turn the line off (it is always on by default
 except in Scatter charts). This is useful if you wish to plot a series
@@ -1439,21 +1465,21 @@ The available colours are shown in the main WriteXLSX documentation. It is also 
         :line       => { :color => '#FF0000' }
     )
 
-The width property sets the width of the line. It should be specified in increments of 0.25 of a point as in Excel.
+The `width` property sets the width of the line. It should be specified in increments of 0.25 of a point as in Excel.
 
     chart.add_series(
         :values     => '=Sheet1!$B$1:$B$5',
         :line       => { :width => 3.25 }
     )
 
-The dash_type property sets the dash style of the line.
+The `dash_type` property sets the dash style of the line.
 
     chart.add_series(
         :values     => '=Sheet1!$B$1:$B$5',
         :line       => { :dash_type => 'dash_dot' }
     )
 
-The following dash_type values are available. They are shown in the order that they appear in the Excel dialog.
+The following `dash_type` values are available. They are shown in the order that they appear in the Excel dialog.
 
     solid
     round_dot
@@ -1466,7 +1492,14 @@ The following dash_type values are available. They are shown in the order that t
 
 The default line style is solid.
 
-More than one line property can be specified at a time:
+The `transparency` property sets the transparency of the `line` color in the integer range 1 - 100. The color must be set for transparency to work, it doesn't work with an automatic/default color:
+
+    chart.add_series(
+      :values => '=Sheet1!$B$1:$B$5',
+      :line   => { :color => 'yellow', :transparency => 50 }
+    )
+
+More than one `line` property can be specified at a time:
 
     chart.add_series(
         :values     => '=Sheet1!$B$1:$B$5',
@@ -1492,8 +1525,8 @@ the interior of a column or the background of the chart itself.
 
 The following properties can be set for fill formats in a chart.
 
-    :none
     :color
+    :none
 
 The none property is used to turn the fill property off (it is generally on by default).
 

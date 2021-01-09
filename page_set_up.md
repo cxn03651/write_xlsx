@@ -31,14 +31,15 @@ The following methods are available for page set-up:
 * [repeat_columns](#repeat_columns)
 * [hide_gridlines](#hide_gridlines)
 * [print_row_col_headers](#print_row_col_headers)
+* [hide_row_col_headers](#hide_row_col_headers)
 * [print_area](#print_area)
 * [print_across](#print_across)
 * [fit_to_pages](#fit_to_pages)
 * [start_page=](#start_page=)
 * [print_scale=](#print_scale=)
 * [print_black_and_white](#print_black_and_white)
-* [set_h_pagebreaks](#set_h_pagebreaks)
-* [set_v_pagebreaks](#set_v_pagebreaks)
+* [set_h_pagebreaks]*
+(#set_h_pagebreaks) [set_v_pagebreaks](#set_v_pagebreaks)
 * [set_paper](#set_paper)(deprecated)
 * [set_margins](#set_margins)(deprecated)
 * [set_margins_LR](#set_margins_LR)(deprecated)
@@ -450,15 +451,19 @@ An Excel worksheet looks something like the following;
     |...|  ...  |  ...  |  ...  |  ...  |  ...
 
 The headers are the letters and numbers at the top and the left of the
-worksheet. Since these headers serve mainly as a indication of position
-on the worksheet they generally do not appear on the printed page.
-If you wish to have them printed you can use the `print_row_col_headers()`
-method :
+worksheet. Since these headers serve mainly as a indication of position on the worksheet they generally do not appear on the printed page.
+If you wish to have them printed you can use the `print_row_col_headers()` method:
 
     worksheet.print_row_col_headers
 
 Do not confuse these headers with page headers as described in the
 `set_header()` section above.
+
+#### <a name="hide_row_col_headers" class="anchor" href="#hide_row_col_headers"><span class="octicon octicon-link" /></a>hide_row_col_headers
+
+Similar to 'print_row_col_headers()' above but set the option to hide the row and column headers within Excel so that they aren't visible to the user:
+
+    worksheet.hide_row_col_headers
 
 #### <a name="print_area" class="anchor" href="#print_area"><span class="octicon octicon-link" /></a>print_area(first_row, first_col, last_row, last_col)
 

@@ -17,6 +17,7 @@ The following methods are available through a new workbook.
 * [add_vba_name](#add_vba_name)
 * [close](#close)
 * [set_size](#set_size)
+* [set_tab_ratio](#set_tab_ratio)
 * [set_properties](#set_properties)
 * [set_custom_properties](#set_custom_properties)
 * [define_name](#define_name)
@@ -258,6 +259,15 @@ The units are pixels and the default size is 1073 x 644.
 
 Note, this doesn't equate exactly to the Excel for Mac pixel size
 since it is based on the original Excel 2007 for Windows sizing.
+
+#### <a name="set_tab_ratio" class="anchor" href="#set_tab_ratio"><span class="octicon octicon-link" /></a>set_tab_ratio
+
+<!-- The `set_tab_ratio()` method ca -->n be used to set the ratio between worksheet tabs and the horizontal slider at the bottom of a workbook.
+This can be increased to give more room to the tabs or reduced to increase the size of the horizontal slider:
+
+    workbook.set_tab_ratio(75)
+
+The default value in Excel is 60.
 
 #### <a name="set_properties" class="anchor" href="#set_properties"><span class="octicon octicon-link" /></a>set_properties
 
