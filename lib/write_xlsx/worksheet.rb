@@ -5871,17 +5871,21 @@ module Writexlsx
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
-      x1, col_start = adjust_column_offset(x1, col_start)
+      if size_col(col_start) > 0
+        x1, col_start = adjust_column_offset(x1, col_start)
+      end
 
       # Adjust start row for offsets that are greater than the row height.
-      y1, row_start = adjust_row_offset(y1, row_start)
+      if size_row(row_start) > 0
+        y1, row_start = adjust_row_offset(y1, row_start)
+      end
 
       # Initialise end cell to the same as the start cell.
       col_end = col_start
       row_end = row_start
 
-      width  += x1
-      height += y1
+      width  += x1 if size_col(col_start) > 0
+      height += y1 if size_row(row_start) > 0
 
       # Subtract the underlying cell widths to find the end cell of the object.
       width, col_end = adjust_column_offset(width, col_end)
