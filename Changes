@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2021-01-23 v1.00.0
+
+   Fixed issue where images that started in hidden rows/columns weren't placed
+   correctly in the worksheet.
+
+
 2021-01-08 v0.99.0
 
    Added font and font_size parameters to write_comment().
