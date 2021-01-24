@@ -365,6 +365,7 @@ module Writexlsx
       @original_row_height    = 15
       @default_row_height     = 15
       @default_row_pixels     = 20
+      @default_col_width      = 8.43
       @default_col_pixels     = 64
       @default_row_rezoed     = 0
 
@@ -768,10 +769,10 @@ module Writexlsx
 
       # Store the col sizes for use when calculating image vertices taking
       # hidden columns into account. Also store the column formats.
-      width = 0 if ptrue?(hidden)         # Set width to zero if hidden
+      width  = @default_col_width unless width
 
       (firstcol .. lastcol).each do |col|
-        @col_sizes[col]   = width
+        @col_sizes[col]   = [width, hidden]
         @col_formats[col] = format if format
       end
     end
@@ -2990,7 +2991,8 @@ module Writexlsx
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, chart, x_offset, y_offset, x_scale, y_scale = row_col_notation(args)
+      row, col, chart, x_offset, y_offset, x_scale, y_scale, anchor =
+                                                             row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
       x_offset ||= 0
@@ -3060,15 +3062,17 @@ module Writexlsx
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, image, x_offset, y_offset, x_scale, y_scale = row_col_notation(args)
+      row, col, image, x_offset, y_offset, x_scale, y_scale, anchor =
+                                                             row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, image].include?(nil)
 
       x_offset ||= 0
       y_offset ||= 0
       x_scale  ||= 1
       y_scale  ||= 1
+      anchor   ||= 2
 
-      @images << [row, col, image, x_offset, y_offset, x_scale, y_scale]
+      @images << [row, col, image, x_offset, y_offset, x_scale, y_scale, anchor]
     end
 
     #
@@ -3306,10 +3310,8 @@ module Writexlsx
       # Store the row change to allow optimisations.
       @row_size_changed = true
 
-      height = 0 if ptrue?(hidden)
-
       # Store the row sizes for use when calculating image vertices.
-      @row_sizes[row] = height
+      @row_sizes[row] = [height, hidden]
     end
 
     #
@@ -5724,7 +5726,8 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
-      row, col, chart, x_offset, y_offset, x_scale, y_scale  = @charts[index]
+      row, col, chart, x_offset, y_offset, x_scale, y_scale, anchor =
+                                                             @charts[index]
       chart.id = chart_id - 1
       x_scale ||= 0
       y_scale ||= 0
@@ -5736,7 +5739,9 @@ module Writexlsx
       width  = (0.5 + (width  * x_scale)).to_i
       height = (0.5 + (height * y_scale)).to_i
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
+      dimensions = position_object_emus(
+        col, row, x_offset, y_offset, width, height, anchor
+      )
 
       # Set the chart name for the embedded object if it has been specified.
       name = chart.name
@@ -5744,14 +5749,18 @@ module Writexlsx
       # Create a Drawing object to use with worksheet unless one already exists.
       if !drawing?
         drawing = Drawing.new
-        drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name)
+        drawing.add_drawing_object(
+          drawing_type, dimensions, 0, 0, name, nil, anchor
+        )
         drawing.embedded = 1
 
         @drawing = drawing
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml" ]
       else
-        @drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name)
+        @drawing.add_drawing_object(
+          drawing_type, dimensions, 0, 0, name, nil, anchor
+        )
       end
       @drawing_links << ['/chart', "../charts/chart#{chart_id}.xml"]
     end
@@ -5824,6 +5833,10 @@ module Writexlsx
     # the width and height of the object from the width and height of the
     # underlying cells.
     #
+    # The anchor/object position defines how images are scaled for hidden rows and
+    # columns. For option 1 "Move and size with cells" the size of the hidden
+    # row/column is subtracted from the image.
+    #
     #    col_start    # Col containing upper left corner of object.
     #    x1           # Distance to left side of object.
     #    row_start    # Row containing top left corner of object.
@@ -5834,7 +5847,11 @@ module Writexlsx
     #    y2           # Distance to bottom of object.
     #    width        # Width of object frame.
     #    height       # Height of object frame.
-    def position_object_pixels(col_start, row_start, x1, y1, width, height) #:nodoc:
+    #    anchor       # The type of object positioning.
+    #
+    def position_object_pixels(
+          col_start, row_start, x1, y1, width, height, anchor = nil) #:nodoc:
+
       # Adjust start column for negative offsets.
       while x1 < 0 && col_start > 0
         x1 += size_col(col_start - 1)
@@ -5871,27 +5888,27 @@ module Writexlsx
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
-      if size_col(col_start) > 0
-        x1, col_start = adjust_column_offset(x1, col_start)
+      if size_col(col_start, anchor) > 0
+        x1, col_start = adjust_column_offset(x1, col_start, anchor)
       end
 
       # Adjust start row for offsets that are greater than the row height.
-      if size_row(row_start) > 0
-        y1, row_start = adjust_row_offset(y1, row_start)
+      if size_row(row_start, anchor) > 0
+        y1, row_start = adjust_row_offset(y1, row_start, anchor)
       end
 
       # Initialise end cell to the same as the start cell.
       col_end = col_start
       row_end = row_start
 
-      width  += x1 if size_col(col_start) > 0
-      height += y1 if size_row(row_start) > 0
+      width  += x1 if size_col(col_start, anchor) > 0
+      height += y1 if size_row(row_start, anchor) > 0
 
       # Subtract the underlying cell widths to find the end cell of the object.
-      width, col_end = adjust_column_offset(width, col_end)
+      width, col_end = adjust_column_offset(width, col_end, anchor)
 
       # Subtract the underlying cell heights to find the end cell of the object.
-      height, row_end = adjust_row_offset(height, row_end)
+      height, row_end = adjust_row_offset(height, row_end, anchor)
 
       # The end vertices are whatever is left from the width and height.
       x2 = width
@@ -6351,17 +6368,17 @@ module Writexlsx
       end
     end
 
-    def adjust_column_offset(x, column)
-      while x >= size_col(column)
-        x -= size_col(column)
+    def adjust_column_offset(x, column, anchor)
+      while x >= size_col(column, anchor)
+        x -= size_col(column, anchor)
         column += 1
       end
       [x, column]
     end
 
-    def adjust_row_offset(y, row)
-      while y >= size_row(row)
-        y -= size_row(row)
+    def adjust_row_offset(y, row, anchor)
+      while y >= size_row(row, anchor)
+        y -= size_row(row, anchor)
         row += 1
       end
       [y, row]
@@ -6374,9 +6391,11 @@ module Writexlsx
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height, x_dpi = 96, y_dpi = 96) #:nodoc:
+    def position_object_emus(
+          col_start, row_start, x1, y1, width, height, anchor = nil,
+          x_dpi = 96, y_dpi = 96) #:nodoc:
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels(col_start, row_start, x1, y1, width, height)
+        position_object_pixels(col_start, row_start, x1, y1, width, height, anchor)
 
       # Convert the pixel values to EMUs. See above.
       x1    = (0.5 + 9_525 * x1).to_i
@@ -6392,15 +6411,17 @@ module Writexlsx
     #
     # Convert the width of a cell from user's units to pixels. Excel rounds the
     # column width to the nearest pixel. If the width hasn't been set by the user
-    # we use the default value. If the column is hidden it has a value of zero.
+    # we use the default value. A hidden column is treated as having a width of
+    # zero unless it has the special "object_position" of 4 (size with cells).
     #
-    def size_col(col) #:nodoc:
+    def size_col(col, anchor = 0) #:nodoc:
       # Look up the cell value to see if it has been changed.
       if @col_sizes[col]
-        width = @col_sizes[col]
+        width  = @col_sizes[col][0]
+        hidden = @col_sizes[col][1]
 
         # Convert to pixels.
-        if width == 0
+        if width == 0 && anchor != 4
           pixels = 0
         elsif width < 1
           pixels = (width * (MAX_DIGIT_WIDTH + PADDING) + 0.5).to_i
@@ -6415,15 +6436,17 @@ module Writexlsx
 
     #
     # Convert the height of a cell from user's units to pixels. If the height
-    # hasn't been set by the user we use the default value. If the row is hidden
-    # it has a value of zero.
+    # hasn't been set by the user we use the default value. A hidden row is
+    # treated as having a height of zero unless it has the special
+    # "object_position" of 4 (size with cells).
     #
-    def size_row(row) #:nodoc:
+    def size_row(row, anchor = 0) #:nodoc:
       # Look up the cell value to see if it has been changed
       if @row_sizes[row]
-        height = @row_sizes[row]
+        height = @row_sizes[row][0]
+        hidden = @row_sizes[row][1]
 
-        if height == 0
+        if height == 0 && anchor != 4
           pixels = 0
         else
           pixels = (4 / 3.0 * height).to_i
@@ -6441,9 +6464,8 @@ module Writexlsx
       x_dpi ||= 96
       y_dpi ||= 96
       drawing_type = 2
-      drawing
 
-      row, col, image, x_offset, y_offset, x_scale, y_scale = @images[index]
+      row, col, image, x_offset, y_offset, x_scale, y_scale, anchor = @images[index]
 
       width  *= x_scale
       height *= y_scale
@@ -6451,7 +6473,9 @@ module Writexlsx
       width  *= 96.0 / x_dpi
       height *= 96.0 / y_dpi
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height)
+      dimensions = position_object_emus(
+        col, row, x_offset, y_offset, width, height, anchor
+      )
 
       # Convert from pixels to emus.
       width  = (0.5 + (width  * 9_525)).to_i
@@ -6468,7 +6492,9 @@ module Writexlsx
       else
         drawing = @drawing
       end
-      drawing.add_drawing_object(drawing_type, dimensions, width, height, name)
+      drawing.add_drawing_object(
+        drawing_type, dimensions, width, height, name, nil, anchor
+      )
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
@@ -6523,16 +6549,16 @@ module Writexlsx
     #
     def insert_shape(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row_start, column_start, shape, x_offset, y_offset, x_scale, y_scale =
+      row_start, column_start, shape, x_offset, y_offset, x_scale, y_scale, anchor =
         row_col_notation(args)
       if [row_start, column_start, shape].include?(nil)
         raise "Insufficient arguments in insert_shape()"
       end
 
       shape.set_position(
-                           row_start, column_start, x_offset, y_offset,
-                           x_scale, y_scale
-                           )
+        row_start, column_start, x_offset, y_offset,
+        x_scale, y_scale, anchor
+      )
       # Assign a shape ID.
       while true
         id = shape.id || 0
@@ -6588,7 +6614,9 @@ module Writexlsx
       shape.calc_position_emus(self)
 
       drawing_type = 3
-      drawing.add_drawing_object(drawing_type, shape.dimensions, shape.name, shape)
+      drawing.add_drawing_object(
+        drawing_type, shape.dimensions, shape.name, shape, shape.anchor
+      )
     end
     public :prepare_shape
 
@@ -6640,13 +6668,13 @@ module Writexlsx
 
       # Calculate the positions of comment object.
       vertices = position_object_pixels(
-                                        params[:start_col],
-                                        params[:start_row],
-                                        params[:x_offset],
-                                        params[:y_offset],
-                                        params[:width],
-                                        params[:height]
-                                        )
+        params[:start_col],
+        params[:start_row],
+        params[:x_offset],
+        params[:y_offset],
+        params[:width],
+        params[:height]
+      )
 
       # Add the width and height for VML.
       vertices << [params[:width], params[:height]]

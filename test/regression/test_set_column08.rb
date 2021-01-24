@@ -31,8 +31,10 @@ class TestRegressionSetColumn08 < Minitest::Test
     worksheet.set_row(12, nil, nil, 1)
     worksheet.set_column('F:F', nil, nil, 1)
 
-    worksheet.insert_image('E12',
-                           File.join(@test_dir, 'regression', 'images/logo.png'))
+    worksheet.insert_image(
+      'E12',
+      File.join(@test_dir, 'regression', 'images/logo.png')
+    )
 
     workbook.close
 

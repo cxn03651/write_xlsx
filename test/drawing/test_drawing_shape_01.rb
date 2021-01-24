@@ -11,9 +11,9 @@ class DrawingShape01 < Minitest::Test
     @obj = Writexlsx::Drawing.new
     @obj.embedded = 1
     @obj.add_drawing_object(
-                               3, 4, 8, 209550, 95250, 12, 22, 209660,
-                               96260, 10000, 20000, 95250, 190500, 'rect 1', shape
-                               )
+      3, 4, 8, 209550, 95250, 12, 22, 209660,
+      96260, 10000, 20000, 95250, 190500, 'rect 1', shape, 1
+    )
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(<<EOS
