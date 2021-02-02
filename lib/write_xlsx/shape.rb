@@ -15,7 +15,7 @@ module Writexlsx
 
     attr_reader :edit_as, :type, :drawing
     attr_reader :tx_box, :fill, :line, :format
-    attr_reader :align, :valign
+    attr_reader :align, :valign, :anchor
     attr_accessor :name, :connect, :type, :id, :start, :end, :rotation
     attr_accessor :flip_h, :flip_v, :adjustments, :palette, :text, :stencil
     attr_accessor :row_start, :row_end, :column_start, :column_end
@@ -183,11 +183,12 @@ module Writexlsx
       @y_abs = (y_abslt * 9_525).to_i
     end
 
-    def set_position(row_start, column_start, x_offset, y_offset, x_scale, y_scale)
+    def set_position(row_start, column_start, x_offset, y_offset, x_scale, y_scale, anchor)
       @row_start    = row_start
       @column_start = column_start
       @x_offset     = x_offset || 0
       @y_offset     = y_offset || 0
+      @anchor       = anchor   || 1
 
       # Override shape scale if supplied as an argument. Otherwise, use the
       # existing shape scale factors.
