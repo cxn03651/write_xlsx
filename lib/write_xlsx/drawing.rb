@@ -73,16 +73,12 @@ module Writexlsx
     def write_two_cell_anchor(*args)
       index, type, col_from, row_from, col_from_offset, row_from_offset,
       col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute,
-      width, height, description, shape, anchor = args
+      width, height, description, shape = args
 
       attributes      = []
 
       # Add attribute for images.
-      if anchor == 2
-        attributes << [:editAs, 'oneCell']
-      elsif anchor == 3
-        attributes << [:editAs, 'absolute']
-      end
+      attributes << [:editAs, 'oneCell'] if type == 2
 
       # Add attribute for shapes.
       attributes << [:editAs, shape.edit_as] if shape && shape.edit_as
