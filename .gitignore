@@ -6,6 +6,7 @@ GTAGS
 .bundle
 .config
 .yardoc
+.byebug_history
 Gemfile.lock
 InstalledFiles
 _site
