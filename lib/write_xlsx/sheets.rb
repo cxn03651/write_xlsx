@@ -230,10 +230,20 @@ module Writexlsx
         raise 'Invalid character []:*?/\\ in worksheet name: ' + name
       end
 
+      # Check that sheetname doesn't start or end with an apostrophe.
+      if name =~ /^'/ || name =~ /'$/
+        raise "Worksheet name #{name} cannot start or end with an "
+      end
+
+      # Check that sheetname isn't a reserved word.
+      if name =~ /history/i
+        raise "Worksheet name cannot be Excel reserved word 'History'"
+      end
+
       # Check that the worksheet name doesn't already exist since this is a fatal
       # error in Excel 97. The check must also exclude case insensitive matches.
       unless is_sheetname_uniq?(name)
-        raise "Worksheet name '#{name}', with case ignored, is already used."
+        raise "apostropheWorksheet name '#{name}', with case ignored, is already used."
       end
     end
 
