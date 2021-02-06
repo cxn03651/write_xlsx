@@ -257,13 +257,9 @@ module Writexlsx
         @comments[row]
       end
 
-      def add(comment)
-        if @comments[comment.row]
-          @comments[comment.row][comment.col] = comment
-        else
-          @comments[comment.row] = {}
-          @comments[comment.row][comment.col] = comment
-        end
+      def add(workbook, worksheet, row, col, string, options)
+        @comments[row] ||= {}
+        @comments[row][col] = [workbook, worksheet, row, col, string, options]
       end
 
       def empty?
@@ -293,6 +289,10 @@ module Writexlsx
           # We sort the comments by row and column but that isn't strictly required.
           @comments.keys.sort.each do |row|
             @comments[row].keys.sort.each do |col|
+              user_options = @comments[row][col]
+              comment = Comment.new(*user_options)
+              @comments[row][col] = comment
+
               # Set comment visibility if required and not already user defined.
               @comments[row][col].visible ||= 1 if comments_visible?
 

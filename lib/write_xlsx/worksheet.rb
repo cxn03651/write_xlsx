@@ -2170,7 +2170,7 @@ module Writexlsx
       @has_vml = true
 
       # Process the properties of the cell comment.
-      @comments.add(Package::Comment.new(@workbook, self, row, col, string, options))
+      @comments.add(@workbook, self, row, col, string, options)
     end
 
     #
@@ -5842,13 +5842,13 @@ module Writexlsx
     def position_object_pixels(col_start, row_start, x1, y1, width, height, anchor = nil) #:nodoc:
       # Adjust start column for negative offsets.
       while x1 < 0 && col_start > 0
-        x1 += size_col(col_start - 1, anchor)
+        x1 += size_col(col_start - 1)
         col_start -= 1
       end
 
       # Adjust start row for negative offsets.
       while y1 < 0 && row_start > 0
-        y1 += size_row(row_start - 1, anchor)
+        y1 += size_row(row_start - 1)
         row_start -= 1
       end
 
@@ -5876,27 +5876,39 @@ module Writexlsx
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
-      if size_col(col_start, anchor) > 0
-        x1, col_start = adjust_column_offset(x1, col_start, anchor)
+      if size_col(col_start) > 0
+        while x1 >= size_col(col_start)
+          x1 -= size_col(col_start)
+          col_start += 1
+        end
       end
 
       # Adjust start row for offsets that are greater than the row height.
-      if size_row(row_start, anchor) > 0
-        y1, row_start = adjust_row_offset(y1, row_start, anchor)
+      if size_row(row_start) > 0
+        while y1 >= size_row(row_start)
+          y1 -= size_row(row_start)
+          row_start += 1
+        end
       end
 
       # Initialise end cell to the same as the start cell.
       col_end = col_start
       row_end = row_start
 
-      width  += x1 if size_col(col_start, anchor) > 0
-      height += y1 if size_row(row_start, anchor) > 0
+      width  += x1 if size_col(col_start) > 0
+      height += y1 if size_row(row_start) > 0
 
       # Subtract the underlying cell widths to find the end cell of the object.
-      width, col_end = adjust_column_offset(width, col_end, anchor)
+      while width >= size_col(col_end, anchor)
+        width -= size_col(col_end, anchor)
+        col_end += 1
+      end
 
       # Subtract the underlying cell heights to find the end cell of the object.
-      height, row_end = adjust_row_offset(height, row_end, anchor)
+      while height >= size_row(row_end, anchor)
+        height -= size_row(row_end, anchor)
+        row_end += 1
+      end
 
       # The end vertices are whatever is left from the width and height.
       x2 = width
@@ -6356,28 +6368,12 @@ module Writexlsx
       end
     end
 
-    def adjust_column_offset(x, column, anchor)
-      while x >= size_col(column, anchor)
-        x -= size_col(column, anchor)
-        column += 1
-      end
-      [x, column]
-    end
-
-    def adjust_row_offset(y, row, anchor)
-      while y >= size_row(row, anchor)
-        y -= size_row(row, anchor)
-        row += 1
-      end
-      [y, row]
-    end
-
     #
     # Calculate the vertices that define the position of a graphical object within
     # the worksheet in EMUs.
     #
     # The vertices are expressed as English Metric Units (EMUs). There are 12,700
-    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
+    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per el.
     #
     def position_object_emus(col_start, row_start, x1, y1, width, height, anchor = nil) #:nodoc:
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
@@ -6600,7 +6596,7 @@ module Writexlsx
 
     #
     # This method handles the parameters passed to insert_button as well as
-    # calculating the comment object position and vertices.
+    # calculating the button object position and vertices.
     #
     def button_params(row, col, params)
       button = Writexlsx::Package::Button.new
@@ -6629,7 +6625,7 @@ module Writexlsx
       params[:x_offset] = 0 if !params[:x_offset]
       params[:y_offset] = 0 if !params[:y_offset]
 
-      # Scale the size of the comment box if required.
+      # Scale the size of the button box if required.
       if params[:x_scale]
         params[:width] = params[:width] * params[:x_scale]
       end
@@ -6644,7 +6640,7 @@ module Writexlsx
       params[:start_row] = row
       params[:start_col] = col
 
-      # Calculate the positions of comment object.
+      # Calculate the positions of button object.
       vertices = position_object_pixels(
         params[:start_col],
         params[:start_row],
