@@ -43,13 +43,6 @@ module Writexlsx
       end
 
       #
-      # Override parent method to add a warning.
-      #
-      def combine(chart)
-        raise "Combined chart not currently supported for Pie charts"
-      end
-
-      #
       # Set the Pie/Doughnut chart rotation: the angle of the first slice.
       #
       def set_rotation(rotation)
@@ -91,11 +84,31 @@ module Writexlsx
       # Write the <c:plotArea> element.
       #
       def write_plot_area
+        second_chart = @combined
+
         @writer.tag_elements('c:plotArea') do
           # Write the c:layout element.
           write_layout(@plotarea.layout, 'plot')
           # Write the subclass chart type element.
           write_chart_type
+          # Configure a combined chart if present.
+          if second_chart
+            # Secondary axis has unique id otherwise use same as primary.
+            if second_chart.is_secondary?
+              second_chart.id = 1000 + @id
+            else
+              second_chart.id = @id
+            end
+
+            # Share the same filehandle for writing
+            second_chart.writer = @writer
+
+            # Share series index with primary chart.
+            second_chart.series_index = @series_index
+
+            # Write the subclass chart type elements for combined chart.
+            second_chart.write_chart_type
+          end
           # Write the c:spPr eleent for the plotarea formatting.
           write_sp_pr(@plotarea)
         end

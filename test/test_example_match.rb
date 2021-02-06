@@ -36,9 +36,9 @@ class TestExampleMatch < Minitest::Test
 
     # Write a hyperlink
     hyperlink_format = workbook.add_format(
-                                           :color     => 'blue',
-                                           :underline => 1
-                                           )
+      :color     => 'blue',
+      :underline => 1
+    )
 
     worksheet.write(10, 0, 'http://www.ruby-lang.org/', hyperlink_format)
 
@@ -242,6 +242,68 @@ class TestExampleMatch < Minitest::Test
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
+  def test_chart_gauge
+    @xlsx = 'chart_gauge.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    chart_doughnut = workbook.add_chart(:type => 'doughnut', :embedded => 1)
+    chart_pie      = workbook.add_chart(:type => 'pie', :embedded => 1)
+
+    # Add some data for the Doughnut and Pie charts. This is set up so the
+    # gauge goes from 0-100. It is initially set at 75%.
+    worksheet.write_col('H2', ['Donut', 25, 50, 25, 100])
+    worksheet.write_col('I2', ['Pie', 75, 1, '=200-I4-I3'])
+
+    # Configure the doughnut chart as the background for the gauge.
+    chart_doughnut.add_series(
+      :name   => '=Sheet1!$H$2',
+      :values => '=Sheet1!$H$3:$H$6',
+      :points => [
+        { :fill => { :color => 'green' } },
+        { :fill => { :color => 'yellow' } },
+        { :fill => { :color => 'red' } },
+        { :fill => { :none  => 1 } }
+      ]
+    )
+
+    # Rotate chart so the gauge parts are above the horizontal.
+    chart_doughnut.set_rotation(270)
+
+    # Turn off the chart legend.
+    chart_doughnut.set_legend(:none => 1)
+
+    # Turn off the chart fill and border.
+    chart_doughnut.set_chartarea(
+      :border => { :none  => 1 },
+      :fill   => { :none  => 1 }
+    )
+
+    # Configure the pie chart as the needle for the gauge.
+    chart_pie.add_series(
+      :name   => '=Sheet1!$I$2',
+      :values => '=Sheet1!$I$3:$I$6',
+      :points => [
+        { :fill => { :none  => 1 } },
+        { :fill => { :color => 'black' } },
+        { :fill => { :none  => 1 } }
+      ]
+    )
+
+    # Rotate the pie chart/needle to align with the doughnut/gauge.
+    chart_pie.set_rotation(270)
+
+    # Combine the pie and doughnut charts.
+    chart_doughnut.combine(chart_pie)
+
+    # Insert the chart into the worksheet.
+    worksheet.insert_chart('A1', chart_doughnut)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_chart_scatter06
     @xlsx = 'chart_scatter06.xlsx'
     workbook  = WriteXLSX.new(@io)
@@ -252,23 +314,23 @@ class TestExampleMatch < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [57708544, 44297600])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
+      [ 1, 2, 3, 4,  5 ],
+      [ 2, 4, 6, 8,  10 ],
+      [ 3, 6, 9, 12, 15 ]
 
-           ]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5'
-                    )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$B$1:$B$5'
+    )
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5'
-                    )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$C$1:$C$5'
+    )
 
     chart.set_x_axis(:minor_unit => 1, :major_unit => 3)
     chart.set_y_axis(:minor_unit => 2, :major_unit => 4)
@@ -281,7 +343,7 @@ class TestExampleMatch < Minitest::Test
   end
 
   def autofilter_data
-<<EOS
+    <<EOS
     Region    Item      Volume    Month
     East      Apple     9000      July
     East      Apple     5000      July
@@ -345,10 +407,10 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-            [ 2, 3, 4, 5, 6, 7 ],
-            [ 40, 40, 50, 30, 25, 50 ],
-            [ 30, 25, 30, 10,  5, 10 ]
-           ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 40, 40, 50, 30, 25, 50 ],
+      [ 30, 25, 30, 10,  5, 10 ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -358,18 +420,18 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-                     :name       => '=Sheet1!$B$1',
-                     :categories => '=Sheet1!$A$2:$A$7',
-                     :values     => '=Sheet1!$B$2:$B$7'
-                     )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart.add_series(
-                     :name       => '=Sheet1!$C$1',
-                     :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                     :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                     )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart.set_title(:name => 'Results of sample analysis')
@@ -396,9 +458,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-        [ 2, 3, 4, 5, 6, 7 ],
-        [ 10, 40, 50, 20, 10, 50 ],
-        [ 30, 60, 70, 50, 40, 30 ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
     ]
 
     worksheet.write('A1', headings, bold)
@@ -409,17 +471,17 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-        :name       => '=Sheet1!$B$1',
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7'
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
     )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart.add_series(
-        :name       => '=Sheet1!$C$1',
-        :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-        :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
     )
 
     # Add a chart title and some axis labels.
@@ -447,9 +509,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-        [ 2, 3, 4, 5, 6, 7 ],
-        [ 10, 40, 50, 20, 10, 50 ],
-        [ 30, 60, 70, 50, 40, 30 ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
     ]
 
     worksheet.write('A1', headings, bold)
@@ -460,17 +522,17 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-        :name       => '=Sheet1!$B$1',
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7'
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
     )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart.add_series(
-        :name       => '=Sheet1!$C$1',
-        :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-        :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
     )
 
     # Add a chart title and some axis labels.
@@ -498,9 +560,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Category', 'Values' ]
     data = [
-            [ 'Glazed', 'Chocolate', 'Cream' ],
-            [ 50,       35,          15      ]
-           ]
+      [ 'Glazed', 'Chocolate', 'Cream' ],
+      [ 50,       35,          15      ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -512,10 +574,10 @@ EOS
     # [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
     # See below for an alternative syntax.
     chart1.add_series(
-                      :name       => 'Doughnut sales data',
-                      :categories => [ 'Sheet1', 1, 3, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 3, 1, 1 ]
-                      );
+      :name       => 'Doughnut sales data',
+      :categories => [ 'Sheet1', 1, 3, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 3, 1, 1 ]
+    );
 
     # Add a title.
     chart1.set_title(:name => 'Popular Doughnut Types')
@@ -536,15 +598,15 @@ EOS
 
     # Configure the series and add user defined segment colours.
     chart2.add_series(
-                      :name       => 'Doughnut sales data',
-                      :categories => '=Sheet1!$A$2:$A$4',
-                      :values     => '=Sheet1!$B$2:$B$4',
-                      :points     => [
-                                      { :fill => { :color => '#FA58D0' } },
-                                      { :fill => { :color => '#61210B' } },
-                                      { :fill => { :color => '#F5F6CE' } }
-                                     ]
-                      )
+      :name       => 'Doughnut sales data',
+      :categories => '=Sheet1!$A$2:$A$4',
+      :values     => '=Sheet1!$B$2:$B$4',
+      :points     => [
+        { :fill => { :color => '#FA58D0' } },
+        { :fill => { :color => '#61210B' } },
+        { :fill => { :color => '#F5F6CE' } }
+      ]
+    )
 
     # Add a title.
     chart2.set_title(:name => 'Doughnut Chart with user defined colors')
@@ -563,10 +625,10 @@ EOS
 
     # Configure the series.
     chart3.add_series(
-                      :name       => 'Doughnut sales data',
-                      :categories => '=Sheet1!$A$2:$A$4',
-                      :values     => '=Sheet1!$B$2:$B$4'
-                      )
+      :name       => 'Doughnut sales data',
+      :categories => '=Sheet1!$A$2:$A$4',
+      :values     => '=Sheet1!$B$2:$B$4'
+    )
 
     # Add a title.
     chart3.set_title(:name => 'Doughnut Chart with segment rotation')
@@ -587,10 +649,10 @@ EOS
 
     # Configure the series.
     chart4.add_series(
-                      :name       => 'Doughnut sales data',
-                      :categories => '=Sheet1!$A$2:$A$4',
-                      :values     => '=Sheet1!$B$2:$B$4'
-                      )
+      :name       => 'Doughnut sales data',
+      :categories => '=Sheet1!$A$2:$A$4',
+      :values     => '=Sheet1!$B$2:$B$4'
+    )
 
     # Add a title.
     chart4.set_title(:name => 'Doughnut Chart with user defined hole size')
@@ -615,9 +677,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-        [ 2, 3, 4, 5, 6, 7 ],
-        [ 10, 40, 50, 20, 10, 50 ],
-        [ 30, 60, 70, 50, 40, 30 ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
     ]
 
     worksheet.write('A1', headings, bold)
@@ -628,17 +690,17 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-        :name       => '=Sheet1!$B$1',
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7'
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
     )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart.add_series(
-        :name       => '=Sheet1!$C$1',
-        :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-        :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
     )
 
     # Add a chart title and some axis labels.
@@ -666,9 +728,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Category', 'Values' ]
     data = [
-            [ 'Apple', 'Cherry', 'Pecan' ],
-            [ 60,       30,       10     ]
-           ]
+      [ 'Apple', 'Cherry', 'Pecan' ],
+      [ 60,       30,       10     ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -680,10 +742,10 @@ EOS
     # [ $sheetname, $row_start, $row_end, $col_start, $col_end ].
     # See below for an alternative syntax.
     chart1.add_series(
-                      :name       => 'Pie sales data',
-                      :categories => [ 'Sheet1', 1, 3, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 3, 1, 1 ]
-                      )
+      :name       => 'Pie sales data',
+      :categories => [ 'Sheet1', 1, 3, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 3, 1, 1 ]
+    )
 
     # Add a title.
     chart1.set_title(:name => 'Popular Pie Types')
@@ -703,15 +765,15 @@ EOS
 
     # Configure the series and add user defined segment colours.
     chart2.add_series(
-                      :name       => 'Pie sales data',
-                      :categories => '=Sheet1!$A$2:$A$4',
-                      :values     => '=Sheet1!$B$2:$B$4',
-                      :points     => [
-                                      { :fill => { :color => '#5ABA10' } },
-                                      { :fill => { :color => '#FE110E' } },
-                                      { :fill => { :color => '#CA5C05' } }
-                                     ]
-                      )
+      :name       => 'Pie sales data',
+      :categories => '=Sheet1!$A$2:$A$4',
+      :values     => '=Sheet1!$B$2:$B$4',
+      :points     => [
+        { :fill => { :color => '#5ABA10' } },
+        { :fill => { :color => '#FE110E' } },
+        { :fill => { :color => '#CA5C05' } }
+      ]
+    )
 
     # Add a title.
     chart2.set_title(:name => 'Pie Chart with user defined colors')
@@ -733,10 +795,10 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-            [ 2, 3, 4, 5, 6, 7 ],
-            [ 30, 60, 70, 50, 40, 30 ],
-            [ 25, 40, 50, 30, 50, 40 ]
-           ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 30, 60, 70, 50, 40, 30 ],
+      [ 25, 40, 50, 30, 50, 40 ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -746,18 +808,18 @@ EOS
 
     # Configure the first series.
     chart1.add_series(
-                      :name       => '=Sheet1!$B$1',
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart1.add_series(
-                      :name       => '=Sheet1!$C$1',
-                      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                      )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart1.set_title(:name => 'Results of sample analysis')
@@ -774,24 +836,24 @@ EOS
     # Create a with_markers chart sub-type
     #
     chart2 = workbook.add_chart(
-                                :type     => 'radar',
-                                :embedded => 1,
-                                :subtype  => 'with_markers'
-                                )
+      :type     => 'radar',
+      :embedded => 1,
+      :subtype  => 'with_markers'
+    )
 
     # Configure the first series.
     chart2.add_series(
-                      :name       => '=Sheet1!$B$1',
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series.
     chart2.add_series(
-                      :name       => '=Sheet1!$C$1',
-                      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                      )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart2.set_title(:name  => 'Stacked Chart')
@@ -808,24 +870,24 @@ EOS
     # Create a filled chart sub-type
     #
     chart3 = workbook.add_chart(
-                                :type     => 'radar',
-                                :embedded => 1,
-                                :subtype  => 'filled'
-                                )
+      :type     => 'radar',
+      :embedded => 1,
+      :subtype  => 'filled'
+    )
 
     # Configure the first series.
     chart3.add_series(
-                      :name       => '=Sheet1!$B$1',
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series.
     chart3.add_series(
-                      :name       => '=Sheet1!$C$1',
-                      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                      )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart3.set_title(:name  => 'Percent Stacked Chart')
@@ -852,9 +914,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-        [ 2, 3, 4, 5, 6, 7 ],
-        [ 10, 40, 50, 20, 10, 50 ],
-        [ 30, 60, 70, 50, 40, 30 ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
     ]
 
     worksheet.write('A1', headings, bold)
@@ -865,17 +927,17 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-        :name       => '=Sheet1!$B$1',
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7'
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
     )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ $sheetname, $row_start, $row_end, $col_start, $col_end ].$chart->add_series(
     chart.add_series(
-        :name       => '=Sheet1!$C$1',
-        :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-        :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
     )
 
     # Add a chart title and some axis labels.
@@ -906,19 +968,19 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Date', 'High', 'Low', 'Close' ]
     data = [
-        [ '2007-01-01T', '2007-01-02T', '2007-01-03T', '2007-01-04T', '2007-01-05T' ],
-        [ 27.2,  25.03, 19.05, 20.34, 18.5 ],
-        [ 23.49, 19.55, 15.12, 17.84, 16.34 ],
-        [ 25.45, 23.05, 17.32, 20.45, 17.34 ]
+      [ '2007-01-01T', '2007-01-02T', '2007-01-03T', '2007-01-04T', '2007-01-05T' ],
+      [ 27.2,  25.03, 19.05, 20.34, 18.5 ],
+      [ 23.49, 19.55, 15.12, 17.84, 16.34 ],
+      [ 25.45, 23.05, 17.32, 20.45, 17.34 ]
     ]
 
     worksheet.write('A1', headings, bold)
 
     (0 .. 4).each do |row|
-        worksheet.write_date_time(row + 1, 0, data[0][row], date_format)
-        worksheet.write(row + 1, 1, data[1][row])
-        worksheet.write(row + 1, 2, data[2][row])
-        worksheet.write(row + 1, 3, data[3][row])
+      worksheet.write_date_time(row + 1, 0, data[0][row], date_format)
+      worksheet.write(row + 1, 1, data[1][row])
+      worksheet.write(row + 1, 2, data[2][row])
+      worksheet.write(row + 1, 3, data[3][row])
     end
 
     worksheet.set_column('A:D', 11)
@@ -960,9 +1022,9 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Aliens', 'Humans']
     data = [
-            [ 2,  3,  4,  5,  6,  7 ],
-            [ 10, 40, 50, 20, 10, 50 ]
-           ]
+      [ 2,  3,  4,  5,  6,  7 ],
+      [ 10, 40, 50, 20, 10, 50 ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -972,15 +1034,15 @@ EOS
 
     # Configure the first series.
     chart.add_series(
-                     :name    => '=Sheet1!$A$1',
-                     :values  => '=Sheet1!$A$2:$A$7',
-                     :y2_axis => 1
-                     )
+      :name    => '=Sheet1!$A$1',
+      :values  => '=Sheet1!$A$2:$A$7',
+      :y2_axis => 1
+    )
 
     chart.add_series(
-                     :name       => '=Sheet1!$B$1',
-                     :values     => '=Sheet1!$B$2:$B$7'
-                     )
+      :name       => '=Sheet1!$B$1',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     chart.set_legend(:position => 'right')
 
@@ -1275,7 +1337,7 @@ EOS
     cell   = 'C3'
 
     cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' (blank) in the status bar at the bottom"
+                "by #{author}' (blank) in the status bar at the bottom"
 
     comment = 'Hello.'
 
@@ -1286,7 +1348,7 @@ EOS
     author    = 'Ruby'
     cell      = 'C6'
     cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' in the status bar at the bottom"
+                "by #{author}' in the status bar at the bottom"
 
     comment = 'Hello.'
 
@@ -1297,7 +1359,7 @@ EOS
     author    = '€'
     cell      = 'C9'
     cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
-      "by #{author}' in the status bar at the bottom"
+                "by #{author}' in the status bar at the bottom"
     comment = 'Hello.'
 
     worksheet7.write( cell, cell_text, text_wrap )
@@ -1361,36 +1423,36 @@ EOS
 
     # Light red fill with dark red text.
     format1 = workbook.add_format(
-                                  :bg_color => '#FFC7CE',
-                                  :color    => '#9C0006'
-                                  )
+      :bg_color => '#FFC7CE',
+      :color    => '#9C0006'
+    )
 
     # Green fill with dark green text.
     format2 = workbook.add_format(
-                                  :bg_color => '#C6EFCE',
-                                  :color    => '#006100'
-                                  )
+      :bg_color => '#C6EFCE',
+      :color    => '#006100'
+    )
 
     # Some sample data to run the conditional formatting against.
     data = [
-            [ 34, 72,  38, 30, 75, 48, 75, 66, 84, 86 ],
-            [ 6,  24,  1,  84, 54, 62, 60, 3,  26, 59 ],
-            [ 28, 79,  97, 13, 85, 93, 93, 22, 5,  14 ],
-            [ 27, 71,  40, 17, 18, 79, 90, 93, 29, 47 ],
-            [ 88, 25,  33, 23, 67, 1,  59, 79, 47, 36 ],
-            [ 24, 100, 20, 88, 29, 33, 38, 54, 54, 88 ],
-            [ 6,  57,  88, 28, 10, 26, 37, 7,  41, 48 ],
-            [ 52, 78,  1,  96, 26, 45, 47, 33, 96, 36 ],
-            [ 60, 54,  81, 66, 81, 90, 80, 93, 12, 55 ],
-            [ 70, 5,   46, 14, 71, 19, 66, 36, 41, 21 ]
-           ]
+      [ 34, 72,  38, 30, 75, 48, 75, 66, 84, 86 ],
+      [ 6,  24,  1,  84, 54, 62, 60, 3,  26, 59 ],
+      [ 28, 79,  97, 13, 85, 93, 93, 22, 5,  14 ],
+      [ 27, 71,  40, 17, 18, 79, 90, 93, 29, 47 ],
+      [ 88, 25,  33, 23, 67, 1,  59, 79, 47, 36 ],
+      [ 24, 100, 20, 88, 29, 33, 38, 54, 54, 88 ],
+      [ 6,  57,  88, 28, 10, 26, 37, 7,  41, 48 ],
+      [ 52, 78,  1,  96, 26, 45, 47, 33, 96, 36 ],
+      [ 60, 54,  81, 66, 81, 90, 80, 93, 12, 55 ],
+      [ 70, 5,   46, 14, 71, 19, 66, 36, 41, 21 ]
+    ]
 
     ###############################################################################
     #
     # Example 1.
     #
     caption = 'Cells with values >= 50 are in light red. ' +
-      'Values < 50 are in light green.'
+              'Values < 50 are in light green.'
 
     # Write the data.
     worksheet1.write('A1', caption)
@@ -1404,7 +1466,7 @@ EOS
                                         :value    => 50,
                                         :format   => format1
                                       }
-                                      )
+                                     )
 
     # Write another conditional format over the same range.
     worksheet1.conditional_formatting('B3:K12',
@@ -1414,7 +1476,7 @@ EOS
                                         :value    => 50,
                                         :format   => format2
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1422,7 +1484,7 @@ EOS
     # Example 2.
     #
     caption = 'Values between 30 and 70 are in light red. ' +
-      'Values outside that range are in light green.'
+              'Values outside that range are in light green.'
 
     worksheet2.write('A1', caption)
     worksheet2.write_col('B3', data)
@@ -1435,7 +1497,7 @@ EOS
                                         :maximum  => 70,
                                         :format   => format1
                                       }
-                                      )
+                                     )
 
     worksheet2.conditional_formatting('B3:K12',
                                       {
@@ -1445,7 +1507,7 @@ EOS
                                         :maximum  => 70,
                                         :format   => format2
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1453,7 +1515,7 @@ EOS
     # Example 3.
     #
     caption = 'Duplicate values are in light red. ' +
-      'Unique values are in light green.'
+              'Unique values are in light green.'
 
     worksheet3.write('A1', caption)
     worksheet3.write_col('B3', data)
@@ -1463,14 +1525,14 @@ EOS
                                         :type     => 'duplicate',
                                         :format   => format1,
                                       }
-                                      )
+                                     )
 
     worksheet3.conditional_formatting('B3:K12',
                                       {
                                         :type     => 'unique',
                                         :format   => format2,
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1478,7 +1540,7 @@ EOS
     # Example 4.
     #
     caption = 'Above average values are in light red. ' +
-      'Below average values are in light green.'
+              'Below average values are in light green.'
 
     worksheet4.write('A1', caption)
     worksheet4.write_col('B3', data)
@@ -1489,7 +1551,7 @@ EOS
                                         :criteria => 'above',
                                         :format   => format1
                                       }
-                                      )
+                                     )
 
     worksheet4.conditional_formatting('B3:K12',
                                       {
@@ -1497,7 +1559,7 @@ EOS
                                         :criteria => 'below',
                                         :format   => format2
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1505,7 +1567,7 @@ EOS
     # Example 5.
     #
     caption = 'Top 10 values are in light red. ' +
-      'Bottom 10 values are in light green.'
+              'Bottom 10 values are in light green.'
 
     worksheet5.write('A1', caption)
     worksheet5.write_col('B3', data)
@@ -1516,7 +1578,7 @@ EOS
                                         :value    => '10',
                                         :format   => format1
                                       }
-                                      )
+                                     )
 
     worksheet5.conditional_formatting('B3:K12',
                                       {
@@ -1524,7 +1586,7 @@ EOS
                                         :value    => '10',
                                         :format   => format2
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1532,7 +1594,7 @@ EOS
     # Example 6.
     #
     caption = 'Cells with values >= 50 are in light red. ' +
-      'Values < 50 are in light green. Non-contiguous ranges.'
+              'Values < 50 are in light green. Non-contiguous ranges.'
 
     # Write the data.
     worksheet6.write('A1', caption)
@@ -1546,7 +1608,7 @@ EOS
                                         :value    => 50,
                                         :format   => format1
                                       }
-                                      )
+                                     )
 
     # Write another conditional format over the same range.
     worksheet6.conditional_formatting('B3:K6,B9:K12',
@@ -1556,7 +1618,7 @@ EOS
                                         :value    => 50,
                                         :format   => format2
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1583,19 +1645,19 @@ EOS
                                       {
                                         :type => '2_color_scale'
                                       }
-                                      )
+                                     )
 
     worksheet7.conditional_formatting('D3:D14',
                                       {
                                         :type => '3_color_scale'
                                       }
-                                      )
+                                     )
 
     worksheet7.conditional_formatting('F3:F14',
                                       {
                                         :type => 'data_bar'
                                       }
-                                      )
+                                     )
 
 
     ###############################################################################
@@ -1624,7 +1686,7 @@ EOS
                                         :min_color => "#FF0000",
                                         :max_color => "#00FF00"
                                       }
-                                      )
+                                     )
 
     worksheet8.conditional_formatting('D3:D14',
                                       {
@@ -1633,14 +1695,14 @@ EOS
                                         :mid_color => "#8DB4E3",
                                         :max_color => "#538ED5"
                                       }
-                                      )
+                                     )
 
     worksheet8.conditional_formatting('F3:F14',
                                       {
                                         :type      => 'data_bar',
                                         :bar_color => '#63C384'
                                       }
-                                      )
+                                     )
 
     workbook.close
     store_to_tempfile
@@ -1654,13 +1716,13 @@ EOS
 
     # Add a format for the header cells.
     header_format = workbook.add_format(
-                                        :border      => 1,
-                                        :bg_color    => 43,
-                                        :bold        => 1,
-                                        :text_wrap   => 1,
-                                        :valign      => 'vcenter',
-                                        :indent      => 1
-                                        )
+      :border      => 1,
+      :bg_color    => 43,
+      :bold        => 1,
+      :text_wrap   => 1,
+      :valign      => 'vcenter',
+      :indent      => 1
+    )
 
     # Set up layout of the worksheet.
     worksheet.set_column('A:A', 68)
@@ -1932,32 +1994,32 @@ EOS
     # the format codes change the appearance of the date.
     #
     date_formats = [
-    'dd/mm/yy',
-    'mm/dd/yy',
-    '',
-    'd mm yy',
-    'dd mm yy',
-    '',
-    'dd m yy',
-    'dd mm yy',
-    'dd mmm yy',
-    'dd mmmm yy',
-    '',
-    'dd mm y',
-    'dd mm yyy',
-    'dd mm yyyy',
-    '',
-    'd mmmm yyyy',
-    '',
-    'dd/mm/yy',
-    'dd/mm/yy hh:mm',
-    'dd/mm/yy hh:mm:ss',
-    'dd/mm/yy hh:mm:ss.000',
-    '',
-    'hh:mm',
-    'hh:mm:ss',
-    'hh:mm:ss.000'
-                   ]
+      'dd/mm/yy',
+      'mm/dd/yy',
+      '',
+      'd mm yy',
+      'dd mm yy',
+      '',
+      'dd m yy',
+      'dd mm yy',
+      'dd mmm yy',
+      'dd mmmm yy',
+      '',
+      'dd mm y',
+      'dd mm yyy',
+      'dd mm yyyy',
+      '',
+      'd mmmm yyyy',
+      '',
+      'dd/mm/yy',
+      'dd/mm/yy hh:mm',
+      'dd/mm/yy hh:mm:ss',
+      'dd/mm/yy hh:mm:ss.000',
+      '',
+      'hh:mm',
+      'hh:mm:ss',
+      'hh:mm:ss.000'
+    ]
 
     # Write the same date and time using each of the above formats. The empty
     # string formats create a blank line to make the example clearer.
@@ -1969,9 +2031,9 @@ EOS
 
       # Create a format for the date or time.
       format = workbook.add_format(
-                 :num_format => date_format,
-                 :align      => 'left'
-                                   )
+        :num_format => date_format,
+        :align      => 'left'
+      )
 
       # Write the same date using different formats.
       worksheet.write_date_time(row, 0, '2004-08-01T12:30:45.123', format)
@@ -2036,17 +2098,17 @@ EOS
     worksheet.set_row(0, 40)
 
     heading = workbook.add_format(
-                                  :bold  => 1,
-                                  :color => 'blue',
-                                  :size  => 16,
-                                  :merge => 1,
-                                  :align => 'vcenter'
-                                  )
+      :bold  => 1,
+      :color => 'blue',
+      :size  => 16,
+      :merge => 1,
+      :align => 'vcenter'
+    )
 
     hyperlink_format = workbook.add_format(
-                                           :color => 'blue',
-                                           :underline => 1
-                                           )
+      :color => 'blue',
+      :underline => 1
+    )
 
     headings = ['Features of WriteXLSX', '']
     worksheet.write_row('A1', headings, heading)
@@ -2056,12 +2118,12 @@ EOS
     # Some text examples
     #
     text_format = workbook.add_format(
-                                      :bold   => 1,
-                                      :italic => 1,
-                                      :color  => 'red',
-                                      :size   => 18,
-                                      :font   => 'Lucida Calligraphy'
-                                      )
+      :bold   => 1,
+      :italic => 1,
+      :color  => 'red',
+      :size   => 18,
+      :font   => 'Lucida Calligraphy'
+    )
 
     worksheet.write('A2', "Text")
     worksheet.write('B2', "Hello Excel")
@@ -2129,10 +2191,10 @@ EOS
     format3 = workbook.add_format(:diag_type => 3)
 
     format4 = workbook.add_format(
-                                  :diag_type   => 3,
-                                  :diag_border => 7,
-                                  :diag_color  => 'red'
-                                  )
+      :diag_type   => 3,
+      :diag_border => 7,
+      :diag_color  => 'red'
+    )
 
     worksheet.write('B3',  'Text', format1)
     worksheet.write('B6',  'Text', format2)
@@ -2218,9 +2280,9 @@ EOS
       format2.set_color('blue')
 
       format3 = workbook.add_format(
-                                    :color     => 'blue',
-                                    :underline => 1
-                                    )
+        :color     => 'blue',
+        :underline => 1
+      )
 
       worksheet.write(2, 0, 'This workbook demonstrates some of', format)
       worksheet.write(3, 0, 'the formatting options provided by', format)
@@ -2233,16 +2295,16 @@ EOS
                       'Named colors', format3)
 
       worksheet.write(
-                      'A10',
-                      "internal:'Standard colors'!A1",
-                      'Standard colors', format3
-                      )
+        'A10',
+        "internal:'Standard colors'!A1",
+        'Standard colors', format3
+      )
 
       worksheet.write(
-                      'A11',
-                      "internal:'Numeric formats'!A1",
-                      'Numeric formats', format3
-                      )
+        'A11',
+        "internal:'Numeric formats'!A1",
+        'Numeric formats', format3
+      )
 
       worksheet.write('A12', "internal:Borders!A1", 'Borders', format3)
       worksheet.write('A13', "internal:Patterns!A1", 'Patterns', format3)
@@ -2272,10 +2334,10 @@ EOS
       [33, 11, 53, 17, 22, 18, 13, 16, 23, 9, 12, 15, 14, 20, 8, 10].each do |index|
         color = colors[index]
         format = workbook.add_format(
-                                     :bg_color => color,
-                                     :pattern  => 1,
-                                     :border   => 1
-                                     )
+          :bg_color => color,
+          :pattern  => 1,
+          :border   => 1
+        )
 
         worksheet.write(i + 1, 0, index, center)
         worksheet.write(i + 1, 1, sprintf("0x%02X", index), center)
@@ -2302,10 +2364,10 @@ EOS
 
       (8 .. 63).each do |i|
         format = workbook.add_format(
-                                     :bg_color => i,
-                                     :pattern  => 1,
-                                     :border   => 1
-                                     )
+          :bg_color => i,
+          :pattern  => 1,
+          :border   => 1
+        )
 
         worksheet.write((i - 7), 0, i, center)
         worksheet.write((i - 7), 1, sprintf("0x%02X", i), center)
@@ -2787,17 +2849,17 @@ EOS
 
     # Add the standard url link format.
     url_format = workbook.add_format(
-                                     :color     => 'blue',
-                                     :underline => 1
-                                     )
+      :color     => 'blue',
+      :underline => 1
+    )
 
     # Add a sample format.
     red_format = workbook.add_format(
-                                     :color     => 'red',
-                                     :bold      => 1,
-                                     :underline => 1,
-                                     :size      => 12
-                                     )
+      :color     => 'red',
+      :bold      => 1,
+      :underline => 1,
+      :size      => 12
+    )
 
     # Add an alternate description string to the URL.
     str = 'Perl home.'
@@ -2873,16 +2935,16 @@ EOS
 
     # Create a merged format
     format = workbook.add_format(
-                                 :center_across => 1,
-                                 :bold          => 1,
-                                 :size          => 15,
-                                 :pattern       => 1,
-                                 :border        => 6,
-                                 :color         => 'white',
-                                 :fg_color      => 'green',
-                                 :border_color  => 'yellow',
-                                 :align         => 'vcenter'
-                                 )
+      :center_across => 1,
+      :bold          => 1,
+      :size          => 15,
+      :pattern       => 1,
+      :border        => 6,
+      :color         => 'white',
+      :fg_color      => 'green',
+      :border_color  => 'yellow',
+      :align         => 'vcenter'
+    )
 
     # Only one cell should contain text, the others should be blank.
     worksheet.write(2, 1, "Center across selection", format)
@@ -2909,12 +2971,12 @@ EOS
     # Example: Merge cells containing a hyperlink using merge_range().
     #
     format = workbook.add_format(
-                                 :border    => 1,
-                                 :underline => 1,
-                                 :color     => 'blue',
-                                 :align     => 'center',
-                                 :valign    => 'vcenter'
-                                 )
+      :border    => 1,
+      :underline => 1,
+      :color     => 'blue',
+      :align     => 'center',
+      :valign    => 'vcenter'
+    )
 
     # Merge 3 cells
     worksheet.merge_range('B4:D4', 'http://www.perl.com', format)
@@ -2942,12 +3004,12 @@ EOS
     # Example 1: Text centered vertically and horizontally
     #
     format1 = workbook.add_format(
-                                  :border => 6,
-                                  :bold   => 1,
-                                  :color  => 'red',
-                                  :valign => 'vcenter',
-                                  :align  => 'center'
-                                  )
+      :border => 6,
+      :bold   => 1,
+      :color  => 'red',
+      :valign => 'vcenter',
+      :align  => 'center'
+    )
 
     worksheet.merge_range('B2:D3', 'Vertical and horizontal', format1)
 
@@ -2956,12 +3018,12 @@ EOS
     # Example 2: Text aligned to the top and left
     #
     format2 = workbook.add_format(
-                                  :border => 6,
-                                  :bold   => 1,
-                                  :color  => 'red',
-                                  :valign => 'top',
-                                  :align  => 'left'
-                                  )
+      :border => 6,
+      :bold   => 1,
+      :color  => 'red',
+      :valign => 'top',
+      :align  => 'left'
+    )
 
     worksheet.merge_range('B5:D6', 'Aligned to the top and left', format2)
 
@@ -2970,12 +3032,12 @@ EOS
     # Example 3:  Text aligned to the bottom and right
     #
     format3 = workbook.add_format(
-                                  :border => 6,
-                                  :bold   => 1,
-                                  :color  => 'red',
-                                  :valign => 'bottom',
-                                  :align  => 'right'
-                                  )
+      :border => 6,
+      :bold   => 1,
+      :color  => 'red',
+      :valign => 'bottom',
+      :align  => 'right'
+    )
 
     worksheet.merge_range('B8:D9', 'Aligned to the bottom and right', format3)
 
@@ -2984,12 +3046,12 @@ EOS
     # Example 4:  Text justified (i.e. wrapped) in the cell
     #
     format4 = workbook.add_format(
-                                  :border => 6,
-                                  :bold   => 1,
-                                  :color  => 'red',
-                                  :valign => 'top',
-                                  :align  => 'justify'
-                                  )
+      :border => 6,
+      :bold   => 1,
+      :color  => 'red',
+      :valign => 'top',
+      :align  => 'justify'
+    )
 
     worksheet.merge_range('B11:D12', 'Justified: ' << 'so on and ' * 18, format4)
 
@@ -3013,13 +3075,13 @@ EOS
     # Rotation 1, letters run from top to bottom
     #
     format1 = workbook.add_format(
-                                  :border   => 6,
-                                  :bold     => 1,
-                                  :color    => 'red',
-                                  :valign   => 'vcentre',
-                                  :align    => 'centre',
-                                  :rotation => 270
-                                  )
+      :border   => 6,
+      :bold     => 1,
+      :color    => 'red',
+      :valign   => 'vcentre',
+      :align    => 'centre',
+      :rotation => 270
+    )
 
     worksheet.merge_range( 'B4:B9', 'Rotation 270', format1 )
 
@@ -3028,13 +3090,13 @@ EOS
     # Rotation 2, 90ｰ anticlockwise
     #
     format2 = workbook.add_format(
-                                  :border   => 6,
-                                  :bold     => 1,
-                                  :color    => 'red',
-                                  :valign   => 'vcentre',
-                                  :align    => 'centre',
-                                  :rotation => 90
-                                  )
+      :border   => 6,
+      :bold     => 1,
+      :color    => 'red',
+      :valign   => 'vcentre',
+      :align    => 'centre',
+      :rotation => 90
+    )
 
     worksheet.merge_range( 'D4:D9', 'Rotation 90°', format2 )
 
@@ -3043,13 +3105,13 @@ EOS
     # Rotation 3, 90ｰ clockwise
     #
     format3 = workbook.add_format(
-                                  :border   => 6,
-                                  :bold     => 1,
-                                  :color    => 'red',
-                                  :valign   => 'vcentre',
-                                  :align    => 'centre',
-                                  :rotation => -90
-                                  )
+      :border   => 6,
+      :bold     => 1,
+      :color    => 'red',
+      :valign   => 'vcentre',
+      :align    => 'centre',
+      :rotation => -90
+    )
 
     worksheet.merge_range( 'F4:F9', 'Rotation -90°', format3 )
 
@@ -3070,14 +3132,14 @@ EOS
 
     # Format for the merged cells.
     format = workbook.add_format(
-                                 :border => 6,
-                                 :bold   => 1,
-                                 :color  => 'red',
-                                 :size   => 20,
-                                 :valign => 'vcentre',
-                                 :align  => 'left',
-                                 :indent => 1
-                                 )
+      :border => 6,
+      :bold   => 1,
+      :color  => 'red',
+      :size   => 20,
+      :valign => 'vcentre',
+      :align  => 'left',
+      :indent => 1
+    )
 
     ###############################################################################
     #
@@ -3234,12 +3296,12 @@ EOS
     # Example 3: Create a worksheet with outlined columns.
     #
     data = [
-            [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total' ],
-            [ 'North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)' ],
-            [ 'South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)' ],
-            [ 'East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)' ],
-            [ 'West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)' ],
-           ]
+      [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total' ],
+      [ 'North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)' ],
+      [ 'South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)' ],
+      [ 'East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)' ],
+      [ 'West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)' ],
+    ]
 
     # Add bold format to the first row
     worksheet3.set_row(0, nil, bold)
@@ -3259,10 +3321,10 @@ EOS
     # Example 4: Show all possible outline levels.
     #
     levels = [
-              "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
-              "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
-              "Level 1"
-             ]
+      "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
+      "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
+      "Level 1"
+    ]
 
 
     worksheet4.write_col('A1', levels)
@@ -3393,12 +3455,12 @@ EOS
     # Example 5: Create a worksheet with outlined columns.
     #
     data = [
-            [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Total' ],
-            [ 'North', 50,    20,    15,    25,    65,    80,   '=SUM(B2:G2)' ],
-            [ 'South', 10,    20,    30,    50,    50,    50,   '=SUM(B3:G3)' ],
-            [ 'East',  45,    75,    50,    15,    75,    100,  '=SUM(B4:G4)' ],
-            [ 'West',  15,    15,    55,    35,    20,    50,   '=SUM(B5:G6)' ]
-           ]
+      [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Total' ],
+      [ 'North', 50,    20,    15,    25,    65,    80,   '=SUM(B2:G2)' ],
+      [ 'South', 10,    20,    30,    50,    50,    50,   '=SUM(B3:G3)' ],
+      [ 'East',  45,    75,    50,    15,    75,    100,  '=SUM(B4:G4)' ],
+      [ 'West',  15,    15,    55,    35,    20,    50,   '=SUM(B5:G6)' ]
+    ]
 
     # Add bold format to the first row
     worksheet5.set_row(0, nil, bold)
@@ -3499,10 +3561,10 @@ EOS
     #
 
     header = workbook.add_format(
-                                 :align    => 'center',
-                                 :valign   => 'vcenter',
-                                 :fg_color => 0x2A
-                                 )
+      :align    => 'center',
+      :valign   => 'vcenter',
+      :fg_color => 0x2A
+    )
 
     center = workbook.add_format(:align => 'center')
 
@@ -3598,16 +3660,16 @@ EOS
     worksheet = workbook.add_worksheet
 
     workbook.set_properties(
-                            :title    => 'This is an example spreadsheet',
-                            :subject  => 'With document properties',
-                            :author   => 'John McNamara',
-                            :manager  => 'Dr. Heinz Doofenshmirtz',
-                            :company  => 'of Wolves',
-                            :category => 'Example spreadsheets',
-                            :keywords => 'Sample, Example, Properties',
-                            :comments => 'Created with Perl and Excel::Writer::XLSX',
-                            :status   => 'Quo'
-                            )
+      :title    => 'This is an example spreadsheet',
+      :subject  => 'With document properties',
+      :author   => 'John McNamara',
+      :manager  => 'Dr. Heinz Doofenshmirtz',
+      :company  => 'of Wolves',
+      :category => 'Example spreadsheets',
+      :keywords => 'Sample, Example, Properties',
+      :comments => 'Created with Perl and Excel::Writer::XLSX',
+      :status   => 'Quo'
+    )
 
     worksheet.set_column('A:A', 70)
     worksheet.write('A1', "Select 'Office Button -> Prepare -> Properties' to see the file properties.")
@@ -3708,16 +3770,16 @@ EOS
 
     # Write some strings with multiple formats.
     worksheet.write_rich_string('A1',
-        'This is ', bold, 'bold', ' and this is ', italic, 'italic')
+                                'This is ', bold, 'bold', ' and this is ', italic, 'italic')
 
     worksheet.write_rich_string('A3',
-        'This is ', red, 'red', ' and this is ', blue, 'blue')
+                                'This is ', red, 'red', ' and this is ', blue, 'blue')
 
     worksheet.write_rich_string('A5',
-        'Some ', bold, 'bold text', ' centered', center)
+                                'Some ', bold, 'bold text', ' centered', center)
 
     worksheet.write_rich_string('A7',
-        italic, 'j = k', superc, '(n-1)', center)
+                                italic, 'j = k', superc, '(n-1)', center)
 
     workbook.close
     store_to_tempfile
@@ -3750,7 +3812,7 @@ EOS
       :text   => "Hello\nWorld",
       :width  => 60,
       :height => 60
-                                 )
+    )
 
     worksheet.insert_shape('A1', ellipse, 50, 50)
 
@@ -3775,12 +3837,12 @@ EOS
       :text   => "Plain",
       :width  => 100,
       :height => 100
-                                 )
+    )
 
     bbformat = workbook.add_format(
       :color => 'red',
       :font  => 'Lucida Calligraphy'
-                                   )
+    )
 
     bbformat.set_bold
     bbformat.set_underline
@@ -3797,7 +3859,7 @@ EOS
       :line_weight => 3,
       :fill        => 'FFFF00',
       :line        => '3366FF'
-                               )
+    )
 
     worksheet.insert_shape('A1', plain,  50, 50)
     worksheet.insert_shape('A1', decor, 250, 50)
@@ -3818,7 +3880,7 @@ EOS
       :text   => 'Normal',
       :width  => 100,
       :height => 100
-                                 )
+    )
 
     worksheet.insert_shape('A1', normal, 50, 50)
     normal.text = 'Scaled 3w x 2h'
@@ -3841,7 +3903,7 @@ EOS
       :type   => type,
       :width  => 90,
       :height => 90
-                               )
+    )
 
     (1..10).each do |n|
       # Change the last 5 rectangles to stars. Previously
@@ -3857,7 +3919,7 @@ EOS
       :width   => 90,
       :height  => 90,
       :text    => 'started as a box'
-                                 )
+    )
     worksheet.insert_shape('A1', stencil, 100, 150)
 
     stencil.stencil = 0
@@ -3884,14 +3946,14 @@ EOS
       :type   => 'ellipse',
       :width  => 60,
       :height => 60
-                                 )
+    )
     worksheet.insert_shape('A1', s1, 50, 50)
 
     s2 = workbook.add_shape(
       :type   => 'plus',
       :width  => 20,
       :height => 20
-                                 )
+    )
     worksheet.insert_shape('A1', s2, 250, 200)
 
     # Create a connector to link the two shapes.
@@ -3923,14 +3985,14 @@ EOS
       :type   => 'chevron',
       :width  => 60,
       :height => 60
-                                 )
+    )
     worksheet.insert_shape('A1', s1, 50, 50)
 
     s2 = workbook.add_shape(
       :type   => 'pentagon',
       :width  => 20,
       :height => 20
-                                 )
+    )
     worksheet.insert_shape('A1', s2, 250, 200)
 
     # Create a connector to link the two shapes.
@@ -3970,7 +4032,7 @@ EOS
       :text   => "Hello\nWorld",
       :width  => cw,
       :height => ch
-                                 )
+    )
     worksheet.insert_shape('A1', ellipse, cx, cy)
 
     # Add a plus sign at 4 different positions around the circle.
@@ -3984,7 +4046,7 @@ EOS
       :id     => 3,
       :width  => pw,
       :height => ph
-                                 )
+    )
 
     p1 = worksheet.insert_shape('A1', plus, 350, 350)
     p2 = worksheet.insert_shape('A1', plus, 150, 350)
@@ -4035,7 +4097,7 @@ EOS
       :text   => "Hello\nWorld",
       :width  => cw,
       :height => ch
-                                 )
+    )
     worksheet.insert_shape('A1', ellipse, cx, cy)
 
     # Add a plus sign at 4 different positionos around the circle.
@@ -4049,7 +4111,7 @@ EOS
       :id     => 3,
       :width  => pw,
       :height => ph
-                                 )
+    )
 
     p1 = worksheet.insert_shape('A1', plus, 350, 150)
     p2 = worksheet.insert_shape('A1', plus, 350, 350)
@@ -4100,11 +4162,11 @@ EOS
       end
       last_sheet = sheet
       shape      = workbook.add_shape(
-                                  :type   => name,
-                                  :text   => name,
-                                  :width  => 90,
-                                  :height => 90
-                                  )
+        :type   => name,
+        :text   => name,
+        :width  => 90,
+        :height => 90
+      )
 
       # Connectors can not have labels, so write the connector name in the cell
       # to the left.
@@ -4536,11 +4598,11 @@ EOS
 
     # Some sample data for the table.
     data = [
-            [ 'Apples',  10000, 5000, 8000, 6000 ],
-            [ 'Pears',   2000,  3000, 4000, 5000 ],
-            [ 'Bananas', 6000,  6000, 6500, 6000 ],
-            [ 'Oranges', 500,   300,  200,  700 ]
-           ]
+      [ 'Apples',  10000, 5000, 8000, 6000 ],
+      [ 'Pears',   2000,  3000, 4000, 5000 ],
+      [ 'Bananas', 6000,  6000, 6500, 6000 ],
+      [ 'Oranges', 500,   300,  200,  700 ]
+    ]
 
     ###############################################################################
     #
@@ -4658,18 +4720,18 @@ EOS
 
     # Add a table to the worksheet.
     worksheet7.add_table(
-                         'B3:F7',
-                         {
-                           :data    => data,
-                           :columns => [
-                                        { :header => 'Product' },
-                                        { :header => 'Quarter 1' },
-                                        { :header => 'Quarter 2' },
-                                        { :header => 'Quarter 3' },
-                                        { :header => 'Quarter 4' }
-                                       ]
-                         }
-                         )
+      'B3:F7',
+      {
+        :data    => data,
+        :columns => [
+          { :header => 'Product' },
+          { :header => 'Quarter 1' },
+          { :header => 'Quarter 2' },
+          { :header => 'Quarter 3' },
+          { :header => 'Quarter 4' }
+        ]
+      }
+    )
 
     ###############################################################################
     #
@@ -4685,22 +4747,22 @@ EOS
 
     # Add a table to the worksheet.
     worksheet8.add_table(
-                         'B3:G7',
-                         {
-                           :data    => data,
-                           :columns => [
-                                        { :header => 'Product' },
-                                        { :header => 'Quarter 1' },
-                                        { :header => 'Quarter 2' },
-                                        { :header => 'Quarter 3' },
-                                        { :header => 'Quarter 4' },
-                                        {
-                                          :header  => 'Year',
-                                          :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
-                                        }
-                                       ]
-                         }
-                         )
+      'B3:G7',
+      {
+        :data    => data,
+        :columns => [
+          { :header => 'Product' },
+          { :header => 'Quarter 1' },
+          { :header => 'Quarter 2' },
+          { :header => 'Quarter 3' },
+          { :header => 'Quarter 4' },
+          {
+            :header  => 'Year',
+            :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+          }
+        ]
+      }
+    )
 
 
     ###############################################################################
@@ -4717,23 +4779,23 @@ EOS
 
     # Add a table to the worksheet.
     worksheet9.add_table(
-                         'B3:G8',
-                         {
-                           :data      => data,
-                           :total_row => 1,
-                           :columns   => [
-                                          { :header => 'Product' },
-                                          { :header => 'Quarter 1' },
-                                          { :header => 'Quarter 2' },
-                                          { :header => 'Quarter 3' },
-                                          { :header => 'Quarter 4' },
-                                          {
-                                            :header  => 'Year',
-                                            :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
-                                          }
-                                         ]
-                         }
-                         )
+      'B3:G8',
+      {
+        :data      => data,
+        :total_row => 1,
+        :columns   => [
+          { :header => 'Product' },
+          { :header => 'Quarter 1' },
+          { :header => 'Quarter 2' },
+          { :header => 'Quarter 3' },
+          { :header => 'Quarter 4' },
+          {
+            :header  => 'Year',
+            :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+          }
+        ]
+      }
+    )
 
     ###############################################################################
     #
@@ -4749,24 +4811,24 @@ EOS
 
     # Add a table to the worksheet.
     worksheet10.add_table(
-                          'B3:G8',
-                          {
-                            :data      => data,
-                            :total_row => 1,
-                            :columns   => [
-                                           { :header => 'Product',   :total_string   => 'Totals' },
-                                           { :header => 'Quarter 1', :total_function => 'sum' },
-                                           { :header => 'Quarter 2', :total_function => 'sum' },
-                                           { :header => 'Quarter 3', :total_function => 'sum' },
-                                           { :header => 'Quarter 4', :total_function => 'sum' },
-                                           {
-                                             :header         => 'Year',
-                                             :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-                                             :total_function => 'sum'
-                                           }
-                                          ]
-                          }
-                          )
+      'B3:G8',
+      {
+        :data      => data,
+        :total_row => 1,
+        :columns   => [
+          { :header => 'Product',   :total_string   => 'Totals' },
+          { :header => 'Quarter 1', :total_function => 'sum' },
+          { :header => 'Quarter 2', :total_function => 'sum' },
+          { :header => 'Quarter 3', :total_function => 'sum' },
+          { :header => 'Quarter 4', :total_function => 'sum' },
+          {
+            :header         => 'Year',
+            :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+            :total_function => 'sum'
+          }
+        ]
+      }
+    )
 
     ###############################################################################
     #
@@ -4782,25 +4844,25 @@ EOS
 
     # Add a table to the worksheet.
     worksheet11.add_table(
-                          'B3:G8',
-                          {
-                            :data      => data,
-                            :style     => 'Table Style Light 11',
-                            :total_row => 1,
-                            :columns   => [
-                                           { :header => 'Product',   :total_string   => 'Totals' },
-                                           { :header => 'Quarter 1', :total_function => 'sum' },
-                                           { :header => 'Quarter 2', :total_function => 'sum' },
-                                           { :header => 'Quarter 3', :total_function => 'sum' },
-                                           { :header => 'Quarter 4', :total_function => 'sum' },
-                                           {
-                                             :header         => 'Year',
-                                             :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-                                             :total_function => 'sum'
-                                           }
-                                          ]
-                          }
-                          )
+      'B3:G8',
+      {
+        :data      => data,
+        :style     => 'Table Style Light 11',
+        :total_row => 1,
+        :columns   => [
+          { :header => 'Product',   :total_string   => 'Totals' },
+          { :header => 'Quarter 1', :total_function => 'sum' },
+          { :header => 'Quarter 2', :total_function => 'sum' },
+          { :header => 'Quarter 3', :total_function => 'sum' },
+          { :header => 'Quarter 4', :total_function => 'sum' },
+          {
+            :header         => 'Year',
+            :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+            :total_function => 'sum'
+          }
+        ]
+      }
+    )
 
     ###############################################################################
     #
@@ -4816,41 +4878,41 @@ EOS
 
     # Add a table to the worksheet.
     worksheet12.add_table(
-                          'B3:G8',
-                          {
-                            :data      => data,
-                            :total_row => 1,
-                            :columns   => [
-                                           { :header => 'Product', :total_string => 'Totals' },
-                                           {
-                                             :header         => 'Quarter 1',
-                                             :total_function => 'sum',
-                                             :format         => currency_format,
-                                           },
-                                           {
-                                             :header         => 'Quarter 2',
-                                             :total_function => 'sum',
-                                             :format         => currency_format,
-                                           },
-                                           {
-                                             :header         => 'Quarter 3',
-                                             :total_function => 'sum',
-                                             :format         => currency_format,
-                                           },
-                                           {
-                                             :header         => 'Quarter 4',
-                                             :total_function => 'sum',
-                                             :format         => currency_format,
-                                           },
-                                           {
-                                             :header         => 'Year',
-                                             :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-                                             :total_function => 'sum',
-                                             :format         => currency_format,
-                                           }
-                                          ]
-                          }
-                          )
+      'B3:G8',
+      {
+        :data      => data,
+        :total_row => 1,
+        :columns   => [
+          { :header => 'Product', :total_string => 'Totals' },
+          {
+            :header         => 'Quarter 1',
+            :total_function => 'sum',
+            :format         => currency_format,
+          },
+          {
+            :header         => 'Quarter 2',
+            :total_function => 'sum',
+            :format         => currency_format,
+          },
+          {
+            :header         => 'Quarter 3',
+            :total_function => 'sum',
+            :format         => currency_format,
+          },
+          {
+            :header         => 'Quarter 4',
+            :total_function => 'sum',
+            :format         => currency_format,
+          },
+          {
+            :header         => 'Year',
+            :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+            :total_function => 'sum',
+            :format         => currency_format,
+          }
+        ]
+      }
+    )
 
     workbook.close
     store_to_tempfile
@@ -4864,42 +4926,42 @@ EOS
 
     # Some sample data to plot.
     data = [
-            [ -2, 2,  3,  -1, 0 ],
-            [ 30, 20, 33, 20, 15 ],
-            [ 1,  -1, -1, 1,  -1 ]
-           ]
+      [ -2, 2,  3,  -1, 0 ],
+      [ 30, 20, 33, 20, 15 ],
+      [ 1,  -1, -1, 1,  -1 ]
+    ]
 
     # Write the sample data to the worksheet.
     worksheet.write_col('A1', data)
 
     # Add a line sparkline (the default) with markers.
     worksheet.add_sparkline(
-                            {
-                              :location => 'F1',
-                              :range    => 'Sheet1!A1:E1',
-                              :markers  => 1
-                            }
-                            )
+      {
+        :location => 'F1',
+        :range    => 'Sheet1!A1:E1',
+        :markers  => 1
+      }
+    )
 
     # Add a column sparkline with non-default style.
     worksheet.add_sparkline(
-                            {
-                              :location => 'F2',
-                              :range    => 'Sheet1!A2:E2',
-                              :type     => 'column',
-                              :style    => 12
-                            }
-                            )
+      {
+        :location => 'F2',
+        :range    => 'Sheet1!A2:E2',
+        :type     => 'column',
+        :style    => 12
+      }
+    )
 
     # Add a win/loss sparkline with negative values highlighted.
     worksheet.add_sparkline(
-                            {
-                              :location        => 'F3',
-                              :range           => 'Sheet1!A3:E3',
-                              :type            => 'win_loss',
-                              :negative_points => 1
-                            }
-                            )
+      {
+        :location        => 'F3',
+        :range           => 'Sheet1!A3:E3',
+        :type            => 'win_loss',
+        :negative_points => 1
+      }
+    )
 
     workbook.close
     store_to_tempfile
@@ -4928,11 +4990,11 @@ EOS
     str = 'A default "line" sparkline.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A2',
-                               :range    => 'Sheet2!A1:J1'
-                             }
-                             )
+      {
+        :location => 'A2',
+        :range    => 'Sheet2!A1:J1'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -4942,12 +5004,12 @@ EOS
     str = 'A default "column" sparkline.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A3',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column'
-                             }
-                             )
+      {
+        :location => 'A3',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -4957,12 +5019,12 @@ EOS
     str = 'A default "win/loss" sparkline.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A4',
-                               :range    => 'Sheet2!A3:J3',
-                               :type     => 'win_loss'
-                             }
-                             )
+      {
+        :location => 'A4',
+        :range    => 'Sheet2!A3:J3',
+        :type     => 'win_loss'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 2
@@ -4972,12 +5034,12 @@ EOS
     str = 'Line with markers.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A6',
-                               :range    => 'Sheet2!A1:J1',
-                               :markers  => 1
-                             }
-                             )
+      {
+        :location => 'A6',
+        :range    => 'Sheet2!A1:J1',
+        :markers  => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -4987,13 +5049,13 @@ EOS
     str = 'Line with high and low points.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location   => 'A7',
-                               :range      => 'Sheet2!A1:J1',
-                               :high_point => 1,
-                               :low_point  => 1
-                             }
-                             )
+      {
+        :location   => 'A7',
+        :range      => 'Sheet2!A1:J1',
+        :high_point => 1,
+        :low_point  => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5003,13 +5065,13 @@ EOS
     str = 'Line with first and last point markers.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location    => 'A8',
-                               :range       => 'Sheet2!A1:J1',
-                               :first_point => 1,
-                               :last_point  => 1
-                             }
-                             )
+      {
+        :location    => 'A8',
+        :range       => 'Sheet2!A1:J1',
+        :first_point => 1,
+        :last_point  => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5019,12 +5081,12 @@ EOS
     str = 'Line with negative point markers.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location        => 'A9',
-                               :range           => 'Sheet2!A1:J1',
-                               :negative_points => 1
-                             }
-                             )
+      {
+        :location        => 'A9',
+        :range           => 'Sheet2!A1:J1',
+        :negative_points => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5034,12 +5096,12 @@ EOS
     str = 'Line with axis.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A10',
-                               :range    => 'Sheet2!A1:J1',
-                               :axis     => 1
-                             }
-                             )
+      {
+        :location => 'A10',
+        :range    => 'Sheet2!A1:J1',
+        :axis     => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 2
@@ -5049,12 +5111,12 @@ EOS
     str = 'Column with default style (1).'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A12',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column'
-                             }
-                             )
+      {
+        :location => 'A12',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5064,13 +5126,13 @@ EOS
     str = 'Column with style 2.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A13',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column',
-                               :style    => 2
-                             }
-                             )
+      {
+        :location => 'A13',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 2
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5080,13 +5142,13 @@ EOS
     str = 'Column with style 3.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A14',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column',
-                               :style    => 3
-                             }
-                             )
+      {
+        :location => 'A14',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 3
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5096,13 +5158,13 @@ EOS
     str = 'Column with style 4.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A15',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column',
-                               :style    => 4
-                             }
-                             )
+      {
+        :location => 'A15',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 4
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5112,13 +5174,13 @@ EOS
     str = 'Column with style 5.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A16',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column',
-                               :style    => 5
-                             }
-                             )
+      {
+        :location => 'A16',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 5
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5128,13 +5190,13 @@ EOS
     str = 'Column with style 6.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A17',
-                               :range    => 'Sheet2!A2:J2',
-                               :type     => 'column',
-                               :style    => 6
-                             }
-                             )
+      {
+        :location => 'A17',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 6
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5144,13 +5206,13 @@ EOS
     str = 'Column with a user defined colour.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location     => 'A18',
-                               :range        => 'Sheet2!A2:J2',
-                               :type         => 'column',
-                               :series_color => '#E965E0'
-                             }
-                             )
+      {
+        :location     => 'A18',
+        :range        => 'Sheet2!A2:J2',
+        :type         => 'column',
+        :series_color => '#E965E0'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 2
@@ -5160,12 +5222,12 @@ EOS
     str = 'A win/loss sparkline.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A20',
-                               :range    => 'Sheet2!A3:J3',
-                               :type     => 'win_loss'
-                             }
-                             )
+      {
+        :location => 'A20',
+        :range    => 'Sheet2!A3:J3',
+        :type     => 'win_loss'
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5175,13 +5237,13 @@ EOS
     str = 'A win/loss sparkline with negative points highlighted.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location        => 'A21',
-                               :range           => 'Sheet2!A3:J3',
-                               :type            => 'win_loss',
-                               :negative_points => 1
-                             }
-                             )
+      {
+        :location        => 'A21',
+        :range           => 'Sheet2!A3:J3',
+        :type            => 'win_loss',
+        :negative_points => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 2
@@ -5191,13 +5253,13 @@ EOS
     str = 'A left to right column (the default).'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A23',
-                               :range    => 'Sheet2!A4:J4',
-                               :type     => 'column',
-                               :style    => 20
-                             }
-                             )
+      {
+        :location => 'A23',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5207,14 +5269,14 @@ EOS
     str = 'A right to left column.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A24',
-                               :range    => 'Sheet2!A4:J4',
-                               :type     => 'column',
-                               :style    => 20,
-                               :reverse  => 1
-                             }
-                             )
+      {
+        :location => 'A24',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20,
+        :reverse  => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5224,13 +5286,13 @@ EOS
     str = 'Sparkline and text in one cell.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => 'A25',
-                               :range    => 'Sheet2!A4:J4',
-                               :type     => 'column',
-                               :style    => 20
-                             }
-                             )
+      {
+        :location => 'A25',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20
+      }
+    )
 
     worksheet1.write(row,   0, 'Growth')
     worksheet1.write(row, 1, str)
@@ -5241,12 +5303,12 @@ EOS
     str = 'A grouped sparkline. Changes are applied to all three.'
 
     worksheet1.add_sparkline(
-                             {
-                               :location => [ 'A27',          'A28',          'A29' ],
-                               :range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
-                               :markers  => 1
-                             }
-                             )
+      {
+        :location => [ 'A27',          'A28',          'A29' ],
+        :range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
+        :markers  => 1
+      }
+    )
 
     worksheet1.write(row, 1, str)
     row += 1
@@ -5258,23 +5320,23 @@ EOS
     worksheet2.set_column('A:J', 11)
 
     data = [
-            # Simple line data.
-            [ -2, 2, 3, -1, 0, -2, 3, 2, 1, 0 ],
+      # Simple line data.
+      [ -2, 2, 3, -1, 0, -2, 3, 2, 1, 0 ],
 
-            # Simple column data.
-            [ 30, 20, 33, 20, 15, 5, 5, 15, 10, 15 ],
+      # Simple column data.
+      [ 30, 20, 33, 20, 15, 5, 5, 15, 10, 15 ],
 
-            # Simple win/loss data.
-            [ 1, 1, -1, -1, 1, -1, 1, 1, 1, -1 ],
+      # Simple win/loss data.
+      [ 1, 1, -1, -1, 1, -1, 1, 1, 1, -1 ],
 
-            # Unbalanced histogram.
-            [ 5, 6, 7, 10, 15, 20, 30, 50, 70, 100 ],
+      # Unbalanced histogram.
+      [ 5, 6, 7, 10, 15, 20, 30, 50, 70, 100 ],
 
-            # Data for the grouped sparkline example.
-            [ -2, 2,  3, -1, 0, -2, 3, 2, 1, 0 ],
-            [ 3,  -1, 0, -2, 3, 2,  1, 0, 2, 1 ],
-            [ 0,  -2, 3, 2,  1, 0,  1, 2, 3, 1 ]
-           ]
+      # Data for the grouped sparkline example.
+      [ -2, 2,  3, -1, 0, -2, 3, 2, 1, 0 ],
+      [ 3,  -1, 0, -2, 3, 2,  1, 0, 2, 1 ],
+      [ 0,  -2, 3, 2,  1, 0,  1, 2, 3, 1 ]
+    ]
 
     # Write the sample data to the worksheet.
     worksheet2.write_col('A1', data)
@@ -5339,10 +5401,10 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Batch 1', 'Batch 2' ]
     data = [
-            [ 2, 3, 4, 5, 6, 7 ],
-            [ 10, 40, 50, 20, 10, 50 ],
-            [ 30, 60, 70, 50, 40, 30 ]
-           ]
+      [ 2, 3, 4, 5, 6, 7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -5352,18 +5414,18 @@ EOS
 
     # Configure the first series.
     chart1.add_series(
-                      :name       => '=Sheet1!$B$1',
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart1.add_series(
-                      :name       => '=Sheet1!$C$1',
-                      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                      )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart1.set_title(:name => 'Chart with Data Table')
@@ -5383,18 +5445,18 @@ EOS
 
     # Configure the first series.
     chart2.add_series(
-                      :name       => '=Sheet1!$B$1',
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure second series. Note alternative use of array ref to define
     # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
     chart2.add_series(
-                      :name       => '=Sheet1!$C$1',
-                      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-                      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
-                      )
+      :name       => '=Sheet1!$C$1',
+      :categories => [ 'Sheet1', 1, 6, 0, 0 ],
+      :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+    )
 
     # Add a chart title and some axis labels.
     chart2.set_title(:name => 'Data Table with legend keys')
@@ -5424,10 +5486,10 @@ EOS
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Number', 'Data 1', 'Data 2' ]
     data = [
-            [ 2,  3,  4,  5,  6,  7 ],
-            [ 10, 40, 50, 20, 10, 50 ],
-            [ 30, 60, 70, 50, 40, 30 ]
-           ]
+      [ 2,  3,  4,  5,  6,  7 ],
+      [ 10, 40, 50, 20, 10, 50 ],
+      [ 30, 60, 70, 50, 40, 30 ]
+    ]
 
     worksheet.write('A1', headings, bold)
     worksheet.write('A2', data)
@@ -5443,20 +5505,20 @@ EOS
 
     # Configure the first series with a polynomial trendline.
     chart1.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7',
-                      :trendline  => {
-                        :type  => 'polynomial',
-                        :order => 3,
-                      }
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7',
+      :trendline  => {
+        :type  => 'polynomial',
+        :order => 3,
+      }
+    )
 
     # Configure the second series with a moving average trendline.
     chart1.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7',
-                      :trendline  => { :type => 'linear' }
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7',
+      :trendline  => { :type => 'linear' }
+    )
 
     # Add a chart title. and some axis labels.
     chart1.set_title(:name => 'Chart with Trendlines')
@@ -5474,17 +5536,17 @@ EOS
 
     # Configure the first series.
     chart2.add_series(
-                      :categories  => '=Sheet1!$A$2:$A$7',
-                      :values      => '=Sheet1!$B$2:$B$7',
-                      :data_labels => { :value => 1 },
-                      :marker      => { :type => 'automatic' }
-                      )
+      :categories  => '=Sheet1!$A$2:$A$7',
+      :values      => '=Sheet1!$B$2:$B$7',
+      :data_labels => { :value => 1 },
+      :marker      => { :type => 'automatic' }
+    )
 
     # Configure the second series.
     chart2.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
 
     # Add a chart title. and some axis labels.
     chart2.set_title(:name => 'Chart with Data Labels and Markers')
@@ -5502,16 +5564,16 @@ EOS
 
     # Configure the first series.
     chart3.add_series(
-                      :categories   => '=Sheet1!$A$2:$A$7',
-                      :values       => '=Sheet1!$B$2:$B$7',
-                      :y_error_bars => { :type => 'standard_error' }
-                      )
+      :categories   => '=Sheet1!$A$2:$A$7',
+      :values       => '=Sheet1!$B$2:$B$7',
+      :y_error_bars => { :type => 'standard_error' }
+    )
 
     # Configure the second series.
     chart3.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
 
     # Add a chart title. and some axis labels.
     chart3.set_title(:name => 'Chart with Error Bars')
@@ -5532,15 +5594,15 @@ EOS
 
     # Configure the first series.
     chart4.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure the second series.
     chart4.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
 
     # Add a chart title. and some axis labels.
     chart4.set_title(:name => 'Chart with Up-Down Bars')
@@ -5561,15 +5623,15 @@ EOS
 
     # Configure the first series.
     chart5.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure the second series.
     chart5.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
 
     # Add a chart title. and some axis labels.
     chart5.set_title(:name => 'Chart with High-Low Lines')
@@ -5590,15 +5652,15 @@ EOS
 
     # Configure the first series.
     chart6.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$B$2:$B$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
 
     # Configure the second series.
     chart6.add_series(
-                      :categories => '=Sheet1!$A$2:$A$7',
-                      :values     => '=Sheet1!$C$2:$C$7'
-                      )
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
 
     # Add a chart title. and some axis labels.
     chart6.set_title(:name => 'Chart with Drop Lines')
