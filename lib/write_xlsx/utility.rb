@@ -811,6 +811,10 @@ module Writexlsx
           # 270 deg/stacked angle.
           attributes << ['rot',  0]
           attributes << ['vert', 'wordArtVert']
+        elsif rot == 16_260_000
+          # 271 deg/stacked angle.
+          attributes << ['rot',  0]
+          attributes << ['vert', 'eaVert']
         else
           attributes << ['rot',  rot]
           attributes << ['vert', 'horz']
