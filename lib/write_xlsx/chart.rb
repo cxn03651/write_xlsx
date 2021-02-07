@@ -2241,7 +2241,12 @@ module Writexlsx
         write_format_code('General')
 
         # Write the c:ptCount element.
-        write_pt_count(data.size)
+        if data
+          count = data.size
+        else
+          count = 0
+        end
+        write_pt_count(count)
 
         data.each_with_index do |token, i|
           # Write non-numeric data as 0.
