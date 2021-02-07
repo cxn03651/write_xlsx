@@ -7,7 +7,7 @@
 # add shapes to an Excel xlsx file.
 #
 # reverse('c'), May 2012, John McNamara, jmcnamara@cpan.org
-# converted to Ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# converted to Ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

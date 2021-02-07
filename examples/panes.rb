@@ -6,7 +6,7 @@
 # Example of using the Excel::Writer::XLSX module to create worksheet panes.
 #
 # reverse(c), May 2001, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

@@ -9,7 +9,7 @@ module Writexlsx
   # Used in conjunction with WriteXLSX.
   #
   # Copyright 2000-2012, John McNamara, jmcnamara@cpan.org
-  # Converted to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+  # Converted to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
   #
   class Sparkline
     include Writexlsx::Utility

@@ -12,7 +12,7 @@
 # formatting to each point in the series.
 #
 # reverse ('(c)'), March 2011, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

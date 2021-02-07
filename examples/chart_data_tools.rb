@@ -10,7 +10,7 @@
 # High-Low Lines and Up-Down Bars.
 #
 # reverse ('(c)'), December 2012, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

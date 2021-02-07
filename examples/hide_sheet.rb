@@ -6,7 +6,7 @@
 # Example of how to hide a worksheet with Excel::Writer::XLSX.
 #
 # reverse('c'), April 2005, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo, Nakamura, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo, Nakamura, nakamura.hideo@gmail.com
 #
 require 'write_xlsx'
 

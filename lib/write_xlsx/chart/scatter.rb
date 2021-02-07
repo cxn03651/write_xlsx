@@ -8,7 +8,7 @@
 # See formatting note in Chart.
 #
 # Copyright 2000-2011, John McNamara, jmcnamara@cpan.org
-# Convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# Convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx/package/xml_writer_simple'

@@ -10,7 +10,7 @@
 # part of the ECMA-376 standard.
 #
 # reverse(c), May 2012, John McNamara, jmcnamara@cpan.org
-# converted to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# converted to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 require 'write_xlsx'
 

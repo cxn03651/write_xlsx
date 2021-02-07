@@ -5,7 +5,7 @@
 # Example of how to set Excel worksheet tab colours.
 #
 # reverse(c), May 2006, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

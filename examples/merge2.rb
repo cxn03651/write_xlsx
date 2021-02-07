@@ -11,7 +11,7 @@
 # See the merge3.pl - merge6.pl programs.
 #
 # reverse(c), August 2002, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

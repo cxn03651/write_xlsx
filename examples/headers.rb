@@ -35,7 +35,7 @@
 #
 # reverse(c), March 2002, John McNamara, jmcnamara@cpan.org
 #
-# converted to ruby by Hideo Nakamura, cxn03651@msj.biglobe.ne.jp
+# converted to ruby by Hideo Nakamura, nakamura.hideo@gmail.com
 
 require 'write_xlsx'
 

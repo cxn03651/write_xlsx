@@ -10,7 +10,7 @@
 # in the various formatting possibilities.
 #
 # reverse('ｩ'), September 2002, John McNamara, jmcnamara@cpan.org
-# convert to Ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to Ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'

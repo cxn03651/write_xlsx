@@ -6,7 +6,7 @@
 # A Simple example of how to use functions with the WriteXLSX gem.
 #
 # reverse(c), March 2001, John McNamara, jmcnamara@cpan.org
-# convert to ruby by Hideo NAKAMURA, cxn03651@msj.biglobe.ne.jp
+# convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
 require 'write_xlsx'
