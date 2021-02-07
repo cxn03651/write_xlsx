@@ -50,7 +50,10 @@ chart1.set_title(:name => 'Popular Doughnut Types')
 chart1.set_style(10)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('C2', chart1, 25, 10)
+worksheet.insert_chart(
+  'C2', chart1,
+  :x_offset => 25, :y_offset => 10
+)
 
 
 #
@@ -77,7 +80,10 @@ chart2.set_title(:name => 'Doughnut Chart with user defined colors')
 
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('C18', chart2, 25, 10)
+worksheet.insert_chart(
+  'C18', chart2,
+  :x_offset => 25, :y_offset => 10
+)
 
 
 #
@@ -101,7 +107,10 @@ chart3.set_title(:name => 'Doughnut Chart with segment rotation')
 chart3.set_rotation(90)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('C34', chart3, 25, 10)
+worksheet.insert_chart(
+  'C34', chart3,
+  :x_offset => 25, :y_offset => 10
+)
 
 
 #
@@ -125,6 +134,9 @@ chart4.set_title(:name => 'Doughnut Chart with user defined hole size')
 chart4.set_hole_size(33)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('C50', chart4, 25, 10)
+worksheet.insert_chart(
+  'C50', chart4,
+  :x_offset => 25, :y_offset => 10
+)
 
 workbook.close

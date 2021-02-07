@@ -53,7 +53,10 @@ chart1.set_y_axis(:name => 'Sample length (mm)')
 chart1.set_style(11)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('D2', chart1, 25, 10)
+worksheet.insert_chart(
+  'D2', chart1,
+  :x_offset => 25, :y_offset => 10
+)
 
 #
 # Create a with_markers chart sub-type
@@ -87,7 +90,10 @@ chart2.set_y_axis(:name => 'Sample length (mm)')
 chart2.set_style(12)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('D18', chart2, 25, 11)
+worksheet.insert_chart(
+  'D18', chart2,
+  :x_offset => 25, :y_offset => 10
+)
 
 #
 # Create a filled chart sub-type
@@ -121,6 +127,9 @@ chart3.set_y_axis(:name => 'Sample length (mm)')
 chart3.set_style(13)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart('D34', chart3, 25, 11)
+worksheet.insert_chart(
+  'D34', chart3,
+  :x_offset => 25, :y_offset => 10
+)
 
 workbook.close

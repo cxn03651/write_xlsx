@@ -39,7 +39,10 @@ class TestRegressionObjectPosition09 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$B$2:$B$6')
     chart.add_series(:values => '=Sheet1!$C$2:$C$6')
 
-    worksheet.insert_chart('E9', chart, 0, 0, 1, 1, 4)
+    worksheet.insert_chart(
+      'E9', chart,
+      :object_position => 4
+    )
 
     workbook.close
     compare_for_regression

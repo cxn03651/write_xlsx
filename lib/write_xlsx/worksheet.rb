@@ -2991,9 +2991,20 @@ module Writexlsx
     #
     def insert_chart(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, chart, x_offset, y_offset, x_scale, y_scale, anchor = row_col_notation(args)
+      row, col, chart, *options = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
 
+      if options.first.class == Hash
+        params = options.first
+        x_offset = params[:x_offset]
+        y_offset = params[:y_offset]
+        x_scale  = params[:x_scale]
+        y_scale  = params[:y_scale]
+        anchor   = params[:object_position]
+
+      else
+        x_offset, y_offset, x_scale, y_scale, anchor = options
+      end
       x_offset ||= 0
       y_offset ||= 0
       x_scale  ||= 1
