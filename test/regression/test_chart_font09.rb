@@ -13,7 +13,7 @@ class TestRegressionChartFont09 < Minitest::Test
     chart     = workbook.add_chart(:type => 'bar', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [68825472, 68827392])
+    chart.instance_variable_set(:@axis_ids, [108178432, 108321408])
 
     data = [
             [1, 2, 3,  4,  5],

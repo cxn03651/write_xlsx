@@ -17,15 +17,17 @@ class TestRegressionChartAxis26 < Minitest::Test
     chart       = workbook.add_chart(:type => 'line', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [73048448, 73049984])
+    chart.instance_variable_set(:@axis_ids, [108315392, 108329216])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [ 1, 2, 3,  4,  5 ],
+      [ 2, 4, 6,  8, 10 ],
+      [ 3, 6, 9, 12, 15 ]
+    ]
 
-    chart.set_x_axis(:num_font => {:rotation => 45})
+    chart.set_x_axis(
+      :num_font => { :rotation => 45, :baseline => -1 }
+    )
 
     worksheet.write('A1', data)
 
@@ -37,8 +39,8 @@ class TestRegressionChartAxis26 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-      nil,
-      { 'xl/charts/chart1.xml' => ['<a:defRPr'] }
+      [],
+      {}
     )
   end
 end

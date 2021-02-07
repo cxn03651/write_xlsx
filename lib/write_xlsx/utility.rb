@@ -785,14 +785,14 @@ module Writexlsx
     #
     # Write the <c:txPr> element.
     #
-    def write_tx_pr(horiz, font) # :nodoc:
+    def write_tx_pr(is_y_axis, font) # :nodoc:
       rotation = nil
       if font && font[:_rotation]
         rotation = font[:_rotation]
       end
       @writer.tag_elements('c:txPr') do
         # Write the a:bodyPr element.
-        write_a_body_pr(rotation, horiz)
+        write_a_body_pr(rotation, is_y_axis)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
@@ -803,11 +803,19 @@ module Writexlsx
     #
     # Write the <a:bodyPr> element.
     #
-    def write_a_body_pr(rot, horiz = nil) # :nodoc:
-      rot = -5400000 if !rot && ptrue?(horiz)
+    def write_a_body_pr(rot, is_y_axis = nil) # :nodoc:
+      rot = -5400000 if !rot && ptrue?(is_y_axis)
       attributes = []
-      attributes << ['rot',  rot]   if rot
-      attributes << ['vert', 'horz'] if ptrue?(horiz)
+      if rot
+        if rot == 16_200_000
+          # 270 deg/stacked angle.
+          attributes << ['rot',  0]
+          attributes << ['vert', 'wordArtVert']
+        else
+          attributes << ['rot',  rot]
+          attributes << ['vert', 'horz']
+        end
+      end
 
       @writer.empty_tag('a:bodyPr', attributes)
     end

@@ -1178,8 +1178,8 @@ module Writexlsx
       return unless axis_ids
       return if axis_ids.empty?
 
-      position = @cat_axis_position
-      horiz    = @horiz_cat_axis
+      position  = @cat_axis_position
+      is_y_axis = @horiz_cat_axis
 
       # Overwrite the default axis position with a user supplied value.
       position = x_axis.position || position
@@ -1202,9 +1202,9 @@ module Writexlsx
 
         # Write the axis title elements.
         if x_axis.formula
-          write_title_formula(x_axis, horiz, @x_axis, x_axis.layout)
+          write_title_formula(x_axis, is_y_axis, @x_axis, x_axis.layout)
         elsif x_axis.name
-          write_title_rich(x_axis, horiz, x_axis.layout)
+          write_title_rich(x_axis, is_y_axis, x_axis.layout)
         end
 
         # Write the c:numFmt element.
@@ -1808,10 +1808,10 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, horiz = nil, layout = nil, overlay = nil) # :nodoc:
+    def write_title_rich(title, is_y_axis = nil, layout = nil, overlay = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
-        write_tx_rich(title, horiz)
+        write_tx_rich(title, is_y_axis)
         # Write the c:layout element.
         write_layout(layout, 'text')
         # Write the c:overlay element.
@@ -1822,7 +1822,7 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_formula(title, horiz = nil, axis = nil, layout = nil, overlay = nil) # :nodoc:
+    def write_title_formula(title, is_y_axis = nil, axis = nil, layout = nil, overlay = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
         write_tx_formula(title.formula, axis ? axis.data_id : title.data_id)
@@ -1831,15 +1831,15 @@ module Writexlsx
         # Write the c:overlay element.
         write_overlay if overlay
         # Write the c:txPr element.
-        write_tx_pr(horiz, axis ? axis.name_font : title.name_font)
+        write_tx_pr(is_y_axis, axis ? axis.name_font : title.name_font)
       end
     end
 
     #
     # Write the <c:tx> element.
     #
-    def write_tx_rich(title, horiz) # :nodoc:
-      @writer.tag_elements('c:tx') { write_rich(title, horiz) }
+    def write_tx_rich(title, is_y_axis) # :nodoc:
+      @writer.tag_elements('c:tx') { write_rich(title, is_y_axis) }
     end
 
     #
@@ -1861,14 +1861,14 @@ module Writexlsx
     #
     # Write the <c:rich> element.
     #
-    def write_rich(title, horiz) # :nodoc:
+    def write_rich(title, is_y_axis) # :nodoc:
       rotation = nil
       if title.name_font && title.name_font[:_rotation]
         rotation = title.name_font[:_rotation]
       end
       @writer.tag_elements('c:rich') do
         # Write the a:bodyPr element.
-        write_a_body_pr(rotation, horiz)
+        write_a_body_pr(rotation, is_y_axis)
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.

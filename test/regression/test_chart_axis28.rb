@@ -17,7 +17,7 @@ class TestRegressionChartAxis28 < Minitest::Test
     chart       = workbook.add_chart(:type => 'line', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [45451904, 47401600])
+    chart.instance_variable_set(:@axis_ids, [115375104, 115390720])
 
     data = [
             [ 1, 2, 3, 4,  5 ],
