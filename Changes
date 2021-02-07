@@ -1,5 +1,20 @@
 Change history of write_xlsx rubygem.
 
+2021-02-08 v1.01.0
+
+   Added support for stacked and East Asian vertical chart fonts.
+
+   Added option to control positioning of charts or images when cells are
+   resized.
+
+   Added support for combining Pie/Doughnut charts.
+
+   Fixed sizing of cell comment boxes when they cross columns/rows that have
+   size changes that occur after the comment is written. Comments should
+   now behave like other worksheet objects such as images and charts.
+
+   Fix for structured reference in chart ranges.
+
 2021-01-23 v1.00.0
 
    Fixed issue where images that started in hidden rows/columns weren't placed
