@@ -2166,7 +2166,10 @@ EOS
     # Images
     #
     worksheet.write('A10', "Images")
-    worksheet.insert_image('B10', File.join(@test_dir, 'republic.png'), 16, 8)
+    worksheet.insert_image(
+      'B10', File.join(@test_dir, 'republic.png'),
+      :x_offset => 16, :y_offset => 8
+    )
 
     #######################################################################
     #

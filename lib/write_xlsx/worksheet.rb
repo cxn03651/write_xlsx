@@ -3021,50 +3021,24 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   insert_image(row, column, filename, x=0, y=0, x_scale=1, y_scale=1)
-    #
-    # Partially supported. Currently only works for 96 dpi images.
-    #
-    # This method can be used to insert a image into a worksheet. The image
-    # can be in PNG, JPEG or BMP format. The x, y, x_scale and y_scale
-    # parameters are optional.
-    #
-    #     worksheet1.insert_image('A1', 'ruby.bmp')
-    #     worksheet2.insert_image('A1', '../images/ruby.bmp')
-    #     worksheet3.insert_image('A1', '.c:\images\ruby.bmp')
-    #
-    # The parameters +x+ and +y+ can be used to specify an offset from the top
-    # left hand corner of the cell specified by +row+ and +column+. The offset
-    # values are in pixels.
-    #
-    #     worksheet1.insert_image('A1', 'ruby.bmp', 32, 10)
-    #
-    # The offsets can be greater than the width or height of the underlying
-    # cell. This can be occasionally useful if you wish to align two or more
-    # images relative to the same cell.
-    #
-    # The parameters +x_scale+ and +y_scale+ can be used to scale the inserted
-    # image horizontally and vertically:
-    #
-    #     # Scale the inserted image: width x 2.0, height x 0.8
-    #     worksheet.insert_image('A1', 'perl.bmp', 0, 0, 2, 0.8)
-    #
-    # Note: you must call set_row() or set_column() before insert_image()
-    # if you wish to change the default dimensions of any of the rows or
-    # columns that the image occupies. The height of a row can also change
-    # if you use a font that is larger than the default. This in turn will
-    # affect the scaling of your image. To avoid this you should explicitly
-    # set the height of the row using set_row() if it contains a font size
-    # that will change the row height.
-    #
-    # BMP images must be 24 bit, true colour, bitmaps. In general it is
-    # best to avoid BMP images since they aren't compressed.
+    #   insert_image(row, column, filename, options)
     #
     def insert_image(*args)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, image, x_offset, y_offset, x_scale, y_scale, anchor = row_col_notation(args)
+      row, col, image, *options = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, image].include?(nil)
 
+      if options.first.class == Hash
+        # Newer hash bashed options
+        params = options.first
+        x_offset = params[:x_offset]
+        y_offset = params[:y_offset]
+        x_scale  = params[:x_scale]
+        y_scale  = params[:y_scale]
+        anchor   = params[:object_position]
+      else
+        x_offset, y_offset, x_scale, y_scale, anchor = options
+      end
       x_offset ||= 0
       y_offset ||= 0
       x_scale  ||= 1

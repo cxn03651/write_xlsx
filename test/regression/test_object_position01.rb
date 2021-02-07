@@ -17,7 +17,7 @@ class TestRegressionObjectPosition01 < Minitest::Test
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      0, 0, 1, 1, 1
+      :object_position => 1
     )
 
     workbook.close
