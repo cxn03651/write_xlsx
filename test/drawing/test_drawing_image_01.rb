@@ -4,11 +4,18 @@ require 'write_xlsx/drawing'
 
 class DrawingImage011 < Minitest::Test
   def test_drawing_image_01
-    @obj = Writexlsx::Drawing.new
-    @obj.add_drawing_object(
-      2, 2, 1, 0, 0, 3, 6, 533257, 190357,
-      1219200, 190500, 1142857, 1142857, 'republic.png', nil, 2
+    @obj = Writexlsx::Drawings.new
+    dimensions = [
+      2, 1, 0, 0, 3, 6, 533257, 190357, 1219200, 190500
+    ]
+    drawing = Writexlsx::Drawing.new(
+      2, dimensions, 1142857, 1142857, 'republic.png', nil, 2
     )
+    @obj.add_drawing_object(drawing)
+    # @obj.add_drawing_object(
+    #   2, 2, 1, 0, 0, 3, 6, 533257, 190357,
+    #   1219200, 190500, 1142857, 1142857, 'republic.png', nil, 2
+    # )
     @obj.embedded = true
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)

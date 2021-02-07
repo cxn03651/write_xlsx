@@ -17,8 +17,10 @@ class TestRegressionShapeConnect01 < Minitest::Test
     format    = workbook.add_format(:font => 'Arial', :size => 8)
 
     # Add a circle, with centered text
-    ellipse = workbook.add_shape(:type => 'ellipse', :text => "Hello\nWorld",
-                                 :width => 60, :height => 60, :format => format)
+    ellipse = workbook.add_shape(
+      :type => 'ellipse', :text => "Hello\nWorld",
+      :width => 60, :height => 60, :format => format
+    )
     worksheet.insert_shape('A1', ellipse, 50, 50)
 
     # Add a plus

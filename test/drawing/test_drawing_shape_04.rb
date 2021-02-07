@@ -19,36 +19,20 @@ class DrawingShape04 < Minitest::Test
     shape.palette[0] = [0x00, 0x00, 0x00, 0x00]
     shape.palette[7] = [0x00, 0x00, 0x00, 0x00]
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.embedded = 2
-    @obj.add_drawing_object(
-      3, 4, 8, 209550, 95250, 12, 22, 209660,
-      96260, 10000, 20000, 95250, 190500, 'rect 1', shape, 1
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, 'rect 1', shape, 1
     )
+    @obj.add_drawing_object(drawing)
     @obj.assemble_xml_file
 
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(expected_str)
     assert_equal(expected, result)
-
-    drawing1 = Writexlsx::Drawing.new
-    @worksheet.instance_variable_set(:@drawing, drawing1)
-    inserted = @worksheet.insert_shape(4, 8, shape, 300, 400)
-
-    # Force the shape cell x offset to be non-integer
-    inserted.x_offset += 0.5
-    @worksheet.__send__(:prepare_shape, 0, 1)
-
-    # Truncate drawing object to just the dimensions
-    drawing1.instance_variable_get(:@drawings)[0] =
-      drawing1.instance_variable_get(:@drawings)[0][0..12]
-
-    # Verify fractional dimensions have been rounded
-    expected = [
-                3, 12, 24, 423862, 0, 13, 26, 290512,
-                95250, 7739062, 4572000, 476250, 476250
-               ]
-    assert_equal(expected, drawing1.instance_variable_get(:@drawings)[0])
   end
 
   def expected_str

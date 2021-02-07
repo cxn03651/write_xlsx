@@ -1924,7 +1924,7 @@ module Writexlsx
         shape_count = sheet.shapes.size
         header_image_count = sheet.header_images.size
         footer_image_count = sheet.footer_images.size
-        has_drawing = false
+        has_drawings = false
 
         # Check that some image or drawing needs to be processed.
         next if chart_count + image_count + shape_count + header_image_count + footer_image_count == 0
@@ -1932,7 +1932,7 @@ module Writexlsx
         # Don't increase the drawing_id header/footer images.
         if chart_count + image_count + shape_count > 0
           drawing_id += 1
-          has_drawing = true
+          has_drawings = true
         end
 
         # Prepare the worksheet charts.
@@ -1981,9 +1981,9 @@ module Writexlsx
                                      name, type, position, x_dpi, y_dpi)
         end
 
-        if has_drawing
-          drawing = sheet.drawing
-          @drawings << drawing
+        if has_drawings
+          drawings = sheet.drawings
+          @drawings << drawings
         end
       end
 

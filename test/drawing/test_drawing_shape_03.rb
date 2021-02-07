@@ -13,12 +13,15 @@ class DrawingShape03 < Minitest::Test
     shape.end         = 1002
     shape.end_index   = 4
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.embedded = 1
-    @obj.add_drawing_object(
-      3, 4, 8, 209550, 95250, 12, 22, 209660,
-      96260, 10000, 20000, 95250, 190500, '', shape, 1
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, '', shape, 1
     )
+    @obj.add_drawing_object(drawing)
     @obj.__send__('write_nv_cxn_sp_pr', 1, shape)
 
     result = got_to_array(@obj.xml_str)

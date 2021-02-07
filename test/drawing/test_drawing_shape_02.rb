@@ -13,12 +13,19 @@ class DrawingShape02 < Minitest::Test
     # Set bulk shape properties via set_properties method
     shape.set_properties(:type => 'straightConnector1', :connect => 1)
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.embedded = 1
-    @obj.add_drawing_object(
-      3, 4, 8, 209550, 95250, 12, 22, 209660,
-      96260, 10000, 20000, 95250, 190500, 'Connector 1', shape, 1
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, 'Connector 1', shape, 1
     )
+    @obj.add_drawing_object(drawing)
+    # @obj.add_drawing_object(
+    #   3, 4, 8, 209550, 95250, 12, 22, 209660,
+    #   96260, 10000, 20000, 95250, 190500, 'Connector 1', shape, 1
+    # )
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(<<EOS

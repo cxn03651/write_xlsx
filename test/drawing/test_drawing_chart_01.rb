@@ -4,8 +4,12 @@ require 'write_xlsx/drawing'
 
 class DrawingChart011 < Minitest::Test
   def test_drawing_chart_01
-    @obj = Writexlsx::Drawing.new
-    @obj.add_drawing_object(1, 4, 8, 457200, 104775, 12, 22, 152400, 180975, nil, nil, nil, nil, nil, nil, 1)
+    @obj = Writexlsx::Drawings.new
+    dimensions = [4, 8, 457200, 104775, 12, 22, 152400, 180975]
+    drawing = Writexlsx::Drawing.new(
+      1, dimensions, nil, nil, nil, nil, 1
+    )
+    @obj.add_drawing_object(drawing)
     @obj.embedded = true
     @obj.assemble_xml_file
     result = got_to_array(@obj.xml_str)

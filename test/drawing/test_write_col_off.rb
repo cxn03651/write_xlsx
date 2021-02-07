@@ -4,7 +4,7 @@ require 'write_xlsx/drawing'
 
 class TestWriteColOff < Minitest::Test
   def setup
-    @drawing = Writexlsx::Drawing.new
+    @drawing = Writexlsx::Drawings.new
   end
 
   def test_write_col_off

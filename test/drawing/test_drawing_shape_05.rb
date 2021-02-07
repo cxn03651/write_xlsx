@@ -19,14 +19,17 @@ class DrawingShape05 < Minitest::Test
     shape.flip_h   = 1
     shape.rotation = 90
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.instance_variable_set(:@palette, @worksheet.instance_variable_get(:@palette))
     @obj.embedded = 1
 
-    @obj.add_drawing_object(
-                            3, 4, 8, 209550, 95250, 12, 22, 209660,
-                            96260, 10000, 20000, 95250, 190500, '', shape
-                            )
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, '', shape, 1
+    )
+    @obj.add_drawing_object(drawing)
     @obj.__send__(:write_a_xfrm, 100, 200, 10, 20, shape)
 
     result = got_to_array(@obj.xml_str)

@@ -285,7 +285,7 @@ module Writexlsx
     PADDING         = 5                       # :nodoc:
 
     attr_reader :index # :nodoc:
-    attr_reader :charts, :images, :tables, :shapes, :drawing # :nodoc:
+    attr_reader :charts, :images, :tables, :shapes, :drawings # :nodoc:
     attr_reader :header_images, :footer_images # :nodoc:
     attr_reader :vml_drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
@@ -5743,16 +5743,15 @@ module Writexlsx
       name = chart.name
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      if !drawing?
-        drawing = Drawing.new
-        drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name, nil, anchor)
-        drawing.embedded = 1
-
-        @drawing = drawing
+      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor)
+      if !drawings?
+        @drawings = Drawings.new
+        @drawings.add_drawing_object(drawing)
+        @drawings.embedded = 1
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml" ]
       else
-        @drawing.add_drawing_object(drawing_type, dimensions, 0, 0, name, nil, anchor)
+        @drawings.add_drawing_object(drawing)
       end
       @drawing_links << ['/chart', "../charts/chart#{chart_id}.xml"]
     end
@@ -6460,17 +6459,18 @@ module Writexlsx
       height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      if !drawing?
-        drawing = Drawing.new
-        drawing.embedded = 1
+      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor)
+      if !drawings?
+        drawings = Drawings.new
+        drawings.embedded = 1
 
-        @drawing = drawing
+        @drawings = drawings
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
       else
-        drawing = @drawing
+        drawings = @drawings
       end
-      drawing.add_drawing_object(drawing_type, dimensions, width, height, name, nil, anchor)
+      drawings.add_drawing_object(drawing)
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
@@ -6578,9 +6578,9 @@ module Writexlsx
       shape = @shapes[index]
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      unless drawing?
-        @drawing = Drawing.new
-        @drawing.embedded = 1
+      unless drawings?
+        @drawings = Drawings.new
+        @drawings.embedded = 1
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
         @has_shapes = true
       end
@@ -6590,7 +6590,8 @@ module Writexlsx
       shape.calc_position_emus(self)
 
       drawing_type = 3
-      drawing.add_drawing_object(drawing_type, shape.dimensions, shape.name, shape, shape.anchor)
+      drawing = Drawing.new(drawing_type, shape.dimensions, shape.width_emu, shape.height_emu, shape.name, shape, shape.anchor)
+      drawings.add_drawing_object(drawing)
     end
     public :prepare_shape
 
@@ -7498,7 +7499,7 @@ module Writexlsx
     # Write the <drawing> elements.
     #
     def write_drawings #:nodoc:
-      increment_rel_id_and_write_r_id('drawing') if drawing?
+      increment_rel_id_and_write_r_id('drawing') if drawings?
     end
 
     #
@@ -7976,8 +7977,8 @@ module Writexlsx
       !!@autofilter_ref
     end
 
-    def drawing? #:nodoc:
-      !!@drawing
+    def drawings? #:nodoc:
+      !!@drawings
     end
 
     def remove_white_space(margin) #:nodoc:

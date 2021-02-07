@@ -20,8 +20,10 @@ class TestRegressionImage15 < Minitest::Test
     worksheet.set_column('C:E', 3.29)
     worksheet.set_column('F:F', 10.71)
 
-    worksheet.insert_image('C2',
-                           'test/regression/images/logo.png', 13, 2)
+    worksheet.insert_image(
+      'C2',
+      'test/regression/images/logo.png', 13, 2
+    )
 
     workbook.close
     compare_for_regression

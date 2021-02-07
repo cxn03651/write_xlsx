@@ -17,13 +17,18 @@ class DrawingShape07 < Minitest::Test
     shape.line_weight = 5
     shape.line_type   = 'lgDashDot'
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.embedded = 1
-
-    @obj.add_drawing_object(
-                            3, 4, 8, 209550, 95250, 12, 22, 209660,
-                            96260, 10000, 20000, 95250, 190500, '', shape
-                            )
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, '', shape, 1
+    )
+    @obj.add_drawing_object(drawing)
+                            # 3, 4, 8, 209550, 95250, 12, 22, 209660,
+                            # 96260, 10000, 20000, 95250, 190500, '', shape
+                            # )
     @obj.__send__(:write_a_ln, shape)
 
     result = got_to_array(@obj.xml_str)

@@ -19,7 +19,7 @@ module Writexlsx
 
     def initialize(workbook, index, name)
       super
-      @drawing           = Drawing.new
+      @drawings          = Drawings.new
       @is_chartsheet     = true
       @chart             = nil
       @charts            = [1]
@@ -176,9 +176,9 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       @chart.id = chart_id - 1
 
-      drawing = Drawing.new
-      @drawing = drawing
-      @drawing.orientation = @page_setup.orientation
+      drawings  = Drawings.new
+      @drawings = drawings
+      @drawings.orientation = @page_setup.orientation
 
       @external_drawing_links << [ '/drawing', "../drawings/drawing#{drawing_id}.xml" ]
 

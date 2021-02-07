@@ -16,13 +16,18 @@ class DrawingShape06 < Minitest::Test
     shape = Writexlsx::Shape.new
     shape.adjustments = -10, 100, 20
 
-    @obj = Writexlsx::Drawing.new
+    @obj = Writexlsx::Drawings.new
     @obj.embedded = 1
-
-    @obj.add_drawing_object(
-                            3, 4, 8, 209550, 95250, 12, 22, 209660,
-                            96260, 10000, 20000, 95250, 190500, '', shape
-                            )
+    dimensions = [
+      4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
+    ]
+    drawing = Writexlsx::Drawing.new(
+      3, dimensions, 95250, 190500, '', shape, 1
+    )
+    @obj.add_drawing_object(drawing)
+                            # 3, 4, 8, 209550, 95250, 12, 22, 209660,
+                            # 96260, 10000, 20000, 95250, 190500, '', shape
+                            # )
     @obj.__send__(:write_a_av_lst, shape)
 
     result = got_to_array(@obj.xml_str)

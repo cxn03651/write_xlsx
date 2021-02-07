@@ -4,7 +4,7 @@ require 'write_xlsx/drawing'
 
 class TestDrawingWriteRow < Minitest::Test
   def setup
-    @drawing = Writexlsx::Drawing.new
+    @drawing = Writexlsx::Drawings.new
   end
 
   def test_write_row

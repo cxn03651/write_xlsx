@@ -4,6 +4,15 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
+    attr_accessor :type, :dimensions, :width, :height, :name, :shape, :anchor
+
+    def initialize(type, dimensions, width, height, name, shape, anchor)
+      @type, @dimensions, @width, @height, @name, @shape, @anchor =
+        type, dimensions, width, height, name, shape, anchor
+    end
+  end
+
+  class Drawings
     include Writexlsx::Utility
 
     attr_writer :embedded, :orientation
@@ -32,10 +41,10 @@ module Writexlsx
         write_drawing_workspace do
           if @embedded
             index = 0
-            @drawings.each do |dimensions|
+            @drawings.each do |drawing|
               # Write the xdr:twoCellAnchor element.
               index += 1
-              write_two_cell_anchor(index, *(dimensions.flatten))
+              write_two_cell_anchor(index, drawing)
             end
           else
             # Write the xdr:absoluteAnchor element.
@@ -48,8 +57,8 @@ module Writexlsx
     #
     # Add a chart, image or shape sub object to the drawing.
     #
-    def add_drawing_object(*args)
-      @drawings << args.flatten
+    def add_drawing_object(drawing)
+      @drawings << drawing
     end
 
     private
@@ -71,9 +80,16 @@ module Writexlsx
     # Write the <xdr:twoCellAnchor> element.
     #
     def write_two_cell_anchor(*args)
-      index, type, col_from, row_from, col_from_offset, row_from_offset,
-      col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute,
-      width, height, description, shape, anchor = args
+      index, drawing = args
+
+      type = drawing.type
+      width = drawing.width
+      height = drawing.height
+      description = drawing.name
+      shape = drawing.shape
+      anchor = drawing.anchor
+      col_from, row_from, col_from_offset, row_from_offset,
+      col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute = drawing.dimensions
 
       attributes      = []
 
