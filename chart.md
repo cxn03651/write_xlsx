@@ -624,7 +624,11 @@ in the cell that it is inserted into.
 Note: the `:x_scale`, `:y_scale`, `:x_offset` and `:y_offset` parameters
 can also be set via the [insert_chart()][] method:
 
-    worksheet.insert_chart('E2', chart, 2, 4, 1.5, 2)
+    worksheet.insert_chart(
+      'E2', chart,
+      :x_offset => 2,   :y_offset => 4,
+      :x_scale  => 1.5, :y_scale  => 2
+    )
 
 #### <a name="set_title" class="anchor" href="#set_title"><span class="octicon octicon-link" /></a>set_title()
 

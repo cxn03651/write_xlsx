@@ -850,32 +850,49 @@ Individual comment authors can be set using the author parameter of the `write_c
 
 The default comment author is an empty string, '', if no author is specified.
 
-#### <a name="insert_image" class="anchor" href="#insert_image"><span class="octicon octicon-link" /></a>insert_image(row, col, filename, x, y, x_scale, y_scale)
-
-Partially supported. Currently only works for 96 dpi images.
+#### <a name="insert_image" class="anchor" href="#insert_image"><span class="octicon octicon-link" /></a>insert_image(row, col, filename, options)
 
 This method can be used to insert a image into a worksheet.
 The image can be in PNG, JPEG or BMP format.
-The `x`, `y`, `x_scale` and `y_scale` parameters are optional.
 
     worksheet1.insert_image('A1', 'ruby.bmp')
     worksheet2.insert_image('A1', '../images/ruby.bmp')
     worksheet3.insert_image('A1', '.c:\images\ruby.bmp')
 
-The parameters `x` and `y` can be used to specify an offset from the top left
-hand corner of the cell specified by `row` and `col`.
-The offset values are in pixels.
+The `options` parameter can be used to set various options for the image. The defaults are:
 
-    worksheet1.insert_image('A1', 'ruby.bmp', 32, 10)
+    options = {
+      :x_offset        => 0,
+      :y_offset        => 0,
+      :x_scale         => 1,
+      :y_scale         => 1,
+      :object_position => 2
+    }
+
+The parameters `:x_offset` and `:y_offset` can be used to specified by `row` and `col`. The offset values are in pixels.
+
+    worksheet1.insert_image('A1', 'ruby.bmp', :x_offset => 32, :y_offset => 10)
 
 The offsets can be greater than the width or height of the underlying cell.
 This can be occasionally useful if you wish to align two or more images relative to the same cell.
 
-The parameters `x_scale` and `y_scale` can be used to scale the inserted image
-horizontally and vertically:
+The parameters `:x_scale` and `:y_scale` can be used to scale the inserted image horizontally and vertically:
 
     # Scale the inserted image: width x 2.0, height x 0.8
-    worksheet.insert_image('A1', 'ruby.bmp', 0, 0, 2, 0.8)
+    worksheet.insert_image('A1', 'ruby.bmp', :x_scale => 2, :y_scale => 0.8)
+
+The positioning of the image when cells are resized can be set with the `:object_position` parameter:
+
+    worksheet.insert_image('A1', 'ruby.bmp', :object_position => 1 )
+
+The `object_position` parameter can have one of the following allowable values:
+
+    1. Move and size with cells.
+    2. Move but don’t size with cells.
+    3. Don’t move or size with cells.
+    4. Same as Option 1, see below.
+
+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This allows the user to hide an image in a cell, possibly as part of an autofilter.
 
 Note: you must call `set_row()` or `set_column()` before `insert_image()`
 if you wish to change the default dimensions of any of the rows or columns
@@ -887,7 +904,7 @@ if it contains a font size that will change the row height.
 BMP images must be 24 bit, true colour, bitmaps.
 In general it is best to avoid BMP images since they aren't compressed.
 
-#### <a name="insert_chart" class="anchor" href="#insert_chart"><span class="octicon octicon-link" /></a>insert_chart(row, col, chart, x, y, x_scale, y_scale)
+#### <a name="insert_chart" class="anchor" href="#insert_chart"><span class="octicon octicon-link" /></a>insert_chart(row, col, chart, options)
 
 This method can be used to insert a Chart object into a worksheet.
 The Chart must be created by the `add_chart()` Workbook method and it must have
@@ -907,19 +924,38 @@ See also the
 [`chart_\*.rb`](examples.html#chart_area)
 programs in the examples directory of the distro.
 
-The `x`, `y`, `x_scale` and `y_scale` parameters are optional.
+The optional `options` parameter can be used to set various options for the chart. The defaults are:
 
-The parameters `x` and `y` can be used to specify an offset from the top left
-hand corner of the cell specified by `row` and `col`.
-The offset values are in pixels.
+    options = {
+      :x_offset         => 0,
+      :y_offset         => 0,
+      :x_scale          => 1,
+      :y_scale          => 1,
+      :objerct_position => 1
+    }
 
-    worksheet1.insert_chart('E2', chart, 3, 3)
+The parameters `:x_offset` and `:y_offset` can be used to specify an offset from the top left hand corner of the cell specified by `row` and `col`. The offset values are in pixels.
 
-The parameters `x_scale` and `y_scale` can be used to scale the inserted chart
-horizontally and vertically:
+    worksheet1.insert_chart('E2', chart, :x_offset => 10, :y_offset => 20)
+
+The parameters `:x_scale` and `:y_scale` can be used to scale the inserted chart horizontally and vertically:
 
     # Scale the width by 120% and the height by 150%
-    worksheet.insert_chart('E2', chart, 0, 0, 1.2, 1.5)
+    worksheet.insert_chart('E2', chart, :x_scale => 1.2, :y_scale => 1.5)
+
+The positioning of the chart when cells are resized can be set with the `object_position` parameter:
+
+    worksheet.insert_chart('E2', chart, :object_position => 2 )
+
+The C<object_position> parameter can have one of the following allowable values:
+
+    1. Move and size with cells.
+    2. Move but don’t size with cells.
+    3. Don’t move or size with cells.
+    4. Same as Option 1, see below.
+
++Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
+
 
 #### <a name="insert_shape" class="anchor" href="#insert_shape"><span class="octicon octicon-link" /></a>insert_shape(row, col, shape, x, y, x_scale, y_scale)
 
@@ -952,11 +988,25 @@ horizontally and vertically:
     # Scale the width by 120% and the height by 150%
     worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
 
+The positioning of the chart when cells are resized can be set with the C<object_position> parameter:
+
+    $worksheet->insert_chart( 'E2', $chart, { object_position => 2 } );
+
+The `:object_position` parameter can have one of the following allowable values:
+
+    1. Move and size with cells.
+    2. Move but don’t size with cells.
+    3. Don’t move or size with cells.
+    4. Same as Option 1, see below.
+
++Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
++
+
 See also the
 [`shape\*.rb`](examples.html#shape1)
 programs in the examples directory of the distro.
 
-#### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, properties)
+#### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, options)
 
 The `insert_button()` method can be used to insert an Excel form button into
 a worksheet.
@@ -971,7 +1021,7 @@ button to a macro from an embedded VBA project:
 
     worksheet.insert_button('C2', :macro => 'my_macro')
 
-The properties of the button that can be set are:
+The options of the button that can be set are:
 
     :macro
     :caption

@@ -46,11 +46,16 @@ Set the font underline property, should be 0 or 1:
     chart.set_x_axis( :num_font => { :underline => 1 } )
 
 ##### <a name="rotation" class="anchor" href="#rotation"><span class="octicon octicon-link" /></a>:rotation
-Set the font rotation in the range -90 to 90:
+Set the font rotation in the integer range -90 to 90, and 270-271:
 
     chart.set_x_axis( :num_font => { :rotation => 45 } )
 
 This is useful for displaying large axis data such as dates in a more compact format.
+
+There are 2 special case angles outside the range -90 to 90:
+
+* 270: Stacked text, where the text runs from top to bottom.
+* 271: A special variant of stacked text for East Asian fonts.
 
 ##### <a name="color" class="anchor" href="#color"><span class="octicon octicon-link" /></a>:color
 Set the font color property. Can be a color index, a color name or HTML style RGB colour:
