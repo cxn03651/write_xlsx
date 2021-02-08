@@ -5,7 +5,7 @@
 
 gem to create a new file in the Excel 2007+ XLSX format, and you can use the
 same interface as writeexcel gem. write_xlsx is converted from Perl's module
-[Excel::Writer::XLSX-0.99](https://github.com/jmcnamara/excel-writer-xlsx) .
+[Excel::Writer::XLSX-1.01](https://github.com/jmcnamara/excel-writer-xlsx/tree/CPAN_1.01)
 
 ## Description
 
