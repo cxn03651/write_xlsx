@@ -4,11 +4,11 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
-    attr_accessor :type, :dimensions, :width, :height, :name, :shape, :anchor
+    attr_accessor :type, :dimensions, :width, :height, :description, :shape, :anchor
 
-    def initialize(type, dimensions, width, height, name, shape, anchor)
-      @type, @dimensions, @width, @height, @name, @shape, @anchor =
-        type, dimensions, width, height, name, shape, anchor
+    def initialize(type, dimensions, width, height, description, shape, anchor)
+      @type, @dimensions, @width, @height, @description, @shape, @anchor =
+        type, dimensions, width, height, description, shape, anchor
     end
   end
 
@@ -85,7 +85,7 @@ module Writexlsx
       type = drawing.type
       width = drawing.width
       height = drawing.height
-      description = drawing.name
+      description = drawing.description
       shape = drawing.shape
       anchor = drawing.anchor
       col_from, row_from, col_from_offset, row_from_offset,
