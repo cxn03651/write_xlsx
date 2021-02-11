@@ -1,5 +1,13 @@
 Change history of write_xlsx rubygem.
 
+2021-02-12 v1.02.0
+
+   Added support for hyperlinks in worksheet images.
+
+   Increased allowable url length from 255 to 2079 characters, as allowed in
+   more recent versions of Excel.
+
+
 2021-02-08 v1.01.0
 
    Added support for stacked and East Asian vertical chart fonts.
