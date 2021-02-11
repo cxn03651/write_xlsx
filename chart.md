@@ -724,7 +724,7 @@ Set the gradient fill properties of the legend.
 Set the font properties of the chart legend.
 
     chart.set_legend(
-      :font => { :bold => 1, :italic -> 1 }
+      :font => { :bold => 1, :italic => 1 }
     )
 
 ##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
@@ -1751,10 +1751,10 @@ axes. However, date axes are an exception.
 The min and max values should be set as Excel times or dates:
 
     chart.set_x_axis(
-        :date_axis  => 1,
-        :min        => $worksheet->convert_date_time('2013-01-02T'),
-        :max        => $worksheet->convert_date_time('2013-01-09T'),
-        :num_format => 'dd/mm/yyyy'
+      :date_axis  => 1,
+      :min        => worksheet.convert_date_time('2013-01-02T'),
+      :max        => worksheet.convert_date_time('2013-01-09T'),
+      :num_format => 'dd/mm/yyyy'
     )
 
 For date axes it is also possible to set the type of the major and minor units:
