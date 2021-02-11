@@ -309,6 +309,7 @@ module Writexlsx
       @excel_version = 2007
       @palette = workbook.palette
       @default_url_format = workbook.default_url_format
+      @max_url_length = workbook.max_url_length
 
       @page_setup = PageSetup.new
 

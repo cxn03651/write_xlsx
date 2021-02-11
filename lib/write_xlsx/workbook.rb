@@ -49,6 +49,7 @@ module Writexlsx
     attr_reader :shared_strings  # :nodoc:
     attr_reader :vba_project  # :nodoc:
     attr_reader :excel2003_style # :nodoc:
+    attr_reader :max_url_length # :nodoc:
     attr_reader :strings_to_urls # :nodoc:
     attr_reader :default_url_format # :nodoc:
 
@@ -130,6 +131,12 @@ module Writexlsx
       @images              = []
       @strings_to_urls     = (options[:strings_to_urls].nil? || options[:strings_to_urls]) ? true : false
 
+      @max_url_length      = 2079
+      if options[:max_url_length]
+        @max_url_length = options[:max_url_length]
+
+        @max_url_length = 2079 if @max_url_length < 250
+      end
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
 

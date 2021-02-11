@@ -7,19 +7,19 @@ module Writexlsx
 
       attr_reader :str, :tip
 
-      MAXIMUM_URLS_SIZE = 255
+      MAXIMUM_URLS_SIZE = 2079
 
-      def self.factory(url, str = nil, tip = nil)
+      def self.factory(url, str = nil, tip = nil, max_url_length = MAXIMUM_URLS_SIZE)
         if url =~ /^internal:(.+)/
-          InternalHyperlink.new($~[1], str, tip)
+          InternalHyperlink.new($~[1], str, tip, max_url_length)
         elsif url =~ /^external:(.+)/
-          ExternalHyperlink.new($~[1], str, tip)
+          ExternalHyperlink.new($~[1], str, tip, max_url_length)
         else
-          new(url, str, tip)
+          new(url, str, tip, max_url_length)
         end
       end
 
-      def initialize(url, str, tip)
+      def initialize(url, str, tip, max_url_length)
         # The displayed string defaults to the url string.
         str ||= url.dup
 
@@ -33,8 +33,8 @@ module Writexlsx
         url = escape_url(url)
 
         # Excel limits the escaped URL and location/anchor to 255 characters.
-        if url.bytesize > 255 || (!@url_str.nil? && @url_str.bytesize > 255)
-          raise "Ignoring URL '#{url}' where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
+        if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
+          raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
         end
 
         @url       = url
@@ -66,7 +66,7 @@ module Writexlsx
     class InternalHyperlink < Hyperlink
       undef external_hyper_link
 
-      def initialize(url, str, tip)
+      def initialize(url, str, tip, max_url_length)
         @url = url
         # The displayed string defaults to the url string.
         str ||= @url.dup
@@ -77,9 +77,9 @@ module Writexlsx
         # Copy string for use in hyperlink elements.
         @url_str = @str.dup
 
-        # Excel limits escaped URL to 255 characters.
-        if @url.bytesize > MAXIMUM_URLS_SIZE
-          raise "URL '#{@url}' > #{MAXIMUM_URLS_SIZE} characters, it exceeds Excel's limit for URLS."
+        # Excel limits escaped URL to #{max_url_length} characters.
+        if @url.bytesize > max_url_length
+          raise "URL '#{@url}' > #{max_url_length} characters, it exceeds Excel's limit for URLS."
         end
 
         @tip = tip
@@ -97,7 +97,7 @@ module Writexlsx
     end
 
     class ExternalHyperlink < Hyperlink
-      def initialize(url, str, tip)
+      def initialize(url, str, tip, max_url_length)
         # The displayed string defaults to the url string.
         str ||= url.dup
 
@@ -124,9 +124,9 @@ module Writexlsx
         url = url.sub(%r!^.\\!, '')
         @url_str   = url_str
 
-        # Excel limits the escaped URL and location/anchor to 255 characters.
-        if url.bytesize > 255 || (!@url_str.nil? && @url_str.bytesize > 255)
-          raise "Ignoring URL '#{url}' where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
+        # Excel limits the escaped URL and location/anchor to max_url_length characters.
+        if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
+          raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
         end
 
         @url       = url
