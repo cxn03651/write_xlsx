@@ -267,7 +267,7 @@ since it is based on the original Excel 2007 for Windows sizing.
 
 #### <a name="set_tab_ratio" class="anchor" href="#set_tab_ratio"><span class="octicon octicon-link" /></a>set_tab_ratio
 
-<!-- The `set_tab_ratio()` method ca -->n be used to set the ratio between worksheet tabs and the horizontal slider at the bottom of a workbook.
+The `set_tab_ratio()` method can be used to set the ratio between worksheet tabs and the horizontal slider at the bottom of a workbook.
 This can be increased to give more room to the tabs or reduced to increase the size of the horizontal slider:
 
     workbook.set_tab_ratio(75)
@@ -340,7 +340,7 @@ The text and number types are optional since they can usually be inferred from t
     workbook.set_custom_property('Reference',  '1.2345')
 
 
-The C<name> and C<value> (for text types) are limited to 255 characters by Excel.
+The `name` and `value` (for text types) are limited to 255 characters by Excel.
 
 
 #### <a name="define_name" class="anchor" href="#define_name"><span class="octicon octicon-link" /></a>define_name

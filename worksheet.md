@@ -554,6 +554,8 @@ Note: WriteXLSX will escape the following characters in URLs as required by Exce
 `\s` `"` `<` `>` `\` `[` `]` `backquote` `^` `{` `}` unless the URL already contains `%xx` style escapes.
 In which case it is assumed that the URL was escaped correctly by the user and will by passed directly to Excel.
 
+Versions of Excel prior to Excel 2015 limited hyperlink links and anchor/locations to 255 characters each. Versions after that support urls up to 2079 characters. WriteXLSX versions >= v1.02.0 support the new longer limit by default.
+
 See also, the note about [CELL NOTATION][].
 
 #### <a name="write_formula" class="anchor" href="#write_formula"><span class="octicon octicon-link" /></a>write_formula(row, column, formula, format = nil, value = nil)
@@ -866,7 +868,9 @@ The `options` parameter can be used to set various options for the image. The de
       :y_offset        => 0,
       :x_scale         => 1,
       :y_scale         => 1,
-      :object_position => 2
+      :object_position => 2,
+      :url             => nil,
+      :tip             => nil
     }
 
 The parameters `:x_offset` and `:y_offset` can be used to specified by `row` and `col`. The offset values are in pixels.
@@ -893,6 +897,20 @@ The `object_position` parameter can have one of the following allowable values:
     4. Same as Option 1, see below.
 
 Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This allows the user to hide an image in a cell, possibly as part of an autofilter.
+
+The `:url` option can be use to used to add a hyperlink to an image:
+
+    worksheet.insert_image('A1', 'logo.png',
+        :url => 'https://github.com/jmcnamara')
+
+The supported url formats are the same as those supported by the `write_url()` method and the same rules/limits apply.
+
+The `:tip` option can be use to used to add a mouseover tip to the hyperlink:
+
+    worksheet.insert_image('A1', 'logo.png',
+        :url => 'https://github.com/jmcnamara',
+        :tip => 'GitHub'
+    )
 
 Note: you must call `set_row()` or `set_column()` before `insert_image()`
 if you wish to change the default dimensions of any of the rows or columns
@@ -947,14 +965,14 @@ The positioning of the chart when cells are resized can be set with the `object_
 
     worksheet.insert_chart('E2', chart, :object_position => 2 )
 
-The C<object_position> parameter can have one of the following allowable values:
+The `:object_position` parameter can have one of the following allowable values:
 
     1. Move and size with cells.
     2. Move but don’t size with cells.
     3. Don’t move or size with cells.
     4. Same as Option 1, see below.
 
-+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
 
 
 #### <a name="insert_shape" class="anchor" href="#insert_shape"><span class="octicon octicon-link" /></a>insert_shape(row, col, shape, x, y, x_scale, y_scale)
@@ -988,9 +1006,9 @@ horizontally and vertically:
     # Scale the width by 120% and the height by 150%
     worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
 
-The positioning of the chart when cells are resized can be set with the C<object_position> parameter:
+The positioning of the chart when cells are resized can be set with the `:object_position` parameter:
 
-    $worksheet->insert_chart( 'E2', $chart, { object_position => 2 } );
+    worksheet.insert_chart('E2', chart, :object_position => 2)
 
 The `:object_position` parameter can have one of the following allowable values:
 
