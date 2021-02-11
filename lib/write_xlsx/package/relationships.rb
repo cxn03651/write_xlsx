@@ -31,8 +31,8 @@ module Writexlsx
       #
       # Add container relationship to XLSX .rels xml files.
       #
-      def add_document_relationship(type, target)
-        @rels.push([Document_schema + type, target])
+      def add_document_relationship(type, target, target_mode = nil)
+        @rels.push([Document_schema + type, target, target_mode])
       end
 
       #

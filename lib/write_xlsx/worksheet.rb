@@ -356,6 +356,8 @@ module Writexlsx
       @sparklines             = []
       @shapes                 = []
       @shape_hash             = {}
+      @drawing_rels           = {}
+      @drawing_rels_id        = 0
       @header_images          = []
       @footer_images          = []
 
@@ -3047,6 +3049,8 @@ module Writexlsx
         x_scale  = params[:x_scale]
         y_scale  = params[:y_scale]
         anchor   = params[:object_position]
+        url      = params[:url]
+        tip      = params[:tip]
       else
         x_offset, y_offset, x_scale, y_scale, anchor = options
       end
@@ -3056,7 +3060,10 @@ module Writexlsx
       y_scale  ||= 1
       anchor   ||= 2
 
-      @images << [row, col, image, x_offset, y_offset, x_scale, y_scale, anchor]
+      @images << [
+        row, col, image, x_offset, y_offset,
+        x_scale, y_scale, url, tip, anchor
+      ]
     end
 
     #
@@ -5728,7 +5735,7 @@ module Writexlsx
       name = chart.name
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor)
+      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor, drawing_rel_index, 0, nil)
       if !drawings?
         @drawings = Drawings.new
         @drawings.add_drawing_object(drawing)
@@ -6076,6 +6083,21 @@ module Writexlsx
     end
 
     private
+
+    #
+    # Get the index used to address a drawing rel link.
+    #
+    def drawing_rel_index(target = nil)
+      if !target
+        # Undefined values for drawings like charts will always be unique.
+        @drawing_rels_id += 1
+      elsif ptrue?(@drawing_rels[target])
+        @drawing_rels[target]
+      else
+        @drawing_rels_id += 1
+        @drawing_rels[target] = @drawing_rels_id
+      end
+    end
 
     def hyperlinks_count
       @hyperlinks.keys.inject(0) { |s, n| s += @hyperlinks[n].keys.size }
@@ -6429,7 +6451,8 @@ module Writexlsx
       y_dpi ||= 96
       drawing_type = 2
 
-      row, col, image, x_offset, y_offset, x_scale, y_scale, anchor = @images[index]
+      row, col, image, x_offset, y_offset,
+      x_scale, y_scale, url, tip, anchor = @images[index]
 
       width  *= x_scale
       height *= y_scale
@@ -6444,7 +6467,7 @@ module Writexlsx
       height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor)
+      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor, 0, 0, tip)
       if !drawings?
         drawings = Drawings.new
         drawings.embedded = 1
@@ -6457,6 +6480,35 @@ module Writexlsx
       end
       drawings.add_drawing_object(drawing)
 
+      if url
+        rel_type = '/hyperlink'
+        target_mode = 'External'
+        if url =~ %r!^[fh]tt?ps?://! || url =~ /^mailto:/
+          target = escape_url(url)
+        end
+        if url =~ /^external:/
+          target = escape_url(url.sub(/^external:/, 'file:///'))
+          # Additional escape not required in worksheet hyperlinks
+          target = target.gsub(/#/, '%23')
+        end
+        if url =~ /^internal:/
+          target      = url.sub(/^internal:/, '#')
+          target_mode = nil
+        end
+
+        if target.length > 255
+          raise <<"EOS"
+Ignoring URL #{target} where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the WriteXLSX documentation.
+EOS
+        end
+
+        if target
+          @drawing_links << [rel_type, target, target_mode]
+        end
+        drawing.url_rel_index = drawing_rel_index
+      end
+
+      drawing.rel_index = drawing_rel_index
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
     end
     public :prepare_image
@@ -6575,7 +6627,7 @@ module Writexlsx
       shape.calc_position_emus(self)
 
       drawing_type = 3
-      drawing = Drawing.new(drawing_type, shape.dimensions, shape.width_emu, shape.height_emu, shape.name, shape, shape.anchor)
+      drawing = Drawing.new(drawing_type, shape.dimensions, shape.width_emu, shape.height_emu, shape.name, shape, shape.anchor, drawing_rel_index, 0, nil)
       drawings.add_drawing_object(drawing)
     end
     public :prepare_shape

@@ -4,11 +4,12 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
-    attr_accessor :type, :dimensions, :width, :height, :description, :shape, :anchor
+    attr_accessor :type, :dimensions, :width, :height, :description, :shape, :anchor, :rel_index, :url_rel_index
+    attr_reader :tip
 
-    def initialize(type, dimensions, width, height, description, shape, anchor)
-      @type, @dimensions, @width, @height, @description, @shape, @anchor =
-        type, dimensions, width, height, description, shape, anchor
+    def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil)
+      @type, @dimensions, @width, @height, @description, @shape, @anchor, @rel_index, @url_rel_index, @tip =
+        type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip
     end
   end
 
@@ -82,12 +83,16 @@ module Writexlsx
     def write_two_cell_anchor(*args)
       index, drawing = args
 
-      type = drawing.type
-      width = drawing.width
-      height = drawing.height
-      description = drawing.description
-      shape = drawing.shape
-      anchor = drawing.anchor
+      type          = drawing.type
+      width         = drawing.width
+      height        = drawing.height
+      description   = drawing.description
+      shape         = drawing.shape
+      anchor        = drawing.anchor
+      rel_index     = drawing.rel_index
+      url_rel_index = drawing.url_rel_index
+      tip           = drawing.tip
+
       col_from, row_from, col_from_offset, row_from_offset,
       col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute = drawing.dimensions
 
@@ -113,10 +118,14 @@ module Writexlsx
           # Graphic frame.
 
           # Write the xdr:graphicFrame element for charts.
-          write_graphic_frame(index, description)
+          write_graphic_frame(index, rel_index, description)
         elsif type == 2
           # Write the xdr:pic element.
-          write_pic(index, col_absolute, row_absolute, width, height, description)
+          write_pic(
+            index,        rel_index,      col_absolute,
+            row_absolute, width,          height,
+            description,  url_rel_index , tip
+          )
         else
           # Write the xdr:sp element for shapes.
           write_sp(index, col_absolute, row_absolute, width, height, shape)
@@ -149,7 +158,7 @@ module Writexlsx
         end
 
         # Write the xdr:graphicFrame element.
-        write_graphic_frame(index)
+        write_graphic_frame(index, index)
 
         # Write the xdr:clientData element.
         write_client_data
@@ -223,9 +232,9 @@ module Writexlsx
     #
     def write_pos(x, y)
       attributes = [
-                    ['x', x],
-                    ['y', y]
-                   ]
+        ['x', x],
+        ['y', y]
+      ]
 
       @writer.empty_tag('xdr:pos', attributes)
     end
@@ -235,9 +244,9 @@ module Writexlsx
     #
     def write_ext(cx, cy)
       attributes = [
-                    ['cx', cx],
-                    ['cy', cy]
-                   ]
+        ['cx', cx],
+        ['cy', cy]
+      ]
 
       @writer.empty_tag('xdr:ext', attributes)
     end
@@ -245,7 +254,7 @@ module Writexlsx
     #
     # Write the <xdr:graphicFrame> element.
     #
-    def write_graphic_frame(index, name = nil)
+    def write_graphic_frame(index, rel_index, name = nil)
       macro  = ''
 
       attributes = [ ['macro', macro] ]
@@ -256,7 +265,7 @@ module Writexlsx
         # Write the xdr:xfrm element.
         write_xfrm
         # Write the a:graphic element.
-        write_atag_graphic(index)
+        write_atag_graphic(rel_index)
       end
     end
 
@@ -277,18 +286,42 @@ module Writexlsx
     #
     # Write the <xdr:cNvPr> element.
     #
-    def write_c_nv_pr(id, name, descr = nil)
+    def write_c_nv_pr(index, name, description = nil, url_rel_index = nil, tip = nil)
       attributes = [
-          ['id',   id],
-          ['name', name]
+        ['id',   index],
+        ['name', name]
       ]
 
       # Add description attribute for images.
-      attributes << ['descr', descr] if descr
+      attributes << ['descr', description] if description
 
-      @writer.empty_tag('xdr:cNvPr', attributes)
+      if ptrue?(url_rel_index)
+        @writer.tag_elements('xdr:cNvPr', attributes) do
+          # Write the a:hlinkClick element.
+          write_a_hlink_click(url_rel_index, tip)
+        end
+      else
+        @writer.empty_tag('xdr:cNvPr', attributes)
+      end
     end
 
+    #
+    # Write the <a:hlinkClick> element.
+    #
+    def write_a_hlink_click(index, tip)
+      schema  = 'http://schemas.openxmlformats.org/officeDocument/'
+      xmlns_r = "#{schema}2006/relationships"
+      r_id    = "rId#{index}"
+
+      attributes = [
+        ['xmlns:r', xmlns_r],
+        ['r:id', r_id]
+      ]
+
+      attributes << ['tooltip', tip] if tip
+
+      @writer.empty_tag('a:hlinkClick', attributes)
+    end
 
     #
     # Write the <xdr:cNvGraphicFramePr> element.
@@ -371,7 +404,7 @@ module Writexlsx
     # Write the <a:graphicData> element.
     #
     def write_atag_graphic_data(index)
-      uri   = 'http://schemas.openxmlformats.org/drawingml/2006/chart'
+      uri = 'http://schemas.openxmlformats.org/drawingml/2006/chart'
 
       attributes = [ ['uri', uri] ]
 
@@ -494,12 +527,12 @@ module Writexlsx
     #
     # Write the <xdr:pic> element.
     #
-    def write_pic(index, col_absolute, row_absolute, width, height, description)
+    def write_pic(index, rel_index, col_absolute, row_absolute, width, height, description, url_rel_index, tip)
       @writer.tag_elements('xdr:pic') do
         # Write the xdr:nvPicPr element.
-        write_nv_pic_pr(index, description)
+        write_nv_pic_pr(index, rel_index, description, url_rel_index, tip)
         # Write the xdr:blipFill element.
-        write_blip_fill(index)
+        write_blip_fill(rel_index)
 
         # Pictures are rectangle shapes by default.
         shape = Shape.new
@@ -513,10 +546,13 @@ module Writexlsx
     #
     # Write the <xdr:nvPicPr> element.
     #
-    def write_nv_pic_pr(index, description)
+    def write_nv_pic_pr(index, rel_index, description, url_rel_index, tip)
       @writer.tag_elements('xdr:nvPicPr') do
         # Write the xdr:cNvPr element.
-        write_c_nv_pr( index + 1, "Picture #{index}", description )
+        write_c_nv_pr(
+          index + 1, "Picture #{index}", description,
+          url_rel_index, tip
+        )
         # Write the xdr:cNvPicPr element.
         write_c_nv_pic_pr
       end

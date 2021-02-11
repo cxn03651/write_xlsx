@@ -9,7 +9,7 @@ class DrawingImage011 < Minitest::Test
       2, 1, 0, 0, 3, 6, 533257, 190357, 1219200, 190500
     ]
     drawing = Writexlsx::Drawing.new(
-      2, dimensions, 1142857, 1142857, 'republic.png', nil, 2
+      2, dimensions, 1142857, 1142857, 'republic.png', nil, 2, 1
     )
     @obj.add_drawing_object(drawing)
     # @obj.add_drawing_object(

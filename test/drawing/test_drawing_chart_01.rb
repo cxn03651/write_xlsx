@@ -7,7 +7,7 @@ class DrawingChart011 < Minitest::Test
     @obj = Writexlsx::Drawings.new
     dimensions = [4, 8, 457200, 104775, 12, 22, 152400, 180975]
     drawing = Writexlsx::Drawing.new(
-      1, dimensions, nil, nil, nil, nil, 1
+      1, dimensions, nil, nil, nil, nil, 1, 1
     )
     @obj.add_drawing_object(drawing)
     @obj.embedded = true

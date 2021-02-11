@@ -1935,17 +1935,17 @@ module Writexlsx
           has_drawings = true
         end
 
-        # Prepare the worksheet charts.
-        sheet.charts.each_with_index do |chart, index|
-          chart_ref_id += 1
-          sheet.prepare_chart(index, chart_ref_id, drawing_id)
-        end
-
         # Prepare the worksheet images.
         sheet.images.each_with_index do |image, index|
           type, width, height, name, x_dpi, y_dpi = get_image_properties(image[2])
           image_ref_id += 1
           sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type, x_dpi, y_dpi)
+        end
+
+        # Prepare the worksheet charts.
+        sheet.charts.each_with_index do |chart, index|
+          chart_ref_id += 1
+          sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end
 
         # Prepare the worksheet shapes.
