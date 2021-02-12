@@ -139,6 +139,10 @@ Standard Excel table format names should be used
 
 The default table style is 'Table Style Medium 9'.
 
+You can also turn the table style off by setting it to 'None':
+
+    worksheet11.add_table('B3:F7', :style => 'None')
+
 ##### <a name="name" class="anchor" href="#name"><span class="octicon octicon-link" /></a>:name
 
 The `:name` parameter can be used to set the name of the table.
