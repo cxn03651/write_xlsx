@@ -4595,6 +4595,7 @@ EOS
     worksheet10 = workbook.add_worksheet
     worksheet11 = workbook.add_worksheet
     worksheet12 = workbook.add_worksheet
+    worksheet13 = workbook.add_worksheet
 
     currency_format = workbook.add_format(:num_format => '$#,##0')
 
@@ -4626,7 +4627,7 @@ EOS
     #
     # Example 2.
     #
-    caption = 'Default table with data.';
+    caption = 'Default table with data.'
 
     # Set the columns widths.
     worksheet2.set_column('B:G', 12)
@@ -4695,7 +4696,7 @@ EOS
     #
     # Example 6.
     #
-    caption = 'Table with banded columns but without default banded rows.';
+    caption = 'Table with banded columns but without default banded rows.'
 
     # Set the columns widths.
     worksheet6.set_column('B:G', 12)
@@ -4713,7 +4714,7 @@ EOS
     #
     # Example 7.
     #
-    caption = 'Table with user defined column headers';
+    caption = 'Table with user defined column headers'
 
     # Set the columns widths.
     worksheet7.set_column('B:G', 12)
@@ -4740,7 +4741,7 @@ EOS
     #
     # Example 8.
     #
-    caption = 'Table with user defined column headers';
+    caption = 'Table with user defined column headers'
 
     # Set the columns widths.
     worksheet8.set_column('B:G', 12)
@@ -4772,7 +4773,7 @@ EOS
     #
     # Example 9.
     #
-    caption = 'Table with totals row (but no caption or totals).';
+    caption = 'Table with totals row (but no caption or totals).'
 
     # Set the columns widths.
     worksheet9.set_column('B:G', 12)
@@ -4804,7 +4805,7 @@ EOS
     #
     # Example 10.
     #
-    caption = 'Table with totals row with user captions and functions.';
+    caption = 'Table with totals row with user captions and functions.'
 
     # Set the columns widths.
     worksheet10.set_column('B:G', 12)
@@ -4837,7 +4838,7 @@ EOS
     #
     # Example 11.
     #
-    caption = 'Table with alternative Excel style.';
+    caption = 'Table with alternative Excel style.'
 
     # Set the columns widths.
     worksheet11.set_column('B:G', 12)
@@ -4871,7 +4872,7 @@ EOS
     #
     # Example 12.
     #
-    caption = 'Table with column formats.';
+    caption = 'Table with no Excel style.'
 
     # Set the columns widths.
     worksheet12.set_column('B:G', 12)
@@ -4881,6 +4882,40 @@ EOS
 
     # Add a table to the worksheet.
     worksheet12.add_table(
+      'B3:G8',
+      {
+        :data      => data,
+        :style     => 'None',
+        :total_row => 1,
+        :columns   => [
+          { :header => 'Product',   :total_string   => 'Totals' },
+          { :header => 'Quarter 1', :total_function => 'sum' },
+          { :header => 'Quarter 2', :total_function => 'sum' },
+          { :header => 'Quarter 3', :total_function => 'sum' },
+          { :header => 'Quarter 4', :total_function => 'sum' },
+          {
+            :header         => 'Year',
+            :formula        => '=SUM(Table12[@[Quarter 1]:[Quarter 4]])',
+            :total_function => 'sum'
+          }
+        ]
+      }
+    )
+
+    ###############################################################################
+    #
+    # Example 13.
+    #
+    caption = 'Table with column formats.'
+
+    # Set the columns widths.
+    worksheet13.set_column('B:G', 12)
+
+    # Write the caption.
+    worksheet13.write('B1', caption)
+
+    # Add a table to the worksheet.
+    worksheet13.add_table(
       'B3:G8',
       {
         :data      => data,

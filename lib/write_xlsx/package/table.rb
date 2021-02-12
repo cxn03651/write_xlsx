@@ -398,13 +398,14 @@ module Writexlsx
       # Write the <tableStyleInfo> element.
       #
       def write_table_style_info
-        attributes = [
-                      ['name',              @style],
-                      ['showFirstColumn',   @show_first_col],
-                      ['showLastColumn',    @show_last_col],
-                      ['showRowStripes',    @show_row_stripes],
-                      ['showColumnStripes', @show_col_stripes]
-                     ]
+        attributes = []
+        if @style && @style != '' && @style != 'None'
+          attributes << ['name', @style]
+        end
+        attributes << ['showFirstColumn',   @show_first_col]
+        attributes << ['showLastColumn',    @show_last_col]
+        attributes << ['showRowStripes',    @show_row_stripes]
+        attributes << ['showColumnStripes', @show_col_stripes]
 
         @writer.empty_tag('tableStyleInfo', attributes)
       end
