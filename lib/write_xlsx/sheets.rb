@@ -67,18 +67,18 @@ module Writexlsx
           vml = Package::Vml.new
           vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
           vml.assemble_xml_file(
-                                sheet.vml_data_id, sheet.vml_shape_id,
-                                sheet.sorted_comments, sheet.buttons_data
-                                )
+            sheet.vml_data_id, sheet.vml_shape_id,
+            sheet.sorted_comments, sheet.buttons_data
+          )
           index += 1
         end
         if sheet.has_header_vml?
           vml = Package::Vml.new
           vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
           vml.assemble_xml_file(
-                                sheet.vml_header_id, sheet.vml_header_id * 1024,
-                                [], [], sheet.header_images_data
-                                )
+            sheet.vml_header_id, sheet.vml_header_id * 1024,
+            [], [], sheet.header_images_data
+          )
           write_vml_drawing_rels_files(package_dir, sheet, index)
           index += 1
         end
@@ -106,16 +106,12 @@ module Writexlsx
     end
 
     def write_chartsheet_rels_files(package_dir)
-      write_sheet_rels_files_base(chartsheets, "#{package_dir}/xl/chartsheets/_rels",
-                            'sheet')
+      write_sheet_rels_files_base(
+        chartsheets, "#{package_dir}/xl/chartsheets/_rels", 'sheet'
+      )
     end
 
     def write_drawing_rels_files(package_dir)
-      # write_rels_files_base(
-      #                       self.reject { |sheet| sheet.drawing_links[0].empty? },
-      #                       "#{package_dir}/xl/drawings/_rels",
-
-      #                       )
       dir = "#{package_dir}/xl/drawings/_rels"
 
       index = 0
@@ -159,8 +155,9 @@ module Writexlsx
     end
 
     def write_worksheet_rels_files(package_dir)
-      write_sheet_rels_files_base(worksheets, "#{package_dir}/xl/worksheets/_rels",
-                            'sheet')
+      write_sheet_rels_files_base(
+        worksheets, "#{package_dir}/xl/worksheets/_rels", 'sheet'
+      )
     end
 
     def write_sheet_rels_files_base(sheets, dir, body)

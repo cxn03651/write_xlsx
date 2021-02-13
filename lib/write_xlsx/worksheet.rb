@@ -359,6 +359,8 @@ module Writexlsx
       @shape_hash             = {}
       @drawing_rels           = {}
       @drawing_rels_id        = 0
+      @vml_drawing_rels       = {}
+      @vml_drawing_rels_id    = 0
       @header_images          = []
       @footer_images          = []
 
@@ -6100,6 +6102,18 @@ module Writexlsx
       end
     end
 
+    #
+    # Get the index used to address a vml_drawing rel link.
+    #
+    def get_vml_drawing_rel_index(target)
+      if @vml_drawing_rels[target]
+        @vml_drawing_rels[target]
+      else
+        @vml_drawing_rels_id += 1
+        @vml_drawing_rels[target] = @vml_drawing_rels_id
+      end
+    end
+
     def hyperlinks_count
       @hyperlinks.keys.inject(0) { |s, n| s += @hyperlinks[n].keys.size }
     end
@@ -6447,7 +6461,7 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, image_id, drawing_id, width, height, name, image_type, x_dpi = 96, y_dpi = 96) #:nodoc:
+    def prepare_image(index, image_id, drawing_id, width, height, name, image_type, x_dpi = 96, y_dpi = 96, md5 = nil) #:nodoc:
       x_dpi ||= 96
       y_dpi ||= 96
       drawing_type = 2
@@ -6503,24 +6517,30 @@ Ignoring URL #{target} where link or anchor > 255 characters since it exceeds Ex
 EOS
         end
 
-        if target
+        if target && !@drawing_rels[url]
           @drawing_links << [rel_type, target, target_mode]
         end
-        drawing.url_rel_index = drawing_rel_index
+        drawing.url_rel_index = drawing_rel_index(url)
       end
 
-      drawing.rel_index = drawing_rel_index
-      @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
+      if !@drawing_rels[md5]
+        @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"]
+      end
+      drawing.rel_index = drawing_rel_index(md5)
     end
     public :prepare_image
 
-    def prepare_header_image(image_id, width, height, name, image_type, position, x_dpi, y_dpi)
+    def prepare_header_image(image_id, width, height, name, image_type, position, x_dpi, y_dpi, md5)
       # Strip the extension from the filename.
       body = name.dup
       body[/\.[^\.]+$/, 0] = ''
 
-      @header_images_array << [width, height, body, position, x_dpi, y_dpi]
-      @vml_drawing_links   << ['/image', "../media/image#{image_id}.#{image_type}" ]
+      if !@vml_drawing_rels[md5]
+        @vml_drawing_links   << ['/image', "../media/image#{image_id}.#{image_type}" ]
+      end
+
+      ref_id = get_vml_drawing_rel_index(md5)
+      @header_images_array << [width, height, body, position, x_dpi, y_dpi, ref_id]
     end
     public :prepare_header_image
 

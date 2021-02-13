@@ -1922,9 +1922,12 @@ module Writexlsx
     # Iterate through the worksheets and set up any chart or image drawings.
     #
     def prepare_drawings #:nodoc:
-      chart_ref_id = 0
-      image_ref_id = 0
-      drawing_id   = 0
+      chart_ref_id     = 0
+      image_ref_id     = 0
+      drawing_id       = 0
+      ref_id           = 0
+      image_ids        = {}
+      header_image_ids = {}
       @worksheets.each do |sheet|
         chart_count = sheet.charts.size
         image_count = sheet.images.size
@@ -1944,9 +1947,19 @@ module Writexlsx
 
         # Prepare the worksheet images.
         sheet.images.each_with_index do |image, index|
-          type, width, height, name, x_dpi, y_dpi = get_image_properties(image[2])
-          image_ref_id += 1
-          sheet.prepare_image(index, image_ref_id, drawing_id, width, height, name, type, x_dpi, y_dpi)
+          filename = image[2]
+          type, width, height, name, x_dpi, y_dpi, md5 = get_image_properties(image[2])
+          if image_ids[md5]
+            ref_id = image_ids[md5]
+          else
+            image_ref_id += 1
+            image_ids[md5] = ref_id = image_ref_id
+            @images << [filename, type]
+          end
+          sheet.prepare_image(
+            index, ref_id, drawing_id, width, height,
+            name,  type,   x_dpi,      y_dpi, md5
+          )
         end
 
         # Prepare the worksheet charts.
@@ -1965,13 +1978,21 @@ module Writexlsx
           filename = sheet.header_images[index][0]
           position = sheet.header_images[index][1]
 
-          type, width, height, name, x_dpi, y_dpi =
+          type, width, height, name, x_dpi, y_dpi, md5 =
             get_image_properties(filename)
 
-          image_ref_id += 1
+          if header_image_ids[md5]
+            ref_id = header_image_ids[md5]
+          else
+            image_ref_id += 1
+            header_image_ids[md5] = ref_id = image_ref_id
+            @images << [filename, type]
+          end
 
-          sheet.prepare_header_image(image_ref_id, width, height,
-                                     name, type, position, x_dpi, y_dpi)
+          sheet.prepare_header_image(
+            ref_id,   width, height, name, type,
+            position, x_dpi, y_dpi,  md5
+          )
         end
 
         # Prepare the footer images.
@@ -1979,13 +2000,21 @@ module Writexlsx
           filename = sheet.footer_images[index][0]
           position = sheet.footer_images[index][1]
 
-          type, width, height, name, x_dpi, y_dpi =
+          type, width, height, name, x_dpi, y_dpi, md5 =
             get_image_properties(filename)
 
-          image_ref_id += 1
+          if header_image_ids[md5]
+            ref_id = header_image_ids[md5]
+          else
+            image_ref_id += 1
+            header_image_ids[md5] = ref_id = image_ref_id
+            @images << [filename, type]
+          end
 
-          sheet.prepare_header_image(image_ref_id, width, height,
-                                     name, type, position, x_dpi, y_dpi)
+          sheet.prepare_header_image(
+            ref_id,   width, height, name, type,
+            position, x_dpi, y_dpi,  md5
+          )
         end
 
         if has_drawings
@@ -2014,6 +2043,7 @@ module Writexlsx
 
       # Open the image file and import the data.
       data = File.binread(filename)
+      md5  = Digest::MD5.hexdigest(data)
       if data.unpack('x A3')[0] == 'PNG'
         # Test for PNGs.
         type, width, height, x_dpi, y_dpi = process_png(data)
@@ -2031,13 +2061,11 @@ module Writexlsx
         raise "Unsupported image format for file: #{filename}\n"
       end
 
-      @images << [filename, type]
-
       # Set a default dpi for images with 0 dpi.
       x_dpi = 96 if x_dpi == 0
       y_dpi = 96 if y_dpi == 0
 
-      [type, width, height, File.basename(filename), x_dpi, y_dpi]
+      [type, width, height, File.basename(filename), x_dpi, y_dpi, md5]
     end
 
     #

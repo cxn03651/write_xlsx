@@ -17,9 +17,9 @@ module Writexlsx
       end
 
       def assemble_xml_file(
-                            data_id, vml_shape_id, comments_data,
-                            buttons_data, header_images_data = []
-                            )
+            data_id, vml_shape_id, comments_data,
+            buttons_data, header_images_data = []
+          )
         return unless @writer
 
         write_xml_namespace do
@@ -29,9 +29,9 @@ module Writexlsx
           z_index = 1
           unless buttons_data.empty?
             vml_shape_id, z_index =
-              write_shape_type_and_shape(
-                                         buttons_data,
-                                         vml_shape_id, z_index) do
+                          write_shape_type_and_shape(
+                            buttons_data,
+                            vml_shape_id, z_index) do
               write_button_shapetype
             end
           end
@@ -277,6 +277,7 @@ module Writexlsx
         position = image_data[3]
         x_dpi    = image_data[4]
         y_dpi    = image_data[5]
+        ref_id   = image_data[6]
 
         # Scale the height/width by the resolution, relative to 72dpi.
         width  = width  * 72.0 / x_dpi
@@ -294,20 +295,20 @@ module Writexlsx
         end
 
         style = [
-                 "position:absolute", "margin-left:0", "margin-top:0",
-                 "width:#{width}pt", "height:#{height}pt",
-                 "z-index:#{index}"
-                ].join(';')
+          "position:absolute", "margin-left:0", "margin-top:0",
+          "width:#{width}pt", "height:#{height}pt",
+          "z-index:#{index}"
+        ].join(';')
         attributes = [
-                      ['id',     position],
-                      ['o:spid', "_x0000_s#{id}"],
-                      ['type',   type],
-                      ['style',  style]
-                     ]
+          ['id',     position],
+          ['o:spid', "_x0000_s#{id}"],
+          ['type',   type],
+          ['style',  style]
+        ]
 
         @writer.tag_elements('v:shape', attributes) do
           # Write the v:imagedata element.
-          write_imagedata(index, name)
+          write_imagedata(ref_id, name)
 
           # Write the o:lock element.
           write_rotation_lock
@@ -319,9 +320,9 @@ module Writexlsx
       #
       def write_imagedata(index, o_title)
         attributes = [
-                      ['o:relid', "rId#{index}"],
-                      ['o:title', o_title]
-                     ]
+          ['o:relid', "rId#{index}"],
+          ['o:title', o_title]
+        ]
 
         @writer.empty_tag('v:imagedata', attributes)
       end
