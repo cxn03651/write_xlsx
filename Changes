@@ -1,5 +1,14 @@
 Change history of write_xlsx rubygem.
 
+2021-02-13 v1.03.0
+
+   Fix for duplicate images being copied to an Excel::Writer::XLSX
+   file. Excel uses an optimization where it only stores one copy of a
+   repeated/duplicate image in a workbook. WriteXLSX didn't do
+   this which meant that the file size would increase when then was a large
+   number of repeated images. This release fixes that issue and replicates
+   Excel's behaviour.
+
 2021-02-12 v1.02.0
 
    Added support for hyperlinks in worksheet images.
