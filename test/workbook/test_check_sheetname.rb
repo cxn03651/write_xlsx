@@ -48,14 +48,4 @@ class TestCheckSheetname < Minitest::Test
       end
     end
   end
-
-  def test_check_sheetname_reserved_name
-    reserved_names = ['History', 'history', 'HISTORY', 'HisTory']
-
-    reserved_names.each do |sheetname|
-      assert_raises RuntimeError, "'#{sheetname}' passed incorrectly" do
-        @workbook.add_worksheet(sheetname)
-      end
-    end
-  end
 end

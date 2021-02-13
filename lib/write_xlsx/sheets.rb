@@ -232,11 +232,6 @@ module Writexlsx
         raise "Worksheet name #{name} cannot start or end with an "
       end
 
-      # Check that sheetname isn't a reserved word.
-      if name =~ /history/i
-        raise "Worksheet name cannot be Excel reserved word 'History'"
-      end
-
       # Check that the worksheet name doesn't already exist since this is a fatal
       # error in Excel 97. The check must also exclude case insensitive matches.
       unless is_sheetname_uniq?(name)
