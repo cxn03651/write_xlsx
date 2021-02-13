@@ -5870,27 +5870,24 @@ module Writexlsx
       y_abs += y1
 
       # Adjust start column for offsets that are greater than the col width.
-      if size_col(col_start) > 0
-        while x1 >= size_col(col_start)
-          x1 -= size_col(col_start)
-          col_start += 1
-        end
+      while x1 >= size_col(col_start, anchor)
+        x1 -= size_col(col_start)
+        col_start += 1
       end
 
       # Adjust start row for offsets that are greater than the row height.
-      if size_row(row_start) > 0
-        while y1 >= size_row(row_start)
-          y1 -= size_row(row_start)
-          row_start += 1
-        end
+      while y1 >= size_row(row_start, anchor)
+        y1 -= size_row(row_start)
+        row_start += 1
       end
 
       # Initialise end cell to the same as the start cell.
       col_end = col_start
       row_end = row_start
 
-      width  += x1 if size_col(col_start) > 0
-      height += y1 if size_row(row_start) > 0
+      # Only offset the image in the cell if the row/col isn't hidden.
+      width  += x1 if size_col(col_start, anchor) > 0
+      height += y1 if size_row(row_start, anchor) > 0
 
       # Subtract the underlying cell widths to find the end cell of the object.
       while width >= size_col(col_end, anchor)
