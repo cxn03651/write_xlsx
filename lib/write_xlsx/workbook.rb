@@ -132,6 +132,7 @@ module Writexlsx
       @strings_to_urls     = (options[:strings_to_urls].nil? || options[:strings_to_urls]) ? true : false
 
       @max_url_length      = 2079
+      @has_comments        = false
       if options[:max_url_length]
         @max_url_length = options[:max_url_length]
 
@@ -1115,7 +1116,8 @@ module Writexlsx
        @border_count,
        @fill_count,
        @custom_colors,
-       @dxf_formats
+       @dxf_formats,
+       @has_comments
       ]
     end
 
@@ -1711,11 +1713,14 @@ module Writexlsx
           if sheet.has_comments?
             comment_files += 1
             comment_id    += 1
+            @has_comments = true
           end
           vml_drawing_id += 1
 
-          sheet.prepare_vml_objects(vml_data_id, vml_shape_id,
-                                    vml_drawing_id, comment_id)
+          sheet.prepare_vml_objects(
+            vml_data_id, vml_shape_id,
+            vml_drawing_id, comment_id
+          )
 
           # Each VML file should start with a shape id incremented by 1024.
           vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
@@ -1738,8 +1743,6 @@ module Writexlsx
         end
       end
 
-      add_font_format_for_cell_comments if num_comment_files > 0
-
       # Set the workbook vba_codename if one of the sheets has a button and
       # the workbook has a vbaProject binary.
       if has_button && @vba_project && !@vba_codename
@@ -1757,19 +1760,6 @@ module Writexlsx
       sheets.each do |sheet|
         table_id += sheet.prepare_tables(table_id + 1, seen)
       end
-    end
-
-    def add_font_format_for_cell_comments
-      format = Format.new(
-                          @formats,
-                          :font          => 'Tahoma',
-                          :size          => 8,
-                          :color_indexed => 81,
-                          :font_only     => 1
-                          )
-
-      format.get_xf_index
-      @formats.formats << format
     end
 
     #

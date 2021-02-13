@@ -155,7 +155,7 @@ module Writexlsx
       #
       def fill_attributes
         [
-         ['color2', '#ffffe1']
+          ['color2', '#ffffe1']
         ]
       end
 
@@ -164,9 +164,9 @@ module Writexlsx
       #
       def write_shadow
         attributes = [
-            ['on',       't'],
-            ['color',    'black'],
-            ['obscured', 't']
+          ['on',       't'],
+          ['color',    'black'],
+          ['obscured', 't']
         ]
 
         @writer.empty_tag('v:shadow', attributes)

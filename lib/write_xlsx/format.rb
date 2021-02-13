@@ -248,11 +248,11 @@ module Writexlsx
     #
     def copy(other)
       reserve = [
-                 :xf_index,
-                 :dxf_index,
-                 :xdf_format_indices,
-                 :palette
-                ]
+        :xf_index,
+        :dxf_index,
+        :xdf_format_indices,
+        :palette
+      ]
       (instance_variables - reserve).each do |v|
         instance_variable_set(v, other.instance_variable_get(v))
       end

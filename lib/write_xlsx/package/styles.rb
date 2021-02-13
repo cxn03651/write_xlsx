@@ -20,6 +20,7 @@ module Writexlsx
         @dxf_formats       = []
         @has_hyperlink     = 0
         @hyperlink_font_id = 0
+        @has_comments      = false
       end
 
       def set_xml_writer(filename)
@@ -37,7 +38,7 @@ module Writexlsx
       #
       def set_style_properties(
             xf_formats, palette, font_count, num_format_count, border_count,
-            fill_count, custom_colors, dxf_formats
+            fill_count, custom_colors, dxf_formats, has_comments
           )
         @xf_formats       = xf_formats
         @palette          = palette
@@ -47,6 +48,7 @@ module Writexlsx
         @fill_count       = fill_count
         @custom_colors    = custom_colors
         @dxf_formats      = dxf_formats
+        @has_comments     = has_comments
       end
 
       #
@@ -148,7 +150,14 @@ module Writexlsx
       # Write the <fonts> element.
       #
       def write_fonts
-        write_format_elements('fonts', @font_count) do
+        count = @font_count
+
+        if @has_comments
+          # Add an extra font for comments.
+          count += 1
+        end
+
+        write_format_elements('fonts', count) do
           write_font_base
         end
       end
@@ -160,6 +169,21 @@ module Writexlsx
             @has_hyperlink     = 1 if ptrue?(format.hyperlink)
             @hyperlink_font_id = format.font_index unless ptrue?(@hyperlink_font_id)
           end
+        end
+        if @has_comments
+          write_comment_font
+        end
+      end
+
+      #
+      # Write the <font> element used for comments.
+      #
+      def write_comment_font
+        @writer.tag_elements('font') do
+          @writer.empty_tag('sz', [['val', 8]])
+          write_color('indexed', 81)
+          @writer.empty_tag( 'name',   [['val', 'Tahoma']])
+          @writer.empty_tag( 'family', [['val', 2]])
         end
       end
 
@@ -393,12 +417,6 @@ module Writexlsx
       #
       def write_cell_xfs
         formats = @xf_formats
-
-        # Workaround for when the last format is used for the comment font
-        # and shouldn't be used for cellXfs.
-        last_format =   formats[-1]
-
-        formats.pop if last_format && last_format.font_only != 0
 
         attributes = [ ['count', formats.size] ]
 

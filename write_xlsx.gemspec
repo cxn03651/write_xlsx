@@ -20,6 +20,7 @@ Gem::Specification.new do |gem|
   gem.add_runtime_dependency 'rubyzip', '>= 1.0.0'
   gem.add_runtime_dependency 'zip-zip'
   gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'byebug'
   gem.add_development_dependency 'rake'
   gem.extra_rdoc_files = [
     "LICENSE.txt",
