@@ -328,7 +328,15 @@ created by [formats.rb][].
 Note 1. Numeric formats 23 to 36 are not documented by Microsoft and may differ
 in international versions.
 
-Note 2. The dollar sign appears as the defined local currency symbol.
+Note 2. The built-in formats are localized according to the locale settings (regional settings on Windows) of the user when opening the file in Excel:
+
+* The dot appears as the defined local decimal separator.
+
+* The comma appears as the defined local digit groups separator.
+
+* The dollar sign appears as the defined local currency symbol.
+
+* The date, time and duration formats appear as the local equivalent date or time format.
 
 #### <a name="set_locked" class="anchor" href="#set_locked"><span class="octicon octicon-link" /></a>set_locked()
 

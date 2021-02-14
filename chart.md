@@ -95,11 +95,13 @@ The currently available subtypes are:
         smooth_with_markers
         smooth
 
+    line
+        stacked
+        percent_stacked
+
     radar
         with_markers
         filled
-
-More charts and sub-types will be supported in time.
 
 ### <a name="chart_methods" class="anchor" href="#chart_methods"><span class="octicon octicon-link" /></a>CHART METHODS
 

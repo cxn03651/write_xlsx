@@ -6,11 +6,11 @@ title: Colours
 
 Throughout WriteXLSX colours can be specified using a Html style `#RRGGBB` value. For example with a Format object:
 
-    format.set_font_color('FF0000')
+    format.set_color('FF0000')
 
 For backward compatibility a limited number of color names are supported:
 
-    format.set_font_color('red')
+    format.set_color('red')
 
 The color names supported are:
 
@@ -33,4 +33,3 @@ The color names supported are:
 
 [`colors.rb`](examples.html#colors)
 in the examples directory.
-

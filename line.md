@@ -47,9 +47,18 @@ that are common to all chart classes:
 These methods are explained in detail in [Chart][].
 Class specific methods or settings, if any, are explained below.
 
-### <a name="line_chart_methods" class="anchor" href="#line_chart_methods"><span class="octicon octicon-link" /></a>Line Chart Methods
+### <a name="line_chart_subtypes" class="anchor" href="#line_chart_subtypes"><span class="octicon octicon-link" /></a>Line Chart Subtypes
 
-There aren't currently any line chart specific methods.
+The `Line` chart module also supports the following sub-types:
+
+    stacked
+    percent_stacked
+
+These can be specified at creation time via the `add_chart` Worksheet method:
+
+    chart = workbook.add_chart(
+      :type => 'line', subtype => 'stacked
+    )
 
 ### <a name="example" class="anchor" href="#example"><span class="octicon octicon-link" /></a>EXAMPLE
 

@@ -99,7 +99,8 @@ The worksheet name must be a valid Excel worksheet name, i.e:
 * It cannot contain any of the following characters: `[ ] : * ? / \`
 * It cannot start or end with an apostrophe.
 * It cannot be the same as an existing worksheet name (or a case insensitive variant).
-* It cannot be the reserved name "History" (or a case insensitive variant).
+
+Note, the sheetname should not be "History" (case insenteive) which is reserved in English language versions of Excel. Non-English versions may have restrictions on the equivalent word.
 
 See the [Excel worksheet naming rules](https://support.office.com/en-ie/article/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9).
 
