@@ -1,5 +1,18 @@
 Change history of write_xlsx rubygem.
 
+2021-02-14 v1.04.0
+
+   Added support for "stacked" and "percent_stacked" Line charts.
+
+   Fix for worksheet objects (charts and images) that are inserted with an
+   offset that starts in a hidden cell.
+
+   Removed error in add_worksheet() for sheet name "History" which is a
+   reserved name in English version of Excel. However, this is an allowed
+   worksheet name in some Excel variants so the warning has been turned into
+   a documentation note instead.
+
+
 2021-02-13 v1.03.0
 
    Fix for duplicate images being copied to an Excel::Writer::XLSX
