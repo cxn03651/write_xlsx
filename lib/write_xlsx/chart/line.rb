@@ -22,8 +22,16 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
+        @subtype        = @subtype || 'standard'
         @default_marker = Marker.new(:type => 'none')
         @smooth_allowed = 1
+
+        # Override and reset the default axis values.
+        if @subtype == 'percent_stacked'
+          @y_axis.defaults[:num_format] = '0%'
+        end
+
+        set_y_axis
 
         # Set the available data label positions for this chart type.
         @label_position_default = 'right'
@@ -54,9 +62,15 @@ module Writexlsx
         series = axes_series(params)
         return if series.empty?
 
+        if @subtype == 'percent_stacked'
+          subtype = 'percentStacked'
+        else
+          subtype = @subtype
+        end
+
         @writer.tag_elements('c:lineChart') do
           # Write the c:grouping element.
-          write_grouping('standard')
+          write_grouping(subtype)
           # Write the series elements.
           series.each {|s| write_series(s)}
 
