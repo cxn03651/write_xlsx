@@ -2514,7 +2514,9 @@ module Writexlsx
       col1, col2 = col2, col1 if col1 > col2
 
       # Check that row and col are valid and store max and min values
+      check_dimensions(row1, col1)
       check_dimensions(row2, col2)
+      store_row_col_max_min_values(row1, col1)
       store_row_col_max_min_values(row2, col2)
 
       # Define array range
