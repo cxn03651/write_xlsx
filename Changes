@@ -1,5 +1,12 @@
 Change history of write_xlsx rubygem.
 
+2021-02-15 v1.05.0
+
+   Added support for custom data labels in charts.
+
+   Remove ruby-1.9.3 travil CI check.
+
+
 2021-02-14 v1.04.0
 
    Added support for "stacked" and "percent_stacked" Line charts.
