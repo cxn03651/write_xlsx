@@ -3365,9 +3365,11 @@ module Writexlsx
       row_first,  row_last  = row_last,  row_first  if row_first > row_last
       col_first, col_last = col_last, col_first if col_first > col_last
 
-      # Check that column number is valid and store the max value
-      check_dimensions(row_last, col_last)
-      store_row_col_max_min_values(row_last, col_last)
+      # Check that the data range is valid and store the max and min values.
+      check_dimensions(row_first, col_first)
+      check_dimensions(row_last,  col_last)
+      store_row_col_max_min_values(row_first, col_first)
+      store_row_col_max_min_values(row_last,  col_last)
 
       # Store the merge range.
       @merge << [row_first, col_first, row_last, col_last]
@@ -3430,9 +3432,11 @@ module Writexlsx
       row_first, row_last = row_last, row_first if row_first > row_last
       col_first, col_last = col_last, col_first if col_first > col_last
 
-      # Check that column number is valid and store the max value
-      check_dimensions(row_last, col_last)
-      store_row_col_max_min_values(row_last, col_last)
+      # Check that the data range is valid and store the max and min values.
+      check_dimensions(row_first, col_first)
+      check_dimensions(row_last,  col_last)
+      store_row_col_max_min_values(row_first, col_first)
+      store_row_col_max_min_values(row_last,  col_last)
 
       # Store the merge range.
       @merge << [row_first, col_first, row_last, col_last]
