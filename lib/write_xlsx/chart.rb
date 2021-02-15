@@ -34,7 +34,7 @@ module Writexlsx
         @writer.empty_tag('c:showOutline',    attributes) if ptrue?(outline)
         @writer.empty_tag('c:showKeys',       attributes) if ptrue?(show_keys)
         # Write the table font.
-        write_tx_pr(nil, font)                            if ptrue?(font)
+        write_tx_pr(font)                                 if ptrue?(font)
       end
     end
 
@@ -783,7 +783,7 @@ module Writexlsx
         elsif @title.formula
           write_title_formula(@title, nil, nil, @title.layout, @title.overlay)
         elsif @title.name
-          write_title_rich(@title, nil, @title.layout, @title.overlay)
+          write_title_rich(@title, nil, @title.name_font, @title.layout, @title.overlay)
         end
 
         # Write the c:plotArea element.
@@ -1204,7 +1204,7 @@ module Writexlsx
         if x_axis.formula
           write_title_formula(x_axis, is_y_axis, @x_axis, x_axis.layout)
         elsif x_axis.name
-          write_title_rich(x_axis, is_y_axis, x_axis.layout)
+          write_title_rich(x_axis, is_y_axis, x_axis.name_font, x_axis.layout)
         end
 
         # Write the c:numFmt element.
@@ -1281,7 +1281,7 @@ module Writexlsx
         if y_axis.formula
           write_title_formula(y_axis, @horiz_val_axis, nil, y_axis.layout)
         elsif y_axis.name
-          write_title_rich(y_axis, @horiz_val_axis, y_axis.layout)
+          write_title_rich(y_axis, @horiz_val_axis, y_axis.name_font, y_axis.layout)
         end
 
         # Write the c:numberFormat element.
@@ -1356,7 +1356,7 @@ module Writexlsx
         if x_axis.formula
           write_title_formula(x_axis, nil, nil, x_axis.layout)
         elsif x_axis.name
-          write_title_rich(x_axis, nil, x_axis.layout)
+          write_title_rich(x_axis, nil, x_axis.name_font, x_axis.layout)
         end
         # Write the c:numFmt element.
         write_number_format(x_axis)
@@ -1693,7 +1693,7 @@ module Writexlsx
         # Write the c:spPr element.
         write_sp_pr(@legend)
         # Write the c:txPr element.
-        write_tx_pr(nil, @legend.font) if ptrue?(@legend.font)
+        write_tx_pr(@legend.font) if ptrue?(@legend.font)
       end
     end
 
@@ -1808,10 +1808,10 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, is_y_axis = nil, layout = nil, overlay = nil) # :nodoc:
+    def write_title_rich(title, is_y_axis, font, layout, overlay = nil) # :nodoc:
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
-        write_tx_rich(title, is_y_axis)
+        write_tx_rich(title, is_y_axis, font)
         # Write the c:layout element.
         write_layout(layout, 'text')
         # Write the c:overlay element.
@@ -1831,15 +1831,18 @@ module Writexlsx
         # Write the c:overlay element.
         write_overlay if overlay
         # Write the c:txPr element.
-        write_tx_pr(is_y_axis, axis ? axis.name_font : title.name_font)
+        write_tx_pr(axis ? axis.name_font : title.name_font, is_y_axis)
       end
     end
 
     #
     # Write the <c:tx> element.
     #
-    def write_tx_rich(title, is_y_axis) # :nodoc:
-      @writer.tag_elements('c:tx') { write_rich(title, is_y_axis) }
+    def write_tx_rich(title, is_y_axis, font) # :nodoc:
+      is_data_label = false
+      @writer.tag_elements('c:tx') do
+        write_rich(title, font, is_y_axis, is_data_label)
+      end
     end
 
     #
@@ -1861,10 +1864,11 @@ module Writexlsx
     #
     # Write the <c:rich> element.
     #
-    def write_rich(title, is_y_axis) # :nodoc:
+    def write_rich(title, font, is_y_axis, is_data_label) # :nodoc:
       rotation = nil
-      if title.name_font && title.name_font[:_rotation]
-        rotation = title.name_font[:_rotation]
+
+      if font && font[:_rotation]
+        rotation = font[:_rotation]
       end
       @writer.tag_elements('c:rich') do
         # Write the a:bodyPr element.
@@ -1872,18 +1876,18 @@ module Writexlsx
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
-        write_a_p_rich(title)
+        write_a_p_rich(title, font, is_data_label)
       end
     end
     #
     # Write the <a:p> element for rich string titles.
     #
-    def write_a_p_rich(title) # :nodoc:
+    def write_a_p_rich(title, font, is_data_label) # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
-        write_a_p_pr_rich(title.name_font)
+        write_a_p_pr_rich(font) if !is_data_label
         # Write the a:r element.
-        write_a_r(title)
+        write_a_r(title, font)
       end
     end
 
@@ -1897,12 +1901,12 @@ module Writexlsx
     #
     # Write the <a:r> element.
     #
-    def write_a_r(title) # :nodoc:
+    def write_a_r(title, font) # :nodoc:
       @writer.tag_elements('a:r') do
         # Write the a:rPr element.
-        write_a_r_pr(title.name_font)
+        write_a_r_pr(font)
         # Write the a:t element.
-        write_a_t(title.name)
+        write_a_t(title.respond_to?(:name) ? title.name : title)
       end
     end
 
@@ -2349,6 +2353,10 @@ module Writexlsx
       return unless labels
 
       @writer.tag_elements('c:dLbls') do
+        # Write the custom c:dLbl elements.
+        if labels[:custom]
+          write_custom_labels(labels, labels[:custom])
+        end
         # Write the c:numFmt element.
         write_data_label_number_format(labels[:num_format]) if labels[:num_format]
         # Write the data label font elements.
@@ -2369,6 +2377,88 @@ module Writexlsx
         write_separator(labels[:separator]) if labels[:separator]
         # Write the c:showLeaderLines element.
         write_show_leader_lines if labels[:leader_lines]
+      end
+    end
+
+    #
+    # Write the <c:dLbl> element.
+    #
+    def write_custom_labels(parent, labels)
+      index  = 0
+
+      labels.each do |label|
+        index += 1
+        next if !ptrue?(label)
+
+        @writer.tag_elements('c:dLbl') do
+          # Write the c:idx element.
+          write_idx(index - 1)
+
+          if label[:delete] && label[:delete]
+            write_delete(1)
+          elsif label[:formula]
+            formula = label[:formula]
+            data_id = label[:data_id]
+            font    = label[:font]
+            write_custom_label_formula(formula, data_id, font)
+
+            write_show_val      if parent[:value]
+            write_show_cat_name if parent[:category]
+            write_show_ser_name if parent[:series_name]
+          elsif label[:value]
+            value = label[:value]
+            font  = label[:font]
+            write_custom_label_str(value, font)
+
+            write_show_val      if parent[:value]
+            write_show_cat_name if parent[:category]
+            write_show_ser_name if parent[:series_name]
+          else
+            font = label[:font]
+            if font
+              @writer.empty_tag('c:spPr')
+              write_tx_pr(font)
+            end
+          end
+        end
+      end
+    end
+
+    #
+    # Write parts of the <c:dLbl> element for strings.
+    #
+    def write_custom_label_str(value, font)
+      is_y_axis     = 0
+      is_data_label = true
+
+      # Write the c:layout element.
+      write_layout()
+
+      @writer.tag_elements('c:tx') do
+        # Write the c:rich element.
+        write_rich(value, font, is_y_axis, is_data_label)
+      end
+    end
+
+    #
+    # Write parts of the <c:dLbl> element for formulas.
+    #
+    def write_custom_label_formula(formula, data_id, font)
+      if data_id
+        data = @formula_data[data_id]
+      end
+
+      # Write the c:layout element.
+      write_layout
+
+      @writer.tag_elements('c:tx') do
+        # Write the c:strRef element.
+        write_str_ref(formula, data, 'str')
+      end
+
+      if font
+        @writer.empty_tag('c:spPr')
+        write_tx_pr(font)
       end
     end
 
@@ -2700,7 +2790,7 @@ module Writexlsx
 
             # Write the a:srgbClr element.
             # TODO: Wait for a feature request to support transparency.
-            write_a_srgb_clr( color );
+            write_a_srgb_clr( color )
           end
         end
       end

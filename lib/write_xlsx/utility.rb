@@ -804,9 +804,9 @@ module Writexlsx
     #
     # Write the <c:txPr> element.
     #
-    def write_tx_pr(is_y_axis, font) # :nodoc:
+    def write_tx_pr(font, is_y_axis = nil) # :nodoc:
       rotation = nil
-      if font && font[:_rotation]
+      if font && font.respond_to?(:[]) && font[:_rotation]
         rotation = font[:_rotation]
       end
       @writer.tag_elements('c:txPr') do
@@ -903,6 +903,7 @@ module Writexlsx
     #
     def get_font_latin_attributes(font)
       return [] unless font
+      return [] unless font.respond_to?(:[])
 
       attributes = []
       attributes << ['typeface', font[:_name]]            if ptrue?(font[:_name])
@@ -959,6 +960,7 @@ module Writexlsx
     #
     def get_font_style_attributes(font)
       return [] unless font
+      return [] unless font.respond_to?(:[])
 
       attributes = []
       attributes << ['sz', font[:_size]]      if ptrue?(font[:_size])

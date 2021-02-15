@@ -300,6 +300,39 @@ module Writexlsx
           labels[:font] = convert_font_args(labels[:font])
         end
 
+        if labels[:custom]
+          # Duplicate, and modify, the custom label properties.
+          custom = []
+
+          labels[:custom].each do |label|
+            if !label
+              custom << nil
+              next
+            end
+
+            property = label.dup
+
+            # Convert formula.
+            if property[:value] && property[:value] =~ /^=[^!]+!\$/
+              property[:formula] = property[:value]
+            end
+
+            if property[:formula]
+              property[:formula] = property[:formula].sub(/^=/, '')
+
+              data_id = @chart.data_id(property[:formula], property[:data])
+              property[:data_id] = data_id
+            end
+
+            if property[:font]
+              property[:font] = convert_font_args(property[:font])
+            end
+
+            custom << property
+          end
+          labels[:custom] = custom
+        end
+
         labels
       end
     end
