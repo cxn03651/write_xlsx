@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2021-02-15 v1.06.0
+
+   Fix for issue where array formulas weren't included in the output file
+   for certain ranges/conditions.
+
+
 2021-02-15 v1.05.0
 
    Added support for custom data labels in charts.
