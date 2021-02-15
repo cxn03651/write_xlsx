@@ -1355,6 +1355,75 @@ The font property is also used to rotate the data labels in a series:
 
 See the [CHART FONTS][] section below.
 
+The `custom` property data label property is used to set the properties of individual data labels, see below.
+
+
+##### <a name="custom_data_labels" class="anchor" href="#custom_data_labels"><span class="octicon octicon-link" /></a>Custom Data Labels
+
+The `custom` property data label property is used to set the properties of individual data labels in a series. The most common use for this is to set custom text or number labels:
+
+    custom_labels = [
+        { :value => 'Jan' },
+        { :value => 'Feb' },
+        { :value => 'Mar' },
+        { :value => 'Apr' },
+        { :value => 'May' },
+        { :value => 'Jun' }
+    ]
+
+    chart.add_series(
+        :categories  => '=Sheet1!$A$2:$A$7',
+        :values      => '=Sheet1!$B$2:$B$7',
+        :data_labels => { :value => 1, :custom => custom_labels }
+    )
+
+As shown in the previous examples th `custom` property should be a list of dicts. Any property dict that is set to `nil` or not included in the list will be assigned the default data label value:
+
+    custom_labels = [
+        nil,
+        { :value => 'Feb' },
+        { :value => 'Mar' },
+        { :value => 'Apr' }
+    ]
+
+The property elements of the `custom` lists should be dicts with the following allowable keys/sub-properties:
+
+    :value
+    :font
+    :delete
+
+The `:value` property should be a string, number or formula string that refers to a cell from which the value will be taken:
+
+    custom_labels = [
+        { :value => '=Sheet1!$C$2' },
+        { :value => '=Sheet1!$C$3' },
+        { :value => '=Sheet1!$C$4' },
+        { :value => '=Sheet1!$C$5' },
+        { :value => '=Sheet1!$C$6' },
+        { :value => '=Sheet1!$C$7' }
+    ]
+
+The `:font` property is used to set the font of the custom data label of a series (See the [CHART FONTS][] section below):
+
+    custom_labels = [
+        { :value => '=Sheet1!$C$1', :font => { :color => 'red' } },
+        { :value => '=Sheet1!$C$2', :font => { :color => 'red' } },
+        { :value => '=Sheet1!$C$2', :font => { :color => 'red' } },
+        { :value => '=Sheet1!$C$4', :font => { :color => 'red' } },
+        { :value => '=Sheet1!$C$5', :font => { :color => 'red' } },
+        { :value => '=Sheet1!$C$6', :font => { :color => 'red' } }
+    ]
+
+The `:delete` property can be used to delete labels in a series. This can be useful if you want to highlight one or more cells in the series, for example the maximum and the minimum:
+
+    custom_labels = [
+        nil,
+        { :delete => 1 },
+        { :delete => 1 },
+        { :delete => 1 },
+        { :delete => 1 },
+        nil
+    ]
 
 ##### <a name="points" class="anchor" href="#points"><span class="octicon octicon-link" /></a>Points
 
