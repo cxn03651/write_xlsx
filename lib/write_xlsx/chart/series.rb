@@ -296,6 +296,40 @@ module Writexlsx
           labels[:separator] = separators[separator]
         end
 
+
+        # Set the line properties for the data labels.
+        line = line_properties( labels[:line] )
+
+        # Allow 'border' as a synonym for 'line'.
+        if labels[:border]
+          line = line_properties(labels[:border])
+        end
+
+        # Set the fill properties for the labels.
+        fill = fill_properties(labels[:fill])
+
+        # Set the pattern properties for the series.
+        pattern = pattern_properties(labels[:pattern])
+
+        # Set the gradient fill properties for the series.
+        gradient = gradient_properties(labels[:gradient])
+
+        # Pattern fill overrides solid fill.
+        if pattern
+          fill = nil
+        end
+
+        # Gradient fill overrides solid and pattern fills.
+        if gradient
+          pattern = nil
+          fill    = nil
+        end
+
+        labels[:line]     = line
+        labels[:fill]     = fill
+        labels[:pattern]  = pattern
+        labels[:gradient] = gradient
+
         if labels[:font]
           labels[:font] = convert_font_args(labels[:font])
         end

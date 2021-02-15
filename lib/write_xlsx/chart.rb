@@ -1975,10 +1975,10 @@ module Writexlsx
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      line     = series.line
-      fill     = series.fill
-      pattern  = series.pattern  if series.respond_to?(:pattern)
-      gradient = series.gradient if series.respond_to?(:gradient)
+      line     = series_property(series, :line)
+      fill     = series_property(series, :fill)
+      pattern  = series_property(series, :pattern)
+      gradient = series_property(series, :gradient)
 
       return if (!line || !ptrue?(line[:_defined])) &&
         (!fill || !ptrue?(fill[:_defined])) && !pattern && !gradient
@@ -2003,6 +2003,14 @@ module Writexlsx
         end
         # Write the a:ln element.
         write_a_ln(line) if line && ptrue?(line[:_defined])
+      end
+    end
+
+    def series_property(object, property)
+      if object.respond_to?(property)
+        object.send(property)
+      elsif object.respond_to?(:[])
+        object[property]
       end
     end
 
@@ -2359,6 +2367,8 @@ module Writexlsx
         end
         # Write the c:numFmt element.
         write_data_label_number_format(labels[:num_format]) if labels[:num_format]
+        # Write the c:spPr element.
+        write_sp_pr(labels)
         # Write the data label font elements.
         write_axis_font(labels[:font]) if labels[:font]
         # Write the c:dLblPos element.
