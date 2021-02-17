@@ -14,12 +14,12 @@ The following methods are available through a new workbook.
 * [add_chart](#add_chart)
 * [add_shape](#add_shape)
 * [add_vba_project](#add_vba_project)
-* [add_vba_name](#add_vba_name)
+* [set_vba_name](#set_vba_name)
 * [close](#close)
 * [set_size](#set_size)
 * [set_tab_ratio](#set_tab_ratio)
 * [set_properties](#set_properties)
-* [set_custom_properties](#set_custom_properties)
+* [set_custom_property](#set_custom_property)
 * [define_name](#define_name)
 * [set_tempdir](#set_tempdir)
 * [set_custom_color](#set_custom_color)
@@ -155,10 +155,10 @@ See the [Chart Documentation][] for a list of available chart subtypes.
 ##### :name
 
 Set the name for the chart sheet.
-The name property is optional and if it isn't supplied will default to Chart1 .. n.
+The name property is optional and if it isn't supplied will default to `Chart1 .. n`.
 The name must be a valid Excel worksheet name.
 See [add_worksheet()](#add_worksheet) for more details on valid sheet names.
-The name property can be omitted for embedded charts.
+The `:name` property can be omitted for embedded charts.
 
     chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
 
@@ -198,7 +198,7 @@ You can either define the properties at creation time via a hash of property val
     # Default rectangle shape. Set properties later.
     rect =  workbook.add_shape
 
-See [Shape](shape.html#shape) for details on how to configure the shape object once it is created.
+See [Shape Documentation](shape.html#shape) for details on how to configure the shape object once it is created.
 
 See also the
 [`shape\*.rb`](examples.html#shape1)
@@ -224,7 +224,7 @@ Macros can be tied to buttons using the worksheet `insert_button()` method
 
     worksheet.insert_button('C2', { :macro => 'my_macro' })
 
-Note, Excel uses the file extension xlsm instead of xlsx for files that contain macros.
+Note, Excel uses the file extension `xlsm` instead of `xlsx` for files that contain macros.
 It is advisable to follow the same convention.
 
 See also the
@@ -232,7 +232,7 @@ See also the
 example file and the ["WORKING WITH VBA MACROS"](working_with_vba_macros.html#working_with_vba_macros).
 
 
-#### <a name="add_vba_name" class="anchor" href="#add_vba_name"><span class="octicon octicon-link" /></a>add_vba_name
+#### <a name="set_vba_name" class="anchor" href="#set_vba_name"><span class="octicon octicon-link" /></a>set_vba_name
 
 The `set_vba_name` method can be used to set the VBA codename for the workbook.
 This is sometimes required when a `vbaProject macro` included via `add_vba_project` refers to the workbook.
@@ -251,7 +251,7 @@ on it such as copying it, reading its size or attaching it to an email.
 
 In general, if you create a file with a size of 0 bytes or you fail to create a file you need to call `close()`.
 
-#### <a name="set_size" class="anchor" href="#set_size"><span class="octicon octicon-link" /></a>set_size
+#### <a name="set_size" class="anchor" href="#set_size"><span class="octicon octicon-link" /></a>set_size( width, height )
 
 The `set_size` method can be used to set the size of a workbook window.
 
@@ -266,7 +266,7 @@ The units are pixels and the default size is 1073 x 644.
 Note, this doesn't equate exactly to the Excel for Mac pixel size
 since it is based on the original Excel 2007 for Windows sizing.
 
-#### <a name="set_tab_ratio" class="anchor" href="#set_tab_ratio"><span class="octicon octicon-link" /></a>set_tab_ratio
+#### <a name="set_tab_ratio" class="anchor" href="#set_tab_ratio"><span class="octicon octicon-link" /></a>set_tab_ratio(tab_ratio)
 
 The `set_tab_ratio()` method can be used to set the ratio between worksheet tabs and the horizontal slider at the bottom of a workbook.
 This can be increased to give more room to the tabs or reduced to increase the size of the horizontal slider:
@@ -277,10 +277,11 @@ The default value in Excel is 60.
 
 #### <a name="set_properties" class="anchor" href="#set_properties"><span class="octicon octicon-link" /></a>set_properties
 
-The `set_properties` method can be used to set the document properties of the Excel file created
-by WriteXLSX. These properties are visible when you use
-the Office Button -> Prepare -> Properties option in Excel
-and are also available to external applications that read or index windows files.
+The `set_properties` method can be used to set the document properties
+of the Excel file created by WriteXLSX. These properties are visible
+when you use the `Office Button -> Prepare -> Properties` option in
+Excel and are also available to external applications that read or
+index Windows files.
 
 The properties should be passed in hash format as follows:
 
@@ -302,16 +303,17 @@ The properties that can be set are:
     :comments
     :status
     :hyperlink_base
+    :created - File create date. Such be an aref of gmtime() values.
 
 See also the
 [`properties.rb`](examples.html#properties)
 program in the examples directory of the distro.
 
-#### <a name="set_custom_properties" class="anchor" href="#set_custom_properties"><span class="octicon octicon-link" /></a>set_custom_properties
+#### <a name="set_custom_property" class="anchor" href="#set_custom_property"><span class="octicon octicon-link" /></a>set_custom_property(name, value, type)
 
-The set_custom_property method can be used to set custom document properties not covered by the set_properties method above. These properties are visible when you use the < Office Button -> Prepare -> Properties -> Advanced Properties -> Custom > option in Excel and are also available to external applications that read or index Windows files.
+The `set_custom_property` method can be used to set one or more custom document properties not covered by the `set_properties` method above. These properties are visible when you use the `Office Button -> Prepare -> Properties -> Advanced Properties -> Custom` option in Excel and are also available to external applications that read or index Windows files.
 
-The set_custom_property method takes 3 parameters:
+The `set_custom_property` method takes 3 parameters:
 
     workbook.set_custom_property(name, value, type)
 
@@ -330,18 +332,18 @@ For example:
     workbook.set_custom_property('Reference',       '1.2345',               'number')
     workbook.set_custom_property('Has review',      1,                      'bool'  )
     workbook.set_custom_property('Has sign off',    0,                      'bool'  )
-    workbook.set_custom_property('Department',      'some_string',          'text'  )
+    workbook.set_custom_property('Department',      some_string,            'text'  )
     workbook.set_custom_property('Scale',           '1.2345678901234',      'number')
 
-Dates should by in ISO8601 <yyyy-mm-ddThh:mm:ss.sssZ> date format in Zulu time, as shown above.
+Dates should by in ISO8601 `yyyy-mm-ddThh:mm:ss.sssZ` date format in Zulu time, as shown above.
 
-The text and number types are optional since they can usually be inferred from the data:
+The `text` and `number` types are optional since they can usually be inferred from the data:
 
     workbook.set_custom_property('Checked by', 'Eve'   )
     workbook.set_custom_property('Reference',  '1.2345')
 
 
-The `name` and `value` (for text types) are limited to 255 characters by Excel.
+The `name` and `value` parameters are limited to 255 characters by Excel.
 
 
 #### <a name="define_name" class="anchor" href="#define_name"><span class="octicon octicon-link" /></a>define_name
@@ -388,9 +390,7 @@ The directory for the temporary file must exist, `set_tempdir()` will not create
 
 #### <a name="set_custom_color" class="anchor" href="#set_custom_color"><span class="octicon octicon-link" /></a>set_custom_color(index, red, green, blue)
 
-The method is maintained for backward compatibility with Writeexcel. WriteXLSX programs don't require this method and colours can be specified using a Html style `#RRGGBB` value, see [/WORKING WITH COLOURS][].
-
-The WriteXLSX  will be extended at a later stage to support the newer, semi-infinite, palette.
+The method is maintained for backward compatibility with Writeexcel. WriteXLSX programs don't require this method and colours can be specified using a Html style `#RRGGBB` value, see [WORKING WITH COLOURS][].
 
 #### <a name="sheets" class="anchor" href="#sheets"><span class="octicon octicon-link" /></a>sheets( 0, 1, ... )
 
@@ -400,7 +400,7 @@ If no arguments are passed the method returns a list of all the worksheets in th
 This is useful if you want to repeat an operation on each worksheet:
 
     workbook.sheets.each do |worksheet|
-      print worksheet.get_name
+      print worksheet.name
     end
 
 You can also specify a slice list to return one or more worksheet objects:
@@ -421,7 +421,7 @@ The following example returns the first and last worksheet in a workbook:
 
 #### <a name="worksheet_by_name" class="anchor" href="#worksheet_by_name"><span class="octicon octicon-link" /></a>worksheet_by_name
 
-The worksheet_by_name function return a worksheet or chartsheet object in the workbook using the sheetname:
+The `worksheet_by_name` function return a worksheet or chartsheet object in the workbook using the sheetname:
 
     worksheet = workbook.worksheet_by_name('Sheet1')
 
@@ -442,21 +442,21 @@ See also [DATES AND TIME IN EXCEL][] for more information about working with Exc
 In general you probably won't need to use `set_1904()`.
 
 
-#### <a name="set_calc_mode" class="anchor" href="#set_calc_mode"><span class="octicon octicon-link" /></a>set_calc_mode()
+#### <a name="set_calc_mode" class="anchor" href="#set_calc_mode"><span class="octicon octicon-link" /></a>set_calc_mode(mode)
 
 +Set the calculation mode for formulas in the workbook. This is mainly of use for workbooks with slow formulas where you want to allow the user to calculate them manually.
 
 The mode parameter can be one of the following strings:
 
-:auto
+`:auto`
 
 The default. Excel will re-calculate formulas when a formula or a value affecting the formula changes.
 
-:manual
+`:manual`
 
 Only re-calculate formulas when the user requires it. Generally by pressing F9.
 
-:auto_except_tables
+`:auto_except_tables`
 
 Excel will automatically re-calculate formulas except for tables.
 
@@ -468,10 +468,8 @@ The `default_url_format()` method gets a copy of the default url format used whe
     url_format = workbook.default_url_format
 
 
-
 [CELL NOTATION]: worksheet.html#cell-notation
 [CELL FORMATTING]: cell_formatting.html#cell_formatting
-[COLOURS IN EXCEL]: colors.html#colors
 [DATA VALIDATION IN EXCEL]: data_validation.html#data_validation
 [DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
 [Chart Documentation]: chart.html#chart
@@ -480,3 +478,4 @@ The `default_url_format()` method gets a copy of the default url format used whe
 [SPARKLINES IN EXCEL]: sparklines.html#sparklines
 [TABLES IN EXCEL]: tables.html#tables
 [insert_chart()]: worksheet.html#insert_chart
+[WORKING WITH COLOURS]: colors.html#colors
