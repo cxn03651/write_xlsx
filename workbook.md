@@ -373,7 +373,7 @@ See the
 program in the examples dir of the distro.
 
 Refer to the following to see Excel's syntax rules for defined names:
-http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names
+[Define and use names in formulas](http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names)
 
 #### <a name="set_tempdir" class="anchor" href="#set_tempdir"><span class="octicon octicon-link" /></a>set_tempdir(tempdir)
 
@@ -444,7 +444,7 @@ In general you probably won't need to use `set_1904()`.
 
 #### <a name="set_calc_mode" class="anchor" href="#set_calc_mode"><span class="octicon octicon-link" /></a>set_calc_mode(mode)
 
-+Set the calculation mode for formulas in the workbook. This is mainly of use for workbooks with slow formulas where you want to allow the user to calculate them manually.
+Set the calculation mode for formulas in the workbook. This is mainly of use for workbooks with slow formulas where you want to allow the user to calculate them manually.
 
 The mode parameter can be one of the following strings:
 
