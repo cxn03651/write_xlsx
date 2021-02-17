@@ -1839,9 +1839,8 @@ module Writexlsx
     # Write the <c:tx> element.
     #
     def write_tx_rich(title, is_y_axis, font) # :nodoc:
-      is_data_label = false
       @writer.tag_elements('c:tx') do
-        write_rich(title, font, is_y_axis, is_data_label)
+        write_rich(title, font, is_y_axis)
       end
     end
 
@@ -1864,7 +1863,7 @@ module Writexlsx
     #
     # Write the <c:rich> element.
     #
-    def write_rich(title, font, is_y_axis, is_data_label) # :nodoc:
+    def write_rich(title, font, is_y_axis, ignore_rich_pr = false) # :nodoc:
       rotation = nil
 
       if font && font[:_rotation]
@@ -1876,16 +1875,16 @@ module Writexlsx
         # Write the a:lstStyle element.
         write_a_lst_style
         # Write the a:p element.
-        write_a_p_rich(title, font, is_data_label)
+        write_a_p_rich(title, font, ignore_rich_pr)
       end
     end
     #
     # Write the <a:p> element for rich string titles.
     #
-    def write_a_p_rich(title, font, is_data_label) # :nodoc:
+    def write_a_p_rich(title, font, ignore_rich_pr) # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
-        write_a_p_pr_rich(font) if !is_data_label
+        write_a_p_pr_rich(font) if !ignore_rich_pr
         # Write the a:r element.
         write_a_r(title, font)
       end
@@ -1971,17 +1970,27 @@ module Writexlsx
       @writer.empty_tag('c:symbol', [ ['val', val] ])
     end
 
+    def has_fill_formatting(element)
+      line     = series_property(element, :line)
+      fill     = series_property(element, :fill)
+      pattern  = series_property(element, :pattern)
+      gradient = series_property(element, :gradient)
+
+      (line && ptrue?(line[:_defined])) ||
+        (fill && ptrue?(fill[:_defined])) || pattern || gradient
+    end
+
+
     #
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
+      return if !has_fill_formatting(series)
+
       line     = series_property(series, :line)
       fill     = series_property(series, :fill)
       pattern  = series_property(series, :pattern)
       gradient = series_property(series, :gradient)
-
-      return if (!line || !ptrue?(line[:_defined])) &&
-        (!fill || !ptrue?(fill[:_defined])) && !pattern && !gradient
 
       @writer.tag_elements('c:spPr') do
         # Write the fill elements for solid charts such as pie/doughnut and bar.
@@ -2407,28 +2416,19 @@ module Writexlsx
           if label[:delete] && label[:delete]
             write_delete(1)
           elsif label[:formula]
-            formula = label[:formula]
-            data_id = label[:data_id]
-            font    = label[:font]
-            write_custom_label_formula(formula, data_id, font)
+            write_custom_label_formula(label)
 
             write_show_val      if parent[:value]
             write_show_cat_name if parent[:category]
             write_show_ser_name if parent[:series_name]
           elsif label[:value]
-            value = label[:value]
-            font  = label[:font]
-            write_custom_label_str(value, font)
+            write_custom_label_str(label)
 
             write_show_val      if parent[:value]
             write_show_cat_name if parent[:category]
             write_show_ser_name if parent[:series_name]
           else
-            font = label[:font]
-            if font
-              @writer.empty_tag('c:spPr')
-              write_tx_pr(font)
-            end
+            write_custom_label_format_only(label)
           end
         end
       end
@@ -2437,23 +2437,31 @@ module Writexlsx
     #
     # Write parts of the <c:dLbl> element for strings.
     #
-    def write_custom_label_str(value, font)
-      is_y_axis     = 0
-      is_data_label = true
+    def write_custom_label_str(label)
+      value          = label[:value]
+      font           = label[:font]
+      is_y_axis      = 0
+      has_formatting = has_fill_formatting(label)
 
       # Write the c:layout element.
       write_layout()
 
       @writer.tag_elements('c:tx') do
         # Write the c:rich element.
-        write_rich(value, font, is_y_axis, is_data_label)
+        write_rich(value, font, is_y_axis, !has_formatting)
       end
+
+      # Write the c:cpPr element.
+      write_sp_pr(label)
     end
 
     #
     # Write parts of the <c:dLbl> element for formulas.
     #
-    def write_custom_label_formula(formula, data_id, font)
+    def write_custom_label_formula(label)
+      formula = label[:formula]
+      data_id = label[:data_id]
+
       if data_id
         data = @formula_data[data_id]
       end
@@ -2466,7 +2474,23 @@ module Writexlsx
         write_str_ref(formula, data, 'str')
       end
 
-      if font
+      # Write the data label formatting, if any.
+      write_custom_label_format_only(label)
+    end
+
+    #
+    # Write parts of the <c:dLbl> element for labels where only the formatting has
+    # changed.
+    #
+    def write_custom_label_format_only(label)
+      font           = label[:font]
+      has_formatting = has_fill_formatting(label)
+
+      if has_formatting
+        # Write the c:spPr element.
+        write_sp_pr(label)
+        write_tx_pr(font)
+      elsif font
         @writer.empty_tag('c:spPr')
         write_tx_pr(font)
       end

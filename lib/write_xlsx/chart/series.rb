@@ -308,10 +308,10 @@ module Writexlsx
         # Set the fill properties for the labels.
         fill = fill_properties(labels[:fill])
 
-        # Set the pattern properties for the series.
+        # Set the pattern properties for the labels.
         pattern = pattern_properties(labels[:pattern])
 
-        # Set the gradient fill properties for the series.
+        # Set the gradient fill properties for the labels.
         gradient = gradient_properties(labels[:gradient])
 
         # Pattern fill overrides solid fill.
@@ -361,6 +361,39 @@ module Writexlsx
             if property[:font]
               property[:font] = convert_font_args(property[:font])
             end
+
+            # Allow 'border' as a synonym for 'line'.
+            if property[:border]
+              line = line_properties(property[:border])
+            else
+              # Set the line properties for the data labels.
+              line = line_properties(property[:line])
+            end
+
+            # Set the fill properties for the labels.
+            fill = fill_properties(property[:fill])
+
+            # Set the pattern properties for the labels.
+            pattern = pattern_properties(property[:pattern])
+
+            # Set the gradient fill properties for the labels.
+            gradient = gradient_properties(property[:gradient])
+
+            # Pattern fill overrides solid fill.
+            if pattern
+              fill = nil
+            end
+
+            # Gradient fill overrides solid and pattern fills.
+            if gradient
+              pattern = nil
+              fill    = nil
+            end
+
+            property[:line]     = line
+            property[:fill]     = fill
+            property[:pattern]  = pattern
+            property[:gradient] = gradient
 
             custom << property
           end
