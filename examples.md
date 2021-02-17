@@ -70,6 +70,10 @@ A demo of line chart with a secondary axis.
 A demo of stock style charts.
 ![Output from chart_stock.rb](images/examples/chart_stock.jpg)
 
+#### <a name="chart_data_labels" class="anchor" href="#chart_data_labels"><span class="octicon octicon-link" /></a>chart_data_labels
+A demo of an various Excel chart data label features.
+![Output from chart_data_labels.rb](images/examples/chart_data_labels.png)
+
 #### <a name="chart_data_table" class="anchor" href="#chart_data_table"><span class="octicon octicon-link" /></a>chart_data_table
 A demo of a chart with a data table on the axis.
 ![Output from chart_data_table.rb](images/examples/chart_data_table.jpg)

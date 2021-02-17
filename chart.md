@@ -1218,7 +1218,7 @@ The options are 1 (the default) or 0 (for no end cap):
 Data labels can be added to a chart series to indicate the values of the plotted
 data points.
 
-The following properties can be set for data_labels formats in a chart.
+The following properties can be set for `:data_labels` formats in a chart.
 
     :value
     :category
@@ -1230,6 +1230,11 @@ The following properties can be set for data_labels formats in a chart.
     :legend_key
     :num_format
     :font
+    :border
+    :fill
+    :pattern
+    :gradient
+    :custom
 
 The value property turns on the Value data label for a series.
 
@@ -1276,7 +1281,7 @@ In Excel the data label positions vary for different chart types. The allowable 
 
 Note: The * indicates the default position for each chart type in Excel, if a position isn't specified.
 
-The percentage property is used to turn on the display of data labels as
+The `:percentage` property is used to turn on the display of data labels as
 a Percentage for a series. It is mainly used for pie and doughnut charts.
 
     chart.add_series(
@@ -1284,7 +1289,7 @@ a Percentage for a series. It is mainly used for pie and doughnut charts.
         :data_labels => { :percentage => 1 }
     )
 
-The leader_lines property is used to turn on Leader Lines for the data label for a series. It is mainly used for pie charts.
+The `:leader_lines` property is used to turn on Leader Lines for the data label for a series. It is mainly used for pie charts.
 
     chart.add_series(
         :values      => '=Sheet1!$B$1:$B$5',
@@ -1297,7 +1302,7 @@ Due to an Excel limitation (or design) leader lines only appear if the data
 label is moved manually or if the data labels are very close and need to be
 adjusted automatically.
 
-The separator property is used to change the separator between multiple data label items:
+The `:separator` property is used to change the separator between multiple data label items:
 
     chart.add_series(
         :values      => '=Sheet1!$B$1:$B$5',
@@ -1305,7 +1310,7 @@ The separator property is used to change the separator between multiple data lab
         :data_labels => { :value => 1, :category => 1, :separator => "\n" }
     )
 
-The separator value must be one of the following strings:
+The `:separator` value must be one of the following strings:
 
             ','
             ';'
@@ -1313,7 +1318,7 @@ The separator value must be one of the following strings:
             "\n"
             ' '
 
-The legend_key property is used to turn on Legend Key for the data label for a series:
+The `:legend_key` property is used to turn on Legend Key for the data label for a series:
 
     chart.add_series(
         :values      => '=Sheet1!$B$1:$B$5',
@@ -1321,7 +1326,7 @@ The legend_key property is used to turn on Legend Key for the data label for a s
     )
 
 
-The num_format property is used to set the number format for the data labels.
+The `:num_format` property is used to set the number format for the data labels.
 
     chart.add_series(
         :values      => '=Sheet1!$A$1:$A$5',
@@ -1333,7 +1338,7 @@ format index cannot be used.
 The explicit format string must be used as shown above.
 
 
-The font property is used to set the font properties of the data labels in a series:
+The `:font` property is used to set the font properties of the data labels in a series:
 
     chart.add_series(
         :values      => '=Sheet1!$A$1:$A$5',
@@ -1343,7 +1348,7 @@ The font property is used to set the font properties of the data labels in a ser
         }
     )
 
-The font property is also used to rotate the data labels in a series:
+The `:font` property is also used to rotate the data labels in a series:
 
     chart.add_series(
         :values      => '=Sheet1!$A$1:$A$5',
@@ -1355,8 +1360,25 @@ The font property is also used to rotate the data labels in a series:
 
 See the [CHART FONTS][] section below.
 
-The `custom` property data label property is used to set the properties of individual data labels, see below.
+The `:custom` property sets the `:border` properties of the data labels such as colour and style. See the [CHART FORMATTING][] section below.
 
+The `:fill` property sets the fill properties of the data labels such as colour. See the [CHART FORMATTING][] section below.
+
+Example of setting data label formatting:
+
+    chart.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7',
+      :data_labels => { :value  => 1,
+                        :border => {:color => 'red'},
+                        :fill   => {:color => 'yellow'} }
+    )
+
+The `:pattern` property sets the pattern properties of the data labels. See the [CHART FORMATTING][] section below.
+
+The `:gradient` property sets the gradient properties of the data labels. See the [CHART FORMATTING][] section below.
+
+The `:custom` property is used to set the properties of individual data labels, see below.
 
 ##### <a name="custom_data_labels" class="anchor" href="#custom_data_labels"><span class="octicon octicon-link" /></a>Custom Data Labels
 
@@ -1390,6 +1412,10 @@ The property elements of the `custom` lists should be dicts with the following a
 
     :value
     :font
+    :border
+    :fill
+    :pattern
+    :gradient
     :delete
 
 The `:value` property should be a string, number or formula string that refers to a cell from which the value will be taken:
@@ -1413,6 +1439,25 @@ The `:font` property is used to set the font of the custom data label of a serie
         { :value => '=Sheet1!$C$5', :font => { :color => 'red' } },
         { :value => '=Sheet1!$C$6', :font => { :color => 'red' } }
     ]
+
+The `:border` property sets the border properties of the data labels such as colour and style. See the [CHART FORMATTING][] section below.
+
+The `:fill` property sets the fill properties of the data labels such as colour. See the [CHART FORMATTING][] section below.
+
+Example of setting custom data label formatting:
+
+    custom_labels = [
+        { :value => 'Jan', :border => {:color => 'blue'} },
+        { :value => 'Feb' },
+        { :value => 'Mar' },
+        { :value => 'Apr' },
+        { :value => 'May' },
+        { :value => 'Jun', :fill   => {:color => 'green'} }
+    ]
+
+The `pattern` property sets the pattern properties of the data labels. See the [CHART FORMATTING][] section below.
+
+The `:gradient` property sets the gradient properties of the data labels. See the [CHART FORMATTING][] section below.
 
 The `:delete` property can be used to delete labels in a series. This can be useful if you want to highlight one or more cells in the series, for example the maximum and the minimum:
 
