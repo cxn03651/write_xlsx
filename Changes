@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2021-02-17 v1.07.0
+
+   Added support for Border, Fill, Pattern and Gradient formatting to chart
+   data labels and chart custom data labels.
+
+
 2021-02-15 v1.06.0
 
    Fix for issue where array formulas weren't included in the output file
