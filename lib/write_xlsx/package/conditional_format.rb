@@ -696,7 +696,7 @@ module Writexlsx
 
           # Ensure we don't set user properties for lowest icon.
           max_data = user_props.size
-          max_data = total_icons -1 if max_data >= total_icons
+          max_data = total_icons - 1 if max_data >= total_icons
 
           (0..max_data - 1).each do |i|
             # Set the user defined 'value' property.
