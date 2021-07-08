@@ -1,6 +1,6 @@
 # write_xlsx
 
-[![Gem Version](https://badge.fury.io/rb/write_xlsx.png)](http://badge.fury.io/rb/write_xlsx)
+[![Gem Version](https://img.shields.io/gem/v/write_xlsx.svg)](https://rubygems.org/gems/write_xlsx)
 [![Build Status](https://travis-ci.org/cxn03651/write_xlsx.svg?branch=master)](https://travis-ci.org/cxn03651/write_xlsx)
 
 gem to create a new file in the Excel 2007+ XLSX format, and you can use the
