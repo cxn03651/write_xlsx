@@ -1209,13 +1209,9 @@ module Writexlsx
     # distribution.
     #
     def set_header(string = '', margin = 0.3, options = {})
-      raise 'Header string must be less than 255 characters' if string.length >= 255
+      raise 'Header string must be less than 255 characters' if string.length > 255
       # Replace the Excel placeholder &[Picture] with the internal &G.
       @page_setup.header = string.gsub(/&\[Picture\]/, '&G')
-
-      if string.size >= 255
-        raise 'Header string must be less than 255 characters'
-      end
 
       if options[:align_with_margins]
         @page_setup.header_footer_aligns = options[:align_with_margins]
@@ -1257,16 +1253,12 @@ module Writexlsx
     # The syntax of the set_footer() method is the same as set_header()
     #
     def set_footer(string = '', margin = 0.3, options = {})
-      raise 'Footer string must be less than 255 characters' if string.length >= 255
+      raise 'Footer string must be less than 255 characters' if string.length > 255
 
       @page_setup.footer                = string.dup
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
       @page_setup.footer = string.gsub(/&\[Picture\]/, '&G')
-
-      if string.size >= 255
-        raise 'Header string must be less than 255 characters'
-      end
 
       if options[:align_with_margins]
         @page_setup.header_footer_aligns = options[:align_with_margins]
