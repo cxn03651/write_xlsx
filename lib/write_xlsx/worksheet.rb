@@ -381,6 +381,7 @@ module Writexlsx
       @comments = Package::Comments.new(self)
       @buttons_array          = []
       @header_images_array    = []
+      @ignore_errors          = nil
 
       @validations = []
 
@@ -427,6 +428,7 @@ module Writexlsx
           write_header_footer
           write_row_breaks
           write_col_breaks
+          write_ignored_errors
           write_drawings
           write_legacy_drawing
           write_legacy_drawing_hf
@@ -6068,6 +6070,30 @@ module Writexlsx
       end
     end
 
+    #
+    # Ignore worksheet errors/warnings in user defined ranges.
+    #
+    def ignore_errors(ignores)
+      # List of valid input parameters.
+      valid_parameter_keys = [
+        :number_stored_as_text,
+        :eval_error,
+        :formula_differs,
+        :formula_range,
+        :formula_unlocked,
+        :empty_cell_reference,
+        :list_data_validation,
+        :calculated_column,
+        :two_digit_text_year
+      ]
+
+      unless (ignores.keys - valid_parameter_keys).empty?
+        raise "Unknown parameter '#{ignores.key - valid_parameter_keys}' in ignore_errors()."
+      end
+
+      @ignore_errors = ignores
+    end
+
     def write_ext(url)
       attributes = [
         ['xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main"],
@@ -8087,6 +8113,45 @@ EOS
         raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
       end
       col
+    end
+
+    #
+    # Write the <ignoredErrors> element.
+    #
+    def write_ignored_errors
+      return unless @ignore_errors
+
+      ignore = @ignore_errors
+
+      @writer.tag_elements('ignoredErrors' ) do
+        {
+          :number_stored_as_text => 'numberStoredAsText',
+          :eval_error            => 'evalError',
+          :formula_differs       => 'formula',
+          :formula_range         => 'formulaRange',
+          :formula_unlocked      => 'unlockedFormula',
+          :empty_cell_reference  => 'emptyCellReference',
+          :list_data_validation  => 'listDataValidation',
+          :calculated_column     => 'calculatedColumn',
+          :two_digit_text_year   => 'twoDigitTextYear'
+        }.each do |key, value|
+          if ignore[key]
+            write_ignored_error(value, ignore[key])
+          end
+        end
+      end
+    end
+
+    #
+    # Write the <ignoredError> element.
+    #
+    def write_ignored_error(type, sqref)
+      attributes = {
+        'sqref' => sqref,
+        type    => 1
+      }
+
+      @writer.empty_tag('ignoredError', attributes)
     end
   end
 end
