@@ -189,6 +189,14 @@ module Writexlsx
         param[:header_row]  ||= 1
         param[:autofilter]  ||= 1
 
+        # Check that there are enough rows.
+        num_rows = row2 - row1
+        num_rows -= 1 if ptrue?(param[:header_row])
+
+        if num_rows < 0
+          raise "Must have at least one data row in in add_table()"
+        end
+
         # If the header row if off the default is to turn autofilter off.
         param[:autofilter] = 0 if param[:header_row] == 0
 
