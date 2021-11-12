@@ -6523,10 +6523,19 @@ module Writexlsx
           target = escape_url(url)
         end
         if url =~ /^external:/
-          target = escape_url(url.sub(/^external:/, 'file:///'))
+          target = escape_url(url.sub(/^external:/, ''))
+
           # Additional escape not required in worksheet hyperlinks
           target = target.gsub(/#/, '%23')
+
+          # Prefix absolute paths (not relative) with file:///
+          if target =~ /^\w:/ || target =~ /^\\\\/
+            target = "file:///#{target}"
+          else
+            target = target.gsub(/\\/, '/')
+          end
         end
+
         if url =~ /^internal:/
           target      = url.sub(/^internal:/, '#')
           target_mode = nil
