@@ -138,12 +138,7 @@ module Writexlsx
           row_first, row_last = row_last, row_first if row_first > row_last
           col_first, col_last = col_last, col_first if col_first > col_last
 
-          # If the first and last cell are the same write a single cell.
-          if row_first == row_last && col_first == col_last
-            sqref += xl_rowcol_to_cell(row_first, col_first)
-          else
-            sqref += xl_range(row_first, row_last, col_first, col_last)
-          end
+          sqref += xl_range(row_first, row_last, col_first, col_last)
         end
 
         if @validate != 'none'

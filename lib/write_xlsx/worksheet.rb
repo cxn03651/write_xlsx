@@ -818,12 +818,7 @@ module Writexlsx
         row_first, row_last = row_last, row_first if row_first > row_last
         col_first, col_last = col_last, col_first if col_first > col_last
 
-        # If the first and last cell are the same write a single cell.
-        if row_first == row_last && col_first == col_last
-          sqref = active_cell
-        else
-          sqref = xl_range(row_first, row_last, col_first, col_last)
-        end
+        sqref = xl_range(row_first, row_last, col_first, col_last)
       else          # Single cell selection.
         sqref = active_cell
       end

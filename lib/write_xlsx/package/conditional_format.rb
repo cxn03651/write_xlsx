@@ -397,14 +397,8 @@ module Writexlsx
       def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
         row1, row2, col1, col2, user_range, param =
                                             row_col_param_for_conditional_formatting(*args)
-        # If the first and last cell are the same write a single cell.
-        if row1 == row2 && col1 == col2
-          range = xl_rowcol_to_cell(row1, col1)
-          @start_cell = range
-        else
-          range = xl_range(row1, row2, col1, col2)
-          @start_cell = xl_rowcol_to_cell(row1, col1)
-        end
+        range       = xl_range(row1, row2, col1, col2)
+        @start_cell = xl_rowcol_to_cell(row1, col1)
 
         # Override with user defined multiple range if provided.
         range = user_range if user_range

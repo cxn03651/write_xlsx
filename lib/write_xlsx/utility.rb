@@ -60,7 +60,11 @@ module Writexlsx
       range1 = xl_rowcol_to_cell(row_1, col_1, row_abs_1, col_abs_1)
       range2 = xl_rowcol_to_cell(row_2, col_2, row_abs_2, col_abs_2)
 
-      "#{range1}:#{range2}"
+      if range1 == range2
+        range1
+      else
+        "#{range1}:#{range2}"
+      end
     end
 
     def xl_range_formula(sheetname, row_1, row_2, col_1, col_2)
