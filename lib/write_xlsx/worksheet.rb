@@ -388,6 +388,9 @@ module Writexlsx
       @data_bars_2010 = []
       @dxf_priority   = 1
 
+      @protected_ranges     = []
+      @num_protected_ranges = 0
+
       if excel2003_style?
         @original_row_height      = 12.75
         @default_row_height       = 12.75
@@ -414,6 +417,7 @@ module Writexlsx
           write_cols
           write_sheet_data
           write_sheet_protection
+          write_protected_ranges
           # write_sheet_calc_pr
           write_phonetic_pr if excel2003_style?
           write_auto_filter
@@ -616,7 +620,25 @@ module Writexlsx
 
       # Set the password after the user defined values.
       @protect[:password] =
-        sprintf("%X", encode_password(password)) if password && password != ''
+        encode_password(password) if password && password != ''
+    end
+
+    #
+    # Unprotect ranges within a protected worksheet.
+    #
+    def unprotect_range(range, range_name = nil, password = nil)
+      if range.nil?
+        raise "The range must be defined in unprotect_range())\n"
+      else
+        range.gsub!(/\$/, "")
+        range.sub!(/^=/, "")
+        @num_protected_ranges += 1
+      end
+
+      range_name ||= "Range#{@num_protected_ranges}"
+      password   &&= encode_password(password)
+
+      @protected_ranges << [range, range_name, password]
     end
 
     def protect_default_settings  # :nodoc:
@@ -6736,6 +6758,8 @@ EOS
       chars.each { |c| encoded_password ^= c }
       encoded_password ^= count
       encoded_password ^= 0xCE4B
+
+      sprintf("%X", encoded_password)
     end
 
     #
@@ -7549,6 +7573,32 @@ EOS
       attributes << ["selectUnlockedCells", 1] unless ptrue?(@protect[:select_unlocked_cells])
 
       @writer.empty_tag('sheetProtection', attributes)
+    end
+
+    #
+    # Write the <protectedRanges> element.
+    #
+    def write_protected_ranges
+      return if @num_protected_ranges == 0
+
+      @writer.tag_elements('protectedRanges') do
+        @protected_ranges.each do |protected_range|
+          write_protected_range(*protected_range)
+        end
+      end
+    end
+
+    #
+    # Write the <protectedRange> element.
+    #
+    def write_protected_range(sqref, name, password)
+      attributes = []
+
+      attributes << ['password', password] if password
+      attributes << ['sqref',    sqref]
+      attributes << ['name',     name]
+
+      @writer.empty_tag('protectedRange', attributes)
     end
 
     #
