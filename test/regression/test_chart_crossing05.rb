@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 require 'helper'
 
-class TestRegressionChartCrossing01 < Minitest::Test
+class TestRegressionChartCrossing05 < Minitest::Test
   def setup
     setup_dir_var
   end
@@ -10,14 +10,14 @@ class TestRegressionChartCrossing01 < Minitest::Test
     @tempfile.close(true)
   end
 
-  def test_chart_crossing01
-    @xlsx = 'chart_crossing01.xlsx'
+  def test_chart_crossing05
+    @xlsx = 'chart_crossing05.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(:type => 'column', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [43812352, 43814272])
+    chart.instance_variable_set(:@axis_ids, [55948032, 55950336])
 
     data = [
             [1, 2, 3,  4,  5],
@@ -31,10 +31,7 @@ class TestRegressionChartCrossing01 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$B$1:$B$5')
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
-    chart.set_y_axis(:crossing => 'max')
-
-    # Not strictly required. Just to match reference file.
-    chart.set_x_axis(:position => 't')
+    chart.set_x_axis(:crossing => 'min')
 
     worksheet.insert_chart('E9', chart)
 

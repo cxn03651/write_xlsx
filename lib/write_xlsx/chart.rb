@@ -1397,7 +1397,7 @@ module Writexlsx
 
     def write_crossing(crossing)
       # Note, the category crossing comes from the value axis.
-      if nil_or_max?(crossing)
+      if [nil, 'max', 'min'].include?(crossing)
         # Write the c:crosses element.
         write_crosses(crossing)
       else
@@ -2927,10 +2927,6 @@ module Writexlsx
       else
         @writer.empty_tag(tag)
       end
-    end
-
-    def nil_or_max?(val)  # :nodoc:
-      val.nil? || val == 'max'
     end
   end
 end
