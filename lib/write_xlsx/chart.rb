@@ -2418,12 +2418,14 @@ module Writexlsx
           elsif label[:formula]
             write_custom_label_formula(label)
 
+            write_d_lbl_pos(parent[:position]) if parent[:position]
             write_show_val      if parent[:value]
             write_show_cat_name if parent[:category]
             write_show_ser_name if parent[:series_name]
           elsif label[:value]
             write_custom_label_str(label)
 
+            write_d_lbl_pos(parent[:position]) if parent[:position]
             write_show_val      if parent[:value]
             write_show_cat_name if parent[:category]
             write_show_ser_name if parent[:series_name]
