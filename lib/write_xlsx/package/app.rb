@@ -7,6 +7,7 @@ module Writexlsx
     class App
 
       include Writexlsx::Utility
+      attr_writer :doc_security
 
       def initialize(workbook)
         @writer = Package::XMLWriterSimple.new
@@ -14,6 +15,7 @@ module Writexlsx
         @part_names    = []
         @heading_pairs = []
         @properties    = {}
+        @doc_security  = 0
       end
 
       def set_xml_writer(filename)
@@ -123,9 +125,7 @@ module Writexlsx
       # Write the <DocSecurity> element.
       #
       def write_doc_security
-        data = 0
-
-        @writer.data_element('DocSecurity', data)
+        @writer.data_element('DocSecurity', @doc_security)
       end
 
       #

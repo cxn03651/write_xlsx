@@ -155,6 +155,7 @@ module Writexlsx
         app.add_named_ranges_parts
 
         app.set_properties(@workbook.doc_properties)
+        app.doc_security = @workbook.read_only
 
         FileUtils.mkdir_p("#{@package_dir}/docProps")
         app.set_xml_writer("#{@package_dir}/docProps/app.xml")

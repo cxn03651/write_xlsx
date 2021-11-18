@@ -52,6 +52,7 @@ module Writexlsx
     attr_reader :max_url_length # :nodoc:
     attr_reader :strings_to_urls # :nodoc:
     attr_reader :default_url_format # :nodoc:
+    attr_reader :read_only # :nodoc:
 
     #
     # A new Excel workbook is created using the +new+ constructor
@@ -133,6 +134,7 @@ module Writexlsx
 
       @max_url_length      = 2079
       @has_comments        = false
+      @read_only           = 0
       if options[:max_url_length]
         @max_url_length = options[:max_url_length]
 
@@ -291,6 +293,9 @@ module Writexlsx
 
           # Write the XLSX file version.
           write_file_version
+
+          # Write the fileSharing element.
+          write_file_sharing
 
           # Write the workbook properties.
           write_workbook_pr
@@ -955,6 +960,13 @@ module Writexlsx
     end
 
     #
+    # Set the Excel "Read-only recommended" save option.
+    #
+    def read_only_recommended
+      @read_only = 2
+    end
+
+    #
     # set_calc_mode()
     #
     # Set the Excel caclcuation mode for the workbook.
@@ -1309,6 +1321,17 @@ module Writexlsx
       end
 
       @writer.empty_tag('fileVersion', attributes)
+    end
+
+    #
+    # Write the <fileSharing> element.
+    #
+    def write_file_sharing
+      return if !ptrue?(@read_only)
+
+      attributes = []
+      attributes << ['readOnlyRecommended', 1]
+      @writer.empty_tag('fileSharing', attributes)
     end
 
     def write_workbook_pr #:nodoc:
