@@ -253,9 +253,20 @@ module Writexlsx
       # Write the <fill> element.
       #
       def write_fill(format, dxf_format = nil)
-        @writer.tag_elements('fill' ) do
-          write_fill_base(format, dxf_format)
+        # Special handling for pattern only case.
+        if pattern_only_case?(format, dxf_format)
+          write_default_fill(PATTERNS[format.pattern])
+        else
+          @writer.tag_elements('fill' ) do
+            write_fill_base(format, dxf_format)
+          end
         end
+      end
+
+      def pattern_only_case?(format, dxf_format)
+        bg_color, fg_color = bg_and_fg_color(format, dxf_format)
+
+        !ptrue?(fg_color) && !ptrue?(bg_color) && ptrue?(format.pattern)
       end
 
       def write_fill_base(format, dxf_format)
@@ -281,7 +292,9 @@ module Writexlsx
         if bg_color && bg_color != 0
           @writer.empty_tag('bgColor', [ ['rgb', palette_color(bg_color)] ])
         else
-          @writer.empty_tag('bgColor', [ ['indexed', 64] ]) if !dxf_format
+          if !dxf_format && format.pattern <= 1
+            @writer.empty_tag('bgColor', [ ['indexed', 64] ])
+          end
         end
       end
 
