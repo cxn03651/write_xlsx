@@ -3065,14 +3065,15 @@ module Writexlsx
 
       if options.first.class == Hash
         # Newer hash bashed options
-        params = options.first
-        x_offset = params[:x_offset]
-        y_offset = params[:y_offset]
-        x_scale  = params[:x_scale]
-        y_scale  = params[:y_scale]
-        anchor   = params[:object_position]
-        url      = params[:url]
-        tip      = params[:tip]
+        params      = options.first
+        x_offset    = params[:x_offset]
+        y_offset    = params[:y_offset]
+        x_scale     = params[:x_scale]
+        y_scale     = params[:y_scale]
+        anchor      = params[:object_position]
+        url         = params[:url]
+        tip         = params[:tip]
+        description = params[:description]
       else
         x_offset, y_offset, x_scale, y_scale, anchor = options
       end
@@ -3084,7 +3085,7 @@ module Writexlsx
 
       @images << [
         row, col, image, x_offset, y_offset,
-        x_scale, y_scale, url, tip, anchor
+        x_scale, y_scale, url, tip, anchor, description
       ]
     end
 
@@ -6487,7 +6488,7 @@ module Writexlsx
       drawing_type = 2
 
       row, col, image, x_offset, y_offset,
-      x_scale, y_scale, url, tip, anchor = @images[index]
+      x_scale, y_scale, url, tip, anchor, description = @images[index]
 
       width  *= x_scale
       height *= y_scale
@@ -6514,6 +6515,10 @@ module Writexlsx
         drawings = @drawings
       end
       drawings.add_drawing_object(drawing)
+
+      if description
+        drawing.description = description
+      end
 
       if url
         rel_type = '/hyperlink'

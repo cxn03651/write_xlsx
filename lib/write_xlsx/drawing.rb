@@ -293,7 +293,7 @@ module Writexlsx
       ]
 
       # Add description attribute for images.
-      attributes << ['descr', description] if description
+      attributes << ['descr', description] if ptrue?(description)
 
       if ptrue?(url_rel_index)
         @writer.tag_elements('xdr:cNvPr', attributes) do
