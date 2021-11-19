@@ -44,6 +44,7 @@ The following methods are available through a new worksheet:
 * [hide](#hide)
 * [set_first_sheet](#set_first_sheet)
 * [protect](#protect)
+* [unprotect_range](#unprotect_range)
 * [set_selection](#set_selection)
 * [set_row](#set_row)
 * [set_default_row](#set_default_row)
@@ -60,6 +61,7 @@ The following methods are available through a new worksheet:
 * [autofilter](#autofilter)
 * [filter_column](#filter_column)
 * [filter_column_list](#filter_column_list)
+* [ignore_errors](#ignore_errors)
 
 #### <a name="cell-notation" class="anchor" href="#cell-notation"><span class="octicon octicon-link" /></a>CELL NOTATION
 
@@ -872,10 +874,12 @@ The `options` parameter can be used to set various options for the image. The de
       :y_scale         => 1,
       :object_position => 2,
       :url             => nil,
-      :tip             => nil
+      :tip             => nil,
+      :description     => filename,
+      :decorative      => 0
     }
 
-The parameters `:x_offset` and `:y_offset` can be used to specified by `row` and `col`. The offset values are in pixels.
+The parameters `:x_offset` and `:y_offset` can be used to specify an offset from the top left hand corner of the cell specified by `row` and `col`. The offset values are in pixels.
 
     worksheet1.insert_image('A1', 'ruby.bmp', :x_offset => 32, :y_offset => 10)
 
@@ -913,6 +917,17 @@ The `:tip` option can be use to used to add a mouseover tip to the hyperlink:
         :url => 'https://github.com/jmcnamara',
         :tip => 'GitHub'
     )
+
+The `:description` parameter can be used to specify a description or "alt text" string for the image. In general this would be used to provide a text description of the image to help accessibility. It is an optional parameter and defaults to the filename of the image. It can be used as follows:
+
+    worksheet.insert_image(
+      'E9', 'logo.png',
+      :description => "This is some alternative text"
+    )
+
+The optional `decorative` parameter is also used to help accessibility. It is used to mark the image as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the `description` field isn't written. It is used as follows:
+
+    worksheet.insert_image('E9', 'logo.png', :decorative => 1 )
 
 Note: you must call `set_row()` or `set_column()` before `insert_image()`
 if you wish to change the default dimensions of any of the rows or columns
@@ -1319,6 +1334,19 @@ with any or all of the following keys:
 The default boolean values are shown above. Individual elements can be protected as follows:
 
     worksheet.protect('drowssap', :insert_rows => 1)
+
+#### <a name="unprotect_range" class="anchor" href="#unprotect_range"><span class="octicon octicon-link" /></a>unprotect_range(cell_range, range_name)
+
+The `unprotect_range()` method is used to unprotect ranges in a protected worksheet. It can be used to set a single range or multiple ranges:
+
+    worksheet.unprotect_range('A1')
+    worksheet.unprotect_range('C1')
+    worksheet.unprotect_range('E1:E3')
+    worksheet.unprotect_range('G1:K100')
+
+As in Excel the ranges are given sequential names like `Range1` and `Range2` but a user defined name can also be specified:
+
+    worksheet.unprotect_range('G4:I6', 'MyRange')
 
 #### <a name="set_selection" class="anchor" href="#set_selection"><span class="octicon octicon-link" /></a>set_selection(first_row, first_col, last_row, last_col)
 
@@ -1849,6 +1877,9 @@ See the
 [`autofilter.rb`](examples.html#autofilter)
 program in the examples directory of the distro for an example.
 
+
+
+
 #### <a name="convert_date_time" class="anchor" href="#convert_date_time"><span class="octicon octicon-link" /></a>convert_date_time(date_string)
 
 The `convert_date_time()` method is used internally by the `write_date_time()`
@@ -1857,6 +1888,56 @@ method to convert date strings to a number that represents an Excel date and tim
 It is exposed as a public method for utility purposes.
 
 The `date_string` format is detailed in the `write_date_time()` method.
+
+
+#### <a name="ignore_errors" class="anchor" href="#ignore_errors"><span class="octicon octicon-link" /></a>ignore_errors)
+
+The `ignore_errors()` method can be used to ignore various worksheet cell errors/warnings. For example the following code writes a string that looks like a number:
+
+    worksheet.write_string('D2', '123')
+
+This causes Excel to display a small green triangle in the top left hand corner of the cell to indicate an error/warning.
+
+Sometimes these warnings are useful indicators that there is an issue in the spreadsheet but sometimes it is preferable to turn them off. Warnings can be turned off at the Excel level for all workbooks and worksheets by using the using "Excel options -> Formulas -> Error checking rules". Alternatively you can turn them off for individual cells in a worksheet, or ranges of cells, using the `ignore_errors()` method with a hashref of options and ranges like this:
+
+    worksheet.ignore_errors(:number_stored_as_text => 'A1:H50')
+
+    # Or for more than one option:
+    worksheet.ignore_errors(:number_stored_as_text => 'A1:H50',
+                            :eval_error            => 'A1:H50')
+
+The range can be a single cell, a range of cells, or multiple cells and ranges separated by spaces:
+
+    # Single cell.
+    worksheet.ignore_errors(:eval_error => 'C6')
+
+    # Or a single range:
+    worksheet.ignore_errors(:eval_error => 'C6:G8')
+
+    # Or multiple cells and ranges:
+    worksheet.ignore_errors(:eval_error => 'C6 E6 G1:G20 J2:J6')
+
+Note: calling `ignore_errors` multiple times will overwrite the previous settings.
+
+You can turn off warnings for an entire column by specifying the range from the first cell in the column to the last cell in the column:
+
+    worksheet.ignore_errors(:number_stored_as_text => 'A1:A1048576')
+
+Or for the entire worksheet by specifying the range from the first cell in the worksheet to the last cell in the worksheet:
+
+    worksheet.ignore_errors(:number_stored_as_text => 'A1:XFD1048576')
+
+The worksheet errors/warnings that can be ignored are:
+
+* `number_stored_as_text`: Turn off errors/warnings for numbers stores as text.
+* `eval_error`: Turn off errors/warnings for formula errors (such as divide by zero).
+* `formula_differs`: Turn off errors/warnings for formulas that differ from surrounding formulas.
+* `formula_range`: Turn off errors/warnings for formulas that omit cells in a range.
+* `formula_unlocked`: Turn off errors/warnings for unlocked cells that contain formulas.
+* `empty_cell_reference`: Turn off errors/warnings for formulas that refer to empty cells.
+* `list_data_validation`: Turn off errors/warnings for cells in a table that do not comply with applicable data validation rules.
+* `calculated_column`: Turn off errors/warnings for cell formulas that differ from the column formula.
+* `two_digit_text_year`: Turn off errors/warnings for formulas that contain a two digit text representation of a year.
 
 [CELL NOTATION]: worksheet.html#cell-notation
 [CELL FORMATTING]: cell_formatting.html#cell_formatting

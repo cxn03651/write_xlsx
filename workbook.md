@@ -28,6 +28,7 @@ The following methods are available through a new workbook.
 * [set_1904](#set_1904)
 * [set_calc_mode](#set_calc_mode)
 * [default_url_format](#default_url_format)
+* [read_only_recommended](#read_only_recommended)
 
 #### <a name="new" class="anchor" href="#new"><span class="octicon octicon-link" /></a>new
 
@@ -467,6 +468,11 @@ The `default_url_format()` method gets a copy of the default url format used whe
 
     url_format = workbook.default_url_format
 
+#### <a name="read_only_recommended" class="anchor" href="#read_only_recommended"><span class="octicon octicon-link" /></a>read_only_recommended
+
+The `read_only_recommended()` method can be used to set the Excel "Read-only Recommended" option that is available when saving a file. This presents the user of the file with an option to open it in "read-only" mode. This means that any changes to the file can't be saved back to the same file and must be saved to a new file. It can be set as follows:
+
+    workbook.read_only_recommended
 
 [CELL NOTATION]: worksheet.html#cell-notation
 [CELL FORMATTING]: cell_formatting.html#cell_formatting

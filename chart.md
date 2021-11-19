@@ -404,8 +404,7 @@ Set the interval unit for a category axis.
 Set the position where the y axis will cross the x axis.
 (Applicable to category and value axes.)
 
-The crossing value can either be the string 'max' to set the crossing
-at the maximum axis value or a numeric value.
+The crossing value can either be a number value or the string `'max'` or `'min'`to set the crossing at the maximum/minimum axis value.
 
     chart.set_x_axis(:crossing => 3)
     # or
