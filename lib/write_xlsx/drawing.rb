@@ -5,11 +5,11 @@ require 'write_xlsx/utility'
 module Writexlsx
   class Drawing
     attr_accessor :type, :dimensions, :width, :height, :description, :shape, :anchor, :rel_index, :url_rel_index
-    attr_reader :tip
+    attr_reader :tip, :decorative
 
-    def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil)
-      @type, @dimensions, @width, @height, @description, @shape, @anchor, @rel_index, @url_rel_index, @tip =
-        type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip
+    def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, decorative = nil)
+      @type, @dimensions, @width, @height, @description, @shape, @anchor, @rel_index, @url_rel_index, @tip, @decorative =
+        type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip, decorative
     end
   end
 
@@ -92,6 +92,7 @@ module Writexlsx
       rel_index     = drawing.rel_index
       url_rel_index = drawing.url_rel_index
       tip           = drawing.tip
+      decorative    = drawing.decorative
 
       col_from, row_from, col_from_offset, row_from_offset,
       col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute = drawing.dimensions
@@ -124,7 +125,7 @@ module Writexlsx
           write_pic(
             index,        rel_index,      col_absolute,
             row_absolute, width,          height,
-            description,  url_rel_index , tip
+            description,  url_rel_index , tip, decorative
           )
         else
           # Write the xdr:sp element for shapes.
@@ -148,13 +149,13 @@ module Writexlsx
           write_pos(0, 0)
 
           # Write the xdr:ext element.
-          write_ext(9308969, 6078325)
+          write_xdr_ext(9308969, 6078325)
         else
           # Write the xdr:pos element.
           write_pos(0, -47625)
 
           # Write the xdr:ext element.
-          write_ext(6162675, 6124575)
+          write_xdr_ext(6162675, 6124575)
         end
 
         # Write the xdr:graphicFrame element.
@@ -242,7 +243,7 @@ module Writexlsx
     #
     # Write the <xdr:ext> element.
     #
-    def write_ext(cx, cy)
+    def write_xdr_ext(cx, cy)
       attributes = [
         ['cx', cx],
         ['cy', cy]
@@ -286,19 +287,25 @@ module Writexlsx
     #
     # Write the <xdr:cNvPr> element.
     #
-    def write_c_nv_pr(index, name, description = nil, url_rel_index = nil, tip = nil)
+    def write_c_nv_pr(index, name, description = nil, url_rel_index = nil, tip = nil, decorative = nil)
       attributes = [
         ['id',   index],
         ['name', name]
       ]
 
       # Add description attribute for images.
-      attributes << ['descr', description] if ptrue?(description)
+      attributes << ['descr', description] if ptrue?(description) && !ptrue?(decorative)
 
-      if ptrue?(url_rel_index)
+      if ptrue?(url_rel_index) || ptrue?(decorative)
         @writer.tag_elements('xdr:cNvPr', attributes) do
-          # Write the a:hlinkClick element.
-          write_a_hlink_click(url_rel_index, tip)
+          if ptrue?(url_rel_index)
+            # Write the a:hlinkClick element.
+            write_a_hlink_click(url_rel_index, tip)
+          end
+          if ptrue?(decorative)
+            # Write the adec:decorative element.
+            write_decorative
+          end
         end
       else
         @writer.empty_tag('xdr:cNvPr', attributes)
@@ -321,6 +328,62 @@ module Writexlsx
       attributes << ['tooltip', tip] if tip
 
       @writer.empty_tag('a:hlinkClick', attributes)
+    end
+
+    #
+    # Write the <adec:decorative> element.
+    #
+    def write_decorative
+      @writer.tag_elements('a:extLst') do
+        write_a_uri_ext('{FF2B5EF4-FFF2-40B4-BE49-F238E27FC236}')
+        write_a16_creation_id
+        @writer.end_tag('a:ext')
+
+        write_a_uri_ext('{C183D7F6-B498-43B3-948B-1728B52AA6E4}')
+        write_adec_decorative
+        @writer.end_tag('a:ext')
+      end
+    end
+
+    #
+    # Write the <a:ext> element.
+    #
+    def write_a_uri_ext(uri)
+      attributes = [
+        ['uri', uri]
+      ]
+
+      @writer.start_tag('a:ext', attributes)
+    end
+
+    #
+    # Write the <adec:decorative> element.
+    #
+    def write_adec_decorative
+      xmlns_adec = 'http://schemas.microsoft.com/office/drawing/2017/decorative'
+      val        = 1
+
+      attributes = [
+        ['xmlns:adec', xmlns_adec],
+        ['val',        val]
+      ]
+
+      @writer.empty_tag('adec:decorative', attributes)
+    end
+
+    #
+    # Write the <a16:creationId> element.
+    #
+    def write_a16_creation_id
+      xmlns_a_16 = 'http://schemas.microsoft.com/office/drawing/2014/main'
+      id         = '{00000000-0008-0000-0000-000002000000}'
+
+      attributes = [
+        ['xmlns:a16', xmlns_a_16],
+        ['id',        id]
+      ]
+
+      @writer.empty_tag('a16:creationId', attributes)
     end
 
     #
@@ -527,10 +590,10 @@ module Writexlsx
     #
     # Write the <xdr:pic> element.
     #
-    def write_pic(index, rel_index, col_absolute, row_absolute, width, height, description, url_rel_index, tip)
+    def write_pic(index, rel_index, col_absolute, row_absolute, width, height, description, url_rel_index, tip, decorative)
       @writer.tag_elements('xdr:pic') do
         # Write the xdr:nvPicPr element.
-        write_nv_pic_pr(index, rel_index, description, url_rel_index, tip)
+        write_nv_pic_pr(index, rel_index, description, url_rel_index, tip, decorative)
         # Write the xdr:blipFill element.
         write_blip_fill(rel_index)
 
@@ -546,12 +609,12 @@ module Writexlsx
     #
     # Write the <xdr:nvPicPr> element.
     #
-    def write_nv_pic_pr(index, rel_index, description, url_rel_index, tip)
+    def write_nv_pic_pr(index, rel_index, description, url_rel_index, tip, decorative)
       @writer.tag_elements('xdr:nvPicPr') do
         # Write the xdr:cNvPr element.
         write_c_nv_pr(
           index + 1, "Picture #{index}", description,
-          url_rel_index, tip
+          url_rel_index, tip, decorative
         )
         # Write the xdr:cNvPicPr element.
         write_c_nv_pic_pr

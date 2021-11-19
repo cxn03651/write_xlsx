@@ -3074,6 +3074,7 @@ module Writexlsx
         url         = params[:url]
         tip         = params[:tip]
         description = params[:description]
+        decorative  = params[:decorative]
       else
         x_offset, y_offset, x_scale, y_scale, anchor = options
       end
@@ -3085,7 +3086,7 @@ module Writexlsx
 
       @images << [
         row, col, image, x_offset, y_offset,
-        x_scale, y_scale, url, tip, anchor, description
+        x_scale, y_scale, url, tip, anchor, description, decorative
       ]
     end
 
@@ -5762,7 +5763,7 @@ module Writexlsx
       name = chart.name
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor, drawing_rel_index, 0, nil)
+      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor, drawing_rel_index, 0, nil, 0)
       if !drawings?
         @drawings = Drawings.new
         @drawings.add_drawing_object(drawing)
@@ -6488,7 +6489,7 @@ module Writexlsx
       drawing_type = 2
 
       row, col, image, x_offset, y_offset,
-      x_scale, y_scale, url, tip, anchor, description = @images[index]
+      x_scale, y_scale, url, tip, anchor, description, decorative = @images[index]
 
       width  *= x_scale
       height *= y_scale
@@ -6503,7 +6504,7 @@ module Writexlsx
       height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor, 0, 0, tip)
+      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor, 0, 0, tip, decorative)
       if !drawings?
         drawings = Drawings.new
         drawings.embedded = 1
@@ -6673,7 +6674,7 @@ EOS
       shape.calc_position_emus(self)
 
       drawing_type = 3
-      drawing = Drawing.new(drawing_type, shape.dimensions, shape.width_emu, shape.height_emu, shape.name, shape, shape.anchor, drawing_rel_index, 0, nil)
+      drawing = Drawing.new(drawing_type, shape.dimensions, shape.width_emu, shape.height_emu, shape.name, shape, shape.anchor, drawing_rel_index, 0, nil, 0)
       drawings.add_drawing_object(drawing)
     end
     public :prepare_shape

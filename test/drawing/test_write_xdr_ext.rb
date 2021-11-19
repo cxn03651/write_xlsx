@@ -2,7 +2,7 @@
 require 'helper'
 require 'write_xlsx/drawing'
 
-class TestWriteExt < Minitest::Test
+class TestWriteXdrExt < Minitest::Test
   def setup
     @drawing = Writexlsx::Drawings.new
   end
@@ -10,7 +10,7 @@ class TestWriteExt < Minitest::Test
   def test_write_ext
     expected = '<xdr:ext cx="9308969" cy="6078325"/>'
 
-    @drawing.__send__(:write_ext, 9308969, 6078325)
+    @drawing.__send__(:write_xdr_ext, 9308969, 6078325)
     result = @drawing.instance_variable_get(:@writer).string
 
     assert_equal(expected, result)
