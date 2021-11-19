@@ -1,5 +1,36 @@
 Change history of write_xlsx rubygem.
 
+2021-11-19 v1.08.0
+
+    Added ability to add accessibility options "description" and
+    "decorative" to images via insert_image().
+
+    Added the workbook read_only_recommended() method to set the Excel
+    "Read-only Recommended" option that is available when saving a file.
+
+    Added option to set a chart crossing to 'min' as well as the existing
+    'max' option. The 'min' option isn't available in the Excel interface
+    but can be enabled via VBA.
+
+    Added option to unprotect ranges in protected worksheets.
+
+    Added check, and warning, for worksheet tables with no data row.  Either
+    with or without a header row.
+
+    Added ignore_errors() worksheet method to ignore Excel worksheet
+    errors/warnings in user defined ranges.
+
+    Fixed issue where pattern formats without colours where given a default
+    black fill colour.
+
+    Fix issue where custom chart data labels didn't inherit the position for
+    the data labels in the series.
+
+    Fixed issue with relative url links in images.
+
+    Fixed issue where headers/footers were restricted to 254 characters
+    instead of 255.
+
 2021-02-17 v1.07.0
 
    Added support for Border, Fill, Pattern and Gradient formatting to chart
