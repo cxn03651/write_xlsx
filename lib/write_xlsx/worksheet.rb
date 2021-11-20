@@ -381,6 +381,7 @@ module Writexlsx
       @comments = Package::Comments.new(self)
       @buttons_array          = []
       @header_images_array    = []
+      @ignore_errors          = nil
 
       @validations = []
 
@@ -431,6 +432,7 @@ module Writexlsx
           write_header_footer
           write_row_breaks
           write_col_breaks
+          write_ignored_errors
           write_drawings
           write_legacy_drawing
           write_legacy_drawing_hf
@@ -1224,13 +1226,9 @@ module Writexlsx
     # distribution.
     #
     def set_header(string = '', margin = 0.3, options = {})
-      raise 'Header string must be less than 255 characters' if string.length >= 255
+      raise 'Header string must be less than 255 characters' if string.length > 255
       # Replace the Excel placeholder &[Picture] with the internal &G.
       @page_setup.header = string.gsub(/&\[Picture\]/, '&G')
-
-      if string.size >= 255
-        raise 'Header string must be less than 255 characters'
-      end
 
       if options[:align_with_margins]
         @page_setup.header_footer_aligns = options[:align_with_margins]
@@ -1272,16 +1270,12 @@ module Writexlsx
     # The syntax of the set_footer() method is the same as set_header()
     #
     def set_footer(string = '', margin = 0.3, options = {})
-      raise 'Footer string must be less than 255 characters' if string.length >= 255
+      raise 'Footer string must be less than 255 characters' if string.length > 255
 
       @page_setup.footer                = string.dup
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
       @page_setup.footer = string.gsub(/&\[Picture\]/, '&G')
-
-      if string.size >= 255
-        raise 'Header string must be less than 255 characters'
-      end
 
       if options[:align_with_margins]
         @page_setup.header_footer_aligns = options[:align_with_margins]
@@ -6087,6 +6081,30 @@ module Writexlsx
       end
     end
 
+    #
+    # Ignore worksheet errors/warnings in user defined ranges.
+    #
+    def ignore_errors(ignores)
+      # List of valid input parameters.
+      valid_parameter_keys = [
+        :number_stored_as_text,
+        :eval_error,
+        :formula_differs,
+        :formula_range,
+        :formula_unlocked,
+        :empty_cell_reference,
+        :list_data_validation,
+        :calculated_column,
+        :two_digit_text_year
+      ]
+
+      unless (ignores.keys - valid_parameter_keys).empty?
+        raise "Unknown parameter '#{ignores.key - valid_parameter_keys}' in ignore_errors()."
+      end
+
+      @ignore_errors = ignores
+    end
+
     def write_ext(url)
       attributes = [
         ['xmlns:x14', "#{OFFICE_URL}spreadsheetml/2009/9/main"],
@@ -6528,10 +6546,19 @@ module Writexlsx
           target = escape_url(url)
         end
         if url =~ /^external:/
-          target = escape_url(url.sub(/^external:/, 'file:///'))
+          target = escape_url(url.sub(/^external:/, ''))
+
           # Additional escape not required in worksheet hyperlinks
           target = target.gsub(/#/, '%23')
+
+          # Prefix absolute paths (not relative) with file:///
+          if target =~ /^\w:/ || target =~ /^\\\\/
+            target = "file:///#{target}"
+          else
+            target = target.gsub(/\\/, '/')
+          end
         end
+
         if url =~ /^internal:/
           target      = url.sub(/^internal:/, '#')
           target_mode = nil
@@ -8138,6 +8165,45 @@ EOS
         raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})"
       end
       col
+    end
+
+    #
+    # Write the <ignoredErrors> element.
+    #
+    def write_ignored_errors
+      return unless @ignore_errors
+
+      ignore = @ignore_errors
+
+      @writer.tag_elements('ignoredErrors' ) do
+        {
+          :number_stored_as_text => 'numberStoredAsText',
+          :eval_error            => 'evalError',
+          :formula_differs       => 'formula',
+          :formula_range         => 'formulaRange',
+          :formula_unlocked      => 'unlockedFormula',
+          :empty_cell_reference  => 'emptyCellReference',
+          :list_data_validation  => 'listDataValidation',
+          :calculated_column     => 'calculatedColumn',
+          :two_digit_text_year   => 'twoDigitTextYear'
+        }.each do |key, value|
+          if ignore[key]
+            write_ignored_error(value, ignore[key])
+          end
+        end
+      end
+    end
+
+    #
+    # Write the <ignoredError> element.
+    #
+    def write_ignored_error(type, sqref)
+      attributes = {
+        'sqref' => sqref,
+        type    => 1
+      }
+
+      @writer.empty_tag('ignoredError', attributes)
     end
   end
 end
