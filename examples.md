@@ -138,6 +138,10 @@ Simple example of hiding a worksheet.
 Shows how to create web hyperlinks.
 ![Output from hyperlink1.rb](images/examples/hyperlink1.jpg)
 
+#### <a name="ignore_errors" class="anchor" href="#ignore_errors"><span class="octicon octicon-link" /></a>ignore_errors
+An example of turning off worksheet cells errors/warnings.
+![Output from ignore_errors.rb](images/examples/ignore_errors.png)
+
 #### <a name="indent" class="anchor" href="#indent"><span class="octicon octicon-link" /></a>indent
 An example of cell indentation.
 ![Output from indent.rb](images/examples/indent.jpg)
