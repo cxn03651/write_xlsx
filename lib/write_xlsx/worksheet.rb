@@ -807,6 +807,39 @@ module Writexlsx
     end
 
     #
+    # Set the width (and properties) of a single column or a range of columns in
+    # pixels rather than character units.
+    #
+    def set_column_pixels(*data)
+      cell = data[0]
+
+      # Check for a cell reference in A1 notation and substitute row and column
+      if cell =~ /^\D/
+        data = substitute_cellref(*data)
+
+        # Returned values row1 and row2 aren't required here. Remove them.
+        data.shift         # $row1
+        data.delete_at(1)  # $row2
+      end
+
+      # Ensure at least $first_col, $last_col and $width
+      return if data.size < 3
+
+      first_col = data[0]
+      last_col  = data[1]
+      pixels    = data[2]
+      format    = data[3]
+      hidden    = data[4] || 0
+      level     = data[5]
+
+      if ptrue?(pixels)
+        width = pixels_to_width(pixels)
+      end
+
+      set_column(first_col, last_col, width, format, hidden, level)
+    end
+
+    #
     # :call-seq:
     #   set_selection(cell_or_cell_range)
     #
@@ -3321,6 +3354,17 @@ module Writexlsx
 
       # Store the row sizes for use when calculating image vertices.
       @row_sizes[row] = [height, hidden]
+    end
+
+    #
+    # This method is used to set the height (in pixels) and the properties of the
+    # row.
+    #
+    def set_row_pixels(*data)
+      height = data[1]
+
+      data[1] = pixels_to_height(height) if ptrue?(height)
+      set_row(*data)
     end
 
     #
@@ -6496,6 +6540,31 @@ module Writexlsx
         pixels = (4 / 3.0 * @default_row_height).to_i
       end
       pixels
+    end
+
+    #
+    # Convert the width of a cell from pixels to character units.
+    #
+    def pixels_to_width(pixels)
+      max_digit_width = 7.0
+      padding         = 5.0
+
+      if pixels <= 12
+        width =  pixels / (max_digit_width + padding)
+      else
+        width = (pixels - padding) / max_digit_width
+      end
+
+      width
+    end
+
+    #
+    # Convert the height of a cell from pixels to character units.
+    #
+    def pixels_to_height(pixels)
+      height = 0.75 * pixels
+      height = height.to_i if ( height - height.to_i).abs < 0.1
+      height
     end
 
     #
