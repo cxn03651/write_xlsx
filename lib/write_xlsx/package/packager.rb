@@ -6,6 +6,7 @@ require 'write_xlsx/package/comments'
 require 'write_xlsx/package/content_types'
 require 'write_xlsx/package/core'
 require 'write_xlsx/package/custom'
+require 'write_xlsx/package/metadata'
 require 'write_xlsx/package/relationships'
 require 'write_xlsx/package/shared_strings'
 require 'write_xlsx/package/styles'
@@ -56,6 +57,7 @@ module Writexlsx
         write_drawing_rels_files
         add_image_files
         add_vba_project
+        write_metadata_file
       end
 
       private
@@ -176,6 +178,20 @@ module Writexlsx
       end
 
       #
+      # Write the metadata.xml file.
+      #
+      def write_metadata_file
+        metadata = Package::Metadata.new(@workbook)
+
+        return unless @workbook.has_metadata?
+
+        FileUtils.mkdir_p("#{@package_dir}/xl")
+
+        metadata.set_xml_writer( "#{@package_dir}/xl/metadata.xml")
+        metadata.assemble_xml_file
+      end
+
+      #
       # Write the custom.xml file.
       #
       def write_custom_file
@@ -211,6 +227,8 @@ module Writexlsx
         content.add_vba_project if @workbook.vba_project
         # Add the custom properties if present.
         content.add_custom_properties unless @workbook.custom_properties.empty?
+        # Add the metadata file if present.
+        content.add_metadata if @workbook.has_metadata?
 
         content.set_xml_writer("#{@package_dir}/[Content_Types].xml")
         content.assemble_xml_file
@@ -304,6 +322,9 @@ module Writexlsx
         if @workbook.vba_project
           rels.add_ms_package_relationship('/vbaProject', 'vbaProject.bin')
         end
+
+        # Add the metadata file if required.
+        rels.add_document_relationship('/sheetMetadata', 'metadata.xml') if @workbook.has_metadata?
 
         rels.set_xml_writer("#{@package_dir}/xl/_rels/workbook.xml.rels")
         rels.assemble_xml_file

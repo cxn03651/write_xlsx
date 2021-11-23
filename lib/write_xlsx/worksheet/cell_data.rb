@@ -16,8 +16,8 @@ module Writexlsx
       def cell_attributes #:nodoc:
         xf_index = xf ? xf.get_xf_index : 0
         attributes = [
-                      ['r', xl_rowcol_to_cell(row, col)]
-                     ]
+          ['r', xl_rowcol_to_cell(row, col)]
+        ]
 
         # Add the cell format index.
         if xf_index != 0
@@ -122,6 +122,28 @@ module Writexlsx
 
       def write_cell
         @worksheet.writer.tag_elements('c', cell_attributes) do
+          @worksheet.write_cell_array_formula(token, range)
+          @worksheet.write_cell_value(result)
+        end
+      end
+    end
+
+    class DynamicFormulaArrayCellData < CellData # :nodoc:
+      def initialize(worksheet, row, col, formula, xf, range, result)
+        @worksheet = worksheet
+        @row, @col, @token, @xf, @range, @result = row, col, formula, xf, range, result
+      end
+
+      def data
+        @result || 0
+      end
+
+      def write_cell
+        # Add metadata linkage for dynamic array formulas.
+        attributes = cell_attributes
+        attributes << ['cm', '1']
+
+        @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_array_formula(token, range)
           @worksheet.write_cell_value(result)
         end

@@ -187,6 +187,15 @@ module Writexlsx
         add_override(custom, "#{App_document}custom-properties+xml")
       end
 
+      #
+      # Add the metadata file to the ContentTypes overrides.
+      #
+      def add_metadata
+        add_override(
+          "/xl/metadata.xml",
+          "#{App_document}spreadsheetml.sheetMetadata+xml"
+        )
+      end
 
       private
 

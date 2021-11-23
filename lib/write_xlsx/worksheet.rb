@@ -361,6 +361,7 @@ module Writexlsx
       @drawing_rels_id        = 0
       @vml_drawing_rels       = {}
       @vml_drawing_rels_id    = 0
+      @has_dynamic_arrays     = false
       @header_images          = []
       @footer_images          = []
 
@@ -2505,50 +2506,9 @@ module Writexlsx
       end
     end
 
-    #
-    # :call-seq:
-    #   write_array_formula(row1, col1, row2, col2, formula [ , format [ , value ] ] )
-    #
-    # Write an array formula to a cell range. In Excel an array formula is a
-    # formula that performs a calculation on a set of values. It can return
-    # a single value or a range of values.
-    #
-    # An array formula is indicated by a pair of braces around the
-    # formula: +{=SUM(A1:B1*A2:B2)}+. If the array formula returns a single
-    # value then the +first_+ and +last_+ parameters should be the same:
-    #
-    #     worksheet.write_array_formula('A1:A1', '{=SUM(B1:C1*B2:C2)}')
-    #
-    # It this case however it is easier to just use the write_formula()
-    # or {#write()}[#method-i-write] methods:
-    #
-    #     # Same as above but more concise.
-    #     worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}')
-    #     worksheet.write_formula('A1', '{=SUM(B1:C1*B2:C2)}')
-    #
-    # For array formulas that return a range of values you must specify
-    # the range that the return values will be written to:
-    #
-    #     worksheet.write_array_formula('A1:A3',    '{=TREND(C1:C3,B1:B3)}')
-    #     worksheet.write_array_formula(0, 0, 2, 0, '{=TREND(C1:C3,B1:B3)}')
-    #
-    # If required, it is also possible to specify the calculated value of
-    # the formula. This is occasionally necessary when working with non-Excel
-    # applications that don't calculate the value of the formula.
-    # The calculated value is added at the end of the argument list:
-    #
-    #     worksheet.write_array_formula('A1:A3', '{=TREND(C1:C3,B1:B3)}', format, 105)
-    #
-    # In addition, some early versions of Excel 2007 don't calculate the
-    # values of array formulas when they aren't supplied. Installing the
-    # latest Office Service Pack should fix this issue.
-    #
-    # See also the array_formula.rb program in the examples directory of
-    # the distro.
-    #
-    # Note: Array formulas are not supported by writeexcel gem.
-    #
-    def write_array_formula(*args)
+    # Internal method shared by the write_array_formula() and
+    # write_dynamic_array_formula() methods.
+    def write_array_formula_base(type, *args)
       # Check for a cell reference in A1 notation and substitute row and column
       row1, col1, row2, col2, formula, xf, value = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, formula].include?(nil)
@@ -2573,7 +2533,15 @@ module Writexlsx
       # Remove array formula braces and the leading =.
       formula = formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
 
-      store_data_to_table(FormulaArrayCellData.new(self, row1, col1, formula, xf, range, value))
+      store_data_to_table(
+        if type == 'a'
+          FormulaArrayCellData.new(self, row1, col1, formula, xf, range, value)
+        elsif type == 'd'
+          DynamicFormulaArrayCellData.new(self, row1, col1, formula, xf, range, value)
+        else
+          raise "invalid type in write_array_formula_base()."
+        end
+      )
 
       # Pad out the rest of the area with formatted zeroes.
       (row1..row2).each do |row|
@@ -2582,6 +2550,29 @@ module Writexlsx
           write_number(row, col, 0, xf)
         end
       end
+    end
+
+    #
+    # write_array_formula(row1, col1, row2, col2, formula, format)
+    #
+    # Write an array formula to the specified row and column (zero indexed).
+    #
+    # format is optional.
+    #
+    def write_array_formula(*args)
+      write_array_formula_base('a', *args)
+    end
+
+    #
+    # write_dynamic_array_formula(row1, col1, row2, col2, formula, format)
+    #
+    # Write a dynamic formula to the specified row and column (zero indexed).
+    #
+    # format is optional.
+    #
+    def write_dynamic_array_formula(*args)
+      write_array_formula_base('d', *args)
+      @has_dynamic_arrays = true
     end
 
     #
@@ -6167,6 +6158,10 @@ module Writexlsx
           sparkline.write_sparkline_group(@writer)
         end
       end
+    end
+
+    def has_dynamic_arrays?
+      @has_dynamic_arrays
     end
 
     private

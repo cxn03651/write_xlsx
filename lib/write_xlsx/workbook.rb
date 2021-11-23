@@ -135,6 +135,7 @@ module Writexlsx
       @max_url_length      = 2079
       @has_comments        = false
       @read_only           = 0
+      @has_metadata        = false
       if options[:max_url_length]
         @max_url_length = options[:max_url_length]
 
@@ -1157,6 +1158,10 @@ module Writexlsx
       @activesheet ||= 0
     end
 
+    def has_metadata?
+      @has_metadata
+    end
+
     private
 
     def filename
@@ -1449,6 +1454,9 @@ module Writexlsx
 
       # Prepare the worksheet tables.
       prepare_tables
+
+      # Prepare the metadata file links.
+      prepare_metadata
 
       # Package the workbook.
       packager = Package::Packager.new(self)
@@ -1782,6 +1790,18 @@ module Writexlsx
 
       sheets.each do |sheet|
         table_id += sheet.prepare_tables(table_id + 1, seen)
+      end
+    end
+
+    #
+    # Set the metadata rel link.
+    #
+    def prepare_metadata
+      @worksheets.each do |sheet|
+        if sheet.has_dynamic_arrays?
+          @has_metadata = true
+          break
+        end
       end
     end
 
