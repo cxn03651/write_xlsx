@@ -1961,21 +1961,40 @@ module Writexlsx
       ref_id           = 0
       image_ids        = {}
       header_image_ids = {}
+      background_ids   = {}
       @worksheets.each do |sheet|
         chart_count = sheet.charts.size
         image_count = sheet.images.size
         shape_count = sheet.shapes.size
         header_image_count = sheet.header_images.size
         footer_image_count = sheet.footer_images.size
-        has_drawings = false
+        has_background     = sheet.background_image.size
+        has_drawings       = false
 
         # Check that some image or drawing needs to be processed.
-        next if chart_count + image_count + shape_count + header_image_count + footer_image_count == 0
+        next if chart_count + image_count + shape_count + header_image_count + footer_image_count + has_background == 0
 
         # Don't increase the drawing_id header/footer images.
         if chart_count + image_count + shape_count > 0
           drawing_id += 1
           has_drawings = true
+        end
+
+        # Prepare the background images.
+        if ptrue?(has_background)
+          filename = sheet.background_image
+          type, width, height, name, x_dpi, y_dpi, md5 = get_image_properties(filename)
+
+          if background_ids[md5]
+            ref_id = background_ids[md5]
+          else
+            image_ref_id += 1
+            ref_id = image_ref_id
+            background_ids[md5] = ref_id
+            @images << [filename, type]
+          end
+
+          sheet.prepare_background(ref_id, type)
         end
 
         # Prepare the worksheet images.

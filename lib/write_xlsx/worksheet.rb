@@ -286,7 +286,7 @@ module Writexlsx
 
     attr_reader :index # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawings # :nodoc:
-    attr_reader :header_images, :footer_images # :nodoc:
+    attr_reader :header_images, :footer_images, :background_image # :nodoc:
     attr_reader :vml_drawing_links # :nodoc:
     attr_reader :vml_data_id # :nodoc:
     attr_reader :vml_header_id # :nodoc:
@@ -349,6 +349,7 @@ module Writexlsx
       @external_comment_links = []
       @external_vml_links     = []
       @external_table_links   = []
+      @external_background_links = []
       @drawing_links          = []
       @vml_drawing_links      = []
       @charts                 = []
@@ -364,6 +365,7 @@ module Writexlsx
       @has_dynamic_arrays     = false
       @header_images          = []
       @footer_images          = []
+      @background_image       = ''
 
       @outline_row_level = 0
       @outline_col_level = 0
@@ -437,6 +439,7 @@ module Writexlsx
           write_drawings
           write_legacy_drawing
           write_legacy_drawing_hf
+          write_picture
           write_table_parts
           write_ext_list
         end
@@ -6032,6 +6035,7 @@ module Writexlsx
        @external_drawing_links,
        @external_vml_links,
        @external_table_links,
+       @external_background_links,
        @external_comment_links
       ].reject { |a| a.empty? }
     end
@@ -6660,6 +6664,25 @@ EOS
       @header_images_array << [width, height, body, position, x_dpi, y_dpi, ref_id]
     end
     public :prepare_header_image
+
+    #
+    # Set the background image for the worksheet.
+    #
+    def set_background(image)
+      raise "Couldn't locate #{image}: $!" unless File.exist?(image)
+
+      @background_image = image
+    end
+    public :set_background
+
+    #
+    # Set up an image without a drawing object for the background image.
+    #
+    def prepare_background(image_id, image_type)
+      @external_background_links <<
+        ['/image', "../media/image#{image_id}.#{image_type}"]
+    end
+    public :prepare_background
 
     #
     # :call-seq:
@@ -7723,6 +7746,21 @@ EOS
 
       attributes = [ ['r:id', "rId#{@rel_count}"] ]
       @writer.empty_tag('legacyDrawingHF', attributes)
+    end
+
+    #
+    # Write the <picture> element.
+    #
+    def write_picture
+      return unless ptrue?(@background_image)
+
+      # Increment the relationship id.
+      @rel_count += 1
+      id = @rel_count
+
+      attributes = [['r:id', "rId#{id}"]]
+
+      @writer.empty_tag('picture', attributes)
     end
 
     #
