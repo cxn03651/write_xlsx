@@ -2085,6 +2085,10 @@ module Writexlsx
         # Test for JPEG files.
         type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
         @image_types[:jpeg] = 1
+      elsif data.unpack('A4')[0] == 'GIF8'
+      # Test for GIFs.
+        type, width, height, x_dpi, y_dpi = process_gif(data, filename)
+        @image_types[:gif] = 1
       elsif data.unpack('A2')[0] == 'BM'
         # Test for BMPs.
         type, width, height = process_bmp(data, filename)
@@ -2186,6 +2190,24 @@ module Writexlsx
       end
 
       raise "#{filename}: no size data found in jpeg image.\n" unless height
+      [type, width, height, x_dpi, y_dpi]
+    end
+
+    #
+    # Extract width and height information from a GIF file.
+    #
+    def process_gif(data, filename)
+      type  = 'gif'
+      x_dpi = 96
+      y_dpi = 96
+
+      width  = data[6, 2].unpack("v")[0]
+      height = data[8, 2].unpack("v")[0]
+
+      if height.nil?
+        raise "#{filename}: no size data found in gif image.\n"
+      end
+
       [type, width, height, x_dpi, y_dpi]
     end
 
