@@ -47,8 +47,10 @@ The following methods are available through a new worksheet:
 * [unprotect_range](#unprotect_range)
 * [set_selection](#set_selection)
 * [set_row](#set_row)
+* [set_row_pixels](#set_row_pixels)
 * [set_default_row](#set_default_row)
 * [set_column](#set_column)
+* [set_column_pixels](#set_column_pixels)
 * [outline_settings](#outline_settings)
 * [freeze_panes](#freeze_panes)
 * [split_panes](#split_panes)
@@ -1373,9 +1375,11 @@ The default cell selections is (0, 0), 'A1'.
 This method can be used to change the default properties of a row.
 All parameters apart from `row` are optional.
 
-The most common use for this method is to change the height of a row:
+The most common use for this method is to change the height of a row.
 
     worksheet.set_row(0, 20)    # Row 1 height set to 20
+
+Note: the row height is in Excel character units. To set the height in pixels use the `set_row_pixels` method, see below.
 
 If you wish to set the format without changing the height you can pass nil as the height parameter:
 
@@ -1428,6 +1432,31 @@ programs in the examples directory of the distro.
 Excel allows up to 7 outline levels.
 Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
+#### <a name="set_row_pixels" class="anchor" href="#set_row_pixels"><span class="octicon octicon-link" /></a>set_row_pixels(row, height, format, hidden, level, collapsed)
+
+This method is the same as `set_row()` except that `height` is in pixels.
+
+    worksheet.set_row       (0, 24)    # Set row height in character units
+    worksheet.set_row_pixels(1, 18)    # Set row to same height in pixels
+
+#### <a name="set_default_row" class="anchor" href="#set_default_row"><span class="octicon octicon-link" /></a>set_default_row(height, hide_unused_rows)
+
+The `set_default_row()` method is used to set the limited number of default
+row properties allowed by Excel.
+These are the default height and the option to hide unused rows.
+
+    worksheet.set_default_row(24)  # Set the default row height to 24.
+
+The option to hide unused rows is used by Excel as an optimisation so that
+the user can hide a large number of rows without generating a very large file
+with an entry for each hidden row.
+
+    worksheet.set_default_row(nil, 1)
+
+See the
+[`hide_row_col.rb`](examples.html#hide_row_col)
+example program.
+
 #### <a name="set_column" class="anchor" href="#set_column"><span class="octicon octicon-link" /></a>set_column(first_col, last_col, width, format, hidden, level, collapsed)
 
 This method can be used to change the default properties of a single column or
@@ -1450,7 +1479,9 @@ Examples:
 
 The width corresponds to the column width value that is specified in Excel.
 It is approximately equal to the length of a string in the default font of Calibri 11.
-Unfortunately, there is no way to specify "AutoFit" for a column in the Excel file format.
+To set the width in pixels use the `set_column_pixels` method, see below.
+
+Unfortunately, there is no way to specify "Autofit" for a column in Excel file format.
 This feature is only available at runtime from within Excel.
 
 As usual the format parameter is optional, for additional information,
@@ -1510,23 +1541,12 @@ programs in the examples directory of the distro.
 Excel allows up to 7 outline levels.
 Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
-#### <a name="set_default_row" class="anchor" href="#set_default_row"><span class="octicon octicon-link" /></a>set_default_row(height, hide_unused_rows)
+#### <a name="set_column_pixels" class="anchor" href="#set_column_pixels"><span class="octicon octicon-link" /></a>set_column_pixels(first_col, last_col, width, format, hidden, level, collapsed)
 
-The `set_default_row()` method is used to set the limited number of default
-row properties allowed by Excel.
-These are the default height and the option to hide unused rows.
+This method is the same as `set_column()` except that `width` is in pixels.
 
-    worksheet.set_default_row(24)  # Set the default row height to 24.
-
-The option to hide unused rows is used by Excel as an optimisation so that
-the user can hide a large number of rows without generating a very large file
-with an entry for each hidden row.
-
-    worksheet.set_default_row(nil, 1)
-
-See the
-[`hide_row_col.rb`](examples.html#hide_row_col)
-example program.
+    worksheet.set_column(0, 0, 10)    # Column A width set to 20 in character units
+    worksheet.set_column(1, 1, 75)    # Column B set to the same width in pixels
 
 #### <a name="outline_settings" class="anchor" href="#outline_settings"><span class="octicon octicon-link" /></a>outline_settings(visible, symbols_below, symbols_right, auto_style)
 
