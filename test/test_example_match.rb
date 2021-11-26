@@ -242,6 +242,18 @@ class TestExampleMatch < Minitest::Test
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
+  def teset_background
+    @xlsx     = 'background.xlsx'
+    workbook  = WriteXLSX.new(@io)
+
+    worksheet = workbook.add_worksheet
+    worksheet.set_background(File.join(@test_dir, 'republic.png'))
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_chart_data_labels
     @xlsx = 'chart_data_labels.xlsx'
     workbook  = WriteXLSX.new(@io)
