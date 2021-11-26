@@ -258,6 +258,10 @@ Same as [stats.rb](#stats) with external references.
 Demonstrates conditional formatting.
 ![Output from stocks.rb](images/examples/stocks.jpg)
 
+#### <a name="background" class="anchor" href="#background"><span class="octicon octicon-link" /></a>stocks
+Example of how to set the background image for a worksheet.
+![Output from background.rb](images/examples/background.jpg)
+
 #### <a name="tab_colors" class="anchor" href="#tab_colors"><span class="octicon octicon-link" /></a>tab_colors
 Example of how to set worksheet tab colors.
 ![Output from tab_colors.rb](images/examples/tab_colors.jpg)
