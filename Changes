@@ -1,5 +1,14 @@
 Change history of write_xlsx rubygem.
 
+2021-11-26 v1.09.0
+
+    Added support for background images in worksheets. See set_background().
+
+    Added support for GIF image files (and in Excel 365, animated GIF files).
+
+    Added support for pixel sizing in set_row() and set_column() via new
+    functions called set_row_pixels() and set_column_pixels().
+
 2021-11-19 v1.08.0
 
     Added ability to add accessibility options "description" and
