@@ -9,23 +9,12 @@ The WriteXLSX and this document is ported from Perl module
 [Excel::Wirter::XLSX](http://search.cpan.org/~jmcnamara/Excel-Writer-XLSX-0.83/).
 If you have any problem and question, please contact [me](mailto:cxn03651@msj.biglobe.ne.jp).
 
-The XLSX format is the Office Open XML (OOXML) format used by Excel 2007 and later.
-
 Multiple worksheets can be added to a workbook and formatting can be applied to cells.
 Text, numbers, and formulas can be written to the cells.
 See [Examples](examples.html#examples)
 
-This module cannot, as yet, be used to write to an existing Excel XLSX file.
-
 WriteXLSX uses the same interface as the Writeexcel rubygem which produces
 an Excel file in binary XLS format.
-WriteXLSX supports all of the features of Writeexcel and in some cases has
-more functionality.
-For more details
-see ["Compatibility with Writeexcel"](compatibility_with_writeexcel.html#compatibility_with_writeexcel).
-
-The main advantage of the XLSX format over the XLS format is that it allows a larger number of rows and columns in a worksheet.
-The XLSX file format also produces much smaller files than the XLS file format.
 
 ### <a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link" /></a>SYNOPSIS
 
