@@ -181,11 +181,11 @@ module Writexlsx
         end
         unless valid_validation_type.has_key?(@validate.downcase)
           raise WriteXLSXOptionParameterError,
-          "Unknown validation type '#{@validate}' for parameter :validate in data_validation()"
+                "Unknown validation type '#{@validate}' for parameter :validate in data_validation()"
         end
         if @error_type && !error_type_hash.has_key?(@error_type.downcase)
           raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
+                "Unknown criteria type '#param[:error_type}' for parameter :error_type in data_validation()"
         end
       end
 
@@ -199,7 +199,7 @@ module Writexlsx
         if @criteria == 'between' || @criteria == 'notBetween'
           unless has_key?(:maximum)
             raise WriteXLSXOptionParameterError,
-            "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
+                  "Parameter :maximum is required in data_validation() when using :between or :not between criteria"
           end
         else
           @maximum = nil
@@ -209,7 +209,7 @@ module Writexlsx
       def check_valid_citeria_types
         unless valid_criteria_type.has_key?(@criteria.downcase)
           raise WriteXLSXOptionParameterError,
-          "Unknown criteria type '#{@criteria}' for parameter :criteria in data_validation()"
+                "Unknown criteria type '#{@criteria}' for parameter :criteria in data_validation()"
         end
       end
 
@@ -253,22 +253,22 @@ module Writexlsx
       # List of valid input parameters.
       def valid_validation_parameter
         [
-         :validate,
-         :criteria,
-         :value,
-         :source,
-         :minimum,
-         :maximum,
-         :ignore_blank,
-         :dropdown,
-         :show_input,
-         :input_title,
-         :input_message,
-         :show_error,
-         :error_title,
-         :error_message,
-         :error_type,
-         :other_cells
+          :validate,
+          :criteria,
+          :value,
+          :source,
+          :minimum,
+          :maximum,
+          :ignore_blank,
+          :dropdown,
+          :show_input,
+          :input_title,
+          :input_message,
+          :show_error,
+          :error_title,
+          :error_message,
+          :error_type,
+          :other_cells
         ]
       end
 

@@ -108,20 +108,6 @@ module Writexlsx
     # The function takes a date and time in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format
     # and converts it to a decimal number representing a valid Excel date.
     #
-    # Dates and times in Excel are represented by real numbers. The integer part of
-    # the number stores the number of days since the epoch and the fractional part
-    # stores the percentage of the day in seconds. The epoch can be either 1900 or
-    # 1904.
-    #
-    # Parameter: Date and time string in one of the following formats:
-    #               yyyy-mm-ddThh:mm:ss.ss  # Standard
-    #               yyyy-mm-ddT             # Date only
-    #                         Thh:mm:ss.ss  # Time only
-    #
-    # Returns:
-    #            A decimal number representing a valid Excel date, or
-    #            nil if the date is invalid.
-    #
     def convert_date_time(date_time_string)       #:nodoc:
       date_time = date_time_string.to_s.sub(/^\s+/, '').sub(/\s+$/, '').sub(/Z$/, '')
 
@@ -352,11 +338,6 @@ module Writexlsx
     # Check that row and col are valid and store max and min values for use in
     # other methods/elements.
     #
-    # The ignore_row/ignore_col flags is used to indicate that we wish to
-    # perform the dimension check without storing the value.
-    #
-    # The ignore flags are use by set_row() and data_validate.
-    #
     def check_dimensions_and_update_max_min_values(row, col, ignore_row = 0, ignore_col = 0)       #:nodoc:
       check_dimensions(row, col)
       store_row_max_min_values(row) if ignore_row == 0
@@ -486,9 +467,9 @@ module Writexlsx
 
     def v_shape_attributes_base(id, z_index)
       [
-        ['id',          "_x0000_s#{id}"],
-        ['type',        type],
-        ['style',       (v_shape_style_base(z_index, vertices) + style_addition).join]
+        ['id',    "_x0000_s#{id}"],
+        ['type',  type],
+        ['style', (v_shape_style_base(z_index, vertices) + style_addition).join]
       ]
     end
 
@@ -943,7 +924,7 @@ module Writexlsx
       else
         @writer.empty_tag(tag, attributes)
       end
-     end
+    end
 
     #
     # Convert the user specified colour index or string to a rgb colour.

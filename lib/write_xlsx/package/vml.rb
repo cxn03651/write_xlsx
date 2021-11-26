@@ -37,8 +37,8 @@ module Writexlsx
           end
           unless comments_data.empty?
             write_shape_type_and_shape(
-                                       comments_data,
-                                       vml_shape_id, z_index) do
+              comments_data,
+              vml_shape_id, z_index) do
               write_comment_shapetype
             end
           end
@@ -84,9 +84,9 @@ module Writexlsx
       def xml_attributes
         schema  = 'urn:schemas-microsoft-com:'
         [
-         ['xmlns:v', "#{schema}vml"],
-         ['xmlns:o', "#{schema}office:office"],
-         ['xmlns:x', "#{schema}office:excel"]
+          ['xmlns:v', "#{schema}vml"],
+          ['xmlns:o', "#{schema}office:office"],
+          ['xmlns:x', "#{schema}office:excel"]
         ]
       end
 
@@ -95,8 +95,8 @@ module Writexlsx
       #
       def write_shapelayout(data_id)
         attributes = [
-                      ['v:ext', 'edit']
-                     ]
+          ['v:ext', 'edit']
+        ]
 
         @writer.tag_elements('o:shapelayout', attributes) do
           # Write the o:idmap element.
@@ -121,10 +121,10 @@ module Writexlsx
       #
       def write_comment_shapetype
         attributes = [
-            ['id',        '_x0000_t202'],
-            ['coordsize', '21600,21600'],
-            ['o:spt',     202],
-            ['path',      'm,l,21600r21600,l21600,xe']
+          ['id',        '_x0000_t202'],
+          ['coordsize', '21600,21600'],
+          ['o:spt',     202],
+          ['path',      'm,l,21600r21600,l21600,xe']
         ]
 
         @writer.tag_elements('v:shapetype', attributes) do
@@ -140,11 +140,11 @@ module Writexlsx
       #
       def write_button_shapetype
         attributes = [
-                      ['id',        '_x0000_t201'],
-                      ['coordsize', '21600,21600'],
-                      ['o:spt',     201],
-                      ['path',      'm,l,21600r21600,l21600,xe']
-                     ]
+          ['id',        '_x0000_t201'],
+          ['coordsize', '21600,21600'],
+          ['o:spt',     201],
+          ['path',      'm,l,21600r21600,l21600,xe']
+        ]
 
         @writer.tag_elements('v:shapetype', attributes) do
           # Write the v:stroke element.
@@ -169,14 +169,14 @@ module Writexlsx
         stroked          = 'f'
 
         attributes = [
-                      ['id',               id],
-                      ['coordsize',        coordsize],
-                      ['o:spt',            spt],
-                      ['o:preferrelative', o_preferrelative],
-                      ['path',             path],
-                      ['filled',           filled],
-                      ['stroked',          stroked]
-                     ]
+          ['id',               id],
+          ['coordsize',        coordsize],
+          ['o:spt',            spt],
+          ['o:preferrelative', o_preferrelative],
+          ['path',             path],
+          ['filled',           filled],
+          ['stroked',          stroked]
+        ]
 
         @writer.tag_elements('v:shapetype', attributes) do
           # Write the v:stroke element.
@@ -198,12 +198,12 @@ module Writexlsx
       #
       def write_button_path
         attributes = [
-                      ['shadowok',      'f'],
-                      ['o:extrusionok', 'f'],
-                      ['strokeok',      'f'],
-                      ['fillok',        'f'],
-                      ['o:connecttype', 'rect']
-                     ]
+          ['shadowok',      'f'],
+          ['o:extrusionok', 'f'],
+          ['strokeok',      'f'],
+          ['fillok',        'f'],
+          ['o:connecttype', 'rect']
+        ]
         @writer.empty_tag('v:path', attributes)
       end
 
@@ -216,10 +216,10 @@ module Writexlsx
         connecttype     = 'rect'
 
         attributes = [
-                      ['o:extrusionok',   extrusionok],
-                      ['gradientshapeok', gradientshapeok],
-                      ['o:connecttype',   connecttype]
-                     ]
+          ['o:extrusionok',   extrusionok],
+          ['gradientshapeok', gradientshapeok],
+          ['o:connecttype',   connecttype]
+        ]
 
         @writer.empty_tag('v:path', attributes)
       end
@@ -229,9 +229,9 @@ module Writexlsx
       #
       def write_shapetype_lock
         attributes = [
-                      ['v:ext',     'edit'],
-                      ['shapetype', 't']
-                     ]
+          ['v:ext',     'edit'],
+          ['shapetype', 't']
+        ]
         @writer.empty_tag('o:lock', attributes)
       end
 
@@ -240,9 +240,9 @@ module Writexlsx
       #
       def write_rotation_lock
         attributes = [
-                      ['v:ext',    'edit'],
-                      ['rotation', 't']
-                     ]
+          ['v:ext',    'edit'],
+          ['rotation', 't']
+        ]
         @writer.empty_tag('o:lock', attributes)
       end
 
@@ -254,9 +254,9 @@ module Writexlsx
         aspectratio = 't'
 
         attributes = [
-                      ['v:ext',       ext],
-                      ['aspectratio', aspectratio]
-                     ]
+          ['v:ext',       ext],
+          ['aspectratio', aspectratio]
+        ]
 
         @writer.empty_tag('o:lock', attributes)
       end

@@ -19,82 +19,25 @@ module Writexlsx
 
   OFFICE_URL = 'http://schemas.microsoft.com/office/'   # :nodoc:
 
-  # The WriteXLSX provides an object oriented interface to a new Excel workbook.
-  # The following methods are available through a new workbook.
-  #
-  # * new[#method-c-new]
-  # * add_worksheet[#method-i-add_worksheet]
-  # * add_format[#method-i-add_format]
-  # * add_chart[#method-i-add_chart]
-  # * add_shape[#method-i-add_shape]
-  # * add_vba_project[#method-i-add_vba_project]
-  # * close[#method-i-close]
-  # * set_properties[#method-i-set_properties]
-  # * define_name[#method-i-define_name]
-  # * set_custom_color[#method-i-set_custom_color]
-  # * sheets[#method-i-sheets]
-  # * set_1904[#method-i-set_1904]
-  #
   class Workbook
 
     include Writexlsx::Utility
 
-    attr_writer :firstsheet  # :nodoc:
-    attr_reader :palette  # :nodoc:
-    attr_reader :worksheets, :charts, :drawings  # :nodoc:
-    attr_reader :named_ranges   # :nodoc:
-    attr_reader :doc_properties  # :nodoc:
-    attr_reader :custom_properties # :nodoc:
-    attr_reader :image_types, :images  # :nodoc:
-    attr_reader :shared_strings  # :nodoc:
-    attr_reader :vba_project  # :nodoc:
-    attr_reader :excel2003_style # :nodoc:
-    attr_reader :max_url_length # :nodoc:
-    attr_reader :strings_to_urls # :nodoc:
-    attr_reader :default_url_format # :nodoc:
-    attr_reader :read_only # :nodoc:
+    attr_writer :firstsheet                     # :nodoc:
+    attr_reader :palette                        # :nodoc:
+    attr_reader :worksheets, :charts, :drawings # :nodoc:
+    attr_reader :named_ranges                   # :nodoc:
+    attr_reader :doc_properties                 # :nodoc:
+    attr_reader :custom_properties              # :nodoc:
+    attr_reader :image_types, :images           # :nodoc:
+    attr_reader :shared_strings                 # :nodoc:
+    attr_reader :vba_project                    # :nodoc:
+    attr_reader :excel2003_style                # :nodoc:
+    attr_reader :max_url_length                 # :nodoc:
+    attr_reader :strings_to_urls                # :nodoc:
+    attr_reader :default_url_format             # :nodoc:
+    attr_reader :read_only                      # :nodoc:
 
-    #
-    # A new Excel workbook is created using the +new+ constructor
-    # which accepts either a filename or an IO object as a parameter.
-    # The following example creates a new Excel file based on a filename:
-    #
-    #     workbook  = WriteXLSX.new('filename.xlsx')
-    #     worksheet = workbook.add_worksheet
-    #     worksheet.write(0, 0, 'Hi Excel!')
-    #     workbook.close
-    #
-    # Here are some other examples of using +new+ with filenames:
-    #
-    #     workbook1 = WriteXLSX.new(filename)
-    #     workbook2 = WriteXLSX.new('/tmp/filename.xlsx')
-    #     workbook3 = WriteXLSX.new("c:\\tmp\\filename.xlsx")
-    #     workbook4 = WriteXLSX.new('c:\tmp\filename.xlsx')
-    #
-    # The last two examples demonstrates how to create a file on DOS or Windows
-    # where it is necessary to either escape the directory separator \
-    # or to use single quotes to ensure that it isn't interpolated.
-    #
-    # It is recommended that the filename uses the extension .xlsx
-    # rather than .xls since the latter causes an Excel warning
-    # when used with the XLSX format.
-    #
-    # The +new+ constructor returns a WriteXLSX object that you can use to
-    # add worksheets and store data.
-    #
-    # You can also pass a valid IO object to the +new+ constructor.
-    #
-    #     xlsx = StringIO.new
-    #     workbook = WriteXLSX.new(xlsx)
-    #     ....
-    #     workbook.close
-    #     # you can get XLSX binary data as xlsx.string
-    #
-    # And you can pass default_formats parameter like this:
-    #
-    #     formats = { :font => 'Arial', :size => 10.5 }
-    #     workbook = WriteXLSX.new('file.xlsx', formats)
-    #
     def initialize(file, *option_params)
       options, default_formats = process_workbook_options(*option_params)
       @writer = Package::XMLWriterSimple.new
@@ -150,8 +93,13 @@ module Writexlsx
       @calc_on_load        = true
 
       if @excel2003_style
-        add_format(default_formats
-                     .merge(:xf_index => 0, :font_family => 0, :font => 'Arial', :size => 10, :theme => -1))
+        add_format(default_formats.merge(
+                     :xf_index    => 0,
+                     :font_family => 0,
+                     :font        => 'Arial',
+                     :size        => 10,
+                     :theme       => -1
+                   ))
       else
         add_format(default_formats.merge(:xf_index => 0))
       end
@@ -164,13 +112,6 @@ module Writexlsx
 
     #
     # The close method is used to close an Excel file.
-    #
-    # An explicit close is required if the file must be closed prior to performing
-    # some external action on it such as copying it, reading its size or attaching
-    # it to an email.
-    #
-    # In general, if you create a file with a size of 0 bytes or you fail to create
-    # a file you need to call close.
     #
     def close
       # In case close() is called twice.
@@ -186,32 +127,6 @@ module Writexlsx
     # :call-seq:
     #   sheets              -> array of all Wordsheet object
     #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
-    #
-    # The sheets method returns a array, or a sliced array, of the worksheets
-    # in a workbook.
-    #
-    # If no arguments are passed the method returns a list of all the worksheets
-    # in the workbook. This is useful if you want to repeat an operation on each
-    # worksheet:
-    #
-    #     workbook.sheets.each do |worksheet|
-    #        print worksheet.get_name
-    #     end
-    #
-    # You can also specify a slice list to return one or more worksheet objects:
-    #
-    #     worksheet = workbook.sheets(0)
-    #     worksheet.write('A1', 'Hello')
-    #
-    # you can write the above example as:
-    #
-    #     workbook.sheets(0).write('A1', 'Hello')
-    #
-    # The following example returns the first and last worksheet in a workbook:
-    #
-    #     workbook.sheets(0, -1).each do |sheet|
-    #        # Do something
-    #     end
     #
     def sheets(*args)
       if args.empty?
@@ -231,20 +146,6 @@ module Writexlsx
 
     #
     # Set the date system: false = 1900 (the default), true = 1904
-    #
-    # Excel stores dates as real numbers where the integer part stores
-    # the number of days since the epoch and the fractional part stores
-    # the percentage of the day. The epoch can be either 1900 or 1904.
-    # Excel for Windows uses 1900 and Excel for Macintosh uses 1904.
-    # However, Excel on either platform will convert automatically between
-    # one system and the other.
-    #
-    # WriteXLSX stores dates in the 1900 format by default. If you wish to
-    # change this you can call the set_1904 workbook method.
-    # You can query the current value by calling the get_1904 workbook method.
-    # This returns false for 1900 and true for 1904.
-    #
-    # In general you probably won't need to use set_1904.
     #
     def set_1904(mode = true)
       unless sheets.empty?
@@ -322,20 +223,6 @@ module Writexlsx
     #
     # At least one worksheet should be added to a new workbook. A worksheet is used to write data into cells:
     #
-    #     worksheet1 = workbook.add_worksheet               # Sheet1
-    #     worksheet2 = workbook.add_worksheet('Foglio2')    # Foglio2
-    #     worksheet3 = workbook.add_worksheet('Data')       # Data
-    #     worksheet4 = workbook.add_worksheet               # Sheet4
-    # If name is not specified the default Excel convention will be followed, i.e. Sheet1, Sheet2, etc.
-    #
-    # The worksheet name must be a valid Excel worksheet name,
-    # i.e. it cannot contain any of the following characters,
-    #     [ ] : * ? / \
-    #
-    # and it must be less than 32 characters.
-    # In addition, you cannot use the same, case insensitive,
-    # sheetname for more than one worksheet.
-    #
     def add_worksheet(name = '')
       name  = check_sheetname(name)
       worksheet = Worksheet.new(self, @worksheets.size, name)
@@ -346,72 +233,7 @@ module Writexlsx
     #
     # This method is use to create a new chart either as a standalone worksheet
     # (the default) or as an embeddable object that can be inserted into
-    # a worksheet via the
-    # {Worksheet#insert_chart}[Worksheet.html#method-i-insert_chart] method.
-    #
-    #     chart = workbook.add_chart(:type => 'column')
-    #
-    # The properties that can be set are:
-    #
-    #     :type     (required)
-    #     :subtype  (optional)
-    #     :name     (optional)
-    #     :embedded (optional)
-    #
-    # === :type
-    #
-    # This is a required parameter.
-    # It defines the type of chart that will be created.
-    #
-    #     chart = workbook.add_chart(:type => 'line')
-    #
-    # The available types are:
-    #
-    #     area
-    #     bar
-    #     column
-    #     line
-    #     pie
-    #     scatter
-    #     stock
-    #
-    # === :subtype
-    #
-    # Used to define a chart subtype where available.
-    #
-    #     chart = workbook.add_chart(:type => 'bar', :subtype => 'stacked')
-    #
-    # Currently only Bar and Column charts support subtypes
-    # (stacked and percent_stacked). See the documentation for those chart
-    # types.
-    #
-    # === :name
-    #
-    # Set the name for the chart sheet. The name property is optional and
-    # if it isn't supplied will default to Chart1 .. n. The name must be
-    # a valid Excel worksheet name. See add_worksheet
-    # for more details on valid sheet names. The name property can be
-    # omitted for embedded charts.
-    #
-    #     chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
-    #
-    # === :embedded
-    #
-    # Specifies that the Chart object will be inserted in a worksheet
-    # via the {Worksheet#insert_chart}[Worksheet.html#insert_chart] method.
-    # It is an error to try insert a Chart that doesn't have this flag set.
-    #
-    #     chart = workbook.add_chart(:type => 'line', :embedded => 1)
-    #
-    #     # Configure the chart.
-    #     ...
-    #
-    #     # Insert the chart into the a worksheet.
-    #     worksheet.insert_chart('E2', chart)
-    #
-    # See Chart[Chart.html] for details on how to configure the chart object
-    # once it is created. See also the chart_*.rb programs in the examples
-    # directory of the distro.
+    # a worksheet via the insert_chart method.
     #
     def add_chart(params = {})
       # Type must be specified so we can create the required chart instance.
@@ -443,16 +265,13 @@ module Writexlsx
     end
 
     #
-    # The +add_format+ method can be used to create new Format objects
+    # The add_format method can be used to create new Format objects
     # which are used to apply formatting to a cell. You can either define
     # the properties at creation time via a hash of property values
     # or later via method calls.
     #
     #     format1 = workbook.add_format(property_hash) # Set properties at creation
     #     format2 = workbook.add_format                # Set properties later
-    #
-    # See the {Format Class's rdoc}[Format.html] for more details about
-    # Format properties and how to set them.
     #
     def add_format(property_hash = {})
       properties = {}
@@ -472,236 +291,6 @@ module Writexlsx
     # The +add_shape+ method can be used to create new shapes that may be
     # inserted into a worksheet.
     #
-    # You can either define the properties at creation time via a hash of
-    # property values or later via method calls.
-    #
-    #     # Set properties at creation.
-    #     plus  = workbook.add_shape(
-    #               :type   => 'plus',
-    #               :id     => 3,
-    #               :width  => pw,
-    #               :height => ph
-    #             )
-    #
-    #     # Default rectangle shape. Set properties later.
-    #     rect  = workbook.add_shape
-    #
-    # See also the shape*.rb programs in the examples directory of the distro.
-    #
-    # === Shape Properties
-    #
-    # Any shape property can be queried or modified by [ ] like hash.
-    #
-    #   ellipse = workbook.add_shape(properties)
-    #   ellipse[:type] = 'cross'    # No longer an ellipse !
-    #   type = ellipse[:type]       # Find out what it really is.
-    #
-    # The properties of a shape object that can be defined via add_shape are
-    # shown below.
-    #
-    # ===:name
-    #
-    # Defines the name of the shape. This is an optional property and the shape
-    # will be given a default name if not supplied. The name is generally only
-    # used by Excel Macros to refer to the object.
-    #
-    # ===:type
-    #
-    # Defines the type of the object such as +:rect+, +:ellipse+ OR +:triangle+.
-    #
-    #   ellipse = workbook.add_shape(:type => :ellipse)
-    #
-    # The default type is +:rect+.
-    #
-    # The full list of available shapes is shown below.
-    #
-    # See also the shape_all.rb program in the examples directory of the distro.
-    # It creates an example workbook with all supported shapes labelled with
-    # their shape names.
-    #
-    # === Basic Shapes
-    #
-    #    blockArc              can            chevron       cube          decagon
-    #    diamond               dodecagon      donut         ellipse       funnel
-    #    gear6                 gear9          heart         heptagon      hexagon
-    #    homePlate             lightningBolt  line          lineInv       moon
-    #    nonIsoscelesTrapezoid noSmoking      octagon       parallelogram pentagon
-    #    pie                   pieWedge       plaque        rect          round1Rect
-    #    round2DiagRect        round2SameRect roundRect     rtTriangle    smileyFace
-    #    snip1Rect             snip2DiagRect  snip2SameRect snipRoundRect star10
-    #    star12                star16         star24        star32        star4
-    #    star5                 star6          star7         star8         sun
-    #    teardrop              trapezoid      triangle
-    #
-    # === Arrow Shapes
-    #
-    #    bentArrow        bentUpArrow       circularArrow     curvedDownArrow
-    #    curvedLeftArrow  curvedRightArrow  curvedUpArrow     downArrow
-    #    leftArrow        leftCircularArrow leftRightArrow    leftRightCircularArrow
-    #    leftRightUpArrow leftUpArrow       notchedRightArrow quadArrow
-    #    rightArrow       stripedRightArrow swooshArrow       upArrow
-    #    upDownArrow      uturnArrow
-    #
-    # === Connector Shapes
-    #
-    #    bentConnector2   bentConnector3   bentConnector4
-    #    bentConnector5   curvedConnector2 curvedConnector3
-    #    curvedConnector4 curvedConnector5 straightConnector1
-    #
-    # === Callout Shapes
-    #
-    #    accentBorderCallout1  accentBorderCallout2  accentBorderCallout3
-    #    accentCallout1        accentCallout2        accentCallout3
-    #    borderCallout1        borderCallout2        borderCallout3
-    #    callout1              callout2              callout3
-    #    cloudCallout          downArrowCallout      leftArrowCallout
-    #    leftRightArrowCallout quadArrowCallout      rightArrowCallout
-    #    upArrowCallout        upDownArrowCallout    wedgeEllipseCallout
-    #    wedgeRectCallout      wedgeRoundRectCallout
-    #
-    # === Flow Chart Shapes
-    #
-    #    flowChartAlternateProcess  flowChartCollate        flowChartConnector
-    #    flowChartDecision          flowChartDelay          flowChartDisplay
-    #    flowChartDocument          flowChartExtract        flowChartInputOutput
-    #    flowChartInternalStorage   flowChartMagneticDisk   flowChartMagneticDrum
-    #    flowChartMagneticTape      flowChartManualInput    flowChartManualOperation
-    #    flowChartMerge             flowChartMultidocument  flowChartOfflineStorage
-    #    flowChartOffpageConnector  flowChartOnlineStorage  flowChartOr
-    #    flowChartPredefinedProcess flowChartPreparation    flowChartProcess
-    #    flowChartPunchedCard       flowChartPunchedTape    flowChartSort
-    #    flowChartSummingJunction   flowChartTerminator
-    #
-    # === Action Shapes
-    #
-    #    actionButtonBackPrevious actionButtonBeginning actionButtonBlank
-    #    actionButtonDocument     actionButtonEnd       actionButtonForwardNext
-    #    actionButtonHelp         actionButtonHome      actionButtonInformation
-    #    actionButtonMovie        actionButtonReturn    actionButtonSound
-    #
-    # === Chart Shapes
-    #
-    # Not to be confused with Excel Charts.
-    #
-    #    chartPlus chartStar chartX
-    #
-    # === Math Shapes
-    #
-    #    mathDivide mathEqual mathMinus mathMultiply mathNotEqual mathPlus
-    #
-    # === Starts and Banners
-    #
-    #    arc            bevel          bracePair  bracketPair chord
-    #    cloud          corner         diagStripe doubleWave  ellipseRibbon
-    #    ellipseRibbon2 foldedCorner   frame      halfFrame   horizontalScroll
-    #    irregularSeal1 irregularSeal2 leftBrace  leftBracket leftRightRibbon
-    #    plus           ribbon         ribbon2    rightBrace  rightBracket
-    #    verticalScroll wave
-    #
-    # === Tab Shapes
-    #
-    #    cornerTabs plaqueTabs squareTabs
-    #
-    # === :text
-    #
-    # This property is used to make the shape act like a text box.
-    #
-    #    rect = workbook.add_shape(:type => 'rect', :text => "Hello \nWorld")
-    #
-    # The Text is super-imposed over the shape. The text can be wrapped using
-    # the newline character \n.
-    #
-    # === :id
-    #
-    # Identification number for internal identification. This number will be
-    # auto-assigned, if not assigned, or if it is a duplicate.
-    #
-    # === :format
-    #
-    # Workbook format for decorating the shape horizontally and/or vertically.
-    #
-    # === :rotation
-    #
-    # Shape rotation, in degrees, from 0 to 360
-    #
-    # === :line, :fill
-    #
-    # Shape color for the outline and fill.
-    # Colors may be specified  as a color index, or in RGB format, i.e. AA00FF.
-    #
-    # See COULOURS IN EXCEL in the main documentation for more information.
-    #
-    # === :link_type
-    #
-    # Line type for shape outline. The default is solid.
-    # The list of possible values is:
-    #
-    #    dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot, solid
-    #
-    # === :valign, :align
-    #
-    # Text alignment within the shape.
-    #
-    # Vertical alignment can be:
-    #
-    #    Setting     Meaning
-    #    =======     =======
-    #    t           Top
-    #    ctr         Centre
-    #    b           Bottom
-    #
-    # Horizontal alignment can be:
-    #
-    #    Setting     Meaning
-    #    =======     =======
-    #    l           Left
-    #    r           Right
-    #    ctr         Centre
-    #    just        Justified
-    #
-    # The default is to center both horizontally and vertically.
-    #
-    # === :scale_x, :scale_y
-    #
-    # Scale factor in x and y dimension, for scaling the shape width and
-    # height. The default value is 1.
-    #
-    # Scaling may be set on the shape object or via insert_shape.
-    #
-    # === :adjustments
-    #
-    # Adjustment of shape vertices. Most shapes do not use this. For some
-    # shapes, there is a single adjustment to modify the geometry.
-    # For instance, the plus shape has one adjustment to control the width
-    # of the spokes.
-    #
-    # Connectors can have a number of adjustments to control the shape
-    # routing. Typically, a connector will have 3 to 5 handles for routing
-    # the shape. The adjustment is in percent of the distance from the
-    # starting shape to the ending shape, alternating between the x and y
-    # dimension. Adjustments may be negative, to route the shape away
-    # from the endpoint.
-    #
-    # === :stencil
-    #
-    # Shapes work in stencil mode by default. That is, once a shape is
-    # inserted, its connection is separated from its master.
-    # The master shape may be modified after an instance is inserted,
-    # and only subsequent insertions will show the modifications.
-    #
-    # This is helpful for Org charts, where an employee shape may be
-    # created once, and then the text of the shape is modified for each
-    # employee.
-    #
-    # The insert_shape method returns a reference to the inserted
-    # shape (the child).
-    #
-    # Stencil mode can be turned off, allowing for shape(s) to be
-    # modified after insertion. In this case the insert_shape() method
-    # returns a reference to the inserted shape (the master).
-    # This is not very useful for inserting multiple shapes,
-    # since the x/y coordinates also gets modified.
-    #
     def add_shape(properties = {})
       shape = Shape.new(properties)
       shape.palette = @palette
@@ -714,31 +303,6 @@ module Writexlsx
     #
     # Create a defined name in Excel. We handle global/workbook level names and
     # local/worksheet names.
-    #
-    # This method is used to defined a name that can be used to represent
-    # a value, a single cell or a range of cells in a workbook.
-    #
-    # For example to set a global/workbook name:
-    #
-    #   # Global/workbook names.
-    #   workbook.define_name('Exchange_rate', '=0.96')
-    #   workbook.define_name('Sales',         '=Sheet1!$G$1:$H$10')
-    #
-    # It is also possible to define a local/worksheet name by prefixing the name
-    # with the sheet name using the syntax +sheetname!definedname+:
-    #
-    #   # Local/worksheet name.
-    #   workbook.define_name('Sheet2!Sales',  '=Sheet2!$G$1:$G$10')
-    #
-    # If the sheet name contains spaces or special characters
-    # you must enclose it in single quotes like in Excel:
-    #
-    #   workbook.define_name("'New Data'!Sales",  '=Sheet2!$G$1:$G$10')
-    #
-    # See the defined_name.rb program in the examples dir of the distro.
-    #
-    # Refer to the following to see Excel's syntax rules for defined names:
-    # <http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names>
     #
     def define_name(name, formula)
       sheet_index = nil
@@ -817,29 +381,6 @@ module Writexlsx
     # when you use the Office Button -> Prepare -> Properties option in Excel
     # and are also available to external applications that read or index windows
     # files.
-    #
-    # The properties should be passed in hash format as follows:
-    #
-    #     workbook.set_properties(
-    #       :title    => 'This is an example spreadsheet',
-    #       :author   => 'Hideo NAKAMURA',
-    #       :comments => 'Created with Ruby and WriteXLSX'
-    #     )
-    #
-    # The properties that can be set are:
-    #
-    #     :title
-    #     :subject
-    #     :author
-    #     :manager
-    #     :company
-    #     :category
-    #     :keywords
-    #     :comments
-    #     :status
-    #
-    # See also the properties.rb program in the examples directory
-    # of the distro.
     #
     def set_properties(params)
       # Ignore if no args were passed.
@@ -924,27 +465,6 @@ module Writexlsx
     # WriteXLSX file using a binary VBA project file that has been extracted
     # from an existing Excel xlsm file.
     #
-    #     workbook  = WriteXLSX.new('file.xlsm')
-    #
-    #     workbook.add_vba_project('./vbaProject.bin')
-    #
-    # The supplied +extract_vba+ utility can be used to extract the required
-    # +vbaProject.bin+ file from an existing Excel file:
-    #
-    #     $ extract_vba file.xlsm
-    #     Extracted 'vbaProject.bin' successfully
-    #
-    # Macros can be tied to buttons using the worksheet
-    # {insert_button}[Worksheet.html#method-i-insert_button] method
-    # (see the "WORKSHEET METHODS" section for details):
-    #
-    #     worksheet.insert_button('C2', { :macro => 'my_macro' })
-    #
-    # Note, Excel uses the file extension xlsm instead of xlsx for files that
-    # contain macros. It is advisable to follow the same convention.
-    #
-    # See also the macros.rb example file.
-    #
     def add_vba_project(vba_project)
       @vba_project = vba_project
     end
@@ -996,60 +516,6 @@ module Writexlsx
 
     #
     # Change the RGB components of the elements in the colour palette.
-    #
-    # The set_custom_color method can be used to override one of the built-in
-    # palette values with a more suitable colour.
-    #
-    # The value for +index+ should be in the range 8..63,
-    # see "COLOURS IN EXCEL".
-    #
-    # The default named colours use the following indices:
-    #
-    #      8   =>   black
-    #      9   =>   white
-    #     10   =>   red
-    #     11   =>   lime
-    #     12   =>   blue
-    #     13   =>   yellow
-    #     14   =>   magenta
-    #     15   =>   cyan
-    #     16   =>   brown
-    #     17   =>   green
-    #     18   =>   navy
-    #     20   =>   purple
-    #     22   =>   silver
-    #     23   =>   gray
-    #     33   =>   pink
-    #     53   =>   orange
-    #
-    # A new colour is set using its RGB (red green blue) components. The +red+,
-    # +green+ and +blue+ values must be in the range 0..255. You can determine
-    # the required values in Excel using the Tools->Options->Colors->Modify
-    # dialog.
-    #
-    # The set_custom_color workbook method can also be used with a HTML style
-    # +#rrggbb+ hex value:
-    #
-    #     workbook.set_custom_color(40, 255,  102,  0   ) # Orange
-    #     workbook.set_custom_color(40, 0xFF, 0x66, 0x00) # Same thing
-    #     workbook.set_custom_color(40, '#FF6600'       ) # Same thing
-    #
-    #     font = workbook.add_format(:color => 40)   # Use the modified colour
-    #
-    # The return value from set_custom_color() is the index of the colour that
-    # was changed:
-    #
-    #     ferrari = workbook.set_custom_color(40, 216, 12, 12)
-    #
-    #     format  = workbook.add_format(
-    #                                 :bg_color => ferrari,
-    #                                 :pattern  => 1,
-    #                                 :border   => 1
-    #                            )
-    #
-    # Note, In the XLSX format the color palette isn't actually confined to 53
-    # unique colors. The WriteXLSX gem will be extended at a later stage to
-    # support the newer, semi-infinite, palette.
     #
     def set_custom_color(index, red = 0, green = 0, blue = 0)
       # Match a HTML #xxyyzz style parameter
@@ -1122,15 +588,15 @@ module Writexlsx
 
     def style_properties
       [
-       @xf_formats,
-       @palette,
-       @font_count,
-       @num_format_count,
-       @border_count,
-       @fill_count,
-       @custom_colors,
-       @dxf_formats,
-       @has_comments
+        @xf_formats,
+        @palette,
+        @font_count,
+        @num_format_count,
+        @border_count,
+        @fill_count,
+        @custom_colors,
+        @dxf_formats,
+        @has_comments
       ]
     end
 
@@ -1195,63 +661,63 @@ module Writexlsx
     #
     def set_color_palette #:nodoc:
       @palette = [
-            [ 0x00, 0x00, 0x00, 0x00 ],    # 8
-            [ 0xff, 0xff, 0xff, 0x00 ],    # 9
-            [ 0xff, 0x00, 0x00, 0x00 ],    # 10
-            [ 0x00, 0xff, 0x00, 0x00 ],    # 11
-            [ 0x00, 0x00, 0xff, 0x00 ],    # 12
-            [ 0xff, 0xff, 0x00, 0x00 ],    # 13
-            [ 0xff, 0x00, 0xff, 0x00 ],    # 14
-            [ 0x00, 0xff, 0xff, 0x00 ],    # 15
-            [ 0x80, 0x00, 0x00, 0x00 ],    # 16
-            [ 0x00, 0x80, 0x00, 0x00 ],    # 17
-            [ 0x00, 0x00, 0x80, 0x00 ],    # 18
-            [ 0x80, 0x80, 0x00, 0x00 ],    # 19
-            [ 0x80, 0x00, 0x80, 0x00 ],    # 20
-            [ 0x00, 0x80, 0x80, 0x00 ],    # 21
-            [ 0xc0, 0xc0, 0xc0, 0x00 ],    # 22
-            [ 0x80, 0x80, 0x80, 0x00 ],    # 23
-            [ 0x99, 0x99, 0xff, 0x00 ],    # 24
-            [ 0x99, 0x33, 0x66, 0x00 ],    # 25
-            [ 0xff, 0xff, 0xcc, 0x00 ],    # 26
-            [ 0xcc, 0xff, 0xff, 0x00 ],    # 27
-            [ 0x66, 0x00, 0x66, 0x00 ],    # 28
-            [ 0xff, 0x80, 0x80, 0x00 ],    # 29
-            [ 0x00, 0x66, 0xcc, 0x00 ],    # 30
-            [ 0xcc, 0xcc, 0xff, 0x00 ],    # 31
-            [ 0x00, 0x00, 0x80, 0x00 ],    # 32
-            [ 0xff, 0x00, 0xff, 0x00 ],    # 33
-            [ 0xff, 0xff, 0x00, 0x00 ],    # 34
-            [ 0x00, 0xff, 0xff, 0x00 ],    # 35
-            [ 0x80, 0x00, 0x80, 0x00 ],    # 36
-            [ 0x80, 0x00, 0x00, 0x00 ],    # 37
-            [ 0x00, 0x80, 0x80, 0x00 ],    # 38
-            [ 0x00, 0x00, 0xff, 0x00 ],    # 39
-            [ 0x00, 0xcc, 0xff, 0x00 ],    # 40
-            [ 0xcc, 0xff, 0xff, 0x00 ],    # 41
-            [ 0xcc, 0xff, 0xcc, 0x00 ],    # 42
-            [ 0xff, 0xff, 0x99, 0x00 ],    # 43
-            [ 0x99, 0xcc, 0xff, 0x00 ],    # 44
-            [ 0xff, 0x99, 0xcc, 0x00 ],    # 45
-            [ 0xcc, 0x99, 0xff, 0x00 ],    # 46
-            [ 0xff, 0xcc, 0x99, 0x00 ],    # 47
-            [ 0x33, 0x66, 0xff, 0x00 ],    # 48
-            [ 0x33, 0xcc, 0xcc, 0x00 ],    # 49
-            [ 0x99, 0xcc, 0x00, 0x00 ],    # 50
-            [ 0xff, 0xcc, 0x00, 0x00 ],    # 51
-            [ 0xff, 0x99, 0x00, 0x00 ],    # 52
-            [ 0xff, 0x66, 0x00, 0x00 ],    # 53
-            [ 0x66, 0x66, 0x99, 0x00 ],    # 54
-            [ 0x96, 0x96, 0x96, 0x00 ],    # 55
-            [ 0x00, 0x33, 0x66, 0x00 ],    # 56
-            [ 0x33, 0x99, 0x66, 0x00 ],    # 57
-            [ 0x00, 0x33, 0x00, 0x00 ],    # 58
-            [ 0x33, 0x33, 0x00, 0x00 ],    # 59
-            [ 0x99, 0x33, 0x00, 0x00 ],    # 60
-            [ 0x99, 0x33, 0x66, 0x00 ],    # 61
-            [ 0x33, 0x33, 0x99, 0x00 ],    # 62
-            [ 0x33, 0x33, 0x33, 0x00 ],    # 63
-        ]
+        [ 0x00, 0x00, 0x00, 0x00 ],    # 8
+        [ 0xff, 0xff, 0xff, 0x00 ],    # 9
+        [ 0xff, 0x00, 0x00, 0x00 ],    # 10
+        [ 0x00, 0xff, 0x00, 0x00 ],    # 11
+        [ 0x00, 0x00, 0xff, 0x00 ],    # 12
+        [ 0xff, 0xff, 0x00, 0x00 ],    # 13
+        [ 0xff, 0x00, 0xff, 0x00 ],    # 14
+        [ 0x00, 0xff, 0xff, 0x00 ],    # 15
+        [ 0x80, 0x00, 0x00, 0x00 ],    # 16
+        [ 0x00, 0x80, 0x00, 0x00 ],    # 17
+        [ 0x00, 0x00, 0x80, 0x00 ],    # 18
+        [ 0x80, 0x80, 0x00, 0x00 ],    # 19
+        [ 0x80, 0x00, 0x80, 0x00 ],    # 20
+        [ 0x00, 0x80, 0x80, 0x00 ],    # 21
+        [ 0xc0, 0xc0, 0xc0, 0x00 ],    # 22
+        [ 0x80, 0x80, 0x80, 0x00 ],    # 23
+        [ 0x99, 0x99, 0xff, 0x00 ],    # 24
+        [ 0x99, 0x33, 0x66, 0x00 ],    # 25
+        [ 0xff, 0xff, 0xcc, 0x00 ],    # 26
+        [ 0xcc, 0xff, 0xff, 0x00 ],    # 27
+        [ 0x66, 0x00, 0x66, 0x00 ],    # 28
+        [ 0xff, 0x80, 0x80, 0x00 ],    # 29
+        [ 0x00, 0x66, 0xcc, 0x00 ],    # 30
+        [ 0xcc, 0xcc, 0xff, 0x00 ],    # 31
+        [ 0x00, 0x00, 0x80, 0x00 ],    # 32
+        [ 0xff, 0x00, 0xff, 0x00 ],    # 33
+        [ 0xff, 0xff, 0x00, 0x00 ],    # 34
+        [ 0x00, 0xff, 0xff, 0x00 ],    # 35
+        [ 0x80, 0x00, 0x80, 0x00 ],    # 36
+        [ 0x80, 0x00, 0x00, 0x00 ],    # 37
+        [ 0x00, 0x80, 0x80, 0x00 ],    # 38
+        [ 0x00, 0x00, 0xff, 0x00 ],    # 39
+        [ 0x00, 0xcc, 0xff, 0x00 ],    # 40
+        [ 0xcc, 0xff, 0xff, 0x00 ],    # 41
+        [ 0xcc, 0xff, 0xcc, 0x00 ],    # 42
+        [ 0xff, 0xff, 0x99, 0x00 ],    # 43
+        [ 0x99, 0xcc, 0xff, 0x00 ],    # 44
+        [ 0xff, 0x99, 0xcc, 0x00 ],    # 45
+        [ 0xcc, 0x99, 0xff, 0x00 ],    # 46
+        [ 0xff, 0xcc, 0x99, 0x00 ],    # 47
+        [ 0x33, 0x66, 0xff, 0x00 ],    # 48
+        [ 0x33, 0xcc, 0xcc, 0x00 ],    # 49
+        [ 0x99, 0xcc, 0x00, 0x00 ],    # 50
+        [ 0xff, 0xcc, 0x00, 0x00 ],    # 51
+        [ 0xff, 0x99, 0x00, 0x00 ],    # 52
+        [ 0xff, 0x66, 0x00, 0x00 ],    # 53
+        [ 0x66, 0x66, 0x99, 0x00 ],    # 54
+        [ 0x96, 0x96, 0x96, 0x00 ],    # 55
+        [ 0x00, 0x33, 0x66, 0x00 ],    # 56
+        [ 0x33, 0x99, 0x66, 0x00 ],    # 57
+        [ 0x00, 0x33, 0x00, 0x00 ],    # 58
+        [ 0x33, 0x33, 0x00, 0x00 ],    # 59
+        [ 0x99, 0x33, 0x00, 0x00 ],    # 60
+        [ 0x99, 0x33, 0x66, 0x00 ],    # 61
+        [ 0x33, 0x33, 0x99, 0x00 ],    # 62
+        [ 0x33, 0x33, 0x33, 0x00 ],    # 63
+      ]
     end
 
     #
@@ -1315,11 +781,11 @@ module Writexlsx
 
     def write_file_version #:nodoc:
       attributes = [
-                    ['appName', 'xl'],
-                    ['lastEdited', 4],
-                    ['lowestEdited', 4],
-                    ['rupBuild', 4505]
-                   ]
+        ['appName', 'xl'],
+        ['lastEdited', 4],
+        ['lowestEdited', 4],
+        ['rupBuild', 4505]
+      ]
 
       if @vba_project
         attributes << [:codeName, '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}']
@@ -1353,11 +819,11 @@ module Writexlsx
 
     def write_workbook_view #:nodoc:
       attributes = [
-                    ['xWindow',       @x_window],
-                    ['yWindow',       @y_window],
-                    ['windowWidth',   @window_width],
-                    ['windowHeight',  @window_height]
-                   ]
+        ['xWindow',       @x_window],
+        ['yWindow',       @y_window],
+        ['windowWidth',   @window_width],
+        ['windowHeight',  @window_height]
+      ]
       if @tab_ratio != 600
         attributes << ['tabRatio', @tab_ratio]
       end
@@ -1693,20 +1159,20 @@ module Writexlsx
         # Check for Print Area settings.
         if sheet.autofilter_area
           @defined_names << [
-                             '_xlnm._FilterDatabase',
-                             sheet.index,
-                             sheet.autofilter_area,
-                             1
-                            ]
+            '_xlnm._FilterDatabase',
+            sheet.index,
+            sheet.autofilter_area,
+            1
+          ]
         end
 
         # Check for Print Area settings.
         if !sheet.print_area.empty?
           @defined_names << [
-                             '_xlnm.Print_Area',
-                             sheet.index,
-                             sheet.print_area
-                            ]
+            '_xlnm.Print_Area',
+            sheet.index,
+            sheet.print_area
+          ]
         end
 
         # Check for repeat rows/cols. aka, Print Titles.
@@ -2105,7 +1571,7 @@ module Writexlsx
         type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
         @image_types[:jpeg] = 1
       elsif data.unpack('A4')[0] == 'GIF8'
-      # Test for GIFs.
+        # Test for GIFs.
         type, width, height, x_dpi, y_dpi = process_gif(data, filename)
         @image_types[:gif] = 1
       elsif data.unpack('A2')[0] == 'BM'

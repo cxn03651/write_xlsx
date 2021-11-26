@@ -138,7 +138,7 @@ module Writexlsx
 
         @writer.tag_elements('cellMetadata', attributes) do
           @writer.tag_elements('bk') do
-          # Write the rc element.
+            # Write the rc element.
             write_rc
           end
         end

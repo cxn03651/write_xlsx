@@ -105,12 +105,12 @@ module Writexlsx
         attributes << ['pageOrder',       "overThenDown"] if @across
         attributes << ['firstPageNumber', @page_start]    if @page_start && @page_start > 1
         attributes << ['orientation',
-          if @orientation
-            'portrait'
-          else
-            'landscape'
-          end
-        ]
+                       if @orientation
+                         'portrait'
+                       else
+                         'landscape'
+                       end
+                      ]
         attributes << ['blackAndWhite', 1]      if @black_white
         attributes << ['useFirstPageNumber', 1] if ptrue?(@page_start)
 
@@ -180,12 +180,12 @@ module Writexlsx
 
       def margin_attributes    # :nodoc:
         [
-         ['left',   @margin_left],
-         ['right',  @margin_right],
-         ['top',    @margin_top],
-         ['bottom', @margin_bottom],
-         ['header', @margin_header],
-         ['footer', @margin_footer]
+          ['left',   @margin_left],
+          ['right',  @margin_right],
+          ['top',    @margin_top],
+          ['bottom', @margin_bottom],
+          ['header', @margin_header],
+          ['footer', @margin_footer]
         ]
       end
     end

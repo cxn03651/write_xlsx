@@ -165,9 +165,9 @@ module Writexlsx
       #
       def add_table_name(table_name)
         add_override(
-                     "/xl/tables/#{table_name}.xml",
-                     "#{App_document}spreadsheetml.table+xml"
-                     )
+          "/xl/tables/#{table_name}.xml",
+          "#{App_document}spreadsheetml.table+xml"
+        )
       end
 
       #
@@ -228,10 +228,10 @@ module Writexlsx
 
       def write_default_or_override(tag, param0, a)
         @writer.empty_tag(tag,
-          [
-            [param0, a[0]],
-            ['ContentType', a[1]]
-          ])
+                          [
+                            [param0, a[0]],
+                            ['ContentType', a[1]]
+                          ])
       end
 
       #
@@ -240,8 +240,8 @@ module Writexlsx
       def write_types
         xmlns = 'http://schemas.openxmlformats.org/package/2006/content-types'
         attributes = [
-                      ['xmlns', xmlns]
-                     ]
+          ['xmlns', xmlns]
+        ]
 
         @writer.tag_elements('Types', attributes) { yield }
       end

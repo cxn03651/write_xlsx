@@ -105,8 +105,8 @@ module Writexlsx
 
         schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
         attributes = [
-            ['xmlns',     "#{schema}extended-properties"],
-            ['xmlns:vt',  "#{schema}docPropsVTypes"]
+          ['xmlns',     "#{schema}extended-properties"],
+          ['xmlns:vt',  "#{schema}docPropsVTypes"]
         ]
 
         @writer.tag_elements('Properties', attributes) { yield }

@@ -9,7 +9,7 @@ module Writexlsx
 
     def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, decorative = nil)
       @type, @dimensions, @width, @height, @description, @shape, @anchor, @rel_index, @url_rel_index, @tip, @decorative =
-        type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip, decorative
+                                                                                                            type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip, decorative
     end
   end
 
@@ -70,8 +70,8 @@ module Writexlsx
     def write_drawing_workspace
       schema    = 'http://schemas.openxmlformats.org/drawingml/'
       attributes = [
-          ['xmlns:xdr', "#{schema}2006/spreadsheetDrawing"],
-          ['xmlns:a',    "#{schema}2006/main"]
+        ['xmlns:xdr', "#{schema}2006/spreadsheetDrawing"],
+        ['xmlns:a',    "#{schema}2006/main"]
       ]
 
       @writer.tag_elements('xdr:wsDr', attributes) { yield }
@@ -166,7 +166,7 @@ module Writexlsx
       end
     end
 
-      #
+    #
     # Write the <xdr:from> element.
     #
     def write_from(col, row, col_offset, row_offset)
@@ -487,9 +487,9 @@ module Writexlsx
 
 
       attributes = [
-                    ['xmlns:c', xmlns_c],
-                    ['xmlns:r', xmlns_r]
-                   ]
+        ['xmlns:c', xmlns_c],
+        ['xmlns:r', xmlns_r]
+      ]
       attributes << r_id_attributes(id)
 
       @writer.empty_tag('c:chart', attributes)
@@ -519,9 +519,9 @@ module Writexlsx
       else
         # Add attribute for shapes.
         attributes = [
-                      [:macro, ''],
-                      [:textlink, '']
-                     ]
+          [:macro, ''],
+          [:textlink, '']
+        ]
         @writer.tag_elements('xdr:sp', attributes) do
 
           # Write the xdr:nvSpPr element.
@@ -554,17 +554,17 @@ module Writexlsx
 
           if shape.start
             attributes = [
-                          ['id', shape.start],
-                          ['idx', shape.start_index]
-                         ]
+              ['id', shape.start],
+              ['idx', shape.start_index]
+            ]
             @writer.empty_tag('a:stCxn', attributes)
           end
 
           if shape.end
             attributes = [
-                          ['id', shape.end],
-                          ['idx', shape.end_index]
-                         ]
+              ['id', shape.end],
+              ['idx', shape.end_index]
+            ]
             @writer.empty_tag('a:endCxn', attributes)
           end
         end
@@ -808,9 +808,9 @@ module Writexlsx
             adj_int = (adj * 1000).to_i
 
             attributes = [
-                          [:name, "adj#{suffix}"],
-                          [:fmla, "val #{adj_int}"]
-                         ]
+              [:name, "adj#{suffix}"],
+              [:fmla, "val #{adj_int}"]
+            ]
             @writer.empty_tag('a:gd', attributes)
           end
         end
@@ -867,15 +867,15 @@ module Writexlsx
     #
     def write_tx_body(shape)
       attributes = [
-                    [:vertOverflow, "clip"],
-                    [:wrap,         "square"],
-                    [:lIns,         "27432"],
-                    [:tIns,         "22860"],
-                    [:rIns,         "27432"],
-                    [:bIns,         "22860"],
-                    [:anchor,       shape.valign],
-                    [:upright,      "1"]
-                   ]
+        [:vertOverflow, "clip"],
+        [:wrap,         "square"],
+        [:lIns,         "27432"],
+        [:tIns,         "22860"],
+        [:rIns,         "27432"],
+        [:bIns,         "22860"],
+        [:anchor,       shape.valign],
+        [:upright,      "1"]
+      ]
       @writer.tag_elements('xdr:txBody') do
         @writer.empty_tag('a:bodyPr', attributes)
         @writer.empty_tag('a:lstStyle')
@@ -885,9 +885,9 @@ module Writexlsx
           rotation *= 60000
 
           attributes = [
-                        [:algn, shape.align],
-                        [:rtl, rotation]
-                       ]
+            [:algn, shape.align],
+            [:rtl, rotation]
+          ]
           @writer.tag_elements('a:pPr', attributes) do
             attributes = [ [:sz, "1000"] ]
             @writer.empty_tag('a:defRPr', attributes)
@@ -903,14 +903,14 @@ module Writexlsx
             strike    = ptrue?(shape.format[:font_strikeout]) ? 'Strike' : 'noStrike'
 
             attributes = [
-                          [:lang,     "en-US"],
-                          [:sz,       size],
-                          [:b,        bold],
-                          [:i,        italic],
-                          [:u,        underline],
-                          [:strike,   strike],
-                          [:baseline, 0]
-                         ]
+              [:lang,     "en-US"],
+              [:sz,       size],
+              [:b,        bold],
+              [:i,        italic],
+              [:u,        underline],
+              [:strike,   strike],
+              [:baseline, 0]
+            ]
             @writer.tag_elements('a:rPr', attributes) do
               color = shape.format[:color]
               if color

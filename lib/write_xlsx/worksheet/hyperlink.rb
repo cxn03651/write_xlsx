@@ -87,9 +87,9 @@ module Writexlsx
 
       def attributes(row, col, dummy = nil)
         attr = [
-                ['ref', xl_rowcol_to_cell(row, col)],
-                ['location', @url]
-               ]
+          ['ref', xl_rowcol_to_cell(row, col)],
+          ['location', @url]
+        ]
 
         attr << ['tooltip', @tip] if @tip
         attr << ['display', @str]
@@ -116,7 +116,7 @@ module Writexlsx
 
         # Add the file:/// URI to the url if non-local.
         if url =~ %r![:]! ||        # Windows style "C:/" link.
-            url =~ %r!^\\\\!        # Network share.
+           url =~ %r!^\\\\!        # Network share.
           url = "file:///#{url}"
         end
 

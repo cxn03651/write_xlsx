@@ -100,7 +100,7 @@ module Writexlsx
           elsif error_code.include?(@result)
             attributes << ['t', 'e']
           else
-             attributes << ['t', 'str']
+            attributes << ['t', 'str']
           end
         end
         @worksheet.writer.tag_elements('c', attributes) do

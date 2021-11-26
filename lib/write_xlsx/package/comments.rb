@@ -177,8 +177,8 @@ module Writexlsx
       #
       def write_textbox
         attributes = [
-                      ['style', 'mso-direction-alt:auto']
-                     ]
+          ['style', 'mso-direction-alt:auto']
+        ]
 
         @writer.tag_elements('v:textbox', attributes) do
           # Write the div element.
@@ -191,8 +191,8 @@ module Writexlsx
       #
       def write_client_data
         attributes = [
-                      ['ObjectType', 'Note']
-                     ]
+          ['ObjectType', 'Note']
+        ]
 
         @writer.tag_elements('x:ClientData', attributes) do
           @writer.empty_tag('x:MoveWithCells')
@@ -225,10 +225,10 @@ module Writexlsx
         @author      = options[:author]
         @start_cell  = options[:start_cell]
         @start_row, @start_col = if @start_cell
-          substitute_cellref(@start_cell)
-        else
-          [ options[:start_row], options[:start_col] ]
-        end
+                                   substitute_cellref(@start_cell)
+                                 else
+                                   [ options[:start_row], options[:start_col] ]
+                                 end
         @visible     = options[:visible]
         @x_offset    = options[:x_offset]       || default_x_offset(col)
         @y_offset    = options[:y_offset]       || default_y_offset(row)

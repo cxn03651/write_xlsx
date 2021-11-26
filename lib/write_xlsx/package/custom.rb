@@ -47,7 +47,7 @@ module Writexlsx
           @properties.each do |property|
             # Write the property element.
             write_property(property)
-        end
+          end
         end
       end
 
@@ -112,7 +112,7 @@ module Writexlsx
         end
 
         @writer.data_element('vt:bool', data)
-    end
+      end
 
       #
       # Write the <vt:filetime> element.

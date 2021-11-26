@@ -56,11 +56,11 @@ module Writexlsx
       # based on the default or user defined values in the Workbook palette.
       #
       def palette_color(index)
-      if index.to_s =~ /^#([0-9A-F]{6})$/i
-        "FF#{$1.upcase}"
-      else
-        "FF#{super(index)}"
-      end
+        if index.to_s =~ /^#([0-9A-F]{6})$/i
+          "FF#{$1.upcase}"
+        else
+          "FF#{super(index)}"
+        end
       end
 
       #
@@ -526,9 +526,9 @@ module Writexlsx
       #
       def write_cell_style(name, xf_id, builtin_id)
         attributes = [
-            ['name',      name],
-            ['xfId',      xf_id],
-            ['builtinId', builtin_id]
+          ['name',      name],
+          ['xfId',      xf_id],
+          ['builtinId', builtin_id]
         ]
 
         @writer.empty_tag('cellStyle', attributes)
@@ -570,9 +570,9 @@ module Writexlsx
       #
       def write_table_styles
         attributes = [
-            ['count',             0],
-            ['defaultTableStyle', 'TableStyleMedium9'],
-            ['defaultPivotStyle', 'PivotStyleLight16']
+          ['count',             0],
+          ['defaultTableStyle', 'TableStyleMedium9'],
+          ['defaultPivotStyle', 'PivotStyleLight16']
         ]
 
         @writer.empty_tag('tableStyles', attributes)

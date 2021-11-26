@@ -87,8 +87,8 @@ module Writexlsx
 
       def num_fmt_attributes
         [
-         ['formatCode',   @num_format],
-         ['sourceLinked', source_linked]
+          ['formatCode',   @num_format],
+          ['sourceLinked', source_linked]
         ]
       end
 
@@ -175,7 +175,7 @@ module Writexlsx
           if @position_axis == 'on_tick'
             @position_axis = 'midCat'
           elsif @position_axis == 'between'
-            # Doesn't neet to be modified.
+          # Doesn't neet to be modified.
           else
             # Otherwise use the default value.
             @position_axis = nil

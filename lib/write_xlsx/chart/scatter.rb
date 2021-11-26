@@ -17,21 +17,6 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
-    # The Scatter chart module also supports the following sub-types:
-    #
-    #     markers_only (the default)
-    #     straight_with_markers
-    #     straight
-    #     smooth_with_markers
-    #     smooth
-    # These can be specified at creation time via the add_chart() Worksheet
-    # method:
-    #
-    #     chart = workbook.add_chart(
-    #         :type    => 'scatter',
-    #         :subtype => 'straight_with_markers'
-    #     )
-    #
     class Scatter < self
       include Writexlsx::Utility
       include Writexlsx::WriteDPtPoint

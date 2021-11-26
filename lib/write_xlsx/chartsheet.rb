@@ -204,9 +204,9 @@ module Writexlsx
       mc_preserve_attributes = 'mv:*'
 
       attributes = [
-                    ['xmlns',   xmlns],
-                    ['xmlns:r', xmlns_r]
-                   ]
+        ['xmlns',   xmlns],
+        ['xmlns:r', xmlns_r]
+      ]
 
       @writer.tag_elements('chartsheet', attributes) do
         yield

@@ -50,8 +50,8 @@ module Writexlsx
       # attributes for <v:fill> element.
       def fill_attributes
         [
-         ['color2',             'buttonFace [67]'],
-         ['o:detectmouseclick', 't']
+          ['color2',             'buttonFace [67]'],
+          ['o:detectmouseclick', 't']
         ]
       end
 
@@ -60,9 +60,9 @@ module Writexlsx
       #
       def write_rotation_lock
         attributes = [
-                      ['v:ext',    'edit'],
-                      ['rotation', 't']
-                     ]
+          ['v:ext',    'edit'],
+          ['rotation', 't']
+        ]
         @writer.empty_tag('o:lock', attributes)
       end
 
@@ -71,9 +71,9 @@ module Writexlsx
       #
       def write_textbox
         attributes = [
-                      ['style', 'mso-direction-alt:auto'],
-                      ['o:singleclick', 'f']
-                     ]
+          ['style', 'mso-direction-alt:auto'],
+          ['o:singleclick', 'f']
+        ]
 
         @writer.tag_elements('v:textbox', attributes) do
           # Write the div element.

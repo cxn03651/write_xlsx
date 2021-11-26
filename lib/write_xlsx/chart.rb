@@ -165,16 +165,16 @@ module Writexlsx
     include Writexlsx::Utility
     include Writexlsx::Gradient
 
-    attr_accessor :id, :name   # :nodoc:
-    attr_writer :index, :palette, :protection   # :nodoc:
-    attr_reader :embedded, :formula_ids, :formula_data   # :nodoc:
-    attr_reader :x_scale, :y_scale, :x_offset, :y_offset # :nodoc:
-    attr_reader :width, :height  # :nodoc:
+    attr_accessor :id, :name                                         # :nodoc:
+    attr_writer :index, :palette, :protection                        # :nodoc:
+    attr_reader :embedded, :formula_ids, :formula_data               # :nodoc:
+    attr_reader :x_scale, :y_scale, :x_offset, :y_offset             # :nodoc:
+    attr_reader :width, :height                                      # :nodoc:
     attr_reader :label_positions, :label_position_default, :combined # :nodoc:
-    attr_writer :date_category, :already_inserted
-    attr_writer :series_index
-    attr_writer :writer
-    attr_reader :x2_axis, :y2_axis, :axis2_ids
+    attr_writer :date_category, :already_inserted                    # :nodoc:
+    attr_writer :series_index                                        # :nodoc:
+    attr_writer :writer                                              # :nodoc:
+    attr_reader :x2_axis, :y2_axis, :axis2_ids                       # :nodoc:
 
     #
     # Factory method for returning chart objects based on their class type.
@@ -1057,7 +1057,7 @@ module Writexlsx
     end
 
     def write_val_base(formula, data_id, tag) # :nodoc:
-      data    = @formula_data[data_id]
+      data = @formula_data[data_id]
 
       @writer.tag_elements(tag) do
         # Unlike Cat axes data should only be numeric.
@@ -1408,11 +1408,11 @@ module Writexlsx
 
     def write_scaling_with_param(param)
       write_scaling(
-                    param.reverse,
-                    param.min,
-                    param.max,
-                    param.log_base
-                    )
+        param.reverse,
+        param.min,
+        param.max,
+        param.log_base
+      )
     end
     #
     # Write the <c:scaling> element.
@@ -1443,7 +1443,7 @@ module Writexlsx
     # Write the <c:orientation> element.
     #
     def write_orientation(reverse = nil) # :nodoc:
-      val     = ptrue?(reverse) ? 'maxMin' : 'minMax'
+      val = ptrue?(reverse) ? 'maxMin' : 'minMax'
 
       @writer.empty_tag('c:orientation', [ ['val', val] ])
     end
@@ -1499,9 +1499,9 @@ module Writexlsx
       source_linked = 0
 
       attributes = [
-                    ['formatCode',   format_code],
-                    ['sourceLinked', source_linked]
-                   ]
+        ['formatCode',   format_code],
+        ['sourceLinked', source_linked]
+      ]
 
       @writer.empty_tag('c:numFmt', attributes)
     end
@@ -1778,13 +1778,13 @@ module Writexlsx
       footer = 0.3
 
       attributes = [
-                    ['b',      b],
-                    ['l',      l],
-                    ['r',      r],
-                    ['t',      t],
-                    ['header', header],
-                    ['footer', footer]
-                   ]
+        ['b',      b],
+        ['l',      l],
+        ['r',      r],
+        ['t',      t],
+        ['header', header],
+        ['footer', footer]
+      ]
 
       @writer.empty_tag('c:pageMargins', attributes)
     end
@@ -2272,7 +2272,7 @@ module Writexlsx
         data.each_with_index do |token, i|
           # Write non-numeric data as 0.
           if token &&
-              !(token.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
+             !(token.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
             token = 0
           end
 
@@ -2703,7 +2703,7 @@ module Writexlsx
     end
 
     def write_num_ref_or_lit(values, data)
-      if values.to_s =~ /^=/                     # '=Sheet1!$A$1:$A$5'
+      if values.to_s =~ /^=/                # '=Sheet1!$A$1:$A$5'
         write_num_ref(values, data, 'num')
       else                                  # [1, 2, 3]
         write_num_lit(values)

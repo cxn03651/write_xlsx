@@ -63,9 +63,9 @@ module Writexlsx
 
         attributes =
           [
-           ['xmlns',       schema + '/spreadsheetml/2006/main'],
-           ['count',       total_count],
-           ['uniqueCount', unique_count]
+            ['xmlns',       schema + '/spreadsheetml/2006/main'],
+            ['count',       total_count],
+            ['uniqueCount', unique_count]
           ]
 
         @writer.tag_elements('sst', attributes) { yield }
@@ -94,9 +94,9 @@ module Writexlsx
 
         # Convert control character to the _xHHHH_ escape.
         string = string.gsub(
-                             /([\x00-\x08\x0B-\x1F])/,
-                             sprintf("_x%04X_", $1.ord)
-                             ) if string =~ /([\x00-\x08\x0B-\x1F])/
+          /([\x00-\x08\x0B-\x1F])/,
+          sprintf("_x%04X_", $1.ord)
+        ) if string =~ /([\x00-\x08\x0B-\x1F])/
 
         # Convert character to \xC2\xxx or \xC3\xxx
         if string.bytesize == 1 && 0x80 <= string.ord && string.ord <= 0xFF

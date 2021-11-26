@@ -154,15 +154,17 @@ module Writexlsx
     # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
     #
     def calc_position_emus(worksheet)
-      c_start, r_start, xx1, yy1, c_end, r_end, xx2, yy2, x_abslt, y_abslt =
-        worksheet.position_object_pixels(
-                               @column_start,
-                               @row_start,
-                               @x_offset,
-                               @y_offset,
-                               @width  * @scale_x,
-                               @height * @scale_y
-                               )
+      c_start, r_start,
+      xx1, yy1, c_end, r_end,
+      xx2, yy2, x_abslt, y_abslt =
+                         worksheet.position_object_pixels(
+                           @column_start,
+                           @row_start,
+                           @x_offset,
+                           @y_offset,
+                           @width  * @scale_x,
+                           @height * @scale_y
+                         )
 
       # Now that x2/y2 have been calculated with a potentially negative
       # width/height we use the absolute value and convert to EMUs.
@@ -297,12 +299,12 @@ module Writexlsx
 
     def dimensions
       [
-       @column_start, @row_start,
-       @x1,           @y1,
-       @column_end,   @row_end,
-       @x2,           @y2,
-       @x_abs,        @y_abs,
-       @width_emu,    @height_emu
+        @column_start, @row_start,
+        @x1,           @y1,
+        @column_end,   @row_end,
+        @x2,           @y2,
+        @x_abs,        @y_abs,
+        @width_emu,    @height_emu
       ]
     end
   end

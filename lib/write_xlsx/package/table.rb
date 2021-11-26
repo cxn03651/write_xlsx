@@ -117,8 +117,8 @@ module Writexlsx
               )
             elsif user_data[:total_string]
               total_label_only(
-                               @row2, col_num, col_data, user_data[:total_string], user_data[:format]
-                               )
+                @row2, col_num, col_data, user_data[:total_string], user_data[:format]
+              )
             end
 
             # Get the dxf format index.
@@ -181,7 +181,7 @@ module Writexlsx
         row1, row2 = row2, row1 if row1 > row2
         col1, col2 = col2, col1 if col1 > col2
 
-      # The final hash contains the validation parameters.
+        # The final hash contains the validation parameters.
         param ||= {}
 
         # Turn on Excel's defaults.
@@ -208,17 +208,17 @@ module Writexlsx
       # List of valid input parameters.
       def valid_table_parameter
         [
-         :autofilter,
-         :banded_columns,
-         :banded_rows,
-         :columns,
-         :data,
-         :first_column,
-         :header_row,
-         :last_column,
-         :name,
-         :style,
-         :total_row
+          :autofilter,
+          :banded_columns,
+          :banded_rows,
+          :columns,
+          :data,
+          :first_column,
+          :header_row,
+          :last_column,
+          :name,
+          :style,
+          :total_row
         ]
       end
 
@@ -331,12 +331,12 @@ module Writexlsx
         xmlns            = "#{schema}spreadsheetml/2006/main"
 
         attributes = [
-                      ['xmlns',       xmlns],
-                      ['id',          id],
-                      ['name',        @name],
-                      ['displayName', @name],
-                      ['ref',         @range]
-                     ]
+          ['xmlns',       xmlns],
+          ['id',          id],
+          ['name',        @name],
+          ['displayName', @name],
+          ['ref',         @range]
+        ]
 
         unless ptrue?(@header_row_count)
           attributes << ['headerRowCount', 0]
@@ -378,9 +378,9 @@ module Writexlsx
       #
       def write_table_column(col_data)
         attributes = [
-                      ['id',   col_data.id],
-                      ['name', col_data.name]
-                     ]
+          ['id',   col_data.id],
+          ['name', col_data.name]
+        ]
 
         if ptrue?(col_data.total_string)
           attributes << [:totalsRowLabel, col_data.total_string]

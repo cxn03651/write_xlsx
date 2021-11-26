@@ -192,7 +192,7 @@ module Writexlsx
         @values     = aref_to_formula(params[:values])
         @categories = aref_to_formula(params[:categories])
         @name, @name_formula =
-          chart.process_names(params[:name], params[:name_formula])
+               chart.process_names(params[:name], params[:name_formula])
 
         set_data_ids(params)
 
