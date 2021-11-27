@@ -315,6 +315,66 @@ example in the distro for more examples.
 As with `write_sting()` the maximum string size is 32767 characters.
 See also the note about [CELL NOTATION][].
 
+#### <a name="keep_leading_zeros" class="anchor" href="#keep_leading_zeros"><span class="octicon octicon-link" /></a>keep_leading_zeros(flag)
+
+This method changes the default handling of integers with leading zeros when using the `write()` method.
+
+The `write()` method uses regular expressions to determine what type of data to write to an Excel worksheet.
+If the data looks like a number it writes a number using `write_number()`.
+One problem with this approach is that occasionally data looks like a number but you don't want it treated as a number.
+
+Zip codes and ID numbers, for example, often start with a leading zero.
+If you write this data as a number then the leading zero(s) will be stripped.
+This is the also the default behaviour when you enter data manually in Excel.
+
+To get around this you can use one of three options.
+Write a formatted number, write the number as a string or use the `keep_leading_zeros()` method to change the default behaviour of `write()`:
+
+    # Implicitly write a number, the leading zero is removed: 1209
+    worksheet.write('A1', '01209')
+
+    # Write a zero padded number using a format: 01209
+    format1 = $workbook.add_format(:num_format => '00000')
+    worksheet.write('A2', '01209', format1)
+
+    # Write explicitly as a string: 01209
+    worksheet.write_string('A3', '01209')
+
+    # Write implicitly as a string: 01209
+    worksheet.keep_leading_zeros
+    worksheet.write('A4', '01209')
+
+
+The above code would generate a worksheet that looked like the following:
+
+     -----------------------------------------------------------
+    |   |     A     |     B     |     C     |     D     | ...
+     -----------------------------------------------------------
+    | 1 |      1209 |           |           |           | ...
+    | 2 |     01209 |           |           |           | ...
+    | 3 | 01209     |           |           |           | ...
+    | 4 | 01209     |           |           |           | ...
+
+
+The examples are on different sides of the cells due to the fact that Excel displays strings with a left justification and numbers with a right justification by default.
+You can change this by using a format to justify the data, see [CELL FORMATTING][].
+
+It should be noted that if the user edits the data in examples `A3` and `A4` the strings will revert back to numbers.
+Again this is Excel's default behaviour. To avoid this you can use the text format `@`:
+
+    # Format as a string (01209)
+    format2 = workbook.add_format(:num_format => '@')
+    worksheet.write_string('A5', '01209', format2)
+
+The `keep_leading_zeros()` property is off by default.
+The `keep_leading_zeros()` method takes boolean argument.
+Default value is true.
+It defaults to 1 if an argument isn't specified:
+
+    worksheet.keep_leading_zeros        # Set on
+    worksheet.keep_leading_zeros(true)  # Set on
+    worksheet.keep_leading_zeros(false) # Set off
+
 #### <a name="write_blank" class="anchor" href="#write_blank"><span class="octicon octicon-link" /></a>write_blank(row, column, format)
 
 Write a blank cell specified by `row` and `column`:
