@@ -1,5 +1,9 @@
 Change history of write_xlsx rubygem.
 
+2021-11-27 v1.09.1
+    Added Worksheet#kee_leading_zeros method to handle '001' as string in
+    Worksheet#write, write_row, and write_col method.
+
 2021-11-26 v1.09.0
 
     Added support for background images in worksheets. See set_background().
