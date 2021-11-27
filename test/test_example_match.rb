@@ -3335,6 +3335,24 @@ EOS
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
+  def test_keep_leading_zoros
+    @xlsx = 'keep_leading_zeros.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.keep_leading_zeros(true)
+    worksheet.write('A1', '001')
+    worksheet.write('B1', 'written as string.')
+    worksheet.write('A2', '012')
+    worksheet.write('B2', 'written as string.')
+    worksheet.write('A3', '123')
+    worksheet.write('B3', 'written as number.')
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_merge1
     @xlsx = 'merge1.xlsx'
     # Create a new workbook and add a worksheet

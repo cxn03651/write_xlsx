@@ -68,6 +68,7 @@ module Writexlsx
       @zoom = 100
       @zoom_scale_normal = true
       @right_to_left = false
+      @leading_zeros = false
 
       @autofilter_area = nil
       @filter_on    = false
@@ -832,6 +833,14 @@ module Writexlsx
        @page_setup.black_white = true
     end
 
+     #
+     # Causes the write() method to treat integers with a leading zero as a string.
+     # This ensures that any leading zeros such, as in zip codes, are maintained.
+     #
+     def keep_leading_zeros(flag = true)
+       @leading_zeros = !!flag
+     end
+
     #
     # Display the worksheet right to left for some eastern versions of Excel.
     #
@@ -890,6 +899,9 @@ module Writexlsx
         write_row(*args)
       elsif token.respond_to?(:coerce)  # Numeric
         write_number(*args)
+      # Match integer with leading zero(s)
+      elsif @leading_zeros && token =~ /^0\d*$/
+        write_string(*args)
       elsif token =~ /^\d+$/
         write_number(*args)
       # Match formula
