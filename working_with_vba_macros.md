@@ -3,9 +3,7 @@ layout: default
 title: WORKING WITH VBA MACROS
 ---
 
-### <a name="working_with_vba_macros" class="anchor"
-    href="#working_with_vba_macros"><span class="octicon octicon-link"
-    /></a>WORKING WITH VBA MACROS
+### <a name="working_with_vba_macros" class="anchor" href="#working_with_vba_macros"><span class="octicon octicon-link" /></a>WORKING WITH VBA MACROS
 
 An Excel `xlsm` file is exactly the same as a `xlsx` file except that
 is includes an additional `vbaProject.bin` file which contains
