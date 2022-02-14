@@ -902,7 +902,7 @@ module Writexlsx
       # Match integer with leading zero(s)
       elsif @leading_zeros && token =~ /^0\d*$/
         write_string(*args)
-      elsif token =~ /^\d+$/
+      elsif token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
         write_number(*args)
       # Match formula
       elsif token =~ /^=/

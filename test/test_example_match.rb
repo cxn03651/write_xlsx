@@ -11,6 +11,18 @@ class TestExampleMatch < Minitest::Test
     @tempfile.close
   end
 
+  def test_multi_line
+    @xlsx = 'multi_line.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.write(0, 0, "Hi Excel!\n1234\nHi, again!")
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_a_simple
     @xlsx = 'a_simple.xlsx'
     # Create a new workbook called simple.xls and add a worksheet
