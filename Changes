@@ -1,5 +1,9 @@
 Change history of write_xlsx rubygem.
 
+2022-02-14 v1.09.2
+    Fixed issue #79. Worksheet#write calls the write_number
+    when multi-line string has a line with only numbers.
+
 2021-11-27 v1.09.1
     Added Worksheet#keep_leading_zeros method to handle '001' as string in
     Worksheet#write, write_row, and write_col method.
