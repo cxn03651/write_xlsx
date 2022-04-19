@@ -237,8 +237,8 @@ See also the note about [CELL NOTATION][].
 The `write_rich_string()` method is used to write strings with multiple formats.
 For example to write the string "This is bold and this is italic" you would use the following:
 
-    bold   = workbook.add_format("bold   => 1)
-    italic = workbook.add_format("italic => 1)
+    bold   = workbook.add_format(:bold   => 1)
+    italic = workbook.add_format(:italic => 1)
 
     worksheet.write_rich_string('A1',
       'This is ', bold, 'bold', ' and this is ', italic, 'italic')
