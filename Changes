@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2022-07-08 v1.09.3
+    Fixed issue #47. Dealing with NAN
+
 2022-02-14 v1.09.2
     Fixed issue #79. Worksheet#write calls the write_number
     when multi-line string has a line with only numbers.
