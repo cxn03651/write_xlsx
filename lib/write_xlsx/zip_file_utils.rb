@@ -3,7 +3,7 @@
 # from http://d.hatena.ne.jp/alunko/20071021
 #
 require 'kconv'
-require 'zip/zipfilesystem'
+require 'zip/filesystem'
 require 'fileutils'
 
 module ZipFileUtils
@@ -15,7 +15,7 @@ module ZipFileUtils
     src = File.expand_path(src)
     dest = File.expand_path(dest)
     File.unlink(dest) if File.exist?(dest)
-    Zip::ZipFile.open(dest, Zip::ZipFile::CREATE) {|zf|
+    Zip::File.open(dest, Zip::File::CREATE) {|zf|
       if(File.file?(src))
         zf.add(encode_path(File.basename(src), options[:fs_encoding]), src)
         break
@@ -37,7 +37,7 @@ module ZipFileUtils
   # options :fs_encoding=[UTF-8,Shift_JIS,EUC-JP]
   def self.unzip(src, dest, options = {})
     FileUtils.makedirs(dest)
-    Zip::ZipInputStream.open(src) do |is|
+    Zip::InputStream.open(src) do |is|
       loop do
         entry = is.get_next_entry()
         break unless entry
