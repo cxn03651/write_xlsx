@@ -347,7 +347,7 @@ module Writexlsx
             property = label.dup
 
             # Convert formula.
-            if property[:value] && property[:value] =~ /^=[^!]+!\$/
+            if property[:value] && property[:value].to_s =~ /^=[^!]+!\$/
               property[:formula] = property[:value]
             end
 

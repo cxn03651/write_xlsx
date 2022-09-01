@@ -3545,7 +3545,7 @@ EOS
     # Write the <filters> element.
     #
     def write_filters(*filters) #:nodoc:
-      non_blanks = filters.reject { |filter| filter =~ /^blanks$/i }
+      non_blanks = filters.reject { |filter| filter.to_s =~ /^blanks$/i }
       attributes = []
 
       if filters != non_blanks
