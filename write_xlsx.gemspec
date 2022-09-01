@@ -18,7 +18,6 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
   gem.add_runtime_dependency 'rubyzip', '>= 1.0.0'
-  gem.add_runtime_dependency 'zip-zip'
   gem.add_development_dependency 'minitest'
   gem.add_development_dependency 'byebug'
   gem.add_development_dependency 'rake'
