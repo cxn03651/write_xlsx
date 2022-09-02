@@ -1,5 +1,10 @@
 Change history of write_xlsx rubygem.
 
+2022-09-02 v1.09.4
+    Remove zip-zip dependency.
+
+    Fix: Object#=~ is called on Integer; it always returns nil
+
 2022-07-08 v1.09.3
     Fixed issue #47. Dealing with NAN
 
