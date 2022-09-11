@@ -13,11 +13,11 @@ module Writexlsx
   class Shape
     include Writexlsx::Utility
 
-    attr_reader :edit_as, :type, :drawing
+    attr_reader :edit_as, :drawing
     attr_reader :tx_box, :fill, :line, :format
-    attr_reader :align, :valign, :anchor
+    attr_reader :align, :valign, :anchor, :adjustments
     attr_accessor :name, :connect, :type, :id, :start, :end, :rotation
-    attr_accessor :flip_h, :flip_v, :adjustments, :palette, :text, :stencil
+    attr_accessor :flip_h, :flip_v, :palette, :text, :stencil
     attr_accessor :row_start, :row_end, :column_start, :column_end
     attr_accessor :x1, :x2, :y1, :y2, :x_abs, :y_abs, :start_index, :end_index
     attr_accessor :x_offset, :y_offset, :width, :height, :scale_x, :scale_y
@@ -134,7 +134,6 @@ module Writexlsx
       # Override default properties with passed arguments
       properties.each do |key, value|
         # Strip leading "-" from Tk style properties e.g. -color => 'red'.
-        k = key.to_s.sub(/^-/, '')
         self.instance_variable_set("@#{key}", value)
       end
     end
@@ -236,8 +235,6 @@ module Writexlsx
       emidx        = els.x_offset + els.width / 2
       smidy        = sls.y_offset + sls.height / 2
       emidy        = els.y_offset + els.height / 2
-      netx         = (smidx - emidx).abs
-      nety         = (smidy - emidy).abs
 
       if connect_type == 'bt'
         sy = sls.y_offset + sls.height

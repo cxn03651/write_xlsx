@@ -453,8 +453,8 @@ module Writexlsx
     # Convert vertices from pixels to points.
     #
     def pixels_to_points(vertices)
-      col_start, row_start, x1,    y1,
-      col_end,   row_end,   x2,    y2,
+      _col_start, _row_start, _x1,    _y1,
+      _col_end,   _row_end,   _x2,    _y2,
       left,      top,       width, height  = vertices.flatten
 
       left   *= 0.75

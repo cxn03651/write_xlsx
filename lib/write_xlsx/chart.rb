@@ -533,8 +533,7 @@ module Writexlsx
         cell = xl_rowcol_to_cell(name[1], name[2], 1, 1)
         name_formula = "#{quote_sheetname(name[0])}!#{cell}"
         name = ''
-      elsif
-        name && name =~ /^=[^!]+!\$/
+      elsif name && name =~ /^=[^!]+!\$/
         name_formula = name
         name         = ''
       end

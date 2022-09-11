@@ -7,7 +7,7 @@ module Writexlsx
 
     attr_reader :xf_index, :dxf_index, :num_format                                                 # :nodoc:
     attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink, :xf_id   # :nodoc:
-    attr_reader :diag_type, :diag_color, :font_only, :color, :color_indexed                        # :nodoc:
+    attr_reader :diag_type, :diag_color, :font_only, :color_indexed                        # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color # :nodoc:
     attr_reader :font_scheme                                                                       # :nodoc:
     attr_accessor :num_format_index, :border_index, :font_index                                    # :nodoc:
@@ -649,7 +649,7 @@ module Writexlsx
       attributes << ['applyBorder', 1] if border_index > 0
 
       # Check if XF format has alignment properties set.
-      apply_align, align = get_align_properties
+      apply_align, _align = get_align_properties
       # We can also have applyAlignment without a sub-element.
       attributes << ['applyAlignment', 1] if apply_align || ptrue?(@hyperlink)
       if get_protection_properties || ptrue?(hyperlink)

@@ -101,8 +101,6 @@ module Writexlsx
       # Write the <Properties> element.
       #
       def write_properties
-        tag = 'Properties'
-
         schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
         attributes = [
           ['xmlns',     "#{schema}extended-properties"],

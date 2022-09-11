@@ -58,7 +58,6 @@ module ZipFileUtils
   private
 
   def self.each_dir_for(dir_path, &block)
-    dir = Dir.open(dir_path)
     each_file_for(dir_path){ |file_path|
       yield(file_path)
     }

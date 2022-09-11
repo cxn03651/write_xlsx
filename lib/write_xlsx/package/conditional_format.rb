@@ -395,7 +395,7 @@ module Writexlsx
       end
 
       def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
-        row1, row2, col1, col2, user_range, param =
+        row1, row2, col1, col2, user_range, _param =
                                             row_col_param_for_conditional_formatting(*args)
         range       = xl_range(row1, row2, col1, col2)
         @start_cell = xl_rowcol_to_cell(row1, col1)
@@ -432,7 +432,7 @@ module Writexlsx
       end
 
       def param_for_conditional_formatting(*args)  # :nodoc:
-        dummy, dummy, dummy, dummy, dummy, @param =
+        _dummy, _dummy, _dummy, _dummy, _dummy, @param =
                                            row_col_param_for_conditional_formatting(*args)
         check_conditional_formatting_parameters(@param)
 
@@ -690,7 +690,7 @@ module Writexlsx
 
           # Ensure we don't set user properties for lowest icon.
           max_data = user_props.size
-          max_data = total_icons -1 if max_data >= total_icons
+          max_data = total_icons - 1 if max_data >= total_icons
 
           (0..max_data - 1).each do |i|
             # Set the user defined 'value' property.

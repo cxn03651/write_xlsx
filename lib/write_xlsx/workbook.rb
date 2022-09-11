@@ -35,7 +35,6 @@ module Writexlsx
     attr_reader :excel2003_style                # :nodoc:
     attr_reader :max_url_length                 # :nodoc:
     attr_reader :strings_to_urls                # :nodoc:
-    attr_reader :default_url_format             # :nodoc:
     attr_reader :read_only                      # :nodoc:
 
     def initialize(file, *option_params)

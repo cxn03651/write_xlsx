@@ -300,7 +300,7 @@ module Writexlsx
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       if args[0].to_s =~ /^\D/
-        row1, firstcol, row2, lastcol, *data = substitute_cellref(*args)
+        _row1, firstcol, _row2, lastcol, *data = substitute_cellref(*args)
       else
         firstcol, lastcol, *data = args
       end
@@ -747,7 +747,7 @@ module Writexlsx
     #
     def repeat_columns(*args)
       if args[0] =~ /^\D/
-        dummy, first_col, dummy, last_col = substitute_cellref(*args)
+        _dummy, first_col, _dummy, last_col = substitute_cellref(*args)
       else
         first_col, last_col = args
       end
@@ -831,7 +831,7 @@ module Writexlsx
      #
      def print_black_and_white
        @page_setup.black_white = true
-    end
+     end
 
      #
      # Causes the write() method to treat integers with a leading zero as a string.
@@ -1054,7 +1054,7 @@ module Writexlsx
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      fragments, length = rich_strings_fragments(rich_strings)
+      fragments, _length = rich_strings_fragments(rich_strings)
       # can't allow 2 formats in a row
       return -4 unless fragments
 
@@ -1186,7 +1186,6 @@ module Writexlsx
 
       val = val ? 1 : 0  # Boolean value.
       # xf : cell format.
-      type = 'l'                 # The data type
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
@@ -2633,7 +2632,7 @@ module Writexlsx
       y_dpi ||= 96
       drawing_type = 2
 
-      row, col, image, x_offset, y_offset,
+      row, col, _image, x_offset, y_offset,
       x_scale, y_scale, url, tip, anchor, description, decorative = @images[index]
 
       width  *= x_scale
@@ -3066,8 +3065,6 @@ EOS
     # Write the <sheetFormatPr> element.
     #
     def write_sheet_format_pr #:nodoc:
-      base_col_width     = 10
-
       attributes = [
         ['defaultRowHeight', @default_row_height]
       ]
@@ -3213,7 +3210,7 @@ EOS
     end
 
     def row_attributes(args)
-      r, spans, height, format, hidden, level, collapsed, empty_row = args
+      r, spans, height, format, hidden, level, collapsed, _empty_row = args
       height    ||= @default_row_height
       hidden    ||= 0
       level     ||= 0
@@ -3259,7 +3256,7 @@ EOS
 
       # Move user cell selection to the panes.
       unless @selections.empty?
-        dummy, active_cell, sqref = @selections[0]
+        _dummy, active_cell, sqref = @selections[0]
         @selections = []
       end
 
@@ -3299,7 +3296,7 @@ EOS
 
       # Move user cell selection to the panes.
       if !@selections.empty?
-        dummy, active_cell, sqref = @selections[0]
+        _dummy, active_cell, sqref = @selections[0]
         @selections = []
         has_selection = true
       end
@@ -4279,7 +4276,7 @@ EOS
         col_letter = col
 
         # Convert col ref to a cell ref and then to a col number.
-        dummy, col = substitute_cellref("#{col}1")
+        _dummy, col = substitute_cellref("#{col}1")
         raise "Invalid column '#{col_letter}'" if col >= COL_MAX
       end
 

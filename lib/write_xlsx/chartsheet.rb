@@ -198,10 +198,6 @@ module Writexlsx
       schema                 = 'http://schemas.openxmlformats.org/'
       xmlns                  = schema + 'spreadsheetml/2006/main'
       xmlns_r                = schema + 'officeDocument/2006/relationships'
-      xmlns_mc               = schema + 'markup-compatibility/2006'
-      xmlns_mv               = 'urn:schemas-microsoft-com:mac:vml'
-      mc_ignorable           = 'mv'
-      mc_preserve_attributes = 'mv:*'
 
       attributes = [
         ['xmlns',   xmlns],

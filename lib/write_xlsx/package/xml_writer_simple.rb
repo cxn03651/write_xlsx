@@ -30,9 +30,9 @@ module Writexlsx
       end
 
       def tag_elements_str(tag, attributes = [])
-        str = start_tag_str(tag, attributes) +
-              yield +
-              end_tag_str(tag)
+        start_tag_str(tag, attributes) +
+          yield +
+          end_tag_str(tag)
       end
 
       def start_tag(tag, attr = [])

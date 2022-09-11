@@ -267,9 +267,6 @@ module Writexlsx
       def write_image_shape(id, index, image_data)
         type       = '#_x0000_t75'
 
-        # Set the shape index.
-        shape_index = "_x0000_s#{id}"
-
         # Get the image parameters
         width    = image_data[0]
         height   = image_data[1]
