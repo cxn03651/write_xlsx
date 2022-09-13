@@ -8,15 +8,15 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
     @chartsheet = workbook.sheets.first
   end
 
-  def test_chartsheet_write_sheet_protection
-    expected = '<sheetProtection password="83AF" content="1" objects="1"/>'
+  def test_chartsheet_write_sheet_protection_with_blank_password
+    expected = '<sheetProtection content="1" objects="1"/>'
 
     @chartsheet.protect('', {})
     result = @chartsheet.__send__(:write_sheet_protection)
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
-  def test_chartsheet_write_sheet_protection
+  def test_chartsheet_write_sheet_protection_with_password
     expected = '<sheetProtection password="83AF" content="1" objects="1"/>'
 
     @chartsheet.protect('password', {})
