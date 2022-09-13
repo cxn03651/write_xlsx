@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat17 < Minitest::Test

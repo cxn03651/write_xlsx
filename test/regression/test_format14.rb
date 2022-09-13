@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFormat14 < Minitest::Test

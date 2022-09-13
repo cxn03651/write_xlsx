@@ -17,19 +17,19 @@ worksheet = workbook.add_worksheet
 
 # Add a circle, with centered text.
 ellipse = workbook.add_shape(
-            :type   => 'ellipse',
-            :text   => "Hello\nWorld",
-            :width  => 60,
-            :height => 60
-                             )
+  :type   => 'ellipse',
+  :text   => "Hello\nWorld",
+  :width  => 60,
+  :height => 60
+)
 worksheet.insert_shape('A1', ellipse, 50, 50)
 
 # Add a plus sign.
 plus = workbook.add_shape(
-         :type => 'plus',
-         :width => 20,
-         :height => 20
-                          )
+  :type   => 'plus',
+  :width  => 20,
+  :height => 20
+)
 worksheet.insert_shape('D8', plus)
 
 workbook.close

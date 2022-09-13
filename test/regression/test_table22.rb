@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable22 < Minitest::Test
@@ -16,8 +17,8 @@ class TestRegressionTable22 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     data = [
-      ['apple', 'pie' ],
-      ['pine',  'tree']
+      %w[apple pie],
+      %w[pine tree]
     ]
 
     # Set the column width to match the taget worksheet.

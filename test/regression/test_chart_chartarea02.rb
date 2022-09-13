@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartChartArea02 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartChartArea02 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [82933248, 82952960])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -33,16 +34,16 @@ class TestRegressionChartChartArea02 < Minitest::Test
 
     # Test the deprecated writeexcel interface.
     chart.set_chartarea(
-                        :line_pattern => 'none',
-                        :color        => 'red'
-                        )
+      :line_pattern => 'none',
+      :color        => 'red'
+    )
 
     chart.set_plotarea(
-                       :line_pattern => 'dash',
-                       :line_weight  => 'narrow',
-                       :line_color   => 'yellow',
-                       :color        => '#92D050'
-                       )
+      :line_pattern => 'dash',
+      :line_weight  => 'narrow',
+      :line_color   => 'yellow',
+      :color        => '#92D050'
+    )
 
     worksheet.insert_chart('E9', chart)
 

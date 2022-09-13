@@ -33,9 +33,7 @@ module Writexlsx
         url = escape_url(url)
 
         # Excel limits the escaped URL and location/anchor to 255 characters.
-        if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
-          raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
-        end
+        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
 
         @url       = url
         @str       = normalized_str
@@ -45,7 +43,7 @@ module Writexlsx
       def attributes(row, col, id)
         ref = xl_rowcol_to_cell(row, col)
 
-        attr = [ ['ref', ref] ]
+        attr = [['ref', ref]]
         attr << r_id_attributes(id)
 
         attr << ['location', @url_str] if @url_str
@@ -78,14 +76,12 @@ module Writexlsx
         @url_str = @str.dup
 
         # Excel limits escaped URL to #{max_url_length} characters.
-        if @url.bytesize > max_url_length
-          raise "URL '#{@url}' > #{max_url_length} characters, it exceeds Excel's limit for URLS."
-        end
+        raise "URL '#{@url}' > #{max_url_length} characters, it exceeds Excel's limit for URLS." if @url.bytesize > max_url_length
 
         @tip = tip
       end
 
-      def attributes(row, col, dummy = nil)
+      def attributes(row, col, _dummy = nil)
         attr = [
           ['ref', xl_rowcol_to_cell(row, col)],
           ['location', @url]
@@ -102,8 +98,8 @@ module Writexlsx
         str ||= url.dup
 
         # For external links change the directory separator from Unix to Dos.
-        url = url.gsub(%r|/|, '\\')
-        str.gsub!(%r|/|, '\\')
+        url = url.gsub(%r{/}, '\\')
+        str.gsub!(%r{/}, '\\')
 
         # Strip the mailto header.
         str.sub!(/^mailto:/, '')
@@ -115,19 +111,17 @@ module Writexlsx
         url = escape_url(url)
 
         # Add the file:/// URI to the url if non-local.
-        if url =~ %r![:]! ||        # Windows style "C:/" link.
-           url =~ %r!^\\\\!        # Network share.
+        if url =~ /:/ ||        # Windows style "C:/" link.
+           url =~ /^\\\\/        # Network share.
           url = "file:///#{url}"
         end
 
         # Convert a ./dir/file.xlsx link to dir/file.xlsx.
-        url = url.sub(%r!^.\\!, '')
+        url = url.sub(/^.\\/, '')
         @url_str   = url_str
 
         # Excel limits the escaped URL and location/anchor to max_url_length characters.
-        if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
-          raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation."
-        end
+        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
 
         @url       = url
         @str       = str

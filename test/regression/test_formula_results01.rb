@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFormulaResults01 < Minitest::Test
@@ -30,7 +31,7 @@ class TestRegressionFormulaResults01 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-      [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
       {}
     )
   end

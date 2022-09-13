@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartsheetWriteSheetProtection < Minitest::Test
@@ -27,7 +28,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
   def test_chartsheet_write_sheet_protection_without_password_and_content
     expected = '<sheetProtection content="1"/>'
 
-    @chartsheet.protect('', {:objects => 0})
+    @chartsheet.protect('', { :objects => 0 })
     result = @chartsheet.__send__(:write_sheet_protection)
     assert_equal(expected_to_array(expected), got_to_array(result))
   end

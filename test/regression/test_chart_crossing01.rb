@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartCrossing01 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartCrossing01 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [43812352, 43814272])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -42,7 +43,7 @@ class TestRegressionChartCrossing01 < Minitest::Test
     compare_for_regression(
       nil,
       {
-        'xl/charts/chart1.xml' => [ '<c:pageMargins' ]
+        'xl/charts/chart1.xml' => ['<c:pageMargins']
       }
     )
   end

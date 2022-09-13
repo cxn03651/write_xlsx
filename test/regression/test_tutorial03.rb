@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTutorial03 < Minitest::Test
@@ -26,11 +27,11 @@ class TestRegressionTutorial03 < Minitest::Test
     worksheet.write('C1', 'Cost', bold)
 
     expenses = [
-                [ 'Rent', '2013-01-13T', 1000 ],
-                [ 'Gas',  '2013-01-14T', 100 ],
-                [ 'Food', '2013-01-16T', 300 ],
-                [ 'Gym',  '2013-01-20T', 50 ]
-               ]
+      ['Rent', '2013-01-13T', 1000],
+      ['Gas',  '2013-01-14T', 100],
+      ['Food', '2013-01-16T', 300],
+      ['Gym',  '2013-01-20T', 50]
+    ]
     expenses.each_with_index do |item, index|
       worksheet.write_string(index + 1,    0, item[0])
       worksheet.write_date_time(index + 1, 1, item[1], date_format)
@@ -42,8 +43,8 @@ class TestRegressionTutorial03 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
-                                {}
-                                )
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
+      {}
+    )
   end
 end

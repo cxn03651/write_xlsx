@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionOutline03 < Minitest::Test
@@ -20,12 +21,12 @@ class TestRegressionOutline03 < Minitest::Test
 
     # Example 3: Create a worksheet with outlined columns.
     data = [
-            ['Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Total'],
-            ['North', 50,    20,    15,    25,    65,    80],
-            ['South', 10,    20,    30,    50,    50,    50],
-            ['East',  45,    75,    50,    15,    75,    100],
-            ['West',  15,    15,    55,    35,    20,    50]
-           ]
+      %w[Month Jan Feb Mar Apr May Jun Total],
+      ['North', 50,    20,    15,    25,    65,    80],
+      ['South', 10,    20,    30,    50,    50,    50],
+      ['East',  45,    75,    50,    15,    75,    100],
+      ['West',  15,    15,    55,    35,    20,    50]
+    ]
     # Add bold format the first row
     worksheet3.set_row(0, nil, bold)
 

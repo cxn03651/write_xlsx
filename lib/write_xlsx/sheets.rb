@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 require 'delegate'
 require 'write_xlsx/package/xml_writer_simple'
 
@@ -6,7 +7,7 @@ module Writexlsx
   class Sheets < DelegateClass(Array)
     include Writexlsx::Utility
 
-    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart'}  # :nodoc:
+    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart' }  # :nodoc:
 
     def initialize
       super([])
@@ -17,7 +18,7 @@ module Writexlsx
     end
 
     def sheetname_count
-      self.count - chartname_count
+      count - chartname_count
     end
 
     def chartname_count
@@ -26,7 +27,7 @@ module Writexlsx
 
     def make_and_check_sheet_chart_name(type, name)
       count = sheet_chart_count(type)
-      name = "#{BASE_NAME[type]}#{count+1}" unless ptrue?(name)
+      name = "#{BASE_NAME[type]}#{count + 1}" unless ptrue?(name)
 
       check_valid_sheetname(name)
       name
@@ -35,7 +36,7 @@ module Writexlsx
     def write_sheets(writer)
       writer.tag_elements('sheets') do
         id_num = 1
-        self.each do |sheet|
+        each do |sheet|
           write_sheet(writer, sheet, id_num)
           id_num += 1
         end
@@ -59,8 +60,9 @@ module Writexlsx
     def write_vml_files(package_dir)
       dir = "#{package_dir}/xl/drawings"
       index = 1
-      self.each do |sheet|
+      each do |sheet|
         next if !sheet.has_vml? and !sheet.has_header_vml?
+
         FileUtils.mkdir_p(dir)
 
         if sheet.has_vml?
@@ -72,24 +74,24 @@ module Writexlsx
           )
           index += 1
         end
-        if sheet.has_header_vml?
-          vml = Package::Vml.new
-          vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
-          vml.assemble_xml_file(
-            sheet.vml_header_id, sheet.vml_header_id * 1024,
-            [], [], sheet.header_images_data
-          )
-          write_vml_drawing_rels_files(package_dir, sheet, index)
-          index += 1
-        end
+        next unless sheet.has_header_vml?
+
+        vml = Package::Vml.new
+        vml.set_xml_writer("#{dir}/vmlDrawing#{index}.vml")
+        vml.assemble_xml_file(
+          sheet.vml_header_id, sheet.vml_header_id * 1024,
+          [], [], sheet.header_images_data
+        )
+        write_vml_drawing_rels_files(package_dir, sheet, index)
+        index += 1
       end
     end
 
     def write_comment_files(package_dir)
-      self.select { |sheet| sheet.has_comments? }.
-        each_with_index do |sheet, index|
+      self.select { |sheet| sheet.has_comments? }
+          .each_with_index do |sheet, index|
         FileUtils.mkdir_p("#{package_dir}/xl/drawings")
-        sheet.comments.set_xml_writer("#{package_dir}/xl/comments#{index+1}.xml")
+        sheet.comments.set_xml_writer("#{package_dir}/xl/comments#{index + 1}.xml")
         sheet.comments.assemble_xml_file
       end
     end
@@ -99,7 +101,7 @@ module Writexlsx
         dir = "#{package_dir}/xl/tables"
         FileUtils.mkdir_p(dir)
         tables.each_with_index do |table, index|
-          table.set_xml_writer("#{dir}/table#{index+1}.xml")
+          table.set_xml_writer("#{dir}/table#{index + 1}.xml")
           table.assemble_xml_file
         end
       end
@@ -115,10 +117,8 @@ module Writexlsx
       dir = "#{package_dir}/xl/drawings/_rels"
 
       index = 0
-      self.each do |sheet|
-        if !sheet.drawing_links[0].empty? || sheet.has_shapes?
-          index += 1
-        end
+      each do |sheet|
+        index += 1 if !sheet.drawing_links[0].empty? || sheet.has_shapes?
 
         next if sheet.drawing_links[0].empty?
 
@@ -162,7 +162,6 @@ module Writexlsx
 
     def write_sheet_rels_files_base(sheets, dir, body)
       sheets.each_with_index do |sheet, index|
-
         next if sheet.external_links.empty?
 
         FileUtils.mkdir_p(dir)
@@ -176,13 +175,13 @@ module Writexlsx
         end
 
         # Create the .rels file such as /xl/worksheets/_rels/sheet1.xml.rels.
-        rels.set_xml_writer("#{dir}/#{body}#{index+1}.xml.rels")
+        rels.set_xml_writer("#{dir}/#{body}#{index + 1}.xml.rels")
         rels.assemble_xml_file
       end
     end
 
     def tables
-      self.inject([]) { |tables, sheet| tables + sheet.tables }.flatten
+      inject([]) { |tables, sheet| tables + sheet.tables }.flatten
     end
 
     def tables_count
@@ -190,12 +189,12 @@ module Writexlsx
     end
 
     def index_by_name(sheetname)
-      name = sheetname.sub(/^'/,'').sub(/'$/,'')
-      self.collect { |sheet| sheet.name }.index(name)
+      name = sheetname.sub(/^'/, '').sub(/'$/, '')
+      collect { |sheet| sheet.name }.index(name)
     end
 
     def worksheets
-      self.reject { |worksheet| worksheet.is_chartsheet? }
+      reject { |worksheet| worksheet.is_chartsheet? }
     end
 
     def chartsheets
@@ -203,7 +202,7 @@ module Writexlsx
     end
 
     def visible_first
-      self.reject { |worksheet| worksheet.hidden? }.first
+      reject { |worksheet| worksheet.hidden? }.first
     end
 
     private
@@ -222,25 +221,19 @@ module Writexlsx
       raise "Sheetname #{name} must be <= #{SHEETNAME_MAX} chars" if name.length > SHEETNAME_MAX
 
       # Check that sheetname doesn't contain any invalid characters
-      invalid_char = /[\[\]:*?\/\\]/
-      if name =~ invalid_char
-        raise 'Invalid character []:*?/\\ in worksheet name: ' + name
-      end
+      invalid_char = %r{[\[\]:*?/\\]}
+      raise 'Invalid character []:*?/\\ in worksheet name: ' + name if name =~ invalid_char
 
       # Check that sheetname doesn't start or end with an apostrophe.
-      if name =~ /^'/ || name =~ /'$/
-        raise "Worksheet name #{name} cannot start or end with an "
-      end
+      raise "Worksheet name #{name} cannot start or end with an " if name =~ /^'/ || name =~ /'$/
 
       # Check that the worksheet name doesn't already exist since this is a fatal
       # error in Excel 97. The check must also exclude case insensitive matches.
-      unless is_sheetname_uniq?(name)
-        raise "apostropheWorksheet name '#{name}', with case ignored, is already used."
-      end
+      raise "apostropheWorksheet name '#{name}', with case ignored, is already used." unless is_sheetname_uniq?(name)
     end
 
     def is_sheetname_uniq?(name)
-      self.each do |worksheet|
+      each do |worksheet|
         return false if name.downcase == worksheet.name.downcase
       end
       true
@@ -248,19 +241,17 @@ module Writexlsx
 
     def write_sheet_files(dir, sheet, index)
       FileUtils.mkdir_p(dir)
-      sheet.set_xml_writer("#{dir}/sheet#{index+1}.xml")
+      sheet.set_xml_writer("#{dir}/sheet#{index + 1}.xml")
       sheet.assemble_xml_file
     end
 
-    def write_sheet(writer, sheet, sheet_id) #:nodoc:
+    def write_sheet(writer, sheet, sheet_id) # :nodoc:
       attributes = [
         ['name',    sheet.name],
         ['sheetId', sheet_id]
       ]
 
-      if sheet.hidden?
-        attributes << ['state', 'hidden']
-      end
+      attributes << %w[state hidden] if sheet.hidden?
       attributes << r_id_attributes(sheet_id)
       writer.empty_tag_encoded('sheet', attributes)
     end

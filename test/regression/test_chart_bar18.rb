@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar18 < Minitest::Test
@@ -17,14 +18,14 @@ class TestRegressionChartBar18 < Minitest::Test
     chart      = workbook.add_chart(:type => 'bar')
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_get(:@chart).
-      instance_variable_set(:@axis_ids, [40294272, 40295808])
+    chart.instance_variable_get(:@chart)
+         .instance_variable_set(:@axis_ids, [40294272, 40295808])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -47,9 +48,9 @@ class TestRegressionChartBar18 < Minitest::Test
         'xl/chartsheets/sheet1.xml' => [
           '<pageMargins',
           '<pageSetup',
-          '<drawing',    # Id is wrong due to missing printerbin.
+          '<drawing'    # Id is wrong due to missing printerbin.
         ],
-        'xl/charts/chart1.xml' => ['<c:pageMargins']
+        'xl/charts/chart1.xml'      => ['<c:pageMargins']
       }
     )
   end

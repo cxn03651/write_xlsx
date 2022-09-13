@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartAxis38 < Minitest::Test
@@ -16,10 +17,10 @@ class TestRegressionChartAxis38 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [45642496, 45644416])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -28,9 +29,9 @@ class TestRegressionChartAxis38 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     chart.set_y_axis(
-                     :line => {:color => 'yellow'},
-                     :fill => {:color => 'red'}
-                     )
+      :line => { :color => 'yellow' },
+      :fill => { :color => 'red' }
+    )
 
     worksheet.insert_chart('E9', chart)
 

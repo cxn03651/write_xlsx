@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestWorksheeByName < Minitest::Test
@@ -27,9 +28,9 @@ class TestWorksheeByName < Minitest::Test
     assert_nil(result)
 
     # Test an invalid name.
-    result   = workbook.worksheet_by_name()
+    result   = workbook.worksheet_by_name
     assert_nil(result)
-    result   = workbook.get_worksheet_by_name()
+    result   = workbook.get_worksheet_by_name
     assert_nil(result)
   end
 end

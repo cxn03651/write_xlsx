@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat02 < Minitest::Test
@@ -28,8 +29,7 @@ class TestRegressionCondFormat02 < Minitest::Test
                                        :format   => format,
                                        :criteria => '<',
                                        :value    => 5
-                                     }
-                                     )
+                                     })
 
     workbook.close
     compare_for_regression(

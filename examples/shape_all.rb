@@ -225,15 +225,15 @@ shapes_list.each_line do |line|
   end
   last_sheet = sheet
   shape      = workbook.add_shape(
-                                  :type   => name,
-                                  :text   => name,
-                                  :width  => 90,
-                                  :height => 90
-                                  )
+    :type   => name,
+    :text   => name,
+    :width  => 90,
+    :height => 90
+  )
 
   # Connectors can not have labels, so write the connector name in the cell
   # to the left.
-  worksheet.write(row, 0, name ) if sheet == 'Connector'
+  worksheet.write(row, 0, name) if sheet == 'Connector'
   worksheet.insert_shape(row, 2, shape, 0, 0)
   row += 5
 end

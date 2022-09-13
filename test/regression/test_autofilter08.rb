@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionAutofilter08 < Minitest::Test
@@ -32,7 +33,7 @@ class TestRegressionAutofilter08 < Minitest::Test
 
     data.each do |row_data|
       region = row_data[0]
-      if region == '' || region == 'North'
+      if ['', 'North'].include?(region)
         # Row is visible.
       else
         # Hide row.
@@ -45,7 +46,7 @@ class TestRegressionAutofilter08 < Minitest::Test
     workbook.close
     compare_for_regression(
       nil,
-      {'xl/workbook.xml' => ['<workbookView']}
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 

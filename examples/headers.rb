@@ -42,7 +42,6 @@ require 'write_xlsx'
 workbook = WriteXLSX.new('headers.xlsx')
 preview  = 'Select Print Preview to see the header and footer'
 
-
 ######################################################################
 #
 # A simple example to start
@@ -56,7 +55,6 @@ worksheet1.set_footer(footer1)
 
 worksheet1.set_column('A:A', 50)
 worksheet1.write('A1', preview)
-
 
 ######################################################################
 #
@@ -74,21 +72,19 @@ worksheet2.write('A1',  preview)
 worksheet2.write('A21', 'Next sheet')
 worksheet2.set_h_pagebreaks(20)
 
-
 ######################################################################
 #
 # This example shows how to use more than one font
 #
 worksheet3 = workbook.add_worksheet('Mixed fonts')
-header3    = %q(&C&"Courier New,Bold"Hello &"Arial,Italic"World)
-footer3    = %q(&C&"Symbol"e&"Arial" = mc&X2)
+header3    = '&C&"Courier New,Bold"Hello &"Arial,Italic"World'
+footer3    = '&C&"Symbol"e&"Arial" = mc&X2'
 
 worksheet3.set_header(header3)
 worksheet3.set_footer(footer3)
 
 worksheet3.set_column('A:A', 50)
 worksheet3.write('A1', preview)
-
 
 ######################################################################
 #
@@ -101,7 +97,6 @@ worksheet4.set_header(header4)
 
 worksheet4.set_column('A:A', 50)
 worksheet4.write('A1', preview)
-
 
 ######################################################################
 #

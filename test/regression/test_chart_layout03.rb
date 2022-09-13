@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartLayout03 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartLayout03 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [68312064, 69198592])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -32,14 +33,14 @@ class TestRegressionChartLayout03 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     chart.set_legend(
-                       :position => 'overlay_right',
-                       :layout => {
-                         :x      => 0.80197353455818043,
-                         :y      => 0.3744240303295423,
-                         :width  => 0.12858202099737534,
-                         :height => 0.25115157480314959
-                       }
-                       )
+      :position => 'overlay_right',
+      :layout   => {
+        :x      => 0.80197353455818043,
+        :y      => 0.3744240303295423,
+        :width  => 0.12858202099737534,
+        :height => 0.25115157480314959
+      }
+    )
 
     worksheet.insert_chart('E9', chart)
 

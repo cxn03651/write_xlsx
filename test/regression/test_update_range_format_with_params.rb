@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestUpdateRangeFormatWithParams < Minitest::Test
@@ -18,10 +19,10 @@ class TestUpdateRangeFormatWithParams < Minitest::Test
     common_format = workbook.add_format(align: 'center', border: 1)
 
     table_contents = [
-      ['Table', 'Header', 'Contents'],
-      ['table', 'body', 'contents'],
-      ['table', 'body', 'contents'],
-      ['table', 'body', 'contents']
+      %w[Table Header Contents],
+      %w[table body contents],
+      %w[table body contents],
+      %w[table body contents]
     ]
 
     worksheet.write_col(0, 0, table_contents, common_format)
@@ -36,7 +37,7 @@ class TestUpdateRangeFormatWithParams < Minitest::Test
     workbook.close
     compare_for_regression(
       nil,
-      {'xl/workbook.xml' => ['<workbookView']}
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 end

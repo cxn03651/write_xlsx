@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionUtf8_11 < Minitest::Test
@@ -15,7 +16,7 @@ class TestRegressionUtf8_11 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    worksheet.write( 'A1', '１２３４５' )
+    worksheet.write('A1', '１２３４５')
 
     workbook.close
     compare_for_regression

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -20,26 +21,26 @@ class TestSparkline10 < Minitest::Test
     # Set up sparklines
 
     @worksheet.add_sparkline(
-                             {
-                               :location => 'F1',
-                               :range    => 'A1:E1',
+      {
+        :location        => 'F1',
+        :range           => 'A1:E1',
 
-                               :high_point      => 1,
-                               :low_point       => 1,
-                               :negative_points => 1,
-                               :first_point     => 1,
-                               :last_point      => 1,
-                               :markers         => 1,
+        :high_point      => 1,
+        :low_point       => 1,
+        :negative_points => 1,
+        :first_point     => 1,
+        :last_point      => 1,
+        :markers         => 1,
 
-                               :series_color    => '#C00000',
-                               :negative_color  => '#FF0000',
-                               :markers_color   => '#FFC000',
-                               :first_color     => '#00B050',
-                               :last_color      => '#00B0F0',
-                               :high_color      => '#FFFF00',
-                               :low_color       => '#92D050'
-                             }
-                             )
+        :series_color    => '#C00000',
+        :negative_color  => '#FF0000',
+        :markers_color   => '#FFC000',
+        :first_color     => '#00B050',
+        :last_color      => '#00B0F0',
+        :high_color      => '#FFFF00',
+        :low_color       => '#92D050'
+      }
+    )
 
     # End sparklines
 

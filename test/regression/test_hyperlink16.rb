@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHyperlink16 < Minitest::Test
@@ -22,8 +23,8 @@ class TestRegressionHyperlink16 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                {},
-                                { 'xl/workbook.xml' => ['<workbookView'] }
-                                )
+      {},
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

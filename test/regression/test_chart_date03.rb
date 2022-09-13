@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDate03 < Minitest::Test
@@ -22,11 +23,11 @@ class TestRegressionChartDate03 < Minitest::Test
 
     worksheet.set_column('A:A', 12)
 
-    dates = [
-             '2013-01-01T', '2013-01-02T', '2013-01-03T', '2013-01-04T',
-             '2013-01-05T', '2013-01-06T', '2013-01-07T', '2013-01-08T',
-             '2013-01-09T', '2013-01-10T'
-            ]
+    dates = %w[
+      2013-01-01T 2013-01-02T 2013-01-03T 2013-01-04T
+      2013-01-05T 2013-01-06T 2013-01-07T 2013-01-08T
+      2013-01-09T 2013-01-10T
+    ]
 
     data = [10, 30, 20, 40, 20, 60, 50, 40, 30, 30]
 
@@ -36,24 +37,24 @@ class TestRegressionChartDate03 < Minitest::Test
     end
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$10',
-                     :values     => '=Sheet1!$B$1:$B$10'
-                     )
+      :categories => '=Sheet1!$A$1:$A$10',
+      :values     => '=Sheet1!$B$1:$B$10'
+    )
 
     chart.set_x_axis(
-                     :date_axis         => 1,
-                     :minor_unit        => 1,
-                     :major_unit        => 1,
-                     :num_format        => 'dd/mm/yyyy',
-                     :num_format_linked => 1,
-                     )
+      :date_axis         => 1,
+      :minor_unit        => 1,
+      :major_unit        => 1,
+      :num_format        => 'dd/mm/yyyy',
+      :num_format_linked => 1
+    )
 
     worksheet.insert_chart('E9', chart)
 
     workbook.close
     compare_for_regression(
-                                nil,
-                                {'xl/charts/chart1.xml' => ['<c:formatCode']}
-                                )
+      nil,
+      { 'xl/charts/chart1.xml' => ['<c:formatCode'] }
+    )
   end
 end

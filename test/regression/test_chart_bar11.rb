@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar11 < Minitest::Test
@@ -19,10 +20,10 @@ class TestRegressionChartBar11 < Minitest::Test
     chart3    = workbook.add_chart(:type => 'bar', :embedded => 1)
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     # Turn off default URL format for testing.
     worksheet.instance_variable_set(:@default_url_format, nil)

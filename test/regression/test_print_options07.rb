@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestPrintOptions07 < Minitest::Test
@@ -25,7 +26,7 @@ class TestPrintOptions07 < Minitest::Test
     workbook.close
     compare_for_regression(
       [],
-      {'xl/worksheets/sheet1.xml' => ['<pageMargins']}
+      { 'xl/worksheets/sheet1.xml' => ['<pageMargins'] }
     )
   end
 end

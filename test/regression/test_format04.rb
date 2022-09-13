@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFormat04 < Minitest::Test
@@ -26,14 +27,14 @@ class TestRegressionFormat04 < Minitest::Test
     worksheet.write('A1', 'Foo', format2)
 
     worksheet.conditional_formatting(
-                                     'C1:C10',
-                                     {
-                                       :type     => 'cell',
-                                       :criteria => '>',
-                                       :value    => 50,
-                                       :format   => format2
-                                     }
-                                     )
+      'C1:C10',
+      {
+        :type     => 'cell',
+        :criteria => '>',
+        :value    => 50,
+        :format   => format2
+      }
+    )
 
     workbook.close
     compare_for_regression

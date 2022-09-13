@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class App
-
       include Writexlsx::Utility
       attr_writer :doc_security
 
@@ -45,7 +45,7 @@ module Writexlsx
         add_heading_pair(
           [
             'Worksheets',
-            @workbook.worksheets.reject {|s| s.is_chartsheet?}.count
+            @workbook.worksheets.reject { |s| s.is_chartsheet? }.count
           ]
         )
       end
@@ -55,15 +55,15 @@ module Writexlsx
       end
 
       def add_worksheet_part_names
-        @workbook.worksheets.
-          reject { |sheet| sheet.is_chartsheet? }.
-          each   { |sheet| add_part_name(sheet.name) }
+        @workbook.worksheets
+                 .reject { |sheet| sheet.is_chartsheet? }
+                 .each   { |sheet| add_part_name(sheet.name) }
       end
 
       def add_chartsheet_part_names
-        @workbook.worksheets.
-          select { |sheet| sheet.is_chartsheet? }.
-          each   { |sheet| add_part_name(sheet.name) }
+        @workbook.worksheets
+                 .select { |sheet| sheet.is_chartsheet? }
+                 .each   { |sheet| add_part_name(sheet.name) }
       end
 
       def add_part_name(part_name)
@@ -73,9 +73,7 @@ module Writexlsx
       def add_named_range_heading_pairs
         range_count = @workbook.named_ranges.size
 
-        if range_count != 0
-          add_heading_pair([ 'Named Ranges', range_count ])
-        end
+        add_heading_pair(['Named Ranges', range_count]) if range_count != 0
       end
 
       def add_named_ranges_parts
@@ -100,14 +98,14 @@ module Writexlsx
       #
       # Write the <Properties> element.
       #
-      def write_properties
-        schema   = 'http://schemas.openxmlformats.org/officeDocument/2006/'
+      def write_properties(&block)
+        schema = 'http://schemas.openxmlformats.org/officeDocument/2006/'
         attributes = [
           ['xmlns',     "#{schema}extended-properties"],
           ['xmlns:vt',  "#{schema}docPropsVTypes"]
         ]
 
-        @writer.tag_elements('Properties', attributes) { yield }
+        @writer.tag_elements('Properties', attributes, &block)
       end
 
       #

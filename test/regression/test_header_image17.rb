@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHeaderImage17 < Minitest::Test
@@ -39,7 +40,7 @@ class TestRegressionHeaderImage17 < Minitest::Test
     compare_for_regression(
       [],
       {
-        'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ]
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
       }
     )
   end

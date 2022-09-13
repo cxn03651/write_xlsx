@@ -7,8 +7,9 @@ module Writexlsx
 
       def self.factory(worksheet, *args)
         range, param  =
-               Package::ConditionalFormat.new(worksheet, nil, nil).
-                 range_param_for_conditional_formatting(*args)
+          Package::ConditionalFormat
+          .new(worksheet, nil, nil)
+          .range_param_for_conditional_formatting(*args)
 
         case param[:type]
         when 'cellIs'
@@ -39,7 +40,9 @@ module Writexlsx
       attr_reader :range
 
       def initialize(worksheet, range, param)
-        @worksheet, @range, @param = worksheet, range, param
+        @worksheet = worksheet
+        @range = range
+        @param = param
         @writer = @worksheet.writer
       end
 
@@ -53,7 +56,7 @@ module Writexlsx
         end
       end
 
-      def write_formula_tag(data) #:nodoc:
+      def write_formula_tag(data) # :nodoc:
         data = data.sub(/^=/, '') if data.respond_to?(:sub)
         @writer.data_element('formula', data)
       end
@@ -62,8 +65,8 @@ module Writexlsx
       # Write the <cfvo> element.
       #
       def write_cfvo(type, value, criteria = nil)
-        attributes = [ ['type', type] ]
-        attributes << [ 'val', value] if value
+        attributes = [['type', type]]
+        attributes << ['val', value] if value
 
         attributes << ['gte', 0] if ptrue?(criteria)
 
@@ -72,7 +75,7 @@ module Writexlsx
 
       def attributes
         attr = []
-        attr << ['type' , type]
+        attr << ['type', type]
         attr << ['dxfId',    format]   if format
         attr << ['priority', priority]
         attr << ['stopIfTrue', 1] if stop_if_true
@@ -122,6 +125,7 @@ module Writexlsx
       def min_type
         @param[:min_type]
       end
+
       def min_value
         @param[:min_value]
       end
@@ -222,21 +226,21 @@ module Writexlsx
       def handling_of_text_criteria
         case @param[:criteria]
         when 'containsText'
-          @param[:type]    = 'containsText';
+          @param[:type]    = 'containsText'
           @param[:formula] =
-            %Q!NOT(ISERROR(SEARCH("#{@param[:value]}",#{@start_cell})))!
+            %!NOT(ISERROR(SEARCH("#{@param[:value]}",#{@start_cell})))!
         when 'notContains'
-          @param[:type]    = 'notContainsText';
+          @param[:type]    = 'notContainsText'
           @param[:formula] =
-            %Q!ISERROR(SEARCH("#{@param[:value]}",#{@start_cell}))!
+            %!ISERROR(SEARCH("#{@param[:value]}",#{@start_cell}))!
         when 'beginsWith'
           @param[:type] = 'beginsWith'
           @param[:formula] =
-            %Q!LEFT(#{@start_cell},#{@param[:value].size})="#{@param[:value]}"!
+            %!LEFT(#{@start_cell},#{@param[:value].size})="#{@param[:value]}"!
         when 'endsWith'
           @param[:type] = 'endsWith'
           @param[:formula] =
-            %Q!RIGHT(#{@start_cell},#{@param[:value].size})="#{@param[:value]}"!
+            %!RIGHT(#{@start_cell},#{@param[:value].size})="#{@param[:value]}"!
         else
           raise "Invalid text criteria '#{@param[:criteria]} in conditional_formatting()"
         end
@@ -304,8 +308,8 @@ module Writexlsx
           @param[:min_color] ||= '#FF7128'
           @param[:max_color] ||= '#FFEF9C'
 
-          @param[:max_color] = palette_color( @param[:max_color] )
-          @param[:min_color] = palette_color( @param[:min_color] )
+          @param[:max_color] = palette_color(@param[:max_color])
+          @param[:min_color] = palette_color(@param[:min_color])
         when '3_color_scale'
           @param[:type] = 'colorScale'
 
@@ -329,17 +333,17 @@ module Writexlsx
           # Excel 2007 data bars don't use any additional formatting.
           @param[:format] = nil
 
-          if !@param[:min_type]
+          if @param[:min_type]
+            @param[:x14_min_type] = @param[:min_type]
+          else
             @param[:min_type]     = 'min'
             @param[:x14_min_type] = 'autoMin'
-          else
-            @param[:x14_min_type] = @param[:min_type]
           end
-          if !@param[:max_type]
+          if @param[:max_type]
+            @param[:x14_max_type] = @param[:max_type]
+          else
             @param[:max_type]     = 'max'
             @param[:x14_max_type] = 'autoMax'
-          else
-            @param[:x14_max_type] = @param[:max_type]
           end
 
           @param[:min_value]                      ||= 0
@@ -373,12 +377,8 @@ module Writexlsx
         if ptrue?(@param[:is_data_bar_2010])
           @worksheet.excel_version = 2010
 
-          if @param[:min_type] == 'min' && @param[:min_value] == 0
-            @param[:min_value] = nil
-          end
-          if @param[:max_type] == 'max' && @param[:max_value] == 0
-            @param[:max_value] = nil
-          end
+          @param[:min_value] = nil if @param[:min_type] == 'min' && @param[:min_value] == 0
+          @param[:max_value] = nil if @param[:max_type] == 'max' && @param[:max_value] == 0
 
           # Store range for Excel 2010 data bars.
           @param[:range] = range
@@ -396,7 +396,7 @@ module Writexlsx
 
       def range_start_cell_for_conditional_formatting(*args)  # :nodoc:
         row1, row2, col1, col2, user_range, _param =
-                                            row_col_param_for_conditional_formatting(*args)
+          row_col_param_for_conditional_formatting(*args)
         range       = xl_range(row1, row2, col1, col2)
         @start_cell = xl_rowcol_to_cell(row1, col1)
 
@@ -408,15 +408,16 @@ module Writexlsx
 
       def row_col_param_for_conditional_formatting(*args)
         # Check for a cell reference in A1 notation and substitute row and column
-        if args[0].to_s =~ /^\D/
+        if args[0].to_s =~ (/^\D/) && (args[0] =~ /,/)
           # Check for a user defined multiple range like B3:K6,B8:K11.
-          user_range = args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '') if args[0] =~ /,/
+          user_range = args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '')
         end
 
         row1, col1, row2, col2, param = row_col_notation(args)
         if row2.respond_to?(:keys)
           param = row2
-          row2, col2 = row1, col1
+          row2 = row1
+          col2 = col1
         end
         raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, param].include?(nil)
 
@@ -433,18 +434,17 @@ module Writexlsx
 
       def param_for_conditional_formatting(*args)  # :nodoc:
         _dummy, _dummy, _dummy, _dummy, _dummy, @param =
-                                           row_col_param_for_conditional_formatting(*args)
+          row_col_param_for_conditional_formatting(*args)
         check_conditional_formatting_parameters(@param)
 
         @param[:format] = @param[:format].get_dxf_index if @param[:format]
         @param[:priority] = @worksheet.dxf_priority
 
         # Check for 2010 style data_bar parameters.
-        %i(data_bar_2010 bar_solid bar_border_color bar_negative_color
+        %i[data_bar_2010 bar_solid bar_border_color bar_negative_color
            bar_negative_color_same bar_negative_border_color
            bar_negative_border_color_same bar_no_border
-           bar_axis_position bar_axis_color bar_direction
-        ).each do |key|
+           bar_axis_position bar_axis_color bar_direction].each do |key|
           if @param[key]
             @param[:is_data_bar_2010] = 1
             break
@@ -466,9 +466,7 @@ module Writexlsx
         param[:type] = valid_type_for_conditional_formatting[param[:type].downcase]
 
         # Check for valid criteria types.
-        if param.has_key?(:criteria) && valid_criteria_type_for_conditional_formatting.has_key?(param[:criteria].downcase)
-          param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase]
-        end
+        param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase] if param.has_key?(:criteria) && valid_criteria_type_for_conditional_formatting.has_key?(param[:criteria].downcase)
 
         # Convert date/times value if required.
         if %w[date time cellIs].include?(param[:type])
@@ -481,17 +479,17 @@ module Writexlsx
 
         # Set properties for icon sets.
         if param[:type] == 'iconSet'
-          if !param[:icon_style]
+          unless param[:icon_style]
             raise "The 'icon_style' parameter must be specified when " +
                   "'type' == 'icon_set' in conditional_formatting()"
           end
 
           # Check for valid icon styles.
-          if !icon_set_styles[param[:icon_style]]
+          if icon_set_styles[param[:icon_style]]
+            param[:icon_style] = icon_set_styles[param[:icon_style]]
+          else
             raise "Unknown icon style '$param->{icon_style}' for parameter " +
                   "'icon_style' in conditional_formatting()"
-          else
-            param[:icon_style] = icon_set_styles[param[:icon_style]]
           end
 
           # Set the number of icons for the icon style.
@@ -507,26 +505,21 @@ module Writexlsx
 
         # 'Between' and 'Not between' criteria require 2 values.
         if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
-          unless param.has_key?(:minimum) || param.has_key?(:maximum)
-            raise WriteXLSXOptionParameterError, "Invalid criteria : #{param[:criteria]}"
-          end
+          raise WriteXLSXOptionParameterError, "Invalid criteria : #{param[:criteria]}" unless param.has_key?(:minimum) || param.has_key?(:maximum)
         else
           param[:minimum] = nil
           param[:maximum] = nil
         end
 
         # Convert date/times value if required.
-        if param[:type] == 'date' || param[:type] == 'time'
-          unless convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum)
-            raise WriteXLSXOptionParameterError
-          end
-        end
+        raise WriteXLSXOptionParameterError if (param[:type] == 'date' || param[:type] == 'time') && !(convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum))
       end
 
       def convert_date_time_if_required(val)
         if val.to_s =~ /T/
           date_time = convert_date_time(val)
           raise "Invalid date/time value '#{val}' in conditional_formatting()" unless date_time
+
           date_time
         else
           val
@@ -535,40 +528,40 @@ module Writexlsx
 
       # List of valid input parameters for conditional_formatting.
       def valid_parameter_for_conditional_formatting
-        [
-          :type,
-          :format,
-          :criteria,
-          :value,
-          :minimum,
-          :maximum,
-          :stop_if_true,
-          :min_type,
-          :mid_type,
-          :max_type,
-          :min_value,
-          :mid_value,
-          :max_value,
-          :min_color,
-          :mid_color,
-          :max_color,
-          :bar_color,
-          :bar_negative_color,
-          :bar_negative_color_same,
-          :bar_solid,
-          :bar_border_color,
-          :bar_negative_border_color,
-          :bar_negative_border_color_same,
-          :bar_no_border,
-          :bar_direction,
-          :bar_axis_position,
-          :bar_axis_color,
-          :bar_only,
-          :icon_style,
-          :reverse_icons,
-          :icons_only,
-          :icons,
-          :data_bar_2010
+        %i[
+          type
+          format
+          criteria
+          value
+          minimum
+          maximum
+          stop_if_true
+          min_type
+          mid_type
+          max_type
+          min_value
+          mid_value
+          max_value
+          min_color
+          mid_color
+          max_color
+          bar_color
+          bar_negative_color
+          bar_negative_color_same
+          bar_solid
+          bar_border_color
+          bar_negative_border_color
+          bar_negative_border_color_same
+          bar_no_border
+          bar_direction
+          bar_axis_position
+          bar_axis_color
+          bar_only
+          icon_style
+          reverse_icons
+          icons_only
+          icons
+          data_bar_2010
         ]
       end
 
@@ -651,7 +644,7 @@ module Writexlsx
           "4_arrows_gray"           => "4ArrowsGray",        # 14
           "4_ratings"               => "4Rating",            # 15
           "5_arrows"                => "5Arrows",            # 16
-          "5_ratings"               => "5Rating",            # 17
+          "5_ratings"               => "5Rating"            # 17
         }
       end
 
@@ -694,9 +687,7 @@ module Writexlsx
 
           (0..max_data - 1).each do |i|
             # Set the user defined 'value' property.
-            if user_props[i][:value]
-              props[i][:value] = user_props[i][:value].to_s.sub(/^=/, '')
-            end
+            props[i][:value] = user_props[i][:value].to_s.sub(/^=/, '') if user_props[i][:value]
 
             # Set the user defined 'type' property.
             if user_props[i][:type]
@@ -710,17 +701,12 @@ module Writexlsx
               else
                 props[i][:type] = type
 
-                if props[i][:type] == 'number'
-                  props[i][:type] = 'num'
-                end
+                props[i][:type] = 'num' if props[i][:type] == 'number'
               end
             end
 
             # Set the user defined 'criteria' property.
-            if user_props[i][:criteria] && user_props[i][:criteria] == '>'
-              props[i][:criteria] = 1
-            end
-
+            props[i][:criteria] = 1 if user_props[i][:criteria] && user_props[i][:criteria] == '>'
           end
         end
         props
@@ -749,7 +735,7 @@ module Writexlsx
           if !(quoted_value =~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/) &&
              !(quoted_value =~ numeric_regex) &&
              !(quoted_value =~ /^".*"$/)
-            quoted_value = (%Q!"#{value}"!)
+            quoted_value = %("#{value}")
           end
           write_cf_rule_formula_tag(quoted_value)
         end
@@ -761,9 +747,7 @@ module Writexlsx
         attr = super
         attr << ['aboveAverage', 0] if criteria =~ /below/
         attr << ['equalAverage', 1] if criteria =~ /equal/
-        if criteria =~ /([123]) std dev/
-          attr << ['stdDev', $~[1]]
-        end
+        attr << ['stdDev', $~[1]] if criteria =~ /([123]) std dev/
         attr
       end
     end
@@ -833,9 +817,7 @@ module Writexlsx
       def write_cf_rule
         @writer.tag_elements('cfRule', attributes) do
           write_data_bar
-          if ptrue?(@param[:is_data_bar_2010])
-            write_data_bar_ext(@param)
-          end
+          write_data_bar_ext(@param) if ptrue?(@param[:is_data_bar_2010])
         end
       end
 
@@ -845,10 +827,8 @@ module Writexlsx
       def write_data_bar
         attributes = []
 
-        if ptrue?(bar_only)
-          attributes << ['showValue', 0]
-        end
-        @writer.tag_elements('dataBar',attributes) do
+        attributes << ['showValue', 0] if ptrue?(bar_only)
+        @writer.tag_elements('dataBar', attributes) do
           write_cfvo(min_type, min_value)
           write_cfvo(max_type, max_value)
 
@@ -900,7 +880,7 @@ module Writexlsx
       def write_icon_set
         attributes = []
         # Don't set attribute for default style.
-        attributes = [ ['iconSet', icon_style] ] if icon_style != '3TrafficLights'
+        attributes = [['iconSet', icon_style]] if icon_style != '3TrafficLights'
         attributes << ['showValue', 0]           if icons_only
         attributes << ['reverse', 1]             if reverse_icons
 

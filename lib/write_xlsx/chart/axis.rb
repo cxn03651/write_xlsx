@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 require 'write_xlsx/chart/caption'
@@ -17,6 +18,7 @@ module Writexlsx
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
       attr_reader :interval_tick, :major_gridlines, :minor_gridlines, :reverse
       attr_reader :line, :fill, :text_axis, :label_align
+
       #
       # Convert user defined axis values into axis instance.
       #
@@ -24,11 +26,11 @@ module Writexlsx
         super
         args      = (defaults || {}).merge(params)
 
-        [
-          :reverse, :min, :max, :minor_unit, :major_unit, :minor_unit_type,
-          :major_unit_type, :log_base, :crossing, :position_axis,
-          :label_position, :num_format, :num_format_linked, :interval_unit,
-          :interval_tick, :line, :fill, :label_align
+        %i[
+          reverse min max minor_unit major_unit minor_unit_type
+          major_unit_type log_base crossing position_axis
+          label_position num_format num_format_linked interval_unit
+          interval_tick line fill label_align
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
         set_major_minor_gridlines(args)
 
@@ -94,7 +96,7 @@ module Writexlsx
 
       def set_major_minor_gridlines(args)
         # Map major/minor_gridlines properties.
-        [:major_gridlines, :minor_gridlines].each do |lines|
+        %i[major_gridlines minor_gridlines].each do |lines|
           if args[lines] && ptrue?(args[lines][:visible])
             instance_variable_set("@#{lines}", Gridline.new(args[lines]))
           else
@@ -108,7 +110,6 @@ module Writexlsx
       # Convert user defined display units to internal units.
       #
       def get_display_units(display_units)
-
         return unless ptrue?(display_units)
 
         types = {
@@ -123,19 +124,14 @@ module Writexlsx
           'trillions'         => 'trillions'
         }
 
-        if types[display_units]
-          return types[display_units]
-        else
-          # warn "Unknown display_units type '$display_units'\n"
-          return
-        end
+        types[display_units] || warn("Unknown display_units type '$display_units'\n")
       end
 
       #
       # Convert user tick types to internal units.
       #
       def get_tick_type(tick_type)
-        return if !ptrue?(tick_type)
+        return unless ptrue?(tick_type)
 
         types = {
           'outside' => 'out',
@@ -144,11 +140,7 @@ module Writexlsx
           'cross'   => 'cross'
         }
 
-        if(types[tick_type])
-          return types[tick_type]
-        else
-          raise "Unknown tick_type type '#{tick_type}'\n"
-        end
+        types[tick_type] || raise("Unknown tick_type type '#{tick_type}'\n")
       end
 
       def set_display_units(args)
@@ -156,11 +148,7 @@ module Writexlsx
       end
 
       def set_display_units_visible(args)
-        if args[:display_units_visible]
-          @display_units_visible = args[:display_units_visible]
-        else
-          @display_units_visible = 1
-        end
+        @display_units_visible = args[:display_units_visible] || 1
       end
 
       def set_position(args)

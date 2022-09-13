@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
@@ -55,7 +56,7 @@ module Writexlsx
       # Write the <metadataTypes> element.
       #
       def write_metadata_types
-        attributes = [['count', 1 ]]
+        attributes = [['count', 1]]
 
         @writer.tag_elements('metadataTypes', attributes) do
           # Write the metadataType element.
@@ -68,7 +69,7 @@ module Writexlsx
       #
       def write_metadata_type
         attributes = [
-          ['name',                'XLDAPR'],
+          %w[name XLDAPR],
           ['minSupportedVersion', 120000],
           ['copy',                1],
           ['pasteAll',            1],
@@ -91,7 +92,7 @@ module Writexlsx
       #
       def write_future_metadata
         attributes = [
-          ['name',  'XLDAPR'],
+          %w[name XLDAPR],
           ['count', 1]
         ]
 
@@ -99,7 +100,7 @@ module Writexlsx
           @writer.tag_elements('bk') do
             @writer.tag_elements('extLst') do
               # Write the ext element.
-              write_ext();
+              write_ext
             end
           end
         end
@@ -109,7 +110,7 @@ module Writexlsx
       # Write the <ext> element.
       #
       def write_ext
-        attributes = [[ 'uri', '{bdbb8cdc-fa1e-496e-a857-3c3f30c029c3}']]
+        attributes = [['uri', '{bdbb8cdc-fa1e-496e-a857-3c3f30c029c3}']]
         @writer.tag_elements('ext', attributes) do
           # Write the xda:dynamicArrayProperties element.
           write_xda_dynamic_array_properties

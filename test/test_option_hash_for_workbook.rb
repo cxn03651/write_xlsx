@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 
@@ -15,7 +16,7 @@ class TestOptionHashForWorkbook < Minitest::Test
       :optimization    => false,
       :excel2003_style => false
     }
-    @default_format_properties = {:size => 12, :color => 'red'}
+    @default_format_properties = { :size => 12, :color => 'red' }
   end
 
   #
@@ -24,9 +25,9 @@ class TestOptionHashForWorkbook < Minitest::Test
   #  => default_format_properties = {}
   #
   def test_empty
-    options, default_format_properties = @obj.process_workbook_options()
-    assert_equal({}, options)
-    assert_equal({}, default_format_properties)
+    options, default_format_properties = @obj.process_workbook_options
+    assert_empty(options)
+    assert_empty(default_format_properties)
   end
 
   #

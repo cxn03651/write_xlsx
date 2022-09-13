@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/drawing'
 
@@ -48,7 +49,7 @@ class DrawingChart011 < Minitest::Test
   </xdr:twoCellAnchor>
 </xdr:wsDr>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

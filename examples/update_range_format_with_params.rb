@@ -15,10 +15,10 @@ worksheet = workbook.add_worksheet
 common_format = workbook.add_format(align: 'center', border: 1)
 
 table_contents = [
-  ['Table', 'Header', 'Contents'],
-  ['table', 'body', 'contents'],
-  ['table', 'body', 'contents'],
-  ['table', 'body', 'contents']
+  %w[Table Header Contents],
+  %w[table body contents],
+  %w[table body contents],
+  %w[table body contents]
 ]
 
 worksheet.write_col(0, 0, table_contents, common_format)

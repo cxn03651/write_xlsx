@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Radar - A class for writing Excel Radar charts.
@@ -31,9 +32,7 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @subtype = subtype || 'marker'
-        if @subtype == 'marker'
-          @default_marker = Marker.new(:type => 'none')
-        end
+        @default_marker = Marker.new(:type => 'none') if @subtype == 'marker'
 
         # Override and reset the default axis values.
         @x_axis.defaults[:major_gridlines] = { :visible => 1 }
@@ -59,11 +58,11 @@ module Writexlsx
       # Write the <c:radarChart> element.
       #
       def write_radar_chart(params)
-        if ptrue?(params[:primary_axes])
-          series = get_primary_axes_series
-        else
-          series = get_secondary_axes_series
-        end
+        series = if ptrue?(params[:primary_axes])
+                   get_primary_axes_series
+                 else
+                   get_secondary_axes_series
+                 end
 
         return if series.empty?
 
@@ -86,7 +85,7 @@ module Writexlsx
         val = 'marker'
         val = 'filled' if @subtype == 'filled'
 
-        attributes = [ ['val', val] ]
+        attributes = [['val', val]]
 
         @writer.empty_tag('c:radarStyle', attributes)
       end

@@ -26,7 +26,7 @@ worksheet.write_formula('C6', '=1/0')
 # Turn off some of the warnings:
 worksheet.ignore_errors(
   :number_stored_as_text => 'C3',
-  :eval_error => 'C6'
+  :eval_error            => 'C6'
 )
 
 # Write some descriptions for the cells and make the column wider for clarity.

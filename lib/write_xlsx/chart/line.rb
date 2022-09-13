@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Line - A class for writing Excel Line charts.
@@ -22,28 +23,26 @@ module Writexlsx
 
       def initialize(subtype)
         super(subtype)
-        @subtype        = @subtype || 'standard'
+        @subtype ||= 'standard'
         @default_marker = Marker.new(:type => 'none')
         @smooth_allowed = 1
 
         # Override and reset the default axis values.
-        if @subtype == 'percent_stacked'
-          @y_axis.defaults[:num_format] = '0%'
-        end
+        @y_axis.defaults[:num_format] = '0%' if @subtype == 'percent_stacked'
 
         set_y_axis
 
         # Set the available data label positions for this chart type.
         @label_position_default = 'right'
         @label_positions = {
-          'center'      => 'ctr',
-          'right'       => 'r',
-          'left'        => 'l',
-          'above'       => 't',
-          'below'       => 'b',
+          'center' => 'ctr',
+          'right'  => 'r',
+          'left'   => 'l',
+          'above'  => 't',
+          'below'  => 'b',
           # For backward compatibility.
-          'top'         => 't',
-          'bottom'      => 'b'
+          'top'    => 't',
+          'bottom' => 'b'
         }
       end
 
@@ -62,17 +61,17 @@ module Writexlsx
         series = axes_series(params)
         return if series.empty?
 
-        if @subtype == 'percent_stacked'
-          subtype = 'percentStacked'
-        else
-          subtype = @subtype
-        end
+        subtype = if @subtype == 'percent_stacked'
+                    'percentStacked'
+                  else
+                    @subtype
+                  end
 
         @writer.tag_elements('c:lineChart') do
           # Write the c:grouping element.
           write_grouping(subtype)
           # Write the series elements.
-          series.each {|s| write_series(s)}
+          series.each { |s| write_series(s) }
 
           # Write the c:dropLines element.
           write_drop_lines

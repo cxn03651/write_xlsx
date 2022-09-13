@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/vml'

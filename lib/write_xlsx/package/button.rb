@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
-
     class Button
       include Writexlsx::Utility
 
@@ -61,7 +61,7 @@ module Writexlsx
       def write_rotation_lock
         attributes = [
           ['v:ext',    'edit'],
-          ['rotation', 't']
+          %w[rotation t]
         ]
         @writer.empty_tag('o:lock', attributes)
       end
@@ -85,7 +85,7 @@ module Writexlsx
       # Write the <x:ClientData> element.
       #
       def write_client_data
-        attributes = [ ['ObjectType', 'Button'] ]
+        attributes = [%w[ObjectType Button]]
 
         @writer.tag_elements('x:ClientData', attributes) do
           # Write the x:Anchor element.

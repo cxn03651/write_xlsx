@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -38,7 +39,7 @@ class DrawingShape05 < Minitest::Test
   end
 
   def expected_str
-<<EOS
+    <<EOS
 <a:xfrm rot="5400000" flipH="1" flipV="1">
 <a:off x="100" y="200"/>
 <a:ext cx="10" cy="20"/>

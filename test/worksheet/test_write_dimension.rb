@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -21,7 +22,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -30,7 +31,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -39,7 +40,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -48,7 +49,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write(cell, 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -58,7 +59,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write('B2', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -68,7 +69,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write('A1', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -78,7 +79,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write('H11', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 
@@ -88,7 +89,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.write('XFD1048576', 'some string')
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
-    expected = %Q!<dimension ref="#{cell}"/>!
+    expected = %(<dimension ref="#{cell}"/>)
     assert_equal(expected, result)
   end
 end

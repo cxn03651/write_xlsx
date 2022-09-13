@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat18 < Minitest::Test
@@ -26,7 +27,6 @@ class TestRegressionCondFormat18 < Minitest::Test
     worksheet.write('A9', 9)
 
     worksheet.write('A12', 75)
-
 
     worksheet.conditional_formatting(
       'A1',
@@ -62,8 +62,8 @@ class TestRegressionCondFormat18 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '3_symbols_circled',
         :icons      => [
-          {:value => 80},
-          {:value => 20}
+          { :value => 80 },
+          { :value => 20 }
         ]
       }
     )
@@ -74,9 +74,9 @@ class TestRegressionCondFormat18 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '4_arrows',
         :icons      => [
-          {:criteria => '>'},
-          {:criteria => '>'},
-          {:criteria => '>'}
+          { :criteria => '>' },
+          { :criteria => '>' },
+          { :criteria => '>' }
         ]
       }
     )
@@ -87,9 +87,9 @@ class TestRegressionCondFormat18 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '4_red_to_black',
         :icons      => [
-          {:criteria => '>=', :type => 'number',     :value => 90},
-          {:criteria => '<',  :type => 'percentile', :value => 50},
-          {:criteria => '<=', :type => 'percent',    :value => 25}
+          { :criteria => '>=', :type => 'number',     :value => 90 },
+          { :criteria => '<',  :type => 'percentile', :value => 50 },
+          { :criteria => '<=', :type => 'percent',    :value => 25 }
         ]
       }
     )
@@ -99,7 +99,7 @@ class TestRegressionCondFormat18 < Minitest::Test
       {
         :type       => 'icon_set',
         :icon_style => '4_traffic_lights',
-        :icons      => [ {:value => '=$A$12'} ]
+        :icons      => [{ :value => '=$A$12' }]
       }
     )
 
@@ -108,7 +108,7 @@ class TestRegressionCondFormat18 < Minitest::Test
       {
         :type       => 'icon_set',
         :icon_style => '5_arrows_gray',
-        :icons      => [ {:type => 'formula', :value => '=$A$12'} ]
+        :icons      => [{ :type => 'formula', :value => '=$A$12' }]
       }
     )
 
@@ -118,10 +118,10 @@ class TestRegressionCondFormat18 < Minitest::Test
         :type          => 'icon_set',
         :icon_style    => '5_quarters',
         :icons         => [
-          {:value => 70},
-          {:value => 50},
-          {:value => 30},
-          {:value => 10}
+          { :value => 70 },
+          { :value => 50 },
+          { :value => 30 },
+          { :value => 10 }
         ],
         :reverse_icons => 1
       }

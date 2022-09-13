@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartClustered01 < Minitest::Test
@@ -40,7 +41,7 @@ class TestRegressionChartClustered01 < Minitest::Test
       :categories      => '=Sheet1!$A$2:$B$6',
       :values          => '=Sheet1!$C$2:$C$6',
       :categories_data => cat_data
-    );
+    )
 
     chart.add_series(
       :name       => '=Sheet1!$D$1',
@@ -59,7 +60,7 @@ class TestRegressionChartClustered01 < Minitest::Test
     workbook.close
     compare_for_regression(
       [],
-      {'xl/charts/chart1.xml' => [ '<c:pageMargins' ]}
+      { 'xl/charts/chart1.xml' => ['<c:pageMargins'] }
     )
   end
 end

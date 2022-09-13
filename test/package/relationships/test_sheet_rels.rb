@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/relationships'
 
@@ -16,7 +17,7 @@ class TestSheetRels < Minitest::Test
   <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="link00.xlsx" TargetMode="External"/>
 </Relationships>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionSetColumn03 < Minitest::Test
@@ -15,10 +16,10 @@ class TestRegressionSetColumn03 < Minitest::Test
     italic = workbook.add_format(:italic => 1)
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', 'Foo', italic)
     worksheet.write('B1', 'Bar', bold)
@@ -29,6 +30,5 @@ class TestRegressionSetColumn03 < Minitest::Test
     workbook.close
 
     compare_for_regression
-
   end
 end

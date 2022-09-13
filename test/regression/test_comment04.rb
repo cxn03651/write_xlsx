@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionComment04 < Minitest::Test
@@ -12,7 +13,7 @@ class TestRegressionComment04 < Minitest::Test
 
   def test_comment04
     @xlsx = 'comment04.xlsx'
-    workbook  = WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet

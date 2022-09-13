@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShapeConnect04 < Minitest::Test
@@ -22,12 +23,12 @@ class TestRegressionShapeConnect04 < Minitest::Test
     cy = 190
 
     ellipse = workbook.add_shape(
-                                 :type => 'ellipse',
-                                 :id => 2,
-                                 :text => "Hello\nWorld",
-                                 :width=> cw,
-                                 :height => ch
-                                 )
+      :type   => 'ellipse',
+      :id     => 2,
+      :text   => "Hello\nWorld",
+      :width  => cw,
+      :height => ch
+    )
     worksheet.insert_shape('A1', ellipse, cx, cy)
 
     # Add a plus sign at 4 different positions around the circle
@@ -37,11 +38,11 @@ class TestRegressionShapeConnect04 < Minitest::Test
     py = 250
 
     plus = workbook.add_shape(
-                              :type => 'plus',
-                              :id => 3,
-                              :width => pw,
-                              :height => ph
-                              )
+      :type   => 'plus',
+      :id     => 3,
+      :width  => pw,
+      :height => ph
+    )
     p1 = worksheet.insert_shape('A1', plus, 350, 150)   #  2:00
     p2 = worksheet.insert_shape('A1', plus, 350, 350)   #  4:00
     p3 = worksheet.insert_shape('A1', plus, 150, 350)   #  8:00

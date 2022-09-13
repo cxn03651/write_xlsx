@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFormat03 < Minitest::Test
@@ -15,7 +16,7 @@ class TestRegressionFormat03 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    format1 = workbook.add_format(:bold     => 1, :fg_color => 'red')
+    format1 = workbook.add_format(:bold => 1, :fg_color => 'red')
     format2 = workbook.add_format
 
     # Test the copy method

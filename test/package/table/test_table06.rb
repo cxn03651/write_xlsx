@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -12,16 +13,16 @@ class TestTable06 < Minitest::Test
   def test_table06
     # Set the table properties.
     @worksheet.add_table(
-                         'C3:F13',
-                         {
-                           :columns => [
-                                        {:header => 'Foo'},
-                                        {:header => ''},
-                                        {},
-                                        {:header => 'Baz'}
-                                       ]
-                         }
-                         )
+      'C3:F13',
+      {
+        :columns => [
+          { :header => 'Foo' },
+          { :header => '' },
+          {},
+          { :header => 'Baz' }
+        ]
+      }
+    )
     @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
@@ -34,7 +35,7 @@ class TestTable06 < Minitest::Test
 
   def expected
     expected_to_array(
-                      <<EOS
+      <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="1" name="Table1" displayName="Table1" ref="C3:F13" totalsRowShown="0">
   <autoFilter ref="C3:F13"/>
@@ -47,6 +48,6 @@ class TestTable06 < Minitest::Test
   <tableStyleInfo name="TableStyleMedium9" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
 </table>
 EOS
-                      )
+    )
   end
 end

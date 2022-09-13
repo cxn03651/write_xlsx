@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDate05 < Minitest::Test
@@ -22,11 +23,11 @@ class TestRegressionChartDate05 < Minitest::Test
 
     worksheet.set_column('A:A', 12)
 
-    dates = [
-             '2013-01-01T', '2013-01-02T', '2013-01-03T', '2013-01-04T',
-             '2013-01-05T', '2013-01-06T', '2013-01-07T', '2013-01-08T',
-             '2013-01-09T', '2013-01-10T'
-            ]
+    dates = %w[
+      2013-01-01T 2013-01-02T 2013-01-03T 2013-01-04T
+      2013-01-05T 2013-01-06T 2013-01-07T 2013-01-08T
+      2013-01-09T 2013-01-10T
+    ]
 
     data = [10, 30, 20, 40, 20, 60, 50, 40, 30, 30]
 
@@ -50,8 +51,8 @@ class TestRegressionChartDate05 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                nil,
-                                {'xl/charts/chart1.xml' => ['<c:formatCode']}
-                                )
+      nil,
+      { 'xl/charts/chart1.xml' => ['<c:formatCode'] }
+    )
   end
 end

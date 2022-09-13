@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 
@@ -12,17 +13,17 @@ class TestDeleteFiles < Minitest::Test
     Dir.mkdir(@dir_path)
     assert(FileTest.exist?(@dir_path))
     Writexlsx::Utility.delete_files(@dir_path)
-    assert(!FileTest.exist?(@dir_path))
+    refute(FileTest.exist?(@dir_path))
   end
 
   def test_delete_directory_and_one_file
     filename = 'test_file'
     Dir.mkdir(@dir_path)
-    File.open(File.join(@dir_path, filename), "w") { |file| file.write("str") }
+    File.write(File.join(@dir_path, filename), "str")
     assert(FileTest.exist?(@dir_path))
     assert(FileTest.exist?(File.join(@dir_path, filename)))
     Writexlsx::Utility.delete_files(@dir_path)
-    assert(!FileTest.exist?(@dir_path))
+    refute(FileTest.exist?(@dir_path))
   end
 
   def test_delete_directory_and_subdirectory
@@ -32,6 +33,6 @@ class TestDeleteFiles < Minitest::Test
     assert(FileTest.exist?(@dir_path))
     assert(FileTest.exist?(File.join(@dir_path, subdir_name)))
     Writexlsx::Utility.delete_files(@dir_path)
-    assert(!FileTest.exist?(@dir_path))
+    refute(FileTest.exist?(@dir_path))
   end
 end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartGridlines06 < Minitest::Test
@@ -12,7 +13,7 @@ class TestChartGridlines06 < Minitest::Test
 
   def test_chart_gridlines06
     @xlsx = 'chart_gridlines06.xlsx'
-    workbook    =  WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'scatter', :embedded => 1)
 
@@ -20,30 +21,30 @@ class TestChartGridlines06 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [82812288, 46261376])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5'
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$B$1:$B$5'
+    )
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5'
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$C$1:$C$5'
+    )
 
     chart.set_x_axis(
-                     :major_gridlines => { :visible => 1 },
-                     :minor_gridlines => { :visible => 1 }
-                     )
+      :major_gridlines => { :visible => 1 },
+      :minor_gridlines => { :visible => 1 }
+    )
     chart.set_y_axis(
-                     :major_gridlines => { :visible => 1 },
-                     :minor_gridlines => { :visible => 1 }
-                     )
+      :major_gridlines => { :visible => 1 },
+      :minor_gridlines => { :visible => 1 }
+    )
 
     worksheet.insert_chart('E9',  chart)
 

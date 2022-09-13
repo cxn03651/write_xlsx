@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartName01 < Minitest::Test
@@ -15,19 +16,19 @@ class TestChartName01 < Minitest::Test
     workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
     chart      = workbook.add_chart(
-                                    :type     => 'line',
-                                    :embedded => 1,
-                                    :name     => 'New Chart Name'
-                                    )
+      :type     => 'line',
+      :embedded => 1,
+      :name     => 'New Chart Name'
+    )
 
     # For testing, copy the randomly generated axis ids in the target xls file.
     chart.instance_variable_set(:@axis_ids, [47335296, 56029952])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

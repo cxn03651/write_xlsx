@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartChartArea05 < Minitest::Test
@@ -17,7 +18,7 @@ class TestRegressionChartChartArea05 < Minitest::Test
     chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
 
     data = [
-      [ 2,  4,  6],
+      [2,  4,  6],
       [60, 30, 10]
     ]
 

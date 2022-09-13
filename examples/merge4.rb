@@ -16,11 +16,9 @@ require 'write_xlsx'
 workbook  = WriteXLSX.new('merge4.xlsx')
 worksheet = workbook.add_worksheet
 
-
 # Increase the cell size of the merged cells to highlight the formatting.
-(1 .. 11).each { |i| worksheet.set_row(i, 30) }
+(1..11).each { |i| worksheet.set_row(i, 30) }
 worksheet.set_column('B:D', 20)
-
 
 ###############################################################################
 #
@@ -76,6 +74,6 @@ format4 = workbook.add_format(
   :align  => 'justify'
 )
 
-worksheet.merge_range('B11:D12', 'Justified: ' << 'so on and ' * 18, format4)
+worksheet.merge_range('B11:D12', 'Justified: ' << ('so on and ' * 18), format4)
 
 workbook.close

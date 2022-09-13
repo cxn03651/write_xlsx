@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartCombined05 < Minitest::Test
@@ -22,7 +23,7 @@ class TestRegressionChartCombined05 < Minitest::Test
     chart2.instance_variable_set(:@axis2_ids, [85542016, 85183872])
 
     data = [
-      [ 2,  7,  3,  6,  2],
+      [2,  7,  3,  6,  2],
       [20, 25, 10, 10, 20]
     ]
 
@@ -39,11 +40,11 @@ class TestRegressionChartCombined05 < Minitest::Test
     compare_for_regression(
       [],
       { 'xl/charts/chart1.xml' => [
-          '<c:dispBlanksAs',
-          '<c:tickLblPos',
-          '<c:crosses',
-          '<c:axPos'
-        ] }
+        '<c:dispBlanksAs',
+        '<c:tickLblPos',
+        '<c:crosses',
+        '<c:axPos'
+      ] }
     )
   end
 end

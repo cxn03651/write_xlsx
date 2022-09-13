@@ -18,33 +18,33 @@ worksheet = workbook.add_worksheet
 worksheet.hide_gridlines(2)
 
 plain = workbook.add_shape(
-      :type   => 'smileyFace',
-      :text   => "Plain",
-      :width  => 100,
-      :height => 100
-                           )
+  :type   => 'smileyFace',
+  :text   => "Plain",
+  :width  => 100,
+  :height => 100
+)
 
 bbformat = workbook.add_format(
-      :color => 'red',
-      :font  => 'Lucida Calligraphy'
-                               )
+  :color => 'red',
+  :font  => 'Lucida Calligraphy'
+)
 
 bbformat.set_bold
 bbformat.set_underline
 bbformat.set_italic
 
 decor = workbook.add_shape(
-      :type        => 'smileyFace',
-      :text        => 'Decorated',
-      :rotation    => 45,
-      :width       => 200,
-      :height      => 100,
-      :format      => bbformat,
-      :line_type   => 'sysDot',
-      :line_weight => 3,
-      :fill        => 'FFFF00',
-      :line        => '3366FF'
-                           )
+  :type        => 'smileyFace',
+  :text        => 'Decorated',
+  :rotation    => 45,
+  :width       => 200,
+  :height      => 100,
+  :format      => bbformat,
+  :line_type   => 'sysDot',
+  :line_weight => 3,
+  :fill        => 'FFFF00',
+  :line        => '3366FF'
+)
 
 worksheet.insert_shape('A1', plain,  50, 50)
 worksheet.insert_shape('A1', decor, 250, 50)

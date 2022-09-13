@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Chartsheet - A class for writing the Excel XLSX Chartsheet files.
@@ -60,21 +61,21 @@ module Writexlsx
     def protect(password = '', user_options = nil, options = {})
       # Objects are default on for chartsheets.
       if user_options
-        if user_options.has_key?(:objects)
-          if ptrue?(user_options[:objects])
-            options[:objects] = 0
-          else
-            options[:objects] = 1
-          end
-        else
-          options[:objects] = 0
-        end
+        options[:objects] = if user_options.has_key?(:objects)
+                              if ptrue?(user_options[:objects])
+                                0
+                              else
+                                1
+                              end
+                            else
+                              0
+                            end
 
-        if user_options.has_key?(:content)
-          options[:content] = user_options[:content]
-        else
-          options[:content] = 1
-        end
+        options[:content] = if user_options.has_key?(:content)
+                              user_options[:content]
+                            else
+                              1
+                            end
       else
         options[:objects] = 0
         options[:content] = 1
@@ -82,9 +83,7 @@ module Writexlsx
 
       # Is objects and content are off then the chartsheet isn't locked.
       # except if it has a password.
-      if password == '' && ptrue?(options[:objects]) && !ptrue?(options[:content])
-        return
-      end
+      return if password == '' && ptrue?(options[:objects]) && !ptrue?(options[:content])
 
       @chart.protection = 1
 
@@ -94,7 +93,6 @@ module Writexlsx
 
       super(password, options)
     end
-
 
     ###############################################################################
     #
@@ -173,16 +171,16 @@ module Writexlsx
     #
     # Set up chart/drawings.
     #
-    def prepare_chart(index, chart_id, drawing_id) # :nodoc:
+    def prepare_chart(_index, chart_id, drawing_id) # :nodoc:
       @chart.id = chart_id - 1
 
       drawings  = Drawings.new
       @drawings = drawings
       @drawings.orientation = @page_setup.orientation
 
-      @external_drawing_links << [ '/drawing', "../drawings/drawing#{drawing_id}.xml" ]
+      @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
 
-      @drawing_links << [ '/chart', "../charts/chart#{chart_id}.xml"]
+      @drawing_links << ['/chart', "../charts/chart#{chart_id}.xml"]
     end
 
     def external_links
@@ -194,7 +192,7 @@ module Writexlsx
     #
     # Write the <chartsheet> element. This is the root element of Chartsheet.
     #
-    def write_chartsheet # :nodoc:
+    def write_chartsheet(&block) # :nodoc:
       schema                 = 'http://schemas.openxmlformats.org/'
       xmlns                  = schema + 'spreadsheetml/2006/main'
       xmlns_r                = schema + 'officeDocument/2006/relationships'
@@ -204,16 +202,13 @@ module Writexlsx
         ['xmlns:r', xmlns_r]
       ]
 
-      @writer.tag_elements('chartsheet', attributes) do
-        yield
-      end
+      @writer.tag_elements('chartsheet', attributes, &block)
     end
 
     #
     # Write the <sheetPr> element for Sheet level properties.
     #
     def write_sheet_pr # :nodoc:
-
       attributes = []
 
       attributes << ['filterMode', 1] if ptrue?(@filter_on)

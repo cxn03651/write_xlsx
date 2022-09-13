@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable12 < Minitest::Test
@@ -16,21 +17,21 @@ class TestRegressionTable12 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     data = [
-            [ 'Foo', 1234, 2000 ],
-            [ 'Bar', 1256, 4000 ],
-            [ 'Baz', 2234, 3000 ]
-           ]
+      ['Foo', 1234, 2000],
+      ['Bar', 1256, 4000],
+      ['Baz', 2234, 3000]
+    ]
 
     # Set the column width to match the taget worksheet.
     worksheet.set_column('C:F', 10.288)
 
     # Add the table.
-    worksheet.add_table('C2:F6', {:data => data})
+    worksheet.add_table('C2:F6', { :data => data })
 
     workbook.close
     compare_for_regression(
-                                nil,
-                                {  'xl/workbook.xml' => ['<workbookView'] }
-                                )
+      nil,
+      {  'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

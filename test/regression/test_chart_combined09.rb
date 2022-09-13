@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartCombined09 < Minitest::Test
@@ -31,8 +32,8 @@ class TestRegressionChartCombined09 < Minitest::Test
     chart1.add_series(:values => '=Sheet1!$A$1:$A$5')
     chart2.add_series(:values => '=Sheet1!$B$1:$B$5', :y2_axis => 1)
 
-    chart1.set_y_axis(:num_font => {:bold => 1, :baseline => -1} )
-    chart2.set_y2_axis(:num_font => {:bold => 1, :baseline => -1} )
+    chart1.set_y_axis(:num_font => { :bold => 1, :baseline => -1 })
+    chart2.set_y2_axis(:num_font => { :bold => 1, :baseline => -1 })
 
     chart1.combine(chart2)
 
@@ -42,9 +43,9 @@ class TestRegressionChartCombined09 < Minitest::Test
     compare_for_regression(
       [],
       { 'xl/charts/chart1.xml' => [
-          '<c:dispBlanksAs',
-          '<c:tickLblPos'
-        ] }
+        '<c:dispBlanksAs',
+        '<c:tickLblPos'
+      ] }
     )
   end
 end

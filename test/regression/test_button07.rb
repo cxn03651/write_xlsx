@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionButton07 < Minitest::Test
@@ -24,8 +25,7 @@ class TestRegressionButton07 < Minitest::Test
     worksheet.insert_button('C2', {
                               :macro   => 'say_hello',
                               :caption => 'Hello'
-                            }
-                            )
+                            })
 
     workbook.add_vba_project(File.join(@regression_output, 'vbaProject02.bin'))
 

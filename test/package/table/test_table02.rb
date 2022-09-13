@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -24,7 +25,7 @@ class TestTable02 < Minitest::Test
 
   def expected
     expected_to_array(
-                      <<EOS
+      <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="1" name="Table1" displayName="Table1" ref="D4:I15" totalsRowShown="0">
   <autoFilter ref="D4:I15"/>
@@ -39,6 +40,6 @@ class TestTable02 < Minitest::Test
   <tableStyleInfo name="TableStyleLight17" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
 </table>
 EOS
-                      )
+    )
   end
 end

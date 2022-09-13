@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartTitle03 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartTitle03 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [93211648, 87847680])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -31,7 +32,7 @@ class TestRegressionChartTitle03 < Minitest::Test
 
     chart.set_title(
       :name      => 'Title!',
-      :name_font => {:bold => 0, :baseline => -1}
+      :name_font => { :bold => 0, :baseline => -1 }
     )
 
     worksheet.insert_chart('E9', chart)

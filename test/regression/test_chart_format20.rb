@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartFormat20 < Minitest::Test
@@ -23,14 +24,14 @@ class TestRegressionChartFormat20 < Minitest::Test
 
     trend = {
       :type => 'linear',
-      :line => {:color => 'red', :dash_type => 'dash'}
+      :line => { :color => 'red', :dash_type => 'dash' }
     }
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartFormat29 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartFormat29 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [108652416, 108655744])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -39,9 +40,9 @@ class TestRegressionChartFormat29 < Minitest::Test
         :display_equation  => 1,
         :display_r_squared => 1,
         :line              => {
-          :color           => 'red',
-          :width           => 1,
-          :dash_type       => 'long_dash'
+          :color     => 'red',
+          :width     => 1,
+          :dash_type => 'long_dash'
         }
       }
     )

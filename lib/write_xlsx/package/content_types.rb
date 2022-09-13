@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class ContentTypes
-
       include Writexlsx::Utility
 
       App_package  = 'application/vnd.openxmlformats-package.'
@@ -15,15 +15,15 @@ module Writexlsx
         @writer = Package::XMLWriterSimple.new
         @workbook  = workbook
         @defaults  = [
-          [ 'rels', "#{App_package}relationships+xml" ],
-          [ 'xml', 'application/xml' ]
+          ['rels', "#{App_package}relationships+xml"],
+          ['xml', 'application/xml']
         ]
         @overrides = [
-          [ '/docProps/app.xml',    "#{App_document}extended-properties+xml" ],
-          [ '/docProps/core.xml',   "#{App_package}core-properties+xml" ],
-          [ '/xl/styles.xml',       "#{App_document}spreadsheetml.styles+xml" ],
-          [ '/xl/theme/theme1.xml', "#{App_document}theme+xml" ],
-          [ '/xl/workbook.xml',     "#{App_document}spreadsheetml.sheet.main+xml" ]
+          ['/docProps/app.xml',    "#{App_document}extended-properties+xml"],
+          ['/docProps/core.xml',   "#{App_package}core-properties+xml"],
+          ['/xl/styles.xml',       "#{App_document}spreadsheetml.styles+xml"],
+          ['/xl/theme/theme1.xml', "#{App_document}theme+xml"],
+          ['/xl/workbook.xml',     "#{App_document}spreadsheetml.sheet.main+xml"]
         ]
       end
 
@@ -39,6 +39,7 @@ module Writexlsx
           end
         end
       end
+
       #
       # Add elements to the ContentTypes defaults.
       #
@@ -55,7 +56,7 @@ module Writexlsx
 
       def add_worksheet_names
         @workbook.non_chartsheet_count.times do |index|
-          add_worksheet_name("sheet#{index+1}")
+          add_worksheet_name("sheet#{index + 1}")
         end
       end
 
@@ -70,7 +71,7 @@ module Writexlsx
 
       def add_chartsheet_names
         @workbook.chartsheet_count.times do |index|
-          add_chartsheet_name("sheet#{index+1}")
+          add_chartsheet_name("sheet#{index + 1}")
         end
       end
 
@@ -84,7 +85,7 @@ module Writexlsx
       end
 
       def add_chart_names
-        (1 .. @workbook.charts.size).each { |i| add_chart_name("chart#{i}") }
+        (1..@workbook.charts.size).each { |i| add_chart_name("chart#{i}") }
       end
 
       #
@@ -97,7 +98,7 @@ module Writexlsx
       end
 
       def add_drawing_names
-        (1 .. @workbook.drawings.size).each do |i|
+        (1..@workbook.drawings.size).each do |i|
           add_drawing_name("drawing#{i}")
         end
       end
@@ -108,7 +109,7 @@ module Writexlsx
       def add_drawing_name(name)
         drawing_name = "/xl/drawings/#{name}.xml"
 
-        add_override( drawing_name, "#{App_document}drawing+xml")
+        add_override(drawing_name, "#{App_document}drawing+xml")
       end
 
       #
@@ -119,7 +120,7 @@ module Writexlsx
       end
 
       def add_comment_names
-        (1 .. @workbook.num_comment_files).each do |i|
+        (1..@workbook.num_comment_files).each do |i|
           add_comment_name("comments#{i}")
         end
       end
@@ -130,7 +131,7 @@ module Writexlsx
       def add_comment_name(name)
         comment_name = "/xl/#{name}.xml"
 
-        add_override( comment_name, "#{App_document}spreadsheetml.comments+xml")
+        add_override(comment_name, "#{App_document}spreadsheetml.comments+xml")
       end
 
       #
@@ -157,7 +158,7 @@ module Writexlsx
       end
 
       def add_table_names(table_count)
-        (1 .. table_count).each { |i| add_table_name("table#{i}") }
+        (1..table_count).each { |i| add_table_name("table#{i}") }
       end
 
       #
@@ -201,9 +202,7 @@ module Writexlsx
 
       def change_the_workbook_xml_content_type_from_xlsx_to_xlsm
         @overrides.collect! do |arr|
-          if arr[0] == '/xl/workbook.xml'
-            arr[1] = 'application/vnd.ms-excel.sheet.macroEnabled.main+xml'
-          end
+          arr[1] = 'application/vnd.ms-excel.sheet.macroEnabled.main+xml' if arr[0] == '/xl/workbook.xml'
           arr
         end
       end
@@ -237,13 +236,13 @@ module Writexlsx
       #
       # Write the <Types> element.
       #
-      def write_types
+      def write_types(&block)
         xmlns = 'http://schemas.openxmlformats.org/package/2006/content-types'
         attributes = [
           ['xmlns', xmlns]
         ]
 
-        @writer.tag_elements('Types', attributes) { yield }
+        @writer.tag_elements('Types', attributes, &block)
       end
 
       #

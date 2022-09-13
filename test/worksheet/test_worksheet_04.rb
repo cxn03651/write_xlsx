@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -39,7 +40,7 @@ class TestWorksheet04 < Minitest::Test
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

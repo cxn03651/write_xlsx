@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartGridlines04 < Minitest::Test
@@ -12,7 +13,7 @@ class TestChartGridlines04 < Minitest::Test
 
   def test_chart_gridlines04
     @xlsx = 'chart_gridlines04.xlsx'
-    workbook    =  WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'radar', :embedded => 1)
 
@@ -20,10 +21,10 @@ class TestChartGridlines04 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [54977280, 54978816])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

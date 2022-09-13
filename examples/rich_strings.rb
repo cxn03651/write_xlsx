@@ -26,16 +26,24 @@ center = workbook.add_format(:align       => 'center')
 superc = workbook.add_format(:font_script => 1)
 
 # Write some strings with multiple formats.
-worksheet.write_rich_string('A1',
-    'This is ', bold, 'bold', ' and this is ', italic, 'italic')
+worksheet.write_rich_string(
+  'A1',
+  'This is ', bold, 'bold', ' and this is ', italic, 'italic'
+)
 
-worksheet.write_rich_string('A3',
-    'This is ', red, 'red', ' and this is ', blue, 'blue')
+worksheet.write_rich_string(
+  'A3',
+  'This is ', red, 'red', ' and this is ', blue, 'blue'
+)
 
-worksheet.write_rich_string('A5',
-    'Some ', bold, 'bold text', ' centered', center)
+worksheet.write_rich_string(
+  'A5',
+  'Some ', bold, 'bold text', ' centered', center
+)
 
-worksheet.write_rich_string('A7',
-    italic, 'j = k', superc, '(n-1)', center)
+worksheet.write_rich_string(
+  'A7',
+  italic, 'j = k', superc, '(n-1)', center
+)
 
 workbook.close

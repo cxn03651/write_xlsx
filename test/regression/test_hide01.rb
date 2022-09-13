@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHide01 < Minitest::Test
@@ -12,7 +13,7 @@ class TestRegressionHide01 < Minitest::Test
 
   def test_hide01
     @xlsx = 'hide01.xlsx'
-    workbook  = WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet

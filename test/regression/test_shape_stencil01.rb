@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShapeStencil01 < Minitest::Test
@@ -18,11 +19,11 @@ class TestRegressionShapeStencil01 < Minitest::Test
 
     format      = workbook.add_format(:font => 'Arial', :size => 8)
     shape       = workbook.add_shape(
-                                     :type   => 'rect',
-                                     :width  => 90,
-                                     :height => 90,
-                                     :format => format
-                                     )
+      :type   => 'rect',
+      :width  => 90,
+      :height => 90,
+      :format => format
+    )
 
     (1..10).each do |n|
       # Change the last 5 rectangles to stars.

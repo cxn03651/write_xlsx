@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Scatter - A class for writing Excel Scatter charts.
@@ -32,21 +33,21 @@ module Writexlsx
         # Set the available data label positions for this chart type.
         @label_position_default = 'right'
         @label_positions = {
-          'center'      => 'ctr',
-          'right'       => 'r',
-          'left'        => 'l',
-          'above'       => 't',
-          'below'       => 'b',
+          'center' => 'ctr',
+          'right'  => 'r',
+          'left'   => 'l',
+          'above'  => 't',
+          'below'  => 'b',
           # For backward compatibility.
-          'top'         => 't',
-          'bottom'      => 'b'
+          'top'    => 't',
+          'bottom' => 'b'
         }
       end
 
       #
       # Override parent method to add a warning.
       #
-      def combine(chart)
+      def combine(_chart)
         raise 'Combined chart not currently supported with scatter chart as the primary chart'
       end
 
@@ -62,16 +63,16 @@ module Writexlsx
       # Write the <c:scatterChart> element.
       #
       def write_scatter_chart(params)
-        if params[:primary_axes] == 1
-          series = get_primary_axes_series
-        else
-          series = get_secondary_axes_series
-        end
+        series = if params[:primary_axes] == 1
+                   get_primary_axes_series
+                 else
+                   get_secondary_axes_series
+                 end
         return if series.empty?
 
-        style   = 'lineMarker'
+        style = 'lineMarker'
         # Set the user defined chart subtype
-        style = 'smoothMarker' if ['smooth_with_markers', 'smooth'].include?(@subtype)
+        style = 'smoothMarker' if %w[smooth_with_markers smooth].include?(@subtype)
 
         # Add default formatting to the series data.
         modify_series_formatting
@@ -80,7 +81,7 @@ module Writexlsx
           # Write the c:scatterStyle element.
           write_scatter_style(style)
           # Write the series elements.
-          series.each {|s| write_series(s)}
+          series.each { |s| write_series(s) }
           # Write the c:marker element.
           write_marker_value
           # Write the c:axId elements
@@ -187,7 +188,7 @@ module Writexlsx
       # Write the <c:scatterStyle> element.
       #
       def write_scatter_style(val)
-        @writer.empty_tag('c:scatterStyle', [ ['val', val] ])
+        @writer.empty_tag('c:scatterStyle', [['val', val]])
       end
 
       #
@@ -200,9 +201,7 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
-            unless series.line_defined?
-              series.line = line_properties(:width => 2.25, :none => 1, :_defined => 1)
-            end
+            series.line = line_properties(:width => 2.25, :none => 1, :_defined => 1) unless series.line_defined?
           end
         end
 
@@ -211,9 +210,7 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.
-            unless ptrue?(series.marker)
-              series.marker = Marker.new(:type => 'none', :_defined => 1)
-            end
+            series.marker = Marker.new(:type => 'none', :_defined => 1) unless ptrue?(series.marker)
           end
         end
       end

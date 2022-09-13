@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionGridlines01 < Minitest::Test
@@ -22,8 +23,8 @@ class TestRegressionGridlines01 < Minitest::Test
     workbook.close
     compare_for_regression(
       %w[
-         xl/printerSettings/printerSettings1.bin
-         xl/worksheets/_rels/sheet1.xml.rels
+        xl/printerSettings/printerSettings1.bin
+        xl/worksheets/_rels/sheet1.xml.rels
       ],
       {
         '[Content_Types].xml'      => ['<Default Extension="bin"'],

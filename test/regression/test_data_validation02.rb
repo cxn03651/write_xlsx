@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestDataValidation02 < Minitest::Test
@@ -16,11 +17,10 @@ class TestDataValidation02 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     worksheet.data_validation('C2',
-                              validate:      'list',
-                              value:         ['Foo', 'Bar', 'Baz'],
-                              input_title:   'This is the input title',
-                              input_message: 'This is the input message'
-                              )
+                              validate: 'list',
+                              value: %w[Foo Bar Baz],
+                              input_title: 'This is the input title',
+                              input_message: 'This is the input message')
     workbook.close
     compare_for_regression
   end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartGradient07 < Minitest::Test
@@ -20,16 +21,16 @@ class TestChartGradient07 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [68936064, 68937600])
 
     data = [
-      [ 1, 2, 3, 4,  5 ],
-      [ 2, 4, 6, 8,  10 ],
-      [ 3, 6, 9, 12, 15 ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
     ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
       :values             => '=Sheet1!$A$1:$A$5',
-      :gradient           => {:colors => ['#DDEBCF', '#9CB86E', '#156B13']},
+      :gradient           => { :colors => ['#DDEBCF', '#9CB86E', '#156B13'] },
       :invert_if_negative => 1
     )
 

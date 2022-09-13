@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShapeScale01 < Minitest::Test
@@ -17,13 +18,13 @@ class TestRegressionShapeScale01 < Minitest::Test
     format      = workbook.add_format(:font => 'Arial', :size => 8)
 
     normal      = workbook.add_shape(
-                                     :name   => 'chip',
-                                     :type   => 'diamond',
-                                     :text   => 'Normal',
-                                     :width  => 100,
-                                     :height => 100,
-                                     :format => format
-                                     )
+      :name   => 'chip',
+      :type   => 'diamond',
+      :text   => 'Normal',
+      :width  => 100,
+      :height => 100,
+      :format => format
+    )
     worksheet.insert_shape('A1', normal, 50, 50)
 
     normal.text = 'Scaled 3w x 2h'

@@ -1,0 +1,105 @@
+inherit_from: .rubocop_todo.yml
+
+require:
+  - rubocop-minitest
+  - rubocop-rake
+
+AllCops:
+  TargetRubyVersion: 2.6
+  NewCops: enable
+
+Gemspec/RequiredRubyVersion:
+  Enabled: false
+
+Gemspec/RequireMFA:
+  Enabled: false
+
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
+Layout/ExtraSpacing:
+  Enabled: false
+
+Layout/FirstParameterIndentation:
+  Enabled: false
+
+Layout/HashAlignment:
+  EnforcedHashRocketStyle: table
+  EnforcedHashColonStyle: table
+
+Layout/HeredocIndentation:
+  Enabled: false
+
+Layout/LineLength:
+  Max: 7000
+
+Lint/DuplicateBranch:
+  IgnoreLiteralBranches: true
+  Exclude:
+    - 'lib/write_xlsx/worksheet.rb'
+
+Lint/UselessSetterCall:
+  Exclude:
+    - 'lib/write_xlsx/worksheet.rb'
+
+Metrics/AbcSize:
+  Max: 350
+
+Metrics/BlockLength:
+  Max: 100
+
+Metrics/ClassLength:
+  Max: 4500
+
+Metrics/CyclomaticComplexity:
+  Max: 50
+
+Metrics/MethodLength:
+  Max: 400
+
+Metrics/ParameterLists:
+  Max: 12
+
+Metrics/PerceivedComplexity:
+  Max: 50
+
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
+Naming/MethodName:
+  Enabled: false
+
+Naming/VariableNumber:
+  Enabled: false
+
+Style/AccessorGrouping:
+  Enabled: false
+
+Style/ConditionalAssignment:
+  Exclude:
+    - 'lib/write_xlsx/worksheet.rb'
+
+Style/Encoding:
+  Enabled: false
+
+Style/FormatString:
+  Enabled: false
+
+Style/FormatStringToken:
+  EnforcedStyle: unannotated
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/NumericLiterals:
+  MinDigits: 10
+
+Style/OptionalBooleanParameter:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: true
+  EnforcedStyle: double_quotes

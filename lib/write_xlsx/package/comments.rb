@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/format'
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
-
     class Comment
       include Writexlsx::Utility
 
@@ -21,9 +21,10 @@ module Writexlsx
         options ||= {}
         @workbook    = workbook
         @worksheet   = worksheet
-        @row, @col   = row, col
+        @row = row
+        @col = col
         options_parse(row, col, options)
-        @string      = string[0, STR_MAX]
+        @string = string[0, STR_MAX]
         @start_row   ||= default_start_row(row)
         @start_col   ||= default_start_col(col)
         @visible     = options[:visible]
@@ -31,8 +32,8 @@ module Writexlsx
         @y_offset    = options[:y_offset] || default_y_offset(row)
         @x_scale     = options[:x_scale]  || 1
         @y_scale     = options[:y_scale]  || 1
-        @width       = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
-        @height      = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+        @width       = (0.5 + ((options[:width]  || DEFAULT_WIDTH)  * @x_scale)).to_i
+        @height      = (0.5 + ((options[:height] || DEFAULT_HEIGHT) * @y_scale)).to_i
         @vertices    = @worksheet.position_object_pixels(
           @start_col, @start_row, @x_offset, @y_offset,
           @width, @height
@@ -56,9 +57,7 @@ module Writexlsx
       # from long format, ffcc00 to short format fc0 used by VML.
       def rgb_color(rgb)
         result = sprintf("%02x%02x%02x", *rgb)
-        if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
-          result = "#{$1}#{$2}#{$3}"
-        end
+        result = "#{::Regexp.last_match(1)}#{::Regexp.last_match(2)}#{::Regexp.last_match(3)}" if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
         result
       end
 
@@ -164,9 +163,9 @@ module Writexlsx
       #
       def write_shadow
         attributes = [
-          ['on',       't'],
-          ['color',    'black'],
-          ['obscured', 't']
+          %w[on t],
+          %w[color black],
+          %w[obscured t]
         ]
 
         @writer.empty_tag('v:shadow', attributes)
@@ -191,7 +190,7 @@ module Writexlsx
       #
       def write_client_data
         attributes = [
-          ['ObjectType', 'Note']
+          %w[ObjectType Note]
         ]
 
         @writer.tag_elements('x:ClientData', attributes) do
@@ -210,9 +209,7 @@ module Writexlsx
         end
       end
 
-      def writer=(w)
-        @writer = w
-      end
+      attr_writer :writer
 
       def font_name
         @font
@@ -227,7 +224,7 @@ module Writexlsx
         @start_row, @start_col = if @start_cell
                                    substitute_cellref(@start_cell)
                                  else
-                                   [ options[:start_row], options[:start_col] ]
+                                   [options[:start_row], options[:start_col]]
                                  end
         @visible     = options[:visible]
         @x_offset    = options[:x_offset]       || default_x_offset(col)
@@ -237,13 +234,12 @@ module Writexlsx
         @font        = options[:font]           || 'Tahoma'
         @font_size   = options[:font_size]      || 8
         @font_family = options[:font_family]    || 2
-        @width       = (0.5 + (options[:width]  || DEFAULT_WIDTH)  * @x_scale).to_i
-        @height      = (0.5 + (options[:height] || DEFAULT_HEIGHT) * @y_scale).to_i
+        @width       = (0.5 + ((options[:width]  || DEFAULT_WIDTH)  * @x_scale)).to_i
+        @height      = (0.5 + ((options[:height] || DEFAULT_HEIGHT) * @y_scale)).to_i
       end
     end
 
     class Comments
-
       include Writexlsx::Utility
 
       def initialize(worksheet)
@@ -312,7 +308,6 @@ module Writexlsx
 
       private
 
-
       def comments_visible?
         @worksheet.comments_visible?
       end
@@ -320,10 +315,10 @@ module Writexlsx
       #
       # Write the <comments> element.
       #
-      def write_comments
-        attributes = [ ['xmlns', XMLWriterSimple::XMLNS] ]
+      def write_comments(&block)
+        attributes = [['xmlns', XMLWriterSimple::XMLNS]]
 
-        @writer.tag_elements('comments', attributes) { yield }
+        @writer.tag_elements('comments', attributes, &block)
       end
 
       #
@@ -335,14 +330,14 @@ module Writexlsx
         @writer.tag_elements('authors') do
           comment_data.each do |comment|
             author = comment.author || ''
-            if author && !@author_ids[author]
-              # Store the author id.
-              @author_ids[author] = author_count
-              author_count += 1
+            next unless author && !@author_ids[author]
 
-              # Write the author element.
-              write_author(author)
-            end
+            # Store the author id.
+            @author_ids[author] = author_count
+            author_count += 1
+
+            # Write the author element.
+            write_author(author)
           end
         end
       end
@@ -367,8 +362,8 @@ module Writexlsx
       # Write the <comment> element.
       #
       def write_comment(comment)
-        ref       = xl_rowcol_to_cell( comment.row, comment.col )
-        attributes = [ ['ref', ref] ]
+        ref = xl_rowcol_to_cell(comment.row, comment.col)
+        attributes = [['ref', ref]]
 
         author_id = (@author_ids[comment.author] if comment.author) || 0
         attributes << ['authorId', author_id]
@@ -432,7 +427,7 @@ module Writexlsx
       # Write the <sz> element.
       #
       def write_sz(val)
-        attributes = [ ['val', val] ]
+        attributes = [['val', val]]
 
         @writer.empty_tag('sz', attributes)
       end
@@ -441,14 +436,14 @@ module Writexlsx
       # Write the <color> element.
       #
       def write_color
-        @writer.empty_tag('color', [ ['indexed', 81] ])
+        @writer.empty_tag('color', [['indexed', 81]])
       end
 
       #
       # Write the <rFont> element.
       #
       def write_r_font(val)
-        attributes = [ ['val', val] ]
+        attributes = [['val', val]]
 
         @writer.empty_tag('rFont', attributes)
       end
@@ -457,7 +452,7 @@ module Writexlsx
       # Write the <family> element.
       #
       def write_family(val)
-        attributes = [ ['val', val] ]
+        attributes = [['val', val]]
 
         @writer.empty_tag('family', attributes)
       end

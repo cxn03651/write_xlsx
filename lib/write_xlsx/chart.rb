@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/gradient'
 require 'write_xlsx/chart/legend'
@@ -14,7 +15,10 @@ module Writexlsx
     attr_reader :horizontal, :vertical, :outline, :show_keys, :font
 
     def initialize(params = {})
-      @horizontal, @vertical, @outline, @show_keys = true, true, true, false
+      @horizontal = true
+      @vertical = true
+      @outline = true
+      @show_keys = false
       @horizontal = params[:horizontal] if params.has_key?(:horizontal)
       @vertical   = params[:vertical]   if params.has_key?(:vertical)
       @outline    = params[:outline]    if params.has_key?(:outline)
@@ -22,9 +26,7 @@ module Writexlsx
       @font       = convert_font_args(params[:font])
     end
 
-    def palette=(palette)
-      @palette = palette
-    end
+    attr_writer :palette
 
     def write_d_table(writer)
       @writer = writer
@@ -41,7 +43,7 @@ module Writexlsx
     private
 
     def attributes
-      [ ['val', 1] ]
+      [['val', 1]]
     end
   end
 
@@ -58,7 +60,7 @@ module Writexlsx
       border = params_to_border(params)
 
       # Set the line properties for the chartarea.
-      @line = border ? line_properties(border) : line_properties(params[:line])
+      @line = line_properties(border || params[:line])
 
       # Set the pattern properties for the series.
       @pattern = pattern_properties(params[:pattern])
@@ -71,9 +73,7 @@ module Writexlsx
       @fill = fill_properties(fill)
 
       # Pattern fill overrides solid fill.
-      if ptrue?(@pattern)
-        @fill = nil
-      end
+      @fill = nil if ptrue?(@pattern)
 
       # Gradient fill overrides solid and pattern fills.
       if ptrue?(@gradient)
@@ -88,7 +88,7 @@ module Writexlsx
       line_weight  = params[:line_weight]
 
       # Map deprecated Spreadsheet::WriteExcel line_weight.
-      border       = params[:border]
+      border = params[:border]
       border = { :width => swe_line_weight(line_weight) } if line_weight
 
       # Map deprecated Spreadsheet::WriteExcel line_pattern.
@@ -266,17 +266,11 @@ module Writexlsx
     #
     def add_series(params)
       # Check that the required input has been specified.
-      unless params.has_key?(:values)
-        raise "Must specify ':values' in add_series"
-      end
+      raise "Must specify ':values' in add_series" unless params.has_key?(:values)
 
-      if @requires_category != 0 && !params.has_key?(:categories)
-        raise  "Must specify ':categories' in add_series for this chart type"
-      end
+      raise "Must specify ':categories' in add_series for this chart type" if @requires_category != 0 && !params.has_key?(:categories)
 
-      if @series.size == 255
-        raise "The maximum number of series that can be added to an Excel Chart is 255."
-      end
+      raise "The maximum number of series that can be added to an Excel Chart is 255." if @series.size == 255
 
       @series << Series.new(self, params)
 
@@ -285,9 +279,7 @@ module Writexlsx
       y2_axis = params[:y2_axis]
 
       # Store secondary status for combined charts.
-      if ptrue?(x2_axis) || ptrue?(y2_axis)
-        @is_secondary = true
-      end
+      @is_secondary = true if ptrue?(x2_axis) || ptrue?(y2_axis)
 
       # Set the gap and overlap for Bar/Column charts.
       if params[:gap]
@@ -388,9 +380,7 @@ module Writexlsx
     def show_blanks_as(option)
       return unless option
 
-      unless [:gap, :zero, :span].include?(option.to_sym)
-        raise "Unknown show_blanks_as() option '#{option}'\n"
-      end
+      raise "Unknown show_blanks_as() option '#{option}'\n" unless %i[gap zero span].include?(option.to_sym)
 
       @show_blanks = option
     end
@@ -415,7 +405,7 @@ module Writexlsx
     end
 
     # Backward compatibility with poorly chosen method name.
-    alias :size :set_size
+    alias size set_size
 
     #
     # The set_table method adds a data table below the horizontal axis with the
@@ -431,7 +421,7 @@ module Writexlsx
     #
     def set_up_down_bars(params = {})
       # Map border to line.
-      [:up, :down].each do |up_down|
+      %i[up down].each do |up_down|
         if params[up_down]
           params[up_down][:line] = params[up_down][:border] if params[up_down][:border]
         else
@@ -441,7 +431,7 @@ module Writexlsx
 
       # Set the up and down bar properties.
       @up_down_bars = {
-        :_up => Chartline.new(params[:up]),
+        :_up   => Chartline.new(params[:up]),
         :_down => Chartline.new(params[:down])
       }
     end
@@ -478,20 +468,18 @@ module Writexlsx
     # Write the <c:barChart> element.
     #
     def write_bar_chart(params)   # :nodoc:
-      if ptrue?(params[:primary_axes])
-        series = get_primary_axes_series
-      else
-        series = get_secondary_axes_series
-      end
+      series = if ptrue?(params[:primary_axes])
+                 get_primary_axes_series
+               else
+                 get_secondary_axes_series
+               end
       return if series.empty?
 
       subtype = @subtype
       subtype = 'percentStacked' if subtype == 'percent_stacked'
 
       # Set a default overlap for stacked charts.
-      if @subtype =~ /stacked/
-        @series_overlap_1 = 100 unless @series_overlap_1
-      end
+      @series_overlap_1 = 100 if @subtype =~ (/stacked/) && !@series_overlap_1
 
       @writer.tag_elements('c:barChart') do
         # Write the c:barDir element.
@@ -499,7 +487,7 @@ module Writexlsx
         # Write the c:grouping element.
         write_grouping(subtype)
         # Write the c:ser elements.
-        series.each {|s| write_ser(s)}
+        series.each { |s| write_ser(s) }
 
         # write the c:marker element.
         write_marker_value
@@ -617,10 +605,10 @@ module Writexlsx
     # retun primary/secondary series by :primary_axes flag
     #
     def axes_series(params)
-      if params[:primary_axes] != 0
-        primary_axes_series
-      else
+      if params[:primary_axes] == 0
         secondary_axes_series
+      else
+        primary_axes_series
       end
     end
 
@@ -633,12 +621,12 @@ module Writexlsx
       # Check for no data in the series.
       return 'none' unless data
       return 'none' if data.empty?
-      return 'multi_str' if data.first.kind_of?(Array)
+      return 'multi_str' if data.first.is_a?(Array)
 
       # If the token isn't a number assume it is a string.
       data.each do |token|
         next unless token
-        return 'str' unless token.kind_of?(Numeric)
+        return 'str' unless token.is_a?(Numeric)
       end
 
       # The series data was all numeric.
@@ -649,17 +637,17 @@ module Writexlsx
     # Returns series which use the primary axes.
     #
     def get_primary_axes_series
-      @series.reject {|s| s.y2_axis}
+      @series.reject { |s| s.y2_axis }
     end
-    alias :primary_axes_series :get_primary_axes_series
+    alias primary_axes_series get_primary_axes_series
 
     #
     # Returns series which use the secondary axes.
     #
     def get_secondary_axes_series
-      @series.select {|s| s.y2_axis}
+      @series.select { |s| s.y2_axis }
     end
-    alias :secondary_axes_series :get_secondary_axes_series
+    alias secondary_axes_series get_secondary_axes_series
 
     #
     # Add a unique ids for primary or secondary axis.
@@ -735,22 +723,21 @@ module Writexlsx
         :visible         => 1
       }
     end
+
     #
     # Write the <c:chartSpace> element.
     #
-    def write_chart_space # :nodoc:
-      @writer.tag_elements('c:chartSpace', chart_space_attributes) do
-        yield
-      end
+    def write_chart_space(&block) # :nodoc:
+      @writer.tag_elements('c:chartSpace', chart_space_attributes, &block)
     end
 
     # for <c:chartSpace> element.
     def chart_space_attributes # :nodoc:
       schema  = 'http://schemas.openxmlformats.org/'
       [
-       ['xmlns:c', "#{schema}drawingml/2006/chart"],
-       ['xmlns:a', "#{schema}drawingml/2006/main"],
-       ['xmlns:r', "#{schema}officeDocument/2006/relationships"]
+        ['xmlns:c', "#{schema}drawingml/2006/chart"],
+        ['xmlns:a', "#{schema}drawingml/2006/main"],
+        ['xmlns:r', "#{schema}officeDocument/2006/relationships"]
       ]
     end
 
@@ -758,7 +745,7 @@ module Writexlsx
     # Write the <c:lang> element.
     #
     def write_lang # :nodoc:
-      @writer.empty_tag('c:lang', [ ['val', 'en-US'] ])
+      @writer.empty_tag('c:lang', [%w[val en-US]])
     end
 
     #
@@ -767,7 +754,7 @@ module Writexlsx
     def write_style # :nodoc:
       return if @style_id == 2
 
-      @writer.empty_tag('c:style', [ ['val', @style_id] ])
+      @writer.empty_tag('c:style', [['val', @style_id]])
     end
 
     #
@@ -803,7 +790,7 @@ module Writexlsx
     def write_disp_blanks_as
       return if @show_blanks == 'gap'
 
-      @writer.empty_tag('c:dispBlanksAs', [ ['val', @show_blanks] ])
+      @writer.empty_tag('c:dispBlanksAs', [['val', @show_blanks]])
     end
 
     #
@@ -822,11 +809,11 @@ module Writexlsx
         if second_chart
 
           # Secondary axis has unique id otherwise use same as primary.
-          if second_chart.is_secondary?
-            second_chart.id = 1000 + @id
-          else
-            second_chart.id = @id
-          end
+          second_chart.id = if second_chart.is_secondary?
+                              1000 + @id
+                            else
+                              @id
+                            end
 
           # Share the same writer for writing.
           second_chart.writer = @writer
@@ -912,18 +899,18 @@ module Writexlsx
     def write_manual_layout(layout, type)
       @writer.tag_elements('c:manualLayout') do
         # Plotarea has a layoutTarget element.
-        @writer.empty_tag('c:layoutTarget', [ ['val', 'inner'] ]) if type == 'plot'
+        @writer.empty_tag('c:layoutTarget', [%w[val inner]]) if type == 'plot'
 
         # Set the x, y positions.
-        @writer.empty_tag('c:xMode', [ ['val', 'edge'] ])
-        @writer.empty_tag('c:yMode', [ ['val', 'edge'] ])
-        @writer.empty_tag('c:x',     [ ['val', layout[:x]] ])
-        @writer.empty_tag('c:y',     [ ['val', layout[:y]] ])
+        @writer.empty_tag('c:xMode', [%w[val edge]])
+        @writer.empty_tag('c:yMode', [%w[val edge]])
+        @writer.empty_tag('c:x',     [['val', layout[:x]]])
+        @writer.empty_tag('c:y',     [['val', layout[:y]]])
 
         # For plotarea and legend set the width and height.
         if type != 'text'
-          @writer.empty_tag('c:w', [ ['val', layout[:width]] ])
-          @writer.empty_tag('c:h', [ ['val', layout[:height]] ])
+          @writer.empty_tag('c:w', [['val', layout[:width]]])
+          @writer.empty_tag('c:h', [['val', layout[:height]]])
         end
       end
     end
@@ -932,14 +919,13 @@ module Writexlsx
     # Write the chart type element. This method should be overridden by the
     # subclasses.
     #
-    def write_chart_type # :nodoc:
-    end
+    def write_chart_type; end
 
     #
     # Write the <c:grouping> element.
     #
     def write_grouping(val) # :nodoc:
-      @writer.empty_tag('c:grouping', [ ['val', val] ])
+      @writer.empty_tag('c:grouping', [['val', val]])
     end
 
     #
@@ -995,14 +981,14 @@ module Writexlsx
     # Write the <c:idx> element.
     #
     def write_idx(val) # :nodoc:
-      @writer.empty_tag('c:idx', [ ['val', val] ])
+      @writer.empty_tag('c:idx', [['val', val]])
     end
 
     #
     # Write the <c:order> element.
     #
     def write_order(val) # :nodoc:
-      @writer.empty_tag('c:order', [ ['val', val] ])
+      @writer.empty_tag('c:order', [['val', val]])
     end
 
     #
@@ -1020,7 +1006,6 @@ module Writexlsx
     # Write the <c:cat> element.
     #
     def write_cat(series) # :nodoc:
-
       formula = series.categories
       data_id = series.cat_data_id
 
@@ -1108,7 +1093,6 @@ module Writexlsx
         write_series_formula(formula)
 
         @writer.tag_elements('c:multiLvlStrCache') do
-
           # Write the c:ptCount element.
           write_pt_count(data.last.size)
 
@@ -1116,7 +1100,7 @@ module Writexlsx
           data.reverse.each do |arr|
             @writer.tag_elements('c:lvl') do
               # Write the c:pt element.
-              arr.each_with_index {|a, i| write_pt(i, a)}
+              arr.each_with_index { |a, i| write_pt(i, a) }
             end
           end
         end
@@ -1147,14 +1131,14 @@ module Writexlsx
       # Generate the axis ids.
       add_axis_ids(params)
 
-      if params[:primary_axes] != 0
-        # Write the axis ids for the primary axes.
-        write_axis_id(@axis_ids[0])
-        write_axis_id(@axis_ids[1])
-      else
+      if params[:primary_axes] == 0
         # Write the axis ids for the secondary axes.
         write_axis_id(@axis2_ids[0])
         write_axis_id(@axis2_ids[1])
+      else
+        # Write the axis ids for the primary axes.
+        write_axis_id(@axis_ids[0])
+        write_axis_id(@axis_ids[1])
       end
     end
 
@@ -1162,7 +1146,7 @@ module Writexlsx
     # Write the <c:axId> element.
     #
     def write_axis_id(val) # :nodoc:
-      @writer.empty_tag('c:axId', [ ['val', val] ])
+      @writer.empty_tag('c:axId', [['val', val]])
     end
 
     #
@@ -1227,9 +1211,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || ptrue?(x_axis.visible)
-          write_crossing(y_axis.crossing)
-        end
+        write_crossing(y_axis.crossing) if @show_crosses || ptrue?(x_axis.visible)
         # Write the c:auto element.
         write_auto(1) unless x_axis.text_axis
         # Write the c:labelAlign element.
@@ -1371,9 +1353,7 @@ module Writexlsx
         # Write the c:crossAx element.
         write_cross_axis(axis_ids[1])
 
-        if @show_crosses || ptrue?(x_axis.visible)
-          write_crossing(y_axis.crossing)
-        end
+        write_crossing(y_axis.crossing) if @show_crosses || ptrue?(x_axis.visible)
 
         # Write the c:auto element.
         write_auto(1)
@@ -1413,6 +1393,7 @@ module Writexlsx
         param.log_base
       )
     end
+
     #
     # Write the <c:scaling> element.
     #
@@ -1435,7 +1416,7 @@ module Writexlsx
     def write_c_log_base(val) # :nodoc:
       return unless ptrue?(val)
 
-      @writer.empty_tag('c:logBase', [ ['val', val] ])
+      @writer.empty_tag('c:logBase', [['val', val]])
     end
 
     #
@@ -1444,21 +1425,21 @@ module Writexlsx
     def write_orientation(reverse = nil) # :nodoc:
       val = ptrue?(reverse) ? 'maxMin' : 'minMax'
 
-      @writer.empty_tag('c:orientation', [ ['val', val] ])
+      @writer.empty_tag('c:orientation', [['val', val]])
     end
 
     #
     # Write the <c:max> element.
     #
     def write_c_max(max = nil) # :nodoc:
-      @writer.empty_tag('c:max', [ ['val', max] ]) if max
+      @writer.empty_tag('c:max', [['val', max]]) if max
     end
 
     #
     # Write the <c:min> element.
     #
     def write_c_min(min = nil) # :nodoc:
-      @writer.empty_tag('c:min', [ ['val', min] ]) if min
+      @writer.empty_tag('c:min', [['val', min]]) if min
     end
 
     #
@@ -1470,7 +1451,7 @@ module Writexlsx
         val = 't' if val == 'b'
       end
 
-      @writer.empty_tag('c:axPos', [ ['val', val] ])
+      @writer.empty_tag('c:axPos', [['val', val]])
     end
 
     #
@@ -1511,7 +1492,7 @@ module Writexlsx
     def write_major_tick_mark(val)
       return unless ptrue?(val)
 
-      @writer.empty_tag('c:majorTickMark', [ ['val', val] ])
+      @writer.empty_tag('c:majorTickMark', [['val', val]])
     end
 
     #
@@ -1520,7 +1501,7 @@ module Writexlsx
     def write_minor_tick_mark(val)
       return unless ptrue?(val)
 
-      @writer.empty_tag('c:minorTickMark', [ ['val', val] ])
+      @writer.empty_tag('c:minorTickMark', [['val', val]])
     end
 
     #
@@ -1530,14 +1511,14 @@ module Writexlsx
       val ||= 'nextTo'
       val = 'nextTo' if val == 'next_to'
 
-      @writer.empty_tag('c:tickLblPos', [ ['val', val] ])
+      @writer.empty_tag('c:tickLblPos', [['val', val]])
     end
 
     #
     # Write the <c:crossAx> element.
     #
     def write_cross_axis(val = 'autoZero') # :nodoc:
-      @writer.empty_tag('c:crossAx', [ ['val', val] ])
+      @writer.empty_tag('c:crossAx', [['val', val]])
     end
 
     #
@@ -1546,21 +1527,21 @@ module Writexlsx
     def write_crosses(val) # :nodoc:
       val ||= 'autoZero'
 
-      @writer.empty_tag('c:crosses', [ ['val', val] ])
+      @writer.empty_tag('c:crosses', [['val', val]])
     end
 
     #
     # Write the <c:crossesAt> element.
     #
     def write_c_crosses_at(val) # :nodoc:
-      @writer.empty_tag('c:crossesAt', [ ['val', val] ])
+      @writer.empty_tag('c:crossesAt', [['val', val]])
     end
 
     #
     # Write the <c:auto> element.
     #
     def write_auto(val) # :nodoc:
-      @writer.empty_tag('c:auto', [ ['val', val] ])
+      @writer.empty_tag('c:auto', [['val', val]])
     end
 
     #
@@ -1573,14 +1554,14 @@ module Writexlsx
       elsif val == 'left'
         val = 'l'
       end
-      @writer.empty_tag('c:lblAlgn', [ ['val', val] ])
+      @writer.empty_tag('c:lblAlgn', [['val', val]])
     end
 
     #
     # Write the <c:labelOffset> element.
     #
     def write_label_offset(val) # :nodoc:
-      @writer.empty_tag('c:lblOffset', [ ['val', val] ])
+      @writer.empty_tag('c:lblOffset', [['val', val]])
     end
 
     #
@@ -1589,7 +1570,7 @@ module Writexlsx
     def write_tick_lbl_skip(val) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:tickLblSkip', [ ['val', val] ])
+      @writer.empty_tag('c:tickLblSkip', [['val', val]])
     end
 
     #
@@ -1598,7 +1579,7 @@ module Writexlsx
     def write_tick_mark_skip(val)  # :nodoc:
       return unless val
 
-      @writer.empty_tag( 'c:tickMarkSkip', [ ['val', val] ])
+      @writer.empty_tag('c:tickMarkSkip', [['val', val]])
     end
 
     #
@@ -1632,7 +1613,7 @@ module Writexlsx
     def write_cross_between(val = nil) # :nodoc:
       val ||= @cross_between
 
-      @writer.empty_tag('c:crossBetween', [ ['val', val] ])
+      @writer.empty_tag('c:crossBetween', [['val', val]])
     end
 
     #
@@ -1641,7 +1622,7 @@ module Writexlsx
     def write_c_major_unit(val = nil) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:majorUnit', [ ['val', val] ])
+      @writer.empty_tag('c:majorUnit', [['val', val]])
     end
 
     #
@@ -1650,7 +1631,7 @@ module Writexlsx
     def write_c_minor_unit(val = nil) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:minorUnit', [ ['val', val] ])
+      @writer.empty_tag('c:minorUnit', [['val', val]])
     end
 
     #
@@ -1659,7 +1640,7 @@ module Writexlsx
     def write_c_major_time_unit(val) # :nodoc:
       val ||= 'days'
 
-      @writer.empty_tag('c:majorTimeUnit', [ ['val', val] ])
+      @writer.empty_tag('c:majorTimeUnit', [['val', val]])
     end
 
     #
@@ -1668,7 +1649,7 @@ module Writexlsx
     def write_c_minor_time_unit(val) # :nodoc:
       val ||= 'days'
 
-      @writer.empty_tag('c:minorTimeUnit', [ ['val', val] ])
+      @writer.empty_tag('c:minorTimeUnit', [['val', val]])
     end
 
     #
@@ -1676,9 +1657,9 @@ module Writexlsx
     #
     def write_legend # :nodoc:
       position = @legend.position.sub(/^overlay_/, '')
-      return if position == 'none' || (not position_allowed.has_key?(position))
+      return if position == 'none' || !position_allowed.has_key?(position)
 
-      @delete_series = @legend.delete_series if @legend.delete_series.kind_of?(Array)
+      @delete_series = @legend.delete_series if @legend.delete_series.is_a?(Array)
       @writer.tag_elements('c:legend') do
         # Write the c:legendPos element.
         write_legend_pos(position_allowed[position])
@@ -1710,7 +1691,7 @@ module Writexlsx
     # Write the <c:legendPos> element.
     #
     def write_legend_pos(val) # :nodoc:
-      @writer.empty_tag('c:legendPos', [ ['val', val] ])
+      @writer.empty_tag('c:legendPos', [['val', val]])
     end
 
     #
@@ -1729,7 +1710,7 @@ module Writexlsx
     # Write the <c:overlay> element.
     #
     def write_overlay # :nodoc:
-      @writer.empty_tag('c:overlay', [ ['val', 1] ])
+      @writer.empty_tag('c:overlay', [['val', 1]])
     end
 
     #
@@ -1741,7 +1722,7 @@ module Writexlsx
       # Ignore this element if we are plotting hidden data.
       return if @show_hidden_data
 
-      @writer.empty_tag('c:plotVisOnly', [ ['val', val] ])
+      @writer.empty_tag('c:plotVisOnly', [['val', val]])
     end
 
     #
@@ -1799,7 +1780,7 @@ module Writexlsx
     # Write the <c:autoTitleDeleted> element.
     #
     def write_auto_title_deleted
-      attributes = [ ['val', 1] ]
+      attributes = [['val', 1]]
 
       @writer.empty_tag('c:autoTitleDeleted', attributes)
     end
@@ -1865,9 +1846,7 @@ module Writexlsx
     def write_rich(title, font, is_y_axis, ignore_rich_pr = false) # :nodoc:
       rotation = nil
 
-      if font && font[:_rotation]
-        rotation = font[:_rotation]
-      end
+      rotation = font[:_rotation] if font && font[:_rotation]
       @writer.tag_elements('c:rich') do
         # Write the a:bodyPr element.
         write_a_body_pr(rotation, is_y_axis)
@@ -1877,13 +1856,14 @@ module Writexlsx
         write_a_p_rich(title, font, ignore_rich_pr)
       end
     end
+
     #
     # Write the <a:p> element for rich string titles.
     #
     def write_a_p_rich(title, font, ignore_rich_pr) # :nodoc:
       @writer.tag_elements('a:p') do
         # Write the a:pPr element.
-        write_a_p_pr_rich(font) if !ignore_rich_pr
+        write_a_p_pr_rich(font) unless ignore_rich_pr
         # Write the a:r element.
         write_a_r(title, font)
       end
@@ -1912,7 +1892,7 @@ module Writexlsx
     # Write the <a:rPr> element.
     #
     def write_a_r_pr(font) # :nodoc:
-      attributes = [ ['lang', 'en-US'] ]
+      attributes = [%w[lang en-US]]
       attr_font = get_font_style_attributes(font)
       attributes += attr_font unless attr_font.empty?
 
@@ -1952,21 +1932,21 @@ module Writexlsx
     def write_marker_value # :nodoc:
       return unless @default_marker
 
-      @writer.empty_tag('c:marker', [ ['val', 1] ])
+      @writer.empty_tag('c:marker', [['val', 1]])
     end
 
     #
     # Write the <c:size> element.
     #
     def write_marker_size(val) # :nodoc:
-      @writer.empty_tag('c:size', [ ['val', val] ])
+      @writer.empty_tag('c:size', [['val', val]])
     end
 
     #
     # Write the <c:symbol> element.
     #
     def write_symbol(val) # :nodoc:
-      @writer.empty_tag('c:symbol', [ ['val', val] ])
+      @writer.empty_tag('c:symbol', [['val', val]])
     end
 
     def has_fill_formatting(element)
@@ -1979,12 +1959,11 @@ module Writexlsx
         (fill && ptrue?(fill[:_defined])) || pattern || gradient
     end
 
-
     #
     # Write the <c:spPr> element.
     #
     def write_sp_pr(series) # :nodoc:
-      return if !has_fill_formatting(series)
+      return unless has_fill_formatting(series)
 
       line     = series_property(series, :line)
       fill     = series_property(series, :fill)
@@ -2002,9 +1981,7 @@ module Writexlsx
             write_a_solid_fill(fill)
           end
         end
-        if ptrue?(pattern)
-          write_a_patt_fill(pattern)
-        end
+        write_a_patt_fill(pattern) if ptrue?(pattern)
         if ptrue?(gradient)
           # Write the a:gradFill element.
           write_a_grad_fill(gradient)
@@ -2070,14 +2047,14 @@ module Writexlsx
     def write_a_alpha(val)
       val = (100 - val.to_i) * 1000
 
-      @writer.empty_tag('a:alpha', [ ['val', val] ])
+      @writer.empty_tag('a:alpha', [['val', val]])
     end
 
     #
     # Write the <a:prstDash> element.
     #
     def write_a_prst_dash(val) # :nodoc:
-      @writer.empty_tag('a:prstDash', [ ['val', val] ])
+      @writer.empty_tag('a:prstDash', [['val', val]])
     end
 
     #
@@ -2122,7 +2099,7 @@ module Writexlsx
     # Write the <c:trendlineType> element.
     #
     def write_trendline_type(val) # :nodoc:
-      @writer.empty_tag('c:trendlineType', [ ['val', val] ])
+      @writer.empty_tag('c:trendlineType', [['val', val]])
     end
 
     #
@@ -2138,14 +2115,14 @@ module Writexlsx
     # Write the <c:order> element.
     #
     def write_trendline_order(val = 2) # :nodoc:
-      @writer.empty_tag('c:order', [ ['val', val] ])
+      @writer.empty_tag('c:order', [['val', val]])
     end
 
     #
     # Write the <c:period> element.
     #
     def write_period(val = 2) # :nodoc:
-      @writer.empty_tag('c:period', [ ['val', val] ])
+      @writer.empty_tag('c:period', [['val', val]])
     end
 
     #
@@ -2154,7 +2131,7 @@ module Writexlsx
     def write_forward(val) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:forward', [ ['val', val] ])
+      @writer.empty_tag('c:forward', [['val', val]])
     end
 
     #
@@ -2163,28 +2140,28 @@ module Writexlsx
     def write_backward(val) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:backward', [ ['val', val] ])
+      @writer.empty_tag('c:backward', [['val', val]])
     end
 
     #
     # Write the <c:intercept> element.
     #
     def write_intercept(val)
-      @writer.empty_tag('c:intercept', [ ['val', val] ])
+      @writer.empty_tag('c:intercept', [['val', val]])
     end
 
     #
     # Write the <c:dispEq> element.
     #
     def write_disp_eq
-      @writer.empty_tag('c:dispEq', [ ['val', 1] ])
+      @writer.empty_tag('c:dispEq', [['val', 1]])
     end
 
     #
     # Write the <c:dispRSqr> element.
     #
     def write_disp_rsqr
-      @writer.empty_tag('c:dispRSqr', [ ['val', 1] ])
+      @writer.empty_tag('c:dispRSqr', [['val', 1]])
     end
 
     #
@@ -2244,7 +2221,7 @@ module Writexlsx
     def write_overlap(val = nil) # :nodoc:
       return unless val
 
-      @writer.empty_tag('c:overlap', [ ['val', val] ])
+      @writer.empty_tag('c:overlap', [['val', val]])
     end
 
     #
@@ -2256,16 +2233,15 @@ module Writexlsx
 
     def write_num_base(tag, data)
       @writer.tag_elements(tag) do
-
         # Write the c:formatCode element.
         write_format_code('General')
 
         # Write the c:ptCount element.
-        if data
-          count = data.size
-        else
-          count = 0
-        end
+        count = if data
+                  data.size
+                else
+                  0
+                end
         write_pt_count(count)
 
         data.each_with_index do |token, i|
@@ -2292,7 +2268,7 @@ module Writexlsx
     end
 
     def write_pts(data)
-      data.each_index { |i| write_pt(i, data[i])}
+      data.each_index { |i| write_pt(i, data[i]) }
     end
 
     #
@@ -2306,7 +2282,7 @@ module Writexlsx
     # Write the <c:ptCount> element.
     #
     def write_pt_count(val) # :nodoc:
-      @writer.empty_tag('c:ptCount', [ ['val', val] ])
+      @writer.empty_tag('c:ptCount', [['val', val]])
     end
 
     #
@@ -2315,7 +2291,7 @@ module Writexlsx
     def write_pt(idx, value) # :nodoc:
       return unless value
 
-      attributes = [ ['idx', idx] ]
+      attributes = [['idx', idx]]
 
       @writer.tag_elements('c:pt', attributes) { write_v(value) }
     end
@@ -2362,6 +2338,7 @@ module Writexlsx
         write_sp_pr(point)
       end
     end
+
     #
     # Write the <c:dLbls> element.
     #
@@ -2370,9 +2347,7 @@ module Writexlsx
 
       @writer.tag_elements('c:dLbls') do
         # Write the custom c:dLbl elements.
-        if labels[:custom]
-          write_custom_labels(labels, labels[:custom])
-        end
+        write_custom_labels(labels, labels[:custom]) if labels[:custom]
         # Write the c:numFmt element.
         write_data_label_number_format(labels[:num_format]) if labels[:num_format]
         # Write the c:spPr element.
@@ -2406,13 +2381,13 @@ module Writexlsx
 
       labels.each do |label|
         index += 1
-        next if !ptrue?(label)
+        next unless ptrue?(label)
 
         @writer.tag_elements('c:dLbl') do
           # Write the c:idx element.
           write_idx(index - 1)
 
-          if label[:delete] && label[:delete]
+          if label[:delete]
             write_delete(1)
           elsif label[:formula]
             write_custom_label_formula(label)
@@ -2445,7 +2420,7 @@ module Writexlsx
       has_formatting = has_fill_formatting(label)
 
       # Write the c:layout element.
-      write_layout()
+      write_layout
 
       @writer.tag_elements('c:tx') do
         # Write the c:rich element.
@@ -2463,9 +2438,7 @@ module Writexlsx
       formula = label[:formula]
       data_id = label[:data_id]
 
-      if data_id
-        data = @formula_data[data_id]
-      end
+      data = @formula_data[data_id] if data_id
 
       # Write the c:layout element.
       write_layout
@@ -2501,35 +2474,35 @@ module Writexlsx
     # Write the <c:showLegendKey> element.
     #
     def write_show_legend_key
-      @writer.empty_tag('c:showLegendKey', [ ['val', 1] ])
+      @writer.empty_tag('c:showLegendKey', [['val', 1]])
     end
 
     #
     # Write the <c:showVal> element.
     #
     def write_show_val # :nodoc:
-      @writer.empty_tag('c:showVal', [ ['val', 1] ])
+      @writer.empty_tag('c:showVal', [['val', 1]])
     end
 
     #
     # Write the <c:showCatName> element.
     #
     def write_show_cat_name # :nodoc:
-      @writer.empty_tag('c:showCatName', [ ['val', 1] ])
+      @writer.empty_tag('c:showCatName', [['val', 1]])
     end
 
     #
     # Write the <c:showSerName> element.
     #
     def write_show_ser_name # :nodoc:
-      @writer.empty_tag('c:showSerName', [ ['val', 1] ])
+      @writer.empty_tag('c:showSerName', [['val', 1]])
     end
 
     #
     # Write the <c:showPercent> element.
     #
     def write_show_percent
-      @writer.empty_tag('c:showPercent', [ ['val', 1] ])
+      @writer.empty_tag('c:showPercent', [['val', 1]])
     end
 
     #
@@ -2543,21 +2516,21 @@ module Writexlsx
     # Write the <c:showLeaderLines> element.
     #
     def write_show_leader_lines
-      @writer.empty_tag('c:showLeaderLines', [ ['val', 1] ])
+      @writer.empty_tag('c:showLeaderLines', [['val', 1]])
     end
 
     #
     # Write the <c:dLblPos> element.
     #
     def write_d_lbl_pos(val)
-      @writer.empty_tag('c:dLblPos', [ ['val', val] ])
+      @writer.empty_tag('c:dLblPos', [['val', val]])
     end
 
     #
     # Write the <c:delete> element.
     #
     def write_delete(val) # :nodoc:
-      @writer.empty_tag('c:delete', [ ['val', val] ])
+      @writer.empty_tag('c:delete', [['val', val]])
     end
 
     #
@@ -2566,7 +2539,7 @@ module Writexlsx
     def write_c_invert_if_negative(invert = nil) # :nodoc:
       return unless ptrue?(invert)
 
-      @writer.empty_tag('c:invertIfNegative', [ ['val', 1] ])
+      @writer.empty_tag('c:invertIfNegative', [['val', 1]])
     end
 
     #
@@ -2605,12 +2578,8 @@ module Writexlsx
     def write_error_bars(error_bars)
       return unless ptrue?(error_bars)
 
-      if error_bars[:_x_error_bars]
-        write_err_bars('x', error_bars[:_x_error_bars])
-      end
-      if error_bars[:_y_error_bars]
-        write_err_bars('y', error_bars[:_y_error_bars])
-      end
+      write_err_bars('x', error_bars[:_x_error_bars]) if error_bars[:_x_error_bars]
+      write_err_bars('y', error_bars[:_y_error_bars]) if error_bars[:_y_error_bars]
     end
 
     #
@@ -2654,35 +2623,35 @@ module Writexlsx
     # Write the <c:errDir> element.
     #
     def write_err_dir(val)
-      @writer.empty_tag('c:errDir', [ ['val', val] ])
+      @writer.empty_tag('c:errDir', [['val', val]])
     end
 
     #
     # Write the <c:errBarType> element.
     #
     def write_err_bar_type(val)
-      @writer.empty_tag('c:errBarType', [ ['val', val] ])
+      @writer.empty_tag('c:errBarType', [['val', val]])
     end
 
     #
     # Write the <c:errValType> element.
     #
     def write_err_val_type(val)
-      @writer.empty_tag('c:errValType', [ ['val', val] ])
+      @writer.empty_tag('c:errValType', [['val', val]])
     end
 
     #
     # Write the <c:noEndCap> element.
     #
     def write_no_end_cap
-      @writer.empty_tag('c:noEndCap', [ ['val', 1] ])
+      @writer.empty_tag('c:noEndCap', [['val', 1]])
     end
 
     #
     # Write the <c:val> element.
     #
     def write_error_val(val)
-      @writer.empty_tag('c:val', [ ['val', val] ])
+      @writer.empty_tag('c:val', [['val', val]])
     end
 
     #
@@ -2733,7 +2702,7 @@ module Writexlsx
     def write_gap_width(val = nil)
       return unless val
 
-      @writer.empty_tag('c:gapWidth', [ ['val', val] ])
+      @writer.empty_tag('c:gapWidth', [['val', val]])
     end
 
     #
@@ -2756,7 +2725,7 @@ module Writexlsx
     def write_c_smooth(smooth)
       return unless ptrue?(smooth)
 
-      attributes = [ ['val', 1] ]
+      attributes = [['val', 1]]
 
       @writer.empty_tag('c:smooth', attributes)
     end
@@ -2767,7 +2736,7 @@ module Writexlsx
     def write_disp_units(units, display)
       return unless ptrue?(units)
 
-      attributes = [ ['val', units] ]
+      attributes = [['val', units]]
 
       @writer.tag_elements('c:dispUnits') do
         @writer.empty_tag('c:builtInUnit', attributes)
@@ -2776,7 +2745,7 @@ module Writexlsx
             @writer.empty_tag('c:layout')
           end
         end
-     end
+      end
     end
 
     #
@@ -2784,13 +2753,12 @@ module Writexlsx
     #
     def write_a_grad_fill(gradient)
       attributes = [
-        ['flip',        'none'],
+        %w[flip none],
         ['rotWithShape', 1]
       ]
       attributes = [] if gradient[:type] == 'linear'
 
       @writer.tag_elements('a:gradFill', attributes) do
-
         # Write the a:gsLst element.
         write_a_gs_lst(gradient)
 
@@ -2815,17 +2783,16 @@ module Writexlsx
       colors    = gradient[:colors]
 
       @writer.tag_elements('a:gsLst') do
-        (0..colors.size-1).each do |i|
+        (0..colors.size - 1).each do |i|
           pos = (positions[i] * 1000).to_i
 
-          attributes = [ ['pos', pos] ]
+          attributes = [['pos', pos]]
           @writer.tag_elements('a:gs', attributes) do
-
             color = color(colors[i])
 
             # Write the a:srgbClr element.
             # TODO: Wait for a feature request to support transparency.
-            write_a_srgb_clr( color )
+            write_a_srgb_clr(color)
           end
         end
       end
@@ -2835,13 +2802,13 @@ module Writexlsx
     # Write the <a:lin> element.
     #
     def write_a_lin(angle)
-     scaled = 0
+      scaled = 0
 
-     angle = (60000 * angle).to_i
+      angle = (60000 * angle).to_i
 
-     attributes = [
-         ['ang',    angle],
-         ['scaled', scaled]
+      attributes = [
+        ['ang',    angle],
+        ['scaled', scaled]
       ]
 
       @writer.empty_tag('a:lin', attributes)
@@ -2851,7 +2818,7 @@ module Writexlsx
     # Write the <a:path> element.
     #
     def write_a_path(type)
-      attributes = [ ['path', type] ]
+      attributes = [['path', type]]
 
       @writer.tag_elements('a:path', attributes) do
         # Write the a:fillToRect element.
@@ -2865,19 +2832,19 @@ module Writexlsx
     def write_a_fill_to_rect(type)
       attributes = []
 
-      if type ==  'shape'
-        attributes = [
-          ['l' , 50000],
-          ['t' , 50000],
-          ['r' , 50000],
-          ['b' , 50000]
-        ]
-      else
-        attributes = [
-          ['l', 100000],
-          ['t', 100000]
-        ]
-      end
+      attributes = if type == 'shape'
+                     [
+                       ['l', 50000],
+                       ['t', 50000],
+                       ['r', 50000],
+                       ['b', 50000]
+                     ]
+                   else
+                     [
+                       ['l', 100000],
+                       ['t', 100000]
+                     ]
+                   end
 
       @writer.empty_tag('a:fillToRect', attributes)
     end
@@ -2888,14 +2855,14 @@ module Writexlsx
     def write_a_tile_rect(type)
       attributes = []
 
-      if type == 'shape'
-        attributes = []
-      else
-        attributes = [
-          ['r', -100000],
-          ['b', -100000]
-        ]
-      end
+      attributes = if type == 'shape'
+                     []
+                   else
+                     [
+                       ['r', -100000],
+                       ['b', -100000]
+                     ]
+                   end
 
       @writer.empty_tag('a:tileRect', attributes)
     end
@@ -2904,7 +2871,7 @@ module Writexlsx
     # Write the <a:pattFill> element.
     #
     def write_a_patt_fill(pattern)
-      attributes = [ ['prst', pattern[:pattern]] ]
+      attributes = [['prst', pattern[:pattern]]]
 
       @writer.tag_elements('a:pattFill', attributes) do
         write_a_fg_clr(pattern[:fg_color])

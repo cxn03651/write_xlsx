@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -24,14 +25,13 @@ class TestCondFormat15 < Minitest::Test
     @worksheet.write('A3', 30)
     @worksheet.write('A4', 40)
 
-    %w[=$A$1>5 =$A$2<80 "1+2" =$A$3>$A$4].each do |criteria|
+    ['=$A$1>5', '=$A$2<80', '"1+2"', '=$A$3>$A$4'].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
                                           :type     => 'formula',
                                           :criteria => criteria,
                                           :format   => nil
-                                        }
-                                        )
+                                        })
     end
 
     @worksheet.assemble_xml_file

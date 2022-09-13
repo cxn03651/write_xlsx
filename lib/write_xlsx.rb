@@ -85,9 +85,7 @@ require 'write_xlsx/workbook'
 # see Writexlsx::Workbook, Writexlsx::Worksheet, Writexlsx::Chart etc.
 #
 class WriteXLSX < Writexlsx::Workbook
-  if RUBY_VERSION < '1.9'
-    $KCODE = 'u'
-  end
+  $KCODE = 'u' if RUBY_VERSION < '1.9'
 end
 
 class WriteXLSXInsufficientArgumentError < StandardError

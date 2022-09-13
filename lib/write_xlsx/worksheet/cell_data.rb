@@ -13,7 +13,7 @@ module Writexlsx
       # attributes for the <cell> element. This is the innermost loop so efficiency is
       # important where possible.
       #
-      def cell_attributes #:nodoc:
+      def cell_attributes # :nodoc:
         xf_index = xf ? xf.get_xf_index : 0
         attributes = [
           ['r', xl_rowcol_to_cell(row, col)]
@@ -40,7 +40,10 @@ module Writexlsx
     class NumberCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, num, xf)
         @worksheet = worksheet
-        @row, @col, @token, @xf = row, col, num, xf
+        @row = row
+        @col = col
+        @token = num
+        @xf = xf
       end
 
       def data
@@ -57,14 +60,17 @@ module Writexlsx
     class StringCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, index, xf)
         @worksheet = worksheet
-        @row, @col, @token, @xf = row, col, index, xf
+        @row = row
+        @col = col
+        @token = index
+        @xf = xf
       end
 
       def data
         { :sst_id => token }
       end
 
-      TYPE_STR_ATTRS = ['t', 's'].freeze
+      TYPE_STR_ATTRS = %w[t s].freeze
       def write_cell
         attributes = cell_attributes
         attributes << TYPE_STR_ATTRS
@@ -81,7 +87,11 @@ module Writexlsx
     class FormulaCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, formula, xf, result)
         @worksheet = worksheet
-        @row, @col, @token, @xf, @result = row, col, formula, xf, result
+        @row = row
+        @col = col
+        @token = formula
+        @xf = xf
+        @result = result
       end
 
       def data
@@ -89,18 +99,18 @@ module Writexlsx
       end
 
       def write_cell
-        truefalse = {'TRUE' => 1, 'FALSE' => 0}
+        truefalse = { 'TRUE' => 1, 'FALSE' => 0 }
         error_code = ['#DIV/0!', '#N/A', '#NAME?', '#NULL!', '#NUM!', '#REF!', '#VALUE!']
 
         attributes = cell_attributes
-        if @result &&  !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
+        if @result && !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
           if truefalse[@result]
-            attributes << ['t', 'b']
+            attributes << %w[t b]
             @result = truefalse[@result]
           elsif error_code.include?(@result)
-            attributes << ['t', 'e']
+            attributes << %w[t e]
           else
-            attributes << ['t', 'str']
+            attributes << %w[t str]
           end
         end
         @worksheet.writer.tag_elements('c', attributes) do
@@ -113,7 +123,12 @@ module Writexlsx
     class FormulaArrayCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, formula, xf, range, result)
         @worksheet = worksheet
-        @row, @col, @token, @xf, @range, @result = row, col, formula, xf, range, result
+        @row = row
+        @col = col
+        @token = formula
+        @xf = xf
+        @range = range
+        @result = result
       end
 
       def data
@@ -131,7 +146,12 @@ module Writexlsx
     class DynamicFormulaArrayCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, formula, xf, range, result)
         @worksheet = worksheet
-        @row, @col, @token, @xf, @range, @result = row, col, formula, xf, range, result
+        @row = row
+        @col = col
+        @token = formula
+        @xf = xf
+        @range = range
+        @result = result
       end
 
       def data
@@ -141,7 +161,7 @@ module Writexlsx
       def write_cell
         # Add metadata linkage for dynamic array formulas.
         attributes = cell_attributes
-        attributes << ['cm', '1']
+        attributes << %w[cm 1]
 
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_array_formula(token, range)
@@ -153,7 +173,10 @@ module Writexlsx
     class BooleanCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, val, xf)
         @worksheet = worksheet
-        @row, @col, @token, @xf = row, col, val, xf
+        @row = row
+        @col = col
+        @token = val
+        @xf = xf
       end
 
       def data
@@ -163,18 +186,19 @@ module Writexlsx
       def write_cell
         attributes = cell_attributes
 
-        attributes << ['t', 'b']
+        attributes << %w[t b]
         @worksheet.writer.tag_elements('c', attributes) do
           @worksheet.write_cell_value(token)
         end
       end
     end
 
-
     class BlankCellData < CellData # :nodoc:
       def initialize(worksheet, row, col, xf)
         @worksheet = worksheet
-        @row, @col, @xf = row, col, xf
+        @row = row
+        @col = col
+        @xf = xf
       end
 
       def data

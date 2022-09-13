@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -54,7 +55,7 @@ class TestStyles01 < Minitest::Test
   <tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
 </styleSheet>
 EOS
-      )
+                                )
     assert_equal(expected, result)
   end
 end

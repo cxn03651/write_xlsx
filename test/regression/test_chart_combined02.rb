@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartCombined02 < Minitest::Test
@@ -21,8 +22,8 @@ class TestRegressionChartCombined02 < Minitest::Test
     # For this test the ids match the generated ids.
 
     data = [
-      [  2,  7,  3,  6,   2 ],
-      [ 20, 25, 10, 10,  20 ]
+      [2,  7,  3,  6,   2],
+      [20, 25, 10, 10,  20]
     ]
 
     worksheet.write('A1', data)

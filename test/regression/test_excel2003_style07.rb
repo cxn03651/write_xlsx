@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionExcel2003Style07 < Minitest::Test
@@ -19,13 +20,13 @@ class TestRegressionExcel2003Style07 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                [],
-                                {
-                                  'xl/drawings/drawing1.xml' =>
-                                  [
-                                   '<xdr:cNvPr', '<a:picLocks', '<a:srcRect />', '<xdr:spPr', '<a:noFill />'
-                                  ]
-                                }
-                                )
+      [],
+      {
+        'xl/drawings/drawing1.xml' =>
+                                      [
+                                        '<xdr:cNvPr', '<a:picLocks', '<a:srcRect />', '<xdr:spPr', '<a:noFill />'
+                                      ]
+      }
+    )
   end
 end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHeader03 < Minitest::Test
@@ -16,16 +17,16 @@ class TestRegressionHeader03 < Minitest::Test
     worksheet   = workbook.add_worksheet
 
     worksheet.set_footer('&L&P', nil,
-                         { :scale_with_doc => 0,
-                           :align_with_margins => 0 }
-                         )
+                         { :scale_with_doc     => 0,
+                           :align_with_margins => 0 })
 
     workbook.close
 
     compare_for_regression(
-                                [],
-                                {
-                                  'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ]
-                                })
+      [],
+      {
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
+      }
+    )
   end
 end

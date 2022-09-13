@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -20,12 +21,12 @@ class TestSparkline05 < Minitest::Test
     # Set up sparklines
 
     @worksheet.add_sparkline(
-                             {
-                               :location => ['$F$1'],
-                               :range    => ['$A$1:$E$1'],
-                               :type     => 'win_loss'
-                             }
-                             )
+      {
+        :location => ['$F$1'],
+        :range    => ['$A$1:$E$1'],
+        :type     => 'win_loss'
+      }
+    )
 
     # End sparklines
 

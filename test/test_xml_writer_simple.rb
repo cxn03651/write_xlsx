@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/xml_writer_simple'
 
@@ -9,7 +10,7 @@ class TestXMLWriterSimple < Minitest::Test
 
   def test_xml_decl
     assert_equal(
-      %Q!<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n!,
+      %(<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n),
       @obj.xml_decl
     )
   end
@@ -32,7 +33,7 @@ EOS
 
   def test_attribute
     assert_equal(
-      "<foo x=\"1&gt;2\"/>", @obj.empty_tag("foo", [ ['x', '1>2'] ])
+      "<foo x=\"1&gt;2\"/>", @obj.empty_tag("foo", [['x', '1>2']])
     )
   end
 

@@ -14,7 +14,7 @@
 require 'write_xlsx'
 
 # Create a new workbook and add a worksheet
-workbook = WriteXLSX.new( 'hyperlink.xlsx')
+workbook = WriteXLSX.new('hyperlink.xlsx')
 
 worksheet = workbook.add_worksheet('Hyperlinks')
 
@@ -24,10 +24,10 @@ worksheet.set_selection('B1')
 
 # Add a sample format.
 red_format = workbook.add_format(
-    :color     => 'red',
-    :bold      => 1,
-    :underline => 1,
-    :size      => 12
+  :color     => 'red',
+  :bold      => 1,
+  :underline => 1,
+  :size      => 12
 )
 
 # Add an alternate description string to the URL.
@@ -35,7 +35,6 @@ str = 'Perl home.'
 
 # Add a "tool tip" to the URL.
 tip = 'Get the latest Perl news here.'
-
 
 # Write some hyperlinks
 worksheet.write('A1', 'http://www.perl.com/')

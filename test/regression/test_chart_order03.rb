@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartOrder03 < Minitest::Test
@@ -12,7 +13,7 @@ class TestChartOrder03 < Minitest::Test
 
   def test_chart_order03
     @xlsx = 'chart_order03.xlsx'
-    workbook    =  WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1  = workbook.add_worksheet
     worksheet2  = workbook.add_worksheet
     chart2      = workbook.add_chart(:type => 'bar')
@@ -24,15 +25,15 @@ class TestChartOrder03 < Minitest::Test
 
     # For testing, copy the randomly generated axis ids in the target xls file.
     chart1.instance_variable_set(:@axis_ids, [67913600, 68169088])
-    chart2.instance_variable_get(:@chart).
-      instance_variable_set(:@axis_ids, [58117120, 67654400])
+    chart2.instance_variable_get(:@chart)
+          .instance_variable_set(:@axis_ids, [58117120, 67654400])
     chart3.instance_variable_set(:@axis_ids, [58109952, 68215936])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet1.write('A1', data)
     worksheet2.write('A1', data)
@@ -51,9 +52,9 @@ class TestChartOrder03 < Minitest::Test
     compare_for_regression(
       [],
       {
-        'xl/charts/chart1.xml' => [ '<c:formatCode', '<c:pageMargins' ],
-        'xl/charts/chart2.xml' => [ '<c:formatCode', '<c:pageMargins' ],
-        'xl/charts/chart4.xml' => [ '<c:formatCode', '<c:pageMargins' ]
+        'xl/charts/chart1.xml' => ['<c:formatCode', '<c:pageMargins'],
+        'xl/charts/chart2.xml' => ['<c:formatCode', '<c:pageMargins'],
+        'xl/charts/chart4.xml' => ['<c:formatCode', '<c:pageMargins']
       }
     )
   end

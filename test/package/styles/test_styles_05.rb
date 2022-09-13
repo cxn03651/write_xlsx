@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/package/styles'
@@ -135,7 +136,7 @@ class TestStyles05 < Minitest::Test
   <tableStyles count="0" defaultTableStyle="TableStyleMedium9" defaultPivotStyle="PivotStyleLight16"/>
 </styleSheet>
 EOS
-      )
-      assert_equal(expected, result)
-    end
+                                )
+    assert_equal(expected, result)
+  end
 end

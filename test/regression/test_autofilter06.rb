@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionAutofilter06 < Minitest::Test
@@ -30,9 +31,8 @@ class TestRegressionAutofilter06 < Minitest::Test
     row = 1
     data.each do |row_data|
       region = row_data[0]
-      if region != ''
+      if region == ''
         # Row is visible.
-      else
         # Hide row.
         worksheet.set_row(row, nil, nil, 1)
       end
@@ -42,9 +42,9 @@ class TestRegressionAutofilter06 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                 nil,
-                 {'xl/workbook.xml' => ['<workbookView']}
-                 )
+      nil,
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 
   def headings

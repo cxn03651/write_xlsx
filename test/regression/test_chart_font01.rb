@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartFont01 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartFont01 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [43945344, 45705856])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -34,21 +35,21 @@ class TestRegressionChartFont01 < Minitest::Test
     chart.set_title(:name => 'Title')
 
     chart.set_x_axis(
-                     :name     => 'XXX',
-                     :num_font => { :size => 11, :bold => 1, :italic => 1 }
-                     )
+      :name     => 'XXX',
+      :num_font => { :size => 11, :bold => 1, :italic => 1 }
+    )
 
     chart.set_y_axis(
-                     :name     => 'YYY',
-                     :num_font => { :size => 9, :bold => 0, :italic => 1 }
-                     )
+      :name     => 'YYY',
+      :num_font => { :size => 9, :bold => 0, :italic => 1 }
+    )
 
     worksheet.insert_chart('E9', chart)
 
     workbook.close
     compare_for_regression(
-                 nil,
-                 { 'xl/charts/chart1.xml' => ['<c:pageMargins'] }
-                 )
+      nil,
+      { 'xl/charts/chart1.xml' => ['<c:pageMargins'] }
+    )
   end
 end

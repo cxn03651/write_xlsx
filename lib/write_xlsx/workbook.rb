@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/package/packager'
 require 'write_xlsx/sheets'
@@ -16,11 +17,9 @@ require 'tempfile'
 require 'digest/md5'
 
 module Writexlsx
-
   OFFICE_URL = 'http://schemas.microsoft.com/office/'   # :nodoc:
 
   class Workbook
-
     include Writexlsx::Utility
 
     attr_writer :firstsheet                     # :nodoc:
@@ -41,9 +40,12 @@ module Writexlsx
       options, default_formats = process_workbook_options(*option_params)
       @writer = Package::XMLWriterSimple.new
 
-      @file                = file
+      @file = file
       @tempdir = options[:tempdir] ||
-        File.join(Dir.tmpdir, Digest::MD5.hexdigest("#{Time.now.to_f.to_s}-#{Process.pid}"))
+                 File.join(
+                   Dir.tmpdir,
+                   Digest::MD5.hexdigest("#{Time.now.to_f}-#{Process.pid}")
+                 )
       @date_1904           = options[:date_1904] || false
       @activesheet         = 0
       @firstsheet          = 0
@@ -72,7 +74,7 @@ module Writexlsx
       @table_count         = 0
       @image_types         = {}
       @images              = []
-      @strings_to_urls     = (options[:strings_to_urls].nil? || options[:strings_to_urls]) ? true : false
+      @strings_to_urls     = options[:strings_to_urls].nil? || options[:strings_to_urls] ? true : false
 
       @max_url_length      = 2079
       @has_comments        = false
@@ -131,7 +133,7 @@ module Writexlsx
       if args.empty?
         @worksheets
       else
-        args.collect{|i| @worksheets[i] }
+        args.collect { |i| @worksheets[i] }
       end
     end
 
@@ -147,9 +149,8 @@ module Writexlsx
     # Set the date system: false = 1900 (the default), true = 1904
     #
     def set_1904(mode = true)
-      unless sheets.empty?
-        raise "set_1904() must be called before add_worksheet()"
-      end
+      raise "set_1904() must be called before add_worksheet()" unless sheets.empty?
+
       @date_1904 = ptrue?(mode)
     end
 
@@ -167,31 +168,29 @@ module Writexlsx
     #
     # user must not use. it is internal method.
     #
-    def set_xml_writer(filename)  #:nodoc:
+    def set_xml_writer(filename)  # :nodoc:
       @writer.set_xml_writer(filename)
     end
 
     #
     # user must not use. it is internal method.
     #
-    def xml_str  #:nodoc:
+    def xml_str  # :nodoc:
       @writer.string
     end
 
     #
     # user must not use. it is internal method.
     #
-    def assemble_xml_file  #:nodoc:
+    def assemble_xml_file  # :nodoc:
       return unless @writer
 
       # Prepare format object for passing to Style.rb.
       prepare_format_properties
 
       write_xml_declaration do
-
         # Write the root workbook element.
         write_workbook do
-
           # Write the XLSX file version.
           write_file_version
 
@@ -214,7 +213,7 @@ module Writexlsx
           write_calc_pr
 
           # Write the workbook extension storage.
-          #write_ext_lst
+          # write_ext_lst
         end
       end
     end
@@ -223,7 +222,7 @@ module Writexlsx
     # At least one worksheet should be added to a new workbook. A worksheet is used to write data into cells:
     #
     def add_worksheet(name = '')
-      name  = check_sheetname(name)
+      name = check_sheetname(name)
       worksheet = Worksheet.new(self, @worksheets.size, name)
       @worksheets << worksheet
       worksheet
@@ -256,7 +255,7 @@ module Writexlsx
         # Check the worksheet name for non-embedded charts.
         sheetname  = check_chart_sheetname(name)
         chartsheet = Chartsheet.new(self, @worksheets.size, sheetname)
-        chartsheet.chart   = chart
+        chartsheet.chart = chart
         @worksheets << chartsheet
       end
       @charts << chart
@@ -274,9 +273,7 @@ module Writexlsx
     #
     def add_format(property_hash = {})
       properties = {}
-      if @excel2003_style
-        properties.update(:font => 'Arial', :size => 10, :theme => -1)
-      end
+      properties.update(:font => 'Arial', :size => 10, :theme => -1) if @excel2003_style
       properties.update(property_hash)
 
       format = Format.new(@formats, properties)
@@ -295,7 +292,7 @@ module Writexlsx
       shape.palette = @palette
 
       @shapes ||= []
-      @shapes << shape  #Store shape reference.
+      @shapes << shape  # Store shape reference.
       shape
     end
 
@@ -309,63 +306,55 @@ module Writexlsx
 
       # Local defined names are formatted like "Sheet1!name".
       if name =~ /^(.*)!(.*)$/
-        sheetname   = $1
-        name        = $2
+        sheetname   = ::Regexp.last_match(1)
+        name        = ::Regexp.last_match(2)
         sheet_index = @worksheets.index_by_name(sheetname)
       else
         sheet_index = -1   # Use -1 to indicate global names.
       end
 
       # Raise if the sheet index wasn't found.
-      if !sheet_index
-       raise "Unknown sheet name #{sheetname} in defined_name()"
-      end
+      raise "Unknown sheet name #{sheetname} in defined_name()" unless sheet_index
 
       # Raise if the name contains invalid chars as defined by Excel help.
       # Refer to the following to see Excel's syntax rules for defined names:
       # http://office.microsoft.com/en-001/excel-help/define-and-use-names-in-formulas-HA010147120.aspx#BMsyntax_rules_for_names
       #
-      if name =~ /\A[-0-9 !"#\$%&'\(\)\*\+,\.:;<=>\?@\[\]\^`\{\}~]/ || name =~ /.+[- !"#\$%&'\(\)\*\+,\\:;<=>\?@\[\]\^`\{\}~]/
-        raise "Invalid characters in name '#{name}' used in defined_name()"
-      end
+      raise "Invalid characters in name '#{name}' used in defined_name()" if name =~ /\A[-0-9 !"#$%&'()*+,.:;<=>?@\[\]\^`{}~]/ || name =~ /.+[- !"#$%&'()*+,\\:;<=>?@\[\]\^`{}~]/
 
       # Raise if the name looks like a cell name.
-      if name =~ %r(^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$)
-        raise "Invalid name '#{name}' looks like a cell name in defined_name()"
-      end
+      raise "Invalid name '#{name}' looks like a cell name in defined_name()" if name =~ /^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$/
 
       # Raise if the name looks like a R1C1
-      if name =~ /\A[rcRC]\Z/ || name =~ /\A[rcRC]\d+[rcRC]\d+\Z/
-        raise "Invalid name '#{name}' like a RC cell ref in defined_name()"
-      end
+      raise "Invalid name '#{name}' like a RC cell ref in defined_name()" if name =~ /\A[rcRC]\Z/ || name =~ /\A[rcRC]\d+[rcRC]\d+\Z/
 
-      @defined_names.push([ name, sheet_index, formula.sub(/^=/, '') ])
+      @defined_names.push([name, sheet_index, formula.sub(/^=/, '')])
     end
 
     #
     # Set the workbook size.
     #
     def set_size(width = nil, height = nil)
-      if ptrue?(width)
-        # Convert to twips at 96 dpi.
-        @window_width = width.to_i * 1440 / 96
-      else
-        @window_width = 16095
-      end
+      @window_width = if ptrue?(width)
+                        # Convert to twips at 96 dpi.
+                        width.to_i * 1440 / 96
+                      else
+                        16095
+                      end
 
-      if ptrue?(height)
-        # Convert to twips at 96 dpi.
-        @window_height = height.to_i * 1440 / 96
-      else
-        @window_height = 9660
-      end
+      @window_height = if ptrue?(height)
+                         # Convert to twips at 96 dpi.
+                         height.to_i * 1440 / 96
+                       else
+                         9660
+                       end
     end
 
     #
     # Set the ratio of space for worksheet tabs.
     #
     def set_tab_ratio(tab_ratio = nil)
-      return if !tab_ratio
+      return unless tab_ratio
 
       if tab_ratio < 0 || tab_ratio > 100
         raise "Tab ratio outside range: 0 <= zoom <= 100"
@@ -416,40 +405,34 @@ module Writexlsx
     # Set a user defined custom document property.
     #
     def set_custom_property(name, value, type = nil)
-    # Valid types.
+      # Valid types.
       valid_type = {
         'text'       => 1,
         'date'       => 1,
         'number'     => 1,
         'number_int' => 1,
-        'bool'       => 1,
+        'bool'       => 1
       }
 
-      if !name || (type != 'bool' && !value)
-        raise "The name and value parameters must be defined in set_custom_property()"
-      end
+      raise "The name and value parameters must be defined in set_custom_property()" if !name || (type != 'bool' && !value)
 
       # Determine the type for strings and numbers if it hasn't been specified.
-      if !ptrue?(type)
-        if value =~ /^\d+$/
-            type = 'number_int'
-        elsif value =~
-            /^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/
-          type = 'number'
-        else
-          type = 'text'
-        end
+      unless ptrue?(type)
+        type = if value =~ /^\d+$/
+                 'number_int'
+               elsif value =~
+                     /^([+-]?)(?=[0-9]|\.[0-9])[0-9]*(\.[0-9]*)?([Ee]([+-]?[0-9]+))?$/
+                 'number'
+               else
+                 'text'
+               end
       end
 
       # Check for valid validation types.
-      if !valid_type[type]
-        raise "Unknown custom type '$type' in set_custom_property()"
-      end
+      raise "Unknown custom type '$type' in set_custom_property()" unless valid_type[type]
 
       #  Check for strings longer than Excel's limit of 255 chars.
-      if type == 'text' && value.length > 255
-        raise "Length of text custom value '$value' exceeds Excel's limit of 255 in set_custom_property()"
-      end
+      raise "Length of text custom value '$value' exceeds Excel's limit of 255 in set_custom_property()" if type == 'text' && value.length > 255
 
       if type == 'bool'
         value = value ? 1 : 0
@@ -457,7 +440,6 @@ module Writexlsx
 
       @custom_properties << [name, value, type]
     end
-
 
     #
     # The add_vba_project method can be used to add macros or functions to an
@@ -472,11 +454,7 @@ module Writexlsx
     # Set the VBA name for the workbook.
     #
     def set_vba_name(vba_codename = nil)
-      if vba_codename
-        @vba_codename = vba_codename
-      else
-        @vba_codename = 'ThisWorkbook'
-      end
+      @vba_codename = vba_codename || 'ThisWorkbook'
     end
 
     #
@@ -495,7 +473,7 @@ module Writexlsx
       @calc_mode = mode || 'auto'
 
       if mode == 'manual'
-          @calc_on_load = false
+        @calc_on_load = false
       elsif mode == 'auto_except_tables'
         @calc_mode = 'autoNoTable'
       end
@@ -508,9 +486,7 @@ module Writexlsx
     # with write_url(). The format is the hyperlink style defined by Excel for the
     # default theme.
     #
-    def default_url_format
-      @default_url_format
-    end
+    attr_reader :default_url_format
     alias get_default_url_format default_url_format
 
     #
@@ -519,15 +495,13 @@ module Writexlsx
     def set_custom_color(index, red = 0, green = 0, blue = 0)
       # Match a HTML #xxyyzz style parameter
       if red.to_s =~ /^#(\w\w)(\w\w)(\w\w)/
-        red   = $1.hex
-        green = $2.hex
-        blue  = $3.hex
+        red   = ::Regexp.last_match(1).hex
+        green = ::Regexp.last_match(2).hex
+        blue  = ::Regexp.last_match(3).hex
       end
 
       # Check that the colour index is the right range
-      if index < 8 || index > 64
-        raise "Color index #{index} outside range: 8 <= index <= 64"
-      end
+      raise "Color index #{index} outside range: 8 <= index <= 64" if index < 8 || index > 64
 
       # Check that the colour components are in the right range
       if (red   < 0 || red   > 255) ||
@@ -536,7 +510,7 @@ module Writexlsx
         raise "Color component outside range: 0 <= color <= 255"
       end
 
-      index -=8       # Adjust colour index (wingless dragonfly)
+      index -= 8       # Adjust colour index (wingless dragonfly)
 
       # Set the RGB value
       @palette[index] = [red, green, blue]
@@ -547,15 +521,11 @@ module Writexlsx
       index + 8
     end
 
-    def activesheet=(worksheet) #:nodoc:
-      @activesheet = worksheet
-    end
+    attr_writer :activesheet
 
-    def writer #:nodoc:
-      @writer
-    end
+    attr_reader :writer
 
-    def date_1904? #:nodoc:
+    def date_1904? # :nodoc:
       @date_1904 ||= false
       !!@date_1904
     end
@@ -565,7 +535,7 @@ module Writexlsx
     # return the string index.
     #
     EMPTY_HASH = {}.freeze
-    def shared_string_index(str) #:nodoc:
+    def shared_string_index(str) # :nodoc:
       @shared_strings.index(str, EMPTY_HASH)
     end
 
@@ -615,11 +585,11 @@ module Writexlsx
       @worksheets.worksheets
     end
 
-    def firstsheet #:nodoc:
+    def firstsheet # :nodoc:
       @firstsheet ||= 0
     end
 
-    def activesheet #:nodoc:
+    def activesheet # :nodoc:
       @activesheet ||= 0
     end
 
@@ -639,7 +609,7 @@ module Writexlsx
       @fileobj
     end
 
-    def setup_filename #:nodoc:
+    def setup_filename # :nodoc:
       if @file.respond_to?(:to_str) && @file != ''
         @filename = @file
         @fileobj  = nil
@@ -651,71 +621,69 @@ module Writexlsx
       end
     end
 
-    def tempdir
-      @tempdir
-    end
+    attr_reader :tempdir
 
     #
     # Sets the colour palette to the Excel defaults.
     #
-    def set_color_palette #:nodoc:
+    def set_color_palette # :nodoc:
       @palette = [
-        [ 0x00, 0x00, 0x00, 0x00 ],    # 8
-        [ 0xff, 0xff, 0xff, 0x00 ],    # 9
-        [ 0xff, 0x00, 0x00, 0x00 ],    # 10
-        [ 0x00, 0xff, 0x00, 0x00 ],    # 11
-        [ 0x00, 0x00, 0xff, 0x00 ],    # 12
-        [ 0xff, 0xff, 0x00, 0x00 ],    # 13
-        [ 0xff, 0x00, 0xff, 0x00 ],    # 14
-        [ 0x00, 0xff, 0xff, 0x00 ],    # 15
-        [ 0x80, 0x00, 0x00, 0x00 ],    # 16
-        [ 0x00, 0x80, 0x00, 0x00 ],    # 17
-        [ 0x00, 0x00, 0x80, 0x00 ],    # 18
-        [ 0x80, 0x80, 0x00, 0x00 ],    # 19
-        [ 0x80, 0x00, 0x80, 0x00 ],    # 20
-        [ 0x00, 0x80, 0x80, 0x00 ],    # 21
-        [ 0xc0, 0xc0, 0xc0, 0x00 ],    # 22
-        [ 0x80, 0x80, 0x80, 0x00 ],    # 23
-        [ 0x99, 0x99, 0xff, 0x00 ],    # 24
-        [ 0x99, 0x33, 0x66, 0x00 ],    # 25
-        [ 0xff, 0xff, 0xcc, 0x00 ],    # 26
-        [ 0xcc, 0xff, 0xff, 0x00 ],    # 27
-        [ 0x66, 0x00, 0x66, 0x00 ],    # 28
-        [ 0xff, 0x80, 0x80, 0x00 ],    # 29
-        [ 0x00, 0x66, 0xcc, 0x00 ],    # 30
-        [ 0xcc, 0xcc, 0xff, 0x00 ],    # 31
-        [ 0x00, 0x00, 0x80, 0x00 ],    # 32
-        [ 0xff, 0x00, 0xff, 0x00 ],    # 33
-        [ 0xff, 0xff, 0x00, 0x00 ],    # 34
-        [ 0x00, 0xff, 0xff, 0x00 ],    # 35
-        [ 0x80, 0x00, 0x80, 0x00 ],    # 36
-        [ 0x80, 0x00, 0x00, 0x00 ],    # 37
-        [ 0x00, 0x80, 0x80, 0x00 ],    # 38
-        [ 0x00, 0x00, 0xff, 0x00 ],    # 39
-        [ 0x00, 0xcc, 0xff, 0x00 ],    # 40
-        [ 0xcc, 0xff, 0xff, 0x00 ],    # 41
-        [ 0xcc, 0xff, 0xcc, 0x00 ],    # 42
-        [ 0xff, 0xff, 0x99, 0x00 ],    # 43
-        [ 0x99, 0xcc, 0xff, 0x00 ],    # 44
-        [ 0xff, 0x99, 0xcc, 0x00 ],    # 45
-        [ 0xcc, 0x99, 0xff, 0x00 ],    # 46
-        [ 0xff, 0xcc, 0x99, 0x00 ],    # 47
-        [ 0x33, 0x66, 0xff, 0x00 ],    # 48
-        [ 0x33, 0xcc, 0xcc, 0x00 ],    # 49
-        [ 0x99, 0xcc, 0x00, 0x00 ],    # 50
-        [ 0xff, 0xcc, 0x00, 0x00 ],    # 51
-        [ 0xff, 0x99, 0x00, 0x00 ],    # 52
-        [ 0xff, 0x66, 0x00, 0x00 ],    # 53
-        [ 0x66, 0x66, 0x99, 0x00 ],    # 54
-        [ 0x96, 0x96, 0x96, 0x00 ],    # 55
-        [ 0x00, 0x33, 0x66, 0x00 ],    # 56
-        [ 0x33, 0x99, 0x66, 0x00 ],    # 57
-        [ 0x00, 0x33, 0x00, 0x00 ],    # 58
-        [ 0x33, 0x33, 0x00, 0x00 ],    # 59
-        [ 0x99, 0x33, 0x00, 0x00 ],    # 60
-        [ 0x99, 0x33, 0x66, 0x00 ],    # 61
-        [ 0x33, 0x33, 0x99, 0x00 ],    # 62
-        [ 0x33, 0x33, 0x33, 0x00 ],    # 63
+        [0x00, 0x00, 0x00, 0x00],    # 8
+        [0xff, 0xff, 0xff, 0x00],    # 9
+        [0xff, 0x00, 0x00, 0x00],    # 10
+        [0x00, 0xff, 0x00, 0x00],    # 11
+        [0x00, 0x00, 0xff, 0x00],    # 12
+        [0xff, 0xff, 0x00, 0x00],    # 13
+        [0xff, 0x00, 0xff, 0x00],    # 14
+        [0x00, 0xff, 0xff, 0x00],    # 15
+        [0x80, 0x00, 0x00, 0x00],    # 16
+        [0x00, 0x80, 0x00, 0x00],    # 17
+        [0x00, 0x00, 0x80, 0x00],    # 18
+        [0x80, 0x80, 0x00, 0x00],    # 19
+        [0x80, 0x00, 0x80, 0x00],    # 20
+        [0x00, 0x80, 0x80, 0x00],    # 21
+        [0xc0, 0xc0, 0xc0, 0x00],    # 22
+        [0x80, 0x80, 0x80, 0x00],    # 23
+        [0x99, 0x99, 0xff, 0x00],    # 24
+        [0x99, 0x33, 0x66, 0x00],    # 25
+        [0xff, 0xff, 0xcc, 0x00],    # 26
+        [0xcc, 0xff, 0xff, 0x00],    # 27
+        [0x66, 0x00, 0x66, 0x00],    # 28
+        [0xff, 0x80, 0x80, 0x00],    # 29
+        [0x00, 0x66, 0xcc, 0x00],    # 30
+        [0xcc, 0xcc, 0xff, 0x00],    # 31
+        [0x00, 0x00, 0x80, 0x00],    # 32
+        [0xff, 0x00, 0xff, 0x00],    # 33
+        [0xff, 0xff, 0x00, 0x00],    # 34
+        [0x00, 0xff, 0xff, 0x00],    # 35
+        [0x80, 0x00, 0x80, 0x00],    # 36
+        [0x80, 0x00, 0x00, 0x00],    # 37
+        [0x00, 0x80, 0x80, 0x00],    # 38
+        [0x00, 0x00, 0xff, 0x00],    # 39
+        [0x00, 0xcc, 0xff, 0x00],    # 40
+        [0xcc, 0xff, 0xff, 0x00],    # 41
+        [0xcc, 0xff, 0xcc, 0x00],    # 42
+        [0xff, 0xff, 0x99, 0x00],    # 43
+        [0x99, 0xcc, 0xff, 0x00],    # 44
+        [0xff, 0x99, 0xcc, 0x00],    # 45
+        [0xcc, 0x99, 0xff, 0x00],    # 46
+        [0xff, 0xcc, 0x99, 0x00],    # 47
+        [0x33, 0x66, 0xff, 0x00],    # 48
+        [0x33, 0xcc, 0xcc, 0x00],    # 49
+        [0x99, 0xcc, 0x00, 0x00],    # 50
+        [0xff, 0xcc, 0x00, 0x00],    # 51
+        [0xff, 0x99, 0x00, 0x00],    # 52
+        [0xff, 0x66, 0x00, 0x00],    # 53
+        [0x66, 0x66, 0x99, 0x00],    # 54
+        [0x96, 0x96, 0x96, 0x00],    # 55
+        [0x00, 0x33, 0x66, 0x00],    # 56
+        [0x33, 0x99, 0x66, 0x00],    # 57
+        [0x00, 0x33, 0x00, 0x00],    # 58
+        [0x33, 0x33, 0x00, 0x00],    # 59
+        [0x99, 0x33, 0x00, 0x00],    # 60
+        [0x99, 0x33, 0x66, 0x00],    # 61
+        [0x33, 0x33, 0x99, 0x00],    # 62
+        [0x33, 0x33, 0x33, 0x00]    # 63
       ]
     end
 
@@ -723,7 +691,7 @@ module Writexlsx
     # Check for valid worksheet names. We check the length, if it contains any
     # invalid characters and if the name is unique in the workbook.
     #
-    def check_sheetname(name) #:nodoc:
+    def check_sheetname(name) # :nodoc:
       @worksheets.make_and_check_sheet_chart_name(:sheet, name)
     end
 
@@ -735,21 +703,22 @@ module Writexlsx
     # Convert a range formula such as Sheet1!$B$1:$B$5 into a sheet name and cell
     # range such as ( 'Sheet1', 0, 1, 4, 1 ).
     #
-    def get_chart_range(range) #:nodoc:
+    def get_chart_range(range) # :nodoc:
       # Split the range formula into sheetname and cells at the last '!'.
       pos = range.rindex('!')
       return nil unless pos
 
       if pos > 0
         sheetname = range[0, pos]
-        cells = range[pos + 1 .. -1]
+        cells = range[pos + 1..-1]
       end
 
       # Split the cell range into 2 cells or else use single cell for both.
       if cells =~ /:/
         cell_1, cell_2 = cells.split(/:/)
       else
-        cell_1, cell_2 = cells, cells
+        cell_1 = cells
+        cell_2 = cells
       end
 
       # Remove leading/trailing apostrophes and convert escaped quotes to single.
@@ -762,33 +731,30 @@ module Writexlsx
 
       # Check that we have a 1D range only.
       return nil if row_start != row_end && col_start != col_end
-      return [sheetname, row_start, col_start, row_end, col_end]
+
+      [sheetname, row_start, col_start, row_end, col_end]
     end
 
-    def write_workbook #:nodoc:
-      schema  = 'http://schemas.openxmlformats.org'
+    def write_workbook(&block) # :nodoc:
+      schema = 'http://schemas.openxmlformats.org'
       attributes = [
         ['xmlns',
          schema + '/spreadsheetml/2006/main'],
         ['xmlns:r',
          schema + '/officeDocument/2006/relationships']
       ]
-      @writer.tag_elements('workbook', attributes) do
-        yield
-      end
+      @writer.tag_elements('workbook', attributes, &block)
     end
 
-    def write_file_version #:nodoc:
+    def write_file_version # :nodoc:
       attributes = [
-        ['appName', 'xl'],
+        %w[appName xl],
         ['lastEdited', 4],
         ['lowestEdited', 4],
         ['rupBuild', 4505]
       ]
 
-      if @vba_project
-        attributes << [:codeName, '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}']
-      end
+      attributes << [:codeName, '{37E998C4-C9E5-D4B9-71C8-EB1FF731991C}'] if @vba_project
 
       @writer.empty_tag('fileVersion', attributes)
     end
@@ -797,14 +763,14 @@ module Writexlsx
     # Write the <fileSharing> element.
     #
     def write_file_sharing
-      return if !ptrue?(@read_only)
+      return unless ptrue?(@read_only)
 
       attributes = []
       attributes << ['readOnlyRecommended', 1]
       @writer.empty_tag('fileSharing', attributes)
     end
 
-    def write_workbook_pr #:nodoc:
+    def write_workbook_pr # :nodoc:
       attributes = []
       attributes << ['codeName', @vba_codename]  if ptrue?(@vba_codename)
       attributes << ['date1904', 1]              if date_1904?
@@ -812,38 +778,32 @@ module Writexlsx
       @writer.empty_tag('workbookPr', attributes)
     end
 
-    def write_book_views #:nodoc:
+    def write_book_views # :nodoc:
       @writer.tag_elements('bookViews') { write_workbook_view }
     end
 
-    def write_workbook_view #:nodoc:
+    def write_workbook_view # :nodoc:
       attributes = [
         ['xWindow',       @x_window],
         ['yWindow',       @y_window],
         ['windowWidth',   @window_width],
         ['windowHeight',  @window_height]
       ]
-      if @tab_ratio != 600
-        attributes << ['tabRatio', @tab_ratio]
-      end
-      if @firstsheet > 0
-        attributes << ['firstSheet', @firstsheet + 1]
-      end
-      if @activesheet > 0
-        attributes << ['activeTab', @activesheet]
-      end
+      attributes << ['tabRatio', @tab_ratio] if @tab_ratio != 600
+      attributes << ['firstSheet', @firstsheet + 1] if @firstsheet > 0
+      attributes << ['activeTab', @activesheet] if @activesheet > 0
       @writer.empty_tag('workbookView', attributes)
     end
 
-    def write_calc_pr #:nodoc:
-      attributes = [ ['calcId', @calc_id] ]
+    def write_calc_pr # :nodoc:
+      attributes = [['calcId', @calc_id]]
 
       case @calc_mode
       when 'manual'
-        attributes << ['calcMode', 'manual']
+        attributes << %w[calcMode manual]
         attributes << ['calcOnSave', 0]
       when 'autoNoTable'
-        attributes << ['calcMode', 'autoNoTable']
+        attributes << %w[calcMode autoNoTable]
       end
 
       attributes << ['fullCalcOnLoad', 1] if @calc_on_load
@@ -851,11 +811,11 @@ module Writexlsx
       @writer.empty_tag('calcPr', attributes)
     end
 
-    def write_ext_lst #:nodoc:
+    def write_ext_lst # :nodoc:
       @writer.tag_elements('extLst') { write_ext }
     end
 
-    def write_ext #:nodoc:
+    def write_ext # :nodoc:
       attributes = [
         ['xmlns:mx', "#{OFFICE_URL}mac/excel/2008/main"],
         ['uri', uri]
@@ -863,41 +823,42 @@ module Writexlsx
       @writer.tag_elements('ext', attributes) { write_mx_arch_id }
     end
 
-    def write_mx_arch_id #:nodoc:
+    def write_mx_arch_id # :nodoc:
       @writer.empty_tag('mx:ArchID', ['Flags', 2])
     end
 
-    def write_defined_names #:nodoc:
+    def write_defined_names # :nodoc:
       return unless ptrue?(@defined_names)
+
       @writer.tag_elements('definedNames') do
         @defined_names.each { |defined_name| write_defined_name(defined_name) }
       end
     end
 
-    def write_defined_name(defined_name) #:nodoc:
+    def write_defined_name(defined_name) # :nodoc:
       name, id, range, hidden = defined_name
 
-      attributes = [ ['name', name] ]
+      attributes = [['name', name]]
       attributes << ['localSheetId', "#{id}"] unless id == -1
-      attributes << ['hidden',       '1']     if hidden
+      attributes << %w[hidden 1]     if hidden
 
       @writer.data_element('definedName', range, attributes)
     end
 
-    def write_io(str) #:nodoc:
+    def write_io(str) # :nodoc:
       @writer << str
       str
     end
 
     # for test
-    def defined_names #:nodoc:
+    def defined_names # :nodoc:
       @defined_names ||= []
     end
 
     #
     # Assemble worksheets into a workbook.
     #
-    def store_workbook #:nodoc:
+    def store_workbook # :nodoc:
       # Add a default worksheet if non have been added.
       add_worksheet if @worksheets.empty?
 
@@ -953,13 +914,13 @@ module Writexlsx
     # files
     #
     def parts
-      Dir.glob(File.join(tempdir, "**", "*"), File::FNM_DOTMATCH).select {|f| File.file?(f)}
+      Dir.glob(File.join(tempdir, "**", "*"), File::FNM_DOTMATCH).select { |f| File.file?(f) }
     end
 
     #
     # Prepare all of the format properties prior to passing them to Styles.rb.
     #
-    def prepare_format_properties #:nodoc:
+    def prepare_format_properties # :nodoc:
       # Separate format objects into XF and DXF formats.
       prepare_formats
 
@@ -980,7 +941,7 @@ module Writexlsx
     # Iterate through the XF Format objects and separate them into XF and DXF
     # formats.
     #
-    def prepare_formats #:nodoc:
+    def prepare_formats # :nodoc:
       @formats.formats.each do |format|
         xf_index  = format.xf_index
         dxf_index = format.dxf_index
@@ -994,7 +955,7 @@ module Writexlsx
     # Iterate through the XF Format objects and give them an index to non-default
     # font elements.
     #
-    def prepare_fonts #:nodoc:
+    def prepare_fonts # :nodoc:
       fonts = {}
 
       @xf_formats.each { |format| format.set_font_info(fonts) }
@@ -1005,9 +966,7 @@ module Writexlsx
       @dxf_formats.each do |format|
         # The only font properties that can change for a DXF format are: color,
         # bold, italic, underline and strikethrough.
-        if format.color? || format.bold? || format.italic? || format.underline? || format.strikeout?
-          format.has_dxf_font(true)
-        end
+        format.has_dxf_font(true) if format.color? || format.bold? || format.italic? || format.underline? || format.strikeout?
       end
     end
 
@@ -1017,7 +976,7 @@ module Writexlsx
     #
     # User defined records start from index 0xA4.
     #
-    def prepare_num_formats #:nodoc:
+    def prepare_num_formats # :nodoc:
       num_formats      = {}
       index            = 164
       num_format_count = 0
@@ -1031,9 +990,7 @@ module Writexlsx
         #
         if num_format.to_s =~ /^\d+$/ && num_format.to_s !~ /^0+\d/
           # Number format '0' is indexed as 1 in Excel.
-          if num_format == 0
-            num_format = 1
-          end
+          num_format = 1 if num_format == 0
           # Index to a built-in number format.
           format.num_format_index = num_format
           next
@@ -1064,7 +1021,7 @@ module Writexlsx
     # Iterate through the XF Format objects and give them an index to non-default
     # border elements.
     #
-    def prepare_borders #:nodoc:
+    def prepare_borders # :nodoc:
       borders = {}
 
       @xf_formats.each { |format| format.set_border_info(borders) }
@@ -1085,7 +1042,7 @@ module Writexlsx
     # The user defined fill properties start from 2 since there are 2 default
     # fills: patternType="none" and patternType="gray125".
     #
-    def prepare_fills #:nodoc:
+    def prepare_fills # :nodoc:
       fills = {}
       index = 2    # Start from 2. See above.
 
@@ -1095,11 +1052,11 @@ module Writexlsx
 
       # Store the DXF colors separately since them may be reversed below.
       @dxf_formats.each do |format|
-        if  format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
-          format.has_dxf_fill(true)
-          format.dxf_bg_color = format.bg_color
-          format.dxf_fg_color = format.fg_color
-        end
+        next unless format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
+
+        format.has_dxf_fill(true)
+        format.dxf_bg_color = format.bg_color
+        format.dxf_fg_color = format.fg_color
       end
 
       @xf_formats.each do |format|
@@ -1153,7 +1110,7 @@ module Writexlsx
     # any user defined names. Stores the defined names for the Workbook.xml and
     # the named ranges for App.xml.
     #
-    def prepare_defined_names #:nodoc:
+    def prepare_defined_names # :nodoc:
       @worksheets.each do |sheet|
         # Check for Print Area settings.
         if sheet.autofilter_area
@@ -1166,7 +1123,7 @@ module Writexlsx
         end
 
         # Check for Print Area settings.
-        if !sheet.print_area.empty?
+        unless sheet.print_area.empty?
           @defined_names << [
             '_xlnm.Print_Area',
             sheet.index,
@@ -1175,26 +1132,26 @@ module Writexlsx
         end
 
         # Check for repeat rows/cols. aka, Print Titles.
-        if !sheet.print_repeat_cols.empty? || !sheet.print_repeat_rows.empty?
-          if !sheet.print_repeat_cols.empty? && !sheet.print_repeat_rows.empty?
-            range = sheet.print_repeat_cols + ',' + sheet.print_repeat_rows
-          else
-            range = sheet.print_repeat_cols + sheet.print_repeat_rows
-          end
+        next unless !sheet.print_repeat_cols.empty? || !sheet.print_repeat_rows.empty?
 
-          # Store the defined names.
-          @defined_names << ['_xlnm.Print_Titles', sheet.index, range]
-        end
+        range = if !sheet.print_repeat_cols.empty? && !sheet.print_repeat_rows.empty?
+                  sheet.print_repeat_cols + ',' + sheet.print_repeat_rows
+                else
+                  sheet.print_repeat_cols + sheet.print_repeat_rows
+                end
+
+        # Store the defined names.
+        @defined_names << ['_xlnm.Print_Titles', sheet.index, range]
       end
 
-      @defined_names  = sort_defined_names(@defined_names)
+      @defined_names = sort_defined_names(@defined_names)
       @named_ranges  = extract_named_ranges(@defined_names)
     end
 
     #
     # Iterate through the worksheets and set up the VML objects.
     #
-    def prepare_vml_objects  #:nodoc:
+    def prepare_vml_objects  # :nodoc:
       comment_id     = 0
       vml_drawing_id = 0
       vml_data_id    = 1
@@ -1205,6 +1162,7 @@ module Writexlsx
 
       @worksheets.each do |sheet|
         next if !sheet.has_vml? && !sheet.has_header_vml?
+
         if sheet.has_vml?
           if sheet.has_comments?
             comment_files += 1
@@ -1219,8 +1177,8 @@ module Writexlsx
           )
 
           # Each VML file should start with a shape id incremented by 1024.
-          vml_data_id  +=    1 * ( 1 + sheet.num_comments_block )
-          vml_shape_id += 1024 * ( 1 + sheet.num_comments_block )
+          vml_data_id += 1 * (1 + sheet.num_comments_block)
+          vml_shape_id += 1024 * (1 + sheet.num_comments_block)
         end
 
         if sheet.has_header_vml?
@@ -1233,17 +1191,13 @@ module Writexlsx
         # has a vbaProject binary.
         unless sheet.buttons_data.empty?
           has_button = true
-          if @vba_project && !sheet.vba_codename
-            sheet.set_vba_name
-          end
+          sheet.set_vba_name if @vba_project && !sheet.vba_codename
         end
       end
 
       # Set the workbook vba_codename if one of the sheets has a button and
       # the workbook has a vbaProject binary.
-      if has_button && @vba_project && !@vba_codename
-        set_vba_name
-      end
+      set_vba_name if has_button && @vba_project && !@vba_codename
     end
 
     #
@@ -1274,7 +1228,7 @@ module Writexlsx
     # Add "cached" data to charts to provide the numCache and strCache data for
     # series and title/axis ranges.
     #
-    def add_chart_data #:nodoc:
+    def add_chart_data # :nodoc:
       worksheets = {}
       seen_ranges = {}
 
@@ -1282,8 +1236,8 @@ module Writexlsx
       @worksheets.each { |worksheet| worksheets[worksheet.name] = worksheet }
 
       # Build an array of the worksheet charts including any combined charts.
-      @charts.collect { |chart| [chart, chart.combined] }.flatten.compact.
-        each do |chart|
+      @charts.collect { |chart| [chart, chart.combined] }.flatten.compact
+             .each do |chart|
         chart.formula_ids.each do |range, id|
           # Skip if the series has user defined data.
           if chart.formula_data[id]
@@ -1311,9 +1265,7 @@ module Writexlsx
 
           # Raise if the name is unknown since it indicates a user error in
           # a chart series formula.
-          unless worksheets[sheetname]
-            raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n"
-          end
+          raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n" unless worksheets[sheetname]
 
           # Add the data to the chart.
           # And store range data locally to avoid lookup if seen agein.
@@ -1329,11 +1281,11 @@ module Writexlsx
 
       # Convert shared string indexes to strings.
       data.collect do |token|
-        if token.kind_of?(Hash)
+        if token.is_a?(Hash)
           string = @shared_strings.string(token[:sst_id])
 
           # Ignore rich strings for now. Deparse later if necessary.
-          if string =~ %r!^<r>! && string =~ %r!</r>$!
+          if string =~ /^<r>/ && string =~ %r{</r>$}
             ''
           else
             string
@@ -1350,7 +1302,7 @@ module Writexlsx
     # issues in the the Spreadsheet::WriteExcel binary version. Also makes
     # comparison testing easier.
     #
-    def sort_defined_names(names) #:nodoc:
+    def sort_defined_names(names) # :nodoc:
       names.sort do |a, b|
         name_a  = normalise_defined_name(a[0])
         name_b  = normalise_defined_name(b[0])
@@ -1361,26 +1313,24 @@ module Writexlsx
           1
         elsif name_a < name_b
           -1
-        else  # name_a == name_b
-        # Secondary sort based on the sheet name.
-          if sheet_a >= sheet_b
-            1
-          else
-            -1
-          end
+        elsif sheet_a >= sheet_b  # name_a == name_b
+          # Secondary sort based on the sheet name.
+          1
+        else
+          -1
         end
       end
     end
 
     # Used in the above sort routine to normalise the defined names. Removes any
     # leading '_xmln.' from internal names and lowercases the strings.
-    def normalise_defined_name(name) #:nodoc:
+    def normalise_defined_name(name) # :nodoc:
       name.sub(/^_xlnm./, '').downcase
     end
 
     # Used in the above sort routine to normalise the worksheet names for the
     # secondary sort. Removes leading quote and lowercases the strings.
-    def normalise_sheet_name(name) #:nodoc:
+    def normalise_sheet_name(name) # :nodoc:
       name.sub(/^'/, '').downcase
     end
 
@@ -1388,7 +1338,7 @@ module Writexlsx
     # Extract the named ranges from the sorted list of defined names. These are
     # used in the App.xml file.
     #
-    def extract_named_ranges(defined_names) #:nodoc:
+    def extract_named_ranges(defined_names) # :nodoc:
       named_ranges = []
 
       defined_names.each do |defined_name|
@@ -1398,19 +1348,19 @@ module Writexlsx
         next if name == '_xlnm._FilterDatabase'
 
         # We are only interested in defined names with ranges.
-        if range =~ /^([^!]+)!/
-          sheet_name = $1
+        next unless range =~ /^([^!]+)!/
 
-          # Match Print_Area and Print_Titles xlnm types.
-          if name =~ /^_xlnm\.(.*)$/
-            xlnm_type = $1
-            name = "#{sheet_name}!#{xlnm_type}"
-          elsif index != -1
-            name = "#{sheet_name}!#{name}"
-          end
+        sheet_name = ::Regexp.last_match(1)
 
-          named_ranges << name
+        # Match Print_Area and Print_Titles xlnm types.
+        if name =~ /^_xlnm\.(.*)$/
+          xlnm_type = ::Regexp.last_match(1)
+          name = "#{sheet_name}!#{xlnm_type}"
+        elsif index != -1
+          name = "#{sheet_name}!#{name}"
         end
+
+        named_ranges << name
       end
 
       named_ranges
@@ -1419,7 +1369,7 @@ module Writexlsx
     #
     # Iterate through the worksheets and set up any chart or image drawings.
     #
-    def prepare_drawings #:nodoc:
+    def prepare_drawings # :nodoc:
       chart_ref_id     = 0
       image_ref_id     = 0
       drawing_id       = 0
@@ -1480,13 +1430,13 @@ module Writexlsx
         end
 
         # Prepare the worksheet charts.
-        sheet.charts.each_with_index do |chart, index|
+        sheet.charts.each_with_index do |_chart, index|
           chart_ref_id += 1
           sheet.prepare_chart(index, chart_ref_id, drawing_id)
         end
 
         # Prepare the worksheet shapes.
-        sheet.shapes.each_with_index do |shape, index|
+        sheet.shapes.each_with_index do |_shape, index|
           sheet.prepare_shape(index, drawing_id)
         end
 
@@ -1542,8 +1492,8 @@ module Writexlsx
 
       # Sort the workbook charts references into the order that the were
       # written from the worksheets above.
-      @charts = @charts.select { |chart| chart.id != -1 }.
-        sort_by { |chart| chart.id }
+      @charts = @charts.select { |chart| chart.id != -1 }
+                       .sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
     end
@@ -1561,19 +1511,19 @@ module Writexlsx
       # Open the image file and import the data.
       data = File.binread(filename)
       md5  = Digest::MD5.hexdigest(data)
-      if data.unpack('x A3')[0] == 'PNG'
+      if data.unpack1('x A3') == 'PNG'
         # Test for PNGs.
         type, width, height, x_dpi, y_dpi = process_png(data)
         @image_types[:png] = 1
-      elsif data.unpack('n')[0] == 0xFFD8
+      elsif data.unpack1('n') == 0xFFD8
         # Test for JPEG files.
         type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
         @image_types[:jpeg] = 1
-      elsif data.unpack('A4')[0] == 'GIF8'
+      elsif data.unpack1('A4') == 'GIF8'
         # Test for GIFs.
         type, width, height, x_dpi, y_dpi = process_gif(data, filename)
         @image_types[:gif] = 1
-      elsif data.unpack('A2')[0] == 'BM'
+      elsif data.unpack1('A2') == 'BM'
         # Test for BMPs.
         type, width, height = process_bmp(data, filename)
         @image_types[:bmp] = 1
@@ -1606,17 +1556,17 @@ module Writexlsx
       # IHDR element. Also read the DPI in the pHYs element.
       while offset < data_length
 
-        length = data[offset + 0, 4].unpack("N")[0]
-        png_type   = data[offset + 4, 4].unpack("A4")[0]
+        length = data[offset + 0, 4].unpack1("N")
+        png_type   = data[offset + 4, 4].unpack1("A4")
 
         case png_type
         when "IHDR"
-          width  = data[offset +  8, 4].unpack("N")[0]
-          height = data[offset + 12, 4].unpack("N")[0]
+          width  = data[offset + 8, 4].unpack1("N")
+          height = data[offset + 12, 4].unpack1("N")
         when "pHYs"
-          x_ppu = data[offset +  8, 4].unpack("N")[0]
-          y_ppu = data[offset + 12, 4].unpack("N")[0]
-          units = data[offset + 16, 1].unpack("C")[0]
+          x_ppu = data[offset +  8, 4].unpack1("N")
+          y_ppu = data[offset + 12, 4].unpack1("N")
+          units = data[offset + 16, 1].unpack1("C")
 
           if units == 1
             x_dpi = x_ppu * 0.0254
@@ -1643,22 +1593,22 @@ module Writexlsx
 
       # Search through the image data to read the JPEG markers.
       while offset < data_length
-        marker  = data[offset+0, 2].unpack("n")[0]
-        length  = data[offset+2, 2].unpack("n")[0]
+        marker  = data[offset + 0, 2].unpack1("n")
+        length  = data[offset + 2, 2].unpack1("n")
 
         # Read the height and width in the 0xFFCn elements
         # (Except C4, C8 and CC which aren't SOF markers).
         if (marker & 0xFFF0) == 0xFFC0 &&
            marker != 0xFFC4 && marker != 0xFFCC
-          height = data[offset+5, 2].unpack("n")[0]
-          width  = data[offset+7, 2].unpack("n")[0]
+          height = data[offset + 5, 2].unpack1("n")
+          width  = data[offset + 7, 2].unpack1("n")
         end
 
         # Read the DPI in the 0xFFE0 element.
         if marker == 0xFFE0
-          units     = data[offset + 11, 1].unpack("C")[0]
-          x_density = data[offset + 12, 2].unpack("n")[0]
-          y_density = data[offset + 14, 2].unpack("n")[0]
+          units     = data[offset + 11, 1].unpack1("C")
+          x_density = data[offset + 12, 2].unpack1("n")
+          y_density = data[offset + 14, 2].unpack1("n")
 
           if units == 1
             x_dpi = x_density
@@ -1674,6 +1624,7 @@ module Writexlsx
       end
 
       raise "#{filename}: no size data found in jpeg image.\n" unless height
+
       [type, width, height, x_dpi, y_dpi]
     end
 
@@ -1685,18 +1636,16 @@ module Writexlsx
       x_dpi = 96
       y_dpi = 96
 
-      width  = data[6, 2].unpack("v")[0]
-      height = data[8, 2].unpack("v")[0]
+      width  = data[6, 2].unpack1("v")
+      height = data[8, 2].unpack1("v")
 
-      if height.nil?
-        raise "#{filename}: no size data found in gif image.\n"
-      end
+      raise "#{filename}: no size data found in gif image.\n" if height.nil?
 
       [type, width, height, x_dpi, y_dpi]
     end
 
     # Extract width and height information from a BMP file.
-    def process_bmp(data, filename)       #:nodoc:
+    def process_bmp(data, filename)       # :nodoc:
       type     = 'bmp'
 
       # Check that the file is big enough to be a bitmap.
@@ -1713,8 +1662,9 @@ module Writexlsx
       raise "#{filename}: only 1 plane supported in bitmap image." unless planes == 1
 
       # Read the bitmap compression. Verify compression.
-      compression = data.unpack("x30 V")[0]
+      compression = data.unpack1("x30 V")
       raise "#{filename}: compression not supported in bitmap image." unless compression == 0
+
       [type, width, height]
     end
   end

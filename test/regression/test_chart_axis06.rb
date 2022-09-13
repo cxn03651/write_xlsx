@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartAxis06 < Minitest::Test
@@ -20,16 +21,16 @@ class TestRegressionChartAxis06 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [47076480, 47078016])
 
     data = [
-            [ 2,  4,  6],
-            [60, 30, 10]
-           ]
+      [2,  4,  6],
+      [60, 30, 10]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$3',
-                     :values     => '=Sheet1!$B$1:$B$3'
-                     )
+      :categories => '=Sheet1!$A$1:$A$3',
+      :values     => '=Sheet1!$B$1:$B$3'
+    )
 
     chart.set_title(:name => 'Title')
     # Axis formatting should be ignored.

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat19 < Minitest::Test
@@ -59,6 +60,5 @@ class TestRegressionCondFormat19 < Minitest::Test
       nil,
       { 'xl/workbook.xml' => ['<workbookView'] }
     )
-
   end
 end

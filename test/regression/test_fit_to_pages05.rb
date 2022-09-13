@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFitToPages05 < Minitest::Test
@@ -28,7 +29,7 @@ class TestRegressionFitToPages05 < Minitest::Test
       ],
       {
         '[Content_Types].xml'      => ['<Default Extension="bin"'],
-        'xl/worksheets/sheet1.xml' => ['<pageMargins'],
+        'xl/worksheets/sheet1.xml' => ['<pageMargins']
       }
     )
   end

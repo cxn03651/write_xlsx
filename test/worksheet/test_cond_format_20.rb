@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -24,43 +25,47 @@ class TestCondFormat20 < Minitest::Test
     @worksheet.write('A3', 30)
     @worksheet.write('A4', 40)
 
-    @worksheet.conditional_formatting('A1:A4',
-                                      {
-                                        :type     => 'text',
-                                        :criteria => 'begins with',
-                                        :value    => 'b',
-                                        :format   => nil
-                                      }
-                                      )
+    @worksheet.conditional_formatting(
+      'A1:A4',
+      {
+        :type     => 'text',
+        :criteria => 'begins with',
+        :value    => 'b',
+        :format   => nil
+      }
+    )
 
-    @worksheet.conditional_formatting('A1:A4',
-                                      {
-                                        :type     => 'text',
-                                        :criteria => 'begins with',
-                                        :value    => 'bc',
-                                        :format   => nil
-                                      }
-                                      )
+    @worksheet.conditional_formatting(
+      'A1:A4',
+      {
+        :type     => 'text',
+        :criteria => 'begins with',
+        :value    => 'bc',
+        :format   => nil
+      }
+    )
 
-     @worksheet.conditional_formatting('A1:A4',
-                                      {
-                                        :type     => 'text',
-                                        :criteria => 'ends with',
-                                        :value    => 'z',
-                                        :format   => nil
-                                      }
-                                      )
+    @worksheet.conditional_formatting(
+      'A1:A4',
+      {
+        :type     => 'text',
+        :criteria => 'ends with',
+        :value    => 'z',
+        :format   => nil
+      }
+    )
 
-     @worksheet.conditional_formatting('A1:A4',
-                                      {
-                                        :type     => 'text',
-                                        :criteria => 'ends with',
-                                        :value    => 'yz',
-                                        :format   => nil
-                                      }
-                                      )
+    @worksheet.conditional_formatting(
+      'A1:A4',
+      {
+        :type     => 'text',
+        :criteria => 'ends with',
+        :value    => 'yz',
+        :format   => nil
+      }
+    )
 
-   @worksheet.assemble_xml_file
+    @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
 
     expected = expected_to_array(expected_xml)

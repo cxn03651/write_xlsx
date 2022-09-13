@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -26,16 +27,14 @@ class TestCondFormat04 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'duplicate',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'duplicate',
+                                        :format => nil
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'unique',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'unique',
+                                        :format => nil
+                                      })
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
 

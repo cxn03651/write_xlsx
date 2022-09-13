@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -57,21 +58,19 @@ class TestWritePrintOptions < Minitest::Test
     expected = '<printOptions gridLines="1"/>'
     assert_equal(expected, result)
   end
-=begin
-  def test_write_print_options_1_hide_gridlines
-    @worksheet.hide_gridlines
-    @worksheet.__send__('write_print_options', 1)
-    result = @worksheet.instance_variable_get(:@writer).string
-    expected = ''
-    assert_equal(expected, result)
-  end
-
-  def test_write_print_options_2_hide_gridlines_false
-    @worksheet.hide_gridlines(false)
-    @worksheet.__send__('write_print_options', 2)
-    result = @worksheet.instance_variable_get(:@writer).string
-    expected = '<printOptions gridLines="1"/>'
-    assert_equal(expected, result)
-  end
-=end
+  #   def test_write_print_options_1_hide_gridlines
+  #     @worksheet.hide_gridlines
+  #     @worksheet.__send__('write_print_options', 1)
+  #     result = @worksheet.instance_variable_get(:@writer).string
+  #     expected = ''
+  #     assert_equal(expected, result)
+  #   end
+  #
+  #   def test_write_print_options_2_hide_gridlines_false
+  #     @worksheet.hide_gridlines(false)
+  #     @worksheet.__send__('write_print_options', 2)
+  #     result = @worksheet.instance_variable_get(:@writer).string
+  #     expected = '<printOptions gridLines="1"/>'
+  #     assert_equal(expected, result)
+  #   end
 end

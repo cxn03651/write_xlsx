@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar02 < Minitest::Test
@@ -21,22 +22,22 @@ class TestRegressionChartBar02 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [93218304, 93219840])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet1.write('A1', 'Foo')
     worksheet2.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet2!$A$1:$A$5',
-                     :values     => '=Sheet2!$B$1:$B$5'
-                     )
+      :categories => '=Sheet2!$A$1:$A$5',
+      :values     => '=Sheet2!$B$1:$B$5'
+    )
     chart.add_series(
-                     :categories => '=Sheet2!$A$1:$A$5',
-                     :values     => '=Sheet2!$C$1:$C$5'
-                     )
+      :categories => '=Sheet2!$A$1:$A$5',
+      :values     => '=Sheet2!$C$1:$C$5'
+    )
 
     worksheet2.insert_chart('E9', chart)
 
@@ -45,9 +46,9 @@ class TestRegressionChartBar02 < Minitest::Test
       nil,
       {
         # Ignore the page margins.
-        'xl/charts/chart1.xml' => [ '<c:pageMargins' ],
+        'xl/charts/chart1.xml' => ['<c:pageMargins'],
         # Ignore the workbookView.
-        'xl/workbook.xml' => ['<workbookView']
+        'xl/workbook.xml'      => ['<workbookView']
       }
     )
   end

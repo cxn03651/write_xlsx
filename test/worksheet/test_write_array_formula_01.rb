@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -13,8 +14,8 @@ class TestWriteArrayFormula01 < Minitest::Test
   def test_write_array_formula
     format = nil
     @worksheet.select
-    @worksheet.write('B1', [ [ 500, 10 ], [ 300, 15 ] ])
-    @worksheet.write('B5', [ [ 1, 2, 3 ], [ 20234, 21003, 10000 ] ])
+    @worksheet.write('B1', [[500, 10], [300, 15]])
+    @worksheet.write('B5', [[1, 2, 3], [20234, 21003, 10000]])
 
     @worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}', format, 9500)
     @worksheet.write_array_formula('A2:A2', '{=SUM(B1:C1*B2:C2)}',   format, 9500)
@@ -92,7 +93,7 @@ class TestWriteArrayFormula01 < Minitest::Test
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>
 EOS
-)
+                                )
     assert_equal(expected, result)
   end
 end

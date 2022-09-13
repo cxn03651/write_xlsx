@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -25,18 +26,17 @@ class TestCondFormat05 < Minitest::Test
     @worksheet.write('A4', 40)
 
     [
-     'above', 'below', 'equal or above', 'equal or below',
-     '1 std dev above', '1 std dev below',
-     '2 std dev above', '2 std dev below',
-     '3 std dev above', '3 std dev below'
+      'above', 'below', 'equal or above', 'equal or below',
+      '1 std dev above', '1 std dev below',
+      '2 std dev above', '2 std dev below',
+      '3 std dev above', '3 std dev below'
     ].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
                                           :type     => 'average',
                                           :format   => nil,
                                           :criteria => criteria
-                                        }
-                                        )
+                                        })
     end
 
     @worksheet.assemble_xml_file

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -12,11 +13,12 @@ class TestWriteConditionalFormatting < Minitest::Test
   def test_conditional_formatting_01
     format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
-    @worksheet.conditional_formatting('A1',
-        :type     => 'cell',
-        :format   => format,
-        :criteria => 'greater than',
-        :value    => 5
+    @worksheet.conditional_formatting(
+      'A1',
+      :type     => 'cell',
+      :format   => format,
+      :criteria => 'greater than',
+      :value    => 5
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -27,11 +29,12 @@ class TestWriteConditionalFormatting < Minitest::Test
   def test_conditional_formatting_02
     format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
-    @worksheet.conditional_formatting('A2',
-        :type     => 'cell',
-        :format   => format,
-        :criteria => 'less than',
-        :value    => 30
+    @worksheet.conditional_formatting(
+      'A2',
+      :type     => 'cell',
+      :format   => format,
+      :criteria => 'less than',
+      :value    => 30
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -42,11 +45,12 @@ class TestWriteConditionalFormatting < Minitest::Test
   def test_conditional_formatting_03
     format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
-    @worksheet.conditional_formatting('A3',
-        :type     => 'cell',
-        :format   => nil,
-        :criteria => '>=',
-        :value    => 50
+    @worksheet.conditional_formatting(
+      'A3',
+      :type     => 'cell',
+      :format   => nil,
+      :criteria => '>=',
+      :value    => 50
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -57,12 +61,13 @@ class TestWriteConditionalFormatting < Minitest::Test
   def test_conditional_formatting_04
     format = Writexlsx::Format.new(Writexlsx::Formats.new)
 
-    @worksheet.conditional_formatting('A1',
-        :type     => 'cell',
-        :format   => format,
-        :criteria => 'between',
-        :minimum  => 10,
-        :maximum  => 20
+    @worksheet.conditional_formatting(
+      'A1',
+      :type     => 'cell',
+      :format   => format,
+      :criteria => 'between',
+      :minimum  => 10,
+      :maximum  => 20
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string

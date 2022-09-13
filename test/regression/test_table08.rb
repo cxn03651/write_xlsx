@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable08 < Minitest::Test
@@ -27,22 +28,22 @@ class TestRegressionTable08 < Minitest::Test
 
     # Add the table.
     worksheet.add_table(
-                        'C3:F14',
-                        {
-                          :total_row => 1,
-                          :columns   => [
-                                         {:total_string => 'Total'},
-                                         {},
-                                         {},
-                                         {:total_function => 'count'}
-                                        ]
-                        }
-                        )
+      'C3:F14',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          {},
+          { :total_function => 'count' }
+        ]
+      }
+    )
 
     workbook.close
     compare_for_regression(
-                                [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
-                                {  'xl/workbook.xml' => ['<workbookView'] }
-                                )
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
+      {  'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

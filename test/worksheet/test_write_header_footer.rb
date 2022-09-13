@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -13,9 +14,9 @@ class TestWriteHeaderFooter < Minitest::Test
 
   def test_write_odd_header
     @worksheet.set_header('Page &P of &N')
-    @worksheet.
-      instance_variable_get(:@page_setup).
-      __send__('write_odd_header', @writer)
+    @worksheet
+      .instance_variable_get(:@page_setup)
+      .__send__('write_odd_header', @writer)
     result = @writer.string
     expected = '<oddHeader>Page &amp;P of &amp;N</oddHeader>'
     assert_equal(expected, result)
@@ -23,9 +24,9 @@ class TestWriteHeaderFooter < Minitest::Test
 
   def test_write_odd_footer
     @worksheet.set_footer('&F')
-    @worksheet.
-      instance_variable_get(:@page_setup).
-      __send__('write_odd_footer', @writer)
+    @worksheet
+      .instance_variable_get(:@page_setup)
+      .__send__('write_odd_footer', @writer)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<oddFooter>&amp;F</oddFooter>'
     assert_equal(expected, result)

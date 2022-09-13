@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHeaderImage15 < Minitest::Test
@@ -17,19 +18,18 @@ class TestRegressionHeaderImage15 < Minitest::Test
     worksheet2 = workbook.add_worksheet
 
     worksheet1.set_header(
-      '&L&G', nil, {:image_left => 'test/regression/images/red.jpg'}
+      '&L&G', nil, { :image_left => 'test/regression/images/red.jpg' }
     )
     worksheet2.set_header(
-      '&L&G', nil, {:image_left => 'test/regression/images/red.jpg'}
+      '&L&G', nil, { :image_left => 'test/regression/images/red.jpg' }
     )
-
 
     workbook.close
     compare_for_regression(
       [],
       {
-        'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ],
-        'xl/worksheets/sheet2.xml' => [ '<pageMargins', '<pageSetup' ]
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup'],
+        'xl/worksheets/sheet2.xml' => ['<pageMargins', '<pageSetup']
       }
     )
   end

@@ -48,23 +48,23 @@ order = [
 ]
 
 colors = {
-                0x08 => 'black',
-                0x0C => 'blue',
-                0x10 => 'brown',
-                0x0F => 'cyan',
-                0x17 => 'gray',
-                0x11 => 'green',
-                0x0B => 'lime',
-                0x0E => 'magenta',
-                0x12 => 'navy',
-                0x35 => 'orange',
-                0x21 => 'pink',
-                0x14 => 'purple',
-                0x0A => 'red',
-                0x16 => 'silver',
-                0x09 => 'white',
-                0x0D => 'yellow',
-        }
+  0x08 => 'black',
+  0x0C => 'blue',
+  0x10 => 'brown',
+  0x0F => 'cyan',
+  0x17 => 'gray',
+  0x11 => 'green',
+  0x0B => 'lime',
+  0x0E => 'magenta',
+  0x12 => 'navy',
+  0x35 => 'orange',
+  0x21 => 'pink',
+  0x14 => 'purple',
+  0x0A => 'red',
+  0x16 => 'silver',
+  0x09 => 'white',
+  0x0D => 'yellow'
+}
 
 worksheet1 = workbook.add_worksheet('Named colors')
 
@@ -83,9 +83,9 @@ i = 1
 #
 order.each do |index|
   format = workbook.add_format(
-      :fg_color => colors[index],
-      :pattern  => 1,
-      :border   => 1
+    :fg_color => colors[index],
+    :pattern  => 1,
+    :border   => 1
   )
 
   worksheet1.write(i + 1, 0, index,                    center)
@@ -111,9 +111,9 @@ worksheet2.write(0, 3, "Name",  heading)
 
 (8..63).each do |i|
   format = workbook.add_format(
-      :fg_color => i,
-      :pattern  => 1,
-      :border   => 1
+    :fg_color => i,
+    :pattern  => 1,
+    :border   => 1
   )
 
   worksheet2.write((i - 7), 0, i,                    center)
@@ -121,11 +121,8 @@ worksheet2.write(0, 3, "Name",  heading)
   worksheet2.write((i - 7), 2, '',                   format)
 
   # Add the  color names
-  if colors.has_key?(i)
-    worksheet2.write((i - 7), 3, colors[i], center)
-  end
+  worksheet2.write((i - 7), 3, colors[i], center) if colors.has_key?(i)
 end
-
 
 #
 # Demonstrate the Html colors.
@@ -142,7 +139,7 @@ colors = {
   '#FF00FF' => 'magenta',
   '#000080' => 'navy',
   '#FF6600' => 'orange',
-  '#FF00FF' => 'pink',
+  '#FFC0CB' => 'pink',
   '#800080' => 'purple',
   '#FF0000' => 'red',
   '#C0C0C0' => 'silver',
@@ -166,7 +163,7 @@ colors.each do |html_color, color|
     :pattern  => 1,
     :border   => 1
   )
-  
+
   worksheet3.write(i + 1, 1, html_color, center)
   worksheet3.write(i + 1, 2, color,      center)
   worksheet3.write(i + 1, 3, '',         format)

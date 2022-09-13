@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartTable02 < Minitest::Test
@@ -20,10 +21,10 @@ class TestChartTable02 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [61354368, 61355904])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -33,11 +34,11 @@ class TestChartTable02 < Minitest::Test
 
     # Test the default table.
     chart.set_table(
-                    :vertical   => false,
-                    :horizontal => false,
-                    :outline    => false,
-                    :show_keys  => true
-                    )
+      :vertical   => false,
+      :horizontal => false,
+      :outline    => false,
+      :show_keys  => true
+    )
 
     worksheet.insert_chart('E9',  chart)
 

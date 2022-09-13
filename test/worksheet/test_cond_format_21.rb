@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -36,8 +37,7 @@ class TestCondFormat21 < Minitest::Test
                                         :criteria     => 'greater than',
                                         :value        => 5,
                                         :stop_if_true => 1
-                                      }
-                                     )
+                                      })
     # End test code.
 
     @worksheet.assemble_xml_file

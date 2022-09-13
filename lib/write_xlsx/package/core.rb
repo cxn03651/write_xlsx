@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class Core
-
       include Writexlsx::Utility
 
       App_package  = 'application/vnd.openxmlformats-package.'
@@ -60,7 +60,7 @@ module Writexlsx
       #
       # Write the <cp:coreProperties> element.
       #
-      def write_cp_core_properties
+      def write_cp_core_properties(&block)
         xmlns_cp       = 'http://schemas.openxmlformats.org/package/2006/metadata/core-properties'
         xmlns_dc       = 'http://purl.org/dc/elements/1.1/'
         xmlns_dcterms  = 'http://purl.org/dc/terms/'
@@ -75,7 +75,7 @@ module Writexlsx
           ['xmlns:xsi',      xmlns_xsi]
         ]
 
-        @writer.tag_elements('cp:coreProperties', attributes) { yield }
+        @writer.tag_elements('cp:coreProperties', attributes, &block)
       end
 
       #
@@ -107,7 +107,7 @@ module Writexlsx
       end
 
       def write_dcterms(tag)
-        @writer.data_element(tag, dcterms_date, [ ['xsi:type', 'dcterms:W3CDTF'] ])
+        @writer.data_element(tag, dcterms_date, [['xsi:type', 'dcterms:W3CDTF']])
       end
 
       def dcterms_date
@@ -159,6 +159,7 @@ module Writexlsx
       def write_base(key, tag, default = nil)
         data = @properties[key] || default
         return unless data
+
         @writer.data_element(tag, data)
       end
     end

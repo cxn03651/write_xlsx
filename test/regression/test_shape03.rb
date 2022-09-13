@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShape03 < Minitest::Test
@@ -23,10 +24,10 @@ class TestRegressionShape03 < Minitest::Test
     chart.instance_variable_set('@axis_ids', [110994176, 110996096])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet1.write('A1', data)
 
@@ -38,8 +39,8 @@ class TestRegressionShape03 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                [],
-                                {'xl/workbook.xml' => ['<workbookView']}
-                                )
+      [],
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

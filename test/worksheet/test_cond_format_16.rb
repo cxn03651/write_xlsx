@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -38,8 +39,7 @@ class TestCondFormat16 < Minitest::Test
                                         :min_color => '#C5D9F1',
                                         :mid_color => '#8DB4E3',
                                         :max_color => '#538ED5'
-                                      }
-                                      )
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

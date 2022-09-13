@@ -45,7 +45,7 @@ colors = {
 #
 # Intro.
 #
-def intro(workbook, center, heading, colors)
+def intro(workbook, _center, _heading, _colors)
   worksheet = workbook.add_worksheet('Introduction')
 
   worksheet.set_column(0, 0, 60)
@@ -61,9 +61,9 @@ def intro(workbook, center, heading, colors)
   format2.set_color('blue')
 
   format3 = workbook.add_format(
-                                :color     => 'blue',
-                                :underline => 1,
-                               )
+    :color     => 'blue',
+    :underline => 1
+  )
 
   worksheet.write(2, 0, 'This workbook demonstrates some of', format)
   worksheet.write(3, 0, 'the formatting options provided by', format)
@@ -73,26 +73,25 @@ def intro(workbook, center, heading, colors)
   worksheet.write('A8', "internal:Fonts!A1", 'Fonts', format3)
 
   worksheet.write('A9', "internal:'Named colors'!A1",
-                   'Named colors', format3)
+                  'Named colors', format3)
 
   worksheet.write(
-                  'A10',
-                  "internal:'Standard colors'!A1",
-                  'Standard colors', format3
-                 )
+    'A10',
+    "internal:'Standard colors'!A1",
+    'Standard colors', format3
+  )
 
   worksheet.write(
-                  'A11',
-                  "internal:'Numeric formats'!A1",
-                  'Numeric formats', format3
-                 )
+    'A11',
+    "internal:'Numeric formats'!A1",
+    'Numeric formats', format3
+  )
 
   worksheet.write('A12', "internal:Borders!A1", 'Borders', format3)
   worksheet.write('A13', "internal:Patterns!A1", 'Patterns', format3)
   worksheet.write('A14', "internal:Alignment!A1", 'Alignment', format3)
   worksheet.write('A15', "internal:Miscellaneous!A1", 'Miscellaneous',
-                   format3)
-
+                  format3)
 end
 
 ######################################################################
@@ -100,7 +99,6 @@ end
 # Demonstrate the named colors.
 #
 def named_colors(workbook, center, heading, colors)
-
   worksheet = workbook.add_worksheet('Named colors')
 
   worksheet.set_column(0, 3, 15)
@@ -115,10 +113,10 @@ def named_colors(workbook, center, heading, colors)
   [33, 11, 53, 17, 22, 18, 13, 16, 23, 9, 12, 15, 14, 20, 8, 10].each do |index|
     color = colors[index]
     format = workbook.add_format(
-                                 :bg_color => color,
-                                 :pattern  => 1,
-                                 :border   => 1
-                                )
+      :bg_color => color,
+      :pattern  => 1,
+      :border   => 1
+    )
 
     worksheet.write(i + 1, 0, index, center)
     worksheet.write(i + 1, 1, sprintf("0x%02X", index), center)
@@ -133,7 +131,6 @@ end
 # Demonstrate the standard Excel colors in the range 8..63.
 #
 def standard_colors(workbook, center, heading, colors)
-
   worksheet = workbook.add_worksheet('Standard colors')
 
   worksheet.set_column(0, 3, 15)
@@ -143,21 +140,19 @@ def standard_colors(workbook, center, heading, colors)
   worksheet.write(0, 2, "Color", heading)
   worksheet.write(0, 3, "Name",  heading)
 
-  (8 .. 63).each do |i|
+  (8..63).each do |i|
     format = workbook.add_format(
-                                 :bg_color => i,
-                                 :pattern  => 1,
-                                 :border   => 1
-                                )
+      :bg_color => i,
+      :pattern  => 1,
+      :border   => 1
+    )
 
     worksheet.write((i - 7), 0, i, center)
     worksheet.write((i - 7), 1, sprintf("0x%02X", i), center)
     worksheet.write((i - 7), 2, '', format)
 
     # Add the  color names
-    if colors[i]
-      worksheet.write((i - 7), 3, colors[i], center)
-    end
+    worksheet.write((i - 7), 3, colors[i], center) if colors[i]
   end
 end
 
@@ -165,8 +160,7 @@ end
 #
 # Demonstrate the standard numeric formats.
 #
-def numeric_formats(workbook, center, heading, colors)
-
+def numeric_formats(workbook, center, heading, _colors)
   worksheet = workbook.add_worksheet('Numeric formats')
 
   worksheet.set_column(0, 4, 15)
@@ -180,42 +174,42 @@ def numeric_formats(workbook, center, heading, colors)
   worksheet.write(0, 5, "Format",      heading)
 
   formats = []
-  formats << [ 0x00, 1234.567,   0,         'General' ]
-  formats << [ 0x01, 1234.567,   0,         '0' ]
-  formats << [ 0x02, 1234.567,   0,         '0.00' ]
-  formats << [ 0x03, 1234.567,   0,         '#,##0' ]
-  formats << [ 0x04, 1234.567,   0,         '#,##0.00' ]
-  formats << [ 0x05, 1234.567,   -1234.567, '($#,##0_);($#,##0)' ]
-  formats << [ 0x06, 1234.567,   -1234.567, '($#,##0_);[Red]($#,##0)' ]
-  formats << [ 0x07, 1234.567,   -1234.567, '($#,##0.00_);($#,##0.00)' ]
-  formats << [ 0x08, 1234.567,   -1234.567, '($#,##0.00_);[Red]($#,##0.00)' ]
-  formats << [ 0x09, 0.567,      0,         '0%' ]
-  formats << [ 0x0a, 0.567,      0,         '0.00%' ]
-  formats << [ 0x0b, 1234.567,   0,         '0.00E+00' ]
-  formats << [ 0x0c, 0.75,       0,         '# ?/?' ]
-  formats << [ 0x0d, 0.3125,     0,         '# ??/??' ]
-  formats << [ 0x0e, 36892.521,  0,         'm/d/yy' ]
-  formats << [ 0x0f, 36892.521,  0,         'd-mmm-yy' ]
-  formats << [ 0x10, 36892.521,  0,         'd-mmm' ]
-  formats << [ 0x11, 36892.521,  0,         'mmm-yy' ]
-  formats << [ 0x12, 36892.521,  0,         'h:mm AM/PM' ]
-  formats << [ 0x13, 36892.521,  0,         'h:mm:ss AM/PM' ]
-  formats << [ 0x14, 36892.521,  0,         'h:mm' ]
-  formats << [ 0x15, 36892.521,  0,         'h:mm:ss' ]
-  formats << [ 0x16, 36892.521,  0,         'm/d/yy h:mm' ]
-  formats << [ 0x25, 1234.567,   -1234.567, '(#,##0_);(#,##0)' ]
-  formats << [ 0x26, 1234.567,   -1234.567, '(#,##0_);[Red](#,##0)' ]
-  formats << [ 0x27, 1234.567,   -1234.567, '(#,##0.00_);(#,##0.00)' ]
-  formats << [ 0x28, 1234.567,   -1234.567, '(#,##0.00_);[Red](#,##0.00)' ]
-  formats << [ 0x29, 1234.567,   -1234.567, '_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)' ]
-  formats << [ 0x2a, 1234.567,   -1234.567, '_($* #,##0_);_($* (#,##0);_($* "-"_);_(@_)' ]
-  formats << [ 0x2b, 1234.567,   -1234.567, '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)' ]
-  formats << [ 0x2c, 1234.567,   -1234.567, '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)' ]
-  formats << [ 0x2d, 36892.521,  0,         'mm:ss' ]
-  formats << [ 0x2e, 3.0153,     0,         '[h]:mm:ss' ]
-  formats << [ 0x2f, 36892.521,  0,         'mm:ss.0' ]
-  formats << [ 0x30, 1234.567,   0,         '##0.0E+0' ]
-  formats << [ 0x31, 1234.567,   0,         '@' ]
+  formats << [0x00, 1234.567,   0,         'General']
+  formats << [0x01, 1234.567,   0,         '0']
+  formats << [0x02, 1234.567,   0,         '0.00']
+  formats << [0x03, 1234.567,   0,         '#,##0']
+  formats << [0x04, 1234.567,   0,         '#,##0.00']
+  formats << [0x05, 1234.567,   -1234.567, '($#,##0_);($#,##0)']
+  formats << [0x06, 1234.567,   -1234.567, '($#,##0_);[Red]($#,##0)']
+  formats << [0x07, 1234.567,   -1234.567, '($#,##0.00_);($#,##0.00)']
+  formats << [0x08, 1234.567,   -1234.567, '($#,##0.00_);[Red]($#,##0.00)']
+  formats << [0x09, 0.567,      0,         '0%']
+  formats << [0x0a, 0.567,      0,         '0.00%']
+  formats << [0x0b, 1234.567,   0,         '0.00E+00']
+  formats << [0x0c, 0.75,       0,         '# ?/?']
+  formats << [0x0d, 0.3125,     0,         '# ??/??']
+  formats << [0x0e, 36892.521,  0,         'm/d/yy']
+  formats << [0x0f, 36892.521,  0,         'd-mmm-yy']
+  formats << [0x10, 36892.521,  0,         'd-mmm']
+  formats << [0x11, 36892.521,  0,         'mmm-yy']
+  formats << [0x12, 36892.521,  0,         'h:mm AM/PM']
+  formats << [0x13, 36892.521,  0,         'h:mm:ss AM/PM']
+  formats << [0x14, 36892.521,  0,         'h:mm']
+  formats << [0x15, 36892.521,  0,         'h:mm:ss']
+  formats << [0x16, 36892.521,  0,         'm/d/yy h:mm']
+  formats << [0x25, 1234.567,   -1234.567, '(#,##0_);(#,##0)']
+  formats << [0x26, 1234.567,   -1234.567, '(#,##0_);[Red](#,##0)']
+  formats << [0x27, 1234.567,   -1234.567, '(#,##0.00_);(#,##0.00)']
+  formats << [0x28, 1234.567,   -1234.567, '(#,##0.00_);[Red](#,##0.00)']
+  formats << [0x29, 1234.567,   -1234.567, '_(* #,##0_);_(* (#,##0);_(* "-"_);_(@_)']
+  formats << [0x2a, 1234.567,   -1234.567, '_($* #,##0_);_($* (#,##0);_($* "-"_);_(@_)']
+  formats << [0x2b, 1234.567,   -1234.567, '_(* #,##0.00_);_(* (#,##0.00);_(* "-"??_);_(@_)']
+  formats << [0x2c, 1234.567,   -1234.567, '_($* #,##0.00_);_($* (#,##0.00);_($* "-"??_);_(@_)']
+  formats << [0x2d, 36892.521,  0,         'mm:ss']
+  formats << [0x2e, 3.0153,     0,         '[h]:mm:ss']
+  formats << [0x2f, 36892.521,  0,         'mm:ss.0']
+  formats << [0x30, 1234.567,   0,         '##0.0E+0']
+  formats << [0x31, 1234.567,   0,         '@']
 
   i = 0
   formats.each do |format|
@@ -228,9 +222,7 @@ def numeric_formats(workbook, center, heading, colors)
     worksheet.write(i, 2, format[1], center)
     worksheet.write(i, 3, format[1], style)
 
-    if format[2] != 0
-      worksheet.write(i, 4, format[2], style)
-    end
+    worksheet.write(i, 4, format[2], style) if format[2] != 0
 
     worksheet.write_string(i, 5, format[3])
   end
@@ -240,8 +232,7 @@ end
 #
 # Demonstrate the font options.
 #
-def fonts(workbook, center, heading, colors)
-
+def fonts(workbook, _center, heading, _colors)
   worksheet = workbook.add_worksheet('Fonts')
 
   worksheet.set_column(0, 0, 30)
@@ -251,21 +242,21 @@ def fonts(workbook, center, heading, colors)
   worksheet.write(0, 1, "Font size", heading)
 
   fonts = []
-  fonts << [ 10, 'Arial' ]
-  fonts << [ 12, 'Arial' ]
-  fonts << [ 14, 'Arial' ]
-  fonts << [ 12, 'Arial Black' ]
-  fonts << [ 12, 'Arial Narrow' ]
-  fonts << [ 12, 'Century Schoolbook' ]
-  fonts << [ 12, 'Courier' ]
-  fonts << [ 12, 'Courier New' ]
-  fonts << [ 12, 'Garamond' ]
-  fonts << [ 12, 'Impact' ]
-  fonts << [ 12, 'Lucida Handwriting' ]
-  fonts << [ 12, 'Times New Roman' ]
-  fonts << [ 12, 'Symbol' ]
-  fonts << [ 12, 'Wingdings' ]
-  fonts << [ 12, 'A font that doesn\'t exist' ]
+  fonts << [10, 'Arial']
+  fonts << [12, 'Arial']
+  fonts << [14, 'Arial']
+  fonts << [12, 'Arial Black']
+  fonts << [12, 'Arial Narrow']
+  fonts << [12, 'Century Schoolbook']
+  fonts << [12, 'Courier']
+  fonts << [12, 'Courier New']
+  fonts << [12, 'Garamond']
+  fonts << [12, 'Impact']
+  fonts << [12, 'Lucida Handwriting']
+  fonts << [12, 'Times New Roman']
+  fonts << [12, 'Symbol']
+  fonts << [12, 'Wingdings']
+  fonts << [12, 'A font that doesn\'t exist']
 
   i = 0
   fonts.each do |font|
@@ -284,7 +275,7 @@ end
 #
 # Demonstrate the standard Excel border styles.
 #
-def borders(workbook, center, heading, colors)
+def borders(workbook, center, heading, _colors)
   worksheet = workbook.add_worksheet('Borders')
 
   worksheet.set_column(0, 4, 10)
@@ -295,10 +286,9 @@ def borders(workbook, center, heading, colors)
   worksheet.write(0, 3, "Style",                                heading)
   worksheet.write(0, 5, "The style is highlighted in red for ", heading)
   worksheet.write(1, 5, "emphasis, the default color is black.",
-                   heading)
+                  heading)
 
-  (0 .. 13).each do |i|
-
+  14.times do |i|
     format = workbook.add_format
     format.set_border(i)
     format.set_border_color('red')
@@ -306,7 +296,7 @@ def borders(workbook, center, heading, colors)
 
     worksheet.write((2 * (i + 1)), 0, i, center)
     worksheet.write((2 * (i + 1)),
-                     1, sprintf("0x%02X", i), center)
+                    1, sprintf("0x%02X", i), center)
 
     worksheet.write((2 * (i + 1)), 3, "Border", format)
   end
@@ -316,7 +306,7 @@ def borders(workbook, center, heading, colors)
   worksheet.write(30, 3, "Style",                 heading)
   worksheet.write(30, 5, "Diagonal Boder styles", heading)
 
-  (1 .. 3).each do |i|
+  (1..3).each do |i|
     format = workbook.add_format
     format.set_diag_type(i)
     format.set_diag_border(1)
@@ -325,7 +315,7 @@ def borders(workbook, center, heading, colors)
 
     worksheet.write((2 * (i + 15)), 0, i, center)
     worksheet.write((2 * (i + 15)),
-                     1, sprintf("0x%02X", i), center)
+                    1, sprintf("0x%02X", i), center)
 
     worksheet.write((2 * (i + 15)), 3, "Border", format)
   end
@@ -335,7 +325,7 @@ end
 #
 # Demonstrate the standard Excel cell patterns.
 #
-def patterns(workbook, center, heading, colors)
+def patterns(workbook, center, heading, _colors)
   worksheet = workbook.add_worksheet('Patterns')
 
   worksheet.set_column(0, 4, 10)
@@ -346,11 +336,11 @@ def patterns(workbook, center, heading, colors)
   worksheet.write(0, 3, "Pattern", heading)
 
   worksheet.write(0, 5, "The background colour has been set to silver.",
-                   heading)
+                  heading)
   worksheet.write(1, 5, "The foreground colour has been set to green.",
-                   heading)
+                  heading)
 
-  (0 .. 18).each do |i|
+  19.times do |i|
     format = workbook.add_format
 
     format.set_pattern(i)
@@ -360,13 +350,13 @@ def patterns(workbook, center, heading, colors)
 
     worksheet.write((2 * (i + 1)), 0, i, center)
     worksheet.write((2 * (i + 1)),
-                     1, sprintf("0x%02X", i), center)
+                    1, sprintf("0x%02X", i), center)
 
     worksheet.write((2 * (i + 1)), 3, "Pattern", format)
 
     if i == 1
       worksheet.write((2 * (i + 1)),
-                       5, "This is solid colour, the most useful pattern.", heading)
+                      5, "This is solid colour, the most useful pattern.", heading)
     end
   end
 end
@@ -375,7 +365,7 @@ end
 #
 # Demonstrate the standard Excel cell alignments.
 #
-def alignment(workbook, center, heading, colors)
+def alignment(workbook, _center, heading, _colors)
   worksheet = workbook.add_worksheet('Alignment')
 
   worksheet.set_column(0, 7, 12)
@@ -440,7 +430,6 @@ def alignment(workbook, center, heading, colors)
   worksheet.write(3, 3, 'Shrink ' * 3, format16)
   worksheet.write(3, 4, 'Indent',      format17)
 
-
   worksheet.write(5, 0, 'Rotation',   heading)
   worksheet.write(5, 1, 'Rotate 45',  format13)
   worksheet.write(6, 1, 'Rotate -45', format14)
@@ -451,7 +440,7 @@ end
 #
 # Demonstrate other miscellaneous features.
 #
-def misc(workbook, center, heading, colors)
+def misc(workbook, _center, _heading, _colors)
   worksheet = workbook.add_worksheet('Miscellaneous')
 
   worksheet.set_column(2, 2, 25)
@@ -492,6 +481,5 @@ patterns(workbook, center, heading, colors)
 alignment(workbook, center, heading, colors)
 misc(workbook, center, heading, colors)
 
-# Note: this is required
+# NOTE: this is required
 workbook.close
-

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/app'
 
@@ -40,7 +41,7 @@ class TestApp02 < Minitest::Test
   <AppVersion>12.0000</AppVersion>
 </Properties>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

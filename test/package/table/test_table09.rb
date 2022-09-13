@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -12,23 +13,23 @@ class TestTable09 < Minitest::Test
   def test_table09
     # Set the table properties.
     @worksheet.add_table(
-                         'B2:K8',
-                         {
-                           :total_row => 1,
-                           :columns => [
-                                        {:total_string => 'Total'},
-                                        {},
-                                        {:total_function => 'Average'},
-                                        {:total_function => 'COUNT'},
-                                        {:total_function => 'count_nums'},
-                                        {:total_function => 'max'},
-                                        {:total_function => 'min'},
-                                        {:total_function => 'sum'},
-                                        {:total_function => 'std Dev'},
-                                        {:total_function => 'var'}
-                                       ]
-                         }
-                         )
+      'B2:K8',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          { :total_function => 'Average' },
+          { :total_function => 'COUNT' },
+          { :total_function => 'count_nums' },
+          { :total_function => 'max' },
+          { :total_function => 'min' },
+          { :total_function => 'sum' },
+          { :total_function => 'std Dev' },
+          { :total_function => 'var' }
+        ]
+      }
+    )
     @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
@@ -41,7 +42,7 @@ class TestTable09 < Minitest::Test
 
   def expected
     expected_to_array(
-                      <<EOS
+      <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="1" name="Table1" displayName="Table1" ref="B2:K8" totalsRowCount="1">
   <autoFilter ref="B2:K7"/>
@@ -60,6 +61,6 @@ class TestTable09 < Minitest::Test
   <tableStyleInfo name="TableStyleMedium9" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
 </table>
 EOS
-                      )
+    )
   end
 end

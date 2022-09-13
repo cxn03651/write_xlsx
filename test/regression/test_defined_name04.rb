@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'stringio'
 
@@ -33,16 +34,16 @@ class TestRegressionDefinedName04 < Minitest::Test
 
   def test_defined_name04
     @xlsx = 'defined_name04.xlsx'
-    workbook  = WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
 
     # Test for valid Excel defined names.
-    workbook.define_name( "\\__",     %q(=Sheet1!$A$1) )
-    workbook.define_name( %q(a3f6),     %q(=Sheet1!$A$2) )
-    workbook.define_name( %q(afoo.bar), %q(=Sheet1!$A$3) )
-    workbook.define_name( %q(étude),    %q(=Sheet1!$A$4) )
-    workbook.define_name( %q(eésumé),   %q(=Sheet1!$A$5) )
-    workbook.define_name( %q(a),        %q(=Sheet1!$A$6) )
+    workbook.define_name("\\__",     '=Sheet1!$A$1')
+    workbook.define_name('a3f6',     '=Sheet1!$A$2')
+    workbook.define_name('afoo.bar', '=Sheet1!$A$3')
+    workbook.define_name('étude',    '=Sheet1!$A$4')
+    workbook.define_name('eésumé',   '=Sheet1!$A$5')
+    workbook.define_name('a',        '=Sheet1!$A$6')
 
     workbook.close
     compare_for_regression

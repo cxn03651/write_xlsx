@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -41,8 +42,7 @@ class TestCondFormat17 < Minitest::Test
                                         :min_type  => 'num',
                                         :mid_type  => 'percent',
                                         :max_type  => 'percentile'
-                                      }
-                                      )
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

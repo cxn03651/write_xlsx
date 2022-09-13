@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionDefinedName01 < Minitest::Test
@@ -12,7 +13,7 @@ class TestRegressionDefinedName01 < Minitest::Test
 
   def test_defined_name01
     @xlsx = 'defined_name01.xlsx'
-    workbook  = WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet('Sheet 3')
@@ -37,7 +38,7 @@ class TestRegressionDefinedName01 < Minitest::Test
       ["xl/printerSettings/printerSettings1.bin",
        "xl/worksheets/_rels/sheet1.xml.rels"],
       {
-        '[Content_Types].xml' => ['<Default Extension="bin"'],
+        '[Content_Types].xml'      => ['<Default Extension="bin"'],
         'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
       }
     )

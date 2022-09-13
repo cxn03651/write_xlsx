@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionEscapes08 < Minitest::Test
@@ -20,9 +21,9 @@ class TestRegressionEscapes08 < Minitest::Test
 
     # Test an already escaped string.
     worksheet.write_url(
-                        'A1',
-                        'http://example.com/%5b0%5d', 'http://example.com/[0]'
-                        )
+      'A1',
+      'http://example.com/%5b0%5d', 'http://example.com/[0]'
+    )
 
     workbook.close
     compare_for_regression

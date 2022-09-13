@@ -17,7 +17,7 @@ workbook  = WriteXLSX.new('merge6.xlsx')
 worksheet = workbook.add_worksheet
 
 # Increase the cell size of the merged cells to highlight the formatting.
-(2 .. 9).each { |row| worksheet.set_row(row, 36) }
+(2..9).each { |row| worksheet.set_row(row, 36) }
 worksheet.set_column('B:D', 25)
 
 # Format for the merged cells.

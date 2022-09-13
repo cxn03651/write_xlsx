@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartPoints01 < Minitest::Test
@@ -17,17 +18,17 @@ class TestRegressionChartPoints01 < Minitest::Test
     chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
 
     data = [
-            [2, 5, 4, 1, 7, 4]
-           ]
+      [2, 5, 4, 1, 7, 4]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :values => '=Sheet1!$A$1:$A$6',
-                     :points => [
-                                 { :fill => { :color => 'red' } }
-                                ]
-                     )
+      :values => '=Sheet1!$A$1:$A$6',
+      :points => [
+        { :fill => { :color => 'red' } }
+      ]
+    )
 
     worksheet.insert_chart('E9', chart)
 

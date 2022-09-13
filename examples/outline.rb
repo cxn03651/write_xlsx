@@ -76,14 +76,12 @@ worksheet4 = workbook.add_worksheet('Outline levels')
 # Add a general format
 bold = workbook.add_format(:bold => 1)
 
-
 ###############################################################################
 #
 # Example 1: Create a worksheet with outlined rows. It also includes SUBTOTAL()
 # functions so that it looks like the type of automatic outlines that are
 # generated when you use the Excel Data.SubTotals menu item.
 #
-
 
 # For outlines the important parameters are $hidden and $level. Rows with the
 # same $level are grouped together. The group will be collapsed if $hidden is
@@ -102,7 +100,6 @@ worksheet1.set_row(7,  nil, nil, 0, 2)
 worksheet1.set_row(8,  nil, nil, 0, 2)
 worksheet1.set_row(9,  nil, nil, 0, 2)
 worksheet1.set_row(10, nil, nil, 0, 1)
-
 
 # Add a column format for clarity
 worksheet1.set_column('A:A', 20)
@@ -137,7 +134,6 @@ worksheet1.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
 worksheet1.write('A12', 'Grand Total',         bold)
 worksheet1.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
 
-
 ###############################################################################
 #
 # Example 2: Create a worksheet with outlined rows. This is the same as the
@@ -160,7 +156,6 @@ worksheet2.set_row(8,  nil, nil, 1, 2)
 worksheet2.set_row(9,  nil, nil, 1, 2)
 worksheet2.set_row(10, nil, nil, 1, 1)
 worksheet2.set_row(11, nil, nil, 0, 0, 1)
-
 
 # Add a column format for clarity
 worksheet2.set_column('A:A', 20)
@@ -195,17 +190,16 @@ worksheet2.write('B11', '=SUBTOTAL(9,B7:B10)', bold)
 worksheet2.write('A12', 'Grand Total',         bold)
 worksheet2.write('B12', '=SUBTOTAL(9,B2:B10)', bold)
 
-
 ###############################################################################
 #
 # Example 3: Create a worksheet with outlined columns.
 #
 data = [
-    [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total' ],
-    [ 'North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)' ],
-    [ 'South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)' ],
-    [ 'East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)' ],
-    [ 'West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)' ],
+  ['Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', ' Total'],
+  ['North', 50,    20,    15,    25,    65,    80,    '=SUM(B2:G2)'],
+  ['South', 10,    20,    30,    50,    50,    50,    '=SUM(B3:G3)'],
+  ['East',  45,    75,    50,    15,    75,    100,   '=SUM(B4:G4)'],
+  ['West',  15,    15,    55,    35,    20,    50,    '=SUM(B5:G5)']
 ]
 
 # Add bold format to the first row
@@ -220,17 +214,15 @@ worksheet3.set_column('H:H', 10)
 worksheet3.write_col('A1', data)
 worksheet3.write('H6', '=SUM(H2:H5)', bold)
 
-
 ###############################################################################
 #
 # Example 4: Show all possible outline levels.
 #
 levels = [
-    "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
-    "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
-    "Level 1"
+  "Level 1", "Level 2", "Level 3", "Level 4", "Level 5", "Level 6",
+  "Level 7", "Level 6", "Level 5", "Level 4", "Level 3", "Level 2",
+  "Level 1"
 ]
-
 
 worksheet4.write_col('A1', levels)
 

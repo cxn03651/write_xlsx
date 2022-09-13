@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestWorksheetDataBar11 < Minitest::Test
@@ -21,7 +22,7 @@ class TestWorksheetDataBar11 < Minitest::Test
       :type          => 'data_bar',
       :data_bar_2010 => 1,
       :min_type      => 'formula',
-      :min_value      => '=$B$1'
+      :min_value     => '=$B$1'
     )
 
     @worksheet.conditional_formatting(

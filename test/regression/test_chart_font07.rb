@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartFont07 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartFont07 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [69215744, 69217280])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -31,14 +32,14 @@ class TestRegressionChartFont07 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$B$1:$B$5')
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
-    chart.set_legend(:font => {:size => 9, :baseline => -1})
+    chart.set_legend(:font => { :size => 9, :baseline => -1 })
 
     worksheet.insert_chart('E9', chart)
 
     workbook.close
     compare_for_regression(
-                 nil,
-                 {}
-                 )
+      nil,
+      {}
+    )
   end
 end

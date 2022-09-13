@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/shared_strings'
 
@@ -24,7 +25,7 @@ class TestSharedStrings02 < Minitest::Test
   </si>
 </sst>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

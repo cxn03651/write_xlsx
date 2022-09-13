@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartLine02 < Minitest::Test
@@ -21,9 +22,9 @@ class TestRegressionChartLine02 < Minitest::Test
     chart.instance_variable_set(:@axis2_ids, [63615360, 63613568])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 6, 8, 6, 4, 2 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [6, 8, 6, 4, 2]
+    ]
 
     worksheet.write('A1', data)
 
@@ -37,7 +38,7 @@ class TestRegressionChartLine02 < Minitest::Test
       nil,
       {
         'xl/charts/chart1.xml' => ['<c:pageMargins'],
-        'xl/workbook.xml'      => [ '<fileVersion' ]
+        'xl/workbook.xml'      => ['<fileVersion']
       }
     )
   end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Stock - A class for writing Excel Stock charts.
@@ -39,14 +40,14 @@ module Writexlsx
         # Set the available data label positions for this chart type.
         @label_position_default = 'right'
         @label_positions = {
-          'center'      => 'ctr',
-          'right'       => 'r',
-          'left'        => 'l',
-          'above'       => 't',
-          'below'       => 'b',
+          'center' => 'ctr',
+          'right'  => 'r',
+          'left'   => 'l',
+          'above'  => 't',
+          'below'  => 'b',
           # For backward compatibility.
-          'top'         => 't',
-          'bottom'      => 'b',
+          'top'    => 't',
+          'bottom' => 'b'
         }
       end
 
@@ -63,11 +64,11 @@ module Writexlsx
       # Overridden to add hi_low_lines(). TODO. Refactor up into the SUPER class
       #
       def write_stock_chart(params)
-        if params[:primary_axes] == 1
-          series = get_primary_axes_series
-        else
-          series = get_secondary_axes_series
-        end
+        series = if params[:primary_axes] == 1
+                   get_primary_axes_series
+                 else
+                   get_secondary_axes_series
+                 end
         return if series.empty?
 
         # Add default formatting to the series data.
@@ -75,7 +76,7 @@ module Writexlsx
 
         @writer.tag_elements('c:stockChart') do
           # Write the series elements.
-          series.each {|s| write_series(s)}
+          series.each { |s| write_series(s) }
 
           # Write the c:dtopLines element.
           write_drop_lines
@@ -101,17 +102,21 @@ module Writexlsx
         array = []
         @series.each_with_index do |series, index|
           if index % 4 != 3
-            series.line = {
-              :width    => 2.25,
-              :none     => 1,
-              :_defined => 1
-            } unless series.line_defined?
+            unless series.line_defined?
+              series.line = {
+                :width    => 2.25,
+                :none     => 1,
+                :_defined => 1
+              }
+            end
 
-            if index % 4 == 2
-              series.marker = Marker.new(:type => 'dot', :size => 3)
-            else
-              series.marker = Marker.new(:type => 'none')
-            end unless ptrue?(series.marker)
+            unless ptrue?(series.marker)
+              series.marker = if index % 4 == 2
+                                Marker.new(:type => 'dot', :size => 3)
+                              else
+                                Marker.new(:type => 'none')
+                              end
+            end
           end
           array << series
         end

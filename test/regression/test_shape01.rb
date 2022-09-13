@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShape01 < Minitest::Test
@@ -12,7 +13,7 @@ class TestRegressionShape01 < Minitest::Test
 
   def test_shape01
     @xlsx = 'shape01.xlsx'
-    workbook   = WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
     rect = workbook.add_shape

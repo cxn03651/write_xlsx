@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -19,14 +20,14 @@ class TestSparkline09 < Minitest::Test
 
     # Test all the styles.
     (1..36).each do |i|
-      @worksheet.write(i-1, 0, data)
+      @worksheet.write(i - 1, 0, data)
       @worksheet.add_sparkline(
-                               {
-                                 :location => "F#{i}",
-                                 :range    => "A#{i}:E#{i}",
-                                 :style    => i
-                               }
-                               )
+        {
+          :location => "F#{i}",
+          :range    => "A#{i}:E#{i}",
+          :style    => i
+        }
+      )
     end
 
     # End sparklines

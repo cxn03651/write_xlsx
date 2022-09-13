@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class Relationships
-
       include Writexlsx::Utility
 
       Schema_root     = 'http://schemas.openxmlformats.org'

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'stringio'
@@ -25,7 +26,7 @@ class TestWorkbook03 < Minitest::Test
   <calcPr calcId="124519" fullCalcOnLoad="1"/>
 </workbook>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

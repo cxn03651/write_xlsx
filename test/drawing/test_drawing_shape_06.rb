@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -25,9 +26,9 @@ class DrawingShape06 < Minitest::Test
       3, dimensions, 95250, 190500, '', shape, 1
     )
     @obj.add_drawing_object(drawing)
-                            # 3, 4, 8, 209550, 95250, 12, 22, 209660,
-                            # 96260, 10000, 20000, 95250, 190500, '', shape
-                            # )
+    # 3, 4, 8, 209550, 95250, 12, 22, 209660,
+    # 96260, 10000, 20000, 95250, 190500, '', shape
+    # )
     @obj.__send__(:write_a_av_lst, shape)
 
     result = got_to_array(@obj.xml_str)
@@ -36,7 +37,7 @@ class DrawingShape06 < Minitest::Test
   end
 
   def expected_str
-<<EOS
+    <<EOS
 <a:avLst>
 <a:gd name="adj" fmla="val -10000"/>
 <a:gd name="adj" fmla="val 100000"/>

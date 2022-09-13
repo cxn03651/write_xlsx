@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionAutofilter07 < Minitest::Test
@@ -40,10 +41,10 @@ class TestRegressionAutofilter07 < Minitest::Test
     end
 
     workbook.close
-       compare_for_regression(
-                 nil,
-                 {'xl/workbook.xml' => ['<workbookView']}
-                 )
+    compare_for_regression(
+      nil,
+      { 'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 
   def headings

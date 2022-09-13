@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartsheet06 < Minitest::Test
@@ -13,14 +14,14 @@ class TestRegressionChartsheet06 < Minitest::Test
     chart       = workbook.add_chart(:type => 'bar')
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_get(:@chart).
-      instance_variable_set(:@axis_ids,  [43778432, 43780352])
+    chart.instance_variable_get(:@chart)
+         .instance_variable_set(:@axis_ids,  [43778432, 43780352])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

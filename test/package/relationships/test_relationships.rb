@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/relationships'
 
@@ -22,7 +23,7 @@ class TestRelationships < Minitest::Test
   <Relationship Id="rId5" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/calcChain" Target="calcChain.xml"/>
 </Relationships>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

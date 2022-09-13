@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartCombined04 < Minitest::Test
@@ -21,7 +22,7 @@ class TestRegressionChartCombined04 < Minitest::Test
     # For this test the ids match the generated ids.
 
     data = [
-      [ 2,  7,  3,  6,  2],
+      [2,  7,  3,  6,  2],
       [20, 25, 10, 10, 20]
     ]
 
@@ -38,10 +39,10 @@ class TestRegressionChartCombined04 < Minitest::Test
     compare_for_regression(
       [],
       { 'xl/charts/chart1.xml' => [
-          '<c:dispBlanksAs',
-          '<c:tickLblPos',
-          '<c:crosses'
-        ] }
+        '<c:dispBlanksAs',
+        '<c:tickLblPos',
+        '<c:crosses'
+      ] }
     )
   end
 end

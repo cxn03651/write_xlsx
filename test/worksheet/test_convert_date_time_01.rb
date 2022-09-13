@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -14,19 +15,19 @@ class TestConvertDateTime01 < Minitest::Test
     lines = data_for_test.split(/\n/)
     until lines.empty?
       line = lines.shift
-      if line =~ /"DateTime">([^<]+)/
-        date_time = $1
-        if lines.shift =~ /"Number">([^<]+)/
-          number = 0 + $1.to_f
-          result    = @worksheet.convert_date_time(date_time)
-          assert fit_cmp(number, result)
-        end
-      end
+      next unless line =~ /"DateTime">([^<]+)/
+
+      date_time = ::Regexp.last_match(1)
+      next unless lines.shift =~ /"Number">([^<]+)/
+
+      number = 0 + ::Regexp.last_match(1).to_f
+      result    = @worksheet.convert_date_time(date_time)
+      assert fit_cmp(number, result)
     end
   end
 
   def data_for_test
-  <<EOS
+    <<EOS
 # Test data taken from Excel in XML format.
    <Row>
     <Cell ss:StyleID="s21"><Data ss:Type="DateTime">1899-12-31T00:00:00.000</Data></Cell>
@@ -430,10 +431,10 @@ EOS
 
   def test_fit_cmp_fail
     result = @worksheet.convert_date_time('1899-12-31T00:00:00.0005')
-    assert !fit_cmp(0, result)
+    refute fit_cmp(0, result)
   end
 
   def fit_cmp(a, b)
-    (a - b).abs < 0.5 / ( 24 * 60 * 60 * 1000 )
+    (a - b).abs < 0.5 / (24 * 60 * 60 * 1000)
   end
 end

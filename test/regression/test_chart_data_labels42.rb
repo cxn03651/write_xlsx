@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDataLabels42 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartDataLabels42 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [74893568, 80048128])
 
     data = [
-      [  1,  2,  3,  4,  5],
-      [  2,  4,  6,  8, 10],
-      [  3,  6,  9, 12, 15],
-      [ 10, 20, 30, 40, 50]
+      [1,  2,  3,  4,  5],
+      [2,  4,  6,  8, 10],
+      [3,  6,  9, 12, 15],
+      [10, 20, 30, 40, 50]
     ]
 
     worksheet.write('A1', data)
@@ -37,7 +38,7 @@ class TestRegressionChartDataLabels42 < Minitest::Test
             :value  => '=Sheet1!$D$1',
             :font   => {
               :baseline => -1,
-              :color => 'red'
+              :color    => 'red'
             },
             :border => {
               :color => 'red'

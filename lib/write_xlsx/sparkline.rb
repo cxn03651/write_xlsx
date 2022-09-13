@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/utility'
 
 module Writexlsx
@@ -19,21 +20,16 @@ module Writexlsx
 
       # Check for valid input parameters.
       param.each_key do |k|
-        unless valid_sparkline_parameter[k]
-          raise "Unknown parameter '#{k}' in add_sparkline()"
-        end
+        raise "Unknown parameter '#{k}' in add_sparkline()" unless valid_sparkline_parameter[k]
       end
-      [:location, :range].each do |required_key|
-        unless param[required_key]
-          raise "Parameter '#{required_key}' is required in add_sparkline()"
-        end
+      %i[location range].each do |required_key|
+        raise "Parameter '#{required_key}' is required in add_sparkline()" unless param[required_key]
       end
 
       # Handle the sparkline type.
       type = param[:type] || 'line'
-      unless ['line', 'column', 'win_loss'].include?(type)
-        raise "Parameter ':type' must be 'line', 'column' or 'win_loss' in add_sparkline()"
-      end
+      raise "Parameter ':type' must be 'line', 'column' or 'win_loss' in add_sparkline()" unless %w[line column win_loss].include?(type)
+
       type  = 'stacked' if type == 'win_loss'
       @type = type
 
@@ -41,9 +37,7 @@ module Writexlsx
       @locations = [param[:location]].flatten
       @ranges    = [param[:range]].flatten
 
-      if @ranges.size != @locations.size
-        raise "Must have the same number of location and range parameters in add_sparkline()"
-      end
+      raise "Must have the same number of location and range parameters in add_sparkline()" if @ranges.size != @locations.size
 
       # Cleanup the input ranges.
       @ranges.collect! do |range|
@@ -82,9 +76,7 @@ module Writexlsx
 
       # Map the date axis range.
       date_range = param[:date_axis]
-      if ptrue?(date_range) && !(date_range =~ /!/)
-        date_range = "#{sheetname}!#{date_range}"
-      end
+      date_range = "#{sheetname}!#{date_range}" if ptrue?(date_range) && !(date_range =~ /!/)
       @date_axis = date_range
 
       # Set the sparkline styles.
@@ -99,7 +91,7 @@ module Writexlsx
       @low_color      = style[:low]
 
       # Override the style colours with user defined colors.
-      [:series_color, :negative_color, :markers_color, :first_color, :last_color, :high_color, :low_color].each do |user_color|
+      %i[series_color negative_color markers_color first_color last_color high_color low_color].each do |user_color|
         set_spark_color(user_color, ptrue?(param[user_color]) ? ws.palette_color(param[user_color]) : nil)
       end
     end
@@ -202,7 +194,7 @@ module Writexlsx
     # Write the <x14:colorAxis> element.
     #
     def write_color_axis  # :nodoc:
-      write_spark_color('x14:colorAxis', { :_rgb => 'FF000000'} )
+      write_spark_color('x14:colorAxis', { :_rgb => 'FF000000' })
     end
 
     #
@@ -253,8 +245,7 @@ module Writexlsx
     def write_sparklines  # :nodoc:
       # Write the sparkline elements.
       @writer.tag_elements('x14:sparklines') do
-
-        (0 .. count-1).each do |i|
+        (0..count - 1).each do |i|
           range    = @ranges[i]
           location = @locations[i]
 

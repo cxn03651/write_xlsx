@@ -17,16 +17,15 @@ worksheet = workbook.add_worksheet
 bold      = workbook.add_format(:bold => 1)
 
 # Add the worksheet data that the charts will refer to.
-headings = ['Number', 'Data', 'Text']
+headings = %w[Number Data Text]
 data = [
-  [ 2,  3,  4,  5,  6,  7 ],
-  [20, 10, 20, 30, 40, 30 ],
-  ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
+  [2,  3,  4,  5,  6,  7],
+  [20, 10, 20, 30, 40, 30],
+  %w[Jan Feb Mar Apr May Jun]
 ]
 
 worksheet.write('A1', headings, bold)
 worksheet.write('A2', data)
-
 
 #######################################################################
 #
@@ -52,7 +51,6 @@ chart1.set_legend(:none => 1)
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D2', chart1, { :x_offset => 25, :y_offset => 10 })
 
-
 #######################################################################
 #
 # Example with value and category data labels.
@@ -77,7 +75,6 @@ chart2.set_legend(:none => 1)
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D18', chart2, { :x_offset => 25, :y_offset => 10 })
 
-
 #######################################################################
 #
 # Example with standard data labels with different font.
@@ -91,10 +88,9 @@ chart3.add_series(
   :categories  => '=Sheet1!$A$2:$A$7',
   :values      => '=Sheet1!$B$2:$B$7',
   :data_labels => { :value => 1,
-                    :font => {:bold => 1,
-                              :color => 'red',
-                              :rotation => -30}
-                  }
+                    :font  => { :bold     => 1,
+                                :color    => 'red',
+                                :rotation => -30 } }
 )
 
 # Add a chart title.
@@ -105,7 +101,6 @@ chart3.set_legend(:none => 1)
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D34', chart3, { :x_offset => 25, :y_offset => 10 })
-
 
 #######################################################################
 #
@@ -121,8 +116,8 @@ chart4.add_series(
   :values      => '=Sheet1!$B$2:$B$7',
   :data_labels => {
     :value  => 1,
-    :border => {:color => 'red'},
-    :fill   => {:color => 'yellow'}
+    :border => { :color => 'red' },
+    :fill   => { :color => 'yellow' }
   }
 )
 
@@ -135,14 +130,13 @@ chart4.set_legend(:none => 1)
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D50', chart4, { :x_offset => 25, :y_offset => 10 })
 
-
 #######################################################################
 #
 # Example with custom string data labels.
 #
 
 # Create a Column chart.
-chart5 = workbook.add_chart( :type => 'column', :embedded => 1 )
+chart5 = workbook.add_chart(:type => 'column', :embedded => 1)
 
 # Some custom labels.
 custom_labels = [
@@ -156,8 +150,8 @@ custom_labels = [
 
 # Configure the data series and add the data labels.
 chart5.add_series(
-  :categories => '=Sheet1!$A$2:$A$7',
-  :values     => '=Sheet1!$B$2:$B$7',
+  :categories  => '=Sheet1!$A$2:$A$7',
+  :values      => '=Sheet1!$B$2:$B$7',
   :data_labels => { :value => 1, :custom => custom_labels }
 )
 
@@ -169,7 +163,6 @@ chart5.set_legend(:none => 1)
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D66', chart5, { :x_offset => 25, :y_offset => 10 })
-
 
 #######################################################################
 #
@@ -189,7 +182,6 @@ custom_labels = [
   { :value => '=Sheet1!$C$7' }
 ]
 
-
 # Configure the data series and add the data labels.
 chart6.add_series(
   :categories  => '=Sheet1!$A$2:$A$7',
@@ -205,7 +197,6 @@ chart6.set_legend(:none => 1)
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D82', chart6, { :x_offset => 25, :y_offset => 10 })
-
 
 #######################################################################
 #
@@ -224,7 +215,6 @@ custom_labels = [
   { :value => '=Sheet1!$C$5', :font => { :color => 'red' } }
 ]
 
-
 # Configure the data series and add the data labels.
 chart7.add_series(
   :categories  => '=Sheet1!$A$2:$A$7',
@@ -240,7 +230,6 @@ chart7.set_legend(:none => 1)
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart('D98', chart7, { :x_offset => 25, :y_offset => 10 })
-
 
 #######################################################################
 #
@@ -283,38 +272,37 @@ worksheet.insert_chart('D114', chart8, { :x_offset => 25, :y_offset => 10 })
 #
 
 # Create a Column chart.
-chart9 = workbook.add_chart( :type => 'column', :embedded => 1 )
+chart9 = workbook.add_chart(:type => 'column', :embedded => 1)
 
 # Some custom labels.
 custom_labels = [
-  { :value => 'Amy', :border => {:color => 'blue'} },
+  { :value => 'Amy', :border => { :color => 'blue' } },
   { :value => 'Bea' },
   { :value => 'Eva' },
   { :value => 'Fay' },
   { :value => 'Liv' },
-  { :value => 'Una', :fill   => {:color => 'green'} }
+  { :value => 'Una', :fill => { :color => 'green' } }
 ]
-
 
 # Configure the data series and add the data labels.
 chart9.add_series(
-  :categories => '=Sheet1!$A$2:$A$7',
-  :values     => '=Sheet1!$B$2:$B$7',
+  :categories  => '=Sheet1!$A$2:$A$7',
+  :values      => '=Sheet1!$B$2:$B$7',
   :data_labels => {
-    :value => 1,
+    :value  => 1,
     :custom => custom_labels,
-    :border => {:color => 'red'},
-    :fill   => {:color => 'yellow'}
+    :border => { :color => 'red' },
+    :fill   => { :color => 'yellow' }
   }
 )
 
 # Add a chart title.
-chart9.set_title( :name => 'Chart with custom labels and formatting' )
+chart9.set_title(:name => 'Chart with custom labels and formatting')
 
 # Turn off the chart legend.
-chart9.set_legend( :none => 1 )
+chart9.set_legend(:none => 1)
 
 # Insert the chart into the worksheet (with an offset).
-worksheet.insert_chart( 'D130', chart9, { :x_offset => 25, :y_offset => 10 } )
+worksheet.insert_chart('D130', chart9, { :x_offset => 25, :y_offset => 10 })
 
 workbook.close

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -21,21 +22,21 @@ class TestTable13 < Minitest::Test
   def test_table13_add_table_should_not_change_formula_string
     formula = '=SUM(Table1[@[Column1]:[Column3]])'
     @worksheet.add_table(
-                         'C2:F14',
-                         {
-                           :total_row => 1,
-                           :columns   => [
-                                          {:total_string => 'Total'},
-                                          {},
-                                          {},
-                                          {
-                                            :total_function => 'count',
-                                            :format         => @format,
-                                            :formula        => formula
-                                          }
-                                         ]
-                         }
-                         )
+      'C2:F14',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          {},
+          {
+            :total_function => 'count',
+            :format         => @format,
+            :formula        => formula
+          }
+        ]
+      }
+    )
 
     # add_table should not change style string.
     assert_equal('=SUM(Table1[@[Column1]:[Column3]])', formula)
@@ -46,23 +47,23 @@ class TestTable13 < Minitest::Test
     # Set the table properties.
 
     @worksheet.add_table(
-                         'B2:K8',
-                         {
-                           :total_row => 1,
-                           :columns => [
-                                        {:total_string => 'Total'},
-                                        {},
-                                        {:total_function => 'Average'},
-                                        {:total_function => 'COUNT'},
-                                        {:total_function => 'count_nums'},
-                                        {:total_function => 'max'},
-                                        {:total_function => 'min'},
-                                        {:total_function => 'sum'},
-                                        {:total_function => total_function},
-                                        {:total_function => 'var'}
-                                       ]
-                         }
-                         )
+      'B2:K8',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          { :total_function => 'Average' },
+          { :total_function => 'COUNT' },
+          { :total_function => 'count_nums' },
+          { :total_function => 'max' },
+          { :total_function => 'min' },
+          { :total_function => 'sum' },
+          { :total_function => total_function },
+          { :total_function => 'var' }
+        ]
+      }
+    )
     # add_table should not change total_function string.
     assert_equal('std Dev', total_function)
   end

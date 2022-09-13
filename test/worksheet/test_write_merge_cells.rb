@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -37,7 +38,7 @@ class TestWriteMergeCells < Minitest::Test
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 
@@ -78,7 +79,7 @@ EOS
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 
@@ -95,9 +96,9 @@ EOS
     @worksheet.merge_range_type('number',      'B2:C2',   123,                    format1)
     @worksheet.merge_range_type('string',      'B4:C4',   'foo',                  format1)
     @worksheet.merge_range_type('blank',       'B6:C6',                           format1)
-#    @worksheet.merge_range_type('rich_string', 'B8:C8',   'This is ', format2, 'bold', format1)
+    #    @worksheet.merge_range_type('rich_string', 'B8:C8',   'This is ', format2, 'bold', format1)
     @worksheet.merge_range_type('date_time',   'B10:C10', '2011-01-01T',          format2)
-#    @worksheet.merge_range_type('url',         'B12:C12', 'http://www.perl.com/', format3)
+    #    @worksheet.merge_range_type('url',         'B12:C12', 'http://www.perl.com/', format3)
 
     @worksheet.__send__('assemble_xml_file')
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
@@ -153,40 +154,38 @@ EOS
   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
 </worksheet>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
-=begin
-  def test_write_merge_cells_2_1_2_2_Foo_format
-    format = Writexlsx::Format.new({}, {}, :xf_index => 1)
-    @worksheet.merge_range(2, 1, 2, 2, 'Foo', format)
-    @worksheet.__send__('write_merge_cells')
-    @worksheet.__send__('assemble_xml_file')
-    result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
-    expected = expected_to_array(<<EOS
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-  <dimension ref="B3:C3"/>
-  <sheetViews>
-    <sheetView tabSelected="1" workbookViewId="0"/>
-  </sheetViews>
-  <sheetFormatPr defaultRowHeight="15"/>
-  <sheetData>
-    <row r="3" spans="2:3">
-      <c r="B3" s="1" t="s">
-        <v>0</v>
-      </c>
-      <c r="C3" s="1"/>
-    </row>
-  </sheetData>
-  <mergeCells count="1">
-    <mergeCell ref="B3:C3"/>
-  </mergeCells>
-  <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
-</worksheet>
-EOS
-    )
-    assert_equal(expected, result)
-  end
-=end
+  #   def test_write_merge_cells_2_1_2_2_Foo_format
+  #     format = Writexlsx::Format.new({}, {}, :xf_index => 1)
+  #     @worksheet.merge_range(2, 1, 2, 2, 'Foo', format)
+  #     @worksheet.__send__('write_merge_cells')
+  #     @worksheet.__send__('assemble_xml_file')
+  #     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
+  #     expected = expected_to_array(<<EOS
+  # <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+  # <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  #   <dimension ref="B3:C3"/>
+  #   <sheetViews>
+  #     <sheetView tabSelected="1" workbookViewId="0"/>
+  #   </sheetViews>
+  #   <sheetFormatPr defaultRowHeight="15"/>
+  #   <sheetData>
+  #     <row r="3" spans="2:3">
+  #       <c r="B3" s="1" t="s">
+  #         <v>0</v>
+  #       </c>
+  #       <c r="C3" s="1"/>
+  #     </row>
+  #   </sheetData>
+  #   <mergeCells count="1">
+  #     <mergeCell ref="B3:C3"/>
+  #   </mergeCells>
+  #   <pageMargins left="0.7" right="0.7" top="0.75" bottom="0.75" header="0.3" footer="0.3"/>
+  # </worksheet>
+  # EOS
+  #     )
+  #     assert_equal(expected, result)
+  #   end
 end

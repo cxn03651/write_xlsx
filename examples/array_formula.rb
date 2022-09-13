@@ -17,8 +17,8 @@ workbook  = WriteXLSX.new('array_formula.xlsx')
 worksheet = workbook.add_worksheet
 
 # Write some test data.
-worksheet.write('B1', [ [ 500, 10 ], [ 300, 15 ] ])
-worksheet.write('B5', [ [ 1, 2, 3 ], [ 20234, 21003, 10000 ] ])
+worksheet.write('B1', [[500, 10], [300, 15]])
+worksheet.write('B5', [[1, 2, 3], [20234, 21003, 10000]])
 
 # Write an array formula that returns a single value
 worksheet.write('A1', '{=SUM(B1:C1*B2:C2)}')

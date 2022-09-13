@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat03 < Minitest::Test
@@ -29,9 +30,8 @@ class TestRegressionCondFormat03 < Minitest::Test
                                        :format   => format1,
                                        :criteria => 'between',
                                        :minimum  => 2,
-                                       :maximum => 6
-                                     }
-                                     )
+                                       :maximum  => 6
+                                     })
 
     worksheet.conditional_formatting('A1',
                                      {
@@ -39,8 +39,7 @@ class TestRegressionCondFormat03 < Minitest::Test
                                        :format   => format2,
                                        :criteria => 'greater than',
                                        :value    => 1
-                                     }
-                                     )
+                                     })
 
     workbook.close
     compare_for_regression(

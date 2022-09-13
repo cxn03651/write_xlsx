@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable10 < Minitest::Test
@@ -39,30 +40,29 @@ class TestRegressionTable10 < Minitest::Test
 
     # Add the table.
     worksheet.add_table(
-                        'B3:K6',
-                        {
-                          :total_row => 1,
-                          :columns   => [
-                                         {:total_string => 'Total'},
-                                         {},
-                                         {:total_function => 'Average'},
-                                         {:total_function => 'COUNT'},
-                                         {:total_function => 'count_nums'},
-                                         {:total_function => 'max'},
-                                         {:total_function => 'min'},
-                                         {:total_function => 'sum'},
-                                         {:total_function => 'std Dev'},
-                                         {:total_function => 'var',
-                                           :formula => 'SUM(Table1[[#This Row],[Column1]:[Column3]])', :format => format
-                                         }
-                                        ]
-                        }
-                        )
+      'B3:K6',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          { :total_function => 'Average' },
+          { :total_function => 'COUNT' },
+          { :total_function => 'count_nums' },
+          { :total_function => 'max' },
+          { :total_function => 'min' },
+          { :total_function => 'sum' },
+          { :total_function => 'std Dev' },
+          { :total_function => 'var',
+            :formula => 'SUM(Table1[[#This Row],[Column1]:[Column3]])', :format => format }
+        ]
+      }
+    )
 
     workbook.close
     compare_for_regression(
-                                [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
-                                {  'xl/workbook.xml' => ['<workbookView'] }
-                                )
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
+      {  'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

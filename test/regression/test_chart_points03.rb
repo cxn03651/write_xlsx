@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartPoints03 < Minitest::Test
@@ -20,19 +21,19 @@ class TestRegressionChartPoints03 < Minitest::Test
     workbook.set_custom_color(41, 0x99, 0x00, 0x00)
 
     data = [
-            [2, 5, 4]
-           ]
+      [2, 5, 4]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :values => '=Sheet1!$A$1:$A$3',
-                     :points => [
-                                 { :fill => { :color => '#FF0000' } },
-                                 { :fill => { :color => '#CC0000' } },
-                                 { :fill => { :color => '#990000' } }
-                                ]
-                     )
+      :values => '=Sheet1!$A$1:$A$3',
+      :points => [
+        { :fill => { :color => '#FF0000' } },
+        { :fill => { :color => '#CC0000' } },
+        { :fill => { :color => '#990000' } }
+      ]
+    )
 
     worksheet.insert_chart('E9', chart)
 

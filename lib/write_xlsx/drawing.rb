@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
@@ -8,8 +9,17 @@ module Writexlsx
     attr_reader :tip, :decorative
 
     def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, decorative = nil)
-      @type, @dimensions, @width, @height, @description, @shape, @anchor, @rel_index, @url_rel_index, @tip, @decorative =
-                                                                                                            type, dimensions, width, height, description, shape, anchor, rel_index, url_rel_index, tip, decorative
+      @type = type
+      @dimensions = dimensions
+      @width = width
+      @height = height
+      @description = description
+      @shape = shape
+      @anchor = anchor
+      @rel_index = rel_index
+      @url_rel_index = url_rel_index
+      @tip = tip
+      @decorative = decorative
     end
   end
 
@@ -67,14 +77,14 @@ module Writexlsx
     #
     # Write the <xdr:wsDr> element.
     #
-    def write_drawing_workspace
-      schema    = 'http://schemas.openxmlformats.org/drawingml/'
+    def write_drawing_workspace(&block)
+      schema = 'http://schemas.openxmlformats.org/drawingml/'
       attributes = [
         ['xmlns:xdr', "#{schema}2006/spreadsheetDrawing"],
         ['xmlns:a',    "#{schema}2006/main"]
       ]
 
-      @writer.tag_elements('xdr:wsDr', attributes) { yield }
+      @writer.tag_elements('xdr:wsDr', attributes, &block)
     end
 
     #
@@ -125,7 +135,7 @@ module Writexlsx
           write_pic(
             index,        rel_index,      col_absolute,
             row_absolute, width,          height,
-            description,  url_rel_index , tip, decorative
+            description,  url_rel_index, tip, decorative
           )
         else
           # Write the xdr:sp element for shapes.
@@ -143,19 +153,19 @@ module Writexlsx
     def write_absolute_anchor(index)
       @writer.tag_elements('xdr:absoluteAnchor') do
         # Different co-ordinates for horizonatal (= 0) and vertical (= 1).
-        if !ptrue?(@orientation)
+        if ptrue?(@orientation)
+          # Write the xdr:pos element.
+          write_pos(0, -47625)
+
+          # Write the xdr:ext element.
+          write_xdr_ext(6162675, 6124575)
+        else
 
           # Write the xdr:pos element.
           write_pos(0, 0)
 
           # Write the xdr:ext element.
           write_xdr_ext(9308969, 6078325)
-        else
-          # Write the xdr:pos element.
-          write_pos(0, -47625)
-
-          # Write the xdr:ext element.
-          write_xdr_ext(6162675, 6124575)
         end
 
         # Write the xdr:graphicFrame element.
@@ -212,14 +222,12 @@ module Writexlsx
       @writer.data_element('xdr:colOff', data)
     end
 
-
     #
     # Write the <xdr:row> element.
     #
     def write_row(data)
       @writer.data_element('xdr:row', data)
     end
-
 
     #
     # Write the <xdr:rowOff> element.
@@ -258,7 +266,7 @@ module Writexlsx
     def write_graphic_frame(index, rel_index, name = nil)
       macro  = ''
 
-      attributes = [ ['macro', macro] ]
+      attributes = [['macro', macro]]
 
       @writer.tag_elements('xdr:graphicFrame', attributes) do
         # Write the xdr:nvGraphicFramePr element.
@@ -278,7 +286,7 @@ module Writexlsx
 
       @writer.tag_elements('xdr:nvGraphicFramePr') do
         # Write the xdr:cNvPr element.
-        write_c_nv_pr( index + 1, name)
+        write_c_nv_pr(index + 1, name)
         # Write the xdr:cNvGraphicFramePr element.
         write_c_nv_graphic_frame_pr
       end
@@ -406,7 +414,7 @@ module Writexlsx
     def write_a_graphic_frame_locks
       no_grp = 1
 
-      attributes = [ ['noGrp', no_grp ] ]
+      attributes = [['noGrp', no_grp]]
 
       @writer.empty_tag('a:graphicFrameLocks', attributes)
     end
@@ -469,7 +477,7 @@ module Writexlsx
     def write_atag_graphic_data(index)
       uri = 'http://schemas.openxmlformats.org/drawingml/2006/chart'
 
-      attributes = [ ['uri', uri] ]
+      attributes = [['uri', uri]]
 
       @writer.tag_elements('a:graphicData', attributes) do
         # Write the c:chart element.
@@ -484,7 +492,6 @@ module Writexlsx
       schema  = 'http://schemas.openxmlformats.org/'
       xmlns_c = "#{schema}drawingml/2006/chart"
       xmlns_r = "#{schema}officeDocument/2006/relationships"
-
 
       attributes = [
         ['xmlns:c', xmlns_c],
@@ -506,24 +513,13 @@ module Writexlsx
     # Write the <xdr:sp> element.
     #
     def write_sp(index, col_absolute, row_absolute, width, height, shape)
-      if shape.connect != 0
-        attributes = [ [:macro,  ''] ]
-        @writer.tag_elements('xdr:cxnSp', attributes) do
-
-          # Write the xdr:nvCxnSpPr element.
-          write_nv_cxn_sp_pr(index, shape)
-
-          # Write the xdr:spPr element.
-          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
-        end
-      else
+      if shape.connect == 0
         # Add attribute for shapes.
         attributes = [
           [:macro, ''],
           [:textlink, '']
         ]
         @writer.tag_elements('xdr:sp', attributes) do
-
           # Write the xdr:nvSpPr element.
           write_nv_sp_pr(index, shape)
 
@@ -531,9 +527,16 @@ module Writexlsx
           write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
 
           # Write the xdr:txBody element.
-          if shape.text != 0
-            write_tx_body(shape)
-          end
+          write_tx_body(shape) if shape.text != 0
+        end
+      else
+        attributes = [[:macro,  '']]
+        @writer.tag_elements('xdr:cxnSp', attributes) do
+          # Write the xdr:nvCxnSpPr element.
+          write_nv_cxn_sp_pr(index, shape)
+
+          # Write the xdr:spPr element.
+          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
         end
       end
     end
@@ -543,13 +546,11 @@ module Writexlsx
     #
     def write_nv_cxn_sp_pr(index, shape)
       @writer.tag_elements('xdr:nvCxnSpPr') do
-
         shape.name = [shape.type, index].join(' ') unless shape.name
         write_c_nv_pr(shape.id, shape.name)
 
         @writer.tag_elements('xdr:cNvCxnSpPr') do
-
-          attributes = [ [:noChangeShapeType, '1'] ]
+          attributes = [[:noChangeShapeType, '1']]
           @writer.empty_tag('a:cxnSpLocks', attributes)
 
           if shape.start
@@ -582,7 +583,7 @@ module Writexlsx
         write_c_nv_pr(shape.id, "#{shape.type} #{index}")
 
         @writer.tag_elements('xdr:cNvSpPr', attributes) do
-          @writer.empty_tag('a:spLocks', [ [:noChangeArrowheads, '1'] ])
+          @writer.empty_tag('a:spLocks', [[:noChangeArrowheads, '1']])
         end
       end
     end
@@ -609,7 +610,7 @@ module Writexlsx
     #
     # Write the <xdr:nvPicPr> element.
     #
-    def write_nv_pic_pr(index, rel_index, description, url_rel_index, tip, decorative)
+    def write_nv_pic_pr(index, _rel_index, description, url_rel_index, tip, decorative)
       @writer.tag_elements('xdr:nvPicPr') do
         # Write the xdr:cNvPr element.
         write_c_nv_pr(
@@ -637,7 +638,7 @@ module Writexlsx
     def write_a_pic_locks
       no_change_aspect = 1
 
-      attributes = [ ['noChangeAspect', no_change_aspect] ]
+      attributes = [['noChangeAspect', no_change_aspect]]
 
       @writer.empty_tag('a:picLocks', attributes)
     end
@@ -703,10 +704,9 @@ module Writexlsx
     # Write the <xdr:spPr> element for shapes.
     #
     def write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
-      attributes = [ ['bwMode', 'auto'] ]
+      attributes = [%w[bwMode auto]]
 
       @writer.tag_elements('xdr:spPr', attributes) do
-
         # Write the a:xfrm element.
         write_a_xfrm(col_absolute, row_absolute, width, height, shape)
 
@@ -740,9 +740,9 @@ module Writexlsx
 
       @writer.tag_elements('a:xfrm', attributes) do
         # Write the a:off element.
-        write_a_off( col_absolute, row_absolute )
+        write_a_off(col_absolute, row_absolute)
         # Write the a:ext element.
-        write_a_ext( width, height )
+        write_a_ext(width, height)
       end
     end
 
@@ -757,7 +757,6 @@ module Writexlsx
 
       @writer.empty_tag('a:off', attributes)
     end
-
 
     #
     # Write the <a:ext> element.
@@ -802,7 +801,7 @@ module Writexlsx
           adjustments.each do |adj|
             i += 1
             # Only connectors have multiple adjustments.
-            suffix = shape.connect != 0 ? i : ''
+            suffix = shape.connect == 0 ? '' : i
 
             # Scale Adjustments: 100,000 = 100%.
             adj_int = (adj * 1000).to_i
@@ -823,7 +822,7 @@ module Writexlsx
     # Write the <a:solidFill> element.
     #
     def write_a_solid_fill(rgb = '000000')
-      attributes = [ ['val', rgb] ]
+      attributes = [['val', rgb]]
 
       @writer.tag_elements('a:solidFill') do
         @writer.empty_tag('a:srgbClr', attributes)
@@ -835,7 +834,7 @@ module Writexlsx
     #
     def write_a_ln(shape = {})
       weight = shape.line_weight || 0
-      attributes = [ ['w', weight * 9525] ]
+      attributes = [['w', weight * 9525]]
       @writer.tag_elements('a:ln', attributes) do
         line = shape.line || 0
         if line.to_s.bytesize > 1
@@ -846,15 +845,15 @@ module Writexlsx
         end
 
         if shape.line_type != ''
-          attributes = [ ['val', shape.line_type] ]
+          attributes = [['val', shape.line_type]]
           @writer.empty_tag('a:prstDash', attributes)
         end
 
-        if shape.connect != 0
-          @writer.empty_tag('a:round')
-        else
-          attributes = [ ['lim', 800000] ]
+        if shape.connect == 0
+          attributes = [['lim', 800000]]
           @writer.empty_tag('a:miter', attributes)
+        else
+          @writer.empty_tag('a:round')
         end
 
         @writer.empty_tag('a:headEnd')
@@ -889,7 +888,7 @@ module Writexlsx
             [:rtl, rotation]
           ]
           @writer.tag_elements('a:pPr', attributes) do
-            attributes = [ [:sz, "1000"] ]
+            attributes = [[:sz, "1000"]]
             @writer.empty_tag('a:defRPr', attributes)
           end
 
@@ -923,7 +922,7 @@ module Writexlsx
               write_a_solid_fill(color)
 
               font = shape.format[:font] || 'Calibri'
-              attributes = [ [:typeface, font] ]
+              attributes = [[:typeface, font]]
               @writer.empty_tag('a:latin', attributes)
               @writer.empty_tag('a:cs', attributes)
             end

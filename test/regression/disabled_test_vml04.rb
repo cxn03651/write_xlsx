@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionVml04 < Minitest::Test
@@ -7,7 +8,7 @@ class TestRegressionVml04 < Minitest::Test
   end
 
   def teardown
-    File.delete(@xlsx) if File.exist?(@xlsx)
+    FileUtils.rm_f(@xlsx)
   end
 
   def test_vml04
@@ -17,8 +18,8 @@ class TestRegressionVml04 < Minitest::Test
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
 
-    (0..127).each do |row|
-      (0..15).each do |col|
+    128.times do |row|
+      16.times do |col|
         worksheet1.write_comment(row, col, 'Some text')
       end
     end

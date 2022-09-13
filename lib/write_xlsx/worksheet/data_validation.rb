@@ -15,13 +15,15 @@ module Writexlsx
         row1, col1, row2, col2, options = row_col_notation(args)
         if row2.respond_to?(:keys)
           options_to_instance_variable(row2.dup)
-          row2, col2 = row1, col1
+          row2 = row1
+          col2 = col1
         elsif options.respond_to?(:keys)
           options_to_instance_variable(options.dup)
         else
           raise WriteXLSXInsufficientArgumentError
         end
         raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2].include?(nil)
+
         check_for_valid_input_params
 
         check_dimensions(row1, col1)
@@ -42,7 +44,7 @@ module Writexlsx
 
         # The any, list and custom validations don't have a criteria
         # so we use a default of 'between'
-        if ['none', 'list', 'custom'].include?(@validate)
+        if %w[none list custom].include?(@validate)
           @criteria  = 'between'
           @maximum   = nil
         end
@@ -56,13 +58,10 @@ module Writexlsx
 
         convert_date_time_value_if_required
         # Check that the input title doesn't exceed the maximum length.
-        if @input_title && @input_title.length > 32
-          raise "Length of input title '#{@input_title}' exceeds Excel's limit of 32"
-        end
+        raise "Length of input title '#{@input_title}' exceeds Excel's limit of 32" if @input_title && @input_title.length > 32
         # Check that the input message doesn't exceed the maximum length.
-        if @input_message && @input_message.length > 255
-          raise "Length of input message '#{@input_message}' exceeds Excel's limit of 255"
-        end
+        raise "Length of input message '#{@input_message}' exceeds Excel's limit of 255" if @input_message && @input_message.length > 255
+
         set_some_defaults
 
         # A (for now) undocumented parameter to pass additional cell ranges.
@@ -76,7 +75,7 @@ module Writexlsx
       end
 
       def keys
-        self.instance_variables.collect { |v| v.to_s.sub(/@/, '').to_sym }
+        instance_variables.collect { |v| v.to_s.sub(/@/, '').to_sym }
       end
 
       def validate_none?
@@ -86,7 +85,7 @@ module Writexlsx
       #
       # Write the <dataValidation> element.
       #
-      def write_data_validation(writer) #:nodoc:
+      def write_data_validation(writer) # :nodoc:
         @writer = writer
         if @validate == 'none'
           @writer.empty_tag('dataValidation', attributes)
@@ -105,9 +104,9 @@ module Writexlsx
       #
       # Write the <formula1> element.
       #
-      def write_formula_1(formula) #:nodoc:
+      def write_formula_1(formula) # :nodoc:
         # Convert a list array ref into a comma separated string.
-        formula   = %!"#{formula.join(',')}"! if formula.kind_of?(Array)
+        formula   = %("#{formula.join(",")}") if formula.is_a?(Array)
 
         formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
 
@@ -117,7 +116,7 @@ module Writexlsx
       #
       # Write the <formula2> element.
       #
-      def write_formula_2(formula) #:nodoc:
+      def write_formula_2(formula) # :nodoc:
         formula = formula.sub(/^=/, '') if formula.respond_to?(:sub)
 
         @writer.data_element('formula2', formula)
@@ -147,8 +146,8 @@ module Writexlsx
         end
 
         if @error_type
-          attributes << ['errorStyle', 'warning'] if @error_type == 1
-          attributes << ['errorStyle', 'information'] if @error_type == 2
+          attributes << %w[errorStyle warning] if @error_type == 1
+          attributes << %w[errorStyle information] if @error_type == 2
         end
         attributes << ['allowBlank',       1] if @ignore_blank != 0
         attributes << ['showDropDown',     1] if @dropdown     == 0
@@ -176,9 +175,8 @@ module Writexlsx
       def check_for_valid_input_params
         check_parameter(self, valid_validation_parameter, 'data_validation')
 
-        unless has_key?(:validate)
-          raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()"
-        end
+        raise WriteXLSXOptionParameterError, "Parameter :validate is required in data_validation()" unless has_key?(:validate)
+
         unless valid_validation_type.has_key?(@validate.downcase)
           raise WriteXLSXOptionParameterError,
                 "Unknown validation type '#{@validate}' for parameter :validate in data_validation()"
@@ -190,9 +188,7 @@ module Writexlsx
       end
 
       def check_criteria_required
-        unless has_key?(:criteria)
-          raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()"
-        end
+        raise WriteXLSXOptionParameterError, "Parameter :criteria is required in data_validation()" unless has_key?(:criteria)
       end
 
       def check_maximum_value_when_criteria_is_between_or_notbetween
@@ -216,81 +212,77 @@ module Writexlsx
       def convert_date_time_value_if_required
         if @validate == 'date' || @validate == 'time'
           date_time = convert_date_time(@value)
-          if date_time
-            @value = date_time
-          end
+          @value = date_time if date_time
 
           if @maximum
             date_time = convert_date_time(@maximum)
-            if date_time
-              @maximum = date_time
-            end
+            @maximum = date_time if date_time
           end
         end
       end
 
       def error_type_hash
-        {'stop' => 0, 'warning' => 1, 'information' => 2}
+        { 'stop' => 0, 'warning' => 1, 'information' => 2 }
       end
 
       def valid_validation_type # :nodoc:
         {
-          'any'             => 'none',
-          'any value'       => 'none',
-          'whole number'    => 'whole',
-          'whole'           => 'whole',
-          'integer'         => 'whole',
-          'decimal'         => 'decimal',
-          'list'            => 'list',
-          'date'            => 'date',
-          'time'            => 'time',
-          'text length'     => 'textLength',
-          'length'          => 'textLength',
-          'custom'          => 'custom'
+          'any'          => 'none',
+          'any value'    => 'none',
+          'whole number' => 'whole',
+          'whole'        => 'whole',
+          'integer'      => 'whole',
+          'decimal'      => 'decimal',
+          'list'         => 'list',
+          'date'         => 'date',
+          'time'         => 'time',
+          'text length'  => 'textLength',
+          'length'       => 'textLength',
+          'custom'       => 'custom'
         }
       end
 
       # List of valid input parameters.
       def valid_validation_parameter
-        [
-          :validate,
-          :criteria,
-          :value,
-          :source,
-          :minimum,
-          :maximum,
-          :ignore_blank,
-          :dropdown,
-          :show_input,
-          :input_title,
-          :input_message,
-          :show_error,
-          :error_title,
-          :error_message,
-          :error_type,
-          :other_cells
+        %i[
+          validate
+          criteria
+          value
+          source
+          minimum
+          maximum
+          ignore_blank
+          dropdown
+          show_input
+          input_title
+          input_message
+          show_error
+          error_title
+          error_message
+          error_type
+          other_cells
         ]
       end
 
       # List of valid criteria types.
       def valid_criteria_type  # :nodoc:
         {
-          'between'                     => 'between',
-          'not between'                 => 'notBetween',
-          'equal to'                    => 'equal',
-          '='                           => 'equal',
-          '=='                          => 'equal',
-          'not equal to'                => 'notEqual',
-          '!='                          => 'notEqual',
-          '<>'                          => 'notEqual',
-          'greater than'                => 'greaterThan',
-          '>'                           => 'greaterThan',
-          'less than'                   => 'lessThan',
-          '<'                           => 'lessThan',
-          'greater than or equal to'    => 'greaterThanOrEqual',
-          '>='                          => 'greaterThanOrEqual',
-          'less than or equal to'       => 'lessThanOrEqual',
-          '<='                          => 'lessThanOrEqual'
+          'between'                  => 'between',
+          'not between'              => 'notBetween',
+          'equal to'                 => 'equal',
+          '='                        => 'equal',
+          '=='                       => 'equal',
+          'not equal to'             => 'notEqual',
+          '!='                       => 'notEqual',
+          '<>'                       => 'notEqual',
+          'greater than'             => 'greaterThan',
+          '>'                        => 'greaterThan',
+          'less than'                => 'lessThan',
+          '<'                        => 'lessThan',
+          'greater than or equal to' => 'greaterThanOrEqual',
+          '>='                       => 'greaterThanOrEqual',
+          'less than or equal to'    => 'lessThanOrEqual',
+          '<='                       => 'lessThanOrEqual'
         }
       end
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionSetColumn11 < Minitest::Test
@@ -30,7 +31,7 @@ class TestRegressionSetColumn11 < Minitest::Test
 
     worksheet.write('A1', 'Foo', bold)
     worksheet.write('B1', 'Bar', italic)
-    worksheet.write('A2', data )
+    worksheet.write('A2', data)
 
     worksheet.set_row_pixels(12, nil, nil, 1)
     worksheet.set_column_pixels('F:F', nil, nil, 1)

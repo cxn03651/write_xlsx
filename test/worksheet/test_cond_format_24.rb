@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -39,8 +40,8 @@ class TestCondFormat22 < Minitest::Test
     @worksheet.conditional_formatting(
       'A1',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_arrows',
+        :type          => 'icon_set',
+        :icon_style    => '3_arrows',
         :reverse_icons => 1
       }
     )
@@ -57,9 +58,9 @@ class TestCondFormat22 < Minitest::Test
     @worksheet.conditional_formatting(
       'A3',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_traffic_lights_rimmed',
-        :icons_only => 1,
+        :type          => 'icon_set',
+        :icon_style    => '3_traffic_lights_rimmed',
+        :icons_only    => 1,
         :reverse_icons => 1
       }
     )
@@ -70,8 +71,8 @@ class TestCondFormat22 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '3_symbols_circled',
         :icons      => [
-          {:value => 80},
-          {:value => 20}
+          { :value => 80 },
+          { :value => 20 }
         ]
       }
     )
@@ -82,9 +83,9 @@ class TestCondFormat22 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '4_arrows',
         :icons      => [
-          {:criteria => '>'},
-          {:criteria => '>'},
-          {:criteria => '>'}
+          { :criteria => '>' },
+          { :criteria => '>' },
+          { :criteria => '>' }
         ]
       }
     )
@@ -95,9 +96,9 @@ class TestCondFormat22 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '4_red_to_black',
         :icons      => [
-          {:criteria => '>=', :type => 'number',     :value => 90},
-          {:criteria => '<',  :type => 'percentile', :value => 50},
-          {:criteria => '<=', :type => 'percent',    :value => 25}
+          { :criteria => '>=', :type => 'number',     :value => 90 },
+          { :criteria => '<',  :type => 'percentile', :value => 50 },
+          { :criteria => '<=', :type => 'percent',    :value => 25 }
         ]
       }
     )
@@ -107,7 +108,7 @@ class TestCondFormat22 < Minitest::Test
       {
         :type       => 'icon_set',
         :icon_style => '4_traffic_lights',
-        :icons      => [ {:value => '=$A$12'} ]
+        :icons      => [{ :value => '=$A$12' }]
       }
     )
 
@@ -117,7 +118,7 @@ class TestCondFormat22 < Minitest::Test
         :type       => 'icon_set',
         :icon_style => '5_arrows_gray',
         :icons      => [
-          {:type => 'formula', :value => '=$A$12'}
+          { :type => 'formula', :value => '=$A$12' }
         ]
       }
     )
@@ -125,14 +126,14 @@ class TestCondFormat22 < Minitest::Test
     @worksheet.conditional_formatting(
       'A9',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_quarters',
-        :icons      => [
-          {:type => 'percentile', :value => 70},
-          {:type => 'percentile', :value => 50},
-          {:type => 'percentile', :value => 30},
-          {:type => 'percentile', :value => 10},
-          {:type => 'percentile', :value => -1}
+        :type          => 'icon_set',
+        :icon_style    => '5_quarters',
+        :icons         => [
+          { :type => 'percentile', :value => 70 },
+          { :type => 'percentile', :value => 50 },
+          { :type => 'percentile', :value => 30 },
+          { :type => 'percentile', :value => 10 },
+          { :type => 'percentile', :value => -1 }
         ],
         :reverse_icons => 1
       }

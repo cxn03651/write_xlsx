@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Column - A class for writing Excel Column charts.
@@ -34,9 +35,7 @@ module Writexlsx
         @horiz_val_axis = 0
 
         # Override and reset the default axis values.
-        if @subtype == 'percent_stacked'
-          @y_axis.defaults[:num_format] = '0%'
-        end
+        @y_axis.defaults[:num_format] = '0%' if @subtype == 'percent_stacked'
 
         set_y_axis
 
@@ -62,7 +61,7 @@ module Writexlsx
       # Write the <c:barDir> element.
       #
       def write_bar_dir
-        @writer.empty_tag('c:barDir', [ ['val', 'col'] ])
+        @writer.empty_tag('c:barDir', [%w[val col]])
       end
 
       #

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+
 require 'singleton'
 
 class ColName
   include Singleton
 
   def initialize
-    @col_str_table = Hash.new
+    @col_str_table = {}
   end
 
   def col_str(col)

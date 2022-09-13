@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -42,8 +43,7 @@ class TestCondFormat19 < Minitest::Test
                                         :mid_type  => 'percentile',
                                         :max_type  => 'percent',
                                         :bar_color => '#8DB4E3'
-                                      }
-                                      )
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

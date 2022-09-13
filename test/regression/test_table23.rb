@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable23 < Minitest::Test
@@ -31,25 +32,24 @@ class TestRegressionTable23 < Minitest::Test
     # worksheet.write_row('B4', data)
     # worksheet.write_row('B5', data)
 
-
     # Add the table.
     worksheet.add_table(
       'B3:F9',
       {
         :total_row => 1,
-        :columns => [
-            { :header => 'Column1', :total_string   => 'Total' },
-            { :header => "Column'", :total_function => 'sum' },
-            { :header => 'Column#', :total_function => 'sum' },
-            { :header => 'Column[', :total_function => 'sum' },
-            { :header => 'Column]', :total_function => 'sum' },
+        :columns   => [
+          { :header => 'Column1', :total_string   => 'Total' },
+          { :header => "Column'", :total_function => 'sum' },
+          { :header => 'Column#', :total_function => 'sum' },
+          { :header => 'Column[', :total_function => 'sum' },
+          { :header => 'Column]', :total_function => 'sum' }
         ]
       }
     )
 
     workbook.close
     compare_for_regression(
-      [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
       {  'xl/workbook.xml' => ['<workbookView'] }
     )
   end

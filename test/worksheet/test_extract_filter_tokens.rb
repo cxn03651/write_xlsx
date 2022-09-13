@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -12,93 +13,93 @@ class TestExtractFilterTokens < Minitest::Test
   def test_extract_filter_tokens
     [
       [
-          nil,
-          [],
+        nil,
+        []
       ],
 
       [
-          '',
-          [],
+        '',
+        []
       ],
 
       [
-          '0 <  2000',
-          [0, '<', 2000],
+        '0 <  2000',
+        [0, '<', 2000]
       ],
 
       [
-          'x <  2000',
-          ['x', '<', 2000],
+        'x <  2000',
+        ['x', '<', 2000]
       ],
 
       [
-          'x >  2000',
-          ['x', '>', 2000],
+        'x >  2000',
+        ['x', '>', 2000]
       ],
 
       [
-          'x == 2000',
-          ['x', '==', 2000],
+        'x == 2000',
+        ['x', '==', 2000]
       ],
 
       [
-          'x >  2000 and x <  5000',
-          ['x', '>',  2000, 'and', 'x', '<', 5000],
+        'x >  2000 and x <  5000',
+        ['x', '>',  2000, 'and', 'x', '<', 5000]
       ],
 
       [
-          'x = "foo"',
-          ['x', '=', 'foo'],
+        'x = "foo"',
+        ['x', '=', 'foo']
       ],
 
       [
-          'x = foo',
-          ['x', '=', 'foo'],
+        'x = foo',
+        ['x', '=', 'foo']
       ],
 
       [
-          'x = "foo bar"',
-          ['x', '=', 'foo bar'],
+        'x = "foo bar"',
+        ['x', '=', 'foo bar']
       ],
 
       [
-          'x = "foo "" bar"',
-          ['x', '=', 'foo " bar'],
+        'x = "foo "" bar"',
+        ['x', '=', 'foo " bar']
       ],
 
       [
-          'x = "foo bar" or x = "bar foo"',
-          ['x', '=', 'foo bar', 'or', 'x', '=', 'bar foo'],
+        'x = "foo bar" or x = "bar foo"',
+        ['x', '=', 'foo bar', 'or', 'x', '=', 'bar foo']
       ],
 
       [
-          'x = "foo "" bar" or x = "bar "" foo"',
-          ['x', '=', 'foo " bar', 'or', 'x', '=', 'bar " foo'],
+        'x = "foo "" bar" or x = "bar "" foo"',
+        ['x', '=', 'foo " bar', 'or', 'x', '=', 'bar " foo']
       ],
 
       [
-          'x = """"""""',
-          ['x', '=', '"""'],
+        'x = """"""""',
+        ['x', '=', '"""']
       ],
 
       [
-          'x = Blanks',
-          ['x', '=', 'Blanks'],
+        'x = Blanks',
+        ['x', '=', 'Blanks']
       ],
 
       [
-          'x = NonBlanks',
-          ['x', '=', 'NonBlanks'],
+        'x = NonBlanks',
+        ['x', '=', 'NonBlanks']
       ],
 
       [
-          'top 10 %',
-          ['top', 10, '%'],
+        'top 10 %',
+        ['top', 10, '%']
       ],
 
       [
-          'top 10 items',
-          ['top', 10, 'items'],
+        'top 10 items',
+        ['top', 10, 'items']
       ]
     ].each do |test|
       expected = test[1]

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar23 < Minitest::Test
@@ -21,11 +22,11 @@ class TestRegressionChartBar23 < Minitest::Test
 
     headers = ['Series 1', 'Series 2', 'Series 3']
     data = [
-            [ 'Category 1', 'Category 2', 'Category 3', 'Category 4' ],
-            [ 4.3,          2.5,          3.5,          4.5 ],
-            [ 2.4,          4.5,          1.8,          2.8 ],
-            [ 2,            2,            3,            5 ]
-           ]
+      ['Category 1', 'Category 2', 'Category 3', 'Category 4'],
+      [4.3,          2.5,          3.5,          4.5],
+      [2.4,          4.5,          1.8,          2.8],
+      [2,            2,            3,            5]
+    ]
 
     worksheet.set_column('A:D', 11)
 
@@ -33,19 +34,19 @@ class TestRegressionChartBar23 < Minitest::Test
     worksheet.write('A2', data)
 
     chart.add_series(
-                     :categories      => '=Sheet1!$A$2:$A$5',
-                     :values          => '=Sheet1!$B$2:$B$5'
-                     )
+      :categories => '=Sheet1!$A$2:$A$5',
+      :values     => '=Sheet1!$B$2:$B$5'
+    )
 
     chart.add_series(
-                     :categories      => '=Sheet1!$A$2:$A$5',
-                     :values          => '=Sheet1!$C$2:$C$5'
-                     )
+      :categories => '=Sheet1!$A$2:$A$5',
+      :values     => '=Sheet1!$C$2:$C$5'
+    )
 
     chart.add_series(
-                     :categories      => '=Sheet1!$A$2:$A$5',
-                     :values          => '=Sheet1!$D$2:$D$5'
-                     )
+      :categories => '=Sheet1!$A$2:$A$5',
+      :values     => '=Sheet1!$D$2:$D$5'
+    )
 
     worksheet.insert_chart('E9', chart)
 

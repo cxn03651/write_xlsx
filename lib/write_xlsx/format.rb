@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/utility'
 
 module Writexlsx
@@ -23,7 +24,7 @@ module Writexlsx
       @xf_index       = nil
       @dxf_index      = nil
 
-      @num_format     = 'General'
+      @num_format = 'General'
       @num_format_index = 0
       @font_index     = 0
       @font           = 'Calibri'
@@ -90,11 +91,11 @@ module Writexlsx
     # Copy the attributes of another Format object.
     #
     def copy(other)
-      reserve = [
-        :xf_index,
-        :dxf_index,
-        :xdf_format_indices,
-        :palette
+      reserve = %i[
+        xf_index
+        dxf_index
+        xdf_format_indices
+        palette
       ]
       (instance_variables - reserve).each do |v|
         instance_variable_set(v, other.instance_variable_get(v))
@@ -113,6 +114,7 @@ module Writexlsx
     #
     def set_format_properties(*properties)   # :nodoc:
       return if properties.empty?
+
       properties.each do |property|
         property.each do |key, value|
           # Strip leading "-" from Tk style properties e.g. "-color" => 'red'.
@@ -157,22 +159,22 @@ module Writexlsx
 
       continuous = 'centerContinuous'
 
-      align << ['horizontal', 'left']        if @text_h_align == 1
-      align << ['horizontal', 'center']      if @text_h_align == 2
-      align << ['horizontal', 'right']       if @text_h_align == 3
-      align << ['horizontal', 'fill']        if @text_h_align == 4
-      align << ['horizontal', 'justify']     if @text_h_align == 5
+      align << %w[horizontal left]        if @text_h_align == 1
+      align << %w[horizontal center]      if @text_h_align == 2
+      align << %w[horizontal right]       if @text_h_align == 3
+      align << %w[horizontal fill]        if @text_h_align == 4
+      align << %w[horizontal justify]     if @text_h_align == 5
       align << ['horizontal', continuous]    if @text_h_align == 6
-      align << ['horizontal', 'distributed'] if @text_h_align == 7
+      align << %w[horizontal distributed] if @text_h_align == 7
 
       align << ['justifyLastLine', 1] if @just_distrib != 0
 
       # Property 'vertical' => 'bottom' is a default. It sets applyAlignment
       # without an alignment sub-element.
-      align << ['vertical', 'top']         if @text_v_align == 1
-      align << ['vertical', 'center']      if @text_v_align == 2
-      align << ['vertical', 'justify']     if @text_v_align == 4
-      align << ['vertical', 'distributed'] if @text_v_align == 5
+      align << %w[vertical top]         if @text_v_align == 1
+      align << %w[vertical center]      if @text_v_align == 2
+      align << %w[vertical justify]     if @text_v_align == 4
+      align << %w[vertical distributed] if @text_v_align == 5
 
       align << ['indent',       @indent]   if @indent   != 0
       align << ['textRotation', @rotation] if @rotation != 0
@@ -183,7 +185,7 @@ module Writexlsx
       align << ['readingOrder', 1] if @reading_order == 1
       align << ['readingOrder', 2] if @reading_order == 2
 
-      return changed, align
+      [changed, align]
     end
 
     #
@@ -307,7 +309,6 @@ module Writexlsx
     # to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
     #
     def self.color(color_code)
-
       colors = Colors::COLORS
 
       # Return the default color if nil,
@@ -330,7 +331,7 @@ module Writexlsx
         return 0x00 if color_code > 63
 
         # or an integer in the valid range
-        return color_code
+        color_code
       end
     end
 
@@ -355,7 +356,7 @@ module Writexlsx
       set_text_h_align(7) if location == 'equal_space'        # S::PE.
       set_text_h_align(7) if location == 'justify_distributed'
 
-      @just_distrib =   1 if location == 'justify_distributed'
+      @just_distrib = 1 if location == 'justify_distributed'
 
       set_text_v_align(1) if location == 'top'
       set_text_v_align(2) if location == 'vcentre'
@@ -377,7 +378,7 @@ module Writexlsx
     #
     # Implements the Excel5 style "merge".
     #
-    def set_center_across(flag = 1)
+    def set_center_across(_flag = 1)
       set_text_h_align(6)
     end
 
@@ -386,7 +387,7 @@ module Writexlsx
     # called "center_across" and not "merge".
     # This is now deprecated. Use set_center_across() or better merge_range().
     #
-    def set_merge(merge = 1)
+    def set_merge(_merge = 1)
       set_text_h_align(6)
     end
 
@@ -475,15 +476,15 @@ module Writexlsx
       method =~ /set_(\w+)/ or raise "Unknown method: #{method}\n"
 
       # Match the attribute, i.e. "@xxx_yyy".
-      attribute = "@#{$1}"
+      attribute = "@#{::Regexp.last_match(1)}"
 
       # Check that the attribute exists
       # ........
-      if method =~ /set\w+color$/    # for "set_property_color" methods
-        value = color(args[0])
-      else                            # for "set_xxx" methods
-        value = args[0] || 1
-      end
+      value = if method =~ /set\w+color$/    # for "set_property_color" methods
+                color(args[0])
+              else                            # for "set_xxx" methods
+                args[0] || 1
+              end
 
       instance_variable_set(attribute, value)
     end
@@ -565,10 +566,10 @@ module Writexlsx
     end
 
     def [](attr)
-      self.instance_variable_get("@#{attr}")
+      instance_variable_get("@#{attr}")
     end
 
-    def write_font(writer, worksheet, dxf_format = nil) #:nodoc:
+    def write_font(writer, worksheet, dxf_format = nil) # :nodoc:
       writer.tag_elements('font') do
         # The condense and extend elements are mainly used in dxf formats.
         write_condense(writer) if ptrue?(@font_condense)
@@ -576,7 +577,7 @@ module Writexlsx
 
         write_font_shapes(writer)
 
-        writer.empty_tag('sz', [ ['val', size] ]) unless dxf_format
+        writer.empty_tag('sz', [['val', size]]) unless dxf_format
 
         if theme == -1
         # Ignore for excel2003_style
@@ -592,16 +593,16 @@ module Writexlsx
         end
 
         unless ptrue?(dxf_format)
-          writer.empty_tag('name', [ ['val', @font] ])
+          writer.empty_tag('name', [['val', @font]])
           write_font_family_scheme(writer)
         end
       end
     end
 
-    def write_font_rpr(writer, worksheet) #:nodoc:
+    def write_font_rpr(writer, worksheet) # :nodoc:
       writer.tag_elements('rPr') do
         write_font_shapes(writer)
-        writer.empty_tag('sz', [ ['val', size] ])
+        writer.empty_tag('sz', [['val', size]])
 
         if ptrue?(theme)
           write_color(writer, 'theme', theme)
@@ -612,7 +613,7 @@ module Writexlsx
           write_color(writer, 'theme', 1)
         end
 
-        writer.empty_tag('rFont', [ ['val', @font] ])
+        writer.empty_tag('rFont', [['val', @font]])
         write_font_family_scheme(writer)
       end
     end
@@ -635,10 +636,10 @@ module Writexlsx
     def xf_attributes
       attributes = [
         ['numFmtId', num_format_index],
-        ['fontId'  , font_index],
-        ['fillId'  , fill_index],
+        ['fontId', font_index],
+        ['fillId', fill_index],
         ['borderId', border_index],
-        ['xfId'    , xf_id]
+        ['xfId', xf_id]
       ]
       attributes << ['applyNumberFormat', 1] if num_format_index > 0
       # Add applyFont attribute if XF format uses a font element.
@@ -652,9 +653,7 @@ module Writexlsx
       apply_align, _align = get_align_properties
       # We can also have applyAlignment without a sub-element.
       attributes << ['applyAlignment', 1] if apply_align || ptrue?(@hyperlink)
-      if get_protection_properties || ptrue?(hyperlink)
-        attributes << ['applyProtection', 1]
-      end
+      attributes << ['applyProtection', 1] if get_protection_properties || ptrue?(hyperlink)
 
       attributes
     end
@@ -676,17 +675,11 @@ module Writexlsx
     end
 
     def write_font_family_scheme(writer)
-      if ptrue?(@font_family)
-        writer.empty_tag('family', [ ['val', @font_family] ])
-      end
+      writer.empty_tag('family', [['val', @font_family]]) if ptrue?(@font_family)
 
-      if ptrue?(@font_charset)
-        writer.empty_tag('charset', [ ['val', @font_charset] ])
-      end
+      writer.empty_tag('charset', [['val', @font_charset]]) if ptrue?(@font_charset)
 
-      if @font == 'Calibri' && !ptrue?(@hyperlink)
-        writer.empty_tag('scheme', [ ['val', @font_scheme] ])
-      end
+      writer.empty_tag('scheme', [['val', @font_scheme]]) if @font == 'Calibri' && !ptrue?(@hyperlink)
     end
 
     #
@@ -704,11 +697,11 @@ module Writexlsx
       # Handle the underline variants.
       case underline
       when 2
-        [ [val, 'double'] ]
+        [[val, 'double']]
       when 33
-        [ [val, 'singleAccounting'] ]
+        [[val, 'singleAccounting']]
       when 34
-        [ [val, 'doubleAccounting'] ]
+        [[val, 'doubleAccounting']]
       else
         []
       end
@@ -717,22 +710,22 @@ module Writexlsx
     #
     # Write the <vertAlign> font sub-element.
     #
-    def write_vert_align(writer, val) #:nodoc:
-      writer.empty_tag('vertAlign', [ ['val', val] ])
+    def write_vert_align(writer, val) # :nodoc:
+      writer.empty_tag('vertAlign', [['val', val]])
     end
 
     #
     # Write the <condense> element.
     #
     def write_condense(writer)
-      writer.empty_tag('condense', [ ['val', 0] ])
+      writer.empty_tag('condense', [['val', 0]])
     end
 
     #
     # Write the <extend> element.
     #
     def write_extend(writer)
-      writer.empty_tag('extend', [ ['val', 0] ])
+      writer.empty_tag('extend', [['val', 0]])
     end
   end
 end

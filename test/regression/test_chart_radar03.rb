@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartRadar03 < Minitest::Test
@@ -15,19 +16,19 @@ class TestRegressionChartRadar03 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
     chart     = workbook.add_chart(
-                                   :type     => 'radar',
-                                   :embedded => 1,
-                                   :subtype  => 'filled'
-                                   )
+      :type     => 'radar',
+      :embedded => 1,
+      :subtype  => 'filled'
+    )
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [56802304, 56845440])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDoughnut06 < Minitest::Test
@@ -17,9 +18,9 @@ class TestRegressionChartDoughnut06 < Minitest::Test
     chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
 
     data = [
-            [  2,  4,  6 ],
-            [ 60, 30, 10 ]
-           ]
+      [2,  4,  6],
+      [60, 30, 10]
+    ]
 
     worksheet.write('A1', data)
 

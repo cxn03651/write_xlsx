@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar03 < Minitest::Test
@@ -22,32 +23,32 @@ class TestRegressionChartBar03 < Minitest::Test
     chart2.instance_variable_set(:@axis_ids, [86048128, 86058112])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
     chart1.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5'
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$B$1:$B$5'
+    )
     chart1.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5'
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$C$1:$C$5'
+    )
 
     worksheet.insert_chart('E9', chart1)
 
     chart2.add_series(
-                     :categories => '=Sheet1!$A$1:$A$4',
-                     :values     => '=Sheet1!$B$1:$B$4'
-                     )
+      :categories => '=Sheet1!$A$1:$A$4',
+      :values     => '=Sheet1!$B$1:$B$4'
+    )
     chart2.add_series(
-                     :categories => '=Sheet1!$A$1:$A$4',
-                     :values     => '=Sheet1!$C$1:$C$4'
-                     )
+      :categories => '=Sheet1!$A$1:$A$4',
+      :values     => '=Sheet1!$C$1:$C$4'
+    )
 
     worksheet.insert_chart('F25', chart2)
 
@@ -56,10 +57,10 @@ class TestRegressionChartBar03 < Minitest::Test
       nil,
       {
         # Ignore the page margins.
-        'xl/charts/chart1.xml' => [ '<c:pageMargins' ],
-        'xl/charts/chart2.xml' => [ '<c:pageMargins' ],
+        'xl/charts/chart1.xml' => ['<c:pageMargins'],
+        'xl/charts/chart2.xml' => ['<c:pageMargins'],
         # Ignore the workbookView.
-        'xl/workbook.xml' => ['<workbookView']
+        'xl/workbook.xml'      => ['<workbookView']
       }
     )
   end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Pie - A class for writing Excel Pie charts.
@@ -47,6 +48,7 @@ module Writexlsx
       #
       def set_rotation(rotation)
         return unless rotation
+
         if rotation >= 0 && rotation <= 360
           @rotation = rotation
         else
@@ -71,7 +73,7 @@ module Writexlsx
           # Write the c:varyColors element.
           write_vary_colors
           # Write the series elements.
-          @series.each {|s| write_series(s)}
+          @series.each { |s| write_series(s) }
           # Write the c:firstSliceAng element.
           write_first_slice_ang
         end
@@ -94,11 +96,11 @@ module Writexlsx
           # Configure a combined chart if present.
           if second_chart
             # Secondary axis has unique id otherwise use same as primary.
-            if second_chart.is_secondary?
-              second_chart.id = 1000 + @id
-            else
-              second_chart.id = @id
-            end
+            second_chart.id = if second_chart.is_secondary?
+                                1000 + @id
+                              else
+                                @id
+                              end
 
             # Share the same filehandle for writing
             second_chart.writer = @writer
@@ -121,7 +123,7 @@ module Writexlsx
       #
       def write_legend
         position = @legend.position
-        allowed  = %w(right left top bottom)
+        allowed  = %w[right left top bottom]
         delete_series = @legend.delete_series || []
 
         if @legend.position =~ /^overlay_/
@@ -157,9 +159,7 @@ module Writexlsx
       #
       def write_tx_pr_legend(horiz, font)
         rotation = nil
-        if ptrue?(font) && font[:_rotation]
-          rotation = font[:_rotation]
-        end
+        rotation = font[:_rotation] if ptrue?(font) && font[:_rotation]
 
         @writer.tag_elements('c:txPr') do
           # Write the a:bodyPr element.
@@ -187,7 +187,7 @@ module Writexlsx
       # Write the <a:pPr> element for legends.
       #
       def write_a_p_pr_legend(font)
-        @writer.tag_elements('a:pPr', [ ['rtl', 0] ]) do
+        @writer.tag_elements('a:pPr', [['rtl', 0]]) do
           # Write the a:defRPr element.
           write_a_def_rpr(font)
         end
@@ -197,14 +197,14 @@ module Writexlsx
       # Write the <c:varyColors> element.
       #
       def write_vary_colors
-        @writer.empty_tag('c:varyColors', [ ['val', 1] ])
+        @writer.empty_tag('c:varyColors', [['val', 1]])
       end
 
       #
       # Write the <c:firstSliceAng> element.
       #
       def write_first_slice_ang
-        @writer.empty_tag('c:firstSliceAng', [ ['val', @rotation] ])
+        @writer.empty_tag('c:firstSliceAng', [['val', @rotation]])
       end
     end
   end

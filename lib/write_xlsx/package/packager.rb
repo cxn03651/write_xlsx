@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 require 'write_xlsx/package/app'
@@ -17,7 +18,6 @@ require 'write_xlsx/package/vml'
 module Writexlsx
   module Package
     class Packager
-
       include Writexlsx::Utility
 
       def initialize(workbook)
@@ -79,7 +79,6 @@ module Writexlsx
         @workbook.worksheets.write_worksheet_files(@package_dir)
       end
 
-      #
       def write_chartsheet_files
         @workbook.worksheets.write_chartsheet_files(@package_dir)
       end
@@ -103,7 +102,7 @@ module Writexlsx
 
         objects.each_with_index do |object, index|
           FileUtils.mkdir_p(dir)
-          object.set_xml_writer("#{dir}/#{filename}#{index+1}.xml")
+          object.set_xml_writer("#{dir}/#{filename}#{index + 1}.xml")
           object.assemble_xml_file
         end
       end
@@ -187,7 +186,7 @@ module Writexlsx
 
         FileUtils.mkdir_p("#{@package_dir}/xl")
 
-        metadata.set_xml_writer( "#{@package_dir}/xl/metadata.xml")
+        metadata.set_xml_writer("#{@package_dir}/xl/metadata.xml")
         metadata.assemble_xml_file
       end
 
@@ -246,7 +245,7 @@ module Writexlsx
 
         rels.set_style_properties(*@workbook.style_properties)
 
-        rels.set_xml_writer("#{dir}/styles.xml" )
+        rels.set_xml_writer("#{dir}/styles.xml")
         rels.assemble_xml_file
       end
 
@@ -279,15 +278,20 @@ module Writexlsx
 
         rels.add_document_relationship('/officeDocument', 'xl/workbook.xml')
 
-        rels.add_package_relationship('/metadata/core-properties',
-            'docProps/core.xml')
+        rels.add_package_relationship(
+          '/metadata/core-properties', 'docProps/core.xml'
+        )
 
-        rels.add_document_relationship('/extended-properties', 'docProps/app.xml')
+        rels.add_document_relationship(
+          '/extended-properties', 'docProps/app.xml'
+        )
 
         unless @workbook.custom_properties.empty?
-          rels.add_document_relationship('/custom-properties', 'docProps/custom.xml')
+          rels.add_document_relationship(
+            '/custom-properties', 'docProps/custom.xml'
+          )
         end
-        rels.set_xml_writer("#{@package_dir}/_rels/.rels" )
+        rels.set_xml_writer("#{@package_dir}/_rels/.rels")
         rels.assemble_xml_file
       end
 
@@ -304,10 +308,14 @@ module Writexlsx
 
         @workbook.worksheets.each do |worksheet|
           if worksheet.is_chartsheet?
-            rels.add_document_relationship('/chartsheet', "chartsheets/sheet#{chartsheet_index}.xml")
+            rels.add_document_relationship(
+              '/chartsheet', "chartsheets/sheet#{chartsheet_index}.xml"
+            )
             chartsheet_index += 1
           else
-            rels.add_document_relationship( '/worksheet', "worksheets/sheet#{worksheet_index}.xml")
+            rels.add_document_relationship(
+              '/worksheet', "worksheets/sheet#{worksheet_index}.xml"
+            )
             worksheet_index += 1
           end
         end
@@ -316,23 +324,29 @@ module Writexlsx
         rels.add_document_relationship('/styles', 'styles.xml')
 
         # Add the sharedString rel if there is string data in the workbook.
-        rels.add_document_relationship('/sharedStrings', 'sharedStrings.xml') unless @workbook.shared_strings_empty?
-
-        # Add vbaProject if present.
-        if @workbook.vba_project
-          rels.add_ms_package_relationship('/vbaProject', 'vbaProject.bin')
+        unless @workbook.shared_strings_empty?
+          rels.add_document_relationship(
+            '/sharedStrings', 'sharedStrings.xml'
+          )
         end
 
+        # Add vbaProject if present.
+        rels.add_ms_package_relationship('/vbaProject', 'vbaProject.bin') if @workbook.vba_project
+
         # Add the metadata file if required.
-        rels.add_document_relationship('/sheetMetadata', 'metadata.xml') if @workbook.has_metadata?
+        if @workbook.has_metadata?
+          rels.add_document_relationship(
+            '/sheetMetadata', 'metadata.xml'
+          )
+        end
 
         rels.set_xml_writer("#{@package_dir}/xl/_rels/workbook.xml.rels")
         rels.assemble_xml_file
       end
 
       #
-      # Write the worksheet .rels files for worksheets that contain links to external
-      # data such as hyperlinks or drawings.
+      # Write the worksheet .rels files for worksheets that contain links to
+      # external data such as hyperlinks or drawings.
       #
       def write_worksheet_rels_files
         @workbook.worksheets.write_worksheet_rels_files(@package_dir)
@@ -346,12 +360,12 @@ module Writexlsx
       end
 
       #
-      # Write the drawing .rels files for worksheets that contain charts or drawings.
+      # Write the drawing .rels files for worksheets that contain charts or
+      # drawings.
       #
       def write_drawing_rels_files
         @workbook.worksheets.write_drawing_rels_files(@package_dir)
       end
-
 
       #
       # Write the /xl/media/image?.xml files.
@@ -361,7 +375,7 @@ module Writexlsx
 
         @workbook.images.each_with_index do |image, index|
           FileUtils.mkdir_p(dir)
-          FileUtils.cp(image[0], "#{dir}/image#{index+1}.#{image[1]}")
+          FileUtils.cp(image[0], "#{dir}/image#{index + 1}.#{image[1]}")
         end
       end
 

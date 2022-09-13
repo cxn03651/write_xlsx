@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class Custom
-
       include Writexlsx::Utility
 
       def initialize
@@ -43,7 +43,7 @@ module Writexlsx
           ['xmlns:vt', xmlns_vt]
         ]
 
-        @writer.tag_elements('Properties', attributes ) do
+        @writer.tag_elements('Properties', attributes) do
           @properties.each do |property|
             # Write the property element.
             write_property(property)
@@ -105,11 +105,11 @@ module Writexlsx
       # Write the <vt:bool> element.
       #
       def write_vt_bool(data)
-        if ptrue?(data)
-          data = 'true'
-        else
-          data = 'false'
-        end
+        data = if ptrue?(data)
+                 'true'
+               else
+                 'false'
+               end
 
         @writer.data_element('vt:bool', data)
       end

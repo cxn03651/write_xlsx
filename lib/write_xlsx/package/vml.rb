@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class Vml
-
       include Writexlsx::Utility
 
       def initialize
@@ -17,9 +17,9 @@ module Writexlsx
       end
 
       def assemble_xml_file(
-            data_id, vml_shape_id, comments_data,
-            buttons_data, header_images_data = []
-          )
+        data_id, vml_shape_id, comments_data,
+        buttons_data, header_images_data = []
+      )
         return unless @writer
 
         write_xml_namespace do
@@ -29,16 +29,18 @@ module Writexlsx
           z_index = 1
           unless buttons_data.empty?
             vml_shape_id, z_index =
-                          write_shape_type_and_shape(
-                            buttons_data,
-                            vml_shape_id, z_index) do
+              write_shape_type_and_shape(
+                buttons_data,
+                vml_shape_id, z_index
+              ) do
               write_button_shapetype
             end
           end
           unless comments_data.empty?
             write_shape_type_and_shape(
               comments_data,
-              vml_shape_id, z_index) do
+              vml_shape_id, z_index
+            ) do
               write_comment_shapetype
             end
           end
@@ -74,10 +76,8 @@ module Writexlsx
       #
       # Write the <xml> element. This is the root element of VML.
       #
-      def write_xml_namespace
-        @writer.tag_elements('xml', xml_attributes) do
-          yield
-        end
+      def write_xml_namespace(&block)
+        @writer.tag_elements('xml', xml_attributes, &block)
       end
 
       # for <xml> elements.
@@ -121,7 +121,7 @@ module Writexlsx
       #
       def write_comment_shapetype
         attributes = [
-          ['id',        '_x0000_t202'],
+          %w[id _x0000_t202],
           ['coordsize', '21600,21600'],
           ['o:spt',     202],
           ['path',      'm,l,21600r21600,l21600,xe']
@@ -140,7 +140,7 @@ module Writexlsx
       #
       def write_button_shapetype
         attributes = [
-          ['id',        '_x0000_t201'],
+          %w[id _x0000_t201],
           ['coordsize', '21600,21600'],
           ['o:spt',     201],
           ['path',      'm,l,21600r21600,l21600,xe']
@@ -198,10 +198,10 @@ module Writexlsx
       #
       def write_button_path
         attributes = [
-          ['shadowok',      'f'],
+          %w[shadowok f],
           ['o:extrusionok', 'f'],
-          ['strokeok',      'f'],
-          ['fillok',        'f'],
+          %w[strokeok f],
+          %w[fillok f],
           ['o:connecttype', 'rect']
         ]
         @writer.empty_tag('v:path', attributes)
@@ -230,7 +230,7 @@ module Writexlsx
       def write_shapetype_lock
         attributes = [
           ['v:ext',     'edit'],
-          ['shapetype', 't']
+          %w[shapetype t]
         ]
         @writer.empty_tag('o:lock', attributes)
       end
@@ -241,7 +241,7 @@ module Writexlsx
       def write_rotation_lock
         attributes = [
           ['v:ext',    'edit'],
-          ['rotation', 't']
+          %w[rotation t]
         ]
         @writer.empty_tag('o:lock', attributes)
       end
@@ -281,15 +281,11 @@ module Writexlsx
         height = height * 72.0 / y_dpi
 
         # Excel uses a rounding based around 72 and 96 dpi.
-        width  = 72/96.0 * (width  * 96/72.0 + 0.25).to_i
-        height = 72/96.0 * (height * 96/72.0 + 0.25).to_i
+        width  = 72 / 96.0 * ((width  * 96 / 72.0) + 0.25).to_i
+        height = 72 / 96.0 * ((height * 96 / 72.0) + 0.25).to_i
 
-        if (width - width.to_i).abs < 0.1
-          width = width.to_i
-        end
-        if (height - height.to_i).abs < 0.1
-          height = height.to_i
-        end
+        width = width.to_i if (width - width.to_i).abs < 0.1
+        height = height.to_i if (height - height.to_i).abs < 0.1
 
         style = [
           "position:absolute", "margin-left:0", "margin-top:0",
@@ -349,7 +345,7 @@ module Writexlsx
       # Write the <v:f> element.
       #
       def write_f(eqn)
-        attributes = [ ['eqn', eqn] ]
+        attributes = [['eqn', eqn]]
 
         @writer.empty_tag('v:f', attributes)
       end

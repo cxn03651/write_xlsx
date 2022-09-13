@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -26,28 +27,24 @@ class TestCondFormat0 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'blanks',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'blanks',
+                                        :format => nil
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'no_blanks',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'no_blanks',
+                                        :format => nil
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'errors',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'errors',
+                                        :format => nil
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'no_errors',
-                                        :format   => nil
-                                      }
-                                      )
+                                        :type   => 'no_errors',
+                                        :format => nil
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDataLabels28 < Minitest::Test
@@ -20,25 +21,25 @@ class TestRegressionChartDataLabels28 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [48514944, 48516480])
 
     data = [
-      [ 1,  2,  3,  4,  5],
-      [ 2,  4,  6,  8, 10],
-      [ 3,  6,  9, 12, 15],
-      ['foo', 'bar']
+      [1,  2,  3,  4,  5],
+      [2,  4,  6,  8, 10],
+      [3,  6,  9, 12, 15],
+      %w[foo bar]
     ]
 
     worksheet.write('A1', data)
 
     custom = [
-      {:value => 123},
-      {:value => 'abc'},
+      { :value => 123 },
+      { :value => 'abc' },
       nil,
-      {:formula => 'Sheet1!$D$1'},
-      {:formula => 'Sheet1!$D$2'}
+      { :formula => 'Sheet1!$D$1' },
+      { :formula => 'Sheet1!$D$2' }
     ]
 
     chart.add_series(
       :values      => '=Sheet1!$A$1:$A$5',
-      :data_labels => {:value    => 1, :custom => custom }
+      :data_labels => { :value => 1, :custom => custom }
     )
 
     chart.add_series(:values => '=Sheet1!$B$1:$B$5')

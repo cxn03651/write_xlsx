@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionEscapes02 < Minitest::Test
@@ -15,11 +16,11 @@ class TestRegressionEscapes02 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
-    worksheet.write('A1', %q{"<>'&})
-    worksheet.write_comment('B2', %q{<>&"'})
+    worksheet.write('A1', %q("<>'&))
+    worksheet.write_comment('B2', %q(<>&"'))
 
     # Set the author to match the target XLSX file.
-    worksheet.comments_author = %q{I am '"<>&}
+    worksheet.comments_author = %q(I am '"<>&)
 
     workbook.close
     compare_for_regression(

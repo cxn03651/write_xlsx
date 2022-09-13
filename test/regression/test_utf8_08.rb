@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionUtf8_08 < Minitest::Test
@@ -24,15 +25,15 @@ class TestRegressionUtf8_08 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                [
-                                 'xl/printerSettings/printerSettings1.bin',
-                                 'xl/worksheets/_rels/sheet1.xml.rels'
-                                ],
-                                {
-                                  '[Content_Types].xml'      => ['<Default Extension="bin"'],
-                                  'xl/workbook.xml' => ['<workbookView'],
-                                  #    'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup'],
-                                }
-                                )
+      [
+        'xl/printerSettings/printerSettings1.bin',
+        'xl/worksheets/_rels/sheet1.xml.rels'
+      ],
+      {
+        '[Content_Types].xml' => ['<Default Extension="bin"'],
+        'xl/workbook.xml'     => ['<workbookView']
+        #    'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup'],
+      }
+    )
   end
 end

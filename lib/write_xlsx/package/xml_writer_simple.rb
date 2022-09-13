@@ -1,5 +1,6 @@
 # coding: utf-8
 # frozen_string_literal: true
+
 #
 # XMLWriterSimple
 #
@@ -19,7 +20,7 @@ module Writexlsx
       end
 
       def xml_decl(encoding = 'UTF-8', standalone = true)
-        str = %Q!<?xml version="1.0" encoding="#{encoding}" standalone="#{standalone ? 'yes' : 'no'}"?>\n!
+        str = %(<?xml version="1.0" encoding="#{encoding}" standalone="#{standalone ? "yes" : "no"}"?>\n)
         io_write(str)
       end
 
@@ -91,9 +92,7 @@ module Writexlsx
       end
 
       def close
-        if @filename
-          File.open(@filename, "wb:utf-8:utf-8") { |f| f << string }
-        end
+        File.open(@filename, "wb:utf-8:utf-8") { |f| f << string } if @filename
         @io.close
       end
 
@@ -109,30 +108,30 @@ module Writexlsx
       private
 
       def key_val(key, val)
-        %Q{ #{key}="#{val}"}
+        %( #{key}="#{val}")
       end
 
       def key_vals(attribute)
-        attribute.
-          inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
+        attribute
+          .inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
       end
 
       def escape_attributes(str = '')
-        return str if !(str.to_s =~ /["&<>\n]/)
+        return str unless str.to_s =~ /["&<>\n]/
 
-        str.
-          gsub(/&/, "&amp;").
-          gsub(/"/, "&quot;").
-          gsub(/</, "&lt;").
-          gsub(/>/, "&gt;").
-          gsub(/\n/, "&#xA;")
+        str
+          .gsub(/&/, "&amp;")
+          .gsub(/"/, "&quot;")
+          .gsub(/</, "&lt;")
+          .gsub(/>/, "&gt;")
+          .gsub(/\n/, "&#xA;")
       end
 
       def escape_data(str = '')
         if str.to_s =~ /[&<>]/
-          str.gsub(/&/, '&amp;').
-            gsub(/</, '&lt;').
-            gsub(/>/, '&gt;')
+          str.gsub(/&/, '&amp;')
+             .gsub(/</, '&lt;')
+             .gsub(/>/, '&gt;')
         else
           str
         end

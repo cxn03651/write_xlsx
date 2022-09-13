@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestCheckSheetname < Minitest::Test
@@ -8,7 +9,7 @@ class TestCheckSheetname < Minitest::Test
   end
 
   def test_check_sheetname_duplicate_names
-    duplicate_names = ['Sheet1', 'sheet1']
+    duplicate_names = %w[Sheet1 sheet1]
 
     duplicate_names.each do |sheetname|
       assert_raises RuntimeError, "'#{sheetname}' passed incorrectly" do

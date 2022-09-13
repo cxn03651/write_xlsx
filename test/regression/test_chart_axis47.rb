@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartAxis47 < Minitest::Test
@@ -20,9 +21,9 @@ class TestRegressionChartAxis47 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [84517632, 106222720])
 
     data = [
-      [ 1, 2, 3,  4,  5 ],
-      [ 2, 4, 6,  8, 10 ],
-      [ 3, 6, 9, 12, 15 ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
     ]
 
     worksheet.write('A1', data)
@@ -33,12 +34,12 @@ class TestRegressionChartAxis47 < Minitest::Test
 
     chart.set_x_axis(
       :name      => 'XXX',
-      :name_font => { :rotation => 0, :baseline => -1}
-     )
+      :name_font => { :rotation => 0, :baseline => -1 }
+    )
 
     chart.set_y_axis(
       :name      => 'YYY',
-      :name_font => { :rotation => 0, :baseline => -1}
+      :name_font => { :rotation => 0, :baseline => -1 }
     )
 
     worksheet.insert_chart('E9', chart)

@@ -32,13 +32,12 @@ worksheet13 = workbook.add_worksheet
 
 currency_format = workbook.add_format(:num_format => '$#,##0')
 
-
 # Some sample data for the table.
 data = [
-    [ 'Apples',  10000, 5000, 8000, 6000 ],
-    [ 'Pears',   2000,  3000, 4000, 5000 ],
-    [ 'Bananas', 6000,  6000, 6500, 6000 ],
-    [ 'Oranges', 500,   300,  200,  700 ]
+  ['Apples',  10000, 5000, 8000, 6000],
+  ['Pears',   2000,  3000, 4000, 5000],
+  ['Bananas', 6000,  6000, 6500, 6000],
+  ['Oranges', 500,   300,  200,  700]
 ]
 
 ###############################################################################
@@ -56,7 +55,6 @@ worksheet1.write('B1', caption)
 # Add a table to the worksheet.
 worksheet1.add_table('B3:F7')
 
-
 ###############################################################################
 #
 # Example 2.
@@ -71,7 +69,6 @@ worksheet2.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet2.add_table('B3:F7', { :data => data })
-
 
 ###############################################################################
 #
@@ -145,7 +142,6 @@ worksheet6.add_table('B3:F7', { :banded_rows => 0, :banded_columns => 1 })
 # Table data can also be written separately, as an array or individual cells.
 worksheet6.write_col('B4', data)
 
-
 ###############################################################################
 #
 # Example 7.
@@ -160,17 +156,17 @@ worksheet7.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet7.add_table(
-    'B3:F7',
-    {
-        :data    => data,
-        :columns => [
-            { :header => 'Product' },
-            { :header => 'Quarter 1' },
-            { :header => 'Quarter 2' },
-            { :header => 'Quarter 3' },
-            { :header => 'Quarter 4' }
-        ]
-    }
+  'B3:F7',
+  {
+    :data    => data,
+    :columns => [
+      { :header => 'Product' },
+      { :header => 'Quarter 1' },
+      { :header => 'Quarter 2' },
+      { :header => 'Quarter 3' },
+      { :header => 'Quarter 4' }
+    ]
+  }
 )
 
 ###############################################################################
@@ -187,23 +183,22 @@ worksheet8.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet8.add_table(
-    'B3:G7',
-    {
-        :data    => data,
-        :columns => [
-            { :header => 'Product' },
-            { :header => 'Quarter 1' },
-            { :header => 'Quarter 2' },
-            { :header => 'Quarter 3' },
-            { :header => 'Quarter 4' },
-            {
-                :header  => 'Year',
-                :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
-            }
-        ]
-    }
+  'B3:G7',
+  {
+    :data    => data,
+    :columns => [
+      { :header => 'Product' },
+      { :header => 'Quarter 1' },
+      { :header => 'Quarter 2' },
+      { :header => 'Quarter 3' },
+      { :header => 'Quarter 4' },
+      {
+        :header  => 'Year',
+        :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+      }
+    ]
+  }
 )
-
 
 ###############################################################################
 #
@@ -219,24 +214,23 @@ worksheet9.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet9.add_table(
-    'B3:G8',
-    {
-        :data      => data,
-        :total_row => 1,
-        :columns   => [
-            { :header => 'Product' },
-            { :header => 'Quarter 1' },
-            { :header => 'Quarter 2' },
-            { :header => 'Quarter 3' },
-            { :header => 'Quarter 4' },
-            {
-                :header  => 'Year',
-                :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
-            }
-        ]
-    }
+  'B3:G8',
+  {
+    :data      => data,
+    :total_row => 1,
+    :columns   => [
+      { :header => 'Product' },
+      { :header => 'Quarter 1' },
+      { :header => 'Quarter 2' },
+      { :header => 'Quarter 3' },
+      { :header => 'Quarter 4' },
+      {
+        :header  => 'Year',
+        :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+      }
+    ]
+  }
 )
-
 
 ###############################################################################
 #
@@ -252,25 +246,24 @@ worksheet10.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet10.add_table(
-    'B3:G8',
-    {
-        :data      => data,
-        :total_row => 1,
-        :columns   => [
-            { :header => 'Product',   :total_string   => 'Totals' },
-            { :header => 'Quarter 1', :total_function => 'sum' },
-            { :header => 'Quarter 2', :total_function => 'sum' },
-            { :header => 'Quarter 3', :total_function => 'sum' },
-            { :header => 'Quarter 4', :total_function => 'sum' },
-            {
-                :header         => 'Year',
-                :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-                :total_function => 'sum'
-            }
-        ]
-    }
+  'B3:G8',
+  {
+    :data      => data,
+    :total_row => 1,
+    :columns   => [
+      { :header => 'Product',   :total_string   => 'Totals' },
+      { :header => 'Quarter 1', :total_function => 'sum' },
+      { :header => 'Quarter 2', :total_function => 'sum' },
+      { :header => 'Quarter 3', :total_function => 'sum' },
+      { :header => 'Quarter 4', :total_function => 'sum' },
+      {
+        :header         => 'Year',
+        :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+        :total_function => 'sum'
+      }
+    ]
+  }
 )
-
 
 ###############################################################################
 #
@@ -286,26 +279,25 @@ worksheet11.write('B1', caption)
 
 # Add a table to the worksheet.
 worksheet11.add_table(
-    'B3:G8',
-    {
-        :data      => data,
-        :style     => 'Table Style Light 11',
-        :total_row => 1,
-        :columns   => [
-            { :header => 'Product',   :total_string   => 'Totals' },
-            { :header => 'Quarter 1', :total_function => 'sum' },
-            { :header => 'Quarter 2', :total_function => 'sum' },
-            { :header => 'Quarter 3', :total_function => 'sum' },
-            { :header => 'Quarter 4', :total_function => 'sum' },
-            {
-                :header         => 'Year',
-                :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-                :total_function => 'sum'
-            }
-        ]
-    }
+  'B3:G8',
+  {
+    :data      => data,
+    :style     => 'Table Style Light 11',
+    :total_row => 1,
+    :columns   => [
+      { :header => 'Product',   :total_string   => 'Totals' },
+      { :header => 'Quarter 1', :total_function => 'sum' },
+      { :header => 'Quarter 2', :total_function => 'sum' },
+      { :header => 'Quarter 3', :total_function => 'sum' },
+      { :header => 'Quarter 4', :total_function => 'sum' },
+      {
+        :header         => 'Year',
+        :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+        :total_function => 'sum'
+      }
+    ]
+  }
 )
-
 
 ###############################################################################
 #
@@ -364,28 +356,28 @@ worksheet13.add_table(
       {
         :header         => 'Quarter 1',
         :total_function => 'sum',
-        :format         => currency_format,
+        :format         => currency_format
       },
       {
         :header         => 'Quarter 2',
         :total_function => 'sum',
-        :format         => currency_format,
+        :format         => currency_format
       },
       {
         :header         => 'Quarter 3',
         :total_function => 'sum',
-        :format         => currency_format,
+        :format         => currency_format
       },
       {
         :header         => 'Quarter 4',
         :total_function => 'sum',
-        :format         => currency_format,
+        :format         => currency_format
       },
       {
         :header         => 'Year',
         :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
         :total_function => 'sum',
-        :format         => currency_format,
+        :format         => currency_format
       }
     ]
   }

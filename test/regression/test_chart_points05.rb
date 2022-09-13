@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartPoints05 < Minitest::Test
@@ -20,26 +21,26 @@ class TestRegressionChartPoints05 < Minitest::Test
     chart.instance_variable_set("@axis_ids", [45471616, 46804992])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5',
-                     :marker     => { :type => 'automatic' },
-                     :points => [
-                                 { :fill => { :color => 'red' } }
-                                ]
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$B$1:$B$5',
+      :marker     => { :type => 'automatic' },
+      :points     => [
+        { :fill => { :color => 'red' } }
+      ]
+    )
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5',
-                     :marker     => { :type => 'automatic' }
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$C$1:$C$5',
+      :marker     => { :type => 'automatic' }
+    )
 
     worksheet.insert_chart('E9', chart)
 

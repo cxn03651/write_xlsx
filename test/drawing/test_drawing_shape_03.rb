@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/shape'
 require 'write_xlsx/drawing'
@@ -35,7 +36,7 @@ class DrawingShape03 < Minitest::Test
 </xdr:cNvCxnSpPr>
 </xdr:nvCxnSpPr>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

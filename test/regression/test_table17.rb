@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable17 < Minitest::Test
@@ -32,7 +33,7 @@ class TestRegressionTable17 < Minitest::Test
     worksheet.write_string('K1', 'Total')
 
     # Populate the data range.
-    data = [ 0, 0, 0, nil, nil, 0, 0, 0, 0, 0];
+    data = [0, 0, 0, nil, nil, 0, 0, 0, 0, 0]
     worksheet.write_row('B4', data)
     worksheet.write_row('B5', data)
 
@@ -46,17 +47,17 @@ class TestRegressionTable17 < Minitest::Test
       'B3:K6',
       {
         :total_row => 1,
-        :columns => [
-          {:total_string => 'Total'},
+        :columns   => [
+          { :total_string => 'Total' },
           {},
-          {:total_function => 'Average'},
-          {:total_function => 'COUNT'},
-          {:total_function => 'count_nums'},
-          {:total_function => 'max', :total_value => 5},
-          {:total_function => 'min'},
-          {:total_function => 'sum', :total_value => 3},
-          {:total_function => 'std Dev'},
-          {:total_function => 'var'}
+          { :total_function => 'Average' },
+          { :total_function => 'COUNT' },
+          { :total_function => 'count_nums' },
+          { :total_function => 'max', :total_value => 5 },
+          { :total_function => 'min' },
+          { :total_function => 'sum', :total_value => 3 },
+          { :total_function => 'std Dev' },
+          { :total_function => 'var' }
         ]
       }
     )
@@ -64,7 +65,7 @@ class TestRegressionTable17 < Minitest::Test
     workbook.close
     compare_for_regression(
       ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
-      {'xl/workbook.xml' => ['<workbookView']}
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 end

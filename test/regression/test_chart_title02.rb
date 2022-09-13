@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartTitle02 < Minitest::Test
@@ -17,13 +18,13 @@ class TestRegressionChartTitle02 < Minitest::Test
     chart     = workbook.add_chart(:type => 'column', :embedded => 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
-    chart.instance_variable_set(:@axis_ids, [73655040, 73656576 ])
+    chart.instance_variable_set(:@axis_ids, [73655040, 73656576])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 

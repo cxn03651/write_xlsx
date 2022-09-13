@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionEscapes07 < Minitest::Test
@@ -19,9 +20,9 @@ class TestRegressionEscapes07 < Minitest::Test
     worksheet.instance_variable_set(:@default_url_format, nil)
 
     worksheet.write_url(
-                        'A1',
-                        "http://example.com/!\"$%&'( )*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
-                        )
+      'A1',
+      "http://example.com/!\"$%&'( )*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+    )
 
     workbook.close
     compare_for_regression

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar07 < Minitest::Test
@@ -20,10 +21,10 @@ class TestRegressionChartBar07 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [64053248, 64446464])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -33,7 +34,7 @@ class TestRegressionChartBar07 < Minitest::Test
 
     chart.set_x_axis(:name_formula => '=Sheet1!$A$2', :data => [2])
     chart.set_y_axis(:name_formula => '=Sheet1!$A$3', :data => [3])
-    chart.set_title( :name_formula => '=Sheet1!$A$1', :data => [1])
+    chart.set_title(:name_formula => '=Sheet1!$A$1', :data => [1])
 
     worksheet.insert_chart('E9', chart)
 
@@ -45,7 +46,7 @@ class TestRegressionChartBar07 < Minitest::Test
         'xl/charts/chart1.xml' => [
           '<c:pageMargins',
           '<c:axId',
-          '<c:crossAx',
+          '<c:crossAx'
         ]
       }
     )

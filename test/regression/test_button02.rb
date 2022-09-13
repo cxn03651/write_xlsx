@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionButton02 < Minitest::Test
@@ -20,8 +21,7 @@ class TestRegressionButton02 < Minitest::Test
                               :x_offset => 4,
                               :y_offset => 3,
                               :caption  => 'my text'
-                            }
-                            )
+                            })
 
     workbook.close
     compare_for_regression

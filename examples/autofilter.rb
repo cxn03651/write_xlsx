@@ -14,7 +14,7 @@
 
 require 'write_xlsx'
 
-workbook = WriteXLSX.new( 'autofilter.xlsx' )
+workbook = WriteXLSX.new('autofilter.xlsx')
 
 worksheet1 = workbook.add_worksheet
 worksheet2 = workbook.add_worksheet
@@ -23,7 +23,7 @@ worksheet4 = workbook.add_worksheet
 worksheet5 = workbook.add_worksheet
 worksheet6 = workbook.add_worksheet
 
-bold = workbook.add_format( :bold => 1 )
+bold = workbook.add_format(:bold => 1)
 
 # Extract the data embedded at the end of this file.
 headings = DATA.gets.split
@@ -32,19 +32,18 @@ DATA.each { |line| data << line.split }
 
 # Set up several sheets with the same data.
 workbook.worksheets.each do |worksheet|
-  worksheet.set_column( 'A:D', 12 )
-  worksheet.set_row( 0, 20, bold )
-  worksheet.write( 'A1', headings )
+  worksheet.set_column('A:D', 12)
+  worksheet.set_row(0, 20, bold)
+  worksheet.write('A1', headings)
 end
-
 
 ###############################################################################
 #
 # Example 1. Autofilter without conditions.
 #
 
-worksheet1.autofilter( 'A1:D51' )
-worksheet1.write( 'A2', [ data ] )
+worksheet1.autofilter('A1:D51')
+worksheet1.write('A2', [data])
 
 ###############################################################################
 #
@@ -53,12 +52,12 @@ worksheet1.write( 'A2', [ data ] )
 #
 
 # The range in this example is the same as above but in row-column notation.
-worksheet2.autofilter( 0, 0, 50, 3 )
+worksheet2.autofilter(0, 0, 50, 3)
 
 # The placeholder "Region" in the filter is ignored and can be any string
 # that adds clarity to the expression.
 #
-worksheet2.filter_column( 0, 'Region eq East' )
+worksheet2.filter_column(0, 'Region eq East')
 
 #
 # Hide the rows that don't match the filter criteria.
@@ -79,9 +78,9 @@ end
 # Example 3. Autofilter with a dual filter condition in one of the columns.
 #
 
-worksheet3.autofilter( 'A1:D51' )
+worksheet3.autofilter('A1:D51')
 
-worksheet3.filter_column( 'A', 'x eq East or x eq South' )
+worksheet3.filter_column('A', 'x eq East or x eq South')
 
 #
 # Hide the rows that don't match the filter criteria.
@@ -91,11 +90,10 @@ row = 1
 data.each do |row_data|
   region = row_data[0]
 
-  worksheet3.set_row(row, nil, nil, 1) unless region == 'East' || region == 'South'
-  worksheet3.write(row, 0,row_data)
+  worksheet3.set_row(row, nil, nil, 1) unless %w[East South].include?(region)
+  worksheet3.write(row, 0, row_data)
   row += 1
 end
-
 
 ###############################################################################
 #
@@ -126,7 +124,6 @@ data.each do |row_data|
   row += 1
 end
 
-
 ###############################################################################
 #
 #
@@ -153,13 +150,11 @@ data.each do |row_data|
   row += 1
 end
 
-
 ###############################################################################
 #
 #
 # Example 6. Autofilter with filter for non-blanks.
 #
-
 
 worksheet6.autofilter('A1:D51')
 worksheet6.filter_column('A', 'x eq NonBlanks')

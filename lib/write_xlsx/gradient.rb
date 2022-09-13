@@ -25,9 +25,7 @@ module Writexlsx
 
         # Check the positions are in the correct range.
         args[:positions].each do |pos|
-          if pos < 0 || pos > 100
-            raise "Gradient position '#{pos} must be in range 0 <= pos <= 100"
-          end
+          raise "Gradient position '#{pos} must be in range 0 <= pos <= 100" if pos < 0 || pos > 100
         end
         gradient[:positions] = args[:positions]
       else
@@ -48,9 +46,8 @@ module Writexlsx
       if args[:angle]
         angle = args[:angle]
 
-        if angle < 0 || angle > 359.9
-          raise "Gradient angle '#{angle} must be in range 0 <= pos < 360"
-        end
+        raise "Gradient angle '#{angle} must be in range 0 <= pos < 360" if angle < 0 || angle > 359.9
+
         gradient[:angle] = angle
       else
         gradient[:angle] = 90
@@ -60,9 +57,8 @@ module Writexlsx
       if args[:type]
         type = args[:type]
 
-        unless types[type]
-          raise "Unknow gradient type '#{type}'"
-        end
+        raise "Unknow gradient type '#{type}'" unless types[type]
+
         gradient[:type] = types[type]
       else
         gradient[:type] = 'linear'

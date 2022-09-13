@@ -23,14 +23,14 @@ worksheet.set_column('A:A', 15)
 worksheet.set_column('B:C', 10)
 
 # Add the worksheet data that the charts will refer to.
-headings = ['Reason', 'Number', 'Percentage']
+headings = %w[Reason Number Percentage]
 
 reasons = [
   'Traffic',   'Child care', 'Public Transport', 'Weather',
   'Overslept', 'Emergency'
 ]
 
-numbers  = [  60,    40,  20,  15,    10, 5]
+numbers  = [60,    40,  20,  15,    10, 5]
 percents = [0.44, 0.667, 0.8, 0.9, 0.967, 1]
 
 worksheet.write_row('A1', headings, bold)
@@ -69,7 +69,7 @@ line_chart = workbook.add_chart(:type => 'line', :embedded => 1)
 line_chart.add_series(
   :categories => '=Sheet1!$A$2:$A$7',
   :values     => '=Sheet1!$C$2:$C$7',
-  :marker     => {:type => 'automatic'},
+  :marker     => { :type => 'automatic' },
   :y2_axis    => 1
 )
 

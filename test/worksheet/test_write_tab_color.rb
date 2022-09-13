@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -12,7 +13,7 @@ class TestWriteTabColor < Minitest::Test
   def test_write_tab_color
     # Mock up the color palette.
     @worksheet.instance_variable_set(:@tab_color, 0x0A)
-    palette = [nil, nil, [ 0xff, 0x00, 0x00, 0x00 ]]
+    palette = [nil, nil, [0xff, 0x00, 0x00, 0x00]]
     @worksheet.instance_variable_set(:@palette, palette)
 
     @worksheet.__send__('write_tab_color')

@@ -120,12 +120,12 @@ create_sub_totals(worksheet4, bold)
 # Example 5: Create a worksheet with outlined columns.
 #
 data = [
-        [ 'Month', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Total' ],
-        [ 'North', 50,    20,    15,    25,    65,    80,   '=SUM(B2:G2)' ],
-        [ 'South', 10,    20,    30,    50,    50,    50,   '=SUM(B3:G3)' ],
-        [ 'East',  45,    75,    50,    15,    75,    100,  '=SUM(B4:G4)' ],
-        [ 'West',  15,    15,    55,    35,    20,    50,   '=SUM(B5:G6)' ]
-       ]
+  %w[Month Jan Feb Mar Apr May Jun Total],
+  ['North', 50,    20,    15,    25,    65,    80,   '=SUM(B2:G2)'],
+  ['South', 10,    20,    30,    50,    50,    50,   '=SUM(B3:G3)'],
+  ['East',  45,    75,    50,    15,    75,    100,  '=SUM(B4:G4)'],
+  ['West',  15,    15,    55,    35,    20,    50,   '=SUM(B5:G6)']
+]
 
 # Add bold format to the first row
 worksheet5.set_row(0, nil, bold)

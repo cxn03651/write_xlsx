@@ -21,7 +21,7 @@ module Writexlsx
           @formula        = ''
           @format         = nil
           @name_format    = nil
-          @user_data      = param[id-1] if param
+          @user_data      = param[id - 1] if param
         end
       end
 
@@ -39,8 +39,8 @@ module Writexlsx
         # Set the data range rows (without the header and footer).
         @first_data_row = @row1
         @first_data_row += 1 if ptrue?(@param[:header_row])
-        @last_data_row  = @row2
-        @last_data_row  -= 1 if @param[:total_row]
+        @last_data_row = @row2
+        @last_data_row -= 1 if @param[:total_row]
 
         set_the_table_options
         set_the_table_style
@@ -88,48 +88,43 @@ module Writexlsx
       end
 
       def overrite_the_defaults_with_any_use_defined_values(col_id, col_data, col_num)
-        if @param[:columns]
-          # Check if there are user defined values for this column.
-          if user_data = @param[:columns][col_id]
-            # Map user defined values to internal values.
-            if user_data[:header] && !user_data[:header].empty?
-              col_data.name = user_data[:header]
-            end
+        # Check if there are user defined values for this column.
+        if @param[:columns] && (user_data = @param[:columns][col_id])
+          # Map user defined values to internal values.
+          col_data.name = user_data[:header] if user_data[:header] && !user_data[:header].empty?
 
-            # Excel requires unique case insensitive header names.
-            if @seen_name[col_data.name.downcase]
-              raise "add_table() contains duplicate name: '#{col_data.name}'"
-            else
-              @seen_name[col_data.name.downcase] = true
-            end
-            # Get the header format if defined.
-            col_data.name_format = user_data[:header_format]
-
-            # Handle the column formula.
-            handle_the_column_formula(
-              col_data, col_num, user_data[:formula], user_data[:format]
-            )
-
-            # Handle the function for the total row.
-            if user_data[:total_function]
-              handle_the_function_for_the_table_row(
-                @row2, col_data, col_num, user_data
-              )
-            elsif user_data[:total_string]
-              total_label_only(
-                @row2, col_num, col_data, user_data[:total_string], user_data[:format]
-              )
-            end
-
-            # Get the dxf format index.
-            if user_data[:format]
-              col_data.format = user_data[:format].get_dxf_index
-            end
-
-            # Store the column format for writing the cell data.
-            # It doesn't matter if it is undefined.
-            @col_formats[col_id] = user_data[:format]
+          # Excel requires unique case insensitive header names.
+          if @seen_name[col_data.name.downcase]
+            raise "add_table() contains duplicate name: '#{col_data.name}'"
+          else
+            @seen_name[col_data.name.downcase] = true
           end
+
+          # Get the header format if defined.
+          col_data.name_format = user_data[:header_format]
+
+          # Handle the column formula.
+          handle_the_column_formula(
+            col_data, col_num, user_data[:formula], user_data[:format]
+          )
+
+          # Handle the function for the total row.
+          if user_data[:total_function]
+            handle_the_function_for_the_table_row(
+              @row2, col_data, col_num, user_data
+            )
+          elsif user_data[:total_string]
+            total_label_only(
+              @row2, col_num, col_data, user_data[:total_string], user_data[:format]
+            )
+          end
+
+          # Get the dxf format index.
+          col_data.format = user_data[:format].get_dxf_index if user_data[:format]
+
+          # Store the column format for writing the cell data.
+          # It doesn't matter if it is undefined.
+          @col_formats[col_id] = user_data[:format]
         end
       end
 
@@ -193,9 +188,7 @@ module Writexlsx
         num_rows = row2 - row1
         num_rows -= 1 if ptrue?(param[:header_row])
 
-        if num_rows < 0
-          raise "Must have at least one data row in in add_table()"
-        end
+        raise "Must have at least one data row in in add_table()" if num_rows < 0
 
         # If the header row if off the default is to turn autofilter off.
         param[:autofilter] = 0 if param[:header_row] == 0
@@ -207,25 +200,25 @@ module Writexlsx
 
       # List of valid input parameters.
       def valid_table_parameter
-        [
-          :autofilter,
-          :banded_columns,
-          :banded_rows,
-          :columns,
-          :data,
-          :first_column,
-          :header_row,
-          :last_column,
-          :name,
-          :style,
-          :total_row
+        %i[
+          autofilter
+          banded_columns
+          banded_rows
+          columns
+          data
+          first_column
+          header_row
+          last_column
+          name
+          style
+          total_row
         ]
       end
 
       def handle_the_column_formula(col_data, col_num, formula, format)
         return unless formula
 
-        col_data.formula = formula.sub(/^=/, '').gsub(/@/,'[#This Row],')
+        col_data.formula = formula.sub(/^=/, '').gsub(/@/, '[#This Row],')
 
         (@first_data_row..@last_data_row).each do |row|
           @worksheet.write_formula(row, col_num, col_data.formula, format)
@@ -248,10 +241,10 @@ module Writexlsx
       # Convert a table total function to a worksheet formula.
       #
       def table_function_to_formula(function, col_name)
-        col_name = col_name.gsub(/'/, "''").
-                     gsub(/#/, "'#").
-                     gsub(/\[/, "'[").
-                     gsub(/\]/, "']")
+        col_name = col_name.gsub(/'/, "''")
+                           .gsub(/#/, "'#")
+                           .gsub(/\[/, "'[")
+                           .gsub(/\]/, "']")
 
         subtotals = {
           :average   => 101,
@@ -264,9 +257,10 @@ module Writexlsx
           :var       => 110
         }
 
-        unless func_num = subtotals[function.to_sym]
+        unless (func_num = subtotals[function.to_sym])
           raise "Unsupported function '#{function}' in add_table()"
         end
+
         "SUBTOTAL(#{func_num},[#{col_name}])"
       end
 
@@ -287,11 +281,11 @@ module Writexlsx
       end
 
       def set_the_table_style
-        if @param[:style]
-          @style = @param[:style].gsub(/\s/, '')
-        else
-          @style = "TableStyleMedium9"
-        end
+        @style = if @param[:style]
+                   @param[:style].gsub(/\s/, '')
+                 else
+                   "TableStyleMedium9"
+                 end
       end
 
       def set_the_table_name
@@ -299,19 +293,13 @@ module Writexlsx
           name = @param[:name]
 
           # Raise if the name contains invalid chars as defined by Excel help.
-          if name !~ /^[\w\\][\w\\.]*$/ || name =~ /^\d/
-            raise "Invalid character in name '#{name} used in add_table()"
-          end
+          raise "Invalid character in name '#{name} used in add_table()" if name !~ /^[\w\\][\w\\.]*$/ || name =~ /^\d/
 
           # Raise if the name looks like a cell name.
-          if name =~ /^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$/
-            ralse "Invalid name '#{name}' looks like a cell name in add_table()"
-          end
+          ralse "Invalid name '#{name}' looks like a cell name in add_table()" if name =~ /^[a-zA-Z][a-zA-Z]?[a-dA-D]?[0-9]+$/
 
           # Raise if the name looks like a R1C1.
-          if name =~ /^[rcRC]$/ || name =~ /^[rcRC]\d+[rcRC]\d+$/
-            raise "Invalid name '#{name}' like a RC cell ref in add_table()"
-          end
+          raise "Invalid name '#{name}' like a RC cell ref in add_table()" if name =~ /^[rcRC]$/ || name =~ /^[rcRC]\d+[rcRC]\d+$/
 
           @name = @param[:name]
         end
@@ -338,15 +326,13 @@ module Writexlsx
           ['ref',         @range]
         ]
 
-        unless ptrue?(@header_row_count)
-          attributes << ['headerRowCount', 0]
-        end
+        attributes << ['headerRowCount', 0] unless ptrue?(@header_row_count)
 
-        if ptrue?(@totals_row_shown)
-          attributes << ['totalsRowCount', 1]
-        else
-          attributes << ['totalsRowShown', 0]
-        end
+        attributes << if ptrue?(@totals_row_shown)
+                        ['totalsRowCount', 1]
+                      else
+                        ['totalsRowShown', 0]
+                      end
       end
 
       #
@@ -355,7 +341,7 @@ module Writexlsx
       def write_auto_filter
         return unless ptrue?(@autofilter)
 
-        attributes = [ ['ref', @autofilter] ]
+        attributes = [['ref', @autofilter]]
 
         @writer.empty_tag('autoFilter', attributes)
       end
@@ -366,10 +352,10 @@ module Writexlsx
       def write_table_columns
         count = @columns.size
 
-        attributes = [ ['count', count] ]
+        attributes = [['count', count]]
 
         @writer.tag_elements('tableColumns', attributes) do
-          @columns.each {|col_data| write_table_column(col_data)}
+          @columns.each { |col_data| write_table_column(col_data) }
         end
       end
 
@@ -388,9 +374,7 @@ module Writexlsx
           attributes << [:totalsRowFunction, col_data.total_function]
         end
 
-        if col_data.format
-          attributes << [:dataDxfId, col_data.format]
-        end
+        attributes << [:dataDxfId, col_data.format] if col_data.format
 
         if ptrue?(col_data.formula)
           @writer.tag_elements('tableColumn', attributes) do
@@ -407,9 +391,7 @@ module Writexlsx
       #
       def write_table_style_info
         attributes = []
-        if @style && @style != '' && @style != 'None'
-          attributes << ['name', @style]
-        end
+        attributes << ['name', @style] if @style && @style != '' && @style != 'None'
         attributes << ['showFirstColumn',   @show_first_col]
         attributes << ['showLastColumn',    @show_last_col]
         attributes << ['showRowStripes',    @show_row_stripes]

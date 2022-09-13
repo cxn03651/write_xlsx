@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestDataValidation01 < Minitest::Test
@@ -15,7 +16,7 @@ class TestDataValidation01 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    worksheet.data_validation('C2', validate: 'list', value: ['Foo', 'Bar', 'Baz'])
+    worksheet.data_validation('C2', validate: 'list', value: %w[Foo Bar Baz])
     workbook.close
     compare_for_regression
   end

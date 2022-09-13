@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -25,17 +26,16 @@ class TestCondFormat08 < Minitest::Test
     @worksheet.write('A4', 40)
 
     [
-     'yesterday', 'today', 'tomorrow',
-     'last 7 days', 'last week', 'this week', 'next week',
-     'last month', 'this month', 'next month'
+      'yesterday', 'today', 'tomorrow',
+      'last 7 days', 'last week', 'this week', 'next week',
+      'last month', 'this month', 'next month'
     ].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
                                           :type     => 'time_period',
                                           :criteria => criteria,
                                           :format   => nil
-                                        }
-                                        )
+                                        })
     end
 
     @worksheet.assemble_xml_file

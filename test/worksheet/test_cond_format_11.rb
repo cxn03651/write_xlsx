@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -31,8 +32,7 @@ class TestCondFormat11 < Minitest::Test
                                         :minimum  => '2011-01-01T',
                                         :maximum  => '2011-12-31T',
                                         :format   => nil
-                                      }
-                                      )
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

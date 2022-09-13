@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDataLabels36 < Minitest::Test
@@ -17,9 +18,9 @@ class TestRegressionChartDataLabels36 < Minitest::Test
     chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
 
     data = [
-      [  1,  2,  3,  4,  5],
-      [  2,  4,  6,  8, 10],
-      [  3,  6,  9, 12, 15]
+      [1,  2,  3,  4,  5],
+      [2,  4,  6,  8, 10],
+      [3,  6,  9, 12, 15]
     ]
 
     worksheet.write('A1', data)
@@ -42,7 +43,7 @@ class TestRegressionChartDataLabels36 < Minitest::Test
           :pitch_family => 49,
           :charset      => 0
         },
-        :border => { :color => 'red' }
+        :border       => { :color => 'red' }
       }
     )
 

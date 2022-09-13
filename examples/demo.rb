@@ -10,7 +10,6 @@ worksheet3 = workbook.add_worksheet('And another')
 
 bold = workbook.add_format(:bold => 1)
 
-
 #######################################################################
 #
 # Write a general heading
@@ -20,11 +19,11 @@ worksheet.set_column('B:B', 20)
 worksheet.set_row(0, 40)
 
 heading = workbook.add_format(
-    :bold  => 1,
-    :color => 'blue',
-    :size  => 16,
-    :merge => 1,
-    :align => 'vcenter'
+  :bold  => 1,
+  :color => 'blue',
+  :size  => 16,
+  :merge => 1,
+  :align => 'vcenter'
 )
 
 headings = ['Features of WriteXLSX', '']
@@ -35,11 +34,11 @@ worksheet.write_row('A1', headings, heading)
 # Some text examples
 #
 text_format = workbook.add_format(
-    :bold   => 1,
-    :italic => 1,
-    :color  => 'red',
-    :size   => 18,
-    :font   => 'Lucida Calligraphy'
+  :bold   => 1,
+  :italic => 1,
+  :color  => 'red',
+  :size   => 18,
+  :font   => 'Lucida Calligraphy'
 )
 
 worksheet.write('A2', "Text")
@@ -87,7 +86,6 @@ worksheet.insert_image(
   'B10', 'republic.png',
   :x_offset => 16, :y_offset => 8
 )
-
 
 #######################################################################
 #

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionCondFormat06 < Minitest::Test
@@ -16,10 +17,10 @@ class TestRegressionCondFormat06 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     format1 = workbook.add_format(
-                                  :pattern  => 15,
-                                  :fg_color => '#FF0000',
-                                  :bg_color => '#FFFF00'
-                                  )
+      :pattern  => 15,
+      :fg_color => '#FF0000',
+      :bg_color => '#FFFF00'
+    )
 
     worksheet.write('A1', 10)
     worksheet.write('A2', 20)
@@ -32,8 +33,7 @@ class TestRegressionCondFormat06 < Minitest::Test
                                        :format   => format1,
                                        :criteria => '>',
                                        :value    => 7
-                                     }
-                                     )
+                                     })
 
     workbook.close
     compare_for_regression(

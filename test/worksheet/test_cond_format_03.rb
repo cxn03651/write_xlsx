@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -31,8 +32,7 @@ class TestCondFormat03 < Minitest::Test
                                         :criteria => 'between',
                                         :minimum  => 20,
                                         :maximum  => 30
-                                      }
-                                      )
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
                                         :type     => 'cell',
@@ -40,8 +40,7 @@ class TestCondFormat03 < Minitest::Test
                                         :criteria => 'not between',
                                         :minimum  => 20,
                                         :maximum  => 30
-                                      }
-                                      )
+                                      })
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
 

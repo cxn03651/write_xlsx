@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionArrayFormula01 < Minitest::Test
@@ -24,8 +25,8 @@ class TestRegressionArrayFormula01 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-      [ 'xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels' ],
-      {'xl/workbook.xml' => ['<workbookView']}
+      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 end

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionButton06 < Minitest::Test
@@ -19,8 +20,7 @@ class TestRegressionButton06 < Minitest::Test
                               :macro  => 'my_macro',
                               :width  => 128,
                               :height => 30
-                            }
-                            )
+                            })
 
     workbook.close
     compare_for_regression

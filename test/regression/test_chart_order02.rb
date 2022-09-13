@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartOrder02 < Minitest::Test
@@ -12,7 +13,7 @@ class TestChartOrder02 < Minitest::Test
 
   def test_chart_order02
     @xlsx = 'chart_order01.xlsx'
-    workbook    =  WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet1  = workbook.add_worksheet
     worksheet2  = workbook.add_worksheet
     worksheet3  = workbook.add_worksheet
@@ -29,10 +30,10 @@ class TestChartOrder02 < Minitest::Test
     chart4.instance_variable_set(:@axis_ids, [69816704, 69818240])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet1.write('A1', data)
     worksheet2.write('A1', data)

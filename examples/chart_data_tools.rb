@@ -21,17 +21,16 @@ worksheet = workbook.add_worksheet
 bold      = workbook.add_format(:bold => 1)
 
 # Add the worksheet data that the charts will refer to.
-headings = [ 'Number', 'Data 1', 'Data 2' ]
+headings = ['Number', 'Data 1', 'Data 2']
 data = [
-    [ 2,  3,  4,  5,  6,  7 ],
-    [ 10, 40, 50, 20, 10, 50 ],
-    [ 30, 60, 70, 50, 40, 30 ]
+  [2,  3,  4,  5,  6,  7],
+  [10, 40, 50, 20, 10, 50],
+  [30, 60, 70, 50, 40, 30]
 
 ]
 
 worksheet.write('A1', headings, bold)
 worksheet.write('A2', data)
-
 
 #######################################################################
 #
@@ -43,19 +42,19 @@ chart1 = workbook.add_chart(:type => 'line', :embedded => 1)
 
 # Configure the first series with a polynomial trendline.
 chart1.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$B$2:$B$7',
-    :trendline  => {
-        :type  => 'polynomial',
-        :order => 3,
-    },
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$B$2:$B$7',
+  :trendline  => {
+    :type  => 'polynomial',
+    :order => 3
+  }
 )
 
 # Configure the second series with a moving average trendline.
 chart1.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
-    :trendline  => { :type => 'linear' },
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7',
+  :trendline  => { :type => 'linear' }
 )
 
 # Add a chart title. and some axis labels.
@@ -67,7 +66,6 @@ worksheet.insert_chart(
   :x_offset => 25, :y_offset => 10
 )
 
-
 #######################################################################
 #
 # Data Labels and Markers example.
@@ -78,16 +76,16 @@ chart2 = workbook.add_chart(:type => 'line', :embedded => 1)
 
 # Configure the first series.
 chart2.add_series(
-    :categories  => '=Sheet1!$A$2:$A$7',
-    :values      => '=Sheet1!$B$2:$B$7',
-    :data_labels => { :value => 1 },
-    :marker      => { :type => 'automatic' },
+  :categories  => '=Sheet1!$A$2:$A$7',
+  :values      => '=Sheet1!$B$2:$B$7',
+  :data_labels => { :value => 1 },
+  :marker      => { :type => 'automatic' }
 )
 
 # Configure the second series.
 chart2.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7'
 )
 
 # Add a chart title. and some axis labels.
@@ -99,7 +97,6 @@ worksheet.insert_chart(
   :x_offset => 25, :y_offset => 10
 )
 
-
 #######################################################################
 #
 # Error Bars example.
@@ -110,15 +107,15 @@ chart3 = workbook.add_chart(:type => 'line', :embedded => 1)
 
 # Configure the first series.
 chart3.add_series(
-    :categories   => '=Sheet1!$A$2:$A$7',
-    :values       => '=Sheet1!$B$2:$B$7',
-    :y_error_bars => { :type => 'standard_error' },
+  :categories   => '=Sheet1!$A$2:$A$7',
+  :values       => '=Sheet1!$B$2:$B$7',
+  :y_error_bars => { :type => 'standard_error' }
 )
 
 # Configure the second series.
 chart3.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7'
 )
 
 # Add a chart title. and some axis labels.
@@ -129,7 +126,6 @@ worksheet.insert_chart(
   'D34', chart3,
   :x_offset => 25, :y_offset => 10
 )
-
 
 #######################################################################
 #
@@ -144,14 +140,14 @@ chart4.set_up_down_bars
 
 # Configure the first series.
 chart4.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$B$2:$B$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$B$2:$B$7'
 )
 
 # Configure the second series.
 chart4.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7'
 )
 
 # Add a chart title. and some axis labels.
@@ -162,7 +158,6 @@ worksheet.insert_chart(
   'D50', chart4,
   :x_offset => 25, :y_offset => 10
 )
-
 
 #######################################################################
 #
@@ -177,14 +172,14 @@ chart5.set_high_low_lines
 
 # Configure the first series.
 chart5.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$B$2:$B$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$B$2:$B$7'
 )
 
 # Configure the second series.
 chart5.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7'
 )
 
 # Add a chart title. and some axis labels.
@@ -195,7 +190,6 @@ worksheet.insert_chart(
   'D66', chart5,
   :x_offset => 25, :y_offset => 10
 )
-
 
 #######################################################################
 #
@@ -210,14 +204,14 @@ chart6.set_drop_lines
 
 # Configure the first series.
 chart6.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$B$2:$B$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$B$2:$B$7'
 )
 
 # Configure the second series.
 chart6.add_series(
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$C$2:$C$7',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$C$2:$C$7'
 )
 
 # Add a chart title. and some axis labels.

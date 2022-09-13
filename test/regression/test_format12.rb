@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionFormat12 < Minitest::Test
@@ -27,8 +28,8 @@ class TestRegressionFormat12 < Minitest::Test
     )
 
     top_left = workbook.add_format(
-      :left   => 1,
-      :top    => 1
+      :left => 1,
+      :top  => 1
     )
 
     worksheet.write('B2', 'test', top_left_bottom)

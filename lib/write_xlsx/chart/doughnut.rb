@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Doughnut - A class for writing Excel Doughnut charts.
@@ -39,7 +40,7 @@ module Writexlsx
         if size >= 10 && size <= 90
           @hole_size = size
         else
-          raise "Hole size $size outside Excel range: 10 <= size <= 90";
+          raise "Hole size $size outside Excel range: 10 <= size <= 90"
         end
       end
 
@@ -83,7 +84,7 @@ module Writexlsx
       # Write the <c:holeSize> element.
       #
       def write_hole_size
-        @writer.empty_tag('c:holeSize', [ ['val', @hole_size] ])
+        @writer.empty_tag('c:holeSize', [['val', @hole_size]])
       end
     end
   end

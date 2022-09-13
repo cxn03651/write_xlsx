@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionSharedStrings01 < Minitest::Test
@@ -18,15 +19,16 @@ class TestRegressionSharedStrings01 < Minitest::Test
     # Test that control characters and any other single byte characters are
     # handled correctly by the SharedStrings module. We skip chr 34 = " in
     # this test since it isn't encode by Excel as &quot;.
-    (0..255).each do |i|
+    256.times do |i|
       next if i == 34
+
       worksheet.write_string(i, 0, i.chr)
     end
 
     workbook.close
     compare_for_regression(
       nil,
-      {'xl/workbook.xml' => ['<workbookView']}
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 end

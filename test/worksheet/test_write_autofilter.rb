@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/workbook'
 require 'write_xlsx/worksheet'
@@ -235,7 +236,7 @@ class TestWriteAutofilter < Minitest::Test
   end
 
   def test_write_auto_filter_with_filter_matches_East_and_North
-    matches = ['East', 'North']
+    matches = %w[East North]
 
     worksheet = @workbook.add_worksheet('Sheet1')
     worksheet.autofilter('A1:D51')
@@ -247,7 +248,7 @@ class TestWriteAutofilter < Minitest::Test
   end
 
   def test_write_auto_filter_with_filter_matches_four_values
-    matches = %w(February January July June)
+    matches = %w[February January July June]
 
     worksheet = @workbook.add_worksheet('Sheet1')
     worksheet.autofilter('A1:D51')

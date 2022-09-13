@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestChartGridlines05 < Minitest::Test
@@ -12,7 +13,7 @@ class TestChartGridlines05 < Minitest::Test
 
   def test_chart_gridlines05
     @xlsx = 'chart_gridlines05.xlsx'
-    workbook    =  WriteXLSX.new(@io)
+    workbook = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(:type => 'column', :embedded => 1)
 
@@ -20,10 +21,10 @@ class TestChartGridlines05 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [80072064, 79959168])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
@@ -32,13 +33,13 @@ class TestChartGridlines05 < Minitest::Test
     chart.add_series(:values => '=Sheet1!$C$1:$C$5')
 
     chart.set_x_axis(
-                     :major_gridlines => { :visible => 1 },
-                     :minor_gridlines => { :visible => 1 }
-                     )
+      :major_gridlines => { :visible => 1 },
+      :minor_gridlines => { :visible => 1 }
+    )
     chart.set_y_axis(
-                     :major_gridlines => { :visible => 1 },
-                     :minor_gridlines => { :visible => 1 }
-                     )
+      :major_gridlines => { :visible => 1 },
+      :minor_gridlines => { :visible => 1 }
+    )
 
     worksheet.insert_chart('E9',  chart)
 

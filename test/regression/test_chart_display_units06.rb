@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDisplayUnits06 < Minitest::Test
@@ -20,7 +21,7 @@ class TestRegressionChartDisplayUnits06 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [93548544, 93550464])
 
     data = [
-      [ 10000000, 20000000, 30000000, 20000000,  10000000 ]
+      [10000000, 20000000, 30000000, 20000000,  10000000]
     ]
 
     worksheet.write('A1', data)

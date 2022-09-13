@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/core'
 
@@ -36,7 +37,7 @@ class TestCore02 < Minitest::Test
   <cp:contentStatus>Quo</cp:contentStatus>
 </cp:coreProperties>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

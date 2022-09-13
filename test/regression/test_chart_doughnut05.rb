@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDoughnut05 < Minitest::Test
@@ -17,16 +18,16 @@ class TestRegressionChartDoughnut05 < Minitest::Test
     chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
 
     data = [
-            [  2,  4,  6 ],
-            [ 60, 30, 10 ]
-           ]
+      [2,  4,  6],
+      [60, 30, 10]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories      => 'Sheet1!$A$1:$A$3',
-                     :values          => 'Sheet1!$B$1:$B$3'
-                     )
+      :categories => 'Sheet1!$A$1:$A$3',
+      :values     => 'Sheet1!$B$1:$B$3'
+    )
 
     chart.set_rotation(360)
 

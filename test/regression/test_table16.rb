@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionTable16 < Minitest::Test
@@ -30,8 +31,8 @@ class TestRegressionTable16 < Minitest::Test
 
     workbook.close
     compare_for_regression(
-                                nil,
-                                {  'xl/workbook.xml' => ['<workbookView'] }
-                                )
+      nil,
+      {  'xl/workbook.xml' => ['<workbookView'] }
+    )
   end
 end

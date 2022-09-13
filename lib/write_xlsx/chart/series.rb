@@ -93,9 +93,7 @@ module Writexlsx
       def initialize(params)
         super(params)
 
-        if params[:type]
-          @type = value_or_raise(types, params[:type], 'maker type')
-        end
+        @type = value_or_raise(types, params[:type], 'maker type') if params[:type]
 
         @size      = params[:size]
         @automatic = false
@@ -192,7 +190,7 @@ module Writexlsx
         @values     = aref_to_formula(params[:values])
         @categories = aref_to_formula(params[:categories])
         @name, @name_formula =
-               chart.process_names(params[:name], params[:name_formula])
+          chart.process_names(params[:name], params[:name_formula])
 
         set_data_ids(params)
 
@@ -213,23 +211,28 @@ module Writexlsx
         # Set the trendline properties for the series.
         @trendline  = Trendline.new(params[:trendline]) if params[:trendline]
         @error_bars = errorbars(params[:x_error_bars], params[:y_error_bars])
-        @points     = params[:points].collect { |p| p ? Point.new(p) : p } if params[:points]
+        if params[:points]
+          @points = params[:points].collect { |p| p ? Point.new(p) : p }
+        end
 
         @label_positions = chart.label_positions
         @label_position_default = chart.label_position_default
         @labels     = labels_properties(params[:data_labels])
 
-        [:smooth, :invert_if_negative, :x2_axis, :y2_axis].
-          each { |key| instance_variable_set("@#{key}", params[key]) }
+        %i[smooth invert_if_negative x2_axis y2_axis]
+          .each { |key| instance_variable_set("@#{key}", params[key]) }
       end
 
       def ==(other)
-        methods = %w[categories values name name_formula name_id
-                 cat_data_id val_data_id
-                 line fill gradient marker trendline
-                 smooth labels invert_if_neg x2_axis y2_axis error_bars points ]
+        methods = %w[
+          categories values name name_formula name_id
+          cat_data_id val_data_id
+          line fill gradient marker trendline
+          smooth labels invert_if_neg
+          x2_axis y2_axis error_bars points
+        ]
         methods.each do |method|
-          return false unless self.instance_variable_get("@#{method}") == other.instance_variable_get("@#{method}")
+          return false unless instance_variable_get("@#{method}") == other.instance_variable_get("@#{method}")
         end
         true
       end
@@ -245,7 +248,8 @@ module Writexlsx
       #
       def aref_to_formula(data) # :nodoc:
         # If it isn't an array ref it is probably a formula already.
-        return data unless data.kind_of?(Array)
+        return data unless data.is_a?(Array)
+
         xl_range_formula(*data)
       end
 
@@ -272,11 +276,11 @@ module Writexlsx
         position = labels[:position]
         if ptrue?(position)
           if @label_positions[position]
-            if position == @label_position_default
-              labels[:position] = nil
-            else
-              labels[:position] = @label_positions[position]
-            end
+            labels[:position] = if position == @label_position_default
+                                  nil
+                                else
+                                  @label_positions[position]
+                                end
           else
             raise "Unsupported label position '#{position}' for this chart type"
           end
@@ -293,17 +297,15 @@ module Writexlsx
         separator = labels[:separator]
         unless separator.nil? || separator.empty?
           raise "unsuppoted label separator #{separator}" unless separators[separator]
+
           labels[:separator] = separators[separator]
         end
 
-
         # Set the line properties for the data labels.
-        line = line_properties( labels[:line] )
+        line = line_properties(labels[:line])
 
         # Allow 'border' as a synonym for 'line'.
-        if labels[:border]
-          line = line_properties(labels[:border])
-        end
+        line = line_properties(labels[:border]) if labels[:border]
 
         # Set the fill properties for the labels.
         fill = fill_properties(labels[:fill])
@@ -315,9 +317,7 @@ module Writexlsx
         gradient = gradient_properties(labels[:gradient])
 
         # Pattern fill overrides solid fill.
-        if pattern
-          fill = nil
-        end
+        fill = nil if pattern
 
         # Gradient fill overrides solid and pattern fills.
         if gradient
@@ -330,16 +330,14 @@ module Writexlsx
         labels[:pattern]  = pattern
         labels[:gradient] = gradient
 
-        if labels[:font]
-          labels[:font] = convert_font_args(labels[:font])
-        end
+        labels[:font] = convert_font_args(labels[:font]) if labels[:font]
 
         if labels[:custom]
           # Duplicate, and modify, the custom label properties.
           custom = []
 
           labels[:custom].each do |label|
-            if !label
+            unless label
               custom << nil
               next
             end
@@ -347,9 +345,7 @@ module Writexlsx
             property = label.dup
 
             # Convert formula.
-            if property[:value] && property[:value].to_s =~ /^=[^!]+!\$/
-              property[:formula] = property[:value]
-            end
+            property[:formula] = property[:value] if property[:value] && property[:value].to_s =~ /^=[^!]+!\$/
 
             if property[:formula]
               property[:formula] = property[:formula].sub(/^=/, '')
@@ -358,17 +354,10 @@ module Writexlsx
               property[:data_id] = data_id
             end
 
-            if property[:font]
-              property[:font] = convert_font_args(property[:font])
-            end
+            property[:font] = convert_font_args(property[:font]) if property[:font]
 
             # Allow 'border' as a synonym for 'line'.
-            if property[:border]
-              line = line_properties(property[:border])
-            else
-              # Set the line properties for the data labels.
-              line = line_properties(property[:line])
-            end
+            line = line_properties(property[:border] || property[:line])
 
             # Set the fill properties for the labels.
             fill = fill_properties(property[:fill])
@@ -380,9 +369,7 @@ module Writexlsx
             gradient = gradient_properties(property[:gradient])
 
             # Pattern fill overrides solid fill.
-            if pattern
-              fill = nil
-            end
+            fill = nil if pattern
 
             # Gradient fill overrides solid and pattern fills.
             if gradient

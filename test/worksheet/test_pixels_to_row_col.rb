@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -14,12 +15,10 @@ class TestPixelsToRowCol < Minitest::Test
     padding         = 5
 
     if width < 1
-      pixels = (width * (max_digit_width + padding) + 0.5).to_i
+      ((width * (max_digit_width + padding)) + 0.5).to_i
     else
-      pixels = (width * max_digit_width + 0.5).to_i + padding
+      ((width * max_digit_width) + 0.5).to_i + padding
     end
-
-    pixels
   end
 
   def height_to_pixels(height)
@@ -27,7 +26,7 @@ class TestPixelsToRowCol < Minitest::Test
   end
 
   def test_pixel_to_width
-    (0..1790).each do |pixels|
+    1791.times do |pixels|
       caption  = "\tWorksheet: pixcel_to_width(#{pixels})"
       expected = pixels
       result   = width_to_pixels(@worksheet.__send__(:pixels_to_width, pixels))
@@ -36,7 +35,7 @@ class TestPixelsToRowCol < Minitest::Test
   end
 
   def test_pixel_to_height
-    (0..545).each do |pixels|
+    546.times do |pixels|
       caption  = "\tWorksheet: pixcel_to_height(#{pixels})"
       expected = pixels
       result   = height_to_pixels(@worksheet.__send__(:pixels_to_height, pixels))

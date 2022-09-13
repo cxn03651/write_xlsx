@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/content_types'
 
@@ -29,7 +30,7 @@ class TestContentTypes < Minitest::Test
   <Override PartName="/xl/calcChain.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.calcChain+xml"/>
 </Types>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

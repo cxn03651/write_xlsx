@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionIgnoreError03 < Minitest::Test
@@ -15,7 +16,7 @@ class TestRegressionIgnoreError03 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    (0..9).each do |row|
+    10.times do |row|
       worksheet.write_string(row, 0, '123')
     end
     worksheet.ignore_errors(number_stored_as_text: 'A1:A10')

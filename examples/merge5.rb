@@ -14,12 +14,12 @@
 require 'write_xlsx'
 
 # Create a new workbook and add a worksheet
-workbook  = WriteXLSX.new( 'merge5.xlsx' )
+workbook  = WriteXLSX.new('merge5.xlsx')
 worksheet = workbook.add_worksheet
 
 # Increase the cell size of the merged cells to highlight the formatting.
-(3 .. 8).each { |row|  worksheet.set_row(row, 36 ) }
-[1, 3, 5].each { |col| worksheet.set_column( col, col, 15 ) }
+(3..8).each { |row|  worksheet.set_row(row, 36) }
+[1, 3, 5].each { |col| worksheet.set_column(col, col, 15) }
 
 ###############################################################################
 #
@@ -34,7 +34,7 @@ format1 = workbook.add_format(
   :rotation => 270
 )
 
-worksheet.merge_range( 'B4:B9', 'Rotation 270', format1 )
+worksheet.merge_range('B4:B9', 'Rotation 270', format1)
 
 ###############################################################################
 #
@@ -49,7 +49,7 @@ format2 = workbook.add_format(
   :rotation => 90
 )
 
-worksheet.merge_range( 'D4:D9', 'Rotation 90', format2 )
+worksheet.merge_range('D4:D9', 'Rotation 90', format2)
 
 ###############################################################################
 #
@@ -64,6 +64,6 @@ format3 = workbook.add_format(
   :rotation => -90
 )
 
-worksheet.merge_range( 'F4:F9', 'Rotation -90', format3 )
+worksheet.merge_range('F4:F9', 'Rotation -90', format3)
 
 workbook.close

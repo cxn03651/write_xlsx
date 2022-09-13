@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionHeaderImage19 < Minitest::Test
@@ -21,7 +22,7 @@ class TestRegressionHeaderImage19 < Minitest::Test
       '&L&G',
       nil,
       {
-        :image_left   => 'test/regression/images/red.jpg'
+        :image_left => 'test/regression/images/red.jpg'
       }
     )
 
@@ -29,7 +30,7 @@ class TestRegressionHeaderImage19 < Minitest::Test
     compare_for_regression(
       [],
       {
-        'xl/worksheets/sheet1.xml' => [ '<pageMargins', '<pageSetup' ]
+        'xl/worksheets/sheet1.xml' => ['<pageMargins', '<pageSetup']
       }
     )
   end

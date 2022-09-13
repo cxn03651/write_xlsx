@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionShapeConnect02 < Minitest::Test
@@ -15,10 +16,10 @@ class TestRegressionShapeConnect02 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    s1 = workbook.add_shape(:type => 'chevron', :width=> 60, :height => 60)
+    s1 = workbook.add_shape(:type => 'chevron', :width => 60, :height => 60)
     worksheet.insert_shape('A1', s1, 50, 50)
 
-    s2 = workbook.add_shape(:type => 'pentagon', :width=> 20, :height => 20)
+    s2 = workbook.add_shape(:type => 'pentagon', :width => 20, :height => 20)
     worksheet.insert_shape('A1', s2, 250, 200)
 
     # Create a connector to link the two shapes

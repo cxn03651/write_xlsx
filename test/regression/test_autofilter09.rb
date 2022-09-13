@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionAutofilter09 < Minitest::Test
@@ -25,14 +26,14 @@ class TestRegressionAutofilter09 < Minitest::Test
     data[5][0] = ''
 
     worksheet.autofilter('A1:D51')
-    worksheet.filter_column_list('A', %w(East North South))
+    worksheet.filter_column_list('A', %w[East North South])
 
     # Hide the rows that don't match the filter criteria.
     row = 1
 
     data.each do |row_data|
       region = row_data[0]
-      if %w(East North South).include?(region)
+      if %w[East North South].include?(region)
         # Row is visible.
       else
         # Hide row.
@@ -45,7 +46,7 @@ class TestRegressionAutofilter09 < Minitest::Test
     workbook.close
     compare_for_regression(
       nil,
-      {'xl/workbook.xml' => ['<workbookView']}
+      { 'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
+
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
 
 module Writexlsx
   module Package
     class SharedStrings
-
       include Writexlsx::Utility
 
       PRESERVE_SPACE_ATTRIBUTES = ['xml:space', 'preserve'].freeze
@@ -58,7 +58,7 @@ module Writexlsx
       #
       # Write the <sst> element.
       #
-      def write_sst
+      def write_sst(&block)
         schema       = 'http://schemas.openxmlformats.org'
 
         attributes =
@@ -68,7 +68,7 @@ module Writexlsx
             ['uniqueCount', unique_count]
           ]
 
-        @writer.tag_elements('sst', attributes) { yield }
+        @writer.tag_elements('sst', attributes, &block)
       end
 
       #
@@ -93,21 +93,21 @@ module Writexlsx
         string = string.gsub(/(_x[0-9a-fA-F]{4}_)/, '_x005F\1')
 
         # Convert control character to the _xHHHH_ escape.
-        string = string.gsub(
-          /([\x00-\x08\x0B-\x1F])/,
-          sprintf("_x%04X_", $1.ord)
-        ) if string =~ /([\x00-\x08\x0B-\x1F])/
+        if string =~ /([\x00-\x08\x0B-\x1F])/
+          string = string.gsub(
+            /([\x00-\x08\x0B-\x1F])/,
+            sprintf("_x%04X_", ::Regexp.last_match(1).ord)
+          )
+        end
 
         # Convert character to \xC2\xxx or \xC3\xxx
-        if string.bytesize == 1 && 0x80 <= string.ord && string.ord <= 0xFF
-          string = add_c2_c3(string)
-        end
+        string = add_c2_c3(string) if string.bytesize == 1 && 0x80 <= string.ord && string.ord <= 0xFF
 
         # Add attribute to preserve leading or trailing whitespace.
         attributes << PRESERVE_SPACE_ATTRIBUTES if string =~ /\A\s|\s\Z/
 
         # Write any rich strings without further tags.
-        if string =~ %r{^<r>} && string =~ %r{</r>$}
+        if string =~ /^<r>/ && string =~ %r{</r>$}
           @writer.si_rich_element(string)
         else
           @writer.si_element(string, attributes)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -10,7 +11,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_gt_zero
-    @worksheet.data_validation('A1',
+    @worksheet.data_validation(
+      'A1',
       :validate => 'integer',
       :criteria => '>',
       :value    => 0
@@ -22,7 +24,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_gt_zero_with_options_turned_off
-    @worksheet.data_validation('A1',
+    @worksheet.data_validation(
+      'A1',
       :validate     => 'integer',
       :criteria     => '>',
       :value        => 0,
@@ -37,7 +40,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_gt_E3
-    @worksheet.data_validation('A2',
+    @worksheet.data_validation(
+      'A2',
       :validate => 'integer',
       :criteria => '>',
       :value    => 'E3'
@@ -49,7 +53,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_decimal_between_01_05
-    @worksheet.data_validation('A3',
+    @worksheet.data_validation(
+      'A3',
       :validate => 'decimal',
       :criteria => 'between',
       :minimum  => 0.1,
@@ -62,9 +67,10 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_list_array
-    @worksheet.data_validation('A4',
+    @worksheet.data_validation(
+      'A4',
       :validate => 'list',
-      :source   => [ 'open', 'high', 'close' ]
+      :source   => %w[open high close]
     )
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -73,7 +79,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_list_reference
-    @worksheet.data_validation('A5',
+    @worksheet.data_validation(
+      'A5',
       :validate => 'list',
       :source   => '=$E$4:$G$4'
     )
@@ -84,7 +91,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_list_date_between
-    @worksheet.data_validation('A6',
+    @worksheet.data_validation(
+      'A6',
       :validate => 'date',
       :criteria => 'between',
       :minimum  => '2008-01-01T',
@@ -97,7 +105,8 @@ class TestWriteDataValidation01 < Minitest::Test
   end
 
   def test_write_data_validations_between_with_title_and_message
-    @worksheet.data_validation('A7',
+    @worksheet.data_validation(
+      'A7',
       :validate      => 'integer',
       :criteria      => 'between',
       :minimum       => 1,

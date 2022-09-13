@@ -16,11 +16,11 @@ worksheet = workbook.add_worksheet
 bold      = workbook.add_format(:bold => 1)
 
 # Add the worksheet data that the charts will refer to.
-headings = [ 'Number', 'Batch 1', 'Batch 2' ]
+headings = ['Number', 'Batch 1', 'Batch 2']
 data = [
-    [ 2, 3, 4, 5, 6, 7 ],
-    [ 40, 40, 50, 30, 25, 50 ],
-    [ 30, 25, 30, 10,  5, 10 ]
+  [2, 3, 4, 5, 6, 7],
+  [40, 40, 50, 30, 25, 50],
+  [30, 25, 30, 10,  5, 10]
 ]
 
 worksheet.write('A1', headings, bold)
@@ -31,17 +31,17 @@ chart = workbook.add_chart(:type => 'area', :embedded => 1)
 
 # Configure the first series.
 chart.add_series(
-    :name       => '=Sheet1!$B$1',
-    :categories => '=Sheet1!$A$2:$A$7',
-    :values     => '=Sheet1!$B$2:$B$7'
+  :name       => '=Sheet1!$B$1',
+  :categories => '=Sheet1!$A$2:$A$7',
+  :values     => '=Sheet1!$B$2:$B$7'
 )
 
 # Configure second series. Note alternative use of array ref to define
 # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
 chart.add_series(
-    :name       => '=Sheet1!$C$1',
-    :categories => [ 'Sheet1', 1, 6, 0, 0 ],
-    :values     => [ 'Sheet1', 1, 6, 2, 2 ]
+  :name       => '=Sheet1!$C$1',
+  :categories => ['Sheet1', 1, 6, 0, 0],
+  :values     => ['Sheet1', 1, 6, 2, 2]
 )
 
 # Add a chart title and some axis labels.

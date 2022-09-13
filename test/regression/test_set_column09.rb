@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionSetColumn09 < Minitest::Test
@@ -26,6 +27,5 @@ class TestRegressionSetColumn09 < Minitest::Test
     workbook.close
 
     compare_for_regression
-
   end
 end

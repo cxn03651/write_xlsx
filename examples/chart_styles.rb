@@ -16,8 +16,7 @@ require 'write_xlsx'
 workbook  = WriteXLSX.new('chart_styles.xlsx')
 
 # Show the styles for all of these chart types.
-chart_types = ['column', 'area', 'line', 'pie']
-
+chart_types = %w[column area line pie]
 
 chart_types.each do |chart_type|
   # Add a worksheet for each chart type.
@@ -33,10 +32,10 @@ chart_types.each do |chart_type|
         :embedded => 1
       )
 
-      chart.add_series( :values => '=Data!$A$1:$A$6' )
-      chart.set_title( :name => "Style #{style_number}" )
-      chart.set_legend( :none => 1 )
-      chart.set_style( style_number )
+      chart.add_series(:values => '=Data!$A$1:$A$6')
+      chart.set_title(:name => "Style #{style_number}")
+      chart.set_legend(:none => 1)
+      chart.set_style(style_number)
 
       worksheet.insert_chart(row_num, col_num, chart)
       style_number += 1
@@ -45,7 +44,7 @@ chart_types.each do |chart_type|
 end
 
 # Create a worksheet with data for the charts.
-data = [ 10, 40, 50, 20, 10, 50 ]
+data = [10, 40, 50, 20, 10, 50]
 data_worksheet = workbook.add_worksheet('Data')
 data_worksheet.write_col('A1', data)
 data_worksheet.hide

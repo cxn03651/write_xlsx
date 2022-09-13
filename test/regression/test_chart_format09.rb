@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartFormat09 < Minitest::Test
@@ -20,26 +21,26 @@ class TestRegressionChartFormat09 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [46115072, 46157184])
 
     data = [
-            [ 1, 2, 3, 4,  5 ],
-            [ 2, 4, 6, 8,  10 ],
-            [ 3, 6, 9, 12, 15 ]
-           ]
+      [1, 2, 3, 4,  5],
+      [2, 4, 6, 8,  10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', data)
 
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$B$1:$B$5',
-                     :line       => {
-                       :color     => 'red',
-                       :width     => 1.25,
-                       :dash_type => 'square_dot'
-                     }
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$B$1:$B$5',
+      :line       => {
+        :color     => 'red',
+        :width     => 1.25,
+        :dash_type => 'square_dot'
+      }
+    )
     chart.add_series(
-                     :categories => '=Sheet1!$A$1:$A$5',
-                     :values     => '=Sheet1!$C$1:$C$5'
-                     )
+      :categories => '=Sheet1!$A$1:$A$5',
+      :values     => '=Sheet1!$C$1:$C$5'
+    )
 
     worksheet.insert_chart('E9', chart)
 

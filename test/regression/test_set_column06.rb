@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionSetColumn06 < Minitest::Test
@@ -23,10 +24,10 @@ class TestRegressionSetColumn06 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [69197824, 69199360])
 
     data = [
-            [1, 2, 3,  4,  5],
-            [2, 4, 6,  8, 10],
-            [3, 6, 9, 12, 15]
-           ]
+      [1, 2, 3,  4,  5],
+      [2, 4, 6,  8, 10],
+      [3, 6, 9, 12, 15]
+    ]
 
     worksheet.write('A1', 'Foo', bold)
     worksheet.write('B1', 'Bar', italic)
@@ -44,6 +45,5 @@ class TestRegressionSetColumn06 < Minitest::Test
     workbook.close
 
     compare_for_regression
-
   end
 end

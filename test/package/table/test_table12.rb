@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -13,21 +14,21 @@ class TestTable12 < Minitest::Test
   def test_table12
     # Set the table properties.
     @worksheet.add_table(
-                         'C2:F14',
-                         {
-                           :total_row => 1,
-                           :columns   => [
-                                          {:total_string => 'Total'},
-                                          {},
-                                          {},
-                                          {
-                                            :total_function => 'count',
-                                            :format         => @format,
-                                            :formula        => '=SUM(Table1[@[Column1]:[Column3]])'
-                                          }
-                                         ]
-                         }
-                         )
+      'C2:F14',
+      {
+        :total_row => 1,
+        :columns   => [
+          { :total_string => 'Total' },
+          {},
+          {},
+          {
+            :total_function => 'count',
+            :format         => @format,
+            :formula        => '=SUM(Table1[@[Column1]:[Column3]])'
+          }
+        ]
+      }
+    )
     @worksheet.__send__(:prepare_tables, 1, {})
 
     table = @worksheet.tables[0]
@@ -40,7 +41,7 @@ class TestTable12 < Minitest::Test
 
   def expected
     expected_to_array(
-                      <<EOS
+      <<EOS
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <table xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" id="1" name="Table1" displayName="Table1" ref="C2:F14" totalsRowCount="1">
   <autoFilter ref="C2:F13"/>
@@ -55,6 +56,6 @@ class TestTable12 < Minitest::Test
   <tableStyleInfo name="TableStyleMedium9" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/>
 </table>
 EOS
-                      )
+    )
   end
 end

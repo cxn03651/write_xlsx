@@ -134,7 +134,7 @@ module Writexlsx
       # Override default properties with passed arguments
       properties.each do |key, value|
         # Strip leading "-" from Tk style properties e.g. -color => 'red'.
-        self.instance_variable_set("@#{key}", value)
+        instance_variable_set("@#{key}", value)
       end
     end
 
@@ -156,14 +156,14 @@ module Writexlsx
       c_start, r_start,
       xx1, yy1, c_end, r_end,
       xx2, yy2, x_abslt, y_abslt =
-                         worksheet.position_object_pixels(
-                           @column_start,
-                           @row_start,
-                           @x_offset,
-                           @y_offset,
-                           @width  * @scale_x,
-                           @height * @scale_y
-                         )
+        worksheet.position_object_pixels(
+          @column_start,
+          @row_start,
+          @x_offset,
+          @y_offset,
+          @width  * @scale_x,
+          @height * @scale_y
+        )
 
       # Now that x2/y2 have been calculated with a potentially negative
       # width/height we use the absolute value and convert to EMUs.
@@ -231,10 +231,10 @@ module Writexlsx
       # Assume shape connections are to the middle of an object, and
       # not a corner (for now).
       connect_type = @start_side + @end_side
-      smidx        = sls.x_offset + sls.width / 2
-      emidx        = els.x_offset + els.width / 2
-      smidy        = sls.y_offset + sls.height / 2
-      emidy        = els.y_offset + els.height / 2
+      smidx        = sls.x_offset + (sls.width / 2)
+      emidx        = els.x_offset + (els.width / 2)
+      smidy        = sls.y_offset + (sls.height / 2)
+      emidy        = els.y_offset + (els.height / 2)
 
       if connect_type == 'bt'
         sy = sls.y_offset + sls.height
@@ -254,9 +254,7 @@ module Writexlsx
 
           # Create 3 adjustments for an end shape vertically above a
           # start @ Adjustments count from the upper left object.
-          if @adjustments.empty?
-            @adjustments = [-10, 50, 110]
-          end
+          @adjustments = [-10, 50, 110] if @adjustments.empty?
           @type = 'bentConnector5'
         end
       elsif connect_type == 'rl'
@@ -273,9 +271,7 @@ module Writexlsx
         if smidx > emidx
           # Create 3 adjustments for an end shape to the left of a
           # start @
-          if @adjustments.empty?
-            @adjustments = [-10, 50, 110]
-          end
+          @adjustments = [-10, 50, 110] if @adjustments.empty?
           @type = 'bentConnector5'
         end
       end
@@ -285,13 +281,9 @@ module Writexlsx
     # Check shape attributes to ensure they are valid.
     #
     def validate(index)
-      unless %w[l ctr r just].include?(@align)
-        raise "Shape #{index} (#{@type}) alignment (#{@align}) not in ['l', 'ctr', 'r', 'just']\n"
-      end
+      raise "Shape #{index} (#{@type}) alignment (#{@align}) not in ['l', 'ctr', 'r', 'just']\n" unless %w[l ctr r just].include?(@align)
 
-      unless %w[t ctr b].include?(@valign)
-        raise "Shape #{index} (#{@type}) vertical alignment (#{@valign}) not in ['t', 'ctr', 'v']\n"
-      end
+      raise "Shape #{index} (#{@type}) vertical alignment (#{@valign}) not in ['t', 'ctr', 'v']\n" unless %w[t ctr b].include?(@valign)
     end
 
     def dimensions

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Bar - A class for writing Excel Bar charts.
@@ -47,10 +48,7 @@ module Writexlsx
       # charts to ensure that their combined chart is on a secondary axis.
       #
       def combine(chart)
-
-        unless chart.is_secondary?
-          raise 'Charts combined with Bar charts must be on a secondary axis'
-        end
+        raise 'Charts combined with Bar charts must be on a secondary axis' unless chart.is_secondary?
 
         super
       end
@@ -62,9 +60,7 @@ module Writexlsx
         if params[:primary_axes] != 0
           # Reverse X and Y axes for Bar charts.
           @y_axis, @x_axis = @x_axis, @y_axis
-          if @y2_axis.position == 'r'
-            @y2_axis.position = 't'
-          end
+          @y2_axis.position = 't' if @y2_axis.position == 'r'
         end
 
         # Write the c:barChart element.
@@ -75,7 +71,7 @@ module Writexlsx
       # Write the <c:barDir> element.
       #
       def write_bar_dir
-        @writer.empty_tag('c:barDir', [ ['val', 'bar'] ])
+        @writer.empty_tag('c:barDir', [%w[val bar]])
       end
 
       #

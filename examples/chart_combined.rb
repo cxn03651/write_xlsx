@@ -18,7 +18,7 @@ bold      = workbook.add_format(:bold => 1)
 # Add the worksheet data that the charts will refer to.
 headings = ['Number', 'Batch 1', 'Batch 2']
 data = [
-  [ 2,  3,  4,  5,  6,  7],
+  [2,  3,  4,  5,  6,  7],
   [10, 40, 50, 20, 10, 50],
   [30, 60, 70, 50, 40, 30]
 ]
@@ -60,7 +60,6 @@ column_chart1.set_title(:name => 'Combined chart - same Y axis')
 column_chart1.set_x_axis(:name => 'Test number')
 column_chart1.set_y_axis(:name => 'Sample length (mm)')
 
-
 # Insert the chart into the worksheet
 worksheet.insert_chart('E2', column_chart1)
 
@@ -100,7 +99,7 @@ column_chart2.set_title(:name => 'Combine chart - secondary Y axis')
 column_chart2.set_x_axis(:name => 'Test number')
 column_chart2.set_y_axis(:name => 'Sample length (mm)')
 
-# Note: the y2 properties are on the secondary chart.
+# NOTE: the y2 properties are on the secondary chart.
 line_chart2.set_y_axis(:name => 'Target length (mm)')
 
 # Insert the chart into the worksheet

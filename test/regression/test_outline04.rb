@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionOutline04 < Minitest::Test
@@ -17,10 +18,10 @@ class TestRegressionOutline04 < Minitest::Test
 
     # Example 4: Show all possible outline levels.
     levels = [
-              'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6',
-              'Level 7', 'Level 6', 'Level 5', 'Level 4', 'Level 3', 'Level 2',
-              'Level 1'
-             ]
+      'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6',
+      'Level 7', 'Level 6', 'Level 5', 'Level 4', 'Level 3', 'Level 2',
+      'Level 1'
+    ]
 
     worksheet4.write_col('A1', levels)
 

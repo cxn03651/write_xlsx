@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionMacro01 < Minitest::Test
@@ -16,10 +17,9 @@ class TestRegressionMacro01 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     workbook.add_vba_project(File.join(
-                                       @regression_output,
-                                       'vbaProject01.bin'
-                                       )
-                             )
+                               @regression_output,
+                               'vbaProject01.bin'
+                             ))
 
     worksheet.write('A1', 123)
 

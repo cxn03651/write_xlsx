@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx/package/core'
 
 class TestCore01 < Minitest::Test
   def test_assemble_xml_file
     properties = {
-      :author   => 'A User',
-      :created  => Time.local(2010, 1, 1, 0, 0, 0)
+      :author  => 'A User',
+      :created => Time.local(2010, 1, 1, 0, 0, 0)
     }
 
     @obj = Writexlsx::Package::Core.new
@@ -22,7 +23,7 @@ class TestCore01 < Minitest::Test
   <dcterms:modified xsi:type="dcterms:W3CDTF">2010-01-01T00:00:00Z</dcterms:modified>
 </cp:coreProperties>
 EOS
-    )
+                                )
     assert_equal(expected, result)
   end
 end

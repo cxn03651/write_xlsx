@@ -67,7 +67,7 @@ module Writexlsx
 
       def hide_gridlines(option)
         if option == 0 || !option
-          @print_gridlines  = true
+          @print_gridlines = true
           @print_options_changed = true
         else
           @print_gridlines  = false
@@ -94,7 +94,7 @@ module Writexlsx
       #     r:id="rId1"
       # />
       #
-      def write_page_setup(writer) #:nodoc:
+      def write_page_setup(writer) # :nodoc:
         return unless @page_setup_changed
 
         attributes = []
@@ -102,15 +102,14 @@ module Writexlsx
         attributes << ['scale',           @scale]         if @scale != 100
         attributes << ['fitToWidth',      @fit_width]     if @fit_page && @fit_width != 1
         attributes << ['fitToHeight',     @fit_height]    if @fit_page && @fit_height != 1
-        attributes << ['pageOrder',       "overThenDown"] if @across
+        attributes << %w[pageOrder overThenDown] if @across
         attributes << ['firstPageNumber', @page_start]    if @page_start && @page_start > 1
         attributes << ['orientation',
                        if @orientation
                          'portrait'
                        else
                          'landscape'
-                       end
-                      ]
+                       end]
         attributes << ['blackAndWhite', 1]      if @black_white
         attributes << ['useFirstPageNumber', 1] if ptrue?(@page_start)
 
@@ -124,14 +123,14 @@ module Writexlsx
       #
       # Write the <pageMargins> element.
       #
-      def write_page_margins(writer) #:nodoc:
+      def write_page_margins(writer) # :nodoc:
         writer.empty_tag('pageMargins', margin_attributes)
       end
 
       #
       # Write the <printOptions> element.
       #
-      def write_print_options(writer) #:nodoc:
+      def write_print_options(writer) # :nodoc:
         return unless @print_options_changed
 
         attributes = []
@@ -145,7 +144,7 @@ module Writexlsx
       #
       # Write the <headerFooter> element.
       #
-      def write_header_footer(writer, excel2003_style) #:nodoc:
+      def write_header_footer(writer, excel2003_style) # :nodoc:
         tag = 'headerFooter'
         attributes = []
         attributes << ['scaleWithDoc', 0]     unless ptrue?(@header_footer_scales)
@@ -159,7 +158,6 @@ module Writexlsx
         elsif excel2003_style
           writer.empty_tag(tag, attributes)
         end
-
       end
 
       private
@@ -167,14 +165,14 @@ module Writexlsx
       #
       # Write the <oddHeader> element.
       #
-      def write_odd_header(writer) #:nodoc:
+      def write_odd_header(writer) # :nodoc:
         writer.data_element('oddHeader', @header)
       end
 
       #
       # Write the <oddFooter> element.
       #
-      def write_odd_footer(writer) #:nodoc:
+      def write_odd_footer(writer) # :nodoc:
         writer.data_element('oddFooter', @footer)
       end
 

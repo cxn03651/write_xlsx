@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 ###############################################################################
 #
 # Area - A class for writing Excel Area charts.
@@ -27,9 +28,7 @@ module Writexlsx
         @show_crosses  = false
 
         # Override and reset the default axis values.
-        if @subtype == 'percent_stacked'
-          @y_axis.defaults[:num_format] = '0%'
-        end
+        @y_axis.defaults[:num_format] = '0%' if @subtype == 'percent_stacked'
 
         set_y_axis
 
@@ -53,16 +52,16 @@ module Writexlsx
         series = axes_series(params)
         return if series.empty?
 
-        if @subtype == 'percent_stacked'
-          subtype = 'percentStacked'
-        else
-          subtype = @subtype
-        end
+        subtype = if @subtype == 'percent_stacked'
+                    'percentStacked'
+                  else
+                    @subtype
+                  end
         @writer.tag_elements('c:areaChart') do
           # Write the c:grouping element.
           write_grouping(subtype)
           # Write the series elements.
-          series.each {|s| write_series(s)}
+          series.each { |s| write_series(s) }
 
           # Write the c:dropLines element.
           write_drop_lines

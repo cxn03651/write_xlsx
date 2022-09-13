@@ -37,10 +37,10 @@ worksheet4.split_panes(15, 8.43)    # 1 row and column
 #
 
 header = workbook.add_format(
-                             :align    => 'center',
-                             :valign   => 'vcenter',
-                             :fg_color => '#C3FFC0'
-                             )
+  :align    => 'center',
+  :valign   => 'vcenter',
+  :fg_color => '#C3FFC0'
+)
 
 center = workbook.add_format(:align => 'center')
 
@@ -53,9 +53,9 @@ worksheet1.set_column('A:I', 16)
 worksheet1.set_row(0, 20)
 worksheet1.set_selection('C3')
 
-(0..8).each { |i| worksheet1.write(0, i, 'Scroll down', header) }
+9.times { |i| worksheet1.write(0, i, 'Scroll down', header) }
 (1..100).each do |i|
-  (0..8).each {|j| worksheet1.write(i, j, i + 1, center)}
+  9.times { |j| worksheet1.write(i, j, i + 1, center) }
 end
 
 #######################################################################
@@ -66,13 +66,13 @@ end
 worksheet2.set_column('A:A', 16)
 worksheet2.set_selection('C3')
 
-(0..49).each do |i|
+50.times do |i|
   worksheet2.set_row(i, 15)
   worksheet2.write(i, 0, 'Scroll right', header)
 end
 
-(0..49).each do |i|
-  (1..25).each {|j| worksheet2.write(i, j, j, center)}
+50.times do |i|
+  (1..25).each { |j| worksheet2.write(i, j, j, center) }
 end
 
 #######################################################################
@@ -85,10 +85,10 @@ worksheet3.set_selection('C3')
 
 worksheet3.write(0, 0, '', header)
 
-(1..25).each {|i| worksheet3.write(0, i, 'Scroll down', header)}
-(1..49).each {|i| worksheet3.write(i, 0, 'Scroll right', header)}
+(1..25).each { |i| worksheet3.write(0, i, 'Scroll down', header) }
+(1..49).each { |i| worksheet3.write(i, 0, 'Scroll right', header) }
 (1..49).each do |i|
-  (1..25).each {|j| worksheet3.write(i, j, j, center)}
+  (1..25).each { |j| worksheet3.write(i, j, j, center) }
 end
 
 #######################################################################
@@ -98,10 +98,10 @@ end
 
 worksheet4.set_selection('C3')
 
-(1..25).each {|i| worksheet4.write(0, i, 'Scroll', center)}
-(1..49).each {|i| worksheet4.write(i, 0, 'Scroll', center)}
+(1..25).each { |i| worksheet4.write(0, i, 'Scroll', center) }
+(1..49).each { |i| worksheet4.write(i, 0, 'Scroll', center) }
 (1..49).each do |i|
-  (1..25).each {|j| worksheet4.write(i, j, j, center)}
+  (1..25).each { |j| worksheet4.write(i, j, j, center) }
 end
 
 workbook.close

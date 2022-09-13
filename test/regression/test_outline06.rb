@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionOutline06 < Minitest::Test
@@ -37,7 +38,6 @@ class TestRegressionOutline06 < Minitest::Test
     worksheet1.set_row(8,  nil, nil, 0, 2)
     worksheet1.set_row(9,  nil, nil, 0, 2)
     worksheet1.set_row(10, nil, nil, 0, 1)
-
 
     # Add a column format for clarity
     worksheet1.set_column('A:A', 20)

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionEscapes03 < Minitest::Test
@@ -20,7 +21,7 @@ class TestRegressionEscapes03 < Minitest::Test
 
     worksheet.write('A1', "Foo", bold)
     worksheet.write('A2', "Bar", italic)
-    worksheet.write_rich_string('A3', 'a', bold, %q{b"<>'c}, 'defg')
+    worksheet.write_rich_string('A3', 'a', bold, %q(b"<>'c), 'defg')
 
     workbook.close
     compare_for_regression(

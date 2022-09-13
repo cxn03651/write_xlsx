@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartBar24 < Minitest::Test
@@ -21,9 +22,9 @@ class TestRegressionChartBar24 < Minitest::Test
     chart.instance_variable_set(:@axis2_ids, [65934464, 72628864])
 
     data = [
-            [27, 33, 44, 12, 1],
-            [6, 8, 6, 4, 2]
-           ]
+      [27, 33, 44, 12, 1],
+      [6, 8, 6, 4, 2]
+    ]
 
     worksheet.write('A1', data)
 
@@ -37,7 +38,7 @@ class TestRegressionChartBar24 < Minitest::Test
       nil,
       {
         'xl/charts/chart1.xml' => ['<c:pageMargins'],
-        'xl/workbook.xml'      => [ '<fileVersion' ]
+        'xl/workbook.xml'      => ['<fileVersion']
       }
     )
   end

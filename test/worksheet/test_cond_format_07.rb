@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 require 'write_xlsx'
 require 'stringio'
@@ -30,32 +31,28 @@ class TestCondFormat07 < Minitest::Test
                                         :criteria => 'containing',
                                         :value    => 'foo',
                                         :format   => nil
-                                      }
-                                      )
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
                                         :type     => 'text',
                                         :criteria => 'not containing',
                                         :value    => 'foo',
                                         :format   => nil
-                                      }
-                                      )
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
                                         :type     => 'text',
                                         :criteria => 'begins with',
                                         :value    => 'b',
                                         :format   => nil
-                                      }
-                                      )
+                                      })
     @worksheet.conditional_formatting('A1:A4',
                                       {
                                         :type     => 'text',
                                         :criteria => 'ends with',
                                         :value    => 'b',
                                         :format   => nil
-                                      }
-                                      )
+                                      })
 
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

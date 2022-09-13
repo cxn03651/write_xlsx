@@ -17,23 +17,22 @@ bold        = workbook.add_format(:bold => 1)
 date_format = workbook.add_format(:num_format => 'dd/mm/yyyy')
 chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
 
-
 # Add the worksheet data that the charts will refer to.
-headings = [ 'Date', 'High', 'Low', 'Close' ]
+headings = %w[Date High Low Close]
 data = [
-    [ '2007-01-01T', '2007-01-02T', '2007-01-03T', '2007-01-04T', '2007-01-05T' ],
-    [ 27.2,  25.03, 19.05, 20.34, 18.5 ],
-    [ 23.49, 19.55, 15.12, 17.84, 16.34 ],
-    [ 25.45, 23.05, 17.32, 20.45, 17.34 ]
+  %w[2007-01-01T 2007-01-02T 2007-01-03T 2007-01-04T 2007-01-05T],
+  [27.2,  25.03, 19.05, 20.34, 18.5],
+  [23.49, 19.55, 15.12, 17.84, 16.34],
+  [25.45, 23.05, 17.32, 20.45, 17.34]
 ]
 
 worksheet.write('A1', headings, bold)
 
-(0 .. 4).each do |row|
-    worksheet.write_date_time(row + 1, 0, data[0][row], date_format)
-    worksheet.write(row + 1, 1, data[1][row])
-    worksheet.write(row + 1, 2, data[2][row])
-    worksheet.write(row + 1, 3, data[3][row])
+5.times do |row|
+  worksheet.write_date_time(row + 1, 0, data[0][row], date_format)
+  worksheet.write(row + 1, 1, data[1][row])
+  worksheet.write(row + 1, 2, data[2][row])
+  worksheet.write(row + 1, 3, data[3][row])
 end
 
 worksheet.set_column('A:D', 11)

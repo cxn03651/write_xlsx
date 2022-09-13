@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 require 'helper'
 
 class TestRegressionChartDisplayUnits12 < Minitest::Test
@@ -20,7 +21,7 @@ class TestRegressionChartDisplayUnits12 < Minitest::Test
     chart.instance_variable_set(:@axis_ids, [93550464, 93548544])
 
     data = [
-      [ 10000000, 20000000, 30000000, 20000000,  10000000 ]
+      [10000000, 20000000, 30000000, 20000000,  10000000]
     ]
 
     worksheet.write('A1', data)
@@ -28,7 +29,7 @@ class TestRegressionChartDisplayUnits12 < Minitest::Test
 
     chart.add_series(
       :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5',
+      :values     => '=Sheet1!$B$1:$B$5'
     )
     chart.set_y_axis(:display_units => 'hundreds', :display_units_visible => 0)
     chart.set_x_axis(:display_units => 'thousands', :display_units_visible => 0)
