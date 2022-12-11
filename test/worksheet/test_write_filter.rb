@@ -14,6 +14,7 @@ class TestWriteFilter < Minitest::Test
     @worksheet.__send__('write_filter', 'East')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<filter val="East"/>'
+
     assert_equal(expected, result)
   end
 end

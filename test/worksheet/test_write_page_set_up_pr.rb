@@ -15,6 +15,7 @@ class TestWritePageSetUpPr < Minitest::Test
     @worksheet.__send__('write_page_set_up_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetUpPr fitToPage="1"/>'
+
     assert_equal(expected, result)
   end
 end

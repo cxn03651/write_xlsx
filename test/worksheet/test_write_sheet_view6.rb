@@ -17,6 +17,7 @@ class TestWriteSheetView6 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/><selection pane="bottomLeft" activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -27,6 +28,7 @@ class TestWriteSheetView6 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="1" topLeftCell="B1" activePane="topRight" state="frozen"/><selection pane="topRight" activeCell="B1" sqref="B1"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -37,6 +39,7 @@ class TestWriteSheetView6 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="6" ySplit="3" topLeftCell="G4" activePane="bottomRight" state="frozen"/><selection pane="topRight" activeCell="G1" sqref="G1"/><selection pane="bottomLeft" activeCell="A4" sqref="A4"/><selection pane="bottomRight" activeCell="G4" sqref="G4"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -47,6 +50,7 @@ class TestWriteSheetView6 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane xSplit="6" ySplit="3" topLeftCell="G4" activePane="bottomRight" state="frozen"/><selection pane="topRight" activeCell="G1" sqref="G1"/><selection pane="bottomLeft" activeCell="A4" sqref="A4"/><selection pane="bottomRight" activeCell="I5" sqref="I5"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 end

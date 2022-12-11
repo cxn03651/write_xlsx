@@ -41,6 +41,7 @@ class TestAddSeries < Minitest::Test
     @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
 
     result = @chart.instance_variable_get(:@series).first
+
     assert_equal(expected, result)
   end
 
@@ -80,6 +81,7 @@ class TestAddSeries < Minitest::Test
     )
 
     result = @chart.instance_variable_get(:@series)
+
     assert_equal(expected, result)
   end
 
@@ -115,6 +117,7 @@ class TestAddSeries < Minitest::Test
     @chart.add_series(:values => ['Sheet1', 0, 4, 0, 0])
 
     result = @chart.instance_variable_get(:@series)
+
     assert_equal(expected, result)
   end
 
@@ -154,6 +157,7 @@ class TestAddSeries < Minitest::Test
     )
 
     result = @chart.instance_variable_get(:@series).first
+
     assert_equal(expected, result)
   end
 
@@ -196,6 +200,7 @@ class TestAddSeries < Minitest::Test
     )
 
     result = @chart.instance_variable_get(:@series).first
+
     assert_equal(expected, result)
   end
 end

@@ -17,6 +17,7 @@ class TestWriteWorksheetAttributes < Minitest::Test
       ['xmlns', "http://schemas.openxmlformats.org/spreadsheetml/2006/main"],
       ['xmlns:r', "http://schemas.openxmlformats.org/officeDocument/2006/relationships"]
     ]
+
     assert_equal(expected, result)
   end
 end

@@ -76,6 +76,7 @@ class DrawingShape02 < Minitest::Test
 </xdr:wsDr>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

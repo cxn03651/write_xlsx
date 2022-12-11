@@ -15,6 +15,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = ''
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<printOptions horizontalCentered="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -31,6 +33,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<printOptions verticalCentered="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -40,6 +43,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<printOptions horizontalCentered="1" verticalCentered="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -48,6 +52,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = ''
+
     assert_equal(expected, result)
   end
 
@@ -56,6 +61,7 @@ class TestWritePrintOptions < Minitest::Test
     @worksheet.__send__('write_print_options')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<printOptions gridLines="1"/>'
+
     assert_equal(expected, result)
   end
   #   def test_write_print_options_1_hide_gridlines

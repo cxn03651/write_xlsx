@@ -18,6 +18,7 @@ class TestWorksheetWritePageSetup < Minitest::Test
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = ''
+
     assert_equal(expected, result)
   end
 
@@ -26,6 +27,7 @@ class TestWorksheetWritePageSetup < Minitest::Test
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetup orientation="landscape"/>'
+
     assert_equal(expected, result)
   end
 
@@ -34,6 +36,7 @@ class TestWorksheetWritePageSetup < Minitest::Test
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetup orientation="portrait"/>'
+
     assert_equal(expected, result)
   end
 
@@ -42,6 +45,7 @@ class TestWorksheetWritePageSetup < Minitest::Test
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetup paperSize="9" orientation="portrait"/>'
+
     assert_equal(expected, result)
   end
 
@@ -50,6 +54,7 @@ class TestWorksheetWritePageSetup < Minitest::Test
     @worksheet.__send__('write_page_setup')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pageSetup pageOrder="overThenDown" orientation="portrait"/>'
+
     assert_equal(expected, result)
   end
 end

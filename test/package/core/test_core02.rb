@@ -38,6 +38,7 @@ class TestCore02 < Minitest::Test
 </cp:coreProperties>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

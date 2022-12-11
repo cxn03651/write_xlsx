@@ -13,6 +13,7 @@ class TestWriteStyle < Minitest::Test
     @chart.set_style(1)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 
@@ -21,6 +22,7 @@ class TestWriteStyle < Minitest::Test
     @chart.set_style(2)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 
@@ -29,6 +31,7 @@ class TestWriteStyle < Minitest::Test
     @chart.set_style(-1)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 
@@ -37,6 +40,7 @@ class TestWriteStyle < Minitest::Test
     @chart.set_style(49)
     @chart.__send__('write_style')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

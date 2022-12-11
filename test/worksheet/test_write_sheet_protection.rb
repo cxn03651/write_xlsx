@@ -15,6 +15,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection password="83AF" sheet="1" objects="1" scenarios="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -31,6 +33,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" selectLockedCells="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -39,6 +42,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" formatCells="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -47,6 +51,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" formatColumns="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -55,6 +60,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" formatRows="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -63,6 +69,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" insertColumns="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -71,6 +78,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" insertRows="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -79,6 +87,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" insertHyperlinks="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -87,6 +96,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" deleteColumns="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -95,6 +105,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" deleteRows="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -103,6 +114,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" sort="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -111,6 +123,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" autoFilter="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -119,6 +132,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" pivotTables="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -127,6 +141,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" scenarios="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -135,6 +150,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -144,6 +160,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection sheet="1" objects="1" scenarios="1" formatCells="0" selectLockedCells="1" selectUnlockedCells="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -170,6 +187,7 @@ class TestWriteSheetProtection < Minitest::Test
     @worksheet.__send__('write_sheet_protection')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetProtection password="996B" sheet="1" formatCells="0" formatColumns="0" formatRows="0" insertColumns="0" insertRows="0" insertHyperlinks="0" deleteColumns="0" deleteRows="0" selectLockedCells="1" sort="0" autoFilter="0" pivotTables="0" selectUnlockedCells="1"/>'
+
     assert_equal(expected, result)
   end
 end

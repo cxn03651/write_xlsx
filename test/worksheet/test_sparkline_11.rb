@@ -75,6 +75,7 @@ class TestSparkline11 < Minitest::Test
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)
 
     expected = expected_to_array(expected_xml)
+
     assert_equal(expected, result)
   end
 

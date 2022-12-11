@@ -10,6 +10,7 @@ class TestWriteDiv < Minitest::Test
     vml.__send__('write_div', 'left')
     result = vml.instance_variable_get(:@writer).string
     expected = '<div style="text-align:left"></div>'
+
     assert_equal(expected, result)
   end
 end

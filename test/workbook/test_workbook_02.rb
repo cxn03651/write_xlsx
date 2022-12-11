@@ -27,6 +27,7 @@ class TestWorkbook02 < Minitest::Test
 </workbook>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

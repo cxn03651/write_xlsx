@@ -22,6 +22,7 @@ class TestConvertDateTime01 < Minitest::Test
 
       number = 0 + ::Regexp.last_match(1).to_f
       result    = @worksheet.convert_date_time(date_time)
+
       assert fit_cmp(number, result)
     end
   end
@@ -426,11 +427,13 @@ EOS
 
   def test_fit_cmp_pass
     result = @worksheet.convert_date_time('1899-12-31T00:00:00.0004')
+
     assert fit_cmp(0, result)
   end
 
   def test_fit_cmp_fail
     result = @worksheet.convert_date_time('1899-12-31T00:00:00.0005')
+
     refute fit_cmp(0, result)
   end
 

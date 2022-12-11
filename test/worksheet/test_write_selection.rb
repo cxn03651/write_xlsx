@@ -14,6 +14,7 @@ class TestWriteSelection < Minitest::Test
     @worksheet.__send__('write_selection', nil, 'A1', 'A1')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<selection activeCell="A1" sqref="A1"/>'
+
     assert_equal(expected, result)
   end
 end

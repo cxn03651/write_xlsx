@@ -21,6 +21,7 @@ class TestConvertDateTime03 < Minitest::Test
 
       number = 0 + ::Regexp.last_match(1).to_f
       result    = @worksheet.convert_date_time(date_time)
+
       assert fit_cmp(number, result)
     end
   end

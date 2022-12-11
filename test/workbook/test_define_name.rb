@@ -12,6 +12,7 @@ class TestDefinedName < Minitest::Test
   def test_define_name_should_not_change_formula_string
     formula = '=0.98'
     @workbook.define_name('Name', formula)
+
     assert_equal('=0.98', formula)
   end
 end

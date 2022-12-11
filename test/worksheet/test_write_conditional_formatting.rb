@@ -23,6 +23,7 @@ class TestWriteConditionalFormatting < Minitest::Test
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<conditionalFormatting sqref="A1"><cfRule type="cellIs" dxfId="0" priority="1" operator="greaterThan"><formula>5</formula></cfRule></conditionalFormatting>'
+
     assert_equal(expected, result)
   end
 
@@ -39,6 +40,7 @@ class TestWriteConditionalFormatting < Minitest::Test
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<conditionalFormatting sqref="A2"><cfRule type="cellIs" dxfId="0" priority="1" operator="lessThan"><formula>30</formula></cfRule></conditionalFormatting>'
+
     assert_equal(expected, result)
   end
 
@@ -55,6 +57,7 @@ class TestWriteConditionalFormatting < Minitest::Test
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<conditionalFormatting sqref="A3"><cfRule type="cellIs" priority="1" operator="greaterThanOrEqual"><formula>50</formula></cfRule></conditionalFormatting>'
+
     assert_equal(expected, result)
   end
 
@@ -72,6 +75,7 @@ class TestWriteConditionalFormatting < Minitest::Test
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<conditionalFormatting sqref="A1"><cfRule type="cellIs" dxfId="0" priority="1" operator="between"><formula>10</formula><formula>20</formula></cfRule></conditionalFormatting>'
+
     assert_equal(expected, result)
   end
 end

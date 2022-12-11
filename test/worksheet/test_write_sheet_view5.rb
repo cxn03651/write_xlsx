@@ -16,6 +16,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -25,6 +26,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -34,6 +36,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="B1" sqref="B1"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -43,6 +46,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -52,6 +56,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="D3" sqref="D3:F4"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -61,6 +66,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="F4" sqref="D3:F4"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -70,6 +76,7 @@ class TestWriteSheetView5 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><selection activeCell="A2" sqref="A2"/></sheetView></sheetViews>'
+
     assert_equal(expected, result)
   end
 end

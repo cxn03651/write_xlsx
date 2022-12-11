@@ -28,6 +28,7 @@ class TestRegressionTable20 < Minitest::Test
         :columns => [{ :header => 'Column1' }, { :header => 'column1' }]
       )
     end
+
     assert_match(/add_table\(\) contains duplicate name:/, e.message)
 
     workbook.close

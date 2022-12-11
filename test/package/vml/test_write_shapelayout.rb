@@ -10,6 +10,7 @@ class TestWriteShapelayout < Minitest::Test
     vml.__send__('write_shapelayout', 1)
     result = vml.instance_variable_get(:@writer).string
     expected = '<o:shapelayout v:ext="edit"><o:idmap v:ext="edit" data="1"/></o:shapelayout>'
+
     assert_equal(expected, result)
   end
 end

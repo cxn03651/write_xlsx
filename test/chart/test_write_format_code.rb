@@ -12,6 +12,7 @@ class TestWriteFormatCode < Minitest::Test
     expected = '<c:formatCode>General</c:formatCode>'
     @chart.__send__('write_format_code', 'General')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

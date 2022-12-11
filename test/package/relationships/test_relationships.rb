@@ -24,6 +24,7 @@ class TestRelationships < Minitest::Test
 </Relationships>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

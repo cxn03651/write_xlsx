@@ -104,6 +104,7 @@ class TestExtractFilterTokens < Minitest::Test
     ].each do |test|
       expected = test[1]
       result = @worksheet.__send__('extract_filter_tokens', test[0])
+
       assert_equal(expected, result)
     end
   end

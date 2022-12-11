@@ -96,6 +96,7 @@ class TestStyles08 < Minitest::Test
 </styleSheet>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

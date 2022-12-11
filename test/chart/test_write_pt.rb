@@ -12,6 +12,7 @@ class TestWritePt < Minitest::Test
     expected = '<c:pt idx="0"><c:v>1</c:v></c:pt>'
     @chart.__send__('write_pt', 0, 1)
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

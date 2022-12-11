@@ -13,6 +13,7 @@ class TestChartsheet < Minitest::Test
   def test_chartsheet01
     @chartsheet.__send__(:assemble_xml_file)
     result = @chartsheet.instance_variable_get(:@writer).string
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 

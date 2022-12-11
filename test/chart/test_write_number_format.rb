@@ -15,6 +15,7 @@ class TestWriteNumberFormat < Minitest::Test
 
     expected = '<c:numFmt formatCode="General" sourceLinked="1"/>'
     result = @chart.__send__('write_number_format', axis)
+
     assert_equal(expected, result)
   end
 
@@ -25,6 +26,7 @@ class TestWriteNumberFormat < Minitest::Test
 
     expected = '<c:numFmt formatCode="#,##0.00" sourceLinked="0"/>'
     result = @chart.__send__('write_number_format', axis)
+
     assert_equal(expected, result)
   end
 
@@ -34,6 +36,7 @@ class TestWriteNumberFormat < Minitest::Test
     axis.defaults   = { :num_format => 'General' }
 
     result = @chart.__send__('write_cat_number_format', axis)
+
     assert_nil(result)
   end
 
@@ -44,6 +47,7 @@ class TestWriteNumberFormat < Minitest::Test
 
     expected = '<c:numFmt formatCode="#,##0.00" sourceLinked="0"/>'
     result = @chart.__send__('write_cat_number_format', axis)
+
     assert_equal(expected, result)
   end
 end

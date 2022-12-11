@@ -19,6 +19,7 @@ class TestWriteTabColor < Minitest::Test
     @worksheet.__send__('write_tab_color')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<tabColor rgb="FFFF0000"/>'
+
     assert_equal(expected, result)
   end
 end

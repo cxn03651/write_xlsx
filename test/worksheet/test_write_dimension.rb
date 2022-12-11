@@ -14,6 +14,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dimension ref="A1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -32,6 +34,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -41,6 +44,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -50,6 +54,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -60,6 +65,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -70,6 +76,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -80,6 +87,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 
@@ -90,6 +98,7 @@ class TestWriteDimension < Minitest::Test
     @worksheet.__send__('write_dimension')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = %(<dimension ref="#{cell}"/>)
+
     assert_equal(expected, result)
   end
 end

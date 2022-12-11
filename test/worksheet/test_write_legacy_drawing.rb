@@ -15,6 +15,7 @@ class TestWriteLegacyDrawing < Minitest::Test
     @worksheet.__send__('write_legacy_drawing')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<legacyDrawing r:id="rId1"/>'
+
     assert_equal(expected, result)
   end
 end

@@ -48,6 +48,7 @@ EOS
     expected = "<foo>data</foo>"
     @obj.data_element('foo', 'data')
     result = @obj.string
+
     assert_equal(expected, result)
   end
 
@@ -60,6 +61,7 @@ EOS
       "<definedName name=\"_xlnm.Print_Titles\" localSheetId=\"0\">Sheet1!$1:$1</definedName>"
     @obj.data_element('definedName', 'Sheet1!$1:$1', attributes)
     result = @obj.string
+
     assert_equal(expected, result)
   end
 end

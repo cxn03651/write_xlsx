@@ -21,6 +21,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="2" max="4" width="5.7109375" customWidth="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -35,6 +36,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="6" max="6" width="8.7109375" hidden="1" customWidth="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -49,6 +51,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="8" max="8" width="9.140625" style="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -63,6 +66,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="9" max="9" width="9.140625" style="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -77,6 +81,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="10" max="10" width="2.7109375" customWidth="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -91,6 +96,7 @@ class TestWriteColInfo < Minitest::Test
     @worksheet.__send__('write_col_info', [min, max, width, format, hidden])
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<col min="12" max="12" width="0" hidden="1" customWidth="1"/>'
+
     assert_equal(expected, result)
   end
 end

@@ -15,6 +15,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="1" topLeftCell="B1" activePane="topRight" state="frozen"/>'
+
     assert_equal(expected, result)
   end
 
@@ -31,6 +33,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>'
+
     assert_equal(expected, result)
   end
 
@@ -39,6 +42,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane ySplit="1" topLeftCell="A20" activePane="bottomLeft" state="frozen"/>'
+
     assert_equal(expected, result)
   end
 
@@ -47,6 +51,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="6" ySplit="3" topLeftCell="G4" activePane="bottomRight" state="frozen"/>'
+
     assert_equal(expected, result)
   end
 
@@ -55,6 +60,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="6" ySplit="3" topLeftCell="G4" activePane="bottomRight" state="frozenSplit"/>'
+
     assert_equal(expected, result)
   end
 
@@ -63,6 +69,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane ySplit="600" topLeftCell="A2"/>'
+
     assert_equal(expected, result)
   end
 
@@ -71,6 +78,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane ySplit="900" topLeftCell="A3"/>'
+
     assert_equal(expected, result)
   end
 
@@ -79,6 +87,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane ySplit="2400" topLeftCell="A8"/>'
+
     assert_equal(expected, result)
   end
 
@@ -87,6 +96,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="1350" topLeftCell="B1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -95,6 +105,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="2310" topLeftCell="C1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -103,6 +114,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="5190" topLeftCell="F1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -111,6 +123,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="1350" ySplit="600" topLeftCell="B2"/>'
+
     assert_equal(expected, result)
   end
 
@@ -119,6 +132,7 @@ class TestWritePane < Minitest::Test
     @worksheet.__send__('write_panes')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<pane xSplit="6150" ySplit="1200" topLeftCell="G4"/>'
+
     assert_equal(expected, result)
   end
 end

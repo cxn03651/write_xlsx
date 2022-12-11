@@ -30,6 +30,7 @@ class TestPixelsToRowCol < Minitest::Test
       caption  = "\tWorksheet: pixcel_to_width(#{pixels})"
       expected = pixels
       result   = width_to_pixels(@worksheet.__send__(:pixels_to_width, pixels))
+
       assert_equal(expected, result, caption)
     end
   end
@@ -39,6 +40,7 @@ class TestPixelsToRowCol < Minitest::Test
       caption  = "\tWorksheet: pixcel_to_height(#{pixels})"
       expected = pixels
       result   = height_to_pixels(@worksheet.__send__(:pixels_to_height, pixels))
+
       assert_equal(expected, result, caption)
     end
   end

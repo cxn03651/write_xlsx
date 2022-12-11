@@ -12,6 +12,7 @@ class TestWriteSymbol < Minitest::Test
     expected = '<c:symbol val="none"/>'
     @chart.__send__('write_symbol', 'none')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

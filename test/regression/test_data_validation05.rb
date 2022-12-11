@@ -29,6 +29,7 @@ class TestDataValidation05 < Minitest::Test
                                 input_message: input_message.dup)
     end
     message = e.message
+
     assert_equal("Length of input message '#{input_message}' exceeds Excel's limit of 255",
                  message)
     workbook.close

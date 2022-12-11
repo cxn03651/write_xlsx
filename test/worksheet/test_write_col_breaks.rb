@@ -15,6 +15,7 @@ class TestWriteColBreaks < Minitest::Test
     @worksheet.__send__('write_col_breaks')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<colBreaks count="1" manualBreakCount="1"><brk id="1" max="1048575" man="1"/></colBreaks>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWriteColBreaks < Minitest::Test
     @worksheet.__send__('write_col_breaks')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<colBreaks count="3" manualBreakCount="3"><brk id="1" max="1048575" man="1"/><brk id="3" max="1048575" man="1"/><brk id="8" max="1048575" man="1"/></colBreaks>'
+
     assert_equal(expected, result)
   end
 end

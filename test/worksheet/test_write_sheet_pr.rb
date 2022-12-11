@@ -15,6 +15,7 @@ class TestWriteSheetPr < Minitest::Test
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWriteSheetPr < Minitest::Test
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><tabColor rgb="FFFF0000"/></sheetPr>'
+
     assert_equal(expected, result)
   end
 
@@ -32,6 +34,7 @@ class TestWriteSheetPr < Minitest::Test
     @worksheet.__send__('write_sheet_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetPr><tabColor rgb="FFFF0000"/><pageSetUpPr fitToPage="1"/></sheetPr>'
+
     assert_equal(expected, result)
   end
 end

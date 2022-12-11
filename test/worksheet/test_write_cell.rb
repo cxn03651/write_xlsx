@@ -15,6 +15,7 @@ class TestWriteCell < Minitest::Test
     cell_data.write_cell
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<c r="A1"><v>1</v></c>'
+
     assert_equal(expected, result)
   end
 
@@ -23,6 +24,7 @@ class TestWriteCell < Minitest::Test
     cell_data.write_cell
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<c r="B4" t="s"><v>0</v></c>'
+
     assert_equal(expected, result)
   end
 
@@ -32,6 +34,7 @@ class TestWriteCell < Minitest::Test
     cell_data.write_cell
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<c r="C2"><f>A3+A5</f><v>0</v></c>'
+
     assert_equal(expected, result)
   end
 
@@ -41,6 +44,7 @@ class TestWriteCell < Minitest::Test
     cell_data.write_cell
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<c r="C2"><f>A3+A5</f><v>0</v></c>'
+
     assert_equal(expected, result)
   end
 
@@ -50,6 +54,7 @@ class TestWriteCell < Minitest::Test
     cell_data.write_cell
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<c r="A1"><f t="array" ref="A1">SUM(B1:C1*B2:C2)</f><v>9500</v></c>'
+
     assert_equal(expected, result)
   end
 end

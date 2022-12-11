@@ -24,6 +24,7 @@ class TestComments01 < Minitest::Test
     result = got_to_array(comments.instance_variable_get(:@writer).string)
 
     expected = expected_to_array(expected_xml)
+
     assert_equal(expected, result)
   end
 

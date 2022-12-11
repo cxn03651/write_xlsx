@@ -12,6 +12,7 @@ class TestWriteSi < Minitest::Test
     @obj.__send__('write_si', 'neptune')
     result = @obj.instance_variable_get(:@writer).string
     expected = '<si><t>neptune</t></si>'
+
     assert_equal(expected, result)
   end
 end

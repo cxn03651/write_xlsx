@@ -15,6 +15,7 @@ class TestWritePhoneticPr < Minitest::Test
     @worksheet.__send__('write_phonetic_pr')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<phoneticPr fontId="0" type="noConversion"/>'
+
     assert_equal(expected, result)
   end
 end

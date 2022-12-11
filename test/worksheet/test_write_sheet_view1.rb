@@ -15,6 +15,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -24,6 +25,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -33,6 +35,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" zoomScale="200" zoomScaleNormal="200" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -42,6 +45,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView rightToLeft="1" tabSelected="1" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -51,6 +55,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView showZeros="0" tabSelected="1" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 
@@ -60,6 +65,7 @@ class TestWriteSheetView1 < Minitest::Test
     @worksheet.__send__('write_sheet_views')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetViews><sheetView tabSelected="1" view="pageLayout" workbookViewId="0"/></sheetViews>'
+
     assert_equal(expected, result)
   end
 end

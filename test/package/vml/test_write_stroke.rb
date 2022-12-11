@@ -10,6 +10,7 @@ class TestWriteStroke < Minitest::Test
     vml.__send__('write_stroke')
     result = vml.instance_variable_get(:@writer).string
     expected = '<v:stroke joinstyle="miter"/>'
+
     assert_equal(expected, result)
   end
 end

@@ -26,6 +26,7 @@ class TestSharedStrings01 < Minitest::Test
 </sst>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

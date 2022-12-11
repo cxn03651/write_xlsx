@@ -39,6 +39,7 @@ class TestWriteMergeCells < Minitest::Test
 </worksheet>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 
@@ -80,6 +81,7 @@ EOS
 </worksheet>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 
@@ -155,6 +157,7 @@ EOS
 </worksheet>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
   #   def test_write_merge_cells_2_1_2_2_Foo_format

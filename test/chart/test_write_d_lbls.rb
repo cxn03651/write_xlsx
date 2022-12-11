@@ -33,6 +33,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -43,6 +44,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -53,6 +55,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -70,6 +73,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -86,6 +90,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -102,6 +107,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -118,6 +124,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -134,6 +141,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -150,6 +158,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -166,6 +175,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -182,6 +192,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -198,6 +209,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -215,6 +227,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -232,6 +245,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -249,6 +263,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -266,6 +281,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -283,6 +299,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 
@@ -299,6 +316,7 @@ class TestWriteDLbls < Minitest::Test
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
+
     assert_equal(expected, result)
   end
 

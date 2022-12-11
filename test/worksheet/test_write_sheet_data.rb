@@ -14,6 +14,7 @@ class TestWriteSheetData < Minitest::Test
     @worksheet.__send__('write_sheet_data')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<sheetData/>'
+
     assert_equal(expected, result)
   end
 end

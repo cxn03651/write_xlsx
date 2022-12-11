@@ -11,6 +11,7 @@ class TestWriteLegendPos < Minitest::Test
   def test_write_legend_pos_default
     expected = '<c:legendPos val="r"/>'
     result = @chart.__send__('write_legend_pos', 'r')
+
     assert_equal(expected, result)
   end
 
@@ -19,6 +20,7 @@ class TestWriteLegendPos < Minitest::Test
     @chart.set_legend(:position => 'overlay_top_right')
     @chart.__send__('write_legend')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

@@ -14,6 +14,7 @@ class TestWriteFilters < Minitest::Test
     @worksheet.__send__('write_filters', 'East')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<filters><filter val="East"/></filters>'
+
     assert_equal(expected, result)
   end
 
@@ -21,6 +22,7 @@ class TestWriteFilters < Minitest::Test
     @worksheet.__send__('write_filters', 'East', 'South')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<filters><filter val="East"/><filter val="South"/></filters>'
+
     assert_equal(expected, result)
   end
 
@@ -28,6 +30,7 @@ class TestWriteFilters < Minitest::Test
     @worksheet.__send__('write_filters', 'blanks')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<filters blank="1"/>'
+
     assert_equal(expected, result)
   end
 end

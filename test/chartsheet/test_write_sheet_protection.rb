@@ -14,6 +14,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('', {})
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -22,6 +23,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('password', {})
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -30,6 +32,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('', { :objects => 0 })
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -38,6 +41,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('password', { :objects => 0 })
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -46,6 +50,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('', { :content => 0 })
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -54,6 +59,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('', { :content => 0, :objects => 0 })
     result = @chartsheet.__send__(:write_sheet_protection) || ''
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -62,6 +68,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
 
     @chartsheet.protect('password', { :content => 0, :objects => 0 })
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 
@@ -87,6 +94,7 @@ class TestChartsheetWriteSheetProtection < Minitest::Test
     }
     @chartsheet.protect('password', options)
     result = @chartsheet.__send__(:write_sheet_protection)
+
     assert_equal(expected_to_array(expected), got_to_array(result))
   end
 end

@@ -11,6 +11,7 @@ class TestWriteLayout < Minitest::Test
   def test_write_idx
     expected = '<c:layout/>'
     result = @chart.__send__('write_layout')
+
     assert_equal(expected, result)
   end
 end

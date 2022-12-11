@@ -11,11 +11,13 @@ class TestSortDefinedNames < Minitest::Test
 
   def test_sort_defined_names
     sorted = @workbook.__send__('sort_defined_names', unsorted)
+
     assert_equal(expected, sorted)
   end
 
   def test_extract_named_ranges
     sorted = @workbook.__send__('sort_defined_names', unsorted)
+
     assert_equal(@workbook.__send__('extract_named_ranges', sorted), named_ranges)
   end
 

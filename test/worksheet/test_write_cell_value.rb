@@ -15,6 +15,7 @@ class TestWriteCellValue < Minitest::Test
     @worksheet.__send__('write_cell_value', 1)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<v>1</v>'
+
     assert_equal(expected, result)
   end
 
@@ -22,6 +23,7 @@ class TestWriteCellValue < Minitest::Test
     @worksheet.__send__('write_cell_value')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<v></v>'
+
     assert_equal(expected, result)
   end
 
@@ -29,6 +31,7 @@ class TestWriteCellValue < Minitest::Test
     @worksheet.__send__('write_cell_value', '')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<v></v>'
+
     assert_equal(expected, result)
   end
 end

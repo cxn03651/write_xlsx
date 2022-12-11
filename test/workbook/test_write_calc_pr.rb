@@ -13,6 +13,7 @@ class TestWriteCalcPr < Minitest::Test
     @workbook.__send__('write_calc_pr')
     result = @workbook.xml_str
     expected = '<calcPr calcId="124519" fullCalcOnLoad="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -21,6 +22,7 @@ class TestWriteCalcPr < Minitest::Test
     @workbook.__send__('write_calc_pr')
     result = @workbook.xml_str
     expected = '<calcPr calcId="124519" calcMode="autoNoTable" fullCalcOnLoad="1"/>'
+
     assert_equal(expected, result)
   end
 
@@ -29,6 +31,7 @@ class TestWriteCalcPr < Minitest::Test
     @workbook.__send__('write_calc_pr')
     result = @workbook.xml_str
     expected = '<calcPr calcId="124519" calcMode="manual" calcOnSave="0"/>'
+
     assert_equal(expected, result)
   end
 
@@ -37,6 +40,7 @@ class TestWriteCalcPr < Minitest::Test
     @workbook.__send__('write_calc_pr')
     result = @workbook.xml_str
     expected = '<calcPr calcId="12345" fullCalcOnLoad="1"/>'
+
     assert_equal(expected, result)
   end
 end

@@ -33,6 +33,7 @@ class DrawingShape06 < Minitest::Test
 
     result = got_to_array(@obj.xml_str)
     expected = expected_to_array(expected_str)
+
     assert_equal(expected, result)
   end
 

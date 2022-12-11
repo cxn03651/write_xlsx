@@ -42,6 +42,7 @@ class TestApp02 < Minitest::Test
 </Properties>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

@@ -10,6 +10,7 @@ class TestWriteAutoFill < Minitest::Test
     vml.__send__('write_auto_fill')
     result = vml.instance_variable_get(:@writer).string
     expected = '<x:AutoFill>False</x:AutoFill>'
+
     assert_equal(expected, result)
   end
 end

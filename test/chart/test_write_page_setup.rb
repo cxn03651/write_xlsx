@@ -11,6 +11,7 @@ class TestChartWritePageSetup < Minitest::Test
   def test_write_page_setup
     expected = '<c:pageSetup/>'
     result = @chart.__send__('write_page_setup')
+
     assert_equal(expected, result)
   end
 end

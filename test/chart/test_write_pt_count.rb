@@ -12,6 +12,7 @@ class TestWritePtCount < Minitest::Test
     expected = '<c:ptCount val="5"/>'
     @chart.__send__('write_pt_count', 5)
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

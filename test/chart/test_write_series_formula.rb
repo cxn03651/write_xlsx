@@ -12,6 +12,7 @@ class TestWriteSeriesFormula < Minitest::Test
     expected = '<c:f>Sheet1!$A$1:$A$5</c:f>'
     @chart.__send__('write_series_formula', 'Sheet1!$A$1:$A$5')
     result = @chart.instance_variable_get(:@writer).string
+
     assert_equal(expected, result)
   end
 end

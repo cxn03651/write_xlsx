@@ -19,6 +19,7 @@ class TestWriteHeaderFooter < Minitest::Test
       .__send__('write_odd_header', @writer)
     result = @writer.string
     expected = '<oddHeader>Page &amp;P of &amp;N</oddHeader>'
+
     assert_equal(expected, result)
   end
 
@@ -29,6 +30,7 @@ class TestWriteHeaderFooter < Minitest::Test
       .__send__('write_odd_footer', @writer)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<oddFooter>&amp;F</oddFooter>'
+
     assert_equal(expected, result)
   end
 
@@ -37,6 +39,7 @@ class TestWriteHeaderFooter < Minitest::Test
     @worksheet.__send__('write_header_footer')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<headerFooter><oddHeader>Page &amp;P of &amp;N</oddHeader></headerFooter>'
+
     assert_equal(expected, result)
   end
 
@@ -45,6 +48,7 @@ class TestWriteHeaderFooter < Minitest::Test
     @worksheet.__send__('write_header_footer')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<headerFooter><oddFooter>&amp;F</oddFooter></headerFooter>'
+
     assert_equal(expected, result)
   end
 
@@ -54,6 +58,7 @@ class TestWriteHeaderFooter < Minitest::Test
     @worksheet.__send__('write_header_footer')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<headerFooter><oddHeader>Page &amp;P of &amp;N</oddHeader><oddFooter>&amp;F</oddFooter></headerFooter>'
+
     assert_equal(expected, result)
   end
 end

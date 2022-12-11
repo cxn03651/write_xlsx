@@ -54,6 +54,7 @@ class TestCalculateSpans < Minitest::Test
       worksheet.__send__('calculate_spans')
       result = worksheet.instance_variable_get(:@row_spans)
       expected = t.expected
+
       assert_equal(expected, result, "WHEN row: #{t.row}, col: #{t.col}")
     end
   end

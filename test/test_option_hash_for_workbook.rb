@@ -26,6 +26,7 @@ class TestOptionHashForWorkbook < Minitest::Test
   #
   def test_empty
     options, default_format_properties = @obj.process_workbook_options
+
     assert_empty(options)
     assert_empty(default_format_properties)
   end
@@ -38,6 +39,7 @@ class TestOptionHashForWorkbook < Minitest::Test
   def test_one_flat_hash
     params = @options.merge(@default_format_properties)
     options, default_format_properties = @obj.process_workbook_options(params)
+
     assert_equal(@options, options)
     assert_equal(@default_format_properties, default_format_properties)
   end
@@ -53,6 +55,7 @@ class TestOptionHashForWorkbook < Minitest::Test
     params[:default_format_properties] = @default_format_properties
 
     options, default_format_properties = @obj.process_workbook_options(params)
+
     assert_equal(@options, options)
     assert_equal(@default_format_properties, default_format_properties)
   end

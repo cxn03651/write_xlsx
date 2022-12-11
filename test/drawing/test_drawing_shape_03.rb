@@ -37,6 +37,7 @@ class DrawingShape03 < Minitest::Test
 </xdr:nvCxnSpPr>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

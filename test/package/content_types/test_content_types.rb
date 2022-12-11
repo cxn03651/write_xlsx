@@ -31,6 +31,7 @@ class TestContentTypes < Minitest::Test
 </Types>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

@@ -20,6 +20,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="whole" operator="greaterThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A1"><formula1>0</formula1></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -36,6 +37,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="whole" operator="greaterThan" sqref="A1"><formula1>0</formula1></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -49,6 +51,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="whole" operator="greaterThan" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A2"><formula1>E3</formula1></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -63,6 +66,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="decimal" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A3"><formula1>0.1</formula1><formula2>0.5</formula2></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -75,6 +79,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A4"><formula1>"open,high,close"</formula1></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -87,6 +92,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A5"><formula1>$E$4:$G$4</formula1></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -101,6 +107,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="date" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="A6"><formula1>39448</formula1><formula2>39794</formula2></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 
@@ -117,6 +124,7 @@ class TestWriteDataValidation01 < Minitest::Test
     @worksheet.__send__('write_data_validations')
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<dataValidations count="1"><dataValidation type="whole" allowBlank="1" showInputMessage="1" showErrorMessage="1" promptTitle="Enter an integer:" prompt="between 1 and 100" sqref="A7"><formula1>1</formula1><formula2>100</formula2></dataValidation></dataValidations>'
+
     assert_equal(expected, result)
   end
 end

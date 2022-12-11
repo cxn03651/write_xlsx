@@ -14,6 +14,7 @@ class TestWriteCustomFilters < Minitest::Test
     @worksheet.__send__('write_custom_filters', 4, 4000)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<customFilters><customFilter operator="greaterThan" val="4000"/></customFilters>'
+
     assert_equal(expected, result)
   end
 
@@ -21,6 +22,7 @@ class TestWriteCustomFilters < Minitest::Test
     @worksheet.__send__('write_custom_filters', 4, 3000, 0, 1, 8000)
     result = @worksheet.instance_variable_get(:@writer).string
     expected = '<customFilters and="1"><customFilter operator="greaterThan" val="3000"/><customFilter operator="lessThan" val="8000"/></customFilters>'
+
     assert_equal(expected, result)
   end
 end

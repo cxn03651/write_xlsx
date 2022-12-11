@@ -16,6 +16,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"/>'
+
     assert_equal(expected, result)
   end
 
@@ -28,6 +29,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><filters><filter val="East"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -40,6 +42,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><filters><filter val="East"/><filter val="North"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -52,6 +55,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters and="1"><customFilter val="East"/><customFilter val="North"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -64,6 +68,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter operator="notEqual" val="East"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -76,6 +81,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter val="S*"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -88,6 +94,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter operator="notEqual" val="S*"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -100,6 +107,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter val="*h"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -112,6 +120,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter operator="notEqual" val="*h"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -124,6 +133,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter val="*o*"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -136,6 +146,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><customFilters><customFilter operator="notEqual" val="*r*"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -148,6 +159,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><filters><filter val="1000"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -160,6 +172,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters><customFilter operator="notEqual" val="2000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -172,6 +185,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters><customFilter operator="greaterThan" val="3000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -184,6 +198,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters><customFilter operator="greaterThanOrEqual" val="4000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -196,6 +211,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters><customFilter operator="lessThan" val="5000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -208,6 +224,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters><customFilter operator="lessThanOrEqual" val="6000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -220,6 +237,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="2"><customFilters and="1"><customFilter operator="greaterThanOrEqual" val="1000"/><customFilter operator="lessThanOrEqual" val="2000"/></customFilters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -232,6 +250,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><filters><filter val="East"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -244,6 +263,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="0"><filters><filter val="East"/><filter val="North"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 
@@ -256,6 +276,7 @@ class TestWriteAutofilter < Minitest::Test
     worksheet.__send__('write_auto_filter')
     result = worksheet.instance_variable_get(:@writer).string
     expected = '<autoFilter ref="A1:D51"><filterColumn colId="3"><filters><filter val="February"/><filter val="January"/><filter val="July"/><filter val="June"/></filters></filterColumn></autoFilter>'
+
     assert_equal(expected, result)
   end
 end

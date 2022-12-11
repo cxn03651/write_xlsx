@@ -34,6 +34,7 @@ class TestWorksheet02 < Minitest::Test
 </worksheet>
 EOS
                                 )
+
     assert_equal(expected, result)
   end
 end

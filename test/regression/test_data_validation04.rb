@@ -30,6 +30,7 @@ class TestDataValidation04 < Minitest::Test
                                 input_message: 'This is the longest input message ' + ("a" * 221))
     end
     message = e.message
+
     assert_equal("Length of input title '#{input_title}' exceeds Excel's limit of 32",
                  message)
     workbook.close

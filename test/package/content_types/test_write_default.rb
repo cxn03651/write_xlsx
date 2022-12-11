@@ -9,6 +9,7 @@ class TestWriteDefault < Minitest::Test
     @obj.__send__('write_default', 'xml', 'application/xml')
     result = @obj.xml_str
     expected = '<Default Extension="xml" ContentType="application/xml"/>'
+
     assert_equal(expected, result)
   end
 end
