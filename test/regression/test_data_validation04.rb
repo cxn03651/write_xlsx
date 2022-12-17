@@ -24,9 +24,9 @@ class TestDataValidation04 < Minitest::Test
     input_title = 'a' * 33
     e = assert_raises(RuntimeError) do
       worksheet.data_validation('D6',
-                                validate: 'list',
-                                value: values,
-                                input_title: input_title.dup,
+                                validate:      'list',
+                                value:         values,
+                                input_title:   input_title.dup,
                                 input_message: 'This is the longest input message ' + ("a" * 221))
     end
     message = e.message

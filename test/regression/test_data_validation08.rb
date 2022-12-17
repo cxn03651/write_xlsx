@@ -14,8 +14,8 @@ class TestDataValidation08 < Minitest::Test
 
     worksheet.data_validation(
       'C2',
-      validate: 'any',
-      input_title: 'This is the input title',
+      validate:      'any',
+      input_title:   'This is the input title',
       input_message: 'This is the input message'
     )
     workbook.close

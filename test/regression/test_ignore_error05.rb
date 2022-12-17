@@ -21,7 +21,7 @@ class TestRegressionIgnoreError05 < Minitest::Test
 
     worksheet.ignore_errors(
       number_stored_as_text: 'A1',
-      eval_error: 'A2'
+      eval_error:            'A2'
     )
 
     workbook.close
