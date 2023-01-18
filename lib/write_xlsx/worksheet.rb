@@ -876,6 +876,7 @@ module Writexlsx
       # Check for a cell reference in A1 notation and substitute row and column
       row_col_args = row_col_notation(args)
       token = row_col_args[2] || ''
+      token = token.to_s if token.instance_of?(Time)
 
       # Match an array ref.
       if token.respond_to?(:to_ary)
