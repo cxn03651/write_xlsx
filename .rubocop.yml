@@ -97,6 +97,9 @@ Style/NumericLiterals:
 Style/OptionalBooleanParameter:
   Enabled: false
 
+Style/RaiseArgs:
+  Enabled: false
+
 Style/StringLiterals:
   Enabled: false
 
