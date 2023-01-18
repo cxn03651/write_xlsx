@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2023-01-18 v1.09.5
+    Fixed issue #92. Worksheet#write raises with Time instance token.
+
 2022-09-02 v1.09.4
     Remove zip-zip dependency.
 
