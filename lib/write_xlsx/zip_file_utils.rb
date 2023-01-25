@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 #
 # from http://d.hatena.ne.jp/alunko/20071021

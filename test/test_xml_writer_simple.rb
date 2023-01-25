@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 require 'helper'
 require 'write_xlsx/package/xml_writer_simple'

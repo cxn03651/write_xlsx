@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 require 'bundler'
 
@@ -36,7 +37,7 @@ class Minitest::Test
     @test_dir = File.dirname(__FILE__)
     @perl_output = File.join(@test_dir, 'perl_output')
     @regression_output = File.join(@test_dir, 'regression', 'xlsx_files')
-    @io = StringIO.new
+    @io = StringIO.new(''.dup)
   end
 
   def expected_xlsx

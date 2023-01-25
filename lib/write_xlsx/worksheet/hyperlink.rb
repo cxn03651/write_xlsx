@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
 
 module Writexlsx
   class Worksheet
@@ -99,10 +100,10 @@ module Writexlsx
 
         # For external links change the directory separator from Unix to Dos.
         url = url.gsub(%r{/}, '\\')
-        str.gsub!(%r{/}, '\\')
+        str = str.gsub(%r{/}, '\\')
 
         # Strip the mailto header.
-        str.sub!(/^mailto:/, '')
+        str = str.sub(/^mailto:/, '')
 
         # Split url into the link and optional anchor/location.
         url, url_str = url.split(/#/, 2)
