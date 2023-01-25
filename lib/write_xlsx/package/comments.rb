@@ -112,7 +112,8 @@ module Writexlsx
       end
 
       def v_shape_attributes(id, z_index)
-        attr = v_shape_attributes_base(id, z_index)
+        attr = v_shape_attributes_base(id)
+        attr << ['style', (v_shape_style_base(z_index, vertices) + style_addition).join]
         attr << ['fillcolor',   color]
         attr << ['o:insetmode', 'auto']
         attr

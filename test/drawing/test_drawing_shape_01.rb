@@ -15,7 +15,7 @@ class DrawingShape01 < Minitest::Test
       4, 8, 209550, 95250, 12, 22, 209660, 96260, 10000, 20000
     ]
     drawing = Writexlsx::Drawing.new(
-      3, dimensions, 95250, 190500, 'rect 1', shape, 1
+      3, dimensions, 95250, 190500, shape, 1
     )
     @obj.add_drawing_object(drawing)
     @obj.assemble_xml_file

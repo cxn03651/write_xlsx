@@ -458,11 +458,10 @@ module Writexlsx
       [left, top, width, height]
     end
 
-    def v_shape_attributes_base(id, z_index)
+    def v_shape_attributes_base(id)
       [
         ['id',    "_x0000_s#{id}"],
-        ['type',  type],
-        ['style', (v_shape_style_base(z_index, vertices) + style_addition).join]
+        ['type',  type]
       ]
     end
 

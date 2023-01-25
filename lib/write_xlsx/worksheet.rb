@@ -1343,12 +1343,13 @@ module Writexlsx
 
       if options.first.instance_of?(Hash)
         params = options.first
-        x_offset = params[:x_offset]
-        y_offset = params[:y_offset]
-        x_scale  = params[:x_scale]
-        y_scale  = params[:y_scale]
-        anchor   = params[:object_position]
-
+        x_offset    = params[:x_offset]
+        y_offset    = params[:y_offset]
+        x_scale     = params[:x_scale]
+        y_scale     = params[:y_scale]
+        anchor      = params[:object_position]
+        description = params[:description]
+        decorative  = params[:decorative]
       else
         x_offset, y_offset, x_scale, y_scale, anchor = options
       end
@@ -1374,7 +1375,10 @@ module Writexlsx
       x_offset = chart.x_offset if ptrue?(chart.x_offset)
       y_offset = chart.y_offset if ptrue?(chart.y_offset)
 
-      @charts << [row, col, chart, x_offset, y_offset, x_scale, y_scale, anchor]
+      @charts << [
+        row,     col,     chart,  x_offset,    y_offset,
+        x_scale, y_scale, anchor, description, decorative
+      ]
     end
 
     #
@@ -1866,7 +1870,9 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
-      row, col, chart, x_offset, y_offset, x_scale, y_scale, anchor = @charts[index]
+      row,     col,     chart,  x_offset,    y_offset,
+      x_scale, y_scale, anchor, description, decorative = @charts[index]
+
       chart.id = chart_id - 1
       x_scale ||= 0
       y_scale ||= 0
@@ -1884,7 +1890,7 @@ module Writexlsx
       name = chart.name
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, 0, 0, name, nil, anchor, drawing_rel_index, 0, nil, 0)
+      drawing = Drawing.new(drawing_type, dimensions, 0, 0, nil, anchor, drawing_rel_index, 0, nil, name, description, decorative)
       if drawings?
         @drawings.add_drawing_object(drawing)
       else
@@ -2603,7 +2609,7 @@ module Writexlsx
       height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, width, height, name, nil, anchor, 0, 0, tip, decorative)
+      drawing = Drawing.new(drawing_type, dimensions, width, height, nil, anchor, 0, 0, tip, name, description, decorative)
       if drawings?
         drawings = @drawings
       else
@@ -2616,7 +2622,7 @@ module Writexlsx
       end
       drawings.add_drawing_object(drawing)
 
-      drawing.description = description if description
+      drawing.description = name unless description
 
       if url
         rel_type = '/hyperlink'
@@ -2760,7 +2766,7 @@ EOS
       drawing_type = 3
       drawing = Drawing.new(
         drawing_type, shape.dimensions, shape.width_emu, shape.height_emu,
-        shape.name, shape, shape.anchor, drawing_rel_index, 0, nil, 0
+        shape, shape.anchor, drawing_rel_index, 0, shape.name, nil, 0
       )
       drawings.add_drawing_object(drawing)
     end
@@ -2786,6 +2792,9 @@ EOS
                      else
                        "[0]!Button#{button_number}_Click"
                      end
+
+      # Set the alt text for the button.
+      button.description = params[:description]
 
       # Ensure that a width and height have been set.
       default_width  = @default_col_pixels

@@ -5,20 +5,21 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
-    attr_accessor :type, :dimensions, :width, :height, :description, :shape, :anchor, :rel_index, :url_rel_index
+    attr_accessor :type, :dimensions, :width, :height, :shape, :anchor, :rel_index, :url_rel_index, :name, :description
     attr_reader :tip, :decorative
 
-    def initialize(type, dimensions, width, height, description, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, decorative = nil)
+    def initialize(type, dimensions, width, height, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, name = nil, description = nil, decorative = nil)
       @type = type
       @dimensions = dimensions
       @width = width
       @height = height
-      @description = description
       @shape = shape
       @anchor = anchor
       @rel_index = rel_index
       @url_rel_index = url_rel_index
       @tip = tip
+      @name = name
+      @description = description
       @decorative = decorative
     end
   end
@@ -96,12 +97,13 @@ module Writexlsx
       type          = drawing.type
       width         = drawing.width
       height        = drawing.height
-      description   = drawing.description
       shape         = drawing.shape
       anchor        = drawing.anchor
       rel_index     = drawing.rel_index
       url_rel_index = drawing.url_rel_index
       tip           = drawing.tip
+      name          = drawing.name
+      description   = drawing.description
       decorative    = drawing.decorative
 
       col_from, row_from, col_from_offset, row_from_offset,
@@ -129,7 +131,7 @@ module Writexlsx
           # Graphic frame.
 
           # Write the xdr:graphicFrame element for charts.
-          write_graphic_frame(index, rel_index, description)
+          write_graphic_frame(index, rel_index, name, description, decorative)
         elsif type == 2
           # Write the xdr:pic element.
           write_pic(
@@ -263,14 +265,17 @@ module Writexlsx
     #
     # Write the <xdr:graphicFrame> element.
     #
-    def write_graphic_frame(index, rel_index, name = nil)
-      macro  = ''
+    def write_graphic_frame(
+          index, rel_index, name = nil,
+          description = nil, decorative = nil, macro = nil
+        )
+      macro  ||= ''
 
       attributes = [['macro', macro]]
 
       @writer.tag_elements('xdr:graphicFrame', attributes) do
         # Write the xdr:nvGraphicFramePr element.
-        write_nv_graphic_frame_pr(index, name)
+        write_nv_graphic_frame_pr(index, name, description, decorative)
         # Write the xdr:xfrm element.
         write_xfrm
         # Write the a:graphic element.
@@ -281,12 +286,16 @@ module Writexlsx
     #
     # Write the <xdr:nvGraphicFramePr> element.
     #
-    def write_nv_graphic_frame_pr(index, name = nil)
+    def write_nv_graphic_frame_pr(
+          index, name = nil, description = nil, decorative = nil
+        )
+
       name = "Chart #{index}" unless ptrue?(name)
 
       @writer.tag_elements('xdr:nvGraphicFramePr') do
         # Write the xdr:cNvPr element.
-        write_c_nv_pr(index + 1, name)
+        write_c_nv_pr(index + 1, name, description,
+                      nil, nil, decorative)
         # Write the xdr:cNvGraphicFramePr element.
         write_c_nv_graphic_frame_pr
       end
