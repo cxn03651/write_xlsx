@@ -13,6 +13,11 @@ module Writexlsx
 
       def initialize
         @io = StringIO.new
+        # Will allocate new string once, then use allocated string
+        # Key is tag name
+        # Only tags without attributes will be cached
+        @tag_start_cache = {}
+        @tag_end_cache = {}
       end
 
       def set_xml_writer(filename = nil)
@@ -41,7 +46,16 @@ module Writexlsx
       end
 
       def start_tag_str(tag, attr = [])
-        "<#{tag}#{key_vals(attr)}>"
+        if attr.empty?
+          result = @tag_start_cache[tag]
+          unless result
+            result = "<#{tag}>"
+            @tag_start_cache[tag] = result
+          end
+        else
+          result = "<#{tag}#{key_vals(attr)}>"
+        end
+        result
       end
 
       def end_tag(tag)
@@ -49,7 +63,12 @@ module Writexlsx
       end
 
       def end_tag_str(tag)
-        "</#{tag}>"
+        result = @tag_end_cache[tag]
+        unless result
+          result = "</#{tag}>"
+          @tag_end_cache[tag] = result
+        end
+        result
       end
 
       def empty_tag(tag, attr = [])
