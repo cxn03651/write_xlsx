@@ -918,7 +918,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_row(row, col, array [ , format ] )
+    #   write_row(row, col, array [ , format ])
     #
     # Write a row of data starting from (row, col). Call write_col() if any of
     # the elements of the array are in turn array. This allows the writing
@@ -942,7 +942,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_col(row, col, array [ , format ] )
+    #   write_col(row, col, array [ , format ])
     #
     # Write a column of data starting from (row, col). Call write_row() if any of
     # the elements of the array are in turn array. This allows the writing
@@ -981,7 +981,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_number(row, column, number [ , format ] )
+    #   write_number(row, column, number [ , format ])
     #
     # Write an integer or a float to the cell specified by row and column:
     #
@@ -999,7 +999,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_string(row, column, string [, format ] )
+    #   write_string(row, column, string [, format ])
     #
     # Write a string to the specified row and column (zero indexed).
     # +format+ is optional.
@@ -1021,7 +1021,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #    write_rich_string(row, column, (string | format, string)+,  [,cell_format] )
+    #    write_rich_string(row, column, (string | format, string)+,  [,cell_format])
     #
     # The write_rich_string() method is used to write strings with multiple formats.
     # The method receives string fragments prefixed by format objects. The final
@@ -1072,7 +1072,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_formula(row, column, formula [ , format [ , value ] ] )
+    #   write_formula(row, column, formula [ , format [ , value ] ])
     #
     # Write a formula or function to the cell specified by +row+ and +column+:
     #
@@ -1271,7 +1271,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_url(row, column, url [ , format, label, tip ] )
+    #   write_url(row, column, url [ , format, label, tip ])
     #
     # Write a hyperlink to a URL in the cell specified by +row+ and +column+.
     # The hyperlink is comprised of two elements: the visible label and
@@ -1304,7 +1304,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   write_date_time (row, col, date_string [ , format ] )
+    #   write_date_time (row, col, date_string [ , format ])
     #
     # Write a datetime string in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format as a
     # number representing an Excel date. format is optional.
@@ -1330,7 +1330,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   insert_chart(row, column, chart [ , x, y, x_scale, y_scale ] )
+    #   insert_chart(row, column, chart [ , x, y, x_scale, y_scale ])
     #
     # This method can be used to insert a Chart object into a worksheet.
     # The Chart must be created by the add_chart() Workbook method and
@@ -1419,7 +1419,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   repeat_formula(row, column, formula [ , format ] )
+    #   repeat_formula(row, column, formula [ , format ])
     #
     # Deprecated. This is a writeexcel gem's method that is no longer
     # required by WriteXLSX.
@@ -1454,7 +1454,7 @@ module Writexlsx
 
     #
     # :call-seq:
-    #   set_row(row [ , height, format, hidden, level, collapsed ] )
+    #   set_row(row [ , height, format, hidden, level, collapsed ])
     #
     # This method can be used to change the default properties of a row.
     # All parameters apart from +row+ are optional.
@@ -2695,7 +2695,7 @@ EOS
 
     #
     # :call-seq:
-    #   insert_shape(row, col, shape [ , x, y, x_scale, y_scale ] )
+    #   insert_shape(row, col, shape [ , x, y, x_scale, y_scale ])
     #
     # Insert a shape into the worksheet.
     #
