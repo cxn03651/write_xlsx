@@ -61,6 +61,7 @@ module Writexlsx
       @selections           = []
       @panes                = []
       @hide_row_col_headers = 0
+      @top_left_cell        = ''
 
       @tab_color  = 0
 
@@ -409,6 +410,19 @@ module Writexlsx
 
       @selections = [[nil, active_cell, sqref]]
     end
+
+    ###############################################################################
+    #
+    # set_top_left_cell()
+    #
+    # Set the first visible cell at the top left of the worksheet.
+    #
+    def set_top_left_cell(*args)
+      row, col = row_col_notation(args)
+
+      @top_left_cell = xl_rowcol_to_cell(row, col)
+    end
+
 
     #
     # :call-seq:
@@ -2972,6 +2986,9 @@ EOS
       # Set the page view/layout mode if required.
       # TODO. Add pageBreakPreview mode when requested.
       attributes << %w[view pageLayout] if page_view?
+
+      # Set the first visible cell.
+        attributes << ['topLeftCell', @top_left_cell] if ptrue?(@top_left_cell)
 
       # Set the zoom level.
       if @zoom != 100
