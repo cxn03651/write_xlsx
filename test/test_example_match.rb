@@ -12,18 +12,6 @@ class TestExampleMatch < Minitest::Test
     @tempfile.close
   end
 
-  def test_multi_line
-    @xlsx = 'multi_line.xlsx'
-    workbook  = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-
-    worksheet.write(0, 0, "Hi Excel!\n1234\nHi, again!")
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
   def test_a_simple
     @xlsx = 'a_simple.xlsx'
     # Create a new workbook called simple.xls and add a worksheet
@@ -54,6 +42,29 @@ class TestExampleMatch < Minitest::Test
     )
 
     worksheet.write(10, 0, 'http://www.ruby-lang.org/', hyperlink_format)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_add_vba_project
+    @xlsx = 'add_vba_project.xlsm'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.set_column('A:A', 50)
+
+    # Add the VBA project binary.
+    workbook.add_vba_project(File.join(@test_dir, 'vbaProject.bin'))
+
+    # Show text for the end user.
+    worksheet.write('A1', 'Run the SampleMacro embedded in this file.')
+    worksheet.write('A2', 'You may have to turn on the Excel Developer option first.')
+
+    # Call a user defined function from the VBA project.
+    worksheet.write('A6', 'Result from a user defined function:')
+    worksheet.write('B6', '=MyFunction(7)')
 
     workbook.close
     store_to_tempfile
@@ -275,7 +286,63 @@ class TestExampleMatch < Minitest::Test
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
-  def teset_background
+  def autofilter_data
+    <<EOS
+    Region    Item      Volume    Month
+    East      Apple     9000      July
+    East      Apple     5000      July
+    South     Orange    9000      September
+    North     Apple     2000      November
+    West      Apple     9000      November
+    South     Pear      7000      October
+    North     Pear      9000      August
+    West      Orange    1000      December
+    West      Grape     1000      November
+    South     Pear      10000     April
+    West      Grape     6000      January
+    South     Orange    3000      May
+    North     Apple     3000      December
+    South     Apple     7000      February
+    West      Grape     1000      December
+    East      Grape     8000      February
+    South     Grape     10000     June
+    West      Pear      7000      December
+    South     Apple     2000      October
+    East      Grape     7000      December
+    North     Grape     6000      April
+    East      Pear      8000      February
+    North     Apple     7000      August
+    North     Orange    7000      July
+    North     Apple     6000      June
+    South     Grape     8000      September
+    West      Apple     3000      October
+    South     Orange    10000     November
+    West      Grape     4000      July
+    North     Orange    5000      August
+    East      Orange    1000      November
+    East      Orange    4000      October
+    North     Grape     5000      August
+    East      Apple     1000      December
+    South     Apple     10000     March
+    East      Grape     7000      October
+    West      Grape     1000      September
+    East      Grape     10000     October
+    South     Orange    8000      March
+    North     Apple     4000      July
+    South     Orange    5000      July
+    West      Apple     4000      June
+    East      Apple     5000      April
+    North     Pear      3000      August
+    East      Grape     9000      November
+    North     Orange    8000      October
+    East      Apple     10000     June
+    South     Pear      1000      December
+    North     Grape     10000     July
+    East      Grape     6000      February
+EOS
+  end
+
+  def test_background
     @xlsx     = 'background.xlsx'
     workbook  = WriteXLSX.new(@io)
 
@@ -688,62 +755,6 @@ class TestExampleMatch < Minitest::Test
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
-  def autofilter_data
-    <<EOS
-    Region    Item      Volume    Month
-    East      Apple     9000      July
-    East      Apple     5000      July
-    South     Orange    9000      September
-    North     Apple     2000      November
-    West      Apple     9000      November
-    South     Pear      7000      October
-    North     Pear      9000      August
-    West      Orange    1000      December
-    West      Grape     1000      November
-    South     Pear      10000     April
-    West      Grape     6000      January
-    South     Orange    3000      May
-    North     Apple     3000      December
-    South     Apple     7000      February
-    West      Grape     1000      December
-    East      Grape     8000      February
-    South     Grape     10000     June
-    West      Pear      7000      December
-    South     Apple     2000      October
-    East      Grape     7000      December
-    North     Grape     6000      April
-    East      Pear      8000      February
-    North     Apple     7000      August
-    North     Orange    7000      July
-    North     Apple     6000      June
-    South     Grape     8000      September
-    West      Apple     3000      October
-    South     Orange    10000     November
-    West      Grape     4000      July
-    North     Orange    5000      August
-    East      Orange    1000      November
-    East      Orange    4000      October
-    North     Grape     5000      August
-    East      Apple     1000      December
-    South     Apple     10000     March
-    East      Grape     7000      October
-    West      Grape     1000      September
-    East      Grape     10000     October
-    South     Orange    8000      March
-    North     Apple     4000      July
-    South     Orange    5000      July
-    West      Apple     4000      June
-    East      Apple     5000      April
-    North     Pear      3000      August
-    East      Grape     9000      November
-    North     Orange    8000      October
-    East      Apple     10000     June
-    South     Pear      1000      December
-    North     Grape     10000     July
-    East      Grape     6000      February
-EOS
-  end
-
   def test_chart_area
     @xlsx = 'chart_area.xlsx'
     workbook  = WriteXLSX.new(@io)
@@ -891,6 +902,385 @@ EOS
 
     # Insert the chart into the worksheet (with an offset).
     worksheet.insert_chart('D2', chart, 25, 10)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_chart_combined
+    @xlsx = 'chart_combined.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+    bold      = workbook.add_format(:bold => 1)
+
+    # Add the worksheet data that the charts will refer to.
+    headings = ['Number', 'Batch 1', 'Batch 2']
+    data = [
+      [2,  3,  4,  5,  6,  7],
+      [10, 40, 50, 20, 10, 50],
+      [30, 60, 70, 50, 40, 30]
+    ]
+
+    worksheet.write('A1', headings, bold)
+    worksheet.write('A2', data)
+
+    #
+    # In the first example we will create a combined column and line chart.
+    # They will share the same X and Y axes.
+    #
+
+    # Create a new column chart. This will use this as the primary chart.
+    column_chart1 = workbook.add_chart(:type => 'column', :embedded => 1)
+
+    # Configure the data series for the primary chart.
+    column_chart1.add_series(
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Create a new column chart. This will use this as the secondary chart.
+    line_chart1 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure the data series for the secondary chart.
+    line_chart1.add_series(
+      :name       => '=Sheet1!$C$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Combine the charts.
+    column_chart1.combine(line_chart1)
+
+    # Add a chart title and some axis labels. Note, this is done via the
+    # primary chart.
+    column_chart1.set_title(:name => 'Combined chart - same Y axis')
+    column_chart1.set_x_axis(:name => 'Test number')
+    column_chart1.set_y_axis(:name => 'Sample length (mm)')
+
+    # Insert the chart into the worksheet
+    worksheet.insert_chart('E2', column_chart1)
+
+    #
+    # In the second example we will create a similar combined column and line
+    # chart except that the secondary chart will have a secondary Y axis.
+    #
+
+    # Create a new column chart. This will use this as the primary chart.
+    column_chart2 = workbook.add_chart(:type => 'column', :embedded => 1)
+
+    # Configure the data series for the primary chart.
+    column_chart2.add_series(
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Create a new column chart. This will use this as the secondary chart.
+    line_chart2 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure the data series for the secondary chart. We also set a
+    # secondary Y axis via (y2_axis). This is the only difference between
+    # this and the first example, apart from the axis label below.
+    line_chart2.add_series(
+      :name       => '=Sheet1!$C$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7',
+      :y2_axis    => 1
+    )
+
+    # Combine the charts.
+    column_chart2.combine(line_chart2)
+
+    # Add a chart title and some axis labels.
+    column_chart2.set_title(:name => 'Combine chart - secondary Y axis')
+    column_chart2.set_x_axis(:name => 'Test number')
+    column_chart2.set_y_axis(:name => 'Sample length (mm)')
+    column_chart2.set_y2_axis(:name => 'Target length (mm)')
+
+    # Insert the chart into the worksheet
+    worksheet.insert_chart('E18', column_chart2)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_chart_data_table
+    @xlsx = 'chart_data_table.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+    bold      = workbook.add_format(:bold => 1)
+
+    # Add the worksheet data that the charts will refer to.
+    headings = ['Number', 'Batch 1', 'Batch 2']
+    data = [
+      [2, 3, 4, 5, 6, 7],
+      [10, 40, 50, 20, 10, 50],
+      [30, 60, 70, 50, 40, 30]
+    ]
+
+    worksheet.write('A1', headings, bold)
+    worksheet.write('A2', data)
+
+    # Create a new column chart with a data table.
+    chart1 = workbook.add_chart(:type => 'column', :embedded => 1)
+
+    # Configure the first series.
+    chart1.add_series(
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Configure second series. Note alternative use of array ref to define
+    # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
+    chart1.add_series(
+      :name       => '=Sheet1!$C$1',
+      :categories => ['Sheet1', 1, 6, 0, 0],
+      :values     => ['Sheet1', 1, 6, 2, 2]
+    )
+
+    # Add a chart title and some axis labels.
+    chart1.set_title(:name => 'Chart with Data Table')
+    chart1.set_x_axis(:name => 'Test number')
+    chart1.set_y_axis(:name => 'Sample length (mm)')
+
+    # Set a default data table on the X-Axis.
+    chart1.set_table
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D2', chart1, 25, 10)
+
+    #
+    # Create a second charat.
+    #
+    chart2 = workbook.add_chart(:type => 'column', :embedded => 1)
+
+    # Configure the first series.
+    chart2.add_series(
+      :name       => '=Sheet1!$B$1',
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Configure second series. Note alternative use of array ref to define
+    # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
+    chart2.add_series(
+      :name       => '=Sheet1!$C$1',
+      :categories => ['Sheet1', 1, 6, 0, 0],
+      :values     => ['Sheet1', 1, 6, 2, 2]
+    )
+
+    # Add a chart title and some axis labels.
+    chart2.set_title(:name => 'Data Table with legend keys')
+    chart2.set_x_axis(:name => 'Test number')
+    chart2.set_y_axis(:name => 'Sample length (mm)')
+
+    # Set a default data table on the X-Axis with the legend keys shown.
+    chart2.set_table(:show_keys => true)
+
+    # Hide the chart legend since the keys are show on the data table.
+    chart2.set_legend(:position => 'none')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D18', chart2, 25, 11)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_chart_data_tools
+    @xlsx = 'chart_data_tools.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+    bold      = workbook.add_format(:bold => 1)
+
+    # Add the worksheet data that the charts will refer to.
+    headings = ['Number', 'Data 1', 'Data 2']
+    data = [
+      [2,  3,  4,  5,  6,  7],
+      [10, 40, 50, 20, 10, 50],
+      [30, 60, 70, 50, 40, 30]
+    ]
+
+    worksheet.write('A1', headings, bold)
+    worksheet.write('A2', data)
+
+    #######################################################################
+    #
+    # Trendline example.
+    #
+
+    # Create a Line chart.
+    chart1 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure the first series with a polynomial trendline.
+    chart1.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7',
+      :trendline  => {
+        :type  => 'polynomial',
+        :order => 3
+      }
+    )
+
+    # Configure the second series with a moving average trendline.
+    chart1.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7',
+      :trendline  => { :type => 'linear' }
+    )
+
+    # Add a chart title. and some axis labels.
+    chart1.set_title(:name => 'Chart with Trendlines')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D2', chart1, 25, 10)
+
+    #######################################################################
+    #
+    # Data Labels and Markers example.
+    #
+
+    # Create a Line chart.
+    chart2 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure the first series.
+    chart2.add_series(
+      :categories  => '=Sheet1!$A$2:$A$7',
+      :values      => '=Sheet1!$B$2:$B$7',
+      :data_labels => { :value => 1 },
+      :marker      => { :type => 'automatic' }
+    )
+
+    # Configure the second series.
+    chart2.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Add a chart title. and some axis labels.
+    chart2.set_title(:name => 'Chart with Data Labels and Markers')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D18', chart2, 25, 10)
+
+    #######################################################################
+    #
+    # Error Bars example.
+    #
+
+    # Create a Line chart.
+    chart3 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Configure the first series.
+    chart3.add_series(
+      :categories   => '=Sheet1!$A$2:$A$7',
+      :values       => '=Sheet1!$B$2:$B$7',
+      :y_error_bars => { :type => 'standard_error' }
+    )
+
+    # Configure the second series.
+    chart3.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Add a chart title. and some axis labels.
+    chart3.set_title(:name => 'Chart with Error Bars')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D34', chart3, 25, 10)
+
+    #######################################################################
+    #
+    # Up-Down Bars example.
+    #
+
+    # Create a Line chart.
+    chart4 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Add the Up-Down Bars.
+    chart4.set_up_down_bars
+
+    # Configure the first series.
+    chart4.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Configure the second series.
+    chart4.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Add a chart title. and some axis labels.
+    chart4.set_title(:name => 'Chart with Up-Down Bars')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D50', chart4, 25, 10)
+
+    #######################################################################
+    #
+    # High-Low Lines example.
+    #
+
+    # Create a Line chart.
+    chart5 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Add the High-Low lines.
+    chart5.set_high_low_lines
+
+    # Configure the first series.
+    chart5.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Configure the second series.
+    chart5.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Add a chart title. and some axis labels.
+    chart5.set_title(:name => 'Chart with High-Low Lines')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D66', chart5, 25, 10)
+
+    #######################################################################
+    #
+    # Drop Lines example.
+    #
+
+    # Create a Line chart.
+    chart6 = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Add Drop Lines.
+    chart6.set_drop_lines
+
+    # Configure the first series.
+    chart6.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$B$2:$B$7'
+    )
+
+    # Configure the second series.
+    chart6.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7'
+    )
+
+    # Add a chart title. and some axis labels.
+    chart6.set_title(:name => 'Chart with Drop Lines')
+
+    # Insert the chart into the worksheet (with an offset).
+    worksheet.insert_chart('D82', chart6, 25, 10)
 
     workbook.close
     store_to_tempfile
@@ -1129,6 +1519,81 @@ EOS
       'D34', chart3,
       { :x_offset => 25, :y_offset => 10 }
     )
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_chart_pareto
+    @xlsx = 'chart_pareto.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    # Formats used in the workbook.
+    bold           = workbook.add_format(:bold => 1)
+    percent_format = workbook.add_format(:num_format => '0.0%')
+
+    # Widen the columns for visibility.
+    worksheet.set_column('A:A', 15)
+    worksheet.set_column('B:C', 10)
+
+    # Add the worksheet data that the charts will refer to.
+    headings = %w[Reason Number Percentage]
+
+    reasons = [
+      'Traffic',   'Child care', 'Public Transport', 'Weather',
+      'Overslept', 'Emergency'
+    ]
+
+    numbers  = [60,    40,  20,  15,    10, 5]
+    percents = [0.44, 0.667, 0.8, 0.9, 0.967, 1]
+
+    worksheet.write_row('A1', headings, bold)
+    worksheet.write_col('A2', reasons)
+    worksheet.write_col('B2', numbers)
+    worksheet.write_col('C2', percents, percent_format)
+
+    # Create a new column chart. This will be the primary chart.
+    column_chart = workbook.add_chart(:type => 'column', :embedded => 1)
+
+    # Add a series
+    column_chart.add_series(
+      :categories => 'Sheet1!$A$2:$A$7',
+      :values     => 'Sheet1!$B$2:$B$7'
+    )
+
+    # Add a chart title.
+    column_chart.set_title(:name => 'Reasons for lateness')
+
+    # Turn off the chart legend.
+    column_chart.set_legend(:position => 'none')
+
+    # Set the title and scale of the Y axes. Note, the secondary axis is set from
+    # the primary chart.
+    column_chart.set_y_axis(
+      :name => 'Respondents (number)',
+      :min  => 0,
+      :max  => 120
+    )
+    column_chart.set_y2_axis(:max => 1)
+
+    # Create a new line chart. This will be the secondary chart.
+    line_chart = workbook.add_chart(:type => 'line', :embedded => 1)
+
+    # Add a series, on the secondary axis.
+    line_chart.add_series(
+      :categories => '=Sheet1!$A$2:$A$7',
+      :values     => '=Sheet1!$C$2:$C$7',
+      :marker     => { :type => 'automatic' },
+      :y2_axis    => 1
+    )
+
+    # Combine the charts.
+    column_chart.combine(line_chart)
+
+    # Insert the chart into the worksheet.
+    worksheet.insert_chart('F2', column_chart)
 
     workbook.close
     store_to_tempfile
@@ -3139,6 +3604,29 @@ EOS
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
+  def test_hide_row_col
+    @xlsx = 'hide_row_col.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    # Write some data
+    worksheet.write('D1', 'Some hidden columns.')
+    worksheet.write('A8', 'Some hidden rows.')
+
+    # Hide all rows without data.
+    worksheet.set_default_row(nil, 1)
+
+    # Set emptys row that we do want to display. All other will be hidden.
+    (1..6).each { |row| worksheet.set_row(row, 15) }
+
+    # Hide a range of columns.
+    worksheet.set_column('G:XFD', nil, nil, 1)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_hide_sheet
     @xlsx = 'hide_sheet.xlsx'
     workbook   = WriteXLSX.new(@io)
@@ -3527,6 +4015,18 @@ EOS
     #
     smiley = '☺'
     worksheet.merge_range('B6:D7', "UTF-8: A Unicode smiley #{smiley}", format)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_multi_line
+    @xlsx = 'multi_line.xlsx'
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.write(0, 0, "Hi Excel!\n1234\nHi, again!")
 
     workbook.close
     store_to_tempfile
@@ -4738,6 +5238,433 @@ Tabs	squareTabs
 EOS
   end
 
+  def test_sparklines1
+    @xlsx = 'sparklines1.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    # Some sample data to plot.
+    data = [
+      [-2, 2,  3,  -1, 0],
+      [30, 20, 33, 20, 15],
+      [1,  -1, -1, 1,  -1]
+    ]
+
+    # Write the sample data to the worksheet.
+    worksheet.write_col('A1', data)
+
+    # Add a line sparkline (the default) with markers.
+    worksheet.add_sparkline(
+      {
+        :location => 'F1',
+        :range    => 'Sheet1!A1:E1',
+        :markers  => 1
+      }
+    )
+
+    # Add a column sparkline with non-default style.
+    worksheet.add_sparkline(
+      {
+        :location => 'F2',
+        :range    => 'Sheet1!A2:E2',
+        :type     => 'column',
+        :style    => 12
+      }
+    )
+
+    # Add a win/loss sparkline with negative values highlighted.
+    worksheet.add_sparkline(
+      {
+        :location        => 'F3',
+        :range           => 'Sheet1!A3:E3',
+        :type            => 'win_loss',
+        :negative_points => 1
+      }
+    )
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
+  def test_sparklines2
+    @xlsx = 'sparklines2.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet1 = workbook.add_worksheet
+    worksheet2 = workbook.add_worksheet
+    bold       = workbook.add_format(:bold => 1)
+    row = 1
+
+    # Set the columns widths to make the output clearer.
+    worksheet1.set_column('A:A', 14)
+    worksheet1.set_column('B:B', 50)
+    worksheet1.zoom = 150
+
+    # Headings.
+    worksheet1.write('A1', 'Sparkline',   bold)
+    worksheet1.write('B1', 'Description', bold)
+
+    ##########################################################################
+    #
+    str = 'A default "line" sparkline.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A2',
+        :range    => 'Sheet2!A1:J1'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'A default "column" sparkline.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A3',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'A default "win/loss" sparkline.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A4',
+        :range    => 'Sheet2!A3:J3',
+        :type     => 'win_loss'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 2
+
+    ##########################################################################
+    #
+    str = 'Line with markers.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A6',
+        :range    => 'Sheet2!A1:J1',
+        :markers  => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Line with high and low points.'
+
+    worksheet1.add_sparkline(
+      {
+        :location   => 'A7',
+        :range      => 'Sheet2!A1:J1',
+        :high_point => 1,
+        :low_point  => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Line with first and last point markers.'
+
+    worksheet1.add_sparkline(
+      {
+        :location    => 'A8',
+        :range       => 'Sheet2!A1:J1',
+        :first_point => 1,
+        :last_point  => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Line with negative point markers.'
+
+    worksheet1.add_sparkline(
+      {
+        :location        => 'A9',
+        :range           => 'Sheet2!A1:J1',
+        :negative_points => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Line with axis.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A10',
+        :range    => 'Sheet2!A1:J1',
+        :axis     => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 2
+
+    ##########################################################################
+    #
+    str = 'Column with default style (1).'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A12',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with style 2.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A13',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 2
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with style 3.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A14',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 3
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with style 4.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A15',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 4
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with style 5.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A16',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 5
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with style 6.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A17',
+        :range    => 'Sheet2!A2:J2',
+        :type     => 'column',
+        :style    => 6
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Column with a user defined colour.'
+
+    worksheet1.add_sparkline(
+      {
+        :location     => 'A18',
+        :range        => 'Sheet2!A2:J2',
+        :type         => 'column',
+        :series_color => '#E965E0'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 2
+
+    ##########################################################################
+    #
+    str = 'A win/loss sparkline.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A20',
+        :range    => 'Sheet2!A3:J3',
+        :type     => 'win_loss'
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'A win/loss sparkline with negative points highlighted.'
+
+    worksheet1.add_sparkline(
+      {
+        :location        => 'A21',
+        :range           => 'Sheet2!A3:J3',
+        :type            => 'win_loss',
+        :negative_points => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 2
+
+    ##########################################################################
+    #
+    str = 'A left to right column (the default).'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A23',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'A right to left column.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A24',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20,
+        :reverse  => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    #
+    str = 'Sparkline and text in one cell.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => 'A25',
+        :range    => 'Sheet2!A4:J4',
+        :type     => 'column',
+        :style    => 20
+      }
+    )
+
+    worksheet1.write(row,   0, 'Growth')
+    worksheet1.write(row, 1, str)
+    row += 2
+
+    ##########################################################################
+    #
+    str = 'A grouped sparkline. Changes are applied to all three.'
+
+    worksheet1.add_sparkline(
+      {
+        :location => %w[A27 A28 A29],
+        :range    => ['Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7'],
+        :markers  => 1
+      }
+    )
+
+    worksheet1.write(row, 1, str)
+    row += 1
+
+    ##########################################################################
+    # Create a second worksheet with data to plot.
+    #
+
+    worksheet2.set_column('A:J', 11)
+
+    data = [
+      # Simple line data.
+      [-2, 2, 3, -1, 0, -2, 3, 2, 1, 0],
+
+      # Simple column data.
+      [30, 20, 33, 20, 15, 5, 5, 15, 10, 15],
+
+      # Simple win/loss data.
+      [1, 1, -1, -1, 1, -1, 1, 1, 1, -1],
+
+      # Unbalanced histogram.
+      [5, 6, 7, 10, 15, 20, 30, 50, 70, 100],
+
+      # Data for the grouped sparkline example.
+      [-2, 2,  3, -1, 0, -2, 3, 2, 1, 0],
+      [3,  -1, 0, -2, 3, 2,  1, 0, 2, 1],
+      [0,  -2, 3, 2,  1, 0,  1, 2, 3, 1]
+    ]
+
+    # Write the sample data to the worksheet.
+    worksheet2.write_col('A1', data)
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_stats
     @xlsx = 'stats.xlsx'
     workbook = WriteXLSX.new(@io)
@@ -5312,933 +6239,6 @@ EOS
         ]
       }
     )
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_sparklines1
-    @xlsx = 'sparklines1.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-
-    # Some sample data to plot.
-    data = [
-      [-2, 2,  3,  -1, 0],
-      [30, 20, 33, 20, 15],
-      [1,  -1, -1, 1,  -1]
-    ]
-
-    # Write the sample data to the worksheet.
-    worksheet.write_col('A1', data)
-
-    # Add a line sparkline (the default) with markers.
-    worksheet.add_sparkline(
-      {
-        :location => 'F1',
-        :range    => 'Sheet1!A1:E1',
-        :markers  => 1
-      }
-    )
-
-    # Add a column sparkline with non-default style.
-    worksheet.add_sparkline(
-      {
-        :location => 'F2',
-        :range    => 'Sheet1!A2:E2',
-        :type     => 'column',
-        :style    => 12
-      }
-    )
-
-    # Add a win/loss sparkline with negative values highlighted.
-    worksheet.add_sparkline(
-      {
-        :location        => 'F3',
-        :range           => 'Sheet1!A3:E3',
-        :type            => 'win_loss',
-        :negative_points => 1
-      }
-    )
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_sparklines2
-    @xlsx = 'sparklines2.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet1 = workbook.add_worksheet
-    worksheet2 = workbook.add_worksheet
-    bold       = workbook.add_format(:bold => 1)
-    row = 1
-
-    # Set the columns widths to make the output clearer.
-    worksheet1.set_column('A:A', 14)
-    worksheet1.set_column('B:B', 50)
-    worksheet1.zoom = 150
-
-    # Headings.
-    worksheet1.write('A1', 'Sparkline',   bold)
-    worksheet1.write('B1', 'Description', bold)
-
-    ##########################################################################
-    #
-    str = 'A default "line" sparkline.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A2',
-        :range    => 'Sheet2!A1:J1'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'A default "column" sparkline.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A3',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'A default "win/loss" sparkline.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A4',
-        :range    => 'Sheet2!A3:J3',
-        :type     => 'win_loss'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 2
-
-    ##########################################################################
-    #
-    str = 'Line with markers.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A6',
-        :range    => 'Sheet2!A1:J1',
-        :markers  => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Line with high and low points.'
-
-    worksheet1.add_sparkline(
-      {
-        :location   => 'A7',
-        :range      => 'Sheet2!A1:J1',
-        :high_point => 1,
-        :low_point  => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Line with first and last point markers.'
-
-    worksheet1.add_sparkline(
-      {
-        :location    => 'A8',
-        :range       => 'Sheet2!A1:J1',
-        :first_point => 1,
-        :last_point  => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Line with negative point markers.'
-
-    worksheet1.add_sparkline(
-      {
-        :location        => 'A9',
-        :range           => 'Sheet2!A1:J1',
-        :negative_points => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Line with axis.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A10',
-        :range    => 'Sheet2!A1:J1',
-        :axis     => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 2
-
-    ##########################################################################
-    #
-    str = 'Column with default style (1).'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A12',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with style 2.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A13',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column',
-        :style    => 2
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with style 3.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A14',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column',
-        :style    => 3
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with style 4.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A15',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column',
-        :style    => 4
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with style 5.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A16',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column',
-        :style    => 5
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with style 6.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A17',
-        :range    => 'Sheet2!A2:J2',
-        :type     => 'column',
-        :style    => 6
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Column with a user defined colour.'
-
-    worksheet1.add_sparkline(
-      {
-        :location     => 'A18',
-        :range        => 'Sheet2!A2:J2',
-        :type         => 'column',
-        :series_color => '#E965E0'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 2
-
-    ##########################################################################
-    #
-    str = 'A win/loss sparkline.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A20',
-        :range    => 'Sheet2!A3:J3',
-        :type     => 'win_loss'
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'A win/loss sparkline with negative points highlighted.'
-
-    worksheet1.add_sparkline(
-      {
-        :location        => 'A21',
-        :range           => 'Sheet2!A3:J3',
-        :type            => 'win_loss',
-        :negative_points => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 2
-
-    ##########################################################################
-    #
-    str = 'A left to right column (the default).'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A23',
-        :range    => 'Sheet2!A4:J4',
-        :type     => 'column',
-        :style    => 20
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'A right to left column.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A24',
-        :range    => 'Sheet2!A4:J4',
-        :type     => 'column',
-        :style    => 20,
-        :reverse  => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    #
-    str = 'Sparkline and text in one cell.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => 'A25',
-        :range    => 'Sheet2!A4:J4',
-        :type     => 'column',
-        :style    => 20
-      }
-    )
-
-    worksheet1.write(row,   0, 'Growth')
-    worksheet1.write(row, 1, str)
-    row += 2
-
-    ##########################################################################
-    #
-    str = 'A grouped sparkline. Changes are applied to all three.'
-
-    worksheet1.add_sparkline(
-      {
-        :location => %w[A27 A28 A29],
-        :range    => ['Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7'],
-        :markers  => 1
-      }
-    )
-
-    worksheet1.write(row, 1, str)
-    row += 1
-
-    ##########################################################################
-    # Create a second worksheet with data to plot.
-    #
-
-    worksheet2.set_column('A:J', 11)
-
-    data = [
-      # Simple line data.
-      [-2, 2, 3, -1, 0, -2, 3, 2, 1, 0],
-
-      # Simple column data.
-      [30, 20, 33, 20, 15, 5, 5, 15, 10, 15],
-
-      # Simple win/loss data.
-      [1, 1, -1, -1, 1, -1, 1, 1, 1, -1],
-
-      # Unbalanced histogram.
-      [5, 6, 7, 10, 15, 20, 30, 50, 70, 100],
-
-      # Data for the grouped sparkline example.
-      [-2, 2,  3, -1, 0, -2, 3, 2, 1, 0],
-      [3,  -1, 0, -2, 3, 2,  1, 0, 2, 1],
-      [0,  -2, 3, 2,  1, 0,  1, 2, 3, 1]
-    ]
-
-    # Write the sample data to the worksheet.
-    worksheet2.write_col('A1', data)
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_add_vba_project
-    @xlsx = 'add_vba_project.xlsm'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-
-    worksheet.set_column('A:A', 50)
-
-    # Add the VBA project binary.
-    workbook.add_vba_project(File.join(@test_dir, 'vbaProject.bin'))
-
-    # Show text for the end user.
-    worksheet.write('A1', 'Run the SampleMacro embedded in this file.')
-    worksheet.write('A2', 'You may have to turn on the Excel Developer option first.')
-
-    # Call a user defined function from the VBA project.
-    worksheet.write('A6', 'Result from a user defined function:')
-    worksheet.write('B6', '=MyFunction(7)')
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_hide_row_col
-    @xlsx = 'hide_row_col.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-
-    # Write some data
-    worksheet.write('D1', 'Some hidden columns.')
-    worksheet.write('A8', 'Some hidden rows.')
-
-    # Hide all rows without data.
-    worksheet.set_default_row(nil, 1)
-
-    # Set emptys row that we do want to display. All other will be hidden.
-    (1..6).each { |row| worksheet.set_row(row, 15) }
-
-    # Hide a range of columns.
-    worksheet.set_column('G:XFD', nil, nil, 1)
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_chart_data_table
-    @xlsx = 'chart_data_table.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
-
-    # Add the worksheet data that the charts will refer to.
-    headings = ['Number', 'Batch 1', 'Batch 2']
-    data = [
-      [2, 3, 4, 5, 6, 7],
-      [10, 40, 50, 20, 10, 50],
-      [30, 60, 70, 50, 40, 30]
-    ]
-
-    worksheet.write('A1', headings, bold)
-    worksheet.write('A2', data)
-
-    # Create a new column chart with a data table.
-    chart1 = workbook.add_chart(:type => 'column', :embedded => 1)
-
-    # Configure the first series.
-    chart1.add_series(
-      :name       => '=Sheet1!$B$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Configure second series. Note alternative use of array ref to define
-    # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
-    chart1.add_series(
-      :name       => '=Sheet1!$C$1',
-      :categories => ['Sheet1', 1, 6, 0, 0],
-      :values     => ['Sheet1', 1, 6, 2, 2]
-    )
-
-    # Add a chart title and some axis labels.
-    chart1.set_title(:name => 'Chart with Data Table')
-    chart1.set_x_axis(:name => 'Test number')
-    chart1.set_y_axis(:name => 'Sample length (mm)')
-
-    # Set a default data table on the X-Axis.
-    chart1.set_table
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D2', chart1, 25, 10)
-
-    #
-    # Create a second charat.
-    #
-    chart2 = workbook.add_chart(:type => 'column', :embedded => 1)
-
-    # Configure the first series.
-    chart2.add_series(
-      :name       => '=Sheet1!$B$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Configure second series. Note alternative use of array ref to define
-    # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
-    chart2.add_series(
-      :name       => '=Sheet1!$C$1',
-      :categories => ['Sheet1', 1, 6, 0, 0],
-      :values     => ['Sheet1', 1, 6, 2, 2]
-    )
-
-    # Add a chart title and some axis labels.
-    chart2.set_title(:name => 'Data Table with legend keys')
-    chart2.set_x_axis(:name => 'Test number')
-    chart2.set_y_axis(:name => 'Sample length (mm)')
-
-    # Set a default data table on the X-Axis with the legend keys shown.
-    chart2.set_table(:show_keys => true)
-
-    # Hide the chart legend since the keys are show on the data table.
-    chart2.set_legend(:position => 'none')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D18', chart2, 25, 11)
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_chart_data_tools
-    @xlsx = 'chart_data_tools.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
-
-    # Add the worksheet data that the charts will refer to.
-    headings = ['Number', 'Data 1', 'Data 2']
-    data = [
-      [2,  3,  4,  5,  6,  7],
-      [10, 40, 50, 20, 10, 50],
-      [30, 60, 70, 50, 40, 30]
-    ]
-
-    worksheet.write('A1', headings, bold)
-    worksheet.write('A2', data)
-
-    #######################################################################
-    #
-    # Trendline example.
-    #
-
-    # Create a Line chart.
-    chart1 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Configure the first series with a polynomial trendline.
-    chart1.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7',
-      :trendline  => {
-        :type  => 'polynomial',
-        :order => 3
-      }
-    )
-
-    # Configure the second series with a moving average trendline.
-    chart1.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7',
-      :trendline  => { :type => 'linear' }
-    )
-
-    # Add a chart title. and some axis labels.
-    chart1.set_title(:name => 'Chart with Trendlines')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D2', chart1, 25, 10)
-
-    #######################################################################
-    #
-    # Data Labels and Markers example.
-    #
-
-    # Create a Line chart.
-    chart2 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Configure the first series.
-    chart2.add_series(
-      :categories  => '=Sheet1!$A$2:$A$7',
-      :values      => '=Sheet1!$B$2:$B$7',
-      :data_labels => { :value => 1 },
-      :marker      => { :type => 'automatic' }
-    )
-
-    # Configure the second series.
-    chart2.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Add a chart title. and some axis labels.
-    chart2.set_title(:name => 'Chart with Data Labels and Markers')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D18', chart2, 25, 10)
-
-    #######################################################################
-    #
-    # Error Bars example.
-    #
-
-    # Create a Line chart.
-    chart3 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Configure the first series.
-    chart3.add_series(
-      :categories   => '=Sheet1!$A$2:$A$7',
-      :values       => '=Sheet1!$B$2:$B$7',
-      :y_error_bars => { :type => 'standard_error' }
-    )
-
-    # Configure the second series.
-    chart3.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Add a chart title. and some axis labels.
-    chart3.set_title(:name => 'Chart with Error Bars')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D34', chart3, 25, 10)
-
-    #######################################################################
-    #
-    # Up-Down Bars example.
-    #
-
-    # Create a Line chart.
-    chart4 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Add the Up-Down Bars.
-    chart4.set_up_down_bars
-
-    # Configure the first series.
-    chart4.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Configure the second series.
-    chart4.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Add a chart title. and some axis labels.
-    chart4.set_title(:name => 'Chart with Up-Down Bars')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D50', chart4, 25, 10)
-
-    #######################################################################
-    #
-    # High-Low Lines example.
-    #
-
-    # Create a Line chart.
-    chart5 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Add the High-Low lines.
-    chart5.set_high_low_lines
-
-    # Configure the first series.
-    chart5.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Configure the second series.
-    chart5.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Add a chart title. and some axis labels.
-    chart5.set_title(:name => 'Chart with High-Low Lines')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D66', chart5, 25, 10)
-
-    #######################################################################
-    #
-    # Drop Lines example.
-    #
-
-    # Create a Line chart.
-    chart6 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Add Drop Lines.
-    chart6.set_drop_lines
-
-    # Configure the first series.
-    chart6.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Configure the second series.
-    chart6.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Add a chart title. and some axis labels.
-    chart6.set_title(:name => 'Chart with Drop Lines')
-
-    # Insert the chart into the worksheet (with an offset).
-    worksheet.insert_chart('D82', chart6, 25, 10)
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_chart_combined
-    @xlsx = 'chart_combined.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
-
-    # Add the worksheet data that the charts will refer to.
-    headings = ['Number', 'Batch 1', 'Batch 2']
-    data = [
-      [2,  3,  4,  5,  6,  7],
-      [10, 40, 50, 20, 10, 50],
-      [30, 60, 70, 50, 40, 30]
-    ]
-
-    worksheet.write('A1', headings, bold)
-    worksheet.write('A2', data)
-
-    #
-    # In the first example we will create a combined column and line chart.
-    # They will share the same X and Y axes.
-    #
-
-    # Create a new column chart. This will use this as the primary chart.
-    column_chart1 = workbook.add_chart(:type => 'column', :embedded => 1)
-
-    # Configure the data series for the primary chart.
-    column_chart1.add_series(
-      :name       => '=Sheet1!$B$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Create a new column chart. This will use this as the secondary chart.
-    line_chart1 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Configure the data series for the secondary chart.
-    line_chart1.add_series(
-      :name       => '=Sheet1!$C$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7'
-    )
-
-    # Combine the charts.
-    column_chart1.combine(line_chart1)
-
-    # Add a chart title and some axis labels. Note, this is done via the
-    # primary chart.
-    column_chart1.set_title(:name => 'Combined chart - same Y axis')
-    column_chart1.set_x_axis(:name => 'Test number')
-    column_chart1.set_y_axis(:name => 'Sample length (mm)')
-
-    # Insert the chart into the worksheet
-    worksheet.insert_chart('E2', column_chart1)
-
-    #
-    # In the second example we will create a similar combined column and line
-    # chart except that the secondary chart will have a secondary Y axis.
-    #
-
-    # Create a new column chart. This will use this as the primary chart.
-    column_chart2 = workbook.add_chart(:type => 'column', :embedded => 1)
-
-    # Configure the data series for the primary chart.
-    column_chart2.add_series(
-      :name       => '=Sheet1!$B$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7'
-    )
-
-    # Create a new column chart. This will use this as the secondary chart.
-    line_chart2 = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Configure the data series for the secondary chart. We also set a
-    # secondary Y axis via (y2_axis). This is the only difference between
-    # this and the first example, apart from the axis label below.
-    line_chart2.add_series(
-      :name       => '=Sheet1!$C$1',
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7',
-      :y2_axis    => 1
-    )
-
-    # Combine the charts.
-    column_chart2.combine(line_chart2)
-
-    # Add a chart title and some axis labels.
-    column_chart2.set_title(:name => 'Combine chart - secondary Y axis')
-    column_chart2.set_x_axis(:name => 'Test number')
-    column_chart2.set_y_axis(:name => 'Sample length (mm)')
-    column_chart2.set_y2_axis(:name => 'Target length (mm)')
-
-    # Insert the chart into the worksheet
-    worksheet.insert_chart('E18', column_chart2)
-
-    workbook.close
-    store_to_tempfile
-    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
-  end
-
-  def test_chart_pareto
-    @xlsx = 'chart_pareto.xlsx'
-    workbook = WriteXLSX.new(@io)
-    worksheet = workbook.add_worksheet
-
-    # Formats used in the workbook.
-    bold           = workbook.add_format(:bold => 1)
-    percent_format = workbook.add_format(:num_format => '0.0%')
-
-    # Widen the columns for visibility.
-    worksheet.set_column('A:A', 15)
-    worksheet.set_column('B:C', 10)
-
-    # Add the worksheet data that the charts will refer to.
-    headings = %w[Reason Number Percentage]
-
-    reasons = [
-      'Traffic',   'Child care', 'Public Transport', 'Weather',
-      'Overslept', 'Emergency'
-    ]
-
-    numbers  = [60,    40,  20,  15,    10, 5]
-    percents = [0.44, 0.667, 0.8, 0.9, 0.967, 1]
-
-    worksheet.write_row('A1', headings, bold)
-    worksheet.write_col('A2', reasons)
-    worksheet.write_col('B2', numbers)
-    worksheet.write_col('C2', percents, percent_format)
-
-    # Create a new column chart. This will be the primary chart.
-    column_chart = workbook.add_chart(:type => 'column', :embedded => 1)
-
-    # Add a series
-    column_chart.add_series(
-      :categories => 'Sheet1!$A$2:$A$7',
-      :values     => 'Sheet1!$B$2:$B$7'
-    )
-
-    # Add a chart title.
-    column_chart.set_title(:name => 'Reasons for lateness')
-
-    # Turn off the chart legend.
-    column_chart.set_legend(:position => 'none')
-
-    # Set the title and scale of the Y axes. Note, the secondary axis is set from
-    # the primary chart.
-    column_chart.set_y_axis(
-      :name => 'Respondents (number)',
-      :min  => 0,
-      :max  => 120
-    )
-    column_chart.set_y2_axis(:max => 1)
-
-    # Create a new line chart. This will be the secondary chart.
-    line_chart = workbook.add_chart(:type => 'line', :embedded => 1)
-
-    # Add a series, on the secondary axis.
-    line_chart.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$C$2:$C$7',
-      :marker     => { :type => 'automatic' },
-      :y2_axis    => 1
-    )
-
-    # Combine the charts.
-    column_chart.combine(line_chart)
-
-    # Insert the chart into the worksheet.
-    worksheet.insert_chart('F2', column_chart)
 
     workbook.close
     store_to_tempfile
