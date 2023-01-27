@@ -104,6 +104,9 @@ module Writexlsx
       @vml_drawing_rels       = {}
       @vml_drawing_rels_id    = 0
       @has_dynamic_arrays     = false
+
+      @use_future_functions  = false
+
       @header_images          = []
       @footer_images          = []
       @background_image       = ''
@@ -1084,6 +1087,171 @@ module Writexlsx
       store_data_to_table(BlankCellData.new(self, row, col, xf))
     end
 
+    def expand_formula(formula, function, addition = '')
+      if formula =~ /\b(#{function})/
+        formula.gsub(
+          ::Regexp.last_match(1),
+          "_xlfn#{addition}.#{::Regexp.last_match(1)}"
+        )
+      else
+        formula
+      end
+    end
+    private :expand_formula
+
+    #
+    # Utility method to strip equal sign and array braces from a formula
+    # and also expand out future and dynamic array formulas.
+    #
+    def prepare_formula(given_formula)
+      # Ignore empty/null formulas.
+      return given_formula unless ptrue?(given_formula)
+
+      # Remove array formula braces and the leading =.
+      formula = given_formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
+
+      # # Don't expand formulas that the user has already expanded.
+      return formula if formula =~ /_xlfn\./
+
+      # Expand dynamic array formulas.
+      formula = expand_formula(formula, 'LET\(')
+      formula = expand_formula(formula, 'LAMBDA\(')
+      formula = expand_formula(formula, 'SINGLE\(')
+      formula = expand_formula(formula, 'SORTBY\(')
+      formula = expand_formula(formula, 'UNIQUE\(')
+      formula = expand_formula(formula, 'XMATCH\(')
+      formula = expand_formula(formula, 'XLOOKUP\(')
+      formula = expand_formula(formula, 'SEQUENCE\(')
+      formula = expand_formula(formula, 'RANDARRAY\(')
+      formula = expand_formula(formula, 'SORT\(', '._xlws')
+      formula = expand_formula(formula, 'ANCHORARRAY\(')
+      formula = expand_formula(formula, 'FILTER\(', '._xlws')
+
+      return formula unless @use_future_functions
+
+      # Future functions.
+      formula = expand_formula(formula, 'ACOTH\(')
+      formula = expand_formula(formula, 'ACOT\(')
+      formula = expand_formula(formula, 'AGGREGATE\(')
+      formula = expand_formula(formula, 'ARABIC\(')
+      formula = expand_formula(formula, 'BASE\(')
+      formula = expand_formula(formula, 'BETA.DIST\(')
+      formula = expand_formula(formula, 'BETA.INV\(')
+      formula = expand_formula(formula, 'BINOM.DIST.RANGE\(')
+      formula = expand_formula(formula, 'BINOM.DIST\(')
+      formula = expand_formula(formula, 'BINOM.INV\(')
+      formula = expand_formula(formula, 'BITAND\(')
+      formula = expand_formula(formula, 'BITLSHIFT\(')
+      formula = expand_formula(formula, 'BITOR\(')
+      formula = expand_formula(formula, 'BITRSHIFT\(')
+      formula = expand_formula(formula, 'BITXOR\(')
+      formula = expand_formula(formula, 'CEILING.MATH\(')
+      formula = expand_formula(formula, 'CEILING.PRECISE\(')
+      formula = expand_formula(formula, 'CHISQ.DIST.RT\(')
+      formula = expand_formula(formula, 'CHISQ.DIST\(')
+      formula = expand_formula(formula, 'CHISQ.INV.RT\(')
+      formula = expand_formula(formula, 'CHISQ.INV\(')
+      formula = expand_formula(formula, 'CHISQ.TEST\(')
+      formula = expand_formula(formula, 'COMBINA\(')
+      formula = expand_formula(formula, 'CONCAT\(')
+      formula = expand_formula(formula, 'CONFIDENCE.NORM\(')
+      formula = expand_formula(formula, 'CONFIDENCE.T\(')
+      formula = expand_formula(formula, 'COTH\(')
+      formula = expand_formula(formula, 'COT\(')
+      formula = expand_formula(formula, 'COVARIANCE.P\(')
+      formula = expand_formula(formula, 'COVARIANCE.S\(')
+      formula = expand_formula(formula, 'CSCH\(')
+      formula = expand_formula(formula, 'CSC\(')
+      formula = expand_formula(formula, 'DAYS\(')
+      formula = expand_formula(formula, 'DECIMAL\(')
+      formula = expand_formula(formula, 'ERF.PRECISE\(')
+      formula = expand_formula(formula, 'ERFC.PRECISE\(')
+      formula = expand_formula(formula, 'EXPON.DIST\(')
+      formula = expand_formula(formula, 'F.DIST.RT\(')
+      formula = expand_formula(formula, 'F.DIST\(')
+      formula = expand_formula(formula, 'F.INV.RT\(')
+      formula = expand_formula(formula, 'F.INV\(')
+      formula = expand_formula(formula, 'F.TEST\(')
+      formula = expand_formula(formula, 'FILTERXML\(')
+      formula = expand_formula(formula, 'FLOOR.MATH\(')
+      formula = expand_formula(formula, 'FLOOR.PRECISE\(')
+      formula = expand_formula(formula, 'FORECAST.ETS.CONFINT\(')
+      formula = expand_formula(formula, 'FORECAST.ETS.SEASONALITY\(')
+      formula = expand_formula(formula, 'FORECAST.ETS.STAT\(')
+      formula = expand_formula(formula, 'FORECAST.ETS\(')
+      formula = expand_formula(formula, 'FORECAST.LINEAR\(')
+      formula = expand_formula(formula, 'FORMULATEXT\(')
+      formula = expand_formula(formula, 'GAMMA.DIST\(')
+      formula = expand_formula(formula, 'GAMMA.INV\(')
+      formula = expand_formula(formula, 'GAMMALN.PRECISE\(')
+      formula = expand_formula(formula, 'GAMMA\(')
+      formula = expand_formula(formula, 'GAUSS\(')
+      formula = expand_formula(formula, 'HYPGEOM.DIST\(')
+      formula = expand_formula(formula, 'IFNA\(')
+      formula = expand_formula(formula, 'IFS\(')
+      formula = expand_formula(formula, 'IMCOSH\(')
+      formula = expand_formula(formula, 'IMCOT\(')
+      formula = expand_formula(formula, 'IMCSCH\(')
+      formula = expand_formula(formula, 'IMCSC\(')
+      formula = expand_formula(formula, 'IMSECH\(')
+      formula = expand_formula(formula, 'IMSEC\(')
+      formula = expand_formula(formula, 'IMSINH\(')
+      formula = expand_formula(formula, 'IMTAN\(')
+      formula = expand_formula(formula, 'ISFORMULA\(')
+      formula = expand_formula(formula, 'ISOWEEKNUM\(')
+      formula = expand_formula(formula, 'LOGNORM.DIST\(')
+      formula = expand_formula(formula, 'LOGNORM.INV\(')
+      formula = expand_formula(formula, 'MAXIFS\(')
+      formula = expand_formula(formula, 'MINIFS\(')
+      formula = expand_formula(formula, 'MODE.MULT\(')
+      formula = expand_formula(formula, 'MODE.SNGL\(')
+      formula = expand_formula(formula, 'MUNIT\(')
+      formula = expand_formula(formula, 'NEGBINOM.DIST\(')
+      formula = expand_formula(formula, 'NORM.DIST\(')
+      formula = expand_formula(formula, 'NORM.INV\(')
+      formula = expand_formula(formula, 'NORM.S.DIST\(')
+      formula = expand_formula(formula, 'NORM.S.INV\(')
+      formula = expand_formula(formula, 'NUMBERVALUE\(')
+      formula = expand_formula(formula, 'PDURATION\(')
+      formula = expand_formula(formula, 'PERCENTILE.EXC\(')
+      formula = expand_formula(formula, 'PERCENTILE.INC\(')
+      formula = expand_formula(formula, 'PERCENTRANK.EXC\(')
+      formula = expand_formula(formula, 'PERCENTRANK.INC\(')
+      formula = expand_formula(formula, 'PERMUTATIONA\(')
+      formula = expand_formula(formula, 'PHI\(')
+      formula = expand_formula(formula, 'POISSON.DIST\(')
+      formula = expand_formula(formula, 'QUARTILE.EXC\(')
+      formula = expand_formula(formula, 'QUARTILE.INC\(')
+      formula = expand_formula(formula, 'QUERYSTRING\(')
+      formula = expand_formula(formula, 'RANK.AVG\(')
+      formula = expand_formula(formula, 'RANK.EQ\(')
+      formula = expand_formula(formula, 'RRI\(')
+      formula = expand_formula(formula, 'SECH\(')
+      formula = expand_formula(formula, 'SEC\(')
+      formula = expand_formula(formula, 'SHEETS\(')
+      formula = expand_formula(formula, 'SHEET\(')
+      formula = expand_formula(formula, 'SKEW.P\(')
+      formula = expand_formula(formula, 'STDEV.P\(')
+      formula = expand_formula(formula, 'STDEV.S\(')
+      formula = expand_formula(formula, 'SWITCH\(')
+      formula = expand_formula(formula, 'T.DIST.2T\(')
+      formula = expand_formula(formula, 'T.DIST.RT\(')
+      formula = expand_formula(formula, 'T.DIST\(')
+      formula = expand_formula(formula, 'T.INV.2T\(')
+      formula = expand_formula(formula, 'T.INV\(')
+      formula = expand_formula(formula, 'T.TEST\(')
+      formula = expand_formula(formula, 'TEXTJOIN\(')
+      formula = expand_formula(formula, 'UNICHAR\(')
+      formula = expand_formula(formula, 'UNICODE\(')
+      formula = expand_formula(formula, 'VAR.P\(')
+      formula = expand_formula(formula, 'VAR.S\(')
+      formula = expand_formula(formula, 'WEBSERVICE\(')
+      formula = expand_formula(formula, 'WEIBULL.DIST\(')
+      formula = expand_formula(formula, 'XOR\(')
+      expand_formula(formula, 'Z.TEST\(')
+    end
+    private :prepare_formula
+
     #
     # :call-seq:
     #   write_formula(row, column, formula [ , format [ , value ] ])
@@ -1095,6 +1263,15 @@ module Writexlsx
       row, col, formula, format, value = row_col_notation(args)
       raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
 
+      # Check for dynamic array functions.
+      regex = /\bLET\(|\bSORT\(|\bLAMBDA\(|\bSINGLE\(|\bSORTBY\(|\bUNIQUE\(|\bXMATCH\(|\bFILTER\(|\bXLOOKUP\(|\bSEQUENCE\(|\bRANDARRAY\(|\bANCHORARRAY\(/
+      if formula =~ regex
+        return write_dynamic_array_formula(
+          row, col, row, col, formula, format, value
+        )
+      end
+
+      # Hand off array formulas.
       if formula =~ /^\{=.*\}$/
         write_array_formula(row, col, row, col, formula, format, value)
       else
@@ -1112,7 +1289,15 @@ module Writexlsx
     #
     def write_array_formula_base(type, *args)
       # Check for a cell reference in A1 notation and substitute row and column
-      row1, col1, row2, col2, formula, xf, value = row_col_notation(args)
+      # Convert single cell to range
+      if args.first.to_s =~ /^([A-Za-z]+[0-9]+)$/
+        range = "#{::Regexp.last_match(1)}:#{::Regexp.last_match(1)}"
+        params = [range] + args[1..]
+      else
+        params = args
+      end
+
+      row1, col1, row2, col2, formula, xf, value = row_col_notation(params)
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, formula].include?(nil)
 
       # Swap last row/col with first row/col as necessary
@@ -1132,8 +1317,8 @@ module Writexlsx
                 "#{xl_rowcol_to_cell(row1, col1)}:#{xl_rowcol_to_cell(row2, col2)}"
               end
 
-      # Remove array formula braces and the leading =.
-      formula = formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
+      # Modify the formula string, as needed.
+      formula = prepare_formula(formula)
 
       store_data_to_table(
         if type == 'a'
