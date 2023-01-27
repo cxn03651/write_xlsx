@@ -6244,4 +6244,20 @@ EOS
     store_to_tempfile
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
+
+  def test_watermark
+    @xlsx = 'watermark.xlsx'
+    workbook    = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    # Set a worksheet header with the watermark image.
+    worksheet.set_header(
+      '&C&C&[Picture]', nil,
+      { :image_center => File.join(@test_dir, 'watermark.png') }
+    )
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
 end
