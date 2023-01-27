@@ -44,7 +44,7 @@ module Writexlsx
       @index = index
       @name = name
       @colinfo = {}
-      @cell_data_table = {}
+      @cell_data_table = []
       @excel_version = 2007
       @palette = workbook.palette
       @default_url_format = workbook.default_url_format
@@ -3990,7 +3990,7 @@ EOS
       if @cell_data_table[row]
         @cell_data_table[row][col] = cell_data
       else
-        @cell_data_table[row] = {}
+        @cell_data_table[row] = []
         @cell_data_table[row][col] = cell_data
       end
     end
