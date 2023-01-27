@@ -57,4 +57,13 @@ class TestWorksheetWritePageSetup < Minitest::Test
 
     assert_equal(expected, result)
   end
+
+  def test_write_page_setup_with_black_and_white
+    @worksheet.print_black_and_white
+    @worksheet.__send__('write_page_setup')
+    result = @worksheet.instance_variable_get(:@writer).string
+    expected = '<pageSetup orientation="portrait" blackAndWhite="1"/>'
+
+    assert_equal(expected, result)
+  end
 end

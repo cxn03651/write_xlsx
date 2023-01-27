@@ -423,7 +423,6 @@ module Writexlsx
       @top_left_cell = xl_rowcol_to_cell(row, col)
     end
 
-
     #
     # :call-seq:
     #   freeze_panes(row, col [ , top_row, left_col ] )
@@ -827,7 +826,8 @@ module Writexlsx
     # Set the option to print the worksheet in black and white.
     #
     def print_black_and_white
-      @page_setup.black_white = true
+      @page_setup.black_white        = true
+      @page_setup.page_setup_changed = true
     end
 
     #
@@ -2988,7 +2988,7 @@ EOS
       attributes << %w[view pageLayout] if page_view?
 
       # Set the first visible cell.
-        attributes << ['topLeftCell', @top_left_cell] if ptrue?(@top_left_cell)
+      attributes << ['topLeftCell', @top_left_cell] if ptrue?(@top_left_cell)
 
       # Set the zoom level.
       if @zoom != 100
