@@ -40,3 +40,6 @@ test/version_tmp
 tmp
 _site
 .byebug_history
+GPATH
+GRTAGS
+GTAGS
