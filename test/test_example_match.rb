@@ -4001,6 +4001,41 @@ EOS
     compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
   end
 
+  def test_lambda
+    @xlsx = 'lambda.xlsx'
+    # Create a new workbook and add a worksheet
+    workbook  = WriteXLSX.new(@io)
+    worksheet = workbook.add_worksheet
+
+    worksheet.write(
+      'A1',
+      'Note: Lambda functions currently only work with the Beta Channel versions of Excel 365'
+    )
+
+    # Write a Lambda function to convert Fahrenheit to Celsius to a cell.
+    #
+    # Note that the lambda function parameters must be prefixed with
+    # "_xlpm.". These prefixes won't show up in Excel.
+    worksheet.write('A2', '=LAMBDA(_xlpm.temp, (5/9) * (_xlpm.temp-32))(32)')
+
+    # Create the same formula (without an argument) as a defined name and use that
+    # to calculate a value.
+    #
+    # Note that the formula name is prefixed with "_xlfn." (this is normally
+    # converted automatically by write_formula but isn't for defined names)
+    # and note that the lambda function parameters are prefixed with
+    # "_xlpm.". These prefixes won't show up in Excel.
+    workbook.define_name(
+      'ToCelsius',
+      '=_xlfn.LAMBDA(_xlpm.temp, (5/9) * (_xlpm.temp-32))'
+    )
+    worksheet.write_dynamic_array_formula('A3', '=ToCelsius(212)')
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_merge1
     @xlsx = 'merge1.xlsx'
     # Create a new workbook and add a worksheet
