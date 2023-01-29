@@ -16,6 +16,10 @@ See [Examples](examples.html#examples)
 WriteXLSX uses the same interface as the Writeexcel rubygem which produces
 an Excel file in binary XLS format.
 
+### <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link" /></a>REQUIREMENTS
+
+WriteXLSX requires Ruby version 2.5.0 or later.
+
 ### <a name="synopsis" class="anchor" href="#synopsis"><span class="octicon octicon-link" /></a>SYNOPSIS
 
 To write a string, a formatted string, a number and a formula to the first worksheet in an Excel workbook called ruby.xlsx:
