@@ -1,4 +1,5 @@
 # coding: utf-8
+# frozen_string_literal: true
 
 #
 # Why would we ever use Ruby 1.8.7 when we can backport with something

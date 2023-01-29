@@ -27,7 +27,7 @@ module Writexlsx
         unless @strings_index[string]
           # Only first time the string will be append to list
           # next time we only check and not #dup it
-          str = string.dup.freeze
+          str = string.frozen? ? string : string.freeze
           @strings << str
           @strings_index[str] = @strings.size - 1
         end

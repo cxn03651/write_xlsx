@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# frozen_string_literal: true
 
 require 'helper'
 require 'write_xlsx'
@@ -3402,7 +3403,7 @@ EOS
       :align  => 'justify'
     )
 
-    worksheet.merge_range('B11:D12', 'Justified: ' << ('so on and ' * 18), format4)
+    worksheet.merge_range('B11:D12', 'Justified: ' + ('so on and ' * 18), format4)
 
     workbook.close
     store_to_tempfile

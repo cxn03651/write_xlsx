@@ -256,8 +256,8 @@ module Writexlsx
       if range.nil?
         raise "The range must be defined in unprotect_range())\n"
       else
-        range.gsub!(/\$/, "")
-        range.sub!(/^=/, "")
+        range = range.gsub(/\$/, "")
+        range = range.sub(/^=/, "")
         @num_protected_ranges += 1
       end
 
