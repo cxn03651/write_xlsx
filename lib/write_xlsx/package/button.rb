@@ -8,10 +8,13 @@ module Writexlsx
     class Button
       include Writexlsx::Utility
 
-      attr_accessor :font, :macro, :vertices
+      attr_accessor :font, :macro, :vertices, :description
 
       def v_shape_attributes(id, z_index)
-        attributes = v_shape_attributes_base(id, z_index)
+        attributes = v_shape_attributes_base(id)
+        attributes << ['alt', description] if description
+
+        attributes << ['style', (v_shape_style_base(z_index, vertices) + style_addition).join]
         attributes << ['o:button',    't']
         attributes << ['fillcolor',   color]
         attributes << ['strokecolor', 'windowText [64]']
