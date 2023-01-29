@@ -15,13 +15,13 @@ In WriteXLSX we could do that as follows:
 
     worksheet.data_validation('B3',
         {
-            :validate        => 'integer',
-            :criteria        => 'between',
-            :minimum         => 1,
-            :maximum         => 100,
-            :input_title     => 'Input an integer:',
-            :input_message   => 'Between 1 and 100',
-            :error_message   => 'Sorry, try again.'
+            validate:        'integer',
+            criteria:        'between',
+            minimum:         1,
+            maximum:         100,
+            input_title:     'Input an integer:',
+            input_message:   'Between 1 and 100',
+            error_message:   'Sorry, try again.'
         })
 
 The output from the above example
@@ -35,7 +35,7 @@ http://support.microsoft.com/kb/211485.
 The following sections describe how to use the `data_validation()`
 method and its various options.
 
-#### <a name="data_validation" class="anchor" href="#data_validation"><span class="octicon octicon-link" /></a>data_validation(row, col, { parameter => 'value', ... })
+#### <a name="data_validation" class="anchor" href="#data_validation"><span class="octicon octicon-link" /></a>data_validation(row, col, { parameter: 'value', ... })
 
 The `data_validation()` method is used to construct an Excel data validation.
 
@@ -79,9 +79,9 @@ you will generally require the three main options validate, criteria and value.
 
     worksheet.data_validation('B3',
         {
-            :validate => 'integer',
-            :criteria => '>',
-            :value    => 100
+            validate: 'integer',
+            criteria: '>',
+            value:    100
         })
 
 The data_validation method returns:
@@ -116,24 +116,24 @@ in the context of WriteXLSX.
 *integer* restricts the cell to integer values.
 Excel refers to this as 'whole number'.
 
-    :validate => 'integer',
-    :criteria => '>',
-    :value    => 100,
+    validate: 'integer',
+    criteria: '>',
+    value:    100,
 
 *decimal* restricts the cell to decimal values.
 
-    :validate => 'decimal',
-    :criteria => '>',
-    :value    => 38.6,
+    validate: 'decimal',
+    criteria: '>',
+    value:    38.6,
 
 *list* restricts the cell to a set of user specified values.
 These can be passed in an array or as a cell range
 (named ranges aren't currently supported):
 
-    :validate => 'list',
-    :value    => ['open', 'high', 'close'],
+    validate: 'list',
+    value:    ['open', 'high', 'close'],
     # Or like this:
-    :value    => 'B1:B3',
+    value:    'B1:B3',
 
 Excel requires that range references are only to cells on the same worksheet.
 
@@ -143,11 +143,11 @@ style string as used in [write_date_time()][].
 See also [DATES AND TIME IN EXCEL][] for more information about working
 with Excel's dates.
 
-    :validate => 'date',
-    :criteria => '>',
-    :value    => 39653, # 24 July 2008
+    validate: 'date',
+    criteria: '>',
+    value:    39653, # 24 July 2008
     # Or like this:
-    :value    => '2008-07-24T',
+    value:    '2008-07-24T',
 
 *time* restricts the cell to time values.
 Times in Excel are expressed as decimal values but you can also pass an
@@ -155,24 +155,24 @@ ISO8601 style string as used in [write_date_time()][].
 See also [DATES AND TIME IN EXCEL][] for more information about working
 with Excel's times.
 
-    :validate => 'time',
-    :criteria => '>',
-    :value    => 0.5, # Noon
+    validate: 'time',
+    criteria: '>',
+    value:    0.5, # Noon
     # Or like this:
-    :value    => 'T12:00:00',
+    value:    'T12:00:00',
 
 *length* restricts the cell data based on an integer string length.
 Excel refers to this as 'Text length'.
 
-    :validate => 'length',
-    :criteria => '>',
-    :value    => 10,
+    validate: 'length',
+    criteria: '>',
+    value:    10,
 
 *custom* restricts the cell based on an external Excel formula
 that returns a TRUE/FALSE value.
 
-    :validate => 'custom',
-    :value    => '=IF(A10>B10,TRUE,FALSE)',
+    validate: 'custom',
+    value:    '=IF(A10>B10,TRUE,FALSE)',
 
 ##### <a name="criteria" class="anchor" href="#criteria"><span class="octicon octicon-link" /></a>:criteria
 
@@ -196,22 +196,22 @@ You can either use Excel's textual description strings, in the first column
 above, or the more common symbolic alternatives. The following are
 equivalent:
 
-    :validate => 'integer',
-    :criteria => 'greater than',
-    :value    => 100,
+    validate: 'integer',
+    criteria: 'greater than',
+    value:    100,
 
-    :validate => 'integer',
-    :criteria => '>',
-    :value    => 100,
+    validate: 'integer',
+    criteria: '>',
+    value:    100,
 
 The list and custom validate options don't require a criteria.
 If you specify one it will be ignored.
 
-    :validate => 'list',
-    :value    => ['open', 'high', 'close'],
+    validate: 'list',
+    value:    ['open', 'high', 'close'],
 
-    :validate => 'custom',
-    :value    => '=IF(A10>B10,TRUE,FALSE)',
+    validate: 'custom',
+    value:    '=IF(A10>B10,TRUE,FALSE)',
 
 ##### <a name="value_minimum_source" class="anchor" href="#value_minimum_source"><span class="octicon octicon-link" /></a>:value | :minimum | :source
 
@@ -224,19 +224,19 @@ minimum or source to make the validation a little clearer and closer to Excel's
 description of the parameter:
 
     # Use 'value'
-    :validate => 'integer',
-    :criteria => '>',
-    :value    => 100,
+    validate: 'integer',
+    criteria: '>',
+    value:    100,
 
     # Use 'minimum'
-    :validate => 'integer',
-    :criteria => 'between',
-    :minimum  => 1,
-    :maximum  => 100,
+    validate: 'integer',
+    criteria: 'between',
+    minimum:  1,
+    maximum:  100,
 
     # Use 'source'
-    :validate => 'list',
-    :source   => '$B$1:$B$3',
+    validate: 'list',
+    source:   '$B$1:$B$3',
 
 ##### <a name="maximum" class="anchor" href="#maximum"><span class="octicon octicon-link" /></a>:maximum
 
@@ -245,10 +245,10 @@ This parameter is passed in a hash to `data_validation()`.
 The maximum parameter is used to set the upper limiting value when the criteria
 is either 'between' or 'not between':
 
-    :validate => 'integer',
-    :criteria => 'between',
-    :minimum  => 1,
-    :maximum  => 100,
+    validate: 'integer',
+    criteria: 'between',
+    minimum:  1,
+    maximum:  100,
 
 ##### <a name="ignore_blank" class="anchor" href="#ignore_blank"><span class="octicon octicon-link" /></a>:ignore_blank
 
@@ -259,7 +259,7 @@ option in the Excel data validation dialog.
 When the option is on the data validation is not applied to blank data in the
 cell. It is on by default.
 
-    :ignore_blank => 0,  # Turn the option off
+    ignore_blank: 0,  # Turn the option off
 
 ##### <a name="dropdown" class="anchor" href="#dropdown"><span class="octicon octicon-link" /></a>:dropdown
 
@@ -270,7 +270,7 @@ option in the Excel data validation dialog.
 When the option is on a dropdown list will be shown for list validations.
 It is on by default.
 
-    :dropdown => 0,      # Turn the option off
+    dropdown: 0,      # Turn the option off
 
 ##### <a name="input_title" class="anchor" href="#input_title"><span class="octicon octicon-link" /></a>:input_title
 
@@ -280,7 +280,7 @@ The input_title parameter is used to set the title of the input message that is
 displayed when a cell is entered. It has no default value and is only displayed
 if the input message is displayed. See the input_message parameter below.
 
-    :input_title   => 'This is the input title',
+    input_title:   'This is the input title',
 
 The maximum title length is 32 characters.
 
@@ -291,17 +291,17 @@ This parameter is passed in a hash to `data_validation()`.
 The input_message parameter is used to set the input message that is displayed
 when a cell is entered. It has no default value.
 
-    :validate      => 'integer',
-    :criteria      => 'between',
-    :minimum       => 1,
-    :maximum       => 100,
-    :input_title   => 'Enter the applied discount:',
-    :input_message => 'between 1 and 100',
+    validate:      'integer',
+    criteria:      'between',
+    minimum:       1,
+    maximum:       100,
+    input_title:   'Enter the applied discount:',
+    input_message: 'between 1 and 100',
 
 The message can be split over several lines using newlines, "\n" in double
 quoted strings.
 
-    :input_message => "This is\na test.",
+    input_message: "This is\na test.",
 
 The maximum message length is 255 characters.
 
@@ -314,7 +314,7 @@ when cell is selected' option in the Excel data validation dialog.
 When the option is off an input message is not displayed even
 if it has been set using input_message. It is on by default.
 
-    :show_input => 0,      # Turn the option off
+    show_input: 0,      # Turn the option off
 
 ##### <a name="error_title" class="anchor" href="#error_title"><span class="octicon octicon-link" /></a>:error_title
 
@@ -324,7 +324,7 @@ The error_title parameter is used to set the title of the error message
 that is displayed when the data validation criteria is not met.
 The default error title is 'Microsoft Excel'.
 
-    :error_title   => 'Input value is not valid',
+    error_title:   'Input value is not valid',
 
 The maximum title length is 32 characters.
 
@@ -337,17 +337,17 @@ displayed when a cell is entered.
 The default error message is "The value you entered is not valid.\n
 A user has restricted values that can be entered into the cell.".
 
-    :validate      => 'integer',
-    :criteria      => 'between',
-    :minimum       => 1,
-    :maximum       => 100,
-    :error_title   => 'Input value is not valid',
-    :error_message => 'It should be an integer between 1 and 100',
+    validate:      'integer',
+    criteria:      'between',
+    minimum:       1,
+    maximum:       100,
+    error_title:   'Input value is not valid',
+    error_message: 'It should be an integer between 1 and 100',
 
 The message can be split over several lines using newlines,
 "\n" in double quoted strings.
 
-    :input_message => "This is\na test.",
+    input_message: "This is\na test.",
 
 The maximum message length is 255 characters.
 
@@ -374,7 +374,7 @@ data validation dialog.
 When the option is off an error message is not displayed even if it has been
 set using error_message. It is on by default.
 
-    :show_error => 0,      # Turn the option off
+    show_error: 0,      # Turn the option off
 
 #### <a name="data_validation_examples" class="anchor" href="#data_validation_examples"><span class="octicon octicon-link" /></a>Data Validation Examples
 
@@ -382,66 +382,66 @@ Example 1. Limiting input to an integer greater than a fixed value.
 
     worksheet.data_validation('A1',
         {
-            :validate        => 'integer',
-            :criteria        => '>',
-            :value           => 0,
+            validate:        'integer',
+            criteria:        '>',
+            value:           0,
         })
 
 Example 2. Limiting input to an integer greater than a fixed value where the value is referenced from a cell.
 
     worksheet.data_validation('A2',
         {
-            :validate        => 'integer',
-            :criteria        => '>',
-            :value           => '=E3',
+            validate:        'integer',
+            criteria:        '>',
+            value:           '=E3',
         })
 
 Example 3. Limiting input to a decimal in a fixed range.
 
     worksheet.data_validation('A3',
         {
-            :validate        => 'decimal',
-            :criteria        => 'between',
-            :minimum         => 0.1,
-            :maximum         => 0.5,
+            validate:        'decimal',
+            criteria:        'between',
+            minimum:         0.1,
+            maximum:         0.5,
         })
 
 Example 4. Limiting input to a value in a dropdown list.
 
     worksheet.data_validation('A4',
         {
-            :validate        => 'list',
-            :source          => ['open', 'high', 'close'],
+            validate:        'list',
+            source:          ['open', 'high', 'close'],
         })
 
 Example 5. Limiting input to a value in a dropdown list where the list is specified as a cell range.
 
     worksheet.data_validation('A5',
         {
-            :validate        => 'list',
-            :source          => '=$E$4:$G$4',
+            validate:        'list',
+            source:          '=$E$4:$G$4',
         })
 
 Example 6. Limiting input to a date in a fixed range.
 
     worksheet.data_validation('A6',
         {
-            :validate        => 'date',
-            :criteria        => 'between',
-            :minimum         => '2008-01-01T',
-            :maximum         => '2008-12-12T',
+            validate:        'date',
+            criteria:        'between',
+            minimum:         '2008-01-01T',
+            maximum:         '2008-12-12T',
         })
 
 Example 7. Displaying a message when the cell is selected.
 
     worksheet.data_validation('A7',
         {
-            :validate      => 'integer',
-            :criteria      => 'between',
-            :minimum       => 1,
-            :maximum       => 100,
-            :input_title   => 'Enter an integer:',
-            :input_message => 'between 1 and 100',
+            validate:      'integer',
+            criteria:      'between',
+            minimum:       1,
+            maximum:       100,
+            input_title:   'Enter an integer:',
+            input_message: 'between 1 and 100',
         })
 
 See also the

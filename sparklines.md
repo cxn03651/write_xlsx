@@ -13,10 +13,10 @@ In WriteXLSX Sparklines can be added to cells using the
 
     worksheet.add_sparkline(
         {
-            :location => 'F2',
-            :range    => 'Sheet1!A2:E2',
-            :type     => 'column',
-            :style    => 12,
+            location: 'F2',
+            range:    'Sheet1!A2:E2',
+            type:     'column',
+            style:    12,
         }
     )
 
@@ -26,7 +26,7 @@ Note: Sparklines are a feature of Excel 2010+ only.
 You can write them to an XLSX file that can be read by Excel 2007
 but they won't be displayed.
 
-#### <a name="add_sparkline" class="anchor" href="#add_sparkline"><span class="octicon octicon-link" /></a>add_sparkline( { parameter => 'value', ... } )
+#### <a name="add_sparkline" class="anchor" href="#add_sparkline"><span class="octicon octicon-link" /></a>add_sparkline( { parameter: 'value', ... } )
 
 The [add_sparkline()][] worksheet method is used to add sparklines to a cell
 or a range of cells.
@@ -71,7 +71,7 @@ These parameters are explained in the sections below:
 
 This is the cell where the sparkline will be displayed:
 
-    :location => 'F1'
+    location: 'F1'
 
 The `:location` should be a single cell.
 (For multiple cells see [Grouped Sparklines] below).
@@ -82,8 +82,8 @@ This specifies the cell data range that the sparkline will plot:
 
     worksheet.add_sparkline(
         {
-            :location => 'F1',
-            :range    => 'A1:E1',
+            location: 'F1',
+            range:    'A1:E1',
         }
     )
 
@@ -93,12 +93,12 @@ The `:range` should be a 2D array.
 If `:range` is not on the same worksheet you can specify its location
 using the usual Excel notation:
 
-            :range => 'Sheet1!A1:E1',
+            range: 'Sheet1!A1:E1',
 
 If the worksheet contains spaces or special characters you should quote
 the worksheet name in the same way that Excel does:
 
-            :range => q('Monthly Data'!A1:E1),
+            range: q('Monthly Data'!A1:E1),
 
 ##### <a name="type" class="anchor" href="#type"><span class="octicon octicon-link" /></a>:type
 
@@ -111,9 +111,9 @@ Specifies the type of sparkline. There are 3 available sparkline types:
 For example:
 
     {
-        :location => 'F1',
-        :range    => 'A1:E1',
-        :type     => 'column',
+        location: 'F1',
+        range:    'A1:E1',
+        type:     'column',
     }
 
 ##### <a name="style" class="anchor" href="#style"><span class="octicon octicon-link" /></a>:style
@@ -123,9 +123,9 @@ The `:style` parameter can be used to replicate these and should be
 a corresponding number from 1 .. 36.
 
     {
-        :location => 'A14',
-        :range    => 'Sheet2!A2:J2',
-        :style    => 3,
+        location: 'A14',
+        range:    'Sheet2!A2:J2',
+        style:    3,
     }
 
 The `:style` number starts in the top left of the style grid and runs left
@@ -137,9 +137,9 @@ of the sparklines using the \*_color parameters below.
 Turn on the markers for line style sparklines.
 
     {
-        :location => 'A6',
-        :range    => 'Sheet2!A1:J1',
-        :markers  => 1,
+        location: 'A6',
+        range:    'Sheet2!A1:J1',
+        markers:  1,
     }
 
 Markers aren't shown in Excel for column and win_loss sparklines.
@@ -150,10 +150,10 @@ Highlight negative values in a sparkline range.
 This is usually required with win_loss sparklines.
 
     {
-        :location        => 'A21',
-        :range           => 'Sheet2!A3:J3',
-        :type            => 'win_loss',
-        :negative_points => 1,
+        location:        'A21',
+        range:           'Sheet2!A3:J3',
+        type:            'win_loss',
+        negative_points: 1,
     }
 
 ##### <a name="axis" class="anchor" href="#axis"><span class="octicon octicon-link" /></a>:axis
@@ -161,9 +161,9 @@ This is usually required with win_loss sparklines.
 Display a horizontal axis in the sparkline:
 
     {
-        :location => 'A10',
-        :range    => 'Sheet2!A1:J1',
-        :axis     => 1,
+        location: 'A10',
+        range:    'Sheet2!A1:J1',
+        axis:     1,
     }
 
 ##### <a name="reverse" class="anchor" href="#reverse"><span class="octicon octicon-link" /></a>:reverse
@@ -171,17 +171,17 @@ Display a horizontal axis in the sparkline:
 Plot the data from right-to-left instead of the default left-to-right:
 
     {
-        :location => 'A24',
-        :range    => 'Sheet2!A4:J4',
-        :type     => 'column',
-        :reverse  => 1,
+        location: 'A24',
+        range:    'Sheet2!A4:J4',
+        type:     'column',
+        reverse:  1,
     }
 
 ##### <a name="weight" class="anchor" href="#weight"><span class="octicon octicon-link" /></a>:weight
 
 Adjust the default line weight (thickness) for line style sparklines.
 
-     :weight => 0.25,
+     weight: 0.25,
 
 The weight value should be one of the following values allowed by Excel:
 
@@ -196,21 +196,21 @@ The weight value should be one of the following values allowed by Excel:
 
 Highlight points in a sparkline range.
 
-        :high_point  => 1,
-        :low_point   => 1,
-        :first_point => 1,
-        :last_point  => 1,
+        high_point:  1,
+        low_point:   1,
+        first_point: 1,
+        last_point:  1,
 
 ##### <a name="max_min" class="anchor" href="#max_min"><span class="octicon octicon-link" /></a>:max, :min
 
 Specify the maximum and minimum vertical axis values:
 
-        :max         => 0.5,
-        :min         => -0.5,
+        max:         0.5,
+        min:         -0.5,
 
 As a special case you can set the maximum and minimum to be for a group of sparklines rather than one:
 
-        :max         => 'group',
+        max:         'group',
 
 See [Grouped Sparklines][] below.
 
@@ -218,7 +218,7 @@ See [Grouped Sparklines][] below.
 
 Define how empty cells are handled in a sparkline.
 
-    :empty_cells => 'zero',
+    empty_cells: 'zero',
 
 The available options are:
 
@@ -230,7 +230,7 @@ The available options are:
 
 Plot data in hidden rows and columns:
 
-    :show_hidden => 1,
+    show_hidden: 1,
 
 Note, this option is off by default.
 
@@ -240,9 +240,9 @@ Specify an alternative date axis for the sparkline.
 This is useful if the data being plotted isn't at fixed width intervals:
 
     {
-        :location  => 'F3',
-        :range     => 'A3:E3',
-        :date_axis => 'A4:E4',
+        location:  'F3',
+        range:     'A3:E3',
+        date_axis: 'A4:E4',
     }
 
 The number of cells in the date range should correspond to the number
@@ -263,10 +263,10 @@ It is possible to override the colour of a sparkline style using the following p
 The color should be specified as a HTML style #rrggbb hex value:
 
     {
-        :location     => 'A18',
-        :range        => 'Sheet2!A2:J2',
-        :type         => 'column',
-        :series_color => '#E965E0',
+        location:     'A18',
+        range:        'Sheet2!A2:J2',
+        type:         'column',
+        series_color: '#E965E0',
     }
 
 #### <a name="grouped_sparklines" class="anchor" href="#grouped_sparklines"><span class="octicon octicon-link" /></a>Grouped Sparklines
@@ -283,9 +283,9 @@ In WriteXLSX, you can simulate this by passing an array of values to location
 and range:
 
     {
-        :location => [ 'A27',          'A28',          'A29'          ],
-        :range    => [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
-        :markers  => 1,
+        location: [ 'A27',          'A28',          'A29'          ],
+        range:    [ 'Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7' ],
+        markers:  1,
     }
 
 #### <a name="sparkline_examples" class="anchor" href="#sparkline_examples"><span class="octicon octicon-link" /></a>Sparkline examples

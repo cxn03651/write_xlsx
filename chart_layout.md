@@ -18,38 +18,38 @@ It is also possible to change the layout of the following chart sub-objects:
 Here are some examples:
 
     chart.set_plotarea(
-      :layout => {
-        :x      => 0.35,
-        :y      => 0.26,
-        :width  => 0.62,
-        :height => 0.50
+      layout: {
+        x:      0.35,
+        y:      0.26,
+        width:  0.62,
+        height: 0.50
       }
     )
 
     chart.set_legend(
-      :layout => {
-        :x      => 0.80,
-        :y      => 0.37,
-        :width  => 0.12,
-        :height => 0.25
+      layout: {
+        x:      0.80,
+        y:      0.37,
+        width:  0.12,
+        height: 0.25
       }
     )
 
     chartset_title(
-      :name   => 'Title',
-      :layout => {
-        :x      => 0.80,
-        :y      => 0.37,
-        :width  => 0.12,
-        :height => 0.25
+      name:   'Title',
+      layout: {
+        x:      0.80,
+        y:      0.37,
+        width:  0.12,
+        height: 0.25
       }
     )
 
     chartset_x_axis(
-      :name        => 'X axis,
-      :name_layout => {
-        :x      => 0.80,
-        :y      => 0.37
+      name:        'X axis,
+      name_layout: {
+        x: 0.80,
+        y: 0.37
       }
     )
 

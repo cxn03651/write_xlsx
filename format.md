@@ -51,7 +51,7 @@ The following Format methods are available:
 
 The above methods can also be applied directly as properties.
 For example `format.set_bold()` is equivalent to
-`workbook.add_format(:bold => 1)`.
+`workbook.add_format(bold: 1)`.
 
 #### <a name="set_format_properties" class="anchor" href="#set_format_properties"><span class="octicon octicon-link" /></a>set_format_properties(properties)
 
@@ -59,12 +59,12 @@ The properties of an existing Format object can be also be set by means of
 `set_format_properties()`:
 
     format = workbook.add_format
-    format.set_format_properties(:bold => 1, :color => 'red')
+    format.set_format_properties(bold: 1, color: 'red')
 
 However, this method is here mainly for legacy reasons.
 It is preferable to set the properties in the format constructor:
 
-    format = workbook.add_format(:bold => 1, "color => 'red')
+    format = workbook.add_format(bold: 1, color: 'red')
 
 #### <a name="set_font" class="anchor" href="#set_font"><span class="octicon octicon-link" /></a>set_font(fontname)
 

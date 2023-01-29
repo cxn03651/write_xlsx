@@ -96,27 +96,27 @@ the method interface would be as follows:
 By comparison the properties can be set directly by passing a hash of
 properties to the Format constructor:
 
-    format = workbook.add_format(:bold => 1, :color => 'red')
+    format = workbook.add_format(bold: 1, color: 'red')
 
 or after the Format has been constructed by means of the
 `set_format_properties()` method as follows:
 
     format = workbook.add_format
-    format.set_format_properties(:bold => 1, :color => 'red')
+    format.set_format_properties(bold: 1, color: 'red')
 
 You can also store the properties in one or more named hashes and pass them
 to the required method:
 
     font = {
-        :font  => 'Calibri',
-        :size  => 12,
-        :color => 'blue',
-        :bold  => 1
+        font:  'Calibri',
+        size:  12,
+        color: 'blue',
+        bold:  1
     }
 
     shading = {
-        :bg_color => 'green',
-        :pattern  => 1
+        bg_color: 'green',
+        pattern:  1
     }
 
 

@@ -14,7 +14,7 @@ and default formatting.
 For more information see "An Overview of Excel Tables"
 http://office.microsoft.com/en-us/excel-help/overview-of-excel-tables-HA010048546.aspx.
 
-#### <a name="add_table" class="anchor" href="#add_table"><span class="octicon octicon-link" /></a>add_table(row1, col1, row2, col2, { :parameter => 'value', ... })
+#### <a name="add_table" class="anchor" href="#add_table"><span class="octicon octicon-link" /></a>add_table(row1, col1, row2, col2, { parameter: 'value', ... })
 
 Tables are added to a worksheet using the `add_table()` method:
 
@@ -58,7 +58,7 @@ The `:data` parameter can be used to specify the data in the cells of the table.
         [ 'Oranges', 500,   300,  200,  700 ]
     ]
 
-    worksheet.add_table('B3:F7', { :data => data } )
+    worksheet.add_table('B3:F7', { data: data } )
 
 Table data can also be written separately, as an array or individual cells.
 
@@ -78,7 +78,7 @@ as shown above.
 The `:header_row` parameter can be used to turn on or off the header row
 in the table. It is on by default.
 
-    worksheet.add_table('B4:F7', { :header_row => 0 } )  # Turn header off.
+    worksheet.add_table('B4:F7', { header_row: 0 } )  # Turn header off.
 
 The header row will contain default captions such as Column 1, Column 2, etc.
 These captions can be overridden using the columns parameter below.
@@ -88,7 +88,7 @@ These captions can be overridden using the columns parameter below.
 The `:autofilter` parameter can be used to turn on or off the autofilter
 in the header row. It is on by default.
 
-    worksheet.add_table('B3:F7', { :autofilter => 0 } )  # Turn autofilter off.
+    worksheet.add_table('B3:F7', { autofilter: 0 } )  # Turn autofilter off.
 
 The `:autofilter` is only shown if the header_row is on.
 Filters within the table are not supported.
@@ -98,14 +98,14 @@ Filters within the table are not supported.
 The `:banded_rows` parameter can be used to used to create rows of alternating
 colour in the table. It is on by default.
 
-    worksheet.add_table('B3:F7', { :banded_rows => 0 } )
+    worksheet.add_table('B3:F7', { banded_rows: 0 } )
 
 ##### <a name="banded_columns" class="anchor" href="#banded_columns"><span class="octicon octicon-link" /></a>:banded_columns
 
 The `:banded_columns` parameter can be used to used to create columns of
 alternating colour in the table. It is off by default.
 
-    worksheet.add_table('B3:F7', { :banded_columns => 1 } )
+    worksheet.add_table('B3:F7', { banded_columns: 1 } )
 
 ##### <a name="first_column" class="anchor" href="#first_column"><span class="octicon octicon-link" /></a>:first_column
 
@@ -113,7 +113,7 @@ The `:first_column` parameter can be used to highlight the first column of the t
 The type of highlighting will depend on the style of the table.
 It may be bold text or a different colour. It is off by default.
 
-    worksheet.add_table('B3:F7', { :first_column => 1 } )
+    worksheet.add_table('B3:F7', { first_column: 1 } )
 
 ##### <a name="last_column" class="anchor" href="#last_column"><span class="octicon octicon-link" /></a>:last_column
 
@@ -121,7 +121,7 @@ The `:last_column` parameter can be used to highlight the last column of the tab
 The type of highlighting will depend on the style of the table.
 It may be bold text or a different colour. It is off by default.
 
-    worksheet.add_table('B3:F7', { :last_column => 1 } )
+    worksheet.add_table('B3:F7', { last_column: 1 } )
 
 ##### <a name="style" class="anchor" href="#style"><span class="octicon octicon-link" /></a>:style
 
@@ -132,8 +132,8 @@ Standard Excel table format names should be used
     worksheet11.add_table(
         'B3:F7',
         {
-            :data      => data,
-            :style     => 'Table Style Light 11',
+            data:  data,
+            style: 'Table Style Light 11',
         }
     )
 
@@ -141,7 +141,7 @@ The default table style is 'Table Style Medium 9'.
 
 You can also turn the table style off by setting it to 'None':
 
-    worksheet11.add_table('B3:F7', :style => 'None')
+    worksheet11.add_table('B3:F7', style: 'None')
 
 ##### <a name="name" class="anchor" href="#name"><span class="octicon octicon-link" /></a>:name
 
@@ -151,7 +151,7 @@ By default tables are named `Table1`, `Table2`, etc.
 If you override the table name you must ensure that it doesn't clash with an
 existing table name and that it follows Excel's requirements for table names (for example that it doesn't contain spaces).
 
-    worksheet.add_table('B3:F7', { :name => 'SalesData' } )
+    worksheet.add_table('B3:F7', { name: 'SalesData' } )
 
 If you need to know the name of the table, for example to use it in a formula,
 you can get it as follows:
@@ -165,7 +165,7 @@ The `:total_row` parameter can be used to turn on the total row in the last row
 of a table. It is distinguished from the other rows by a different formatting
 and also with dropdown SUBTOTAL functions.
 
-    worksheet.add_table('B3:F7', { :total_row => 1 } )
+    worksheet.add_table('B3:F7', { total_row: 1 } )
 
 The default total row doesn't have any captions or functions.
 These must by specified via the columns parameter below.
@@ -190,13 +190,13 @@ For example to override the default 'Column n' style table headers:
     worksheet.add_table(
         'B3:F7',
         {
-            :data    => data,
-            :columns => [
-                { :header => 'Product' },
-                { :header => 'Quarter 1' },
-                { :header => 'Quarter 2' },
-                { :header => 'Quarter 3' },
-                { :header => 'Quarter 4' }
+            data:    data,
+            columns: [
+                { header: 'Product' },
+                { header: 'Quarter 1' },
+                { header: 'Quarter 2' },
+                { header: 'Quarter 3' },
+                { header: 'Quarter 4' }
             ]
         }
     )
@@ -205,12 +205,12 @@ If you don't wish to specify properties for a specific column you pass an empty
 hash and the defaults will be applied:
 
             ...
-            :columns => [
-                { :header => 'Product' },
-                { :header => 'Quarter 1' },
+            columns: [
+                { header: 'Product' },
+                { header: 'Quarter 1' },
                 { },                        # Defaults to 'Column 3'.
-                { :header => 'Quarter 3' },
-                { :header => 'Quarter 4' }
+                { header: 'Quarter 3' },
+                { header: 'Quarter 4' }
             ]
             ...
 
@@ -219,16 +219,16 @@ Column formulas can by applied using the formula column property:
     worksheet8.add_table(
         'B3:G7',
         {
-            :data    => data,
-            :columns => [
-                { :header => 'Product' },
-                { :header => 'Quarter 1' },
-                { :header => 'Quarter 2' },
-                { :header => 'Quarter 3' },
-                { :header => 'Quarter 4' },
+            data:    data,
+            columns: [
+                { header: 'Product' },
+                { header: 'Quarter 1' },
+                { header: 'Quarter 2' },
+                { header: 'Quarter 3' },
+                { header: 'Quarter 4' },
                 {
-                    :header  => 'Year',
-                    :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+                    header:  'Year',
+                    formula: '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
                 }
             ]
         }
@@ -245,14 +245,14 @@ and the `:total_string`,  `:total_function` and `:total_value` sub properties:
     worksheet10.add_table(
         'B3:F8',
         {
-            :data      => data,
-            :total_row => 1,
-            :columns   => [
-                { :header => 'Product',   :total_string   => 'Totals' },
-                { :header => 'Quarter 1', :total_function => 'sum' },
-                { :header => 'Quarter 2', :total_function => 'sum' },
-                { :header => 'Quarter 3', :total_function => 'sum' },
-                { :header => 'Quarter 4', :total_function => 'sum' }
+            data:      data,
+            total_row: 1,
+            columns:   [
+                { header: 'Product',   total_string:   'Totals' },
+                { header: 'Quarter 1', total_function: 'sum' },
+                { header: 'Quarter 2', total_function: 'sum' },
+                { header: 'Quarter 3', total_function: 'sum' },
+                { header: 'Quarter 4', total_function: 'sum' }
             ]
         }
     )
@@ -279,14 +279,14 @@ setting the `value` optional property in `write_formula`:
     worksheet10.add_table(
         'B3:F8',
         {
-            :data      => data,
-            :total_row => 1,
-            :columns   => [
-                { :total_string   => 'Totals' },
-                { :total_function => 'sum', :total_value => 100 },
-                { :total_function => 'sum', :total_value => 200 },
-                { :total_function => 'sum', :total_value => 100 },
-                { :total_function => 'sum', :total_value => 400 }
+            data:      data,
+            total_row: 1,
+            columns:   [
+                { total_string:   'Totals' },
+                { total_function: 'sum', total_value: 100 },
+                { total_function: 'sum', total_value: 200 },
+                { total_function: 'sum', total_value: 100 },
+                { total_function: 'sum', total_value: 400 }
             ]
         }
     )
@@ -294,26 +294,26 @@ setting the `value` optional property in `write_formula`:
 
 Formatting can also be applied to columns, to the column data using `format` and to the header using `header_format`:
 
-    currency_format = workbook.add_format(:num_format => '$#,##0')
-    bold            = workbook.add_format(:bold => true)
+    currency_format = workbook.add_format(num_format: '$#,##0')
+    bold            = workbook.add_format(bold: true)
 
     worksheet.add_table(
         'B3:D8',
         {
-            :data      => data,
-            :total_row => 1,
-            :columns   => [
-                { :header => 'Product', :total_string => 'Totals' },
+            data:      data,
+            total_row: 1,
+            columns:   [
+                { header: 'Product', total_string: 'Totals' },
                 {
-                    :header         => 'Quarter 1',
-                    :total_function => 'sum',
-                    :format         => currency_format,
+                    header:         'Quarter 1',
+                    total_function: 'sum',
+                    format:         currency_format,
                 },
                 {
-                    :header         => 'Quarter 2',
-                    :header_format  => bold,
-                    :total_function => 'sum',
-                    :format         => currency_format,
+                    header:         'Quarter 2',
+                    header_format:  bold,
+                    total_function: 'sum',
+                    format:         currency_format,
                 }
             ]
         }

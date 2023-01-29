@@ -11,22 +11,22 @@ To create a simple Excel file with a Stock chart using WriteXLSX:
     workbook  = WriteXLSX.new('chart.xlsx')
     worksheet = workbook.add_worksheet
 
-    chart     = workbook.add_chart(:type => 'stock')
+    chart     = workbook.add_chart(type: 'stock')
 
     # Add a series for each High-Low-Close.
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$B$2:$B$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$B$2:$B$6'
     )
 
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$C$2:$C$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$C$2:$C$6'
     )
 
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$D$2:$D$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$D$2:$D$6'
     )
 
     # Add the worksheet data the chart refers to.
@@ -41,7 +41,7 @@ To create a simple Excel file with a Stock chart using WriteXLSX:
 This module implements Stock charts for [WriteXLSX][].
 The chart object is created via the Workbook `add_chart()` method:
 
-    chart = workbook.add_chart(:type => 'stock')
+    chart = workbook.add_chart(type: 'stock')
 
 Once the object is created it can be configured via the following methods
 that are common to all chart classes:
@@ -69,9 +69,9 @@ when creating a chart.
 
     workbook    = WriteXLSX.new('chart_stock.xlsx')
     worksheet   = workbook.add_worksheet
-    bold        = workbook.add_format(:bold => 1)
-    date_format = workbook.add_format(:num_format => 'dd/mm/yyyy')
-    chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
+    bold        = workbook.add_format(bold: 1)
+    date_format = workbook.add_format(num_format: 'dd/mm/yyyy')
+    chart       = workbook.add_chart(type: 'stock', embedded: 1)
 
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Date', 'High', 'Low', 'Close' ]
@@ -95,24 +95,24 @@ when creating a chart.
 
     # Add a series for each of the High-Low-Close columns.
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$B$2:$B$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$B$2:$B$6'
     )
 
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$C$2:$C$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$C$2:$C$6'
     )
 
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$6',
-        :values     => '=Sheet1!$D$2:$D$6'
+        categories: '=Sheet1!$A$2:$A$6',
+        values:     '=Sheet1!$D$2:$D$6'
     )
 
     # Add a chart title and some axis labels.
-    chart.set_title (:name => 'High-Low-Close')
-    chart.set_x_axis(:name => 'Date')
-    chart.set_y_axis(:name => 'Share price')
+    chart.set_title (name: 'High-Low-Close')
+    chart.set_x_axis(name: 'Date')
+    chart.set_y_axis(name: 'Share price')
 
     worksheet.insert_chart('E9', chart)
 

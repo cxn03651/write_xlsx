@@ -228,7 +228,7 @@ However, if the user edits this string Excel may convert it back to a number.
 To get around this you can use the Excel text format @:
 
     # Format as a string. Doesn't change to a number when edited
-    format1 = workbook.add_format(:num_format => '@')
+    format1 = workbook.add_format(num_format: '@')
     worksheet.write_string('A2', '01209', format1)
 
 See also the note about [CELL NOTATION][].
@@ -238,8 +238,8 @@ See also the note about [CELL NOTATION][].
 The `write_rich_string()` method is used to write strings with multiple formats.
 For example to write the string "This is bold and this is italic" you would use the following:
 
-    bold   = workbook.add_format(:bold   => 1)
-    italic = workbook.add_format(:italic => 1)
+    bold   = workbook.add_format(bold:   1)
+    italic = workbook.add_format(italic: 1)
 
     worksheet.write_rich_string('A1',
       'This is ', bold, 'bold', ' and this is ', italic, 'italic')
@@ -264,13 +264,13 @@ String fragments that don't have a format are given a default format. So for exa
 the string "Some bold text" you would use the first example below but it would be equivalent to the second:
 
     # With default formatting:
-    bold    = workbook.add_format(:bold => 1)
+    bold    = workbook.add_format(bold: 1)
 
     worksheet.write_rich_string('A1',
         'Some ', bold, 'bold', ' text')
 
     # Or more explicitly:
-    bold    = workbook.add_format(:bold => 1)
+    bold    = workbook.add_format(bold: 1)
     default = workbook.add_format
 
     worksheet.write_rich_string('A1',
@@ -283,8 +283,8 @@ Other features such as border, background, text wrap and alignment must be appli
 The `write_rich_string()` method allows you to do this by using the last argument as a cell format
 (if it is a format object). The following example centers a rich string in the cell:
 
-    bold   = workbook.add_format(:bold  => 1)
-    center = workbook.add_format(:align => 'center')
+    bold   = workbook.add_format(bold:  1)
+    center = workbook.add_format(align: 'center')
 
     worksheet.write_rich_string('A5',
       'Some ', bold, 'bold text', ' centered', center)
@@ -293,12 +293,12 @@ See the
 [`rich_strings.rb`](examples.html#rich_strings)
 example in the distro for more examples.
 
-    bold   = workbook.add_format(:bold        => 1)
-    italic = workbook.add_format(:italic      => 1)
-    red    = workbook.add_format(:color       => 'red')
-    blue   = workbook.add_format(:color       => 'blue')
-    center = workbook.add_format(:align       => 'center')
-    super  = workbook.add_format(:font_script => 1)
+    bold   = workbook.add_format(bold:        1)
+    italic = workbook.add_format(italic:      1)
+    red    = workbook.add_format(color:       'red')
+    blue   = workbook.add_format(color:       'blue')
+    center = workbook.add_format(align:       'center')
+    super  = workbook.add_format(font_script: 1)
 
     # Write some strings with multiple formats.
     worksheet.write_rich_string('A1',
@@ -335,7 +335,7 @@ Write a formatted number, write the number as a string or use the `keep_leading_
     worksheet.write('A1', '01209')
 
     # Write a zero padded number using a format: 01209
-    format1 = $workbook.add_format(:num_format => '00000')
+    format1 = $workbook.add_format(num_format: '00000')
     worksheet.write('A2', '01209', format1)
 
     # Write explicitly as a string: 01209
@@ -364,7 +364,7 @@ It should be noted that if the user edits the data in examples `A3` and `A4` the
 Again this is Excel's default behaviour. To avoid this you can use the text format `@`:
 
     # Format as a string (01209)
-    format2 = workbook.add_format(:num_format => '@')
+    format2 = workbook.add_format(num_format: '@')
     worksheet.write_string('A5', '01209', format2)
 
 The `keep_leading_zeros()` property is off by default.
@@ -526,7 +526,7 @@ A date should always have a `format`, otherwise it will appear as a number,
 see [DATES AND TIME IN EXCEL][] and [CELL FORMATTING][].
 Here is a typical example:
 
-    date_format = workbook.add_format(:num_format => 'mm/dd/yy')
+    date_format = workbook.add_format(num_format: 'mm/dd/yy')
     worksheet.write_date_time('A1', '2004-05-13T23:20', date_format)
 
 Valid dates should be in the range 1900-01-01 to 9999-12-31,
@@ -550,7 +550,7 @@ The `format` parameter is also optional, however, without a format the link won'
 
 The suggested format is:
 
-    format = workbook.add_format(:color => 'blue', :underline => 1)
+    format = workbook.add_format(color: 'blue', underline: 1)
 
 Note, this behaviour is different from writeexcel gem which provides a default hyperlink format
 if one isn't specified by the user.
@@ -749,7 +749,7 @@ See the note about [CELL NOTATION][].
 In addition to the basic 3 argument form of `write_comment()` you can pass in several optional
 key/value pairs to control the format of the comment. For example:
 
-    worksheet.write_comment('C3', 'Hello', :visible => 1, :author => 'Ruby')
+    worksheet.write_comment('C3', 'Hello', visible: 1, author: 'Ruby')
 
 Most of these options are quite specific and in general the default comment behaviour will be all that you need.
 However, should you need greater control over the format of the cell comment the following options are available:
@@ -775,7 +775,7 @@ Excel displays the author of the comment in the status bar at the bottom of the 
 This is usually of interest in corporate environments where several people might review
 and provide comments to a workbook.
 
-    worksheet.write_comment('C3', 'Atonement', :author => 'Ian McEwan')
+    worksheet.write_comment('C3', 'Atonement', author: 'Ian McEwan')
 
 The default author for all cell comments can be set
 using the `set_comments_author()` method (see below).
@@ -788,44 +788,44 @@ The default behaviour in Excel is that comments are initially hidden.
 However, it is also possible in Excel to make individual or all comments visible.
 In WriteXLSX individual comments can be made visible as follows:
 
-    worksheet.write_comment('C3', 'Hello', :visible => 1)
+    worksheet.write_comment('C3', 'Hello', visible: 1)
 
 It is possible to make all comments in a worksheet visible using the
 `show_comments()` worksheet method (see below). Alternatively, if all of the cell
 comments have been made visible you can hide individual comments:
 
-    worksheet.write_comment('C3', 'Hello', :visible => 0)
+    worksheet.write_comment('C3', 'Hello', visible: 0)
 
 ##### Option: x_scale
 This option is used to set the width of the cell comment box as a factor of
 the default width.
 
-    worksheet.write_comment('C3', 'Hello', :x_scale => 2)
-    worksheet.write_comment('C4', 'Hello', :x_scale => 4.2)
+    worksheet.write_comment('C3', 'Hello', x_scale: 2)
+    worksheet.write_comment('C4', 'Hello', x_scale: 4.2)
 
 ##### Option: width
 This option is used to set the width of the cell comment box explicitly in pixels.
 
-    worksheet.write_comment('C3', 'Hello', :width => 200)
+    worksheet.write_comment('C3', 'Hello', width: 200)
 
 ##### Option: y_scale
 This option is used to set the height of the cell comment box as a factor
 of the default height.
 
-    worksheet.write_comment('C3', 'Hello', :y_scale => 2)
-    worksheet.write_comment('C4', 'Hello', :y_scale => 4.2)
+    worksheet.write_comment('C3', 'Hello', y_scale: 2)
+    worksheet.write_comment('C4', 'Hello', y_scale: 4.2)
 
 ##### Option: height
 This option is used to set the height of the cell comment box explicitly in pixels.
 
-    worksheet.write_comment('C3', 'Hello', :height => 200)
+    worksheet.write_comment('C3', 'Hello', height: 200)
 
 ##### Option: color
 This option is used to set the background colour of cell comment box.
 You can use one of the named colours recognised by WriteXLSX or a Html style `#RRGGBB` colour. See [WORKING WITH COLOURS][].
 
-    worksheet.write_comment('C3', 'Hello', :color => 'green')
-    worksheet.write_comment('C4', 'Hello', :color => '#FF6600')   # Orange
+    worksheet.write_comment('C3', 'Hello', color: 'green')
+    worksheet.write_comment('C4', 'Hello', color: '#FF6600')   # Orange
 
 ##### Option: start_cell
 This option is used to set the cell in which the comment will appear.
@@ -833,40 +833,40 @@ By default Excel displays comments one cell to the right and one cell above the 
 to which the comment relates. However, you can change this behaviour if you wish.
 In the following example the comment which would appear by default in cell D2 is moved to E2.
 
-    worksheet.write_comment('C3', 'Hello', :start_cell => 'E2')
+    worksheet.write_comment('C3', 'Hello', start_cell: 'E2')
 
 ##### Option: start_row
 This option is used to set the row in which the comment will appear.
 See the `:start_cell` option above. The row is zero indexed.
 
-    worksheet.write_comment('C3', 'Hello', :start_row => 0)
+    worksheet.write_comment('C3', 'Hello', start_row: 0)
 
 ##### Option: start_col
 This option is used to set the column in which the comment will appear.
 See the `:start_cell` option above. The column is zero indexed.
 
-    worksheet.write_comment('C3', 'Hello', :start_col => 4)
+    worksheet.write_comment('C3', 'Hello', start_col: 4)
 
 ##### Option: x_offset
 This option is used to change the x offset, in pixels, of a comment within a cell:
 
-    worksheet.write_comment('C3', comment, :x_offset => 30)
+    worksheet.write_comment('C3', comment, x_offset: 30)
 
 ##### Option: y_offset
 This option is used to change the y offset, in pixels, of a comment within a cell:
 
-    worksheet.write_comment('C3', comment, :x_offset => 30)
+    worksheet.write_comment('C3', comment, x_offset: 30)
 
 ##### Option: font
 This option is used to change the font used in the comment from 'Tahoma' which is the default.
 
-    worksheet.write_comment('C3', comment, font => 'Calibri')
+    worksheet.write_comment('C3', comment, font: 'Calibri')
 
 ##### Option: font_size
 
 This option is used to change the font size used in the comment from 8 which is the default.
 
-    worksheet.write_comment('C3', comment, font_size => 20)
+    worksheet.write_comment('C3', comment, font_size: 20)
 
 ###### Note about using options that adjust the position of the cell comment such as `:start_cell`, `:start_row`, `:start_col`, `:x_offset` and `:y_offset`:
 Excel only displays offset cell comments when they are displayed as "visible".
@@ -902,12 +902,12 @@ This method is used to make all cell comments visible when a worksheet is opened
 
 Individual comments can be made visible using the visible parameter of the `write_comment` method (see above):
 
-    worksheet.write_comment('C3', 'Hello', :visible => 1)
+    worksheet.write_comment('C3', 'Hello', visible: 1)
 
 If all of the cell comments have been made visible you can hide individual comments as follows:
 
     worksheet.show_comments
-    worksheet.write_comment('C3', 'Hello', :visible => 0)
+    worksheet.write_comment('C3', 'Hello', visible: 0)
 
 #### <a name="set_comments_author" class="anchor" href="#set_comments_author"><span class="octicon octicon-link" /></a>set_comments_author
 
@@ -931,20 +931,20 @@ The image can be in PNG, JPEG or BMP format.
 The `options` parameter can be used to set various options for the image. The defaults are:
 
     options = {
-      :x_offset        => 0,
-      :y_offset        => 0,
-      :x_scale         => 1,
-      :y_scale         => 1,
-      :object_position => 2,
-      :url             => nil,
-      :tip             => nil,
-      :description     => filename,
-      :decorative      => 0
+      x_offset:        0,
+      y_offset:        0,
+      x_scale:         1,
+      y_scale:         1,
+      object_position: 2,
+      url:             nil,
+      tip:             nil,
+      description:     filename,
+      decorative:      0
     }
 
 The parameters `:x_offset` and `:y_offset` can be used to specify an offset from the top left hand corner of the cell specified by `row` and `col`. The offset values are in pixels.
 
-    worksheet1.insert_image('A1', 'ruby.bmp', :x_offset => 32, :y_offset => 10)
+    worksheet1.insert_image('A1', 'ruby.bmp', x_offset: 32, y_offset: 10)
 
 The offsets can be greater than the width or height of the underlying cell.
 This can be occasionally useful if you wish to align two or more images relative to the same cell.
@@ -952,11 +952,11 @@ This can be occasionally useful if you wish to align two or more images relative
 The parameters `:x_scale` and `:y_scale` can be used to scale the inserted image horizontally and vertically:
 
     # Scale the inserted image: width x 2.0, height x 0.8
-    worksheet.insert_image('A1', 'ruby.bmp', :x_scale => 2, :y_scale => 0.8)
+    worksheet.insert_image('A1', 'ruby.bmp', x_scale: 2, y_scale: 0.8)
 
 The positioning of the image when cells are resized can be set with the `:object_position` parameter:
 
-    worksheet.insert_image('A1', 'ruby.bmp', :object_position => 1 )
+    worksheet.insert_image('A1', 'ruby.bmp', object_position: 1 )
 
 The `object_position` parameter can have one of the following allowable values:
 
@@ -970,27 +970,27 @@ Option 4 appears in Excel as Option 1. However, the worksheet object is sized to
 The `:url` option can be use to used to add a hyperlink to an image:
 
     worksheet.insert_image('A1', 'logo.png',
-        :url => 'https://github.com/jmcnamara')
+        url: 'https://github.com/jmcnamara')
 
 The supported url formats are the same as those supported by the `write_url()` method and the same rules/limits apply.
 
 The `:tip` option can be use to used to add a mouseover tip to the hyperlink:
 
     worksheet.insert_image('A1', 'logo.png',
-        :url => 'https://github.com/jmcnamara',
-        :tip => 'GitHub'
+        url: 'https://github.com/jmcnamara',
+        tip: 'GitHub'
     )
 
 The `:description` parameter can be used to specify a description or "alt text" string for the image. In general this would be used to provide a text description of the image to help accessibility. It is an optional parameter and defaults to the filename of the image. It can be used as follows:
 
     worksheet.insert_image(
       'E9', 'logo.png',
-      :description => "This is some alternative text"
+      description: "This is some alternative text"
     )
 
 The optional `decorative` parameter is also used to help accessibility. It is used to mark the image as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the `description` field isn't written. It is used as follows:
 
-    worksheet.insert_image('E9', 'logo.png', :decorative => 1 )
+    worksheet.insert_image('E9', 'logo.png', decorative: 1 )
 
 Note: you must call `set_row()` or `set_column()` before `insert_image()`
 if you wish to change the default dimensions of any of the rows or columns
@@ -1008,7 +1008,7 @@ This method can be used to insert a Chart object into a worksheet.
 The Chart must be created by the `add_chart()` Workbook method and it must have
 the embedded option set.
 
-    chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    chart = workbook.add_chart(type: 'line', embedded: 1)
 
     # Configure the chart.
     ...
@@ -1025,27 +1025,27 @@ programs in the examples directory of the distro.
 The optional `options` parameter can be used to set various options for the chart. The defaults are:
 
     options = {
-      :x_offset         => 0,
-      :y_offset         => 0,
-      :x_scale          => 1,
-      :y_scale          => 1,
-      :object_position  => 1,
-      :description      => nil,
-      :decorative       => 0
+      x_offset:         0,
+      y_offset:         0,
+      x_scale:          1,
+      y_scale:          1,
+      object_position:  1,
+      description:      nil,
+      decorative:       0
     }
 
 The parameters `:x_offset` and `:y_offset` can be used to specify an offset from the top left hand corner of the cell specified by `row` and `col`. The offset values are in pixels.
 
-    worksheet1.insert_chart('E2', chart, :x_offset => 10, :y_offset => 20)
+    worksheet1.insert_chart('E2', chart, x_offset: 10, y_offset: 20)
 
 The parameters `:x_scale` and `:y_scale` can be used to scale the inserted chart horizontally and vertically:
 
     # Scale the width by 120% and the height by 150%
-    worksheet.insert_chart('E2', chart, :x_scale => 1.2, :y_scale => 1.5)
+    worksheet.insert_chart('E2', chart, x_scale: 1.2, y_scale: 1.5)
 
 The positioning of the chart when cells are resized can be set with the `object_position` parameter:
 
-    worksheet.insert_chart('E2', chart, :object_position => 2 )
+    worksheet.insert_chart('E2', chart, object_position: 2 )
 
 The `:object_position` parameter can have one of the following allowable values:
 
@@ -1061,14 +1061,14 @@ In general this would be used to provide a text description of the chart to help
 It is an optional parameter and has no default.
 It can be used as follows:
 
-    worksheet.insert_chart('E9', chart, { :description => 'Some alternative text' })
+    worksheet.insert_chart('E9', chart, { description: 'Some alternative text' })
 
 The optional `:decorative` parameter is also used to help accessibility.
 It is used to mark the chart as decorative, and thus uninformative, for automated screen readers.
 As in Excel, if this parameter is in use the `:description` field isn't written.
 It is used as follows:
 
-    worksheet.insert_chart('E9', chart, { :decorative => 1 })
+    worksheet.insert_chart('E9', chart, { decorative: 1 })
 
 
 #### <a name="insert_shape" class="anchor" href="#insert_shape"><span class="octicon octicon-link" /></a>insert_shape(row, col, shape, x, y, x_scale, y_scale)
@@ -1076,7 +1076,7 @@ It is used as follows:
 This method can be used to insert a Shape object into a worksheet.
 The Shape must be created by the `add_shape()` Workbook method.
 
-    shape = workbook.add_shape(:name => 'My Shape', :type => 'plus')
+    shape = workbook.add_shape(name: 'My Shape', type: 'plus')
 
     # Configure the shape.
     shape.set_text('foo')
@@ -1104,7 +1104,7 @@ horizontally and vertically:
 
 The positioning of the chart when cells are resized can be set with the `:object_position` parameter:
 
-    worksheet.insert_chart('E2', chart, :object_position => 2)
+    worksheet.insert_chart('E2', chart, object_position: 2)
 
 The `:object_position` parameter can have one of the following allowable values:
 
@@ -1122,14 +1122,14 @@ In general this would be used to provide a text description of the chart to help
 It is an optional parameter and has no default.
 It can be used as follows:
 
-    worksheet.insert_chart('E9', chart, { :description => 'Some alternative text' })
+    worksheet.insert_chart('E9', chart, { description: 'Some alternative text' })
 
 The optional `:decorative` parameter is also used to help accessibility.
 It is used to mark the chart as decorative, and thus uninformative, for automated screen readers.
 As in Excel, if this parameter is in use the `:description` field isn't written.
 It is used as follows:
 
-    worksheet.insert_chart('E9', chart, { :decorative => 1 })
+    worksheet.insert_chart('E9', chart, { decorative: 1 })
 
 
 #### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, options)
@@ -1145,7 +1145,7 @@ button to a macro from an embedded VBA project:
     ...
     workbook.add_vba_project('./vbaProject.bin')
 
-    worksheet.insert_button('C2', :macro => 'my_macro')
+    worksheet.insert_button('C2', macro: 'my_macro')
 
 The options of the button that can be set are:
 
@@ -1164,7 +1164,7 @@ This option is used to set the macro that the button will invoke when the user
 clicks on it. The macro should be included using the
 [Workbook#add_vba_project()](workbook.html#add_vba_project) method shown above.
 
-    worksheet.insert_button('C2', :macro => 'my_macro')
+    worksheet.insert_button('C2', macro: 'my_macro')
 
 The default macro is ButtonX_Click where X is the button number.
 
@@ -1172,36 +1172,36 @@ The default macro is ButtonX_Click where X is the button number.
 This option is used to set the caption on the button.
 The default is Button X where X is the button number.
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :caption => 'Hello')
+    worksheet.insert_button('C2', macro: 'my_macro', caption: 'Hello')
 
 ##### Option: width
 This option is used to set the width of the button in pixels.
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :width => 128)
+    worksheet.insert_button('C2', macro: 'my_macro', width: 128)
 
 The default button width is 64 pixels which is the width of a default cell.
 
 ##### Option: height
 This option is used to set the height of the button in pixels.
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :height => 40)
+    worksheet.insert_button('C2', macro: 'my_macro', height: 40)
 
 The default button height is 20 pixels which is the height of a default cell.
 
 ##### Option: x_scale
 This option is used to set the width of the button as a factor of the default width.
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :x_scale => 2.0)
+    worksheet.insert_button('C2', macro: 'my_macro', x_scale: 2.0)
 
 ##### Option: y_scale
 This option is used to set the height of the button as a factor of the default height.
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :y_scale => 2.0)
+    worksheet.insert_button('C2', macro: 'my_macro', y_scale: 2.0)
 
 ##### Option: x_offset
 This option is used to change the x offset, in pixels, of a button within a cell:
 
-    worksheet.insert_button('C2', :macro => 'my_macro', :x_offset => 2)
+    worksheet.insert_button('C2', macro: 'my_macro', x_offset: 2)
 
 ##### Option: y_offset
 This option is used to change the y offset, in pixels, of a comment within a cell.
@@ -1221,15 +1221,15 @@ or to limit the user input to a dropdown list of values.
 
     worksheet.data_validation('B3',
         {
-            :validate => 'integer',
-            :criteria => '>',
-            :value    => 100
+            validate: 'integer',
+            criteria: '>',
+            value:    100
         })
 
     worksheet.data_validation('B5:B9',
         {
-            :validate => 'list',
-            :value    => ['open', 'high', 'close']
+            validate: 'list',
+            value:    ['open', 'high', 'close']
         })
 
 This method contains a lot of parameters and is described in detail in
@@ -1246,10 +1246,10 @@ or range of cells based on user defined criteria.
 
     worksheet.conditional_formatting( 'A1:J10',
         {
-            :type     => 'cell',
-            :criteria => '>=',
-            :value    => 50,
-            :format   => format1
+            type:     'cell',
+            criteria: '>=',
+            value:    50,
+            format:   format1
         }
     )
 
@@ -1266,10 +1266,10 @@ The `add_sparkline()` worksheet method is used to add sparklines to a cell or a 
 
     worksheet.add_sparkline(
         {
-            :location => 'F2',
-            :range    => 'Sheet1!A2:E2',
-            :type     => 'column',
-            :style    => 12
+            location: 'F2',
+            range:    'Sheet1!A2:E2',
+            type:     'column',
+            style:    12
         }
     )
 
@@ -1410,26 +1410,26 @@ with any or all of the following keys:
 
     # Default shown.
     options = {
-        :objects               => 0,
-        :scenarios             => 0,
-        :format_cells          => 0,
-        :format_columns        => 0,
-        :format_rows           => 0,
-        :insert_columns        => 0,
-        :insert_rows           => 0,
-        :insert_hyperlinks     => 0,
-        :delete_columns        => 0,
-        :delete_rows           => 0,
-        :select_locked_cells   => 1,
-        :sort                  => 0,
-        :autofilter            => 0,
-        :pivot_tables          => 0,
-        :select_unlocked_cells => 1
+        objects:               0,
+        scenarios:             0,
+        format_cells:          0,
+        format_columns:        0,
+        format_rows:           0,
+        insert_columns:        0,
+        insert_rows:           0,
+        insert_hyperlinks:     0,
+        delete_columns:        0,
+        delete_rows:           0,
+        select_locked_cells:   1,
+        sort:                  0,
+        autofilter:            0,
+        pivot_tables:          0,
+        select_unlocked_cells: 1
     }
 
 The default boolean values are shown above. Individual elements can be protected as follows:
 
-    worksheet.protect('drowssap', :insert_rows => 1)
+    worksheet.protect('drowssap', insert_rows: 1)
 
 #### <a name="unprotect_range" class="anchor" href="#unprotect_range"><span class="octicon octicon-link" /></a>unprotect_range(cell_range, range_name)
 
@@ -1761,9 +1761,9 @@ The `merge_range()` method allows you to merge cells that contain other types
 of alignment in addition to the merging:
 
     format = workbook.add_format(
-        :border => 6,
-        :valign => 'vcenter',
-        :align  => 'center'
+        border: 6,
+        valign: 'vcenter',
+        align:  'center'
     )
 
     worksheet.merge_range('B3:D4', 'Vertical and horizontal', format)
@@ -2026,32 +2026,32 @@ This causes Excel to display a small green triangle in the top left hand corner 
 
 Sometimes these warnings are useful indicators that there is an issue in the spreadsheet but sometimes it is preferable to turn them off. Warnings can be turned off at the Excel level for all workbooks and worksheets by using the using "Excel options -> Formulas -> Error checking rules". Alternatively you can turn them off for individual cells in a worksheet, or ranges of cells, using the `ignore_errors()` method with a hashref of options and ranges like this:
 
-    worksheet.ignore_errors(:number_stored_as_text => 'A1:H50')
+    worksheet.ignore_errors(number_stored_as_text: 'A1:H50')
 
     # Or for more than one option:
-    worksheet.ignore_errors(:number_stored_as_text => 'A1:H50',
-                            :eval_error            => 'A1:H50')
+    worksheet.ignore_errors(number_stored_as_text: 'A1:H50',
+                            eval_error:            'A1:H50')
 
 The range can be a single cell, a range of cells, or multiple cells and ranges separated by spaces:
 
     # Single cell.
-    worksheet.ignore_errors(:eval_error => 'C6')
+    worksheet.ignore_errors(eval_error: 'C6')
 
     # Or a single range:
-    worksheet.ignore_errors(:eval_error => 'C6:G8')
+    worksheet.ignore_errors(eval_error: 'C6:G8')
 
     # Or multiple cells and ranges:
-    worksheet.ignore_errors(:eval_error => 'C6 E6 G1:G20 J2:J6')
+    worksheet.ignore_errors(eval_error: 'C6 E6 G1:G20 J2:J6')
 
 Note: calling `ignore_errors` multiple times will overwrite the previous settings.
 
 You can turn off warnings for an entire column by specifying the range from the first cell in the column to the last cell in the column:
 
-    worksheet.ignore_errors(:number_stored_as_text => 'A1:A1048576')
+    worksheet.ignore_errors(number_stored_as_text: 'A1:A1048576')
 
 Or for the entire worksheet by specifying the range from the first cell in the worksheet to the last cell in the worksheet:
 
-    worksheet.ignore_errors(:number_stored_as_text => 'A1:XFD1048576')
+    worksheet.ignore_errors(number_stored_as_text: 'A1:XFD1048576')
 
 The worksheet errors/warnings that can be ignored are:
 

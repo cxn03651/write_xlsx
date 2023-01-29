@@ -20,12 +20,12 @@ To create a simple Excel file containing shapes using WriteXLSX:
 
     # Add an ellipse with centered text.
     ellipse = workbook.add_shape(
-        :type => 'ellipse',
-        :text => "Hello\nWorld"
+        type: 'ellipse',
+        text: "Hello\nWorld"
     )
 
     # Add a plus shape.
-    plus = workbook.add_shape( :type => 'plus')
+    plus = workbook.add_shape( type: 'plus')
 
     # Insert the shapes in the worksheet.
     worksheet.insert_shape( 'B3', rect )
@@ -36,7 +36,7 @@ To create a simple Excel file containing shapes using WriteXLSX:
 
 A Shape object is created via the Workbook add_shape() method:
 
-    shape_rect = workbook.add_shape( :type => 'rect' )
+    shape_rect = workbook.add_shape( type: 'rect' )
 
 Once the object is created it can be inserted into a worksheet using the
 `insert_shape()` method:
@@ -53,7 +53,7 @@ A Shape can be inserted multiple times if required.
 #### <a name="add_shape" class="anchor" href="#add_shape"><span class="octicon octicon-link" /></a>add_shape( properties )
 
 The `add_shape()` Workbook method specifies the properties of the Shape in hash
-`property => value` format:
+`property: value` format:
 
     shape = workbook.add_shape( properties )
 
@@ -84,7 +84,7 @@ Any shape property can be queried or modified by the corresponding get/set metho
 Multiple shape properties may also be modified in one go by using the
 `set_properties()` method:
 
-    shape.set_properties( :type => 'ellipse', :text => 'Hello' )
+    shape.set_properties( type: 'ellipse', text: 'Hello' )
 
 The properties of a shape object that can be defined via `add_shape()`
 are shown below.
@@ -100,7 +100,7 @@ The name is generally only used by Excel Macros to refer to the object.
 
 Defines the type of the object such as rect, ellipse or triangle:
 
-    ellipse = workbook.add_shape( :type => 'ellipse' )
+    ellipse = workbook.add_shape( type: 'ellipse' )
 
 The default type is rect.
 
@@ -198,7 +198,7 @@ shape names.
 
 This property is used to make the shape act like a text box.
 
-    rect = workbook.add_shape( :type => 'rect', :text => "Hello\nWorld" )
+    rect = workbook.add_shape( type: 'rect', text: "Hello\nWorld" )
 
 The text is super-imposed over the shape.
 The text can be wrapped using the newline character \n.
@@ -344,12 +344,12 @@ adjustments will not re-calculate.
 
     # Add an ellipse with centered text.
     ellipse = workbook.add_shape(
-        :type => 'ellipse',
-        :text => "Hello\nWorld"
+        type: 'ellipse',
+        text: "Hello\nWorld"
     )
 
     # Add a plus shape.
-    plus = workbook.add_shape( :type => 'plus')
+    plus = workbook.add_shape( type: 'plus')
 
     # Insert the shapes in the worksheet.
     worksheet.insert_shape( 'B3', rect )

@@ -21,12 +21,12 @@ To create a simple Excel file with a chart using WriteXLSX:
     worksheet.write('A1', data)
 
     # Add a worksheet chart.
-    chart = workbook.add_chart(:type => 'column')
+    chart = workbook.add_chart(type: 'column')
 
     # Configure the chart.
     chart.add_series(
-        categories => '=Sheet1!$A$2:$A$7',
-        values     => '=Sheet1!$B$2:$B$7'
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$B$2:$B$7'
     )
 
     workbook.close
@@ -40,7 +40,7 @@ The Chart module isn't used directly.
 A chart object is created via the Workbook
 [`add_chart()`](workbook.html#add_chart) method where the chart type is specified:
 
-    chart = workbook.add_chart(:type => 'column')
+    chart = workbook.add_chart(type: 'column')
 
 Currently the supported chart types are:
 
@@ -73,7 +73,7 @@ Currently the supported chart types are:
 
 Chart subtypes are also supported in some cases:
 
-    workbook.add_chart(:type => 'bar', :subtype => 'stacked')
+    workbook.add_chart(type: 'bar', subtype: 'stacked')
 
 The currently available subtypes are:
 
@@ -135,9 +135,9 @@ With an WriteXLSX chart object the `add_series()` method is used
 to set the properties for a series:
 
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$10', # Optional.
-        :values     => '=Sheet1!$B$2:$B$10', # Required.
-        :line       => { :color => 'blue' }
+        categories: '=Sheet1!$A$2:$A$10', # Optional.
+        values:     '=Sheet1!$B$2:$B$10', # Required.
+        line:       { color: 'blue' }
     )
 
 The properties that can be set are:
@@ -208,7 +208,7 @@ Usually only applicable to column and bar charts.
 Set the overlap between series in a Bar/Column chart.
 The range is +/- 100. Default is 0.
 
-    overlap => 20,
+    overlap: 20,
 
 Note, it is only necessary to apply this property to one series of the chart.
 
@@ -216,7 +216,7 @@ Note, it is only necessary to apply this property to one series of the chart.
 Set the gap between series in a Bar/Column chart.
 The range is 0 to 500. Default is 150.
 
-    gap => 200,
+    gap: 200,
 
 Note, it is only necessary to apply this property to one series of the chart.
 
@@ -228,8 +228,8 @@ programmatically, an array with zero indexed row/column values:
 
 The following are equivalent:
 
-    chart.add_series(:categories => '=Sheet1!$A$2:$A$7'     ) # Same as ...
-    chart.add_series(:categories => [ 'Sheet1', 1, 6, 0, 0 ]) # Zero-indexed.
+    chart.add_series(categories: '=Sheet1!$A$2:$A$7'     ) # Same as ...
+    chart.add_series(categories: [ 'Sheet1', 1, 6, 0, 0 ]) # Zero-indexed.
 
 You can add more than one series to a chart.
 In fact, some chart types such as stock require it.
@@ -238,30 +238,30 @@ in which they are added in WriteXLSX.
 
     # Add the first series.
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7',
-        :name       => 'Test data series 1'
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$B$2:$B$7',
+        name:       'Test data series 1'
     )
 
     # Add another series. Same categories. Different range values.
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$C$2:$C$7',
-        :name       => 'Test data series 2'
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$C$2:$C$7',
+        name:       'Test data series 2'
     )
 
 It is also possible to specify non-contiguous ranges:
 
     chart.add_series(
-      :categories => '=(Sheet1!$A$1:$A$9,Sheet1!$A$14:$A$25)',
-      :values     => '=(Sheet1!$B$1:$B$9,Sheet1!$B$14:$B$25)'
+      categories: '=(Sheet1!$A$1:$A$9,Sheet1!$A$14:$A$25)',
+      values:     '=(Sheet1!$B$1:$B$9,Sheet1!$B$14:$B$25)'
     )
 
 #### <a name="set_x_axis" class="anchor" href="#set_x_axis"><span class="octicon octicon-link" /></a>set_x_axis()
 
 The `set_x_axis()` method is used to set properties of the X axis.
 
-    chart.set_x_axis(:name => 'Quarterly results')
+    chart.set_x_axis(name: 'Quarterly results')
 
 The properties that can be set are:
 
@@ -302,7 +302,7 @@ Set the name (title or caption) for the axis. The name is displayed below the X 
 The name property is optional. The default is to have no axis name.
 (Applicable to category and value axes).
 
-    chart.set_x_axis(:name => 'Quarterly results')
+    chart.set_x_axis(name: 'Quarterly results')
 
 The name can also be a formula such as `=Sheet1!$A$1`.
 
@@ -310,7 +310,7 @@ The name can also be a formula such as `=Sheet1!$A$1`.
 Set the font properties for the axis title.
 (Applicable to category and value axes).
 
-    chart.set_x_axis(:name_font => {:name => 'Arial', :size => 10})
+    chart.set_x_axis(name_font: {name: 'Arial', size: 10})
 
 See the [CHART FONTS][] section below.
 
@@ -318,10 +318,10 @@ See the [CHART FONTS][] section below.
 Set the x, y position of the axis title in chart relative units. (Applicable to category and value axes).
 
     chart.set_x_axis(
-      :name        => 'X axis',
-      :name_layout => {
-        :x => 0.34,
-        :y => 0.85
+      name:        'X axis',
+      name_layout: {
+        x: 0.34,
+        y: 0.85
       }
     }
 
@@ -331,7 +331,7 @@ See the [CHART LAYOUT][] section below.
 Set the font properties for the axis numbers.
 (Applicable to category and value axes).
 
-    chart.set_x_axis(:num_font => {:bold => 1, :italic => 1})
+    chart.set_x_axis(num_font: {bold: 1, italic: 1})
 
 See the [CHART FONTS][] section below.
 
@@ -339,8 +339,8 @@ See the [CHART FONTS][] section below.
 Set the number format for the axis.
 (Applicable to category and value axes).
 
-    chart.set_x_axis(:num_format => '#,##0.00')
-    chart.set_y_axis(:num_format => '0.00%'   )
+    chart.set_x_axis(num_format: '#,##0.00')
+    chart.set_y_axis(num_format: '0.00%'   )
 
 The number format is similar to the Worksheet Cell Format `:num_format` apart
 from the fact that a format index cannot be used.
@@ -353,7 +353,7 @@ in WriteXLSX for more information.
 Set the properties of the axis line type such as color and width.
 See the [CHART FORMATTING][] section below.
 
-    chart.set_x_axis(:line => { :none => 1 })
+    chart.set_x_axis(line: { none: 1 })
 
 ##### <a name="set_x_axis_fill" class="anchor" href="#set_x_axis_fill"><span class="octicon octicon-link" /></a>:fill
 Set the fill properties of the axis such as color.
@@ -374,31 +374,31 @@ See the [CHART FORMATTING][] section below.
 Set the minimum value for the axis range.
 (Applicable to value axes only.)
 
-    chart.set_x_axis(:min => 20)
+    chart.set_x_axis(min: 20)
 
 ##### <a name="set_x_axis_max" class="anchor" href="#set_x_axis_max"><span class="octicon octicon-link" /></a>:max
 Set the maximum value for the axis range.
 (Applicable to value axes only.)
 
-    chart.set_x_axis(:max => 80)
+    chart.set_x_axis(max: 80)
 
 ##### <a name="set_x_axis_minor_unit" class="anchor" href="#set_x_axis_minor_unit"><span class="octicon octicon-link" /></a>:minor_unit
 Set the increment of the minor units in the axis range.
 (Applicable to value axes only.)
 
-    chart.set_x_axis(:minor_unit => 0.4)
+    chart.set_x_axis(minor_unit: 0.4)
 
 ##### <a name="set_x_axis_major_unit" class="anchor" href="#set_x_axis_major_unit"><span class="octicon octicon-link" /></a>:major_unit
 Set the increment of the major units in the axis range.
 (Applicable to value axes only.)
 
-    chart.set_x_axis(:major_unit => 2)
+    chart.set_x_axis(major_unit: 2)
 
 ##### <a name="set_x_axis_interval_unit" class="anchor" href="#set_x_axis_interval_unit"><span class="octicon octicon-link" /></a>:interval_unit
 Set the interval unit for a category axis.
 (Applicable  to category axes only.)
 
-    chart.set_x_axis(:interval_unit => 2)
+    chart.set_x_axis(interval_unit: 2)
 
 ##### <a name="set_x_axis_crossing" class="anchor" href="#set_x_axis_crossing"><span class="octicon octicon-link" /></a>:crossing
 Set the position where the y axis will cross the x axis.
@@ -406,9 +406,9 @@ Set the position where the y axis will cross the x axis.
 
 The crossing value can either be a number value or the string `'max'` or `'min'`to set the crossing at the maximum/minimum axis value.
 
-    chart.set_x_axis(:crossing => 3)
+    chart.set_x_axis(crossing: 3)
     # or
-    chart.set_x_axis(:crossing => 'max')
+    chart.set_x_axis(crossing: 'max')
 
 For category axes the numeric value must be an integer to represent
 the category number that the axis crosses at.
@@ -423,20 +423,20 @@ Position the axis on or between the axis tick marks. (Applicable to category axe
 
 There are two allowable values on_tick and between:
 
-    chart.set_x_axis( :position_axis => 'on_tick' )
-    chart.set_x_axis( :position_axis => 'between' )
+    chart.set_x_axis( position_axis: 'on_tick' )
+    chart.set_x_axis( position_axis: 'between' )
 
 ##### <a name="set_x_axis_reverse" class="anchor" href="#set_x_axis_reverse"><span class="octicon octicon-link" /></a>:reverse
 Reverse the order of the axis categories or values.
 (Applicable to category and value axes.)
 
-    chart.set_x_axis(:reverse => 1)
+    chart.set_x_axis(reverse: 1)
 
 ##### <a name="set_x_axis_log_base" class="anchor" href="#set_x_axis_log_base"><span class="octicon octicon-link" /></a>:log_base
 Set the log base of the axis range.
 (Applicable to value axes only.)
 
-    chart.set_x_axis(:log_base => 10)
+    chart.set_x_axis(log_base: 10)
 
 ##### <a name="set_x_axis_label_position" class="anchor" href="#set_x_axis_label_position"><span class="octicon octicon-link" /></a>:label_position
 Set the "Axis labels" position for the axis.
@@ -456,9 +456,9 @@ Configure the major gridlines for the axis. The available properties are:
 For example:
 
     chart.set_x_axis(
-        :major_gridlines => {
-            :visible => 1,
-            :line    => { :color => 'red', :width => 1.25, :dash_type => 'dash' }
+        major_gridlines: {
+            visible: 1,
+            line:    { color: 'red', width: 1.25, dash_type: 'dash' }
         }
     )
 
@@ -476,14 +476,14 @@ The minor gridline visible property is off by default for all chart types.
 ##### <a name="set_x_axis_visible" class="anchor" href="#set_x_axis_visible"><span class="octicon octicon-link" /></a>:visible
 Configure the visibility of the axis.
 
-    chart.set_x_axis(:visible => 0)
+    chart.set_x_axis(visible: 0)
 
 ##### <a name="set_x_axis_date_axis" class="anchor" href="#set_x_axis_date_axis"><span class="octicon octicon-link" /></a>:date_axis
 
 This option is used to treat a category axis with date or time data as a
 Date Axis. (Applicable to category axes only.)
 
-    chart.set_x_axis(:date_axis => 1)
+    chart.set_x_axis(date_axis: 1)
 
 This option also allows you to set `max` and `min` values for a category axis
 which isn't allowed by Excel for non-date category axes.
@@ -495,7 +495,7 @@ See [Date Category Axes][] for more details.
 This option is used to treat a category axis explicitly as a Text
 Axis. (Applicable to category axes only.)
 
-    chart.set_x_axis(:text_axis => 1)
+    chart.set_x_axis(text_axis: 1)
 
 ##### <a name="set_x_axis_minor_unit_type" class="anchor" href="#set_x_axis_minor_unit_type"><span class="octicon octicon-link" /></a>:minor_unit_type
 
@@ -503,9 +503,9 @@ For `date_axis` axes, see above, this option is used to set the type of the mino
 units. (Applicable to date category axes only.)
 
     chart.set_x_axis(
-      :date_axis       => 1,
-      :minor_unit      => 4,
-      :minor_unit_type => 'month'
+      date_axis:       1,
+      minor_unit:      4,
+      minor_unit_type: 'month'
     )
 
 The allowable values for this option are 'days', 'months' and 'years'.
@@ -517,9 +517,9 @@ Same as :minor_unit_type, see above, bur for major axes unit types.
 More than one property can be set in a call to `set_x_axis()`:
 
     chart.set_x_axis(
-        :name => 'Quarterly results',
-        :min  => 10,
-        :max  => 80
+        name: 'Quarterly results',
+        min:  10,
+        max:  80
     )
 
 ##### <a name="set_x_axis_display_units" class="anchor" href="#set_x_axis_display_units"><span class="octicon octicon-link" /></a>:display_units
@@ -540,16 +540,16 @@ are very large but you don't want to represent them in scientific notation.
 
  Example:
 
-     chart.set_x_axis(:display_units => 'thousands')
-     chart.set_y_axis(:display_units => 'millions')
+     chart.set_x_axis(display_units: 'thousands')
+     chart.set_y_axis(display_units: 'millions')
 
 ##### <a name="set_x_axis_display_units_visible" class="anchor" href="#set_x_axis_display_units_visible"><span class="octicon octicon-link" /></a>:display_units_visible
 
 Control the visibility of the display units turned on by the previous option.
 This option is on by default. (Applicable to value axes only.)::
 
-     chart.set_x_axis(:display_units         => 'thousands',
-                      :display_units_visible => 0 )
+     chart.set_x_axis(display_units:         'thousands',
+                      display_units_visible: 0 )
 
 
 #### <a name="set_y_axis" class="anchor" href="#set_y_axis"><span class="octicon octicon-link" /></a>set_y_axis()
@@ -563,9 +563,9 @@ The `set_x2_axis()` method is used to set properties of the secondary X axis.
 The properties that can be set are the same as for [set_x_axis()][], see above.
 The default properties for this axis are:
 
-    :label_position => 'none',
-    :crossing       => 'max',
-    :visible        => 0,
+    label_position: 'none',
+    crossing:       'max',
+    visible:        0,
 
 #### <a name="set_y2_axis" class="anchor" href="#set_y2_axis"><span class="octicon octicon-link" /></a>set_y2_axis()
 
@@ -573,20 +573,20 @@ The `set_y2_axis()` method is used to set properties of the secondary Y axis.
 The properties that can be set are the same as for [set_x_axis()][], see above.
 The default properties for this axis are:
 
-    :major_gridlines => { :visible => 0 }
+    major_gridlines: { visible: 0 }
 
 #### <a name="combine" class="anchor" href="#combine"><span class="octicon octicon-link" /></a>combine()
 
 The chart `combine` method is used to combine two charts of different
 types, for example a column and line chart:
 
-    column_chart = workbook.add_chart(:type => 'column', :embedded => 1)
+    column_chart = workbook.add_chart(type: 'column', embedded: 1)
 
     # Configure the data series for the primary chart.
     column_chart.add_series(...)
 
     # Create a new column chart. This will use this as the secondary chart.
-    line_chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    line_chart = workbook.add_chart(type: 'line', embedded: 1)
 
     # Configure the data series for the secondary chart.
     line_chart.add_series(...)
@@ -613,11 +613,11 @@ The default chart width is 480 pixels and the default height is 288 pixels.
 The size of the chart can be modified by setting the width and height
 or by setting the `:x_scale` and `:y_scale`:
 
-    chart.set_size(:width => 720, :height => 576)
+    chart.set_size(width: 720, height: 576)
 
     # Same as:
 
-    chart.set_size(:x_scale => 1.5, :y_scale => 2)
+    chart.set_size(x_scale: 1.5, y_scale: 2)
 
 The `:x_offset` and `:y_offset` position the top left corner of the chart
 in the cell that it is inserted into.
@@ -627,15 +627,15 @@ can also be set via the [insert_chart()][] method:
 
     worksheet.insert_chart(
       'E2', chart,
-      :x_offset => 2,   :y_offset => 4,
-      :x_scale  => 1.5, :y_scale  => 2
+      x_offset: 2,   y_offset: 4,
+      x_scale:  1.5, y_scale:  2
     )
 
 #### <a name="set_title" class="anchor" href="#set_title"><span class="octicon octicon-link" /></a>set_title()
 
 The `set_title()` method is used to set properties of the chart title.
 
-    chart.set_title(:name => 'Year End Results')
+    chart.set_title(name: 'Year End Results')
 
 The properties that can be set are:
 
@@ -657,11 +657,11 @@ Allow the title to be overlaid on the chart. Generally used with the layout prop
 Set the x, y position of the title in chart relative units.
 
     chart.set_title(
-      :name    => 'Title',
-      :overlay => 1,
-      :layout  => {
-        :x => 0.42,
-        :y => 0.14
+      name:    'Title',
+      overlay: 1,
+      layout:  {
+        x: 0.42,
+        y: 0.14
       }
     }
 
@@ -672,7 +672,7 @@ By default Excel adds an automatic chart title to charts with a single series an
 The none option turns this default title off.
 It also turns off all other set_title option.
 
-    chart.set_title(:none => 1)
+    chart.set_title(none: 1)
 
 
 #### <a name="set_legend" class="anchor" href="#set_legend"><span class="octicon octicon-link" /></a>set_legend()
@@ -685,16 +685,16 @@ The properties that can be set are:
 
 The :none option turns off the chart legend. In Excel chart legend are on by default:
 
-    chart.set_legend(:none => 1)
+    chart.set_legend(none: 1)
 
 Note, for backward compatibility, it is also possible to turn off the legend via the :position property:
 
-    chart.set_legend(:position => 'none')
+    chart.set_legend(position: 'none')
 
 ##### <a name="set_legend_position" class="anchor" href="#set_legend_position"><span class="octicon octicon-link" /></a>:position
 Set the position of the chart legend.
 
-    chart.set_legend(:position => 'bottom')
+    chart.set_legend(position: 'bottom')
 
 The default legend position is `right`.
 The available positions are:
@@ -725,25 +725,25 @@ Set the gradient fill properties of the legend.
 Set the font properties of the chart legend.
 
     chart.set_legend(
-      :font => { :bold => 1, :italic => 1 }
+      font: { bold: 1, italic: 1 }
     )
 
 ##### <a name="set_legend_delete_series" class="anchor" href="#set_legend_delete_series"><span class="octicon octicon-link" /></a>:delete_series
 This allows you to remove 1 or more series from the legend (the series will still display on the chart). This property takes an array as an argument and the series are zero indexed:
 
     # Delete/hide series index 0 and 2 from the legend.
-    chart.set_legend(:delete_series => [0, 2])
+    chart.set_legend(delete_series: [0, 2])
 
 ##### <a name="set_legend_layout" class="anchor" href="#set_legend_layout"><span class="octicon octicon-link" /></a>:layout
 
 Set the `(x, y)` position of the legend in chart relative units:
 
     chart.set_legend(
-      :layout => {
-        :x      => 0.80,
-        :y      => 0.37,
-        :width  => 0.12,
-        :height => 0.25
+      layout: {
+        x:      0.80,
+        y:      0.37,
+        width:  0.12,
+        height: 0.25
       }
     )
 
@@ -754,8 +754,8 @@ See the CHART LAYOUT section below.
 The `set_chartarea()` method is used to set the properties of the chart area.
 
     chart.set_chartarea(
-        :border => { :none  => 1 },
-        :fill   => { :color => 'red' }
+        border: { none:  1 },
+        fill:   { color: 'red' }
     )
 
 The properties that can be set are:
@@ -781,8 +781,8 @@ See the [CHART FORMATTING][] section below.
 The `set_plotarea()` method is used to set properties of the plot area of a chart.
 
     chart.set_plotarea(
-        :border => { :color => 'yellow', :width => 1, :dash_type => 'dash' },
-        :fill   => { :color => '#92D050' }
+        border: { color: 'yellow', width: 1, dash_type: 'dash' },
+        fill:   { color: '#92D050' }
     )
 
 The properties that can be set are:
@@ -807,11 +807,11 @@ See the [CHART FORMATTING][] section below.
 Set the (x, y) position of the plotarea in chart relative units:
 
     chart.set_plotarea(
-      :layout => {
-        :x      => 0.35,
-        :y      => 0.26,
-        :width  => 0.62,
-        :height => 0.50
+      layout: {
+        x:      0.35,
+        y:      0.26,
+        width:  0.62,
+        height: 0.50
       }
     )
 
@@ -833,11 +833,11 @@ the data used to plot the chart.
 
 The available options, with default values are:
 
-    :vertical   => 1,  # Display vertical lines in the table.
-    :horizontal => 1,  # Display horizontal lines in the table.
-    :outline    => 1,  # Display an outline in the table.
-    :show_keys  => 0   # Show the legend keys with the table data.
-    :font       => {}  # Standard chart font properties.
+    vertical:   1,  # Display vertical lines in the table.
+    horizontal: 1,  # Display horizontal lines in the table.
+    outline:    1,  # Display an outline in the table.
+    show_keys:  0   # Show the legend keys with the table data.
+    font:       {}  # Standard chart font properties.
 
 The data table can only be shown with Bar, Column, Line, Area and stock charts.
 For font properties see the [CHART FONTS][] section below.
@@ -854,8 +854,8 @@ if required.
 See the [CHART FORMATTING][] section below.
 
     chart.set_up_down_bars(
-        :up   => { :fill => { :color => 'green' } },
-        :down => { :fill => { :color => 'red' } }
+        up:   { fill: { color: 'green' } },
+        down: { fill: { color: 'red' } }
     )
 
 Up-down bars can only be applied to Line charts and to Stock charts (by default).
@@ -870,7 +870,7 @@ value of points in the data.
 It is possible to format the Drop Line line properties if required.
 See the [CHART FORMATTING][] section below.
 
-    chart.set_drop_lines(:line => { :color => 'red', :dash_type => 'square_dot' } )
+    chart.set_drop_lines(line: { color: 'red', dash_type: 'square_dot' } )
 
 Drop Lines are only available in Line, Area and Stock charts.
 
@@ -884,7 +884,7 @@ maximum and minimum values of points in a Category.
 It is possible to format the High-Low Line line properties if required.
 See the [CHART FORMATTING][] section below.
 
-    chart.set_high_low_lines( :line => { :color => 'red' } )
+    chart.set_high_low_lines( line: { color: 'red' } )
 
 High-Low Lines are only available in Line and Stock charts.
 
@@ -936,8 +936,8 @@ The following properties can be set for marker formats in a chart.
 The type property sets the type of marker that is used with a series.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :marker     => { :type => 'diamond' }
+        values:     '=Sheet1!$B$1:$B$5',
+        marker:     { type: 'diamond' }
     )
 
 The following type properties can be set for marker formats in a chart.
@@ -959,8 +959,8 @@ The automatic type is a special case which turns on a marker using the
 default marker style for the particular series number.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :marker     => { :type => 'automatic' }
+        values:     '=Sheet1!$B$1:$B$5',
+        marker:     { type: 'automatic' }
     )
 
 If automatic is on then other marker properties such as size,
@@ -970,20 +970,20 @@ The size property sets the size of the marker and is generally used
 in conjunction with type.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :marker     => { :type => 'diamond', size => 7 }
+        values:     '=Sheet1!$B$1:$B$5',
+        marker:     { type: 'diamond', size: 7 }
     )
 
 Nested border and fill properties can also be set for a marker.
 See the [CHART FORMATTING][] section below.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :marker     => {
-            :type    => 'square',
-            :size    => 5,
-            :border  => { :color => 'red' },
-            :fill    => { :color => 'yellow' },
+        values:     '=Sheet1!$B$1:$B$5',
+        marker:     {
+            type:    'square',
+            size:    5,
+            border:  { color: 'red' },
+            fill:    { color: 'yellow' },
         }
     )
 
@@ -1008,8 +1008,8 @@ The following properties can be set for trendlines in a chart series.
 The type property sets the type of trendline in the series.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :trendline  => { :type => 'linear' }
+        values:     '=Sheet1!$B$1:$B$5',
+        trendline:  { type: 'linear' }
     )
 
 The available trendline types are:
@@ -1025,10 +1025,10 @@ A polynomial trendline can also specify the order of the polynomial.
 The default value is 2.
 
     chart.add_series(
-        :values    => '=Sheet1!$B$1:$B$5',
-        :trendline => {
-            :type  => 'polynomial',
-            :order => 3
+        values:    '=Sheet1!$B$1:$B$5',
+        trendline: {
+            type:  'polynomial',
+            order: 3
         }
     )
 
@@ -1036,21 +1036,21 @@ A moving_average trendline can also specify the period of the moving average.
 The default value is 2.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :trendline  => {
-            :type   => 'moving_average',
-            :period => 3,
+        values:     '=Sheet1!$B$1:$B$5',
+        trendline:  {
+            type:   'moving_average',
+            period: 3,
         }
     )
 
 The forward and backward properties set the forecast period of the trendline.
 
     chart.add_series(
-        :values    => '=Sheet1!$B$1:$B$5',
-        :trendline => {
-            :type     => 'linear',
-            :forward  => 0.5,
-            :backward => 0.5,
+        values:    '=Sheet1!$B$1:$B$5',
+        trendline: {
+            type:     'linear',
+            forward:  0.5,
+            backward: 0.5,
         }
     )
 
@@ -1060,20 +1060,20 @@ If it isn't specified the Excel default name will be displayed.
 This is usually a combination of the trendline type and the series name.
 
     chart.add_series(
-      :values    => '=Sheet1!$B$1:$B$5',
-      :trendline => {
-        :type => 'linear',
-        :name => 'Interpolated trend',
+      values:    '=Sheet1!$B$1:$B$5',
+      trendline: {
+        type: 'linear',
+        name: 'Interpolated trend',
       }
     )
 
 The intercept property sets the point where the trendline crosses the Y (value) axis:
 
     chart.add_series(
-      :values    => '=Sheet1!$B$1:$B$5',
-      :trendline => {
-        :type      => 'linear',
-        :intercept => 0.8
+      values:    '=Sheet1!$B$1:$B$5',
+      trendline: {
+        type:      'linear',
+        intercept: 0.8
         }
     )
 
@@ -1081,20 +1081,20 @@ The intercept property sets the point where the trendline crosses the Y (value) 
 The display_equation property displays the trendline equation on the chart.
 
     chart.add_series(
-      :values    => '=Sheet1!$B$1:$B$5',
-      :trendline => {
-        :type             => 'linear',
-        :display_equation => 1
+      values:    '=Sheet1!$B$1:$B$5',
+      trendline: {
+        type:             'linear',
+        display_equation: 1
       }
     )
 
 The display_r_squared property displays the R squared value of the trendline on the chart.
 
     chart.add_series(
-      :values    => '=Sheet1!$B$1:$B$5',
-      :trendline => {
-        :type              => 'linear',
-        :display_r_squared => 1
+      values:    '=Sheet1!$B$1:$B$5',
+      trendline: {
+        type:              'linear',
+        display_r_squared: 1
       }
     )
 
@@ -1102,19 +1102,19 @@ The display_r_squared property displays the R squared value of the trendline on 
 Several of these properties can be set in one go:
 
     chart.add_series(
-      :values    => '=Sheet1!$B$1:$B$5',
-      :trendline => {
-        :type              => 'linear',
-        :name              => 'My trend name',
-        :forward           => 0.5,
-        :backward          => 0.5,
-        :intercept         => 1.5,
-        :display_equeation => 1,
-        :display_r_squared => 1,
-        :line              => {
-          :color     => 'red',
-          :width     => 1,
-          :dash_type => 'long_dash'
+      values:    '=Sheet1!$B$1:$B$5',
+      trendline: {
+        type:              'linear',
+        name:              'My trend name',
+        forward:           0.5,
+        backward:          0.5,
+        intercept:         1.5,
+        display_equeation: 1,
+        display_r_squared: 1,
+        line:              {
+          color:     'red',
+          width:     1,
+          dash_type: 'long_dash'
         }
       }
     )
@@ -1141,8 +1141,8 @@ The following properties can be set for error bars in a chart series.
 The type property sets the type of error bars in the series.
 
     chart.add_series(
-        :values       => '=Sheet1!$B$1:$B$5',
-        :y_error_bars => { :type => 'standard_error' },
+        values:       '=Sheet1!$B$1:$B$5',
+        y_error_bars: { type: 'standard_error' },
     )
 
 The available error bars types are available:
@@ -1157,10 +1157,10 @@ All error bar types, except for standard_error and custom must also have a value
 associated with it for the error bounds:
 
     chart.add_series(
-        :values       => '=Sheet1!$B$1:$B$5',
-        :y_error_bars => {
-            :type  => 'percentage',
-            :value => 5
+        values:       '=Sheet1!$B$1:$B$5',
+        y_error_bars: {
+            type:  'percentage',
+            value: 5
         }
     )
 
@@ -1168,24 +1168,24 @@ The error bar type must specify plus_values and minus_values which should
 either by a Sheet1!$A$1:$A$5 type range formula or an array of values:
 
     chart.add_series(
-        :categories   => '=Sheet1!$A$1:$A$5',
-        :values       => '=Sheet1!$B$1:$B$5',
-        :y_error_bars => {
-            :type         => 'custom',
-            :plus_values  => '=Sheet1!$C$1:$C$5',
-            :minus_values => '=Sheet1!$D$1:$D$5'
+        categories:   '=Sheet1!$A$1:$A$5',
+        values:       '=Sheet1!$B$1:$B$5',
+        y_error_bars: {
+            type:         'custom',
+            plus_values:  '=Sheet1!$C$1:$C$5',
+            minus_values: '=Sheet1!$D$1:$D$5'
         }
     )
 
     # or
 
     chart.add_series(
-        :categories   => '=Sheet1!$A$1:$A$5',
-        :values       => '=Sheet1!$B$1:$B$5',
-        :y_error_bars => {
-            :type         => 'custom',
-            :plus_values  => [1, 1, 1, 1, 1],
-            :minus_values => [2, 2, 2, 2, 2]
+        categories:   '=Sheet1!$A$1:$A$5',
+        values:       '=Sheet1!$B$1:$B$5',
+        y_error_bars: {
+            type:         'custom',
+            plus_values:  [1, 1, 1, 1, 1],
+            minus_values: [2, 2, 2, 2, 2]
         }
     )
 
@@ -1203,12 +1203,12 @@ The end_style property sets the style of the error bar end cap.
 The options are 1 (the default) or 0 (for no end cap):
 
     chart.add_series(
-        :values       => '=Sheet1!$B$1:$B$5',
-        :y_error_bars => {
-            :type      => 'fixed',
-            :value     => 2,
-            :end_style => 0,
-            :direction => 'minus'
+        values:       '=Sheet1!$B$1:$B$5',
+        y_error_bars: {
+            type:      'fixed',
+            value:     2,
+            end_style: 0,
+            direction: 'minus'
         },
     )
 
@@ -1238,29 +1238,29 @@ The following properties can be set for `:data_labels` formats in a chart.
 The value property turns on the Value data label for a series.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :value => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { value: 1 }
     )
 
 The category property turns on the Category Name data label for a series.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :category => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { category: 1 }
     )
 
 The series_name property turns on the Series Name data label for a series.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :series_name => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { series_name: 1 }
     )
 
 The position property is used to position the data label for a series.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :value => 1, :position => 'center' }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { value: 1, position: 'center' }
     )
 
 In Excel the data label positions vary for different chart types. The allowable positions are:
@@ -1284,15 +1284,15 @@ The `:percentage` property is used to turn on the display of data labels as
 a Percentage for a series. It is mainly used for pie and doughnut charts.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :percentage => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { percentage: 1 }
     )
 
 The `:leader_lines` property is used to turn on Leader Lines for the data label for a series. It is mainly used for pie charts.
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :value => 1, :leader_lines => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { value: 1, leader_lines: 1 }
     )
 
 Note: Even when leader lines are turned on they aren't automatically visible
@@ -1304,9 +1304,9 @@ adjusted automatically.
 The `:separator` property is used to change the separator between multiple data label items:
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :percentage => 1 },
-        :data_labels => { :value => 1, :category => 1, :separator => "\n" }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { percentage: 1 },
+        data_labels: { value: 1, category: 1, separator: "\n" }
     )
 
 The `:separator` value must be one of the following strings:
@@ -1320,16 +1320,16 @@ The `:separator` value must be one of the following strings:
 The `:legend_key` property is used to turn on Legend Key for the data label for a series:
 
     chart.add_series(
-        :values      => '=Sheet1!$B$1:$B$5',
-        :data_labels => { :value => 1, :legend_key => 1 }
+        values:      '=Sheet1!$B$1:$B$5',
+        data_labels: { value: 1, legend_key: 1 }
     )
 
 
 The `:num_format` property is used to set the number format for the data labels.
 
     chart.add_series(
-        :values      => '=Sheet1!$A$1:$A$5',
-        :data_labels => { :value => 1, :num_format => '#,##0.00' }
+        values:      '=Sheet1!$A$1:$A$5',
+        data_labels: { value: 1, num_format: '#,##0.00' }
     )
 
 The number format is similar to the Worksheet Cell Format num_format apart from the fact that a
@@ -1340,20 +1340,20 @@ The explicit format string must be used as shown above.
 The `:font` property is used to set the font properties of the data labels in a series:
 
     chart.add_series(
-        :values      => '=Sheet1!$A$1:$A$5',
-        :data_labels => {
-            :value => 1,
-            :font  => { :name => 'Consolas' }
+        values:      '=Sheet1!$A$1:$A$5',
+        data_labels: {
+            value: 1,
+            font:  { name: 'Consolas' }
         }
     )
 
 The `:font` property is also used to rotate the data labels in a series:
 
     chart.add_series(
-        :values      => '=Sheet1!$A$1:$A$5',
-        :data_labels => {
-            :value => 1,
-            :font  => { :rotate => 45 }
+        values:      '=Sheet1!$A$1:$A$5',
+        data_labels: {
+            value: 1,
+            font:  { rotate: 45 }
         }
     )
 
@@ -1366,11 +1366,11 @@ The `:fill` property sets the fill properties of the data labels such as colour.
 Example of setting data label formatting:
 
     chart.add_series(
-      :categories => '=Sheet1!$A$2:$A$7',
-      :values     => '=Sheet1!$B$2:$B$7',
-      :data_labels => { :value  => 1,
-                        :border => {:color => 'red'},
-                        :fill   => {:color => 'yellow'} }
+      categories: '=Sheet1!$A$2:$A$7',
+      values:     '=Sheet1!$B$2:$B$7',
+      data_labels: { value:  1,
+                        border: {color: 'red'},
+                        fill:   {color: 'yellow'} }
     )
 
 The `:pattern` property sets the pattern properties of the data labels. See the [CHART FORMATTING][] section below.
@@ -1384,27 +1384,27 @@ The `:custom` property is used to set the properties of individual data labels, 
 The `custom` property data label property is used to set the properties of individual data labels in a series. The most common use for this is to set custom text or number labels:
 
     custom_labels = [
-        { :value => 'Jan' },
-        { :value => 'Feb' },
-        { :value => 'Mar' },
-        { :value => 'Apr' },
-        { :value => 'May' },
-        { :value => 'Jun' }
+        { value: 'Jan' },
+        { value: 'Feb' },
+        { value: 'Mar' },
+        { value: 'Apr' },
+        { value: 'May' },
+        { value: 'Jun' }
     ]
 
     chart.add_series(
-        :categories  => '=Sheet1!$A$2:$A$7',
-        :values      => '=Sheet1!$B$2:$B$7',
-        :data_labels => { :value => 1, :custom => custom_labels }
+        categories:  '=Sheet1!$A$2:$A$7',
+        values:      '=Sheet1!$B$2:$B$7',
+        data_labels: { value: 1, custom: custom_labels }
     )
 
 As shown in the previous examples th `custom` property should be a list of dicts. Any property dict that is set to `nil` or not included in the list will be assigned the default data label value:
 
     custom_labels = [
         nil,
-        { :value => 'Feb' },
-        { :value => 'Mar' },
-        { :value => 'Apr' }
+        { value: 'Feb' },
+        { value: 'Mar' },
+        { value: 'Apr' }
     ]
 
 The property elements of the `custom` lists should be dicts with the following allowable keys/sub-properties:
@@ -1420,23 +1420,23 @@ The property elements of the `custom` lists should be dicts with the following a
 The `:value` property should be a string, number or formula string that refers to a cell from which the value will be taken:
 
     custom_labels = [
-        { :value => '=Sheet1!$C$2' },
-        { :value => '=Sheet1!$C$3' },
-        { :value => '=Sheet1!$C$4' },
-        { :value => '=Sheet1!$C$5' },
-        { :value => '=Sheet1!$C$6' },
-        { :value => '=Sheet1!$C$7' }
+        { value: '=Sheet1!$C$2' },
+        { value: '=Sheet1!$C$3' },
+        { value: '=Sheet1!$C$4' },
+        { value: '=Sheet1!$C$5' },
+        { value: '=Sheet1!$C$6' },
+        { value: '=Sheet1!$C$7' }
     ]
 
 The `:font` property is used to set the font of the custom data label of a series (See the [CHART FONTS][] section below):
 
     custom_labels = [
-        { :value => '=Sheet1!$C$1', :font => { :color => 'red' } },
-        { :value => '=Sheet1!$C$2', :font => { :color => 'red' } },
-        { :value => '=Sheet1!$C$2', :font => { :color => 'red' } },
-        { :value => '=Sheet1!$C$4', :font => { :color => 'red' } },
-        { :value => '=Sheet1!$C$5', :font => { :color => 'red' } },
-        { :value => '=Sheet1!$C$6', :font => { :color => 'red' } }
+        { value: '=Sheet1!$C$1', font: { color: 'red' } },
+        { value: '=Sheet1!$C$2', font: { color: 'red' } },
+        { value: '=Sheet1!$C$2', font: { color: 'red' } },
+        { value: '=Sheet1!$C$4', font: { color: 'red' } },
+        { value: '=Sheet1!$C$5', font: { color: 'red' } },
+        { value: '=Sheet1!$C$6', font: { color: 'red' } }
     ]
 
 The `:border` property sets the border properties of the data labels such as colour and style. See the [CHART FORMATTING][] section below.
@@ -1446,12 +1446,12 @@ The `:fill` property sets the fill properties of the data labels such as colour.
 Example of setting custom data label formatting:
 
     custom_labels = [
-        { :value => 'Jan', :border => {:color => 'blue'} },
-        { :value => 'Feb' },
-        { :value => 'Mar' },
-        { :value => 'Apr' },
-        { :value => 'May' },
-        { :value => 'Jun', :fill   => {:color => 'green'} }
+        { value: 'Jan', border: {color: 'blue'} },
+        { value: 'Feb' },
+        { value: 'Mar' },
+        { value: 'Apr' },
+        { value: 'May' },
+        { value: 'Jun', fill:   {color: 'green'} }
     ]
 
 The `pattern` property sets the pattern properties of the data labels. See the [CHART FORMATTING][] section below.
@@ -1462,10 +1462,10 @@ The `:delete` property can be used to delete labels in a series. This can be use
 
     custom_labels = [
         nil,
-        { :delete => 1 },
-        { :delete => 1 },
-        { :delete => 1 },
-        { :delete => 1 },
+        { delete: 1 },
+        { delete: 1 },
+        { delete: 1 },
+        { delete: 1 },
         nil
     ]
 
@@ -1479,11 +1479,11 @@ by a point.
 In these cases it is possible to use the points property of `add_series()`:
 
     chart.add_series(
-        :values => '=Sheet1!$A$1:$A$3',
-        :points => [
-            { :fill => { :color => '#FF0000' } },
-            { :fill => { :color => '#CC0000' } },
-            { :fill => { :color => '#990000' } },
+        values: '=Sheet1!$A$1:$A$3',
+        points: [
+            { fill: { color: '#FF0000' } },
+            { fill: { color: '#CC0000' } },
+            { fill: { color: '#990000' } },
         ]
     )
 
@@ -1493,18 +1493,18 @@ To assign default properties to points in a series pass `nil` values in the arra
 
     # Format point 3 of 3 only.
     chart.add_series(
-        :values => '=Sheet1!$A$1:$A$3',
-        :points => [
+        values: '=Sheet1!$A$1:$A$3',
+        points: [
             nil,
             nil,
-            { :fill => { :color => '#990000' } },
+            { fill: { color: '#990000' } },
         ]
     )
 
     # Format the first point only.
     chart.add_series(
-        :values => '=Sheet1!$A$1:$A$3',
-        :points => [ { :fill => { :color => '#FF0000' } } ]
+        values: '=Sheet1!$A$1:$A$3',
+        points: [ { fill: { color: '#FF0000' } } ]
     )
 
 ##### <a name="smooth" class="anchor" href="#smooth"><span class="octicon octicon-link" /></a>:Smooth
@@ -1512,8 +1512,8 @@ To assign default properties to points in a series pass `nil` values in the arra
 The `:smooth` option is used to set the smooth property of a line series.
 It is only applicable to the Line and Scatter chart types.
 
-    chart.add_series( :values => '=Sheet1!$C$1:$C$5',
-                      :smooth => 1 )
+    chart.add_series( values: '=Sheet1!$C$1:$C$5',
+                      smooth: 1 )
 
 ### <a name="chart_formatting" class="anchor" href="#chart_formatting"><span class="octicon octicon-link" /></a>CHART FORMATTING
 
@@ -1531,21 +1531,21 @@ elements documented above.
 Chart formatting properties are generally set using hash.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :color => 'blue' }
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { color: 'blue' }
     )
 
 In some cases the format properties can be nested. For example a marker may
 contain border and fill sub-properties.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :color => 'blue' },
-        :marker     => {
-            :type    => 'square',
-            :size    => 5,
-            :border  => { :color => 'red' },
-            :fill    => { :color => 'yellow' },
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { color: 'blue' },
+        marker:     {
+            type:    'square',
+            size:    5,
+            border:  { color: 'red' },
+            fill:    { color: 'yellow' },
         }
     )
 
@@ -1567,35 +1567,35 @@ except in Scatter charts). This is useful if you wish to plot a series
 with markers but without a line.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :none => 1 }
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { none: 1 }
     )
 
 The color property sets the color of the line.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :color => 'red' }
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { color: 'red' }
     )
 
 The available colours are shown in the main WriteXLSX documentation. It is also possible to set the colour of a line with a HTML style RGB colour:
 
     chart.add_series(
-        :line       => { :color => '#FF0000' }
+        line:       { color: '#FF0000' }
     )
 
 The `width` property sets the width of the line. It should be specified in increments of 0.25 of a point as in Excel.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :width => 3.25 }
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { width: 3.25 }
     )
 
 The `dash_type` property sets the dash style of the line.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => { :dash_type => 'dash_dot' }
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       { dash_type: 'dash_dot' }
     )
 
 The following `dash_type` values are available. They are shown in the order that they appear in the Excel dialog.
@@ -1614,18 +1614,18 @@ The default line style is solid.
 The `transparency` property sets the transparency of the `line` color in the integer range 1 - 100. The color must be set for transparency to work, it doesn't work with an automatic/default color:
 
     chart.add_series(
-      :values => '=Sheet1!$B$1:$B$5',
-      :line   => { :color => 'yellow', :transparency => 50 }
+      values: '=Sheet1!$B$1:$B$5',
+      line:   { color: 'yellow', transparency: 50 }
     )
 
 More than one `line` property can be specified at a time:
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :line       => {
-            :color     => 'red',
-            :width     => 1.25,
-            :dash_type => 'square_dot'
+        values:     '=Sheet1!$B$1:$B$5',
+        line:       {
+            color:     'red',
+            width:     1.25,
+            dash_type: 'square_dot'
         }
     )
 
@@ -1650,29 +1650,29 @@ The following properties can be set for fill formats in a chart.
 The none property is used to turn the fill property off (it is generally on by default).
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :fill       => { :none => 1 }
+        values:     '=Sheet1!$B$1:$B$5',
+        fill:       { none: 1 }
     )
 
 The color property sets the colour of the fill area.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :fill       => { :color => 'red' }
+        values:     '=Sheet1!$B$1:$B$5',
+        fill:       { color: 'red' }
     )
 
 The available colours are shown in the main WriteXLSX documentation. It is also possible to set the colour of a fill with a HTML style RGB colour:
 
     chart.add_series(
-        :fill       => { :color => '#FF0000' }
+        fill:       { color: '#FF0000' }
     )
 
 The fill format is generally used in conjunction with a border format which has the same properties as a line format.
 
     chart.add_series(
-        :values     => '=Sheet1!$B$1:$B$5',
-        :border     => { :color => 'red' },
-        :fill       => { :color => 'yellow' }
+        values:     '=Sheet1!$B$1:$B$5',
+        border:     { color: 'red' },
+        fill:       { color: 'yellow' }
     )
 
 ## <a name="pattern_fill" class="anchor" href="#pattern_fill"><span class="octicon octicon-link" /></a>Pattern Fill
@@ -1689,10 +1689,10 @@ The following properties can be set for C<pattern> fill formats in a chart:
 For example:
 
     chart.set_plotarea(
-        :pattern => {
-            :pattern  => 'percent_5',
-            :fg_color => 'red',
-            :bg_color => 'yellow'
+        pattern: {
+            pattern:  'percent_5',
+            fg_color: 'red',
+            bg_color: 'yellow'
         }
     )
 
@@ -1770,7 +1770,7 @@ The following properties can be set for gradient fill formats in a chart:
 The colors property sets a list of colors that define the gradient:
 
     chart.set_plotarea(
-      :gradient => { :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ] }
+      gradient: { colors: [ '#DDEBCF', '#9CB86E', '#156B13' ] }
     )
 
 Excel allows between 2 and 10 colors in a gradient but it is unlikely that you will require more than 2 or 3.
@@ -1778,8 +1778,8 @@ Excel allows between 2 and 10 colors in a gradient but it is unlikely that you w
 As with solid or pattern fill it is also possible to set the colors of a gradient with a Html style #RRGGBB string or a limited number of named colors. The available colours are shown in the main documentation:
 
     chart.add_series(
-      :values   => '=Sheet1!$A$1:$A$5',
-      :gradient => { :colors => [ 'red', 'green' ] }
+      values:   '=Sheet1!$A$1:$A$5',
+      gradient: { colors: [ 'red', 'green' ] }
     )
 
 The positions defines an optional list of positions, between 0 and 100, of
@@ -1787,10 +1787,10 @@ where the colors in the gradient are located. Default values are provided for
 colors lists of between 2 and 4 but they can be specified if required:
 
     chart.add_series(
-      :values   => '=Sheet1!$A$1:$A$5',
-      :gradient => {
-        :colors    => [ '#DDEBCF', '#156B13' ],
-        :positions => [ 10,        90 ],
+      values:   '=Sheet1!$A$1:$A$5',
+      gradient: {
+        colors:    [ '#DDEBCF', '#156B13' ],
+        positions: [ 10,        90 ],
       }
     )
 
@@ -1804,10 +1804,10 @@ The type> property can have one of the following values:
 For example:
 
     chart.add_series(
-      :values   => '=Sheet1!$A$1:$A$5',
-      :gradient => {
-        :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ],
-        :type   => 'radial'
+      values:   '=Sheet1!$A$1:$A$5',
+      gradient: {
+        colors: [ '#DDEBCF', '#9CB86E', '#156B13' ],
+        type:   'radial'
       }
     )
 
@@ -1816,10 +1816,10 @@ If type isn't specified it defaults to linear.
 For a linear fill the angle of the gradient can also be specified:
 
     chart.add_series(
-      :values   => '=Sheet1!$A$1:$A$5',
-      :gradient => {
-        :colors => [ '#DDEBCF', '#9CB86E', '#156B13' ],
-        :angle => 30
+      values:   '=Sheet1!$A$1:$A$5',
+      gradient: {
+        colors: [ '#DDEBCF', '#9CB86E', '#156B13' ],
+        angle: 30
       }
     )
 
@@ -1851,14 +1851,14 @@ Date Axes are a special type of category axis which are explained below.
 Date Category Axes are category axes that display time or date information.
 In WriteXLSX Date Category Axes are set using the date_axis option:
 
-    chart.set_x_axis(:date_axis => 1)
+    chart.set_x_axis(date_axis: 1)
 
 In general you should also specify a number format for a date axis although
 Excel will usually default to the same format as the data being plotted:
 
     chart.set_x_axis(
-      :date_axis  => 1,
-      :num_format => 'dd/mm/yyyy'
+      date_axis:  1,
+      num_format: 'dd/mm/yyyy'
     )
 
 Excel doesn't normally allow minimum and maximum values to be set for category
@@ -1866,21 +1866,21 @@ axes. However, date axes are an exception.
 The min and max values should be set as Excel times or dates:
 
     chart.set_x_axis(
-      :date_axis  => 1,
-      :min        => worksheet.convert_date_time('2013-01-02T'),
-      :max        => worksheet.convert_date_time('2013-01-09T'),
-      :num_format => 'dd/mm/yyyy'
+      date_axis:  1,
+      min:        worksheet.convert_date_time('2013-01-02T'),
+      max:        worksheet.convert_date_time('2013-01-09T'),
+      num_format: 'dd/mm/yyyy'
     )
 
 For date axes it is also possible to set the type of the major and minor units:
 
     chart.set_x_axis(
-      :date_axis       => 1,
-      :minor_unit      => 4,
-      :minor_unit_type => 'months',
-      :major_unit      => 1,
-      :major_unit_type => 'years',
-      :num_format      => 'dd/mm/yyyy'
+      date_axis:       1,
+      minor_unit:      4,
+      minor_unit_type: 'months',
+      major_unit:      1,
+      major_unit_type: 'years',
+      num_format:      'dd/mm/yyyy'
     )
 
 #### <a name="secondary_axes" class="anchor" href="#secondary_axes"><span class="octicon octicon-link" /></a>Secondary Axes
@@ -1904,16 +1904,16 @@ the y2_axis or x2_axis property of the series:
     worksheet.write('A1', data)
 
     # Create a new chart object. In this case an embedded chart.
-    chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    chart = workbook.add_chart(type: 'line', embedded: 1)
 
     # Configure a series with a secondary axis
     chart.add_series(
-      :values  => '=Sheet1!$A$1:$A$6',
-      :y2_axis => 1
+      values:  '=Sheet1!$A$1:$A$6',
+      y2_axis: 1
     )
 
     chart.add_series(
-      :values => '=Sheet1!$B$1:$B$6'
+      values: '=Sheet1!$B$1:$B$6'
     )
 
     # Insert the chart into the worksheet.
@@ -1938,7 +1938,7 @@ Here is a simpler example:
 
     workbook  = WriteXLSX.new('chart_combined.xlsx')
     worksheet = workbook.add_worksheet()
-    bold      = workbook.add_format(:bold => 1)
+    bold      = workbook.add_format(bold: 1)
 
     # Add the worksheet data that the charts will refer to.
     headings = ['Number', 'Batch 1', 'Batch 2']
@@ -1957,23 +1957,23 @@ Here is a simpler example:
     #
 
     # Create a new column chart. This will use this as the primary chart.
-    column_chart = workbook.add_chart(:type => 'column', :embedded => 1)
+    column_chart = workbook.add_chart(type: 'column', embedded: 1)
 
     # Configure the data series for the primary chart.
     column_chart.add_series(
-        name       => '=Sheet1!$B$1',
-        categories => '=Sheet1!$A$2:$A$7',
-        values     => '=Sheet1!$B$2:$B$7'
+        name:       '=Sheet1!$B$1',
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$B$2:$B$7'
     )
 
     # Create a new column chart. This will use this as the secondary chart.
-    line_chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    line_chart = workbook.add_chart(type: 'line', embedded: 1)
 
     # Configure the data series for the secondary chart.
     line_chart.add_series(
-        name       => '=Sheet1!$C$1',
-        categories => '=Sheet1!$A$2:$A$7',
-        values     => '=Sheet1!$C$2:$C$7'
+        name:       '=Sheet1!$C$1',
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$C$2:$C$7'
     )
 
     # Combine the charts.
@@ -1981,9 +1981,9 @@ Here is a simpler example:
 
     # Add a chart title and some axis labels. Note, this is done via the
     # primary chart.
-    column_chart.set_title(:name => 'Combined chart - same Y axis')
-    column_chart.set_x_axis(:name => 'Test number')
-    column_chart.set_y_axis(:name => 'Sample length (mm)')
+    column_chart.set_title(name: 'Combined chart - same Y axis')
+    column_chart.set_x_axis(name: 'Test number')
+    column_chart.set_y_axis(name: 'Sample length (mm)')
 
 
     # Insert the chart into the worksheet
@@ -2002,15 +2002,15 @@ secondary chart on the secondary axis:
     ...
 
     line_chart.add_series(
-        :name       => '=Sheet1!$C$1',
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$C$2:$C$7',
-        :y2_axis    => 1
+        name:       '=Sheet1!$C$1',
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$C$2:$C$7',
+        y2_axis:    1
     )
 
     ...
 
-    column_chart.set_y2_axis(:name => 'Target length (mm)')
+    column_chart.set_y2_axis(name: 'Target length (mm)')
 
 ![Chart image.](images/chart_combined2.png)
 

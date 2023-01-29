@@ -268,7 +268,7 @@ Worksheet tables can be aded with WriteXLSX using the add_table method.
 By default tables are named Table1, Table2, etc., in the order that they are added.
 However it can also be set by the user using the name parameter:
 
-    worksheet.add_table('B3:F7', {'name': 'SalesData'})
+    worksheet.add_table('B3:F7', {name: 'SalesData'})
 
 If you need to know the name of the table, for example to use it in a formula,
 you can get it as follows:

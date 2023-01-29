@@ -11,12 +11,12 @@ To create a simple Excel file with a Pie chart using WriteXLSX:
     workbook  = WriteXLSX.new('chart.xlsx')
     worksheet = workbook.add_worksheet
 
-    chart     = workbook.add_chart(:type => 'pie')
+    chart     = workbook.add_chart(type: 'pie')
 
     # Configure the chart.
     chart.add_series(
-        :categories => '=Sheet1!$A$2:$A$7',
-        :values     => '=Sheet1!$B$2:$B$7'
+        categories: '=Sheet1!$A$2:$A$7',
+        values:     '=Sheet1!$B$2:$B$7'
    )
 
     # Add the worksheet data the chart refers to.
@@ -34,7 +34,7 @@ To create a simple Excel file with a Pie chart using WriteXLSX:
 This module implements Doughnut charts for [WriteXLSX][].
 The chart object is created via the Workbook `add_chart()` method:
 
-    chart = workbook.add_chart(:type => 'pie')
+    chart = workbook.add_chart(type: 'pie')
 
 Once the object is created it can be configured via the following methods
 that are common to all chart classes:
@@ -64,11 +64,11 @@ However, Pie/Doughnut charts are a special case since each segment is represente
 as a point so it is necessary to assign formatting to each point in the series:
 
     chart.add_series(
-        :values => '=Sheet1!$A$1:$A$3',
-        :points => [
-            { :fill => { color => '#FF0000' } },
-            { :fill => { color => '#CC0000' } },
-            { :fill => { color => '#990000' } }
+        values: '=Sheet1!$A$1:$A$3',
+        points: [
+            { fill: { color: '#FF0000' } },
+            { fill: { color: '#CC0000' } },
+            { fill: { color: '#990000' } }
         ]
     )
 
@@ -77,14 +77,14 @@ See the main [Chart][] documentation for more details.
 Pie charts support leader lines:
 
     chart.add_series(
-        :name        => 'Doughnut sales data',
-        :categories  => [ 'Sheet1', 1, 3, 0, 0 ],
-        :values      => [ 'Sheet1', 1, 3, 1, 1 ],
-        :data_labels => {
-            :series_name  => 1,
-            :percentage   => 1,
-            :leader_lines => 1,
-            :position     => 'outside_end'
+        name:        'Doughnut sales data',
+        categories:  [ 'Sheet1', 1, 3, 0, 0 ],
+        values:      [ 'Sheet1', 1, 3, 1, 1 ],
+        data_labels: {
+            series_name:  1,
+            percentage:   1,
+            leader_lines: 1,
+            position:     'outside_end'
         }
     )
 
@@ -110,7 +110,7 @@ when creating a chart.
 
     workbook  = WriteXLSX.new('chart_pie.xlsx')
     worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
+    bold      = workbook.add_format(bold: 1)
 
     # Add the worksheet data that the charts will refer to.
     headings = [ 'Category', 'Values' ]
@@ -123,18 +123,18 @@ when creating a chart.
     worksheet.write('A2', data)
 
     # Create a new chart object. In this case an embedded chart.
-    chart = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart = workbook.add_chart(type: 'pie', embedded: 1)
 
     # Configure the series. Note the use of the array ref to define ranges:
     # [ sheetname, row_start, row_end, col_start, col_end ].
     chart.add_series(
-        :name       => 'Pie sales data',
-        :categories => [ 'Sheet1', 1, 3, 0, 0 ],
-        :values     => [ 'Sheet1', 1, 3, 1, 1 ]
+        name:       'Pie sales data',
+        categories: [ 'Sheet1', 1, 3, 0, 0 ],
+        values:     [ 'Sheet1', 1, 3, 1, 1 ]
     )
 
     # Add a title.
-    chart.set_title(:name => 'Popular Pie Types')
+    chart.set_title(name: 'Popular Pie Types')
 
     # Set an Excel chart style. Colors with white outline and shadow.
     chart.set_style(10)

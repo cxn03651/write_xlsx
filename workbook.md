@@ -121,7 +121,7 @@ This method is use to create a new chart either as a standalone worksheet (the d
 or as an embeddable object that can be inserted into a worksheet via the
 [insert_chart()][] Worksheet method.
 
-    chart = workbook.add_chart(:type => 'column')
+    chart = workbook.add_chart(type: 'column')
 
 The properties that can be set are:
 
@@ -133,7 +133,7 @@ The properties that can be set are:
 ##### :type
 This is a required parameter. It defines the type of chart that will be created.
 
-    chart = workbook.add_chart(:type => 'line')
+    chart = workbook.add_chart(type: 'line')
 
 The available types are:
 
@@ -149,7 +149,7 @@ The available types are:
 ##### :subtype
 Used to define a chart subtype where available.
 
-    chart = workbook.add_chart(:type => 'bar', :subtype => 'stacked')
+    chart = workbook.add_chart(type: 'bar', subtype: 'stacked')
 
 See the [Chart Documentation][] for a list of available chart subtypes.
 
@@ -161,7 +161,7 @@ The name must be a valid Excel worksheet name.
 See [add_worksheet()](#add_worksheet) for more details on valid sheet names.
 The `:name` property can be omitted for embedded charts.
 
-    chart = workbook.add_chart(:type => 'line', :name => 'Results Chart')
+    chart = workbook.add_chart(type: 'line', name: 'Results Chart')
 
 ##### :embedded
 
@@ -169,7 +169,7 @@ Specifies that the Chart object will be inserted in a worksheet via the
 [insert_chart()][] Worksheet method.
 It is an error to try insert a Chart that doesn't have this flag set.
 
-    chart = workbook.add_chart(:type => 'line', :embedded => 1)
+    chart = workbook.add_chart(type: 'line', embedded: 1)
 
     # Configure the chart.
     ...
@@ -190,10 +190,10 @@ You can either define the properties at creation time via a hash of property val
 
     # Set properties at creation.
     plus = workbook.add_shape(
-        :type   => 'plus',
-        :id     => 3,
-        :width  => pw,
-        :height => ph
+        type:   'plus',
+        id:     3,
+        width:  pw,
+        height: ph
     )
 
     # Default rectangle shape. Set properties later.
@@ -223,7 +223,7 @@ file from an existing Excel file:
 Macros can be tied to buttons using the worksheet `insert_button()` method
 (see the ["WORKSHEET METHODS"](worksheet.html#worksheet) section for details):
 
-    worksheet.insert_button('C2', { :macro => 'my_macro' })
+    worksheet.insert_button('C2', { macro: 'my_macro' })
 
 Note, Excel uses the file extension `xlsm` instead of `xlsx` for files that contain macros.
 It is advisable to follow the same convention.
@@ -287,9 +287,9 @@ index Windows files.
 The properties should be passed in hash format as follows:
 
     workbook.set_properties(
-        "title    => 'This is an example spreadsheet',
-        "author   => 'John McNamara',
-        "comments => 'Created with Ruby and WriteXLSX'
+        title:    'This is an example spreadsheet',
+        author:   'John McNamara',
+        comments: 'Created with Ruby and WriteXLSX'
     )
 
 The properties that can be set are:

@@ -15,16 +15,16 @@ example from the distro:
     # Write a conditional format over a range.
     worksheet.conditional_formatting('B3:K12',
         {
-            :type     => 'cell',
-            :criteria => '>=',
-            :value    => 50,
-            :format   => format1
+            type:     'cell',
+            criteria: '>=',
+            value:    50,
+            format:   format1
         }
     )
 
 ![The output from the above example](images/conditional_example.jpg)
 
-#### <a name="conditional_formatting" class="anchor" href="#conditional_formatting"><span class="octicon octicon-link" /></a>conditional_formatting(row, col, { parameter => 'value', ... } )
+#### <a name="conditional_formatting" class="anchor" href="#conditional_formatting"><span class="octicon octicon-link" /></a>conditional_formatting(row, col, { parameter: 'value', ... } )
 
 The `conditional_formatting()` method is used to apply formatting based on user
 defined criteria to an WriteXLSX file.
@@ -190,7 +190,7 @@ Allowable type values and their associated parameters are:
 
 Data bar parameters marked wth (*) are only available in Excel 2010 and later. Files that use these properties can still be opened in Excel 2007 but the data bars will be displayed without them.
 
-##### <a name="type_cell" class="anchor" href="#type_cell"><span class="octicon octicon-link" /></a>:type => 'cell'
+##### <a name="type_cell" class="anchor" href="#type_cell"><span class="octicon octicon-link" /></a>type: 'cell'
 
 This is the most common conditional formatting type.
 It is used when a format is applied to a cell based on a simple criterion.
@@ -198,10 +198,10 @@ For example:
 
     worksheet.conditional_formatting('A1',
         {
-            :type     => 'cell',
-            :criteria => 'greater than',
-            :value    => 5,
-            :format   => red_format,
+            type:     'cell',
+            criteria: 'greater than',
+            value:    5,
+            format:   red_format,
         }
     )
 
@@ -209,11 +209,11 @@ Or, using the between criteria:
 
     worksheet.conditional_formatting('C1:C4',
         {
-            :type     => 'cell',
-            :criteria => 'between',
-            :minimum  => 20,
-            :maximum  => 30,
-            :format   => green_format,
+            type:     'cell',
+            criteria: 'between',
+            minimum:  20,
+            maximum:  30,
+            format:   green_format,
         }
     )
 
@@ -221,7 +221,7 @@ Or, using the between criteria:
 
 The `criteria` parameter is used to set the criteria by which the cell data
 will be evaluated. It has no default value. The most common criteria as
-applied to `{ :type => 'cell' }` are:
+applied to `{ type: 'cell' }` are:
 
     'between'
     'not between'
@@ -242,17 +242,17 @@ are shown in the relevant sections below.
 
 The value is generally used along with the criteria parameter to set the rule by which the cell data will be evaluated.
 
-    :type     => 'cell',
-    :criteria => '>',
-    :value    => 5
-    :format   => format,
+    type:     'cell',
+    criteria: '>',
+    value:    5
+    format:   format,
 
 The value property can also be an cell reference.
 
-    :type     => 'cell',
-    :criteria => '>',
-    :value    => '$C$1',
-    :format   => format,
+    type:     'cell',
+    criteria: '>',
+    value:    '$C$1',
+    format:   format,
 
 ##### <a name="format" class="anchor" href="#format"><span class="octicon octicon-link" /></a>:format
 
@@ -261,14 +261,14 @@ the cell when the conditional formatting criterion is met.
 The format is created using the `add_format()` method in the same way as cell
 formats:
 
-    format = workbook.add_format(:bold => 1, :italic => 1)
+    format = workbook.add_format(bold: 1, italic: 1)
 
     worksheet.conditional_formatting('A1',
         {
-            :type     => 'cell',
-            :criteria => '>',
-            :value    => 5
-            ?format   => format,
+            type:     'cell',
+            criteria: '>',
+            value:    5
+            format:   format,
         }
     )
 
@@ -285,22 +285,22 @@ You can replicate them using the following WriteXLSX formats:
     # Light red fill with dark red text.
 
     format1 = workbook.add_format(
-        :bg_color => '#FFC7CE',
-        :color    => '#9C0006',
+        bg_color: '#FFC7CE',
+        color:    '#9C0006',
     )
 
     # Light yellow fill with dark yellow text.
 
     format2 = workbook.add_format(
-        :bg_color => '#FFEB9C',
-        :color    => '#9C6500',
+        bg_color: '#FFEB9C',
+        color:    '#9C6500',
     )
 
     # Green fill with dark green text.
 
     format3 = workbook.add_format(
-        :bg_color => '#C6EFCE',
-        :color    => '#006100',
+        bg_color: '#C6EFCE',
+        color:    '#006100',
     )
 
 ##### <a name="minimum" class="anchor" href="#minimum"><span class="octicon octicon-link" /></a>:minimum
@@ -308,17 +308,17 @@ You can replicate them using the following WriteXLSX formats:
 The `minimum` parameter is used to set the lower limiting value when the
 criteria is either 'between' or 'not between':
 
-    :validate => 'integer',
-    :criteria => 'between',
-    :minimum  => 1,
-    :maximum  => 100,
+    validate: 'integer',
+    criteria: 'between',
+    minimum:  1,
+    maximum:  100,
 
 ##### <a name="maximum" class="anchor" href="#maximum"><span class="octicon octicon-link" /></a>:maximum
 
 The `maximum` parameter is used to set the upper limiting value when the
 criteria is either 'between' or 'not between'. See the previous example.
 
-##### <a name="type_date" class="anchor" href="#type_date"><span class="octicon octicon-link" /></a>:type => 'date'
+##### <a name="type_date" class="anchor" href="#type_date"><span class="octicon octicon-link" /></a>type: 'date'
 
 The `date` type is the same as the `cell` type and uses the same criteria
 and values. However it allows the `:value`, `:minimum` and `:maximum` properties to be
@@ -328,39 +328,39 @@ specified in the ISO8601
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'date',
-            :criteria => 'greater than',
-            :value    => '2011-01-01T',
-            :format   => format,
+            type:     'date',
+            criteria: 'greater than',
+            value:    '2011-01-01T',
+            format:   format,
         }
     )
 
-##### <a name="type_time_period" class="anchor" href="#type_time_period"><span class="octicon octicon-link" /></a>:type => 'time_period'
+##### <a name="type_time_period" class="anchor" href="#type_time_period"><span class="octicon octicon-link" /></a>type: 'time_period'
 
 The `time_period` type is used to specify Excel's "Dates Occurring" style
 conditional format.
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'time_period',
-            :criteria => 'yesterday',
-            :format   => format,
+            type:     'time_period',
+            criteria: 'yesterday',
+            format:   format,
         }
     )
 
 The period is set in the `:criteria` and can have one of the following values:
 
-        :criteria => 'yesterday',
-        :criteria => 'today',
-        :criteria => 'last 7 days',
-        :criteria => 'last week',
-        :criteria => 'this week',
-        :criteria => 'next week',
-        :criteria => 'last month',
-        :criteria => 'this month',
-        :criteria => 'next month'
+        criteria: 'yesterday',
+        criteria: 'today',
+        criteria: 'last 7 days',
+        criteria: 'last week',
+        criteria: 'this week',
+        criteria: 'next week',
+        criteria: 'last month',
+        criteria: 'this month',
+        criteria: 'next month'
 
-##### <a name="type_text" class="anchor" href="#type_text"><span class="octicon octicon-link" /></a>:type => 'text'
+##### <a name="type_text" class="anchor" href="#type_text"><span class="octicon octicon-link" /></a>type: 'text'
 
 The `text` type is used to specify Excel's "Specific Text" style conditional
 format. It is used to do simple string matching using the `:criteria` and
@@ -368,79 +368,79 @@ format. It is used to do simple string matching using the `:criteria` and
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'text',
-            :criteria => 'containing',
-            :value    => 'foo',
-            :format   => format,
+            type:     'text',
+            criteria: 'containing',
+            value:    'foo',
+            format:   format,
         }
     )
 
 The `:criteria` can have one of the following values:
 
-    :criteria => 'containing',
-    :criteria => 'not containing',
-    :criteria => 'begins with',
-    :criteria => 'ends with',
+    criteria: 'containing',
+    criteria: 'not containing',
+    criteria: 'begins with',
+    criteria: 'ends with',
 
 The `:value` parameter should be a string or single character.
 
-##### <a name="type_average" class="anchor" href="#type_average"><span class="octicon octicon-link" /></a>:type => 'average'
+##### <a name="type_average" class="anchor" href="#type_average"><span class="octicon octicon-link" /></a>type: 'average'
 
 The `average` type is used to specify Excel's "Average" style conditional format.
 
     worksheet.conditional_formatting('A1:A4',
         {
-            ?type     => 'average',
-            :criteria => 'above',
-            ?format   => format,
+            type:     'average',
+            criteria: 'above',
+            format:   format,
         }
     )
 
 The type of average for the conditional format range is specified by the `:criteria`:
 
-    :criteria => 'above',
-    :criteria => 'below',
-    :criteria => 'equal or above',
-    :criteria => 'equal or below',
-    :criteria => '1 std dev above',
-    :criteria => '1 std dev below',
-    :criteria => '2 std dev above',
-    :criteria => '2 std dev below',
-    :criteria => '3 std dev above',
-    :criteria => '3 std dev below',
+    criteria: 'above',
+    criteria: 'below',
+    criteria: 'equal or above',
+    criteria: 'equal or below',
+    criteria: '1 std dev above',
+    criteria: '1 std dev below',
+    criteria: '2 std dev above',
+    criteria: '2 std dev below',
+    criteria: '3 std dev above',
+    criteria: '3 std dev below',
 
-##### <a name="type_duplicate" class="anchor" href="#type_duplicate"><span class="octicon octicon-link" /></a>type => 'duplicate'
+##### <a name="type_duplicate" class="anchor" href="#type_duplicate"><span class="octicon octicon-link" /></a>type: 'duplicate'
 
 The `duplicate` type is used to highlight duplicate cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'duplicate',
-            :format   => format,
+            type:     'duplicate',
+            format:   format,
         }
     )
 
-##### <a name="type_unique" class="anchor" href="#type_unique"><span class="octicon octicon-link" /></a>:type => 'unique'
+##### <a name="type_unique" class="anchor" href="#type_unique"><span class="octicon octicon-link" /></a>type: 'unique'
 
 The `unique` type is used to highlight unique cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'unique',
-            :format   => format,
+            type:     'unique',
+            format:   format,
         }
     )
 
-##### <a name="type_top" class="anchor" href="#type_top"><span class="octicon octicon-link" /></a>:type => 'top'
+##### <a name="type_top" class="anchor" href="#type_top"><span class="octicon octicon-link" /></a>type: 'top'
 
 The `top` type is used to specify the top n values by number or percentage
 in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'top',
-            :value    => 10,
-            :format   => format,
+            type:     'top',
+            value:    10,
+            format:   format,
         }
     )
 
@@ -448,101 +448,101 @@ The `:criteria` can be used to indicate that a percentage condition is required:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'top',
-            :value    => 10,
-            :criteria => '%',
-            :format   => format,
+            type:     'top',
+            value:    10,
+            criteria: '%',
+            format:   format,
         }
     )
 
-##### <a name="type_bottom" class="anchor" href="#type_bottom"><span class="octicon octicon-link" /></a>:type => 'bottom'
+##### <a name="type_bottom" class="anchor" href="#type_bottom"><span class="octicon octicon-link" /></a>type: 'bottom'
 
 The `bottom` type is used to specify the bottom n values by number or percentage
 in a range.
 
 It takes the same parameters as top, see above.
 
-##### <a name="type_blanks" class="anchor" href="#type_blanks"><span class="octicon octicon-link" /></a>:type => 'blanks'
+##### <a name="type_blanks" class="anchor" href="#type_blanks"><span class="octicon octicon-link" /></a>type: 'blanks'
 
 The `blanks` type is used to highlight blank cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'blanks',
-            :format   => format,
+            type:     'blanks',
+            format:   format,
         }
     )
 
-##### <a name="type_no_blanks" class="anchor" href="#type_no_blanks"><span class="octicon octicon-link" /></a>:type => 'no_blanks'
+##### <a name="type_no_blanks" class="anchor" href="#type_no_blanks"><span class="octicon octicon-link" /></a>type: 'no_blanks'
 
 The `no_blanks` type is used to highlight non blank cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'no_blanks',
-            :format   => format,
+            type:     'no_blanks',
+            format:   format,
         }
     )
 
-##### <a name="type_errors" class="anchor" href="#type_errors"><span class="octicon octicon-link" /></a>type => 'errors'
+##### <a name="type_errors" class="anchor" href="#type_errors"><span class="octicon octicon-link" /></a>type: 'errors'
 
 The `errors` type is used to highlight error cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'errors',
-            :format   => format,
+            type:     'errors',
+            format:   format,
         }
     )
 
-##### <a name="type_no_errors" class="anchor" href="#type_no_errors"><span class="octicon octicon-link" /></a>:type => 'no_errors'
+##### <a name="type_no_errors" class="anchor" href="#type_no_errors"><span class="octicon octicon-link" /></a>type: 'no_errors'
 
 The `no_errors` type is used to highlight non error cells in a range:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'no_errors',
-            :format   => format,
+            type:     'no_errors',
+            format:   format,
         }
     )
 
-##### <a name="type_formula" class="anchor" href="#type_formula"><span class="octicon octicon-link" /></a>:type => 'formula'
+##### <a name="type_formula" class="anchor" href="#type_formula"><span class="octicon octicon-link" /></a>type: 'formula'
 
 The `formula` type is used to specify a conditional format based on a user
 defined formula:
 
     worksheet.conditional_formatting('A1:A4',
         {
-            :type     => 'formula',
-            :criteria => '=$A$1 > 5',
-            :format   => format,
+            type:     'formula',
+            criteria: '=$A$1 > 5',
+            format:   format,
         }
     )
 
 The formula is specified in the `criteria`.
 
-##### <a name="type_2_color_scale" class="anchor" href="#type_2_color_scale"><span class="octicon octicon-link" /></a>:type => '2_color_scale'
+##### <a name="type_2_color_scale" class="anchor" href="#type_2_color_scale"><span class="octicon octicon-link" /></a>type: '2_color_scale'
 
 The `2_color_scale` type is used to specify Excel's "2 Color Scale"
 style conditional format.
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type  => '2_color_scale',
+            type:  '2_color_scale',
         }
     )
 
 This conditional type can be modified with `:min_type`, `:max_type`,
 `:min_value`, `:max_value`, `:min_color` and `:max_color`, see below.
 
-##### <a name="type_3_color_scale" class="anchor" href="#type_3_color_scale"><span class="octicon octicon-link" /></a>:type => '3_color_scale'
+##### <a name="type_3_color_scale" class="anchor" href="#type_3_color_scale"><span class="octicon octicon-link" /></a>type: '3_color_scale'
 
 The `3_color_scale` type is used to specify Excel's "3 Color Scale"
 style conditional format.
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type  => '3_color_scale',
+            type:  '3_color_scale',
         }
     )
 
@@ -550,13 +550,13 @@ This conditional type can be modified with `:min_type`, `:mid_type`,
 `:max_type`, `:min_value`, `:mid_value`, `:max_value`, `:min_color`,
 `:mid_color` and `:max_color`, see below.
 
-##### <a name="type_data_bar" class="anchor" href="#type_data_bar"><span class="octicon octicon-link" /></a>:type => 'data_bar'
+##### <a name="type_data_bar" class="anchor" href="#type_data_bar"><span class="octicon octicon-link" /></a>type: 'data_bar'
 
 The `data_bar` type is used to specify Excel's "Data Bar" style conditional format.
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type  => 'data_bar',
+            type:  'data_bar',
         }
     )
 
@@ -594,9 +594,9 @@ The properties are used as follows:
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type      => '2_color_scale',
-            :min_type  => 'percent',
-            :max_type  => 'percent',
+            type:      '2_color_scale',
+            min_type:  'percent',
+            max_type:  'percent',
         }
     )
 
@@ -618,9 +618,9 @@ The properties are used as follows:
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type       => '2_color_scale',
-            :min_value  => 10,
-            :max_value  => 90,
+            type:       '2_color_scale',
+            min_value:  10,
+            max_value:  90,
         }
     )
 
@@ -633,9 +633,9 @@ The properties are used as follows:
 
     worksheet.conditional_formatting('A1:A12',
         {
-            :type      => '2_color_scale',
-            :min_color => "#C5D9F1",
-            :max_color => "#538ED5",
+            type:      '2_color_scale',
+            min_color: "#C5D9F1",
+            max_color: "#538ED5",
         }
     )
 
@@ -649,8 +649,8 @@ The `bar_only` parameter property displays a bar data but not the data in the ce
     worksheet.conditional_formatting(
       'D3:D14',
       {
-        :type     => 'data_bar',
-        :bar_only => 1
+        type:     'data_bar',
+        bar_only: 1
       }
     )
 
@@ -662,8 +662,8 @@ The C<bar_solid> parameter turns on a solid (non-gradient) fill for data bars:
     worksheet.conditional_formatting(
       'H3:H14',
       {
-        :type      => 'data_bar',
-        :bar_solid => 1
+        type:      'data_bar',
+        bar_solid: 1
       }
     )
 
@@ -703,9 +703,9 @@ The C<bar_negative_color_same> parameter sets the fill color for the negative po
     worksheet.conditional_formatting(
       'N3:N14',
       {
-        :type                           => 'data_bar',
-        :bar_negative_color_same        => 1,
-        :bar_negative_border_color_same => 1
+        type:                           'data_bar',
+        bar_negative_color_same:        1,
+        bar_negative_border_color_same: 1
       }
     )
 
@@ -734,8 +734,8 @@ The `bar_direction` parameter sets the direction for data bars. This property ca
     worksheet.conditional_formatting(
       'J3:J14',
       {
-        :type          => 'data_bar',
-        :bar_direction => 'right'
+        type:          'data_bar',
+        bar_direction: 'right'
       }
     )
 
@@ -765,8 +765,8 @@ The C<data_bar_2010> parameter sets Excel 2010 style data bars even when Excel 2
     worksheet->conditional_formatting(
       'L3:L14',
       {
-        :type          => 'data_bar',
-        :data_bar_2010 => 1
+        type:          'data_bar',
+        data_bar_2010: 1
       }
     )
 
@@ -783,8 +783,8 @@ The `icon_set` type is used to specify a conditional format with a set of icons 
 
     worksheet.conditional_formatting( 'A1:C1',
         {
-            :type         => 'icon_set',
-            :icon_style   => '3_traffic_lights'
+            type:         'icon_set',
+            icon_style:   '3_traffic_lights'
         }
     )
 
@@ -814,11 +814,11 @@ The criteria, type and value of each icon can be specified using the `icon` arra
 
     worksheet.conditional_formatting( 'A1:D1',
         {
-            :type         => 'icon_set',
-            :icon_style   => '4_red_to_black',
-            :icons        => [ {:criteria => '>',  :type => 'number',     :value => 90},
-                              {:criteria => '>=', :type => 'percentile', :value => 50},
-                              {:criteria => '>',  :type => 'percent',    :value => 25}
+            type:         'icon_set',
+            icon_style:   '4_red_to_black',
+            icons:        [ {criteria: '>',  type: 'number',     value: 90},
+                              {criteria: '>=', type: 'percentile', value: 50},
+                              {criteria: '>',  type: 'percent',    value: 25}
                             ]
         }
     )
@@ -839,11 +839,11 @@ The `icons value` parameter can be a value or formula:
 
     worksheet.conditional_formatting( 'A1:D1',
         {
-            :type         => 'icon_set',
-            :icon_style   => '4_red_to_black',
-            :icons        => [ {:value => 90},
-                              {:value => 50},
-                              {:value => 25}
+            type:         'icon_set',
+            icon_style:   '4_red_to_black',
+            icons:        [ {value: 90},
+                              {value: 50},
+                              {value: 25}
                             ]
         }
     )
@@ -854,9 +854,9 @@ The order of the icons can be reversed using the `reverse_icons` parameter:
 
     worksheet.conditional_formatting( 'A1:C1',
         {
-            :type          => 'icon_set',
-            :icon_style    => '3_arrows',
-            :reverse_icons => 1
+            type:          'icon_set',
+            icon_style:    '3_arrows',
+            reverse_icons: 1
         }
     )
 
@@ -864,9 +864,9 @@ The icons can be displayed without the cell value using the `icons_only` paramet
 
     worksheet.conditional_formatting( 'A1:C1',
         {
-            :type         => 'icon_set',
-            :icon_style   => '3_flags',
-            :icons_only   => 1
+            type:         'icon_set',
+            icon_style:   '3_flags',
+            icons_only:   1
         }
     )
 
@@ -877,10 +877,10 @@ Example 1. Highlight cells greater than an integer value.
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'cell',
-            :criteria => 'greater than',
-            :value    => 5,
-            :format   => format
+            type:     'cell',
+            criteria: 'greater than',
+            value:    5,
+            format:   format
         }
     )
 
@@ -888,10 +888,10 @@ Example 2. Highlight cells greater than a value in a reference cell.
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'cell',
-            :criteria => 'greater than',
-            :value    => '$H$1',
-            :format   => format
+            type:     'cell',
+            criteria: 'greater than',
+            value:    '$H$1',
+            format:   format
         }
     )
 
@@ -899,10 +899,10 @@ Example 3. Highlight cells greater than a certain date:
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'date',
-            :criteria => 'greater than',
-            :value    => '2011-01-01T',
-            :format   => format
+            type:     'date',
+            criteria: 'greater than',
+            value:    '2011-01-01T',
+            format:   format
         }
     )
 
@@ -910,9 +910,9 @@ Example 4. Highlight cells with a date in the last seven days:
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'time_period',
-            :criteria => 'last 7 days',
-            :format   => format
+            type:     'time_period',
+            criteria: 'last 7 days',
+            format:   format
         }
     )
 
@@ -920,10 +920,10 @@ Example 5. Highlight cells with strings starting with the letter b:
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'text',
-            :criteria => 'begins with',
-            :value    => 'b',
-            :format   => format
+            type:     'text',
+            criteria: 'begins with',
+            value:    'b',
+            format:   format
         }
     )
 
@@ -931,8 +931,8 @@ Example 6. Highlight cells that are 1 std deviation above the average for the ra
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'average',
-            :format   => format
+            type:     'average',
+            format:   format
         }
     )
 
@@ -940,8 +940,8 @@ Example 7. Highlight duplicate cells in a range:
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'duplicate',
-            :format   => format
+            type:     'duplicate',
+            format:   format
         }
     )
 
@@ -949,8 +949,8 @@ Example 8. Highlight unique cells in a range.
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'unique',
-            :format   => format
+            type:     'unique',
+            format:   format
         }
     )
 
@@ -958,9 +958,9 @@ Example 9. Highlight the top 10 cells.
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'top',
-            :value    => 10,
-            :format   => format
+            type:     'top',
+            value:    10,
+            format:   format
         }
     )
 
@@ -968,8 +968,8 @@ Example 10. Highlight blank cells.
 
     worksheet.conditional_formatting('A1:F10',
         {
-            :type     => 'blanks',
-            :format   => format
+            type:     'blanks',
+            format:   format
         }
     )
 
@@ -977,8 +977,8 @@ Example 11. Set traffic light icons in 3 cells:
 
     worksheet.conditional_formatting( 'A1:C1',
         {
-            :type         => 'icon_set',
-            :icon_style   => '3_traffic_lights'
+            type:         'icon_set',
+            icon_style:   '3_traffic_lights'
         }
     )
 

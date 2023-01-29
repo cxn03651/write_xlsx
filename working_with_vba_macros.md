@@ -58,13 +58,13 @@ into a worksheet using the `insert_button` method:
     ...
     workbook.add_vba_project('./vbaProject.bin')
 
-    worksheet.insert_button('C2', { :macro => 'my_macro' } )
+    worksheet.insert_button('C2', { macro: 'my_macro' } )
 
 
 It may be necessary to specify a more explicit macro name prefixed by
 the workbook VBA name as follows:
 
-    worksheet.insert_button('C2', { :macro => 'ThisWorkbook.my_macro' } )
+    worksheet.insert_button('C2', { macro: 'ThisWorkbook.my_macro' } )
 
 See the [`macros.rb`](examples.html#macros) from the examples
 directory for a working example.

@@ -40,22 +40,22 @@ Here are some examples.
 
     worksheet.write('A1', number)             #   39506.5
 
-    format2 = workbook.add_format(:num_format => 'dd/mm/yy')
+    format2 = workbook.add_format(num_format: 'dd/mm/yy')
     worksheet.write('A2', number, format2)    #  28/02/08
 
-    format3 = workbook.add_format(:num_format => 'mm/dd/yy')
+    format3 = workbook.add_format(num_format: 'mm/dd/yy')
     worksheet.write('A3', number, format3)    #  02/28/08
 
-    format4 = workbook.add_format(:num_format => 'd-m-yyyy')
+    format4 = workbook.add_format(num_format: 'd-m-yyyy')
     worksheet.write('A4', number, format4)    #  28-2-2008
 
-    format5 = workbook.add_format(:num_format => 'dd/mm/yy hh:mm')
+    format5 = workbook.add_format(num_format: 'dd/mm/yy hh:mm')
     worksheet.write('A5', number, format5)    #  28/02/08 12:00
 
-    format6 = workbook.add_format(:num_format => 'd mmm yyyy')
+    format6 = workbook.add_format(num_format: 'd mmm yyyy')
     worksheet.write('A6', number, format6)    # 28 Feb 2008
 
-    format7 = workbook.add_format(:num_format => 'mmm d yyyy hh:mm AM/PM')
+    format7 = workbook.add_format(num_format: 'mmm d yyyy hh:mm AM/PM')
     worksheet.write('A7', number , format7);     #  Feb 28 2008 12:00 PM
 
 ##### WriteXLSX doesn't automatically convert date/time strings
@@ -94,7 +94,7 @@ Here is an example:
     worksheet = workbook.add_worksheet
 
     # Set the default format for dates.
-    date_format = workbook.add_format(:num_format => 'mmm d yyyy')
+    date_format = workbook.add_format(num_format: 'mmm d yyyy')
 
     # Increase column width to improve visibility of data.
     worksheet.set_column('A:C', 20)
