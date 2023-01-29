@@ -6,8 +6,8 @@ title: WriteXLSX
 The WriteXLSX rubygem can be used to create an Excel file in the 2007+ XLSX format.
 
 The WriteXLSX and this document is ported from Perl module
-[Excel::Wirter::XLSX](http://search.cpan.org/~jmcnamara/Excel-Writer-XLSX-0.83/).
-If you have any problem and question, please contact [me](mailto:cxn03651@msj.biglobe.ne.jp).
+[Excel::Wirter::XLSX](http://search.cpan.org/~jmcnamara/Excel-Writer-XLSX/).
+If you have any problem and question, please contact [me](mailto:nakamura.hideo@gmail.com).
 
 Multiple worksheets can be added to a workbook and formatting can be applied to cells.
 Text, numbers, and formulas can be written to the cells.
