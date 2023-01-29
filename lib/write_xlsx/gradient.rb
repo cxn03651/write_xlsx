@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Writexlsx
   module Gradient
     def gradient_properties(args)

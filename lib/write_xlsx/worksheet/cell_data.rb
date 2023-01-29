@@ -57,6 +57,7 @@ module Writexlsx
 
     class StringCellData < CellData # :nodoc:
       attr_reader :token
+
       def initialize(index, xf)
         @token = index
         @xf = xf
@@ -117,6 +118,7 @@ module Writexlsx
 
     class FormulaArrayCellData < CellData # :nodoc:
       attr_reader :token, :result, :range, :link_type, :url
+
       def initialize(formula, xf, range, result)
         @token = formula
         @xf = xf
@@ -138,6 +140,7 @@ module Writexlsx
 
     class DynamicFormulaArrayCellData < CellData # :nodoc:
       attr_reader :token, :result, :range, :link_type, :url
+
       def initialize(formula, xf, range, result)
         @token = formula
         @xf = xf

@@ -13,7 +13,7 @@
 
 require 'write_xlsx'
 
-workbook  =WriteXLSX.new('lambda.xlsx')
+workbook = WriteXLSX.new('lambda.xlsx')
 worksheet = workbook.add_worksheet
 
 worksheet.write(
