@@ -32,9 +32,9 @@ class TestCondFormat08 < Minitest::Test
     ].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
-                                          :type     => 'time_period',
-                                          :criteria => criteria,
-                                          :format   => nil
+                                          type:     'time_period',
+                                          criteria: criteria,
+                                          format:   nil
                                         })
     end
 

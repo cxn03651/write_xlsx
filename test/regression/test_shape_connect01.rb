@@ -15,21 +15,21 @@ class TestRegressionShapeConnect01 < Minitest::Test
     @xlsx = 'shape_connect01.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:font => 'Arial', :size => 8)
+    format    = workbook.add_format(font: 'Arial', size: 8)
 
     # Add a circle, with centered text
     ellipse = workbook.add_shape(
-      :type => 'ellipse', :text => "Hello\nWorld",
-      :width => 60, :height => 60, :format => format
+      type: 'ellipse', text: "Hello\nWorld",
+      width: 60, height: 60, format: format
     )
     worksheet.insert_shape('A1', ellipse, 50, 50)
 
     # Add a plus
-    plus = workbook.add_shape(:type => 'plus', :width => 20, :height => 20)
+    plus = workbook.add_shape(type: 'plus', width: 20, height: 20)
     worksheet.insert_shape('A1', plus, 250, 200)
 
     # Create a bent connector to link the two shapes
-    cxn_shape = workbook.add_shape(:type => 'bentConnector3')
+    cxn_shape = workbook.add_shape(type: 'bentConnector3')
 
     # Link the connector to the bottom of the circle
     cxn_shape.start = ellipse.id

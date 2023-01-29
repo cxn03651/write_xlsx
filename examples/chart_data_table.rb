@@ -14,7 +14,7 @@ require 'write_xlsx'
 
 workbook  = WriteXLSX.new('chart_data_table.xlsx')
 worksheet = workbook.add_worksheet
-bold      = workbook.add_format(:bold => 1)
+bold      = workbook.add_format(bold: 1)
 
 # Add the worksheet data that the charts will refer to.
 headings = ['Number', 'Batch 1', 'Batch 2']
@@ -28,27 +28,27 @@ worksheet.write('A1', headings, bold)
 worksheet.write('A2', data)
 
 # Create a new column chart with a data table.
-chart1 = workbook.add_chart(:type => 'column', :embedded => 1)
+chart1 = workbook.add_chart(type: 'column', embedded: 1)
 
 # Configure the first series.
 chart1.add_series(
-  :name       => '=Sheet1!$B$1',
-  :categories => '=Sheet1!$A$2:$A$7',
-  :values     => '=Sheet1!$B$2:$B$7'
+  name:       '=Sheet1!$B$1',
+  categories: '=Sheet1!$A$2:$A$7',
+  values:     '=Sheet1!$B$2:$B$7'
 )
 
 # Configure second series. Note alternative use of array ref to define
 # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
 chart1.add_series(
-  :name       => '=Sheet1!$C$1',
-  :categories => ['Sheet1', 1, 6, 0, 0],
-  :values     => ['Sheet1', 1, 6, 2, 2]
+  name:       '=Sheet1!$C$1',
+  categories: ['Sheet1', 1, 6, 0, 0],
+  values:     ['Sheet1', 1, 6, 2, 2]
 )
 
 # Add a chart title and some axis labels.
-chart1.set_title(:name => 'Chart with Data Table')
-chart1.set_x_axis(:name => 'Test number')
-chart1.set_y_axis(:name => 'Sample length (mm)')
+chart1.set_title(name: 'Chart with Data Table')
+chart1.set_x_axis(name: 'Test number')
+chart1.set_y_axis(name: 'Sample length (mm)')
 
 # Set a default data table on the X-Axis.
 chart1.set_table
@@ -56,44 +56,44 @@ chart1.set_table
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart(
   'D2', chart1,
-  :x_offset => 25, :y_offset => 10
+  x_offset: 25, y_offset: 10
 )
 
 #
 # Create a second charat.
 #
-chart2 = workbook.add_chart(:type => 'column', :embedded => 1)
+chart2 = workbook.add_chart(type: 'column', embedded: 1)
 
 # Configure the first series.
 chart2.add_series(
-  :name       => '=Sheet1!$B$1',
-  :categories => '=Sheet1!$A$2:$A$7',
-  :values     => '=Sheet1!$B$2:$B$7'
+  name:       '=Sheet1!$B$1',
+  categories: '=Sheet1!$A$2:$A$7',
+  values:     '=Sheet1!$B$2:$B$7'
 )
 
 # Configure second series. Note alternative use of array ref to define
 # ranges: [ sheetname, row_start, row_end, col_start, col_end ].
 chart2.add_series(
-  :name       => '=Sheet1!$C$1',
-  :categories => ['Sheet1', 1, 6, 0, 0],
-  :values     => ['Sheet1', 1, 6, 2, 2]
+  name:       '=Sheet1!$C$1',
+  categories: ['Sheet1', 1, 6, 0, 0],
+  values:     ['Sheet1', 1, 6, 2, 2]
 )
 
 # Add a chart title and some axis labels.
-chart2.set_title(:name => 'Data Table with legend keys')
-chart2.set_x_axis(:name => 'Test number')
-chart2.set_y_axis(:name => 'Sample length (mm)')
+chart2.set_title(name: 'Data Table with legend keys')
+chart2.set_x_axis(name: 'Test number')
+chart2.set_y_axis(name: 'Sample length (mm)')
 
 # Set a default data table on the X-Axis with the legend keys shown.
-chart2.set_table(:show_keys => true)
+chart2.set_table(show_keys: true)
 
 # Hide the chart legend since the keys are show on the data table.
-chart2.set_legend(:position => 'none')
+chart2.set_legend(position: 'none')
 
 # Insert the chart into the worksheet (with an offset).
 worksheet.insert_chart(
   'D18', chart2,
-  :x_offset => 25, :y_offset => 11
+  x_offset: 25, y_offset: 11
 )
 
 workbook.close

@@ -11,7 +11,7 @@ class TestWriteMergeCells < Minitest::Test
   end
 
   def test_write_merge_cells_B3_C3_Foo_format
-    format = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
+    format = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 1)
     @worksheet.select
     @worksheet.merge_range('B3:C3', 'Foo', format)
     @worksheet.__send__('assemble_xml_file')
@@ -44,8 +44,8 @@ EOS
   end
 
   def test_write_merge_cells_two_range
-    format1 = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
-    format2 = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 2)
+    format1 = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 1)
+    format2 = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 2)
     @worksheet.select
     @worksheet.merge_range('B3:C3', 'Foo', format1)
     @worksheet.merge_range('A2:D2', nil,   format2)
@@ -86,9 +86,9 @@ EOS
   end
 
   def test_write_merge_range_type
-    format1 = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 1)
-    format2 = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 2)
-    format3 = Writexlsx::Format.new(Writexlsx::Formats.new, :xf_index => 3)
+    format1 = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 1)
+    format2 = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 2)
+    format3 = Writexlsx::Format.new(Writexlsx::Formats.new, xf_index: 3)
 
     @worksheet.set_column('B:C', 12)
     @worksheet.instance_variable_set(:@date_1904, 0)

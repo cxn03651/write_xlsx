@@ -15,7 +15,7 @@ class TestTable04 < Minitest::Test
     @worksheet.add_table(
       'C3:F13',
       {
-        :autofilter => 0
+        autofilter: 0
       }
     )
     @worksheet.__send__(:prepare_tables, 1, {})

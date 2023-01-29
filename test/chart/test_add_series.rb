@@ -17,8 +17,8 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@name_id, nil)
     series.instance_variable_set(:@cat_data_id, nil)
     series.instance_variable_set(:@val_data_id, 0)
-    series.instance_variable_set(:@line, { :_defined => 0 })
-    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@line, { _defined: 0 })
+    series.instance_variable_set(:@fill, { _defined: 0 })
     series.instance_variable_set(:@pattern, nil)
     series.instance_variable_set(:@gradient, nil)
     series.instance_variable_set(:@marker, nil)
@@ -30,15 +30,15 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@y2_axis, nil)
     series.instance_variable_set(
       :@error_bars, {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
+        _x_error_bars: nil,
+        _y_error_bars: nil
       }
     )
     series.instance_variable_set(:@points, nil)
 
     expected = series
 
-    @chart.add_series(:values => '=Sheet1!$A$1:$A$5')
+    @chart.add_series(values: '=Sheet1!$A$1:$A$5')
 
     result = @chart.instance_variable_get(:@series).first
 
@@ -54,8 +54,8 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@name_id, nil)
     series.instance_variable_set(:@cat_data_id, 0)
     series.instance_variable_set(:@val_data_id, 1)
-    series.instance_variable_set(:@line, { :_defined => 0 })
-    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@line, { _defined: 0 })
+    series.instance_variable_set(:@fill, { _defined: 0 })
     series.instance_variable_set(:@pattern, nil)
     series.instance_variable_set(:@gradient, nil)
     series.instance_variable_set(:@marker, nil)
@@ -67,17 +67,17 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@y2_axis, nil)
     series.instance_variable_set(
       :@error_bars, {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
+        _x_error_bars: nil,
+        _y_error_bars: nil
       }
     )
     series.instance_variable_set(:@points, nil)
     expected = [series]
 
     @chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5',
-      :name       => 'Text'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5',
+      name:       'Text'
     )
 
     result = @chart.instance_variable_get(:@series)
@@ -94,8 +94,8 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@name_id, nil)
     series.instance_variable_set(:@cat_data_id, nil)
     series.instance_variable_set(:@val_data_id, 0)
-    series.instance_variable_set(:@line, { :_defined => 0 })
-    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@line, { _defined: 0 })
+    series.instance_variable_set(:@fill, { _defined: 0 })
     series.instance_variable_set(:@pattern, nil)
     series.instance_variable_set(:@gradient, nil)
     series.instance_variable_set(:@marker, nil)
@@ -107,14 +107,14 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@y2_axis, nil)
     series.instance_variable_set(
       :@error_bars, {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
+        _x_error_bars: nil,
+        _y_error_bars: nil
       }
     )
     series.instance_variable_set(:@points, nil)
     expected = [series]
 
-    @chart.add_series(:values => ['Sheet1', 0, 4, 0, 0])
+    @chart.add_series(values: ['Sheet1', 0, 4, 0, 0])
 
     result = @chart.instance_variable_get(:@series)
 
@@ -130,8 +130,8 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@name_id, nil)
     series.instance_variable_set(:@cat_data_id, 0)
     series.instance_variable_set(:@val_data_id, 1)
-    series.instance_variable_set(:@line, { :_defined => 0 })
-    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@line, { _defined: 0 })
+    series.instance_variable_set(:@fill, { _defined: 0 })
     series.instance_variable_set(:@pattern, nil)
     series.instance_variable_set(:@gradient, nil)
     series.instance_variable_set(:@marker, nil)
@@ -143,17 +143,17 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@y2_axis, nil)
     series.instance_variable_set(
       :@error_bars, {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
+        _x_error_bars: nil,
+        _y_error_bars: nil
       }
     )
     series.instance_variable_set(:@points, nil)
     expected = series
 
     @chart.add_series(
-      :categories => ['Sheet1', 0, 4, 0, 0],
-      :values     => ['Sheet1', 0, 4, 1, 1],
-      :name       => 'Text'
+      categories: ['Sheet1', 0, 4, 0, 0],
+      values:     ['Sheet1', 0, 4, 1, 1],
+      name:       'Text'
     )
 
     result = @chart.instance_variable_get(:@series).first
@@ -170,8 +170,8 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(:@name_id, nil)
     series.instance_variable_set(:@cat_data_id, 0)
     series.instance_variable_set(:@val_data_id, 1)
-    series.instance_variable_set(:@line, { :_defined => 0 })
-    series.instance_variable_set(:@fill, { :_defined => 0 })
+    series.instance_variable_set(:@line, { _defined: 0 })
+    series.instance_variable_set(:@fill, { _defined: 0 })
     series.instance_variable_set(:@pattern, nil)
     series.instance_variable_set(:@gradient, nil)
     series.instance_variable_set(:@marker, nil)
@@ -184,19 +184,19 @@ class TestAddSeries < Minitest::Test
     series.instance_variable_set(
       :@error_bars,
       {
-        :_x_error_bars => nil,
-        :_y_error_bars => nil
+        _x_error_bars: nil,
+        _y_error_bars: nil
       }
     )
     series.instance_variable_set(:@points, nil)
     expected = series
 
     @chart.add_series(
-      :categories => ['Sheet1', 0, 4, 0, 0],
-      :values     => ['Sheet1', 0, 4, 1, 1],
-      :name       => 'Text',
-      :x2_axis    => 1,
-      :y2_axis    => 1
+      categories: ['Sheet1', 0, 4, 0, 0],
+      values:     ['Sheet1', 0, 4, 1, 1],
+      name:       'Text',
+      x2_axis:    1,
+      y2_axis:    1
     )
 
     result = @chart.instance_variable_get(:@series).first

@@ -19,7 +19,7 @@ class TestRegressionImage46 < Minitest::Test
     worksheet.insert_image(
       'E9',
       File.join(@test_dir, 'regression', 'images/red.png'),
-      :object_position => 4, :y_offset => 4
+      object_position: 4, y_offset: 4
     )
 
     worksheet.set_row(8, 30, nil, 1)

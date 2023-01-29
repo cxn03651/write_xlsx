@@ -29,7 +29,7 @@ class TestWriteDLbls < Minitest::Test
   def test_write_d_lbls_value_only
     expected = '<c:dLbls><c:showVal val="1"/></c:dLbls>'
 
-    labels = @series.__send__(:labels_properties, :value => 1)
+    labels = @series.__send__(:labels_properties, value: 1)
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
@@ -40,7 +40,7 @@ class TestWriteDLbls < Minitest::Test
   def test_write_d_lbls_series_name_only
     expected = '<c:dLbls><c:showSerName val="1"/></c:dLbls>'
 
-    labels = @series.__send__(:labels_properties, :series_name => 1)
+    labels = @series.__send__(:labels_properties, series_name: 1)
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
@@ -51,7 +51,7 @@ class TestWriteDLbls < Minitest::Test
   def test_write_d_lbls_category_only
     expected = '<c:dLbls><c:showCatName val="1"/></c:dLbls>'
 
-    labels = @series.__send__(:labels_properties, :category => 1)
+    labels = @series.__send__(:labels_properties, category: 1)
     @chart.__send__(:write_d_lbls, labels)
 
     result = chart_writer_string
@@ -65,9 +65,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value       => 1,
-        :category    => 1,
-        :series_name => 1
+        value:       1,
+        category:    1,
+        series_name: 1
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -83,8 +83,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'center'
+        value:    1,
+        position: 'center'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -100,8 +100,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'left'
+        value:    1,
+        position: 'left'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -117,8 +117,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'right'
+        value:    1,
+        position: 'right'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -134,8 +134,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'top'
+        value:    1,
+        position: 'top'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -151,8 +151,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'above'
+        value:    1,
+        position: 'above'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -168,8 +168,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'bottom'
+        value:    1,
+        position: 'bottom'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -185,8 +185,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value    => 1,
-        :position => 'below'
+        value:    1,
+        position: 'below'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -202,8 +202,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1
+        value:        1,
+        leader_lines: 1
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -219,9 +219,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1,
-        :position     => ''
+        value:        1,
+        leader_lines: 1,
+        position:     ''
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -237,9 +237,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1,
-        :position     => 'center'
+        value:        1,
+        leader_lines: 1,
+        position:     'center'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -255,9 +255,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1,
-        :position     => 'inside_end'
+        value:        1,
+        leader_lines: 1,
+        position:     'inside_end'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -273,9 +273,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1,
-        :position     => 'outside_end'
+        value:        1,
+        leader_lines: 1,
+        position:     'outside_end'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -291,9 +291,9 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :value        => 1,
-        :leader_lines => 1,
-        :position     => 'best_fit'
+        value:        1,
+        leader_lines: 1,
+        position:     'best_fit'
       }
     )
     @chart.__send__(:write_d_lbls, labels)
@@ -309,8 +309,8 @@ class TestWriteDLbls < Minitest::Test
     labels = @series.__send__(
       :labels_properties,
       {
-        :leader_lines => 1,
-        :percentage   => 1
+        leader_lines: 1,
+        percentage:   1
       }
     )
     @chart.__send__(:write_d_lbls, labels)

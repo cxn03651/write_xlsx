@@ -18,8 +18,8 @@ class TestRegressionSimple04 < Minitest::Test
 
     worksheet.set_column(0, 0, 12)
 
-    format1 = workbook.add_format(:num_format => 20)
-    format2 = workbook.add_format(:num_format => 14)
+    format1 = workbook.add_format(num_format: 20)
+    format2 = workbook.add_format(num_format: 14)
 
     worksheet.write_date_time(0, 0, 'T12:00', format1)
     worksheet.write_date_time(1, 0, '2013-01-27T', format2)

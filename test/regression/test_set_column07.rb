@@ -16,9 +16,9 @@ class TestRegressionSetColumn07 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
-    bold        = workbook.add_format(:bold   => 1)
-    italic      = workbook.add_format(:italic => 1)
-    bold_italic = workbook.add_format(:bold   => 1, :italic => 1)
+    bold        = workbook.add_format(bold: 1)
+    italic      = workbook.add_format(italic: 1)
+    bold_italic = workbook.add_format(bold: 1, italic: 1)
 
     data = [
       [1, 2, 3,  4,  5],

@@ -17,19 +17,19 @@ class TestRegressionFormat12 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     top_left_bottom = workbook.add_format(
-      :left   => 1,
-      :top    => 1,
-      :bottom => 1
+      left:   1,
+      top:    1,
+      bottom: 1
     )
 
     top_bottom = workbook.add_format(
-      :top    => 1,
-      :bottom => 1
+      top:    1,
+      bottom: 1
     )
 
     top_left = workbook.add_format(
-      :left => 1,
-      :top  => 1
+      left: 1,
+      top:  1
     )
 
     worksheet.write('B2', 'test', top_left_bottom)

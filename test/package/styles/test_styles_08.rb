@@ -9,9 +9,9 @@ class TestStyles08 < Minitest::Test
   def test_styles_08
     workbook = WriteXLSX.new(StringIO.new)
 
-    format1 = workbook.add_format(:pattern => 1,  :bg_color => 'red', :bold => 1)
-    format2 = workbook.add_format(:bg_color => 'red', :italic => 1)
-    format3 = workbook.add_format(:fg_color => 'red', :underline => 1)
+    format1 = workbook.add_format(pattern: 1,  bg_color: 'red', bold: 1)
+    format2 = workbook.add_format(bg_color: 'red', italic: 1)
+    format3 = workbook.add_format(fg_color: 'red', underline: 1)
 
     workbook.__send__('set_default_xf_indices')
     workbook.__send__('prepare_format_properties')

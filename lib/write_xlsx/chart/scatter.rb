@@ -123,8 +123,8 @@ module Writexlsx
           write_layout(@plotarea.layout, 'plot')
 
           # Write the subclass chart type elements for primary and secondary axes.
-          write_chart_type(:primary_axes => 1)
-          write_chart_type(:primary_axes => 0)
+          write_chart_type(primary_axes: 1)
+          write_chart_type(primary_axes: 0)
 
           # Write c:catAx and c:valAx elements for series using primary axes.
           write_cat_val_axis(@x_axis, @y_axis, @axis_ids, 'b')
@@ -201,7 +201,7 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a line type unless there is already a user defined type.
-            series.line = line_properties(:width => 2.25, :none => 1, :_defined => 1) unless series.line_defined?
+            series.line = line_properties(width: 2.25, none: 1, _defined: 1) unless series.line_defined?
           end
         end
 
@@ -210,7 +210,7 @@ module Writexlsx
           # Go through each series and define default values.
           @series.each do |series|
             # Set a marker type unless there is already a user defined type.
-            series.marker = Marker.new(:type => 'none', :_defined => 1) unless ptrue?(series.marker)
+            series.marker = Marker.new(type: 'none', _defined: 1) unless ptrue?(series.marker)
           end
         end
       end

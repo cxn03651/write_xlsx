@@ -18,7 +18,7 @@ class TestRegressionDate1904_02 < Minitest::Test
     workbook.set_1904
 
     worksheet   = workbook.add_worksheet
-    format      = workbook.add_format(:num_format => 14)
+    format      = workbook.add_format(num_format: 14)
 
     worksheet.set_column('A:A', 12)
 

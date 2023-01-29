@@ -14,7 +14,7 @@ class TestTable10 < Minitest::Test
     # Set the table properties.
     @worksheet.add_table(
       'C2:F13',
-      { :name => 'MyTable' }
+      { name: 'MyTable' }
     )
     @worksheet.__send__(:prepare_tables, 1, {})
 

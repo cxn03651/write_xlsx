@@ -15,7 +15,7 @@ class TestChartTable03 < Minitest::Test
     @xlsx = 'chart_table03.xlsx'
     workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
-    chart      = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart      = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xls file.
     chart.instance_variable_set(:@axis_ids, [108636032, 108643840])
@@ -28,21 +28,21 @@ class TestChartTable03 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart.add_series(values: '=Sheet1!$C$1:$C$5')
 
     # Test the default table.
     chart.set_table(
-      :vertical   => false,
-      :horizontal => false,
-      :outline    => false,
-      :show_keys  => true,
-      :font       => {
-        :bold     => 1,
-        :italic   => 1,
-        :color    => 'red',
-        :baseline => -1
+      vertical:   false,
+      horizontal: false,
+      outline:    false,
+      show_keys:  true,
+      font:       {
+        bold:     1,
+        italic:   1,
+        color:    'red',
+        baseline: -1
       }
     )
 

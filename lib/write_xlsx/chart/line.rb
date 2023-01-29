@@ -24,7 +24,7 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @subtype ||= 'standard'
-        @default_marker = Marker.new(:type => 'none')
+        @default_marker = Marker.new(type: 'none')
         @smooth_allowed = 1
 
         # Override and reset the default axis values.

@@ -18,9 +18,9 @@ class TestRegressionButton02 < Minitest::Test
 
     worksheet.insert_button('B4',
                             {
-                              :x_offset => 4,
-                              :y_offset => 3,
-                              :caption  => 'my text'
+                              x_offset: 4,
+                              y_offset: 3,
+                              caption:  'my text'
                             })
 
     workbook.close

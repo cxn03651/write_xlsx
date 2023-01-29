@@ -20,7 +20,7 @@ worksheet = workbook.add_worksheet
 dirname = File.dirname(File.expand_path(__FILE__))
 worksheet.set_header(
   '&C&C&[Picture]', nil,
-  { :image_center => File.join(dirname, 'watermark.png') }
+  { image_center: File.join(dirname, 'watermark.png') }
 )
 
 workbook.close

@@ -7,8 +7,8 @@ workbook  = WriteXLSX.new('protection.xlsx')
 worksheet = workbook.add_worksheet
 
 # Create some format objects
-unlocked = workbook.add_format(:locked => 0)
-hidden   = workbook.add_format(:hidden => 1)
+unlocked = workbook.add_format(locked: 0)
+hidden   = workbook.add_format(hidden: 1)
 
 # Format the columns
 worksheet.set_column('A:A', 45)

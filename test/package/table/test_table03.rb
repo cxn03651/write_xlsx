@@ -15,10 +15,10 @@ class TestTable03 < Minitest::Test
     @worksheet.add_table(
       'C5:D16',
       {
-        :banded_rows    => 0,
-        :first_column   => 1,
-        :last_column    => 1,
-        :banded_columns => 1
+        banded_rows:    0,
+        first_column:   1,
+        last_column:    1,
+        banded_columns: 1
       }
     )
     @worksheet.__send__(:prepare_tables, 1, {})

@@ -17,8 +17,8 @@ class TestRegressionHeaderImage06 < Minitest::Test
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
 
-    worksheet1.set_header('&L&G', nil, { :image_left   => 'test/regression/images/red.jpg' })
-    worksheet2.set_header('&L&G', nil, { :image_left   => 'test/regression/images/blue.jpg' })
+    worksheet1.set_header('&L&G', nil, { image_left: 'test/regression/images/red.jpg' })
+    worksheet2.set_header('&L&G', nil, { image_left: 'test/regression/images/blue.jpg' })
 
     workbook.close
     compare_for_regression(

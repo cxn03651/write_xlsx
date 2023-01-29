@@ -20,8 +20,8 @@ require 'write_xlsx'
 workbook = WriteXLSX.new("colors.xlsx")
 
 # Some common formats
-center  = workbook.add_format(:align => 'center')
-heading = workbook.add_format(:align => 'center', :bold => 1)
+center  = workbook.add_format(align: 'center')
+heading = workbook.add_format(align: 'center', bold: 1)
 
 ######################################################################
 #
@@ -83,9 +83,9 @@ i = 1
 #
 order.each do |index|
   format = workbook.add_format(
-    :fg_color => colors[index],
-    :pattern  => 1,
-    :border   => 1
+    fg_color: colors[index],
+    pattern:  1,
+    border:   1
   )
 
   worksheet1.write(i + 1, 0, index,                    center)
@@ -111,9 +111,9 @@ worksheet2.write(0, 3, "Name",  heading)
 
 (8..63).each do |i|
   format = workbook.add_format(
-    :fg_color => i,
-    :pattern  => 1,
-    :border   => 1
+    fg_color: i,
+    pattern:  1,
+    border:   1
   )
 
   worksheet2.write((i - 7), 0, i,                    center)
@@ -159,9 +159,9 @@ i = 1
 
 colors.each do |html_color, color|
   format = workbook.add_format(
-    :fg_color => html_color,
-    :pattern  => 1,
-    :border   => 1
+    fg_color: html_color,
+    pattern:  1,
+    border:   1
   )
 
   worksheet3.write(i + 1, 1, html_color, center)

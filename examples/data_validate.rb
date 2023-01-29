@@ -19,12 +19,12 @@ worksheet = workbook.add_worksheet
 
 # Add a format for the header cells.
 header_format = workbook.add_format(
-  :border    => 1,
-  :bg_color  => '#C6EFCE',
-  :bold      => 1,
-  :text_wrap => 1,
-  :valign    => 'vcenter',
-  :indent    => 1
+  border:    1,
+  bg_color:  '#C6EFCE',
+  bold:      1,
+  text_wrap: 1,
+  valign:    'vcenter',
+  indent:    1
 )
 
 # Set up layout of the worksheet.
@@ -58,10 +58,10 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'integer',
-    :criteria => 'between',
-    :minimum  => 1,
-    :maximum  => 10
+    validate: 'integer',
+    criteria: 'between',
+    minimum:  1,
+    maximum:  10
   }
 )
 
@@ -75,10 +75,10 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'integer',
-    :criteria => 'not between',
-    :minimum  => '=E3',
-    :maximum  => '=F3'
+    validate: 'integer',
+    criteria: 'not between',
+    minimum:  '=E3',
+    maximum:  '=F3'
   }
 )
 
@@ -92,9 +92,9 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'integer',
-    :criteria => '>',
-    :value    => 0
+    validate: 'integer',
+    criteria: '>',
+    value:    0
   }
 )
 
@@ -108,9 +108,9 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'integer',
-    :criteria => '<',
-    :value    => 10
+    validate: 'integer',
+    criteria: '<',
+    value:    10
   }
 )
 
@@ -124,10 +124,10 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'decimal',
-    :criteria => 'between',
-    :minimum  => 0.1,
-    :maximum  => 0.5
+    validate: 'decimal',
+    criteria: 'between',
+    minimum:  0.1,
+    maximum:  0.5
   }
 )
 
@@ -141,8 +141,8 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'list',
-    :source   => %w[open high close]
+    validate: 'list',
+    source:   %w[open high close]
   }
 )
 
@@ -156,8 +156,8 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'list',
-    :source   => '=$E$4:$G$4'
+    validate: 'list',
+    source:   '=$E$4:$G$4'
   }
 )
 
@@ -171,10 +171,10 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'date',
-    :criteria => 'between',
-    :minimum  => '2008-01-01T',
-    :maximum  => '2008-12-12T'
+    validate: 'date',
+    criteria: 'between',
+    minimum:  '2008-01-01T',
+    maximum:  '2008-12-12T'
   }
 )
 
@@ -188,10 +188,10 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'time',
-    :criteria => 'between',
-    :minimum  => 'T06:00',
-    :maximum  => 'T12:00'
+    validate: 'time',
+    criteria: 'between',
+    minimum:  'T06:00',
+    maximum:  'T12:00'
   }
 )
 
@@ -205,9 +205,9 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'length',
-    :criteria => '>',
-    :value    => 3
+    validate: 'length',
+    criteria: '>',
+    value:    3
   }
 )
 
@@ -221,8 +221,8 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate => 'custom',
-    :value    => '=AND(F5=50,G5=60)'
+    validate: 'custom',
+    value:    '=AND(F5=50,G5=60)'
   }
 )
 
@@ -236,12 +236,12 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate      => 'integer',
-    :criteria      => 'between',
-    :minimum       => 1,
-    :maximum       => 100,
-    :input_title   => 'Enter an integer:',
-    :input_message => 'between 1 and 100'
+    validate:      'integer',
+    criteria:      'between',
+    minimum:       1,
+    maximum:       100,
+    input_title:   'Enter an integer:',
+    input_message: 'between 1 and 100'
   }
 )
 
@@ -255,14 +255,14 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate      => 'integer',
-    :criteria      => 'between',
-    :minimum       => 1,
-    :maximum       => 100,
-    :input_title   => 'Enter an integer:',
-    :input_message => 'between 1 and 100',
-    :error_title   => 'Input value is not valid!',
-    :error_message => 'It should be an integer between 1 and 100'
+    validate:      'integer',
+    criteria:      'between',
+    minimum:       1,
+    maximum:       100,
+    input_title:   'Enter an integer:',
+    input_message: 'between 1 and 100',
+    error_title:   'Input value is not valid!',
+    error_message: 'It should be an integer between 1 and 100'
   }
 )
 
@@ -276,15 +276,15 @@ worksheet.write(row, 0, txt)
 worksheet.data_validation(
   row, 1,
   {
-    :validate      => 'integer',
-    :criteria      => 'between',
-    :minimum       => 1,
-    :maximum       => 100,
-    :input_title   => 'Enter an integer:',
-    :input_message => 'between 1 and 100',
-    :error_title   => 'Input value is not valid!',
-    :error_message => 'It should be an integer between 1 and 100',
-    :error_type    => 'information'
+    validate:      'integer',
+    criteria:      'between',
+    minimum:       1,
+    maximum:       100,
+    input_title:   'Enter an integer:',
+    input_message: 'between 1 and 100',
+    error_title:   'Input value is not valid!',
+    error_message: 'It should be an integer between 1 and 100',
+    error_type:    'information'
   }
 )
 

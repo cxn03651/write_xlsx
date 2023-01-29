@@ -22,9 +22,9 @@ class TestRegressionHeaderImage18 < Minitest::Test
       '&L&G&C&G&R&G',
       nil,
       {
-        :image_left   => 'test/regression/images/red.jpg',
-        :image_center => 'test/regression/images/blue.jpg',
-        :image_right  => 'test/regression/images/red.jpg'
+        image_left:   'test/regression/images/red.jpg',
+        image_center: 'test/regression/images/blue.jpg',
+        image_right:  'test/regression/images/red.jpg'
       }
     )
 
@@ -32,9 +32,9 @@ class TestRegressionHeaderImage18 < Minitest::Test
       '&L&G&C&G&R&G',
       nil,
       {
-        :image_left   => 'test/regression/images/blue.jpg',
-        :image_center => 'test/regression/images/red.jpg',
-        :image_right  => 'test/regression/images/blue.jpg'
+        image_left:   'test/regression/images/blue.jpg',
+        image_center: 'test/regression/images/red.jpg',
+        image_right:  'test/regression/images/blue.jpg'
       }
     )
 

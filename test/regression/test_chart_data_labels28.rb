@@ -15,7 +15,7 @@ class TestRegressionChartDataLabels28 < Minitest::Test
     @xlsx = 'chart_data_labels28.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart     = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [48514944, 48516480])
@@ -30,20 +30,20 @@ class TestRegressionChartDataLabels28 < Minitest::Test
     worksheet.write('A1', data)
 
     custom = [
-      { :value => 123 },
-      { :value => 'abc' },
+      { value: 123 },
+      { value: 'abc' },
       nil,
-      { :formula => 'Sheet1!$D$1' },
-      { :formula => 'Sheet1!$D$2' }
+      { formula: 'Sheet1!$D$1' },
+      { formula: 'Sheet1!$D$2' }
     ]
 
     chart.add_series(
-      :values      => '=Sheet1!$A$1:$A$5',
-      :data_labels => { :value => 1, :custom => custom }
+      values:      '=Sheet1!$A$1:$A$5',
+      data_labels: { value: 1, custom: custom }
     )
 
-    chart.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart.add_series(values: '=Sheet1!$C$1:$C$5')
 
     worksheet.insert_chart('E9', chart)
 

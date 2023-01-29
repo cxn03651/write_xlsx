@@ -22,9 +22,9 @@ class TestSparkline05 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location => ['$F$1'],
-        :range    => ['$A$1:$E$1'],
-        :type     => 'win_loss'
+        location: ['$F$1'],
+        range:    ['$A$1:$E$1'],
+        type:     'win_loss'
       }
     )
 

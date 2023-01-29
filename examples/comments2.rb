@@ -5,7 +5,7 @@ require 'write_xlsx'
 
 workbook  = WriteXLSX.new('comments2.xlsx')
 
-text_wrap  = workbook.add_format(:text_wrap => 1, :valign => 'top')
+text_wrap  = workbook.add_format(text_wrap: 1, valign: 'top')
 worksheet1 = workbook.add_worksheet
 worksheet2 = workbook.add_worksheet
 worksheet3 = workbook.add_worksheet
@@ -59,7 +59,7 @@ cell_text = 'This cell comment is visible.'
 comment = 'Hello.'
 
 worksheet2.write('C3', cell_text, text_wrap)
-worksheet2.write_comment('C3', comment, :visible => 1)
+worksheet2.write_comment('C3', comment, visible: 1)
 
 cell_text = "This cell comment isn't visible (the default)."
 
@@ -88,7 +88,7 @@ cell_text = 'This cell comment is visible, explicitly.'
 comment = 'Hello.'
 
 worksheet3.write('C3', cell_text, text_wrap)
-worksheet3.write_comment('C3', comment, :visible => 1)
+worksheet3.write_comment('C3', comment, visible: 1)
 
 cell_text =
   'This cell comment is also visible because we used show_comments().'
@@ -103,7 +103,7 @@ cell_text = 'However, we can still override it locally.'
 comment = 'Hello.'
 
 worksheet3.write('C9', cell_text, text_wrap)
-worksheet3.write_comment('C9', comment, :visible => 0)
+worksheet3.write_comment('C9', comment, visible: 0)
 
 ###############################################################################
 #
@@ -131,28 +131,28 @@ cell_text = 'This cell comment is twice as wide.'
 comment = 'Hello.'
 
 worksheet4.write('C6', cell_text, text_wrap)
-worksheet4.write_comment('C6', comment, :x_scale => 2)
+worksheet4.write_comment('C6', comment, x_scale: 2)
 
 cell_text = 'This cell comment is twice as high.'
 
 comment = 'Hello.'
 
 worksheet4.write('C9', cell_text, text_wrap)
-worksheet4.write_comment('C9', comment, :y_scale => 2)
+worksheet4.write_comment('C9', comment, y_scale: 2)
 
 cell_text = 'This cell comment is scaled in both directions.'
 
 comment = 'Hello.'
 
 worksheet4.write('C16', cell_text, text_wrap)
-worksheet4.write_comment('C16', comment, :x_scale => 1.2, :y_scale => 0.8)
+worksheet4.write_comment('C16', comment, x_scale: 1.2, y_scale: 0.8)
 
 cell_text = 'This cell comment has width and height specified in pixels.'
 
 comment = 'Hello.'
 
 worksheet4.write('C19', cell_text, text_wrap)
-worksheet4.write_comment('C19', comment, :width => 200, :height => 20)
+worksheet4.write_comment('C19', comment, width: 200, height: 20)
 
 ###############################################################################
 #
@@ -179,21 +179,21 @@ cell_text = 'This cell comment has been moved to another cell.'
 comment = 'Hello.'
 
 worksheet5.write('C6', cell_text, text_wrap)
-worksheet5.write_comment('C6', comment, :start_cell => 'E4')
+worksheet5.write_comment('C6', comment, start_cell: 'E4')
 
 cell_text = 'This cell comment has been moved to another cell.'
 
 comment = 'Hello.'
 
 worksheet5.write('C9', cell_text, text_wrap)
-worksheet5.write_comment('C9', comment, :start_row => 8, :start_col => 4)
+worksheet5.write_comment('C9', comment, start_row: 8, start_col: 4)
 
 cell_text = 'This cell comment has been shifted within its default cell.'
 
 comment = 'Hello.'
 
 worksheet5.write('C12', cell_text, text_wrap)
-worksheet5.write_comment('C12', comment, :x_offset => 30, :y_offset => 12)
+worksheet5.write_comment('C12', comment, x_offset: 30, y_offset: 12)
 
 ###############################################################################
 #
@@ -212,7 +212,7 @@ cell_text = 'This cell comment has a different colour.'
 comment = 'Hello.'
 
 worksheet6.write('C3', cell_text, text_wrap)
-worksheet6.write_comment('C3', comment, :color => 'green')
+worksheet6.write_comment('C3', comment, color: 'green')
 
 cell_text = 'This cell comment has the default colour.'
 
@@ -226,7 +226,7 @@ cell_text = 'This cell comment has a different colour.'
 comment = 'Hello.'
 
 worksheet6.write('C9', cell_text, text_wrap)
-worksheet6.write_comment('C9', comment, :color => '#FF6600')
+worksheet6.write_comment('C9', comment, color: '#FF6600')
 
 ###############################################################################
 #
@@ -257,7 +257,7 @@ cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
 comment = 'Hello.'
 
 worksheet7.write(cell, cell_text, text_wrap)
-worksheet7.write_comment(cell, comment, :author => author)
+worksheet7.write_comment(cell, comment, author: author)
 
 author    = '€'
 cell      = 'C9'
@@ -266,7 +266,7 @@ cell_text = "Move the mouse over this cell and you will see 'Cell commented " +
 comment = 'Hello.'
 
 worksheet7.write(cell, cell_text, text_wrap)
-worksheet7.write_comment(cell, comment, :author => author)
+worksheet7.write_comment(cell, comment, author: author)
 
 ###############################################################################
 #

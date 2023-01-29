@@ -18,10 +18,10 @@ class TestRegressionFormat01 < Minitest::Test
     worksheet2 = workbook.add_worksheet('Data Sheet')
     worksheet3 = workbook.add_worksheet
 
-    unused1 = workbook.add_format(:bold => 1)
-    bold    = workbook.add_format(:bold => 1)
-    unused2 = workbook.add_format(:bold => 1)
-    unused3 = workbook.add_format(:italic => 1)
+    unused1 = workbook.add_format(bold: 1)
+    bold    = workbook.add_format(bold: 1)
+    unused2 = workbook.add_format(bold: 1)
+    unused3 = workbook.add_format(italic: 1)
 
     worksheet1.write('A1', 'Foo')
     worksheet1.write('A2', 123)

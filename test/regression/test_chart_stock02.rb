@@ -16,10 +16,10 @@ class TestRegressionChartStock02 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(
-      :type     => 'stock',
-      :embedded => 1
+      type:     'stock',
+      embedded: 1
     )
-    date_format = workbook.add_format(:num_format => 14)
+    date_format = workbook.add_format(num_format: 14)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids,  [63596416, 63597952])
@@ -42,19 +42,19 @@ class TestRegressionChartStock02 < Minitest::Test
     worksheet.set_column('A:D', 11)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$D$1:$D$5',
-      :y2_axis    => 1
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$D$1:$D$5',
+      y2_axis:    1
     )
 
     worksheet.insert_chart('E9', chart)

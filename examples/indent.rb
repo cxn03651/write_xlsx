@@ -16,8 +16,8 @@ require 'write_xlsx'
 workbook = WriteXLSX.new('indent.xlsx')
 
 worksheet = workbook.add_worksheet
-indent1   = workbook.add_format(:indent => 1)
-indent2   = workbook.add_format(:indent => 2)
+indent1   = workbook.add_format(indent: 1)
+indent2   = workbook.add_format(indent: 2)
 
 worksheet.set_column('A:A', 40)
 

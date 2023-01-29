@@ -15,7 +15,7 @@ class TestRegressionChartChartArea06 < Minitest::Test
     @xlsx = 'chart_chartarea06.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
+    chart     = workbook.add_chart(type: 'doughnut', embedded: 1)
 
     data = [
       [2,  4,  6],
@@ -25,21 +25,21 @@ class TestRegressionChartChartArea06 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$3',
-      :values     => '=Sheet1!$B$1:$B$3'
+      categories: '=Sheet1!$A$1:$A$3',
+      values:     '=Sheet1!$B$1:$B$3'
     )
 
     chart.set_chartarea(
-      :border => {
-        :color     => '#FFFF00',
-        :dash_type => 'long_dash'
+      border: {
+        color:     '#FFFF00',
+        dash_type: 'long_dash'
       },
-      :fill   => { :color     => '#92D050' }
+      fill:   { color: '#92D050' }
     )
 
     chart.set_plotarea(
-      :border => { :dash_type => 'square_dot' },
-      :fill   => { :color     => '#FF0000' }
+      border: { dash_type: 'square_dot' },
+      fill:   { color: '#FF0000' }
     )
 
     worksheet.insert_chart('E9', chart)

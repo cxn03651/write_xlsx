@@ -28,40 +28,40 @@ class TestCondFormat20 < Minitest::Test
     @worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type     => 'text',
-        :criteria => 'begins with',
-        :value    => 'b',
-        :format   => nil
+        type:     'text',
+        criteria: 'begins with',
+        value:    'b',
+        format:   nil
       }
     )
 
     @worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type     => 'text',
-        :criteria => 'begins with',
-        :value    => 'bc',
-        :format   => nil
+        type:     'text',
+        criteria: 'begins with',
+        value:    'bc',
+        format:   nil
       }
     )
 
     @worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type     => 'text',
-        :criteria => 'ends with',
-        :value    => 'z',
-        :format   => nil
+        type:     'text',
+        criteria: 'ends with',
+        value:    'z',
+        format:   nil
       }
     )
 
     @worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type     => 'text',
-        :criteria => 'ends with',
-        :value    => 'yz',
-        :format   => nil
+        type:     'text',
+        criteria: 'ends with',
+        value:    'yz',
+        format:   nil
       }
     )
 

@@ -15,17 +15,17 @@ class TestRegressionHyperlink36 < Minitest::Test
     @xlsx = 'hyperlink36.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart     = workbook.add_chart(type: 'pie', embedded: 1)
 
     worksheet.write('A1', 1)
     worksheet.write('A2', 2)
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      :url => 'https://github.com/jmcnamara'
+      url: 'https://github.com/jmcnamara'
     )
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$2')
+    chart.add_series(values: '=Sheet1!$A$1:$A$2')
     worksheet.insert_chart('E12', chart)
 
     workbook.close

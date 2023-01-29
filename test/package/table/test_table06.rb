@@ -15,11 +15,11 @@ class TestTable06 < Minitest::Test
     @worksheet.add_table(
       'C3:F13',
       {
-        :columns => [
-          { :header => 'Foo' },
-          { :header => '' },
+        columns: [
+          { header: 'Foo' },
+          { header: '' },
           {},
-          { :header => 'Baz' }
+          { header: 'Baz' }
         ]
       }
     )

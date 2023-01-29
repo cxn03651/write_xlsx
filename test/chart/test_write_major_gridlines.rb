@@ -10,7 +10,7 @@ class TestWriteMajorGridlines < Minitest::Test
 
   def test_write_major_gridlines
     expected = '<c:majorGridlines/>'
-    result = @chart.__send__('write_major_gridlines', Writexlsx::Chart::Gridline.new(:_visible => 1))
+    result = @chart.__send__('write_major_gridlines', Writexlsx::Chart::Gridline.new(_visible: 1))
 
     assert_equal(expected, result)
   end

@@ -17,10 +17,10 @@ class TestRegressionCondFormat08 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     format = workbook.add_format(
-      :color         => '#9C6500',
-      :bg_color      => '#FFEB9C',
-      :font_condense => 1,
-      :font_extend   => 1
+      color:         '#9C6500',
+      bg_color:      '#FFEB9C',
+      font_condense: 1,
+      font_extend:   1
     )
 
     worksheet.write('A1', 10)
@@ -30,10 +30,10 @@ class TestRegressionCondFormat08 < Minitest::Test
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format,
-                                       :criteria => 'greater than',
-                                       :value    => 5
+                                       type:     'cell',
+                                       format:   format,
+                                       criteria: 'greater than',
+                                       value:    5
                                      })
 
     workbook.close

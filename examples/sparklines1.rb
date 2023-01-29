@@ -31,29 +31,29 @@ worksheet.write_col('A1', data)
 # Add a line sparkline (the default) with markers.
 worksheet.add_sparkline(
   {
-    :location => 'F1',
-    :range    => 'Sheet1!A1:E1',
-    :markers  => 1
+    location: 'F1',
+    range:    'Sheet1!A1:E1',
+    markers:  1
   }
 )
 
 # Add a column sparkline with non-default style.
 worksheet.add_sparkline(
   {
-    :location => 'F2',
-    :range    => 'Sheet1!A2:E2',
-    :type     => 'column',
-    :style    => 12
+    location: 'F2',
+    range:    'Sheet1!A2:E2',
+    type:     'column',
+    style:    12
   }
 )
 
 # Add a win/loss sparkline with negative values highlighted.
 worksheet.add_sparkline(
   {
-    :location        => 'F3',
-    :range           => 'Sheet1!A3:E3',
-    :type            => 'win_loss',
-    :negative_points => 1
+    location:        'F3',
+    range:           'Sheet1!A3:E3',
+    type:            'win_loss',
+    negative_points: 1
   }
 )
 

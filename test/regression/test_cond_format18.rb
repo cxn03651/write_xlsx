@@ -31,39 +31,39 @@ class TestRegressionCondFormat18 < Minitest::Test
     worksheet.conditional_formatting(
       'A1',
       {
-        :type          => 'icon_set',
-        :icon_style    => '3_arrows',
-        :reverse_icons => 1
+        type:          'icon_set',
+        icon_style:    '3_arrows',
+        reverse_icons: 1
       }
     )
 
     worksheet.conditional_formatting(
       'A2',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_flags',
-        :icons_only => 1
+        type:       'icon_set',
+        icon_style: '3_flags',
+        icons_only: 1
       }
     )
 
     worksheet.conditional_formatting(
       'A3',
       {
-        :type          => 'icon_set',
-        :icon_style    => '3_traffic_lights_rimmed',
-        :icons_only    => 1,
-        :reverse_icons => 1
+        type:          'icon_set',
+        icon_style:    '3_traffic_lights_rimmed',
+        icons_only:    1,
+        reverse_icons: 1
       }
     )
 
     worksheet.conditional_formatting(
       'A4',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_symbols_circled',
-        :icons      => [
-          { :value => 80 },
-          { :value => 20 }
+        type:       'icon_set',
+        icon_style: '3_symbols_circled',
+        icons:      [
+          { value: 80 },
+          { value: 20 }
         ]
       }
     )
@@ -71,12 +71,12 @@ class TestRegressionCondFormat18 < Minitest::Test
     worksheet.conditional_formatting(
       'A5',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_arrows',
-        :icons      => [
-          { :criteria => '>' },
-          { :criteria => '>' },
-          { :criteria => '>' }
+        type:       'icon_set',
+        icon_style: '4_arrows',
+        icons:      [
+          { criteria: '>' },
+          { criteria: '>' },
+          { criteria: '>' }
         ]
       }
     )
@@ -84,12 +84,12 @@ class TestRegressionCondFormat18 < Minitest::Test
     worksheet.conditional_formatting(
       'A6',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_red_to_black',
-        :icons      => [
-          { :criteria => '>=', :type => 'number',     :value => 90 },
-          { :criteria => '<',  :type => 'percentile', :value => 50 },
-          { :criteria => '<=', :type => 'percent',    :value => 25 }
+        type:       'icon_set',
+        icon_style: '4_red_to_black',
+        icons:      [
+          { criteria: '>=', type: 'number',     value: 90 },
+          { criteria: '<',  type: 'percentile', value: 50 },
+          { criteria: '<=', type: 'percent',    value: 25 }
         ]
       }
     )
@@ -97,33 +97,33 @@ class TestRegressionCondFormat18 < Minitest::Test
     worksheet.conditional_formatting(
       'A7',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_traffic_lights',
-        :icons      => [{ :value => '=$A$12' }]
+        type:       'icon_set',
+        icon_style: '4_traffic_lights',
+        icons:      [{ value: '=$A$12' }]
       }
     )
 
     worksheet.conditional_formatting(
       'A8',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_arrows_gray',
-        :icons      => [{ :type => 'formula', :value => '=$A$12' }]
+        type:       'icon_set',
+        icon_style: '5_arrows_gray',
+        icons:      [{ type: 'formula', value: '=$A$12' }]
       }
     )
 
     worksheet.conditional_formatting(
       'A9',
       {
-        :type          => 'icon_set',
-        :icon_style    => '5_quarters',
-        :icons         => [
-          { :value => 70 },
-          { :value => 50 },
-          { :value => 30 },
-          { :value => 10 }
+        type:          'icon_set',
+        icon_style:    '5_quarters',
+        icons:         [
+          { value: 70 },
+          { value: 50 },
+          { value: 30 },
+          { value: 10 }
         ],
-        :reverse_icons => 1
+        reverse_icons: 1
       }
     )
 

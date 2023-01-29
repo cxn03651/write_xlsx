@@ -24,7 +24,7 @@ worksheet5 = workbook.add_worksheet
 worksheet6 = workbook.add_worksheet
 worksheet7 = workbook.add_worksheet
 
-bold = workbook.add_format(:bold => 1)
+bold = workbook.add_format(bold: 1)
 
 # Extract the data embedded at the end of this file.
 headings = DATA.gets.split

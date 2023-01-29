@@ -33,9 +33,9 @@ class TestCondFormat05 < Minitest::Test
     ].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
-                                          :type     => 'average',
-                                          :format   => nil,
-                                          :criteria => criteria
+                                          type:     'average',
+                                          format:   nil,
+                                          criteria: criteria
                                         })
     end
 

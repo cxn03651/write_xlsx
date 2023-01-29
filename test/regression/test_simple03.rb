@@ -18,7 +18,7 @@ class TestRegressionSimple03 < Minitest::Test
     worksheet2 = workbook.add_worksheet('Data Sheet')
     worksheet3 = workbook.add_worksheet
 
-    bold = workbook.add_format(:bold => 1)
+    bold = workbook.add_format(bold: 1)
 
     worksheet1.write('A1', 'Foo')
     worksheet1.write('A2', 123)

@@ -25,7 +25,7 @@ class TestRegressionTable22 < Minitest::Test
     worksheet.set_column('B:C', 10.288)
 
     # Add the table.
-    worksheet.add_table('B2:C3', :data => data, :header_row => 0)
+    worksheet.add_table('B2:C3', data: data, header_row: 0)
 
     workbook.close
     compare_for_regression

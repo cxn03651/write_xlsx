@@ -15,7 +15,7 @@ class TestRegressionHyperlink14 < Minitest::Test
     @xlsx = 'hyperlink14.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:align => 'center')
+    format    = workbook.add_format(align: 'center')
 
     # Turn off default URL format for testing.
     worksheet.instance_variable_set(:@default_url_format, nil)

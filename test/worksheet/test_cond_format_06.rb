@@ -27,29 +27,29 @@ class TestCondFormat06 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type   => 'top',
-                                        :value  => 10,
-                                        :format => nil
+                                        type:   'top',
+                                        value:  10,
+                                        format: nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type   => 'bottom',
-                                        :value  => 10,
-                                        :format => nil
+                                        type:   'bottom',
+                                        value:  10,
+                                        format: nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'top',
-                                        :criteria => '%',
-                                        :value    => 10,
-                                        :format   => nil
+                                        type:     'top',
+                                        criteria: '%',
+                                        value:    10,
+                                        format:   nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'bottom',
-                                        :criteria => '%',
-                                        :value    => 10,
-                                        :format   => nil
+                                        type:     'bottom',
+                                        criteria: '%',
+                                        value:    10,
+                                        format:   nil
                                       })
 
     @worksheet.assemble_xml_file

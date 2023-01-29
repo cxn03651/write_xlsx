@@ -12,12 +12,12 @@ class TestOptionHashForWorkbook < Minitest::Test
   def setup
     @obj = ForTest.new
     @options = {
-      :tempdir         => 'temp',
-      :date_1904       => false,
-      :optimization    => false,
-      :excel2003_style => false
+      tempdir:         'temp',
+      date_1904:       false,
+      optimization:    false,
+      excel2003_style: false
     }
-    @default_format_properties = { :size => 12, :color => 'red' }
+    @default_format_properties = { size: 12, color: 'red' }
   end
 
   #

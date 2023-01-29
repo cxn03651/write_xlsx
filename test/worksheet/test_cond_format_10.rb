@@ -27,10 +27,10 @@ class TestCondFormat10 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'date',
-                                        :criteria => 'greater than',
-                                        :value    => '2011-01-01T',
-                                        :format   => nil
+                                        type:     'date',
+                                        criteria: 'greater than',
+                                        value:    '2011-01-01T',
+                                        format:   nil
                                       })
 
     @worksheet.assemble_xml_file

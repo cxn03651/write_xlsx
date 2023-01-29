@@ -273,23 +273,23 @@ module Writexlsx
 
     def protect_default_settings  # :nodoc:
       {
-        :sheet                 => true,
-        :content               => false,
-        :objects               => false,
-        :scenarios             => false,
-        :format_cells          => false,
-        :format_columns        => false,
-        :format_rows           => false,
-        :insert_columns        => false,
-        :insert_rows           => false,
-        :insert_hyperlinks     => false,
-        :delete_columns        => false,
-        :delete_rows           => false,
-        :select_locked_cells   => true,
-        :sort                  => false,
-        :autofilter            => false,
-        :pivot_tables          => false,
-        :select_unlocked_cells => true
+        sheet:                 true,
+        content:               false,
+        objects:               false,
+        scenarios:             false,
+        format_cells:          false,
+        format_columns:        false,
+        format_rows:           false,
+        insert_columns:        false,
+        insert_rows:           false,
+        insert_hyperlinks:     false,
+        delete_columns:        false,
+        delete_rows:           false,
+        select_locked_cells:   true,
+        sort:                  false,
+        autofilter:            false,
+        pivot_tables:          false,
+        select_unlocked_cells: true
       }
     end
     private :protect_default_settings
@@ -2987,7 +2987,7 @@ EOS
       # Set the button caption.
       caption = params[:caption] || "Button #{button_number}"
 
-      button.font = { :_caption => caption }
+      button.font = { _caption: caption }
 
       # Set the macro name.
       button.macro = if params[:macro]
@@ -4412,15 +4412,15 @@ EOS
 
       @writer.tag_elements('ignoredErrors') do
         {
-          :number_stored_as_text => 'numberStoredAsText',
-          :eval_error            => 'evalError',
-          :formula_differs       => 'formula',
-          :formula_range         => 'formulaRange',
-          :formula_unlocked      => 'unlockedFormula',
-          :empty_cell_reference  => 'emptyCellReference',
-          :list_data_validation  => 'listDataValidation',
-          :calculated_column     => 'calculatedColumn',
-          :two_digit_text_year   => 'twoDigitTextYear'
+          number_stored_as_text: 'numberStoredAsText',
+          eval_error:            'evalError',
+          formula_differs:       'formula',
+          formula_range:         'formulaRange',
+          formula_unlocked:      'unlockedFormula',
+          empty_cell_reference:  'emptyCellReference',
+          list_data_validation:  'listDataValidation',
+          calculated_column:     'calculatedColumn',
+          two_digit_text_year:   'twoDigitTextYear'
         }.each do |key, value|
           write_ignored_error(value, ignore[key]) if ignore[key]
         end

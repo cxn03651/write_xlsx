@@ -15,7 +15,7 @@ class TestRegressionChartDoughnut06 < Minitest::Test
     @xlsx = 'chart_doughnut06.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'doughnut', :embedded => 1)
+    chart     = workbook.add_chart(type: 'doughnut', embedded: 1)
 
     data = [
       [2,  4,  6],
@@ -24,8 +24,8 @@ class TestRegressionChartDoughnut06 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => 'Sheet1!$A$1:$A$3')
-    chart.add_series(:values => 'Sheet1!$B$1:$B$3')
+    chart.add_series(values: 'Sheet1!$A$1:$A$3')
+    chart.add_series(values: 'Sheet1!$B$1:$B$3')
 
     worksheet.insert_chart('E9', chart)
 

@@ -15,7 +15,7 @@ class TestRegressionChartPie05 < Minitest::Test
     @xlsx = 'chart_pie05.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart       = workbook.add_chart(type: 'pie', embedded: 1)
 
     data = [
       [2,  4,  6],
@@ -25,8 +25,8 @@ class TestRegressionChartPie05 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$3',
-      :values     => '=Sheet1!$B$1:$B$3'
+      categories: '=Sheet1!$A$1:$A$3',
+      values:     '=Sheet1!$B$1:$B$3'
     )
 
     chart.set_rotation(45)

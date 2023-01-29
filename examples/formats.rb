@@ -18,8 +18,8 @@ require 'write_xlsx'
 workbook = WriteXLSX.new('formats.xlsx')
 
 # Some common formats
-center = workbook.add_format(:align => 'center')
-heading = workbook.add_format(:align => 'center', :bold => 1)
+center = workbook.add_format(align: 'center')
+heading = workbook.add_format(align: 'center', bold: 1)
 
 # The named colors
 colors = {
@@ -61,8 +61,8 @@ def intro(workbook, _center, _heading, _colors)
   format2.set_color('blue')
 
   format3 = workbook.add_format(
-    :color     => 'blue',
-    :underline => 1
+    color:     'blue',
+    underline: 1
   )
 
   worksheet.write(2, 0, 'This workbook demonstrates some of', format)
@@ -113,9 +113,9 @@ def named_colors(workbook, center, heading, colors)
   [33, 11, 53, 17, 22, 18, 13, 16, 23, 9, 12, 15, 14, 20, 8, 10].each do |index|
     color = colors[index]
     format = workbook.add_format(
-      :bg_color => color,
-      :pattern  => 1,
-      :border   => 1
+      bg_color: color,
+      pattern:  1,
+      border:   1
     )
 
     worksheet.write(i + 1, 0, index, center)
@@ -142,9 +142,9 @@ def standard_colors(workbook, center, heading, colors)
 
   (8..63).each do |i|
     format = workbook.add_format(
-      :bg_color => i,
-      :pattern  => 1,
-      :border   => 1
+      bg_color: i,
+      pattern:  1,
+      border:   1
     )
 
     worksheet.write((i - 7), 0, i, center)

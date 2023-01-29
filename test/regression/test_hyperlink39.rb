@@ -18,7 +18,7 @@ class TestRegressionHyperlink39 < Minitest::Test
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      :url => 'external:c:\temp\foo.xlsx'
+      url: 'external:c:\temp\foo.xlsx'
     )
 
     workbook.close

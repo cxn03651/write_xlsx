@@ -24,8 +24,8 @@ class TestRegressionCondFormat17 < Minitest::Test
     worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_arrows'
+        type:       'icon_set',
+        icon_style: '3_arrows'
       }
     )
 

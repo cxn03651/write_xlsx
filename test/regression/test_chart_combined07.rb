@@ -15,8 +15,8 @@ class TestRegressionChartCombined07 < Minitest::Test
     @xlsx = 'chart_combined07.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart1    = workbook.add_chart(:type => 'column',  :embedded => 1)
-    chart2    = workbook.add_chart(:type => 'scatter', :embedded => 1)
+    chart1    = workbook.add_chart(type: 'column',  embedded: 1)
+    chart2    = workbook.add_chart(type: 'scatter', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart1.instance_variable_set(:@axis_ids, [81267328, 81297792])
@@ -31,12 +31,12 @@ class TestRegressionChartCombined07 < Minitest::Test
     worksheet.write('A1', data)
 
     chart1.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
     chart2.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
 
     chart1.combine(chart2)

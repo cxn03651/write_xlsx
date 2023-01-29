@@ -15,7 +15,7 @@ class TestRegressionChartTitle01 < Minitest::Test
     @xlsx = 'chart_title01.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart     = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [46165376, 54462720])
@@ -28,9 +28,9 @@ class TestRegressionChartTitle01 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$5', :name => 'Foo')
+    chart.add_series(values: '=Sheet1!$A$1:$A$5', name: 'Foo')
 
-    chart.set_title(:none => 1)
+    chart.set_title(none: 1)
 
     worksheet.insert_chart('E9', chart)
 

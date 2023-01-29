@@ -9,13 +9,13 @@ class TestStyles05 < Minitest::Test
   def test_styles_05
     workbook = WriteXLSX.new(StringIO.new)
 
-    format1  = workbook.add_format(:left      => 1)
-    format2  = workbook.add_format(:right     => 1)
-    format3  = workbook.add_format(:top       => 1)
-    format4  = workbook.add_format(:bottom    => 1)
-    format5  = workbook.add_format(:diag_type => 1, :diag_border => 1)
-    format6  = workbook.add_format(:diag_type => 2, :diag_border => 1)
-    format7  = workbook.add_format(:diag_type => 3)
+    format1  = workbook.add_format(left: 1)
+    format2  = workbook.add_format(right: 1)
+    format3  = workbook.add_format(top: 1)
+    format4  = workbook.add_format(bottom: 1)
+    format5  = workbook.add_format(diag_type: 1, diag_border: 1)
+    format6  = workbook.add_format(diag_type: 2, diag_border: 1)
+    format7  = workbook.add_format(diag_type: 3)
 
     workbook.__send__('set_default_xf_indices')
     workbook.__send__('prepare_format_properties')

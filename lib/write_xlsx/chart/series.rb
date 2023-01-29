@@ -77,12 +77,12 @@ module Writexlsx
 
       def types
         {
-          :exponential    => 'exp',
-          :linear         => 'linear',
-          :log            => 'log',
-          :moving_average => 'movingAvg',
-          :polynomial     => 'poly',
-          :power          => 'power'
+          exponential:    'exp',
+          linear:         'linear',
+          log:            'log',
+          moving_average: 'movingAvg',
+          polynomial:     'poly',
+          power:          'power'
         }
       end
     end
@@ -108,20 +108,20 @@ module Writexlsx
 
       def types
         {
-          :automatic  => 'automatic',
-          :none       => 'none',
-          :square     => 'square',
-          :diamond    => 'diamond',
-          :triangle   => 'triangle',
-          :x          => 'x',
-          :star       => 'star',
-          :dot        => 'dot',
-          :short_dash => 'dot',
-          :dash       => 'dash',
-          :long_dash  => 'dash',
-          :circle     => 'circle',
-          :plus       => 'plus',
-          :picture    => 'picture'
+          automatic:  'automatic',
+          none:       'none',
+          square:     'square',
+          diamond:    'diamond',
+          triangle:   'triangle',
+          x:          'x',
+          star:       'star',
+          dot:        'dot',
+          short_dash: 'dot',
+          dash:       'dash',
+          long_dash:  'dash',
+          circle:     'circle',
+          plus:       'plus',
+          picture:    'picture'
         }
       end
     end
@@ -155,11 +155,11 @@ module Writexlsx
 
       def types
         {
-          :fixed              => 'fixedVal',
-          :percentage         => 'percentage',
-          :standard_deviation => 'stdDev',
-          :standard_error     => 'stdErr',
-          :custom             => 'cust'
+          fixed:              'fixedVal',
+          percentage:         'percentage',
+          standard_deviation: 'stdDev',
+          standard_error:     'stdErr',
+          custom:             'cust'
         }
       end
 
@@ -261,8 +261,8 @@ module Writexlsx
 
       def errorbars(x, y)
         {
-          :_x_error_bars => x ? Errorbars.new(x) : nil,
-          :_y_error_bars => y ? Errorbars.new(y) : nil
+          _x_error_bars: x ? Errorbars.new(x) : nil,
+          _y_error_bars: y ? Errorbars.new(y) : nil
         }
       end
 

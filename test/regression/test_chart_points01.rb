@@ -15,7 +15,7 @@ class TestRegressionChartPoints01 < Minitest::Test
     @xlsx = 'chart_points01.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart     = workbook.add_chart(type: 'pie', embedded: 1)
 
     data = [
       [2, 5, 4, 1, 7, 4]
@@ -24,9 +24,9 @@ class TestRegressionChartPoints01 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :values => '=Sheet1!$A$1:$A$6',
-      :points => [
-        { :fill => { :color => 'red' } }
+      values: '=Sheet1!$A$1:$A$6',
+      points: [
+        { fill: { color: 'red' } }
       ]
     )
 

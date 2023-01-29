@@ -17,8 +17,8 @@ class TestRegressionCondFormat07 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     # We manually set the indices to get the same order as the target file.
-    format1 = workbook.add_format(:bg_color => '#FF0000', :dxf_index => 1)
-    format2 = workbook.add_format(:bg_color => '#92D050', :dxf_index => 0)
+    format1 = workbook.add_format(bg_color: '#FF0000', dxf_index: 1)
+    format2 = workbook.add_format(bg_color: '#92D050', dxf_index: 0)
 
     data = [
       [90, 80,  50, 10,  20,  90,  40, 90,  30,  40],
@@ -37,18 +37,18 @@ class TestRegressionCondFormat07 < Minitest::Test
 
     worksheet.conditional_formatting('A1:J10',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format1,
-                                       :criteria => '>=',
-                                       :value    => 50
+                                       type:     'cell',
+                                       format:   format1,
+                                       criteria: '>=',
+                                       value:    50
                                      })
 
     worksheet.conditional_formatting('A1:J10',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format2,
-                                       :criteria => '<',
-                                       :value    => 50
+                                       type:     'cell',
+                                       format:   format2,
+                                       criteria: '<',
+                                       value:    50
                                      })
 
     workbook.close

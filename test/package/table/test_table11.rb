@@ -16,15 +16,15 @@ class TestTable11 < Minitest::Test
     @worksheet.add_table(
       'C2:F14',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
           {},
           {
-            :total_function => 'count',
-            :format         => @format,
-            :formula        => 'SUM(Table1[[#This Row],[Column1]:[Column3]])'
+            total_function: 'count',
+            format:         @format,
+            formula:        'SUM(Table1[[#This Row],[Column1]:[Column3]])'
           }
         ]
       }

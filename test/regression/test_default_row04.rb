@@ -21,7 +21,7 @@ class TestRegressionDefaultRow04 < Minitest::Test
     worksheet.write('A1',  'Foo')
     worksheet.write('A10', 'Bar')
 
-    worksheet.write_comment('C4', 'Hello', :y_offset => 22)
+    worksheet.write_comment('C4', 'Hello', y_offset: 22)
 
     # Set the author to match the target XLSX file.
     worksheet.comments_author = 'John'

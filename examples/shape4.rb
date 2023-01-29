@@ -19,9 +19,9 @@ worksheet.hide_gridlines(2)
 
 type = 'rect'
 shape = workbook.add_shape(
-  :type   => type,
-  :width  => 90,
-  :height => 90
+  type:   type,
+  width:  90,
+  height: 90
 )
 
 (1..10).each do |n|
@@ -34,10 +34,10 @@ shape = workbook.add_shape(
 end
 
 stencil = workbook.add_shape(
-  :stencil => 1,     # The default.
-  :width   => 90,
-  :height  => 90,
-  :text    => 'started as a box'
+  stencil: 1,     # The default.
+  width:   90,
+  height:  90,
+  text:    'started as a box'
 )
 worksheet.insert_shape('A1', stencil, 100, 150)
 

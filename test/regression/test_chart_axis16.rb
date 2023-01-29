@@ -15,8 +15,8 @@ class TestRegressionChartAxis16 < Minitest::Test
     @xlsx = 'chart_axis16.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
-    date_format = workbook.add_format(:num_format => 14)
+    chart       = workbook.add_chart(type: 'stock', embedded: 1)
+    date_format = workbook.add_format(num_format: 14)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [43572608, 43812736])
@@ -38,22 +38,22 @@ class TestRegressionChartAxis16 < Minitest::Test
     worksheet.set_column('A:D', 11)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$D$1:$D$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$D$1:$D$5'
     )
 
     chart.set_x_axis(
-      :minor_unit      => 14,
-      :major_unit      => 1,
-      :major_unit_type => 'months'
+      minor_unit:      14,
+      major_unit:      1,
+      major_unit_type: 'months'
     )
 
     worksheet.insert_chart('E9', chart)

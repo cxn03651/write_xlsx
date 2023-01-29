@@ -15,10 +15,10 @@ class TestRegressionChartBar13 < Minitest::Test
     @xlsx = 'chart_bar13.xlsx'
     workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
-    chart1     = workbook.add_chart(:type => 'bar')
+    chart1     = workbook.add_chart(type: 'bar')
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
-    chart2     = workbook.add_chart(:type => 'bar')
+    chart2     = workbook.add_chart(type: 'bar')
     worksheet4 = workbook.add_worksheet
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
@@ -35,13 +35,13 @@ class TestRegressionChartBar13 < Minitest::Test
 
     worksheet1.write('A1', data)
 
-    chart1.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart1.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart1.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart1.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart1.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart1.add_series(values: '=Sheet1!$C$1:$C$5')
 
-    chart2.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart2.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart2.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart2.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart2.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart2.add_series(values: '=Sheet1!$C$1:$C$5')
 
     workbook.close
     compare_for_regression

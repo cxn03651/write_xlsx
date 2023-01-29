@@ -19,13 +19,13 @@ class TestWorksheetDataBar12 < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A1',
-      :type          => 'data_bar',
-      :data_bar_2010 => 1
+      type:          'data_bar',
+      data_bar_2010: 1
     )
 
     @worksheet.add_sparkline(
-      :location => 'A2',
-      :range    => 'Sheet1!B2'
+      location: 'A2',
+      range:    'Sheet1!B2'
     )
 
     @worksheet.assemble_xml_file

@@ -19,12 +19,12 @@ class TestRegressionHyperlink34 < Minitest::Test
     worksheet.insert_image('A1', 'test/regression/images/blue.png')
     worksheet.insert_image(
       'B3', 'test/regression/images/red.jpg',
-      :url => 'https://github.com/jmcnamara'
+      url: 'https://github.com/jmcnamara'
     )
     worksheet.insert_image('D5', 'test/regression/images/yellow.jpg')
     worksheet.insert_image(
       'F9', 'test/regression/images/grey.png',
-      :url => 'https://github.com'
+      url: 'https://github.com'
     )
 
     workbook.close

@@ -35,13 +35,13 @@ class TestCondFormat17 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type      => '3_color_scale',
-                                        :min_value => '$A$10',
-                                        :mid_value => 52,
-                                        :max_value => 99,
-                                        :min_type  => 'num',
-                                        :mid_type  => 'percent',
-                                        :max_type  => 'percentile'
+                                        type:      '3_color_scale',
+                                        min_value: '$A$10',
+                                        mid_value: 52,
+                                        max_value: 99,
+                                        min_type:  'num',
+                                        mid_type:  'percent',
+                                        max_type:  'percentile'
                                       })
 
     @worksheet.assemble_xml_file

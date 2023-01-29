@@ -15,8 +15,8 @@ class TestChartGridlines03 < Minitest::Test
     @xlsx = 'chart_gridlines03.xlsx'
     workbook = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'stock', :embedded => 1)
-    data_format = workbook.add_format(:num_format => 14)
+    chart       = workbook.add_chart(type: 'stock', embedded: 1)
+    data_format = workbook.add_format(num_format: 14)
 
     # For testing, copy the randomly generated axis ids in the target xls file.
     chart.instance_variable_set(:@axis_ids, [54553600, 54977280])
@@ -38,20 +38,20 @@ class TestChartGridlines03 < Minitest::Test
     worksheet.set_column('A:D', 11)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$D$1:$D$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$D$1:$D$5'
     )
 
-    chart.set_x_axis(:major_gridlines => { :visible => 1 })
-    chart.set_y_axis(:major_gridlines => { :visible => 0 })
+    chart.set_x_axis(major_gridlines: { visible: 1 })
+    chart.set_y_axis(major_gridlines: { visible: 0 })
 
     worksheet.insert_chart('E9',  chart)
 

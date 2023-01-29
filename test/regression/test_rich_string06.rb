@@ -16,7 +16,7 @@ class TestRegressionRichString06 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    red = workbook.add_format(:color => 'red')
+    red = workbook.add_format(color: 'red')
 
     worksheet.write('A1', 'Foo', red)
     worksheet.write('A2', 'Bar')

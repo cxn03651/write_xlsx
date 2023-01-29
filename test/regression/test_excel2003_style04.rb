@@ -13,7 +13,7 @@ class TestRegressionExcel2003Style04 < Minitest::Test
 
   def test_excel2003_style04
     @xlsx = 'excel2003_style04.xlsx'
-    workbook    = WriteXLSX.new(@io, :excel2003_style => true)
+    workbook    = WriteXLSX.new(@io, excel2003_style: true)
     worksheet   = workbook.add_worksheet
 
     worksheet.write('A1', 'Foo')

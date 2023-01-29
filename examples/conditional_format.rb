@@ -16,14 +16,14 @@ worksheet9 = workbook.add_worksheet
 
 # Light red fill with dark red text.
 format1 = workbook.add_format(
-  :bg_color => '#FFC7CE',
-  :color    => '#9C0006'
+  bg_color: '#FFC7CE',
+  color:    '#9C0006'
 )
 
 # Green fill with dark green text.
 format2 = workbook.add_format(
-  :bg_color => '#C6EFCE',
-  :color    => '#006100'
+  bg_color: '#C6EFCE',
+  color:    '#006100'
 )
 
 # Some sample data to run the conditional formatting against.
@@ -55,10 +55,10 @@ worksheet1.write_col('B3', data)
 worksheet1.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'cell',
-    :criteria => '>=',
-    :value    => 50,
-    :format   => format1
+    type:     'cell',
+    criteria: '>=',
+    value:    50,
+    format:   format1
   }
 )
 
@@ -66,10 +66,10 @@ worksheet1.conditional_formatting(
 worksheet1.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'cell',
-    :criteria => '<',
-    :value    => 50,
-    :format   => format2
+    type:     'cell',
+    criteria: '<',
+    value:    50,
+    format:   format2
   }
 )
 
@@ -86,22 +86,22 @@ worksheet2.write_col('B3', data)
 worksheet2.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'cell',
-    :criteria => 'between',
-    :minimum  => 30,
-    :maximum  => 70,
-    :format   => format1
+    type:     'cell',
+    criteria: 'between',
+    minimum:  30,
+    maximum:  70,
+    format:   format1
   }
 )
 
 worksheet2.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'cell',
-    :criteria => 'not between',
-    :minimum  => 30,
-    :maximum  => 70,
-    :format   => format2
+    type:     'cell',
+    criteria: 'not between',
+    minimum:  30,
+    maximum:  70,
+    format:   format2
   }
 )
 
@@ -118,16 +118,16 @@ worksheet3.write_col('B3', data)
 worksheet3.conditional_formatting(
   'B3:K12',
   {
-    :type   => 'duplicate',
-    :format => format1
+    type:   'duplicate',
+    format: format1
   }
 )
 
 worksheet3.conditional_formatting(
   'B3:K12',
   {
-    :type   => 'unique',
-    :format => format2
+    type:   'unique',
+    format: format2
   }
 )
 
@@ -144,18 +144,18 @@ worksheet4.write_col('B3', data)
 worksheet4.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'average',
-    :criteria => 'above',
-    :format   => format1
+    type:     'average',
+    criteria: 'above',
+    format:   format1
   }
 )
 
 worksheet4.conditional_formatting(
   'B3:K12',
   {
-    :type     => 'average',
-    :criteria => 'below',
-    :format   => format2
+    type:     'average',
+    criteria: 'below',
+    format:   format2
   }
 )
 
@@ -172,18 +172,18 @@ worksheet5.write_col('B3', data)
 worksheet5.conditional_formatting(
   'B3:K12',
   {
-    :type   => 'top',
-    :value  => '10',
-    :format => format1
+    type:   'top',
+    value:  '10',
+    format: format1
   }
 )
 
 worksheet5.conditional_formatting(
   'B3:K12',
   {
-    :type   => 'bottom',
-    :value  => '10',
-    :format => format2
+    type:   'bottom',
+    value:  '10',
+    format: format2
   }
 )
 
@@ -202,10 +202,10 @@ worksheet6.write_col('B3', data)
 worksheet6.conditional_formatting(
   'B3:K6,B9:K12',
   {
-    :type     => 'cell',
-    :criteria => '>=',
-    :value    => 50,
-    :format   => format1
+    type:     'cell',
+    criteria: '>=',
+    value:    50,
+    format:   format1
   }
 )
 
@@ -213,10 +213,10 @@ worksheet6.conditional_formatting(
 worksheet6.conditional_formatting(
   'B3:K6,B9:K12',
   {
-    :type     => 'cell',
-    :criteria => '<',
-    :value    => 50,
-    :format   => format2
+    type:     'cell',
+    criteria: '<',
+    value:    50,
+    format:   format2
   }
 )
 
@@ -242,21 +242,21 @@ worksheet7.write_col('F3', data)
 worksheet7.conditional_formatting(
   'B3:B14',
   {
-    :type => '2_color_scale'
+    type: '2_color_scale'
   }
 )
 
 worksheet7.conditional_formatting(
   'D3:D14',
   {
-    :type => '3_color_scale'
+    type: '3_color_scale'
   }
 )
 
 worksheet7.conditional_formatting(
   'F3:F14',
   {
-    :type => 'data_bar'
+    type: 'data_bar'
   }
 )
 
@@ -282,27 +282,27 @@ worksheet8.write_col('F3', data)
 worksheet8.conditional_formatting(
   'B3:B14',
   {
-    :type      => '2_color_scale',
-    :min_color => "#FF0000",
-    :max_color => "#00FF00"
+    type:      '2_color_scale',
+    min_color: "#FF0000",
+    max_color: "#00FF00"
   }
 )
 
 worksheet8.conditional_formatting(
   'D3:D14',
   {
-    :type      => '3_color_scale',
-    :min_color => "#C5D9F1",
-    :mid_color => "#8DB4E3",
-    :max_color => "#538ED5"
+    type:      '3_color_scale',
+    min_color: "#C5D9F1",
+    mid_color: "#8DB4E3",
+    max_color: "#538ED5"
   }
 )
 
 worksheet8.conditional_formatting(
   'F3:F14',
   {
-    :type      => 'data_bar',
-    :bar_color => '#63C384'
+    type:      'data_bar',
+    bar_color: '#63C384'
   }
 )
 
@@ -328,58 +328,58 @@ worksheet9.write_col('B3', data)
 worksheet9.conditional_formatting(
   'B3:D3',
   {
-    :type       => 'icon_set',
-    :icon_style => '3_traffic_lights'
+    type:       'icon_set',
+    icon_style: '3_traffic_lights'
   }
 )
 
 worksheet9.conditional_formatting(
   'B4:D4',
   {
-    :type          => 'icon_set',
-    :icon_style    => '3_traffic_lights',
-    :reverse_icons => 1
+    type:          'icon_set',
+    icon_style:    '3_traffic_lights',
+    reverse_icons: 1
   }
 )
 
 worksheet9.conditional_formatting(
   'B5:D5',
   {
-    :type       => 'icon_set',
-    :icon_style => '3_traffic_lights',
-    :icons_only => 1
+    type:       'icon_set',
+    icon_style: '3_traffic_lights',
+    icons_only: 1
   }
 )
 
 worksheet9.conditional_formatting(
   'B6:D6',
   {
-    :type       => 'icon_set',
-    :icon_style => '3_arrows'
+    type:       'icon_set',
+    icon_style: '3_arrows'
   }
 )
 
 worksheet9.conditional_formatting(
   'B7:E8',
   {
-    :type       => 'icon_set',
-    :icon_style => '4_arrows'
+    type:       'icon_set',
+    icon_style: '4_arrows'
   }
 )
 
 worksheet9.conditional_formatting(
   'B8:F8',
   {
-    :type       => 'icon_set',
-    :icon_style => '5_arrows'
+    type:       'icon_set',
+    icon_style: '5_arrows'
   }
 )
 
 worksheet9.conditional_formatting(
   'B9:F9',
   {
-    :type       => 'icon_set',
-    :icon_style => '5_ratings'
+    type:       'icon_set',
+    icon_style: '5_ratings'
   }
 )
 

@@ -15,12 +15,12 @@ class TestTable08 < Minitest::Test
     @worksheet.add_table(
       'C3:F14',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
           {},
-          { :total_function => 'count' }
+          { total_function: 'count' }
         ]
       }
     )

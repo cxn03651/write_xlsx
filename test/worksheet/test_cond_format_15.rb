@@ -28,9 +28,9 @@ class TestCondFormat15 < Minitest::Test
     ['=$A$1>5', '=$A$2<80', '"1+2"', '=$A$3>$A$4'].each do |criteria|
       @worksheet.conditional_formatting('A1:A4',
                                         {
-                                          :type     => 'formula',
-                                          :criteria => criteria,
-                                          :format   => nil
+                                          type:     'formula',
+                                          criteria: criteria,
+                                          format:   nil
                                         })
     end
 

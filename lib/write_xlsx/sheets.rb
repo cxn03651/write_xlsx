@@ -8,7 +8,7 @@ module Writexlsx
   class Sheets < DelegateClass(Array)
     include Writexlsx::Utility
 
-    BASE_NAME = { :sheet => 'Sheet', :chart => 'Chart' }  # :nodoc:
+    BASE_NAME = { sheet: 'Sheet', chart: 'Chart' }  # :nodoc:
 
     def initialize
       super([])

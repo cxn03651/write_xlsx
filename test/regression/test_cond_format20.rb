@@ -24,12 +24,12 @@ class TestRegressionCondFormat20 < Minitest::Test
     worksheet.conditional_formatting(
       'A1:A4',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_arrows',
-        :icons      => [
-          { :criteria => '>',  :type => 'percent', :value => 0 },
-          { :criteria => '<',  :type => 'percent', :value => 0 },
-          { :criteria => '>=', :type => 'percent', :value => 0 }
+        type:       'icon_set',
+        icon_style: '3_arrows',
+        icons:      [
+          { criteria: '>',  type: 'percent', value: 0 },
+          { criteria: '<',  type: 'percent', value: 0 },
+          { criteria: '>=', type: 'percent', value: 0 }
         ]
       }
     )

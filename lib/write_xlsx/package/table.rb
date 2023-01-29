@@ -248,14 +248,14 @@ module Writexlsx
                            .gsub(/\]/, "']")
 
         subtotals = {
-          :average   => 101,
-          :countNums => 102,
-          :count     => 103,
-          :max       => 104,
-          :min       => 105,
-          :stdDev    => 107,
-          :sum       => 109,
-          :var       => 110
+          average:   101,
+          countNums: 102,
+          count:     103,
+          max:       104,
+          min:       105,
+          stdDev:    107,
+          sum:       109,
+          var:       110
         }
 
         unless (func_num = subtotals[function.to_sym])

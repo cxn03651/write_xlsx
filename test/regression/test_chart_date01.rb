@@ -11,8 +11,8 @@ class TestRegressionChartDate01 < Minitest::Test
     @xlsx = 'chart_date01.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'line', :embedded => 1)
-    date_format = workbook.add_format(:num_format => 14)
+    chart       = workbook.add_chart(type: 'line', embedded: 1)
+    date_format = workbook.add_format(num_format: 14)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [73655040, 73907584])
@@ -33,14 +33,14 @@ class TestRegressionChartDate01 < Minitest::Test
     end
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$10',
-      :values     => '=Sheet1!$B$1:$B$10'
+      categories: '=Sheet1!$A$1:$A$10',
+      values:     '=Sheet1!$B$1:$B$10'
     )
 
     chart.set_x_axis(
-      :num_format        => 'dd/mm/yyyy',
-      :num_format_linked => 1,
-      :date_axis         => 1
+      num_format:        'dd/mm/yyyy',
+      num_format_linked: 1,
+      date_axis:         1
     )
 
     worksheet.insert_chart('E9', chart)

@@ -15,7 +15,7 @@ class TestRegressionDate1904_01 < Minitest::Test
     @xlsx = 'date_1904_01.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    format      = workbook.add_format(:num_format => 14)
+    format      = workbook.add_format(num_format: 14)
 
     worksheet.set_column('A:A', 12)
 

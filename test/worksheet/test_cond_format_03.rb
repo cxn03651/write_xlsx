@@ -27,19 +27,19 @@ class TestCondFormat03 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'cell',
-                                        :format   => nil,
-                                        :criteria => 'between',
-                                        :minimum  => 20,
-                                        :maximum  => 30
+                                        type:     'cell',
+                                        format:   nil,
+                                        criteria: 'between',
+                                        minimum:  20,
+                                        maximum:  30
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'cell',
-                                        :format   => nil,
-                                        :criteria => 'not between',
-                                        :minimum  => 20,
-                                        :maximum  => 30
+                                        type:     'cell',
+                                        format:   nil,
+                                        criteria: 'not between',
+                                        minimum:  20,
+                                        maximum:  30
                                       })
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

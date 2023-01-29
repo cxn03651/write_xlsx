@@ -16,8 +16,8 @@ class TestRegressionChartBar04 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet1  = workbook.add_worksheet
     worksheet2  = workbook.add_worksheet
-    chart1      = workbook.add_chart(:type => 'bar', :embedded => 1)
-    chart2      = workbook.add_chart(:type => 'bar', :embedded => 1)
+    chart1      = workbook.add_chart(type: 'bar', embedded: 1)
+    chart2      = workbook.add_chart(type: 'bar', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart1.instance_variable_set(:@axis_ids, [64446848, 64448384])
@@ -32,12 +32,12 @@ class TestRegressionChartBar04 < Minitest::Test
     worksheet1.write('A1', data)
 
     chart1.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
     chart1.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
 
     worksheet1.insert_chart('E9', chart1)
@@ -45,12 +45,12 @@ class TestRegressionChartBar04 < Minitest::Test
     worksheet2.write('A1', data)
 
     chart2.add_series(
-      :categories => '=Sheet2!$A$1:$A$5',
-      :values     => '=Sheet2!$B$1:$B$5'
+      categories: '=Sheet2!$A$1:$A$5',
+      values:     '=Sheet2!$B$1:$B$5'
     )
     chart2.add_series(
-      :categories => '=Sheet2!$A$1:$A$5',
-      :values     => '=Sheet2!$C$1:$C$5'
+      categories: '=Sheet2!$A$1:$A$5',
+      values:     '=Sheet2!$C$1:$C$5'
     )
 
     worksheet2.insert_chart('E9', chart2)

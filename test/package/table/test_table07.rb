@@ -15,7 +15,7 @@ class TestTable07 < Minitest::Test
     @worksheet.add_table(
       'C3:F14',
       {
-        :total_row => 1
+        total_row: 1
       }
     )
     @worksheet.__send__(:prepare_tables, 1, {})

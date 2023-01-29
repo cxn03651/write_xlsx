@@ -90,7 +90,8 @@ Style/FormatStringToken:
   EnforcedStyle: unannotated
 
 Style/HashSyntax:
-  Enabled: false
+  EnforceStyle: ruby19_no_mixed_keys
+  EnforcedShorthandSyntax: either
 
 Style/NumericLiterals:
   MinDigits: 10

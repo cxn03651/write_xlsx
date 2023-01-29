@@ -22,13 +22,13 @@ worksheet.set_column('B:D', 25)
 
 # Format for the merged cells.
 format = workbook.add_format(
-  :border => 6,
-  :bold   => 1,
-  :color  => 'red',
-  :size   => 20,
-  :valign => 'vcentre',
-  :align  => 'left',
-  :indent => 1
+  border: 6,
+  bold:   1,
+  color:  'red',
+  size:   20,
+  valign: 'vcentre',
+  align:  'left',
+  indent: 1
 )
 
 ###############################################################################

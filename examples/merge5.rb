@@ -26,12 +26,12 @@ worksheet = workbook.add_worksheet
 # Rotation 1, letters run from top to bottom
 #
 format1 = workbook.add_format(
-  :border   => 6,
-  :bold     => 1,
-  :color    => 'red',
-  :valign   => 'vcentre',
-  :align    => 'centre',
-  :rotation => 270
+  border:   6,
+  bold:     1,
+  color:    'red',
+  valign:   'vcentre',
+  align:    'centre',
+  rotation: 270
 )
 
 worksheet.merge_range('B4:B9', 'Rotation 270', format1)
@@ -41,12 +41,12 @@ worksheet.merge_range('B4:B9', 'Rotation 270', format1)
 # Rotation 2, 90ｰ anticlockwise
 #
 format2 = workbook.add_format(
-  :border   => 6,
-  :bold     => 1,
-  :color    => 'red',
-  :valign   => 'vcentre',
-  :align    => 'centre',
-  :rotation => 90
+  border:   6,
+  bold:     1,
+  color:    'red',
+  valign:   'vcentre',
+  align:    'centre',
+  rotation: 90
 )
 
 worksheet.merge_range('D4:D9', 'Rotation 90', format2)
@@ -56,12 +56,12 @@ worksheet.merge_range('D4:D9', 'Rotation 90', format2)
 # Rotation 3, 90ｰ clockwise
 #
 format3 = workbook.add_format(
-  :border   => 6,
-  :bold     => 1,
-  :color    => 'red',
-  :valign   => 'vcentre',
-  :align    => 'centre',
-  :rotation => -90
+  border:   6,
+  bold:     1,
+  color:    'red',
+  valign:   'vcentre',
+  align:    'centre',
+  rotation: -90
 )
 
 worksheet.merge_range('F4:F9', 'Rotation -90', format3)

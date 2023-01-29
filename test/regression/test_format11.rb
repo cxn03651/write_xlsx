@@ -17,8 +17,8 @@ class TestRegressionFormat11 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     centered  = workbook.add_format(
-      :align  => 'center',
-      :valign => 'vcenter'
+      align:  'center',
+      valign: 'vcenter'
     )
 
     worksheet.write('B2', "Foo", centered)

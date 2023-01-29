@@ -15,7 +15,7 @@ class TestMergeRange05 < Minitest::Test
     @xlsx = 'merge_range05.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:align => 'center')
+    format    = workbook.add_format(align: 'center')
 
     worksheet.merge_range(1, 1, 1, 3, 123, format)
 

@@ -15,7 +15,7 @@ class TestRegressionRowColFormat10 < Minitest::Test
     @xlsx = 'row_col_format10.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
+    bold      = workbook.add_format(bold: 1)
 
     worksheet.set_column('C:C', nil, bold)
 

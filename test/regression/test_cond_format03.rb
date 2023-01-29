@@ -16,8 +16,8 @@ class TestRegressionCondFormat03 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    format1 = workbook.add_format(:font_strikeout => 1, :dxf_index => 1)
-    format2 = workbook.add_format(:underline      => 1, :dxf_index => 0)
+    format1 = workbook.add_format(font_strikeout: 1, dxf_index: 1)
+    format2 = workbook.add_format(underline: 1, dxf_index: 0)
 
     worksheet.write('A1', 10)
     worksheet.write('A2', 20)
@@ -26,19 +26,19 @@ class TestRegressionCondFormat03 < Minitest::Test
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format1,
-                                       :criteria => 'between',
-                                       :minimum  => 2,
-                                       :maximum  => 6
+                                       type:     'cell',
+                                       format:   format1,
+                                       criteria: 'between',
+                                       minimum:  2,
+                                       maximum:  6
                                      })
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format2,
-                                       :criteria => 'greater than',
-                                       :value    => 1
+                                       type:     'cell',
+                                       format:   format2,
+                                       criteria: 'greater than',
+                                       value:    1
                                      })
 
     workbook.close

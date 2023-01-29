@@ -15,8 +15,8 @@ class TestRegressionHyperlink29 < Minitest::Test
     @xlsx = 'hyperlink29.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format1   = workbook.add_format(:hyperlink => 1)
-    format2   = workbook.add_format(:color => 'red', :underline => 1)
+    format1   = workbook.add_format(hyperlink: 1)
+    format2   = workbook.add_format(color: 'red', underline: 1)
 
     worksheet.write_url('A1', 'http://www.perl.org/', format1)
     worksheet.write_url('A2', 'http://www.perl.com/', format2)

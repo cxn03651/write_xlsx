@@ -16,8 +16,8 @@ class TestRegressionChartScatter08 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(
-      :type     => 'scatter',
-      :embedded => 1
+      type:     'scatter',
+      embedded: 1
     )
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
@@ -32,13 +32,13 @@ class TestRegressionChartScatter08 < Minitest::Test
     worksheet.write('A2', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$2:$A$6',
-      :values     => '=Sheet1!$B$2:$B$6'
+      categories: '=Sheet1!$A$2:$A$6',
+      values:     '=Sheet1!$B$2:$B$6'
     )
 
     chart.add_series(
-      :categories => '=Sheet1!$A$2:$A$6',
-      :values     => '=Sheet1!$C$2:$C$6'
+      categories: '=Sheet1!$A$2:$A$6',
+      values:     '=Sheet1!$C$2:$C$6'
     )
 
     worksheet.insert_chart('E9', chart)

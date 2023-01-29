@@ -15,7 +15,7 @@ class TestRegressionChartFont02 < Minitest::Test
     @xlsx = 'chart_font02.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'bar', :embedded => 1)
+    chart     = workbook.add_chart(type: 'bar', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [43945344, 45705856])
@@ -28,22 +28,22 @@ class TestRegressionChartFont02 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart.add_series(values: '=Sheet1!$C$1:$C$5')
 
-    chart.set_title(:name => 'Title')
+    chart.set_title(name: 'Title')
 
     chart.set_x_axis(
-      :name      => 'XXX',
-      :name_font => { :bold => 0, :italic => 1 },
-      :num_font  => { :size => 11, :bold => 1, :italic => 1 }
+      name:      'XXX',
+      name_font: { bold: 0, italic: 1 },
+      num_font:  { size: 11, bold: 1, italic: 1 }
     )
 
     chart.set_y_axis(
-      :name      => 'YYY',
-      :name_font => { :bold => 1, :italic => 1 },
-      :num_font  => { :size => 9, :bold => 0, :italic => 1 }
+      name:      'YYY',
+      name_font: { bold: 1, italic: 1 },
+      num_font:  { size: 9, bold: 0, italic: 1 }
     )
 
     worksheet.insert_chart('E9', chart)

@@ -23,10 +23,10 @@ class TestRegressionQuoteName01 < Minitest::Test
 
     # Test quoted/non-quoted sheet names.
     worksheet = workbook.add_worksheet('Sheet 1')
-    chart = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart = workbook.add_chart(type: 'pie', embedded: 1)
 
     worksheet.write('A1', data)
-    chart.add_series(:values => ["'Sheet 1'", 0, 4, 0, 0])
+    chart.add_series(values: ["'Sheet 1'", 0, 4, 0, 0])
     worksheet.insert_chart('E6', chart, 26, 17)
 
     sheetnames = [
@@ -36,10 +36,10 @@ class TestRegressionQuoteName01 < Minitest::Test
 
     sheetnames.each do |sheetname|
       worksheet = workbook.add_worksheet(sheetname)
-      chart = workbook.add_chart(:type => 'pie', :embedded => 1)
+      chart = workbook.add_chart(type: 'pie', embedded: 1)
 
       worksheet.write('A1', data)
-      chart.add_series(:values => [sheetname, 0, 4, 0, 0])
+      chart.add_series(values: [sheetname, 0, 4, 0, 0])
       worksheet.insert_chart('E6', chart, 26, 17)
     end
 

@@ -25,7 +25,7 @@ class TestRegressionTable20 < Minitest::Test
     e = assert_raises RuntimeError do
       worksheet.add_table(
         'C3:F7',
-        :columns => [{ :header => 'Column1' }, { :header => 'column1' }]
+        columns: [{ header: 'Column1' }, { header: 'column1' }]
       )
     end
 

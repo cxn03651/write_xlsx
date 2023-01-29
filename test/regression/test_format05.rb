@@ -15,7 +15,7 @@ class TestRegressionFormat05 < Minitest::Test
     @xlsx = 'format05.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    wrap      = workbook.add_format(:text_wrap => 1)
+    wrap      = workbook.add_format(text_wrap: 1)
 
     worksheet.set_row(0, 45)
 

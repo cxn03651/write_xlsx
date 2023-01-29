@@ -12,7 +12,7 @@ class DrawingShape02 < Minitest::Test
     shape.name = 'Connector 1'
 
     # Set bulk shape properties via set_properties method
-    shape.set_properties(:type => 'straightConnector1', :connect => 1)
+    shape.set_properties(type: 'straightConnector1', connect: 1)
 
     @obj = Writexlsx::Drawings.new
     @obj.embedded = 1

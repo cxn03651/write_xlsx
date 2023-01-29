@@ -16,7 +16,7 @@ class TestRegressionHeaderImage11 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    worksheet.set_header('&L&G', nil, { :image_left   => 'test/regression/images/black_300.jpg' })
+    worksheet.set_header('&L&G', nil, { image_left: 'test/regression/images/black_300.jpg' })
 
     workbook.close
     compare_for_regression(

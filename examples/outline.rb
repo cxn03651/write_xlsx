@@ -74,7 +74,7 @@ worksheet3 = workbook.add_worksheet('Outline Columns')
 worksheet4 = workbook.add_worksheet('Outline levels')
 
 # Add a general format
-bold = workbook.add_format(:bold => 1)
+bold = workbook.add_format(bold: 1)
 
 ###############################################################################
 #

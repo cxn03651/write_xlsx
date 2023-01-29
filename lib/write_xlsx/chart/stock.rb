@@ -104,17 +104,17 @@ module Writexlsx
           if index % 4 != 3
             unless series.line_defined?
               series.line = {
-                :width    => 2.25,
-                :none     => 1,
-                :_defined => 1
+                width:    2.25,
+                none:     1,
+                _defined: 1
               }
             end
 
             unless ptrue?(series.marker)
               series.marker = if index % 4 == 2
-                                Marker.new(:type => 'dot', :size => 3)
+                                Marker.new(type: 'dot', size: 3)
                               else
-                                Marker.new(:type => 'none')
+                                Marker.new(type: 'none')
                               end
             end
           end

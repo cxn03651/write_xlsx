@@ -225,10 +225,10 @@ shapes_list.each_line do |line|
   end
   last_sheet = sheet
   shape      = workbook.add_shape(
-    :type   => name,
-    :text   => name,
-    :width  => 90,
-    :height => 90
+    type:   name,
+    text:   name,
+    width:  90,
+    height: 90
   )
 
   # Connectors can not have labels, so write the connector name in the cell

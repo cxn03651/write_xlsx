@@ -16,8 +16,8 @@ class TestRegressionProtect06 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    unlocked = workbook.add_format(:locked => 0, :hidden => 0)
-    hidden   = workbook.add_format(:locked => 0, :hidden => 1)
+    unlocked = workbook.add_format(locked: 0, hidden: 0)
+    hidden   = workbook.add_format(locked: 0, hidden: 1)
 
     worksheet.protect
 

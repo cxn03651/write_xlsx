@@ -19,7 +19,7 @@ class TestRegressionOutline06 < Minitest::Test
     worksheet1.outline_settings(0, 0, 0, 1)
 
     # Add a general format
-    bold = workbook.add_format(:bold => 1)
+    bold = workbook.add_format(bold: 1)
 
     # For outlines the important parameters are hidden and level. Rows with the
     # same level are grouped together. The group will be collapsed if hidden is

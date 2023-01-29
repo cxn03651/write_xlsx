@@ -15,9 +15,9 @@ class TestRegressionTable13 < Minitest::Test
     @xlsx = 'table13.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format1 = workbook.add_format(:num_format => 2, :dxf_index => 2)
-    format2 = workbook.add_format(:num_format => 2, :dxf_index => 1)
-    format3 = workbook.add_format(:num_format => 2, :dxf_index => 0)
+    format1 = workbook.add_format(num_format: 2, dxf_index: 2)
+    format2 = workbook.add_format(num_format: 2, dxf_index: 1)
+    format3 = workbook.add_format(num_format: 2, dxf_index: 0)
 
     data = [
       ['Foo', 1234, 2000, 4321],
@@ -33,12 +33,12 @@ class TestRegressionTable13 < Minitest::Test
     worksheet.add_table(
       'C2:F6',
       {
-        :data    => data,
-        :columns => [
+        data:    data,
+        columns: [
           {},
-          { :format => format1 },
-          { :format => format2 },
-          { :format => format3 }
+          { format: format1 },
+          { format: format2 },
+          { format: format3 }
         ]
       }
     )

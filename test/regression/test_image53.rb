@@ -18,7 +18,7 @@ class TestRegressionImage53 < Minitest::Test
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      :description => ''
+      description: ''
     )
 
     workbook.close

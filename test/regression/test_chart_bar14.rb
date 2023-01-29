@@ -17,9 +17,9 @@ class TestRegressionChartBar14 < Minitest::Test
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
     worksheet3 = workbook.add_worksheet
-    chart1     = workbook.add_chart(:type => 'bar', :embedded => 1)
-    chart2     = workbook.add_chart(:type => 'bar', :embedded => 1)
-    chart3     = workbook.add_chart(:type => 'column')
+    chart1     = workbook.add_chart(type: 'bar', embedded: 1)
+    chart2     = workbook.add_chart(type: 'bar', embedded: 1)
+    chart3     = workbook.add_chart(type: 'column')
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart1.instance_variable_set(:@axis_ids, [40294272, 40295808])
@@ -39,15 +39,15 @@ class TestRegressionChartBar14 < Minitest::Test
     worksheet2.write('A1', data)
     worksheet2.write('A6', 'http://www.perl.com/')
 
-    chart3.add_series(:values => '=Sheet2!$A$1:$A$5')
-    chart3.add_series(:values => '=Sheet2!$B$1:$B$5')
-    chart3.add_series(:values => '=Sheet2!$C$1:$C$5')
+    chart3.add_series(values: '=Sheet2!$A$1:$A$5')
+    chart3.add_series(values: '=Sheet2!$B$1:$B$5')
+    chart3.add_series(values: '=Sheet2!$C$1:$C$5')
 
-    chart1.add_series(:values => '=Sheet2!$A$1:$A$5')
-    chart1.add_series(:values => '=Sheet2!$B$1:$B$5')
-    chart1.add_series(:values => '=Sheet2!$C$1:$C$5')
+    chart1.add_series(values: '=Sheet2!$A$1:$A$5')
+    chart1.add_series(values: '=Sheet2!$B$1:$B$5')
+    chart1.add_series(values: '=Sheet2!$C$1:$C$5')
 
-    chart2.add_series(:values => '=Sheet2!$A$1:$A$5')
+    chart2.add_series(values: '=Sheet2!$A$1:$A$5')
 
     worksheet2.insert_chart('E9',  chart1)
     worksheet2.insert_chart('F25', chart2)

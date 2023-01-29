@@ -35,14 +35,14 @@ class TestCondFormat19 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type      => 'data_bar',
-                                        :min_value => 5,
-                                        :mid_value => 52,
-                                        :max_value => 90,
-                                        :min_type  => 'num',
-                                        :mid_type  => 'percentile',
-                                        :max_type  => 'percent',
-                                        :bar_color => '#8DB4E3'
+                                        type:      'data_bar',
+                                        min_value: 5,
+                                        mid_value: 52,
+                                        max_value: 90,
+                                        min_type:  'num',
+                                        mid_type:  'percentile',
+                                        max_type:  'percent',
+                                        bar_color: '#8DB4E3'
                                       })
 
     @worksheet.assemble_xml_file

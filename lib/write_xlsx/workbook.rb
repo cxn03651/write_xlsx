@@ -95,18 +95,18 @@ module Writexlsx
 
       if @excel2003_style
         add_format(default_formats.merge(
-                     :xf_index    => 0,
-                     :font_family => 0,
-                     :font        => 'Arial',
-                     :size        => 10,
-                     :theme       => -1
+                     xf_index:    0,
+                     font_family: 0,
+                     font:        'Arial',
+                     size:        10,
+                     theme:       -1
                    ))
       else
-        add_format(default_formats.merge(:xf_index => 0))
+        add_format(default_formats.merge(xf_index: 0))
       end
 
       # Add a default URL format.
-      @default_url_format = add_format(:hyperlink => 1)
+      @default_url_format = add_format(hyperlink: 1)
 
       set_color_palette
     end
@@ -273,7 +273,7 @@ module Writexlsx
     #
     def add_format(property_hash = {})
       properties = {}
-      properties.update(:font => 'Arial', :size => 10, :theme => -1) if @excel2003_style
+      properties.update(font: 'Arial', size: 10, theme: -1) if @excel2003_style
       properties.update(property_hash)
 
       format = Format.new(@formats, properties)
@@ -376,18 +376,18 @@ module Writexlsx
 
       # List of valid input parameters.
       valid = {
-        :title          => 1,
-        :subject        => 1,
-        :author         => 1,
-        :keywords       => 1,
-        :comments       => 1,
-        :last_author    => 1,
-        :created        => 1,
-        :category       => 1,
-        :manager        => 1,
-        :company        => 1,
-        :status         => 1,
-        :hyperlink_base => 1
+        title:          1,
+        subject:        1,
+        author:         1,
+        keywords:       1,
+        comments:       1,
+        last_author:    1,
+        created:        1,
+        category:       1,
+        manager:        1,
+        company:        1,
+        status:         1,
+        hyperlink_base: 1
       }
 
       # Check for valid input parameters.

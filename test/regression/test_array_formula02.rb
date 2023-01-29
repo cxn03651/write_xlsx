@@ -15,7 +15,7 @@ class TestRegressionArrayFormula02 < Minitest::Test
     @xlsx = 'array_formula02.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:bold => 1)
+    format    = workbook.add_format(bold: 1)
 
     data = [0, 0, 0]
 

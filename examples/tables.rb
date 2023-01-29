@@ -30,7 +30,7 @@ worksheet11 = workbook.add_worksheet
 worksheet12 = workbook.add_worksheet
 worksheet13 = workbook.add_worksheet
 
-currency_format = workbook.add_format(:num_format => '$#,##0')
+currency_format = workbook.add_format(num_format: '$#,##0')
 
 # Some sample data for the table.
 data = [
@@ -68,7 +68,7 @@ worksheet2.set_column('B:G', 12)
 worksheet2.write('B1', caption)
 
 # Add a table to the worksheet.
-worksheet2.add_table('B3:F7', { :data => data })
+worksheet2.add_table('B3:F7', { data: data })
 
 ###############################################################################
 #
@@ -83,7 +83,7 @@ worksheet3.set_column('B:G', 12)
 worksheet3.write('B1', caption)
 
 # Add a table to the worksheet.
-worksheet3.add_table('B3:F7', { :autofilter => 0 })
+worksheet3.add_table('B3:F7', { autofilter: 0 })
 
 # Table data can also be written separately, as an array or individual cells.
 worksheet3.write_col('B4', data)
@@ -101,7 +101,7 @@ worksheet4.set_column('B:G', 12)
 worksheet4.write('B1', caption)
 
 # Add a table to the worksheet.
-worksheet4.add_table('B4:F7', { :header_row => 0 })
+worksheet4.add_table('B4:F7', { header_row: 0 })
 
 # Table data can also be written separately, as an array or individual cells.
 worksheet4.write_col('B4', data)
@@ -119,7 +119,7 @@ worksheet5.set_column('B:G', 12)
 worksheet5.write('B1', caption)
 
 # Add a table to the worksheet.
-worksheet5.add_table('B3:F7', { :first_column => 1, :last_column => 1 })
+worksheet5.add_table('B3:F7', { first_column: 1, last_column: 1 })
 
 # Table data can also be written separately, as an array or individual cells.
 worksheet5.write_col('B4', data)
@@ -137,7 +137,7 @@ worksheet6.set_column('B:G', 12)
 worksheet6.write('B1', caption)
 
 # Add a table to the worksheet.
-worksheet6.add_table('B3:F7', { :banded_rows => 0, :banded_columns => 1 })
+worksheet6.add_table('B3:F7', { banded_rows: 0, banded_columns: 1 })
 
 # Table data can also be written separately, as an array or individual cells.
 worksheet6.write_col('B4', data)
@@ -158,13 +158,13 @@ worksheet7.write('B1', caption)
 worksheet7.add_table(
   'B3:F7',
   {
-    :data    => data,
-    :columns => [
-      { :header => 'Product' },
-      { :header => 'Quarter 1' },
-      { :header => 'Quarter 2' },
-      { :header => 'Quarter 3' },
-      { :header => 'Quarter 4' }
+    data:    data,
+    columns: [
+      { header: 'Product' },
+      { header: 'Quarter 1' },
+      { header: 'Quarter 2' },
+      { header: 'Quarter 3' },
+      { header: 'Quarter 4' }
     ]
   }
 )
@@ -185,16 +185,16 @@ worksheet8.write('B1', caption)
 worksheet8.add_table(
   'B3:G7',
   {
-    :data    => data,
-    :columns => [
-      { :header => 'Product' },
-      { :header => 'Quarter 1' },
-      { :header => 'Quarter 2' },
-      { :header => 'Quarter 3' },
-      { :header => 'Quarter 4' },
+    data:    data,
+    columns: [
+      { header: 'Product' },
+      { header: 'Quarter 1' },
+      { header: 'Quarter 2' },
+      { header: 'Quarter 3' },
+      { header: 'Quarter 4' },
       {
-        :header  => 'Year',
-        :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+        header:  'Year',
+        formula: '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
       }
     ]
   }
@@ -216,17 +216,17 @@ worksheet9.write('B1', caption)
 worksheet9.add_table(
   'B3:G8',
   {
-    :data      => data,
-    :total_row => 1,
-    :columns   => [
-      { :header => 'Product' },
-      { :header => 'Quarter 1' },
-      { :header => 'Quarter 2' },
-      { :header => 'Quarter 3' },
-      { :header => 'Quarter 4' },
+    data:      data,
+    total_row: 1,
+    columns:   [
+      { header: 'Product' },
+      { header: 'Quarter 1' },
+      { header: 'Quarter 2' },
+      { header: 'Quarter 3' },
+      { header: 'Quarter 4' },
       {
-        :header  => 'Year',
-        :formula => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
+        header:  'Year',
+        formula: '=SUM(Table8[@[Quarter 1]:[Quarter 4]])'
       }
     ]
   }
@@ -248,18 +248,18 @@ worksheet10.write('B1', caption)
 worksheet10.add_table(
   'B3:G8',
   {
-    :data      => data,
-    :total_row => 1,
-    :columns   => [
-      { :header => 'Product',   :total_string   => 'Totals' },
-      { :header => 'Quarter 1', :total_function => 'sum' },
-      { :header => 'Quarter 2', :total_function => 'sum' },
-      { :header => 'Quarter 3', :total_function => 'sum' },
-      { :header => 'Quarter 4', :total_function => 'sum' },
+    data:      data,
+    total_row: 1,
+    columns:   [
+      { header: 'Product',   total_string: 'Totals' },
+      { header: 'Quarter 1', total_function: 'sum' },
+      { header: 'Quarter 2', total_function: 'sum' },
+      { header: 'Quarter 3', total_function: 'sum' },
+      { header: 'Quarter 4', total_function: 'sum' },
       {
-        :header         => 'Year',
-        :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-        :total_function => 'sum'
+        header:         'Year',
+        formula:        '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+        total_function: 'sum'
       }
     ]
   }
@@ -281,19 +281,19 @@ worksheet11.write('B1', caption)
 worksheet11.add_table(
   'B3:G8',
   {
-    :data      => data,
-    :style     => 'Table Style Light 11',
-    :total_row => 1,
-    :columns   => [
-      { :header => 'Product',   :total_string   => 'Totals' },
-      { :header => 'Quarter 1', :total_function => 'sum' },
-      { :header => 'Quarter 2', :total_function => 'sum' },
-      { :header => 'Quarter 3', :total_function => 'sum' },
-      { :header => 'Quarter 4', :total_function => 'sum' },
+    data:      data,
+    style:     'Table Style Light 11',
+    total_row: 1,
+    columns:   [
+      { header: 'Product',   total_string: 'Totals' },
+      { header: 'Quarter 1', total_function: 'sum' },
+      { header: 'Quarter 2', total_function: 'sum' },
+      { header: 'Quarter 3', total_function: 'sum' },
+      { header: 'Quarter 4', total_function: 'sum' },
       {
-        :header         => 'Year',
-        :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-        :total_function => 'sum'
+        header:         'Year',
+        formula:        '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+        total_function: 'sum'
       }
     ]
   }
@@ -315,19 +315,19 @@ worksheet12.write('B1', caption)
 worksheet12.add_table(
   'B3:G8',
   {
-    :data      => data,
-    :style     => 'None',
-    :total_row => 1,
-    :columns   => [
-      { :header => 'Product',   :total_string   => 'Totals' },
-      { :header => 'Quarter 1', :total_function => 'sum' },
-      { :header => 'Quarter 2', :total_function => 'sum' },
-      { :header => 'Quarter 3', :total_function => 'sum' },
-      { :header => 'Quarter 4', :total_function => 'sum' },
+    data:      data,
+    style:     'None',
+    total_row: 1,
+    columns:   [
+      { header: 'Product',   total_string: 'Totals' },
+      { header: 'Quarter 1', total_function: 'sum' },
+      { header: 'Quarter 2', total_function: 'sum' },
+      { header: 'Quarter 3', total_function: 'sum' },
+      { header: 'Quarter 4', total_function: 'sum' },
       {
-        :header         => 'Year',
-        :formula        => '=SUM(Table12[@[Quarter 1]:[Quarter 4]])',
-        :total_function => 'sum'
+        header:         'Year',
+        formula:        '=SUM(Table12[@[Quarter 1]:[Quarter 4]])',
+        total_function: 'sum'
       }
     ]
   }
@@ -349,35 +349,35 @@ worksheet13.write('B1', caption)
 worksheet13.add_table(
   'B3:G8',
   {
-    :data      => data,
-    :total_row => 1,
-    :columns   => [
-      { :header => 'Product', :total_string => 'Totals' },
+    data:      data,
+    total_row: 1,
+    columns:   [
+      { header: 'Product', total_string: 'Totals' },
       {
-        :header         => 'Quarter 1',
-        :total_function => 'sum',
-        :format         => currency_format
+        header:         'Quarter 1',
+        total_function: 'sum',
+        format:         currency_format
       },
       {
-        :header         => 'Quarter 2',
-        :total_function => 'sum',
-        :format         => currency_format
+        header:         'Quarter 2',
+        total_function: 'sum',
+        format:         currency_format
       },
       {
-        :header         => 'Quarter 3',
-        :total_function => 'sum',
-        :format         => currency_format
+        header:         'Quarter 3',
+        total_function: 'sum',
+        format:         currency_format
       },
       {
-        :header         => 'Quarter 4',
-        :total_function => 'sum',
-        :format         => currency_format
+        header:         'Quarter 4',
+        total_function: 'sum',
+        format:         currency_format
       },
       {
-        :header         => 'Year',
-        :formula        => '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
-        :total_function => 'sum',
-        :format         => currency_format
+        header:         'Year',
+        formula:        '=SUM(Table8[@[Quarter 1]:[Quarter 4]])',
+        total_function: 'sum',
+        format:         currency_format
       }
     ]
   }

@@ -16,7 +16,7 @@ class TestRegressionShape02 < Minitest::Test
     workbook   = WriteXLSX.new(@io)
     worksheet1 = workbook.add_worksheet
     worksheet2 = workbook.add_worksheet
-    chart      = workbook.add_chart(:type => 'line', :embedded => 1)
+    chart      = workbook.add_chart(type: 'line', embedded: 1)
     rect       = workbook.add_shape
 
     worksheet1.insert_shape('C2', rect)
@@ -31,9 +31,9 @@ class TestRegressionShape02 < Minitest::Test
 
     worksheet2.write('A1', data)
 
-    chart.add_series(:values => '=Sheet2!$A$1:$A$5')
-    chart.add_series(:values => '=Sheet2!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet2!$C$1:$C$5')
+    chart.add_series(values: '=Sheet2!$A$1:$A$5')
+    chart.add_series(values: '=Sheet2!$B$1:$B$5')
+    chart.add_series(values: '=Sheet2!$C$1:$C$5')
 
     worksheet2.insert_chart('E9', chart)
 

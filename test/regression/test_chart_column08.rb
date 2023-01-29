@@ -15,7 +15,7 @@ class TestRegressionChartColumn08 < Minitest::Test
     @xlsx = 'chart_column08.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart     = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [68809856, 68811392])
@@ -29,10 +29,10 @@ class TestRegressionChartColumn08 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories      => '=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)',
-      :values          => '=(Sheet1!$B$1:$B$2,Sheet1!$B$4:$B$5)',
-      :categories_data => [1, 2, 4, 5],
-      :values_data     => [2, 4, 8, 10]
+      categories:      '=(Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5)',
+      values:          '=(Sheet1!$B$1:$B$2,Sheet1!$B$4:$B$5)',
+      categories_data: [1, 2, 4, 5],
+      values_data:     [2, 4, 8, 10]
     )
 
     worksheet.insert_chart('E9', chart)

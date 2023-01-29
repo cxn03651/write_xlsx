@@ -15,7 +15,7 @@ class TestRegressionChartAxis06 < Minitest::Test
     @xlsx = 'chart_axis06.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'pie', :embedded => 1)
+    chart       = workbook.add_chart(type: 'pie', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [47076480, 47078016])
@@ -28,14 +28,14 @@ class TestRegressionChartAxis06 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$3',
-      :values     => '=Sheet1!$B$1:$B$3'
+      categories: '=Sheet1!$A$1:$A$3',
+      values:     '=Sheet1!$B$1:$B$3'
     )
 
-    chart.set_title(:name => 'Title')
+    chart.set_title(name: 'Title')
     # Axis formatting should be ignored.
-    chart.set_x_axis(:name => 'XXX')
-    chart.set_y_axis(:name => 'YYY')
+    chart.set_x_axis(name: 'XXX')
+    chart.set_y_axis(name: 'YYY')
 
     worksheet.insert_chart('E9', chart)
 

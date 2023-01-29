@@ -16,8 +16,8 @@ class TestRegressionChartSparse01 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
     chart       = workbook.add_chart(
-      :type     => 'bar',
-      :embedded => 1
+      type:     'bar',
+      embedded: 1
     )
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
@@ -32,13 +32,13 @@ class TestRegressionChartSparse01 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$6',
-      :values     => '=Sheet1!$C$1:$C$6'
+      categories: '=Sheet1!$A$1:$A$6',
+      values:     '=Sheet1!$C$1:$C$6'
     )
 
     worksheet.insert_chart('E9', chart)

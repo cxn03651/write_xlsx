@@ -15,7 +15,7 @@ class TestRegressionChartLayout05 < Minitest::Test
     @xlsx = 'chart_layout05.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'area', :embedded => 1)
+    chart     = workbook.add_chart(type: 'area', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [43495808, 43497728])
@@ -29,28 +29,28 @@ class TestRegressionChartLayout05 < Minitest::Test
     worksheet.write('A1', data)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
 
     chart.set_x_axis(
-      :name        => 'XXX',
-      :name_layout => {
-        :x => 0.34620319335083105,
-        :y => 0.85090259550889469
+      name:        'XXX',
+      name_layout: {
+        x: 0.34620319335083105,
+        y: 0.85090259550889469
       }
     )
 
     chart.set_y_axis(
-      :name        => 'YYY',
-      :name_layout => {
-        :x => 0.21388888888888888,
-        :y => 0.26349919801691457
+      name:        'YYY',
+      name_layout: {
+        x: 0.21388888888888888,
+        y: 0.26349919801691457
       }
     )
 

@@ -9,7 +9,7 @@ class TestRegressionDefaultFormat01 < Minitest::Test
 
   def test_default_format01
     @xlsx = 'default_format01.xlsx'
-    workbook    = WriteXLSX.new(@io, :default_format_properties => { :size => 10 })
+    workbook    = WriteXLSX.new(@io, default_format_properties: { size: 10 })
     worksheet   = workbook.add_worksheet
 
     worksheet.set_default_row(12.75)

@@ -17,7 +17,7 @@ class TestRegressionProperties02 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     workbook.set_properties(
-      :hyperlink_base => 'C:\\'
+      hyperlink_base: 'C:\\'
     )
 
     workbook.close

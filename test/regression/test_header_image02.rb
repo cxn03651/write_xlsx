@@ -20,8 +20,8 @@ class TestRegressionHeaderImage02 < Minitest::Test
       '&L&G&C&G',
       nil,
       {
-        :image_left   => 'test/regression/images/red.jpg',
-        :image_center => 'test/regression/images/blue.jpg'
+        image_left:   'test/regression/images/red.jpg',
+        image_center: 'test/regression/images/blue.jpg'
       }
     )
 

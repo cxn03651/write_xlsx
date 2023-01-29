@@ -27,31 +27,31 @@ class TestCondFormat07 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'text',
-                                        :criteria => 'containing',
-                                        :value    => 'foo',
-                                        :format   => nil
+                                        type:     'text',
+                                        criteria: 'containing',
+                                        value:    'foo',
+                                        format:   nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'text',
-                                        :criteria => 'not containing',
-                                        :value    => 'foo',
-                                        :format   => nil
+                                        type:     'text',
+                                        criteria: 'not containing',
+                                        value:    'foo',
+                                        format:   nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'text',
-                                        :criteria => 'begins with',
-                                        :value    => 'b',
-                                        :format   => nil
+                                        type:     'text',
+                                        criteria: 'begins with',
+                                        value:    'b',
+                                        format:   nil
                                       })
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'text',
-                                        :criteria => 'ends with',
-                                        :value    => 'b',
-                                        :format   => nil
+                                        type:     'text',
+                                        criteria: 'ends with',
+                                        value:    'b',
+                                        format:   nil
                                       })
 
     @worksheet.assemble_xml_file

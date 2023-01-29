@@ -15,7 +15,7 @@ class TestChartGridlines09 < Minitest::Test
     @xlsx = 'chart_gridlines09.xlsx'
     workbook = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart       = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xls file.
     chart.instance_variable_set(:@axis_ids, [48744320, 49566848])
@@ -28,35 +28,35 @@ class TestChartGridlines09 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart.add_series(values: '=Sheet1!$C$1:$C$5')
 
     chart.set_x_axis(
-      :major_gridlines => {
-        :visible => 1,
-        :line    => {
-          :color     => 'red',
-          :width     => 0.5,
-          :dash_type => 'square_dot'
+      major_gridlines: {
+        visible: 1,
+        line:    {
+          color:     'red',
+          width:     0.5,
+          dash_type: 'square_dot'
         }
       },
-      :minor_gridlines => {
-        :visible => 1,
-        :line    => { :color => 'yellow' }
+      minor_gridlines: {
+        visible: 1,
+        line:    { color: 'yellow' }
       }
     )
     chart.set_y_axis(
-      :major_gridlines => {
-        :visible => 1,
-        :line    => {
-          :width     => 1.25,
-          :dash_type => 'dash'
+      major_gridlines: {
+        visible: 1,
+        line:    {
+          width:     1.25,
+          dash_type: 'dash'
         }
       },
-      :minor_gridlines => {
-        :visible => 1,
-        :line    => { :color => '#00B050' }
+      minor_gridlines: {
+        visible: 1,
+        line:    { color: '#00B050' }
       }
     )
 

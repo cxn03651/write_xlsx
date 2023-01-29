@@ -18,8 +18,8 @@ class TestRegressionComment08 < Minitest::Test
 
     worksheet.write_comment('A1', 'Some text')
     worksheet.write_comment('A2', 'Some text')
-    worksheet.write_comment('A3', 'Some text', :visible => 0)
-    worksheet.write_comment('A4', 'Some text', :visible => 1)
+    worksheet.write_comment('A3', 'Some text', visible: 0)
+    worksheet.write_comment('A4', 'Some text', visible: 1)
     worksheet.write_comment('A5', 'Some text')
 
     worksheet.show_comments

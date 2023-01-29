@@ -15,9 +15,9 @@ class TestRegressionChartBar11 < Minitest::Test
     @xlsx = 'chart_bar11.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart1    = workbook.add_chart(:type => 'bar', :embedded => 1)
-    chart2    = workbook.add_chart(:type => 'bar', :embedded => 1)
-    chart3    = workbook.add_chart(:type => 'bar', :embedded => 1)
+    chart1    = workbook.add_chart(type: 'bar', embedded: 1)
+    chart2    = workbook.add_chart(type: 'bar', embedded: 1)
+    chart3    = workbook.add_chart(type: 'bar', embedded: 1)
 
     data = [
       [1, 2, 3,  4,  5],
@@ -33,14 +33,14 @@ class TestRegressionChartBar11 < Minitest::Test
     worksheet.write('A8', 'http://www.perl.org/')
     worksheet.write('A9', 'http://www.perl.net/')
 
-    chart1.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart1.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart1.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart1.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart1.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart1.add_series(values: '=Sheet1!$C$1:$C$5')
 
-    chart2.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart2.add_series(:values => '=Sheet1!$B$1:$B$5')
+    chart2.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart2.add_series(values: '=Sheet1!$B$1:$B$5')
 
-    chart3.add_series(:values => '=Sheet1!$A$1:$A$5')
+    chart3.add_series(values: '=Sheet1!$A$1:$A$5')
 
     worksheet.insert_chart('E9',  chart1)
     worksheet.insert_chart('D25', chart2)

@@ -20,7 +20,7 @@ class TestRegressionTable07 < Minitest::Test
     worksheet.set_column('C:F', 10.288)
 
     # Add the table.
-    worksheet.add_table('C3:F13', { :header_row => 0 })
+    worksheet.add_table('C3:F13', { header_row: 0 })
 
     worksheet.write('A1', 'Foo')
 

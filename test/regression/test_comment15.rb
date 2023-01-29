@@ -15,7 +15,7 @@ class TestRegressionComment15 < Minitest::Test
     @xlsx = 'comment15.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format1   = workbook.add_format(:bold => 1)
+    format1   = workbook.add_format(bold: 1)
 
     worksheet.write('A1', 'Foo', format1)
     worksheet.write_comment('B2', 'Some text')

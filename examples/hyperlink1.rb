@@ -24,10 +24,10 @@ worksheet.set_selection('B1')
 
 # Add a sample format.
 red_format = workbook.add_format(
-  :color     => 'red',
-  :bold      => 1,
-  :underline => 1,
-  :size      => 12
+  color:     'red',
+  bold:      1,
+  underline: 1,
+  size:      12
 )
 
 # Add an alternate description string to the URL.

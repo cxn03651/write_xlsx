@@ -32,11 +32,11 @@ class TestCondFormat21 < Minitest::Test
 
     @worksheet.conditional_formatting('A1',
                                       {
-                                        :type         => 'cell',
-                                        :format       => nil,
-                                        :criteria     => 'greater than',
-                                        :value        => 5,
-                                        :stop_if_true => 1
+                                        type:         'cell',
+                                        format:       nil,
+                                        criteria:     'greater than',
+                                        value:        5,
+                                        stop_if_true: 1
                                       })
     # End test code.
 

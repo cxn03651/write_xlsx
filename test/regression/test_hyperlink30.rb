@@ -19,9 +19,9 @@ class TestRegressionHyperlink30 < Minitest::Test
     workbook.instance_variable_set(:@custom_colors, ['FF0000FF'])
 
     worksheet = workbook.add_worksheet
-    format1   = workbook.add_format(:hyperlink => 1)
-    format2   = workbook.add_format(:color => 'red',  :underline => 1)
-    format3   = workbook.add_format(:color => 'blue', :underline => 1)
+    format1   = workbook.add_format(hyperlink: 1)
+    format2   = workbook.add_format(color: 'red',  underline: 1)
+    format3   = workbook.add_format(color: 'blue', underline: 1)
 
     # Turn off default URL format for testing.
     worksheet.instance_variable_set(:@default_url_format, nil)

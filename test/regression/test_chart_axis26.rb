@@ -15,7 +15,7 @@ class TestRegressionChartAxis26 < Minitest::Test
     @xlsx = 'chart_axis26.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    chart       = workbook.add_chart(:type => 'line', :embedded => 1)
+    chart       = workbook.add_chart(type: 'line', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [108315392, 108329216])
@@ -27,14 +27,14 @@ class TestRegressionChartAxis26 < Minitest::Test
     ]
 
     chart.set_x_axis(
-      :num_font => { :rotation => 45, :baseline => -1 }
+      num_font: { rotation: 45, baseline: -1 }
     )
 
     worksheet.write('A1', data)
 
-    chart.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart.add_series(values: '=Sheet1!$C$1:$C$5')
 
     worksheet.insert_chart('E9', chart)
 

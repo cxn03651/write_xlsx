@@ -10,12 +10,12 @@ class TestStyles09 < Minitest::Test
     workbook = WriteXLSX.new(StringIO.new)
 
     format1 = workbook.add_format(
-      :color         => '#9C0006',
-      :bg_color      => '#FFC7CE',
-      :font_condense => 1,
-      :font_extend   => 1,
-      :has_fill      => 1,
-      :has_font      => 1
+      color:         '#9C0006',
+      bg_color:      '#FFC7CE',
+      font_condense: 1,
+      font_extend:   1,
+      has_fill:      1,
+      has_font:      1
     )
 
     format1.get_dxf_index

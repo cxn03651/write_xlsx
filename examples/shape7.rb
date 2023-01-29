@@ -22,11 +22,11 @@ cx = 210
 cy = 190
 
 ellipse = workbook.add_shape(
-  :type   => 'ellipse',
-  :id     => 2,
-  :text   => "Hello\nWorld",
-  :width  => cw,
-  :height => ch
+  type:   'ellipse',
+  id:     2,
+  text:   "Hello\nWorld",
+  width:  cw,
+  height: ch
 )
 worksheet.insert_shape('A1', ellipse, cx, cy)
 
@@ -37,10 +37,10 @@ px = 120
 py = 250
 
 plus = workbook.add_shape(
-  :type   => 'plus',
-  :id     => 3,
-  :width  => pw,
-  :height => ph
+  type:   'plus',
+  id:     3,
+  width:  pw,
+  height: ph
 )
 
 p1 = worksheet.insert_shape('A1', plus, 350, 350)
@@ -49,7 +49,7 @@ p3 = worksheet.insert_shape('A1', plus, 350, 150)
 plus.adjustments = 35  # change shape of plus symbol.
 p4 = worksheet.insert_shape('A1', plus, 150, 150)
 
-cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
+cxn_shape = workbook.add_shape(type: 'bentConnector3', fill: 0)
 
 cxn_shape.start       = ellipse.id
 cxn_shape.start_index = 4   # 4th connection pt, clockwise from top(0).

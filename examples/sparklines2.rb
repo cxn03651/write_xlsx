@@ -18,7 +18,7 @@ require 'write_xlsx'
 workbook   = WriteXLSX.new('sparklines2.xlsx')
 worksheet1 = workbook.add_worksheet
 worksheet2 = workbook.add_worksheet
-bold       = workbook.add_format(:bold => 1)
+bold       = workbook.add_format(bold: 1)
 row = 1
 
 # Set the columns widths to make the output clearer.
@@ -36,8 +36,8 @@ str = 'A default "line" sparkline.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A2',
-    :range    => 'Sheet2!A1:J1'
+    location: 'A2',
+    range:    'Sheet2!A1:J1'
   }
 )
 
@@ -50,9 +50,9 @@ str = 'A default "column" sparkline.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A3',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column'
+    location: 'A3',
+    range:    'Sheet2!A2:J2',
+    type:     'column'
   }
 )
 
@@ -65,9 +65,9 @@ str = 'A default "win/loss" sparkline.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A4',
-    :range    => 'Sheet2!A3:J3',
-    :type     => 'win_loss'
+    location: 'A4',
+    range:    'Sheet2!A3:J3',
+    type:     'win_loss'
   }
 )
 
@@ -80,9 +80,9 @@ str = 'Line with markers.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A6',
-    :range    => 'Sheet2!A1:J1',
-    :markers  => 1
+    location: 'A6',
+    range:    'Sheet2!A1:J1',
+    markers:  1
   }
 )
 
@@ -95,10 +95,10 @@ str = 'Line with high and low points.'
 
 worksheet1.add_sparkline(
   {
-    :location   => 'A7',
-    :range      => 'Sheet2!A1:J1',
-    :high_point => 1,
-    :low_point  => 1
+    location:   'A7',
+    range:      'Sheet2!A1:J1',
+    high_point: 1,
+    low_point:  1
   }
 )
 
@@ -111,10 +111,10 @@ str = 'Line with first and last point markers.'
 
 worksheet1.add_sparkline(
   {
-    :location    => 'A8',
-    :range       => 'Sheet2!A1:J1',
-    :first_point => 1,
-    :last_point  => 1
+    location:    'A8',
+    range:       'Sheet2!A1:J1',
+    first_point: 1,
+    last_point:  1
   }
 )
 
@@ -127,9 +127,9 @@ str = 'Line with negative point markers.'
 
 worksheet1.add_sparkline(
   {
-    :location        => 'A9',
-    :range           => 'Sheet2!A1:J1',
-    :negative_points => 1
+    location:        'A9',
+    range:           'Sheet2!A1:J1',
+    negative_points: 1
   }
 )
 
@@ -142,9 +142,9 @@ str = 'Line with axis.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A10',
-    :range    => 'Sheet2!A1:J1',
-    :axis     => 1
+    location: 'A10',
+    range:    'Sheet2!A1:J1',
+    axis:     1
   }
 )
 
@@ -157,9 +157,9 @@ str = 'Column with default style (1).'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A12',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column'
+    location: 'A12',
+    range:    'Sheet2!A2:J2',
+    type:     'column'
   }
 )
 
@@ -172,10 +172,10 @@ str = 'Column with style 2.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A13',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column',
-    :style    => 2
+    location: 'A13',
+    range:    'Sheet2!A2:J2',
+    type:     'column',
+    style:    2
   }
 )
 
@@ -188,10 +188,10 @@ str = 'Column with style 3.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A14',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column',
-    :style    => 3
+    location: 'A14',
+    range:    'Sheet2!A2:J2',
+    type:     'column',
+    style:    3
   }
 )
 
@@ -204,10 +204,10 @@ str = 'Column with style 4.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A15',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column',
-    :style    => 4
+    location: 'A15',
+    range:    'Sheet2!A2:J2',
+    type:     'column',
+    style:    4
   }
 )
 
@@ -220,10 +220,10 @@ str = 'Column with style 5.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A16',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column',
-    :style    => 5
+    location: 'A16',
+    range:    'Sheet2!A2:J2',
+    type:     'column',
+    style:    5
   }
 )
 
@@ -236,10 +236,10 @@ str = 'Column with style 6.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A17',
-    :range    => 'Sheet2!A2:J2',
-    :type     => 'column',
-    :style    => 6
+    location: 'A17',
+    range:    'Sheet2!A2:J2',
+    type:     'column',
+    style:    6
   }
 )
 
@@ -252,10 +252,10 @@ str = 'Column with a user defined colour.'
 
 worksheet1.add_sparkline(
   {
-    :location     => 'A18',
-    :range        => 'Sheet2!A2:J2',
-    :type         => 'column',
-    :series_color => '#E965E0'
+    location:     'A18',
+    range:        'Sheet2!A2:J2',
+    type:         'column',
+    series_color: '#E965E0'
   }
 )
 
@@ -268,9 +268,9 @@ str = 'A win/loss sparkline.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A20',
-    :range    => 'Sheet2!A3:J3',
-    :type     => 'win_loss'
+    location: 'A20',
+    range:    'Sheet2!A3:J3',
+    type:     'win_loss'
   }
 )
 
@@ -283,10 +283,10 @@ str = 'A win/loss sparkline with negative points highlighted.'
 
 worksheet1.add_sparkline(
   {
-    :location        => 'A21',
-    :range           => 'Sheet2!A3:J3',
-    :type            => 'win_loss',
-    :negative_points => 1
+    location:        'A21',
+    range:           'Sheet2!A3:J3',
+    type:            'win_loss',
+    negative_points: 1
   }
 )
 
@@ -299,10 +299,10 @@ str = 'A left to right column (the default).'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A23',
-    :range    => 'Sheet2!A4:J4',
-    :type     => 'column',
-    :style    => 20
+    location: 'A23',
+    range:    'Sheet2!A4:J4',
+    type:     'column',
+    style:    20
   }
 )
 
@@ -315,11 +315,11 @@ str = 'A right to left column.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A24',
-    :range    => 'Sheet2!A4:J4',
-    :type     => 'column',
-    :style    => 20,
-    :reverse  => 1
+    location: 'A24',
+    range:    'Sheet2!A4:J4',
+    type:     'column',
+    style:    20,
+    reverse:  1
   }
 )
 
@@ -332,10 +332,10 @@ str = 'Sparkline and text in one cell.'
 
 worksheet1.add_sparkline(
   {
-    :location => 'A25',
-    :range    => 'Sheet2!A4:J4',
-    :type     => 'column',
-    :style    => 20
+    location: 'A25',
+    range:    'Sheet2!A4:J4',
+    type:     'column',
+    style:    20
   }
 )
 
@@ -349,9 +349,9 @@ str = 'A grouped sparkline. Changes are applied to all three.'
 
 worksheet1.add_sparkline(
   {
-    :location => %w[A27 A28 A29],
-    :range    => ['Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7'],
-    :markers  => 1
+    location: %w[A27 A28 A29],
+    range:    ['Sheet2!A5:J5', 'Sheet2!A6:J6', 'Sheet2!A7:J7'],
+    markers:  1
   }
 )
 

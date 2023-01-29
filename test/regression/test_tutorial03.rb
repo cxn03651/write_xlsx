@@ -16,9 +16,9 @@ class TestRegressionTutorial03 < Minitest::Test
     workbook     = WriteXLSX.new(@io)
     worksheet    = workbook.add_worksheet
 
-    bold         = workbook.add_format(:bold => 1)
-    money_format = workbook.add_format(:num_format => '\\$#,##0')
-    date_format  = workbook.add_format(:num_format => 'mmmm\\ d\\ yyyy')
+    bold         = workbook.add_format(bold: 1)
+    money_format = workbook.add_format(num_format: '\\$#,##0')
+    date_format  = workbook.add_format(num_format: 'mmmm\\ d\\ yyyy')
 
     worksheet.set_column('B:B', 15)
 

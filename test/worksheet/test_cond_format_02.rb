@@ -29,10 +29,10 @@ class TestCondFormat02 < Minitest::Test
 
     @worksheet.conditional_formatting('A1',
                                       {
-                                        :type     => 'cell',
-                                        :format   => nil,
-                                        :criteria => 'greater than',
-                                        :value    => '$B$1'
+                                        type:     'cell',
+                                        format:   nil,
+                                        criteria: 'greater than',
+                                        value:    '$B$1'
                                       })
     @worksheet.assemble_xml_file
     result = got_to_array(@worksheet.instance_variable_get(:@writer).string)

@@ -13,7 +13,7 @@ class TestRegressionExcel2003Style07 < Minitest::Test
 
   def test_excel2003_style07
     @xlsx = 'excel2003_style07.xlsx'
-    workbook    = WriteXLSX.new(@io, :excel2003_style => true)
+    workbook    = WriteXLSX.new(@io, excel2003_style: true)
     worksheet   = workbook.add_worksheet
 
     worksheet.insert_image('B3', 'test/regression/images/yellow.jpg', 4, 3)

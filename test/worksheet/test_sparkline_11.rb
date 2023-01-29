@@ -25,47 +25,47 @@ class TestSparkline11 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location        => 'F1',
-        :range           => 'A1:E1',
+        location:        'F1',
+        range:           'A1:E1',
 
-        :max             => 0.5,
-        :min             => -0.5,
-        :axis            => 1,
-        :reverse         => 1,
-        :empty_cells     => 'zero',
-        :weight          => 0.25,
+        max:             0.5,
+        min:             -0.5,
+        axis:            1,
+        reverse:         1,
+        empty_cells:     'zero',
+        weight:          0.25,
 
-        :high_point      => 1,
-        :low_point       => 1,
-        :negative_points => 1,
-        :first_point     => 1,
-        :last_point      => 1,
-        :markers         => 1
+        high_point:      1,
+        low_point:       1,
+        negative_points: 1,
+        first_point:     1,
+        last_point:      1,
+        markers:         1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location    => 'F2',
-        :range       => 'A2:E2',
+        location:    'F2',
+        range:       'A2:E2',
 
-        :max         => 'group',
-        :min         => 'group',
-        :empty_cells => 'connect',
-        :weight      => 2.25
+        max:         'group',
+        min:         'group',
+        empty_cells: 'connect',
+        weight:      2.25
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location    => 'F3',
-        :range       => 'A3:E3',
+        location:    'F3',
+        range:       'A3:E3',
 
-        :max         => 'group',
-        :min         => '0',
-        :show_hidden => 1,
-        :weight      => 6,
-        :date_axis   => 'A4:E4'
+        max:         'group',
+        min:         '0',
+        show_hidden: 1,
+        weight:      6,
+        date_axis:   'A4:E4'
       }
     )
 

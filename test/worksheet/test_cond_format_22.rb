@@ -38,72 +38,72 @@ class TestCondFormat22 < Minitest::Test
     @worksheet.conditional_formatting(
       'A1',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_arrows'
+        type:       'icon_set',
+        icon_style: '3_arrows'
       }
     )
 
     @worksheet.conditional_formatting(
       'A2',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_flags'
+        type:       'icon_set',
+        icon_style: '3_flags'
       }
     )
 
     @worksheet.conditional_formatting(
       'A3',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_traffic_lights_rimmed'
+        type:       'icon_set',
+        icon_style: '3_traffic_lights_rimmed'
       }
     )
 
     @worksheet.conditional_formatting(
       'A4',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_symbols_circled'
+        type:       'icon_set',
+        icon_style: '3_symbols_circled'
       }
     )
 
     @worksheet.conditional_formatting(
       'A5',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_arrows'
+        type:       'icon_set',
+        icon_style: '4_arrows'
       }
     )
 
     @worksheet.conditional_formatting(
       'A6',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_red_to_black'
+        type:       'icon_set',
+        icon_style: '4_red_to_black'
       }
     )
 
     @worksheet.conditional_formatting(
       'A7',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_traffic_lights'
+        type:       'icon_set',
+        icon_style: '4_traffic_lights'
       }
     )
 
     @worksheet.conditional_formatting(
       'A8',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_arrows_gray'
+        type:       'icon_set',
+        icon_style: '5_arrows_gray'
       }
     )
 
     @worksheet.conditional_formatting(
       'A9',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_quarters'
+        type:       'icon_set',
+        icon_style: '5_quarters'
       }
     )
 

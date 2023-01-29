@@ -15,8 +15,8 @@ class TestRegressionChartChartArea04 < Minitest::Test
     @xlsx = 'chart_chartarea04.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'stock', :embedded => 1)
-    date_format = workbook.add_format(:num_format => 14)
+    chart     = workbook.add_chart(type: 'stock', embedded: 1)
+    date_format = workbook.add_format(num_format: 14)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [82954112, 82956288])
@@ -38,27 +38,27 @@ class TestRegressionChartChartArea04 < Minitest::Test
     worksheet.set_column('A:D', 11)
 
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$B$1:$B$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$B$1:$B$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$C$1:$C$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$C$1:$C$5'
     )
     chart.add_series(
-      :categories => '=Sheet1!$A$1:$A$5',
-      :values     => '=Sheet1!$D$1:$D$5'
+      categories: '=Sheet1!$A$1:$A$5',
+      values:     '=Sheet1!$D$1:$D$5'
     )
 
     # Test the deprecated writeexcel interface.
     chart.set_chartarea(
-      :border => { :color => '#FF0000' },
-      :fill   => { :color => '#00B050' }
+      border: { color: '#FF0000' },
+      fill:   { color: '#00B050' }
     )
 
     chart.set_plotarea(
-      :border => { :dash_type => 'dash_dot' },
-      :fill   => { :color     => '#FFC000' }
+      border: { dash_type: 'dash_dot' },
+      fill:   { color: '#FFC000' }
     )
 
     worksheet.insert_chart('E9', chart)

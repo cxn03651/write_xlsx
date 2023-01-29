@@ -22,8 +22,8 @@ class TestSparkline02 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location => 'F1',
-        :range    => 'Sheet1!A1:E1'
+        location: 'F1',
+        range:    'Sheet1!A1:E1'
       }
     )
 

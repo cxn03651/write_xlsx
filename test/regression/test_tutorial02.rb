@@ -16,8 +16,8 @@ class TestRegressionTutorial02 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    bold      = workbook.add_format(:bold => 1)
-    money     = workbook.add_format(:num_format => '\\$#,##0')
+    bold      = workbook.add_format(bold: 1)
+    money     = workbook.add_format(num_format: '\\$#,##0')
 
     worksheet.write('A1', 'Item', bold)
     worksheet.write('B1', 'Cost', bold)

@@ -16,15 +16,15 @@ class TestChartName02 < Minitest::Test
     workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
     chart1     = workbook.add_chart(
-      :type     => 'line',
-      :embedded => 1,
-      :name     => 'New 1'
+      type:     'line',
+      embedded: 1,
+      name:     'New 1'
     )
 
     chart2     = workbook.add_chart(
-      :type     => 'line',
-      :embedded => 1,
-      :name     => 'New 2'
+      type:     'line',
+      embedded: 1,
+      name:     'New 2'
     )
 
     # For testing, copy the randomly generated axis ids in the target xls file.
@@ -39,13 +39,13 @@ class TestChartName02 < Minitest::Test
 
     worksheet.write('A1', data)
 
-    chart1.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart1.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart1.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart1.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart1.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart1.add_series(values: '=Sheet1!$C$1:$C$5')
 
-    chart2.add_series(:values => '=Sheet1!$A$1:$A$5')
-    chart2.add_series(:values => '=Sheet1!$B$1:$B$5')
-    chart2.add_series(:values => '=Sheet1!$C$1:$C$5')
+    chart2.add_series(values: '=Sheet1!$A$1:$A$5')
+    chart2.add_series(values: '=Sheet1!$B$1:$B$5')
+    chart2.add_series(values: '=Sheet1!$C$1:$C$5')
 
     worksheet.insert_chart('E9',  chart1)
     worksheet.insert_chart('E24', chart2)

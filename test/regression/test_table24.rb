@@ -20,7 +20,7 @@ class TestRegressionTable24 < Minitest::Test
     worksheet.set_column('C:F', 10.288)
 
     # Add the table.
-    worksheet.add_table('C3:F13', { :style => 'Table Style Medium 10' })
+    worksheet.add_table('C3:F13', { style: 'Table Style Medium 10' })
 
     workbook.close
     compare_for_regression

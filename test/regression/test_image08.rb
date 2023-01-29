@@ -19,7 +19,7 @@ class TestRegressionImage08 < Minitest::Test
     worksheet.insert_image(
       'B3',
       'test/regression/images/grey.png',
-      :x_scale => 0.5, :y_scale => 0.5
+      x_scale: 0.5, y_scale: 0.5
     )
 
     workbook.close

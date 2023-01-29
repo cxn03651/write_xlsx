@@ -20,9 +20,9 @@ class TestRegressionCustomColors01 < Minitest::Test
     workbook.set_custom_color(41, '#792DC8')
     workbook.set_custom_color(42, '#646462')
 
-    color1 = workbook.add_format(:bg_color => 40)
-    color2 = workbook.add_format(:bg_color => 41)
-    color3 = workbook.add_format(:bg_color => 42)
+    color1 = workbook.add_format(bg_color: 40)
+    color2 = workbook.add_format(bg_color: 41)
+    color3 = workbook.add_format(bg_color: 42)
 
     worksheet.write('A1', 'Foo', color1)
     worksheet.write('A2', 'Foo', color2)

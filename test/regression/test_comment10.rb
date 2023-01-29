@@ -17,7 +17,7 @@ class TestRegressionComment10 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     worksheet.write('A1', 'Foo')
-    worksheet.write_comment('B2', 'Some text', :color => 51)
+    worksheet.write_comment('B2', 'Some text', color: 51)
 
     # Set the author to match the target XLSX file.
     worksheet.comments_author = 'John'

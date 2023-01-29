@@ -64,7 +64,7 @@ module Writexlsx
       end
 
       def data
-        { :sst_id => token }
+        { sst_id: token }
       end
 
       TYPE_STR_ATTRS = %w[t s].freeze

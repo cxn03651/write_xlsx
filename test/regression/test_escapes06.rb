@@ -15,7 +15,7 @@ class TestRegressionEscapes06 < Minitest::Test
     @xlsx = 'escapes06.xlsx'
     workbook   = WriteXLSX.new(@io)
     worksheet  = workbook.add_worksheet
-    num_format = workbook.add_format(:num_format => '[Red]0.0%\\ "a"')
+    num_format = workbook.add_format(num_format: '[Red]0.0%\\ "a"')
 
     worksheet.set_column('A:A', 14)
 

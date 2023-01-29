@@ -27,11 +27,11 @@ class TestCondFormat11 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A4',
                                       {
-                                        :type     => 'date',
-                                        :criteria => 'between',
-                                        :minimum  => '2011-01-01T',
-                                        :maximum  => '2011-12-31T',
-                                        :format   => nil
+                                        type:     'date',
+                                        criteria: 'between',
+                                        minimum:  '2011-01-01T',
+                                        maximum:  '2011-12-31T',
+                                        format:   nil
                                       })
 
     @worksheet.assemble_xml_file

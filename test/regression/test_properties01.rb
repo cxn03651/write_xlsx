@@ -17,15 +17,15 @@ class TestRegressionProperties01 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     workbook.set_properties(
-      :title    => 'This is an example spreadsheet',
-      :subject  => 'With document properties',
-      :author   => 'Someone',
-      :manager  => 'Dr. Heinz Doofenshmirtz',
-      :company  => 'of Wolves',
-      :category => 'Example spreadsheets',
-      :keywords => 'Sample, Example, Properties',
-      :comments => 'Created with Perl and Excel::Writer::XLSX',
-      :status   => 'Quo'
+      title:    'This is an example spreadsheet',
+      subject:  'With document properties',
+      author:   'Someone',
+      manager:  'Dr. Heinz Doofenshmirtz',
+      company:  'of Wolves',
+      category: 'Example spreadsheets',
+      keywords: 'Sample, Example, Properties',
+      comments: 'Created with Perl and Excel::Writer::XLSX',
+      status:   'Quo'
     )
 
     worksheet.set_column('A:A', 70)

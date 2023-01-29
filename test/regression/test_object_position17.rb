@@ -21,7 +21,7 @@ class TestRegressionObjectPosition17 < Minitest::Test
     # Same as testcase test_object_position14 except with an offset.
     worksheet.insert_image(
       'A9', 'test/regression/images/red.png',
-      :x_offset => 192
+      x_offset: 192
     )
 
     workbook.close

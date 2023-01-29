@@ -9,9 +9,9 @@ class TestStyles02 < Minitest::Test
   def test_styles_02
     workbook = WriteXLSX.new(StringIO.new)
 
-    format1 = workbook.add_format(:bold => 1)
-    format2 = workbook.add_format(:italic => 1)
-    format3 = workbook.add_format(:bold => 1, :italic => 1)
+    format1 = workbook.add_format(bold: 1)
+    format2 = workbook.add_format(italic: 1)
+    format3 = workbook.add_format(bold: 1, italic: 1)
 
     workbook.__send__('set_default_xf_indices')
     workbook.__send__('prepare_format_properties')

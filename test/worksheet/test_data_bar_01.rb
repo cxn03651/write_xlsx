@@ -18,7 +18,7 @@ class TestWorksheetDataBar01 < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A1',
-      :type => 'data_bar'
+      type: 'data_bar'
     )
 
     @worksheet.assemble_xml_file

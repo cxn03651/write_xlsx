@@ -16,8 +16,8 @@ class TestRegressionTypes08 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    bold   = workbook.add_format(:bold   => 1)
-    italic = workbook.add_format(:italic => 1)
+    bold   = workbook.add_format(bold: 1)
+    italic = workbook.add_format(italic: 1)
 
     worksheet.write_boolean('A1', 'True', bold)
     worksheet.write_boolean('A2', nil, italic)

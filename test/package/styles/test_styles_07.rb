@@ -9,10 +9,10 @@ class TestStyles07 < Minitest::Test
   def test_styles_07
     workbook = WriteXLSX.new(StringIO.new)
 
-    format1 = workbook.add_format(:pattern => 1,  :bg_color => 'red')
-    format2 = workbook.add_format(:pattern => 11, :bg_color => 'red')
-    format3 = workbook.add_format(:pattern => 11, :bg_color => 'red', :fg_color => 'yellow')
-    format4 = workbook.add_format(:pattern => 1,  :bg_color => 'red', :fg_color => 'red')
+    format1 = workbook.add_format(pattern: 1,  bg_color: 'red')
+    format2 = workbook.add_format(pattern: 11, bg_color: 'red')
+    format3 = workbook.add_format(pattern: 11, bg_color: 'red', fg_color: 'yellow')
+    format4 = workbook.add_format(pattern: 1,  bg_color: 'red', fg_color: 'red')
 
     workbook.__send__('set_default_xf_indices')
     workbook.__send__('prepare_format_properties')

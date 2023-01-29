@@ -37,12 +37,12 @@ worksheet4.split_panes(15, 8.43)    # 1 row and column
 #
 
 header = workbook.add_format(
-  :align    => 'center',
-  :valign   => 'vcenter',
-  :fg_color => '#C3FFC0'
+  align:    'center',
+  valign:   'vcenter',
+  fg_color: '#C3FFC0'
 )
 
-center = workbook.add_format(:align => 'center')
+center = workbook.add_format(align: 'center')
 
 #######################################################################
 #

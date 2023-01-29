@@ -20,9 +20,9 @@ class TestRegressionComment13 < Minitest::Test
     worksheet.write_comment(
       'B2',
       'Some text',
-      :font        => 'Courier',
-      :font_size   => 10,
-      :font_family => 3
+      font:        'Courier',
+      font_size:   10,
+      font_family: 3
     )
 
     # Set the author to match the target XLSX file.

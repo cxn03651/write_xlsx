@@ -23,11 +23,11 @@ class TestRegressionShapeConnect04 < Minitest::Test
     cy = 190
 
     ellipse = workbook.add_shape(
-      :type   => 'ellipse',
-      :id     => 2,
-      :text   => "Hello\nWorld",
-      :width  => cw,
-      :height => ch
+      type:   'ellipse',
+      id:     2,
+      text:   "Hello\nWorld",
+      width:  cw,
+      height: ch
     )
     worksheet.insert_shape('A1', ellipse, cx, cy)
 
@@ -38,17 +38,17 @@ class TestRegressionShapeConnect04 < Minitest::Test
     py = 250
 
     plus = workbook.add_shape(
-      :type   => 'plus',
-      :id     => 3,
-      :width  => pw,
-      :height => ph
+      type:   'plus',
+      id:     3,
+      width:  pw,
+      height: ph
     )
     p1 = worksheet.insert_shape('A1', plus, 350, 150)   #  2:00
     p2 = worksheet.insert_shape('A1', plus, 350, 350)   #  4:00
     p3 = worksheet.insert_shape('A1', plus, 150, 350)   #  8:00
     p4 = worksheet.insert_shape('A1', plus, 150, 150)   # 10:00
 
-    cxn_shape = workbook.add_shape(:type => 'bentConnector3', :fill => 0)
+    cxn_shape = workbook.add_shape(type: 'bentConnector3', fill: 0)
 
     cxn_shape.start = ellipse.id
     cxn_shape.start_index = 2   # 2nd connection point, clockwise from top(0)

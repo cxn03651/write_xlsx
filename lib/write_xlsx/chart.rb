@@ -70,7 +70,7 @@ module Writexlsx
       @gradient = gradient_properties(params[:gradient])
 
       # Map deprecated Spreadsheet::WriteExcel fill colour.
-      fill = params[:color] ? { :color => params[:color] } : params[:fill]
+      fill = params[:color] ? { color: params[:color] } : params[:fill]
       @fill = fill_properties(fill)
 
       # Pattern fill overrides solid fill.
@@ -90,13 +90,13 @@ module Writexlsx
 
       # Map deprecated Spreadsheet::WriteExcel line_weight.
       border = params[:border]
-      border = { :width => swe_line_weight(line_weight) } if line_weight
+      border = { width: swe_line_weight(line_weight) } if line_weight
 
       # Map deprecated Spreadsheet::WriteExcel line_pattern.
       if params[:line_pattern]
         pattern = swe_line_pattern(params[:line_pattern])
         if pattern == 'none'
-          border = { :none => 1 }
+          border = { none: 1 }
         else
           border[:dash_type] = pattern
         end
@@ -432,8 +432,8 @@ module Writexlsx
 
       # Set the up and down bar properties.
       @up_down_bars = {
-        :_up   => Chartline.new(params[:up]),
-        :_down => Chartline.new(params[:down])
+        _up:   Chartline.new(params[:up]),
+        _down: Chartline.new(params[:down])
       }
     end
 
@@ -695,33 +695,33 @@ module Writexlsx
 
     def x_axis_defaults
       {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 0 }
+        num_format:      'General',
+        major_gridlines: { visible: 0 }
       }
     end
 
     def y_axis_defaults
       {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 1 }
+        num_format:      'General',
+        major_gridlines: { visible: 1 }
       }
     end
 
     def x2_axis_defaults
       {
-        :num_format     => 'General',
-        :label_position => 'none',
-        :crossing       => 'max',
-        :visible        => 0
+        num_format:     'General',
+        label_position: 'none',
+        crossing:       'max',
+        visible:        0
       }
     end
 
     def y2_axis_defaults
       {
-        :num_format      => 'General',
-        :major_gridlines => { :visible => 0 },
-        :position        => 'right',
-        :visible         => 1
+        num_format:      'General',
+        major_gridlines: { visible: 0 },
+        position:        'right',
+        visible:         1
       }
     end
 
@@ -803,8 +803,8 @@ module Writexlsx
         # Write the c:layout element.
         write_layout(@plotarea.layout, 'plot')
         # Write the subclass chart type elements for primary and secondary axes.
-        write_chart_type(:primary_axes => 1)
-        write_chart_type(:primary_axes => 0)
+        write_chart_type(primary_axes: 1)
+        write_chart_type(primary_axes: 0)
 
         # Configure a combined chart if present.
         if second_chart
@@ -823,15 +823,15 @@ module Writexlsx
           second_chart.series_index = @series_index
 
           # Write the subclass chart type elements for combined chart.
-          second_chart.write_chart_type(:primary_axes => 1)
-          second_chart.write_chart_type(:primary_axes => 0)
+          second_chart.write_chart_type(primary_axes: 1)
+          second_chart.write_chart_type(primary_axes: 0)
         end
 
         # Write the category and value elements for the primary axes.
         params = {
-          :x_axis   => @x_axis,
-          :y_axis   => @y_axis,
-          :axis_ids => @axis_ids
+          x_axis:   @x_axis,
+          y_axis:   @y_axis,
+          axis_ids: @axis_ids
         }
 
         if @date_category
@@ -844,9 +844,9 @@ module Writexlsx
 
         # Write the category and value elements for the secondary axes.
         params = {
-          :x_axis   => @x2_axis,
-          :y_axis   => @y2_axis,
-          :axis_ids => @axis2_ids
+          x_axis:   @x2_axis,
+          y_axis:   @y2_axis,
+          axis_ids: @axis2_ids
         }
 
         write_val_axis(@x2_axis, @y2_axis, @axis2_ids)
@@ -855,9 +855,9 @@ module Writexlsx
         if second_chart && second_chart.is_secondary?
 
           params = {
-            :x_axis   => second_chart.x2_axis,
-            :y_axis   => second_chart.y2_axis,
-            :axis_ids => second_chart.axis2_ids
+            x_axis:   second_chart.x2_axis,
+            y_axis:   second_chart.y2_axis,
+            axis_ids: second_chart.axis2_ids
           }
 
           second_chart.write_val_axis(

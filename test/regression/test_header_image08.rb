@@ -22,7 +22,7 @@ class TestRegressionHeaderImage08 < Minitest::Test
     # Set the author to match the target XLSX file.
     worksheet.comments_author = 'John'
 
-    worksheet.set_header('&L&G', nil, { :image_left   => 'test/regression/images/red.jpg' })
+    worksheet.set_header('&L&G', nil, { image_left: 'test/regression/images/red.jpg' })
 
     workbook.close
     compare_for_regression(

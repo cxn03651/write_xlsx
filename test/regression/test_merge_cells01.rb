@@ -11,7 +11,7 @@ class TestRegressionMergeCells01 < Minitest::Test
     @xlsx = 'merge_cells01.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:align => 'center')
+    format    = workbook.add_format(align: 'center')
 
     worksheet.set_selection('A4')
 

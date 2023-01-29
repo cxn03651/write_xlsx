@@ -15,7 +15,7 @@ class TestRegressionFormat16 < Minitest::Test
     @xlsx = 'format16.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    pattern   = workbook.add_format(:pattern => 2)
+    pattern   = workbook.add_format(pattern: 2)
 
     worksheet.write('A1', '', pattern)
 

@@ -17,7 +17,7 @@ class TestRegressionFormat04 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     format1 = workbook.add_format
-    format2 = workbook.add_format(:bold => 1)
+    format2 = workbook.add_format(bold: 1)
 
     # Test the copy method
     format2.copy(format1)
@@ -29,10 +29,10 @@ class TestRegressionFormat04 < Minitest::Test
     worksheet.conditional_formatting(
       'C1:C10',
       {
-        :type     => 'cell',
-        :criteria => '>',
-        :value    => 50,
-        :format   => format2
+        type:     'cell',
+        criteria: '>',
+        value:    50,
+        format:   format2
       }
     )
 

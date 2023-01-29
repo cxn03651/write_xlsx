@@ -16,8 +16,8 @@ class TestRegressionComment09 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    worksheet.write_comment('A1', 'Some text', :author => 'John')
-    worksheet.write_comment('A2', 'Some text', :author => 'Perl')
+    worksheet.write_comment('A1', 'Some text', author: 'John')
+    worksheet.write_comment('A2', 'Some text', author: 'Perl')
     worksheet.write_comment('A3', 'Some text')
 
     # Set the author to match the target XLSX file.

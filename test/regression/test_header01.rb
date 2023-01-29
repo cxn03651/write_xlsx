@@ -16,7 +16,7 @@ class TestRegressionHeader01 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
-    worksheet.set_header('&L&P', nil, { :scale_with_doc => 0 })
+    worksheet.set_header('&L&P', nil, { scale_with_doc: 0 })
 
     workbook.close
 

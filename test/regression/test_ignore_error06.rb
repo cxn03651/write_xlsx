@@ -21,7 +21,7 @@ class TestRegressionIgnoreError06 < Minitest::Test
     worksheet.write_formula('A3', '=B3')
 
     worksheet.ignore_errors(
-      :formula_differs => 'A2'
+      formula_differs: 'A2'
     )
 
     workbook.close

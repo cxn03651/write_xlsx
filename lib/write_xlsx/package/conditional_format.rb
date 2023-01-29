@@ -658,9 +658,9 @@ module Writexlsx
         # Set the default icon properties.
         total_icons.times do
           props << {
-            :criteria => 0,
-            :value    => 0,
-            :type     => 'percent'
+            criteria: 0,
+            value:    0,
+            type:     'percent'
           }
         end
 

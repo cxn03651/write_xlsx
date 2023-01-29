@@ -15,15 +15,15 @@ class TestRegressionShapeScale01 < Minitest::Test
     @xlsx = 'shape_scale01.xlsx'
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
-    format      = workbook.add_format(:font => 'Arial', :size => 8)
+    format      = workbook.add_format(font: 'Arial', size: 8)
 
     normal      = workbook.add_shape(
-      :name   => 'chip',
-      :type   => 'diamond',
-      :text   => 'Normal',
-      :width  => 100,
-      :height => 100,
-      :format => format
+      name:   'chip',
+      type:   'diamond',
+      text:   'Normal',
+      width:  100,
+      height: 100,
+      format: format
     )
     worksheet.insert_shape('A1', normal, 50, 50)
 

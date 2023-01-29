@@ -28,69 +28,69 @@ class TestSparkline07 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location   => 'F1',
-        :range      => 'A1:E1',
-        :type       => 'column',
-        :high_point => 1
+        location:   'F1',
+        range:      'A1:E1',
+        type:       'column',
+        high_point: 1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location  => 'F2',
-        :range     => 'A2:E2',
-        :type      => 'column',
-        :low_point => 1
+        location:  'F2',
+        range:     'A2:E2',
+        type:      'column',
+        low_point: 1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location        => 'F3',
-        :range           => 'A3:E3',
-        :type            => 'column',
-        :negative_points => 1
+        location:        'F3',
+        range:           'A3:E3',
+        type:            'column',
+        negative_points: 1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location    => 'F4',
-        :range       => 'A4:E4',
-        :type        => 'column',
-        :first_point => 1
+        location:    'F4',
+        range:       'A4:E4',
+        type:        'column',
+        first_point: 1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location   => 'F5',
-        :range      => 'A5:E5',
-        :type       => 'column',
-        :last_point => 1
+        location:   'F5',
+        range:      'A5:E5',
+        type:       'column',
+        last_point: 1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location => 'F6',
-        :range    => 'A6:E6',
-        :type     => 'column',
-        :markers  => 1
+        location: 'F6',
+        range:    'A6:E6',
+        type:     'column',
+        markers:  1
       }
     )
 
     @worksheet.add_sparkline(
       {
-        :location        => 'F7',
-        :range           => 'A7:E7',
-        :type            => 'column',
-        :high_point      => 1,
-        :low_point       => 1,
-        :negative_points => 1,
-        :first_point     => 1,
-        :last_point      => 1,
-        :markers         => 1
+        location:        'F7',
+        range:           'A7:E7',
+        type:            'column',
+        high_point:      1,
+        low_point:       1,
+        negative_points: 1,
+        first_point:     1,
+        last_point:      1,
+        markers:         1
       }
     )
 

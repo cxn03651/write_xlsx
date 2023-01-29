@@ -17,9 +17,9 @@ class TestRegressionButton06 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     worksheet.insert_button('C2', {
-                              :macro  => 'my_macro',
-                              :width  => 128,
-                              :height => 30
+                              macro:  'my_macro',
+                              width:  128,
+                              height: 30
                             })
 
     workbook.close

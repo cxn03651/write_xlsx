@@ -6,8 +6,8 @@ require 'write_xlsx/package/core'
 class TestCore01 < Minitest::Test
   def test_assemble_xml_file
     properties = {
-      :author  => 'A User',
-      :created => Time.local(2010, 1, 1, 0, 0, 0)
+      author:  'A User',
+      created: Time.local(2010, 1, 1, 0, 0, 0)
     }
 
     @obj = Writexlsx::Package::Core.new

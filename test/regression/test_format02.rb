@@ -19,21 +19,21 @@ class TestRegressionFormat02 < Minitest::Test
     worksheet.set_row(0, 30)
 
     format1 = workbook.add_format(
-      :font     => "Arial",
-      :bold     => 1,
-      :locked   => 1,
-      :rotation => 0,
-      :align    => "left",
-      :valign   => "bottom"
+      font:     "Arial",
+      bold:     1,
+      locked:   1,
+      rotation: 0,
+      align:    "left",
+      valign:   "bottom"
     )
 
     format2 = workbook.add_format(
-      :font     => "Arial",
-      :bold     => 1,
-      :locked   => 1,
-      :rotation => 90,
-      :align    => "center",
-      :valign   => "bottom"
+      font:     "Arial",
+      bold:     1,
+      locked:   1,
+      rotation: 90,
+      align:    "center",
+      valign:   "bottom"
     )
 
     worksheet.write('A1', 'Foo', format1)

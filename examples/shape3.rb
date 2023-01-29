@@ -16,11 +16,11 @@ workbook  = WriteXLSX.new('shape3.xlsx')
 worksheet = workbook.add_worksheet
 
 normal = workbook.add_shape(
-  :name   => 'chip',
-  :type   => 'diamond',
-  :text   => 'Normal',
-  :width  => 100,
-  :height => 100
+  name:   'chip',
+  type:   'diamond',
+  text:   'Normal',
+  width:  100,
+  height: 100
 )
 
 worksheet.insert_shape('A1', normal, 50, 50)

@@ -22,7 +22,7 @@ class TestRegressionTable26 < Minitest::Test
 
     # Add the table.
     worksheet.add_table('C2:D3')
-    worksheet.add_table('F3:G3', :header_row => 0)
+    worksheet.add_table('F3:G3', header_row: 0)
 
     # These tables should be ignored since the ranges are incorrect.
     assert_raises(RuntimeError) do

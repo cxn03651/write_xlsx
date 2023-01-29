@@ -25,10 +25,10 @@ class TestRegressionCondFormat02 < Minitest::Test
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format,
-                                       :criteria => '<',
-                                       :value    => 5
+                                       type:     'cell',
+                                       format:   format,
+                                       criteria: '<',
+                                       value:    5
                                      })
 
     workbook.close

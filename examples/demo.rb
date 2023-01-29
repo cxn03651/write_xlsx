@@ -8,7 +8,7 @@ worksheet  = workbook.add_worksheet('Demo')
 worksheet2 = workbook.add_worksheet('Another sheet')
 worksheet3 = workbook.add_worksheet('And another')
 
-bold = workbook.add_format(:bold => 1)
+bold = workbook.add_format(bold: 1)
 
 #######################################################################
 #
@@ -19,11 +19,11 @@ worksheet.set_column('B:B', 20)
 worksheet.set_row(0, 40)
 
 heading = workbook.add_format(
-  :bold  => 1,
-  :color => 'blue',
-  :size  => 16,
-  :merge => 1,
-  :align => 'vcenter'
+  bold:  1,
+  color: 'blue',
+  size:  16,
+  merge: 1,
+  align: 'vcenter'
 )
 
 headings = ['Features of WriteXLSX', '']
@@ -34,11 +34,11 @@ worksheet.write_row('A1', headings, heading)
 # Some text examples
 #
 text_format = workbook.add_format(
-  :bold   => 1,
-  :italic => 1,
-  :color  => 'red',
-  :size   => 18,
-  :font   => 'Lucida Calligraphy'
+  bold:   1,
+  italic: 1,
+  color:  'red',
+  size:   18,
+  font:   'Lucida Calligraphy'
 )
 
 worksheet.write('A2', "Text")
@@ -52,8 +52,8 @@ worksheet.write('B4', "А Б В Г Д")
 #
 # Some numeric examples
 #
-num1_format = workbook.add_format(:num_format => '$#,##0.00')
-num2_format = workbook.add_format(:num_format => ' d mmmm yyy')
+num1_format = workbook.add_format(num_format: '$#,##0.00')
+num2_format = workbook.add_format(num_format: ' d mmmm yyy')
 
 worksheet.write('A5', "Numbers")
 worksheet.write('B5', 1234.56)
@@ -84,7 +84,7 @@ worksheet.write('B9', 'http://www.ruby-lang.org/')
 worksheet.write('A10', "Images")
 worksheet.insert_image(
   'B10', 'republic.png',
-  :x_offset => 16, :y_offset => 8
+  x_offset: 16, y_offset: 8
 )
 
 #######################################################################

@@ -15,7 +15,7 @@ class TestRegressionTable10 < Minitest::Test
     @xlsx = 'table10.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:num_format => 2)
+    format    = workbook.add_format(num_format: 2)
 
     # Set the column width to match the taget worksheet.
     worksheet.set_column('B:K', 10.288)
@@ -42,19 +42,19 @@ class TestRegressionTable10 < Minitest::Test
     worksheet.add_table(
       'B3:K6',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
-          { :total_function => 'Average' },
-          { :total_function => 'COUNT' },
-          { :total_function => 'count_nums' },
-          { :total_function => 'max' },
-          { :total_function => 'min' },
-          { :total_function => 'sum' },
-          { :total_function => 'std Dev' },
-          { :total_function => 'var',
-            :formula => 'SUM(Table1[[#This Row],[Column1]:[Column3]])', :format => format }
+          { total_function: 'Average' },
+          { total_function: 'COUNT' },
+          { total_function: 'count_nums' },
+          { total_function: 'max' },
+          { total_function: 'min' },
+          { total_function: 'sum' },
+          { total_function: 'std Dev' },
+          { total_function: 'var',
+            formula: 'SUM(Table1[[#This Row],[Column1]:[Column3]])', format: format }
         ]
       }
     )

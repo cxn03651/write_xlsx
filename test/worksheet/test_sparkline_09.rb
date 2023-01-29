@@ -23,9 +23,9 @@ class TestSparkline09 < Minitest::Test
       @worksheet.write(i - 1, 0, data)
       @worksheet.add_sparkline(
         {
-          :location => "F#{i}",
-          :range    => "A#{i}:E#{i}",
-          :style    => i
+          location: "F#{i}",
+          range:    "A#{i}:E#{i}",
+          style:    i
         }
       )
     end

@@ -13,7 +13,7 @@ class TestTable13 < Minitest::Test
   def test_table13_add_table_should_not_change_style_string
     style = 'Table Style Light 17'
     # Set the table properties.
-    @worksheet.add_table('D4:I15', :style => style)
+    @worksheet.add_table('D4:I15', style: style)
 
     # add_table should not change style string.
     assert_equal('Table Style Light 17', style)
@@ -24,15 +24,15 @@ class TestTable13 < Minitest::Test
     @worksheet.add_table(
       'C2:F14',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
           {},
           {
-            :total_function => 'count',
-            :format         => @format,
-            :formula        => formula
+            total_function: 'count',
+            format:         @format,
+            formula:        formula
           }
         ]
       }
@@ -49,18 +49,18 @@ class TestTable13 < Minitest::Test
     @worksheet.add_table(
       'B2:K8',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
-          { :total_function => 'Average' },
-          { :total_function => 'COUNT' },
-          { :total_function => 'count_nums' },
-          { :total_function => 'max' },
-          { :total_function => 'min' },
-          { :total_function => 'sum' },
-          { :total_function => total_function },
-          { :total_function => 'var' }
+          { total_function: 'Average' },
+          { total_function: 'COUNT' },
+          { total_function: 'count_nums' },
+          { total_function: 'max' },
+          { total_function: 'min' },
+          { total_function: 'sum' },
+          { total_function: total_function },
+          { total_function: 'var' }
         ]
       }
     )

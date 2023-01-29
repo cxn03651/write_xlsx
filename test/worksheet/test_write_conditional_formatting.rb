@@ -15,10 +15,10 @@ class TestWriteConditionalFormatting < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A1',
-      :type     => 'cell',
-      :format   => format,
-      :criteria => 'greater than',
-      :value    => 5
+      type:     'cell',
+      format:   format,
+      criteria: 'greater than',
+      value:    5
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -32,10 +32,10 @@ class TestWriteConditionalFormatting < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A2',
-      :type     => 'cell',
-      :format   => format,
-      :criteria => 'less than',
-      :value    => 30
+      type:     'cell',
+      format:   format,
+      criteria: 'less than',
+      value:    30
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -49,10 +49,10 @@ class TestWriteConditionalFormatting < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A3',
-      :type     => 'cell',
-      :format   => nil,
-      :criteria => '>=',
-      :value    => 50
+      type:     'cell',
+      format:   nil,
+      criteria: '>=',
+      value:    50
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string
@@ -66,11 +66,11 @@ class TestWriteConditionalFormatting < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A1',
-      :type     => 'cell',
-      :format   => format,
-      :criteria => 'between',
-      :minimum  => 10,
-      :maximum  => 20
+      type:     'cell',
+      format:   format,
+      criteria: 'between',
+      minimum:  10,
+      maximum:  20
     )
     @worksheet.__send__('write_conditional_formats')
     result = @worksheet.instance_variable_get(:@writer).string

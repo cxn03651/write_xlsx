@@ -23,8 +23,8 @@ class TestSparkline06 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location => %w[F1 F2],
-        :range    => ['A1:E1', 'A2:E2']
+        location: %w[F1 F2],
+        range:    ['A1:E1', 'A2:E2']
       }
     )
 

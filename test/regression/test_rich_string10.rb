@@ -16,8 +16,8 @@ class TestRegressionRichString10 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    bold   = workbook.add_format(:bold   => 1)
-    italic = workbook.add_format(:italic => 1)
+    bold   = workbook.add_format(bold: 1)
+    italic = workbook.add_format(italic: 1)
 
     worksheet.write('A1', 'Foo', bold)
     worksheet.write('A2', 'Bar', italic)

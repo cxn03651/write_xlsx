@@ -20,7 +20,7 @@ class TestRegressionHyperlink37 < Minitest::Test
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      :url => 'https://github.com/jmcnamara'
+      url: 'https://github.com/jmcnamara'
     )
 
     worksheet.insert_shape('E12', textbox)

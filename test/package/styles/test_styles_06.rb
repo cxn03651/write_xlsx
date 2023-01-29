@@ -10,17 +10,17 @@ class TestStyles06 < Minitest::Test
     workbook = WriteXLSX.new(StringIO.new)
 
     format1 = workbook.add_format(
-      :left         => 1,
-      :right        => 1,
-      :top          => 1,
-      :bottom       => 1,
-      :diag_border  => 1,
-      :diag_type    => 3,
-      :left_color   => 'red',
-      :right_color  => 'red',
-      :top_color    => 'red',
-      :bottom_color => 'red',
-      :diag_color   => 'red'
+      left:         1,
+      right:        1,
+      top:          1,
+      bottom:       1,
+      diag_border:  1,
+      diag_type:    3,
+      left_color:   'red',
+      right_color:  'red',
+      top_color:    'red',
+      bottom_color: 'red',
+      diag_color:   'red'
     )
 
     workbook.__send__('set_default_xf_indices')

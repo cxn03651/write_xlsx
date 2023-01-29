@@ -14,7 +14,7 @@ require 'write_xlsx'
 
 workbook  = WriteXLSX.new('date_time.xlsx')
 worksheet = workbook.add_worksheet
-bold      = workbook.add_format(:bold => 1)
+bold      = workbook.add_format(bold: 1)
 
 # Expand the first column so that the date is visible.
 worksheet.set_column('A:B', 30)
@@ -64,8 +64,8 @@ date_formats.each do |date_format|
 
   # Create a format for the date or time.
   format = workbook.add_format(
-    :num_format => date_format,
-    :align      => 'left'
+    num_format: date_format,
+    align:      'left'
   )
 
   # Write the same date using different formats.

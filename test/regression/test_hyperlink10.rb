@@ -15,7 +15,7 @@ class TestRegressionHyperlink10 < Minitest::Test
     @xlsx = 'hyperlink10.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format    = workbook.add_format(:color => 'red', :underline => 1)
+    format    = workbook.add_format(color: 'red', underline: 1)
 
     # Turn off default URL format for testing.
     worksheet.instance_variable_set(:@default_url_format, nil)

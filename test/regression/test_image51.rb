@@ -18,11 +18,11 @@ class TestRegressionImage51 < Minitest::Test
 
     worksheet.insert_image(
       'E9',  'test/regression/images/red.png',
-      :url => 'https://duckduckgo.com/?q=1'
+      url: 'https://duckduckgo.com/?q=1'
     )
     worksheet.insert_image(
       'E13', 'test/regression/images/red2.png',
-      :url => 'https://duckduckgo.com/?q=2'
+      url: 'https://duckduckgo.com/?q=2'
     )
 
     workbook.close

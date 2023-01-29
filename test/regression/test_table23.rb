@@ -36,13 +36,13 @@ class TestRegressionTable23 < Minitest::Test
     worksheet.add_table(
       'B3:F9',
       {
-        :total_row => 1,
-        :columns   => [
-          { :header => 'Column1', :total_string   => 'Total' },
-          { :header => "Column'", :total_function => 'sum' },
-          { :header => 'Column#', :total_function => 'sum' },
-          { :header => 'Column[', :total_function => 'sum' },
-          { :header => 'Column]', :total_function => 'sum' }
+        total_row: 1,
+        columns:   [
+          { header: 'Column1', total_string: 'Total' },
+          { header: "Column'", total_function: 'sum' },
+          { header: 'Column#', total_function: 'sum' },
+          { header: 'Column[', total_function: 'sum' },
+          { header: 'Column]', total_function: 'sum' }
         ]
       }
     )

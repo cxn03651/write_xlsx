@@ -35,7 +35,7 @@ class TestCondFormat12 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type => '2_color_scale'
+                                        type: '2_color_scale'
                                       })
 
     @worksheet.assemble_xml_file

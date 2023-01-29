@@ -16,7 +16,7 @@ class TestRegressionCondFormat05 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    format1 = workbook.add_format(:border => 1)
+    format1 = workbook.add_format(border: 1)
 
     worksheet.write('A1', 10)
     worksheet.write('A2', 20)
@@ -25,10 +25,10 @@ class TestRegressionCondFormat05 < Minitest::Test
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format1,
-                                       :criteria => '==',
-                                       :value    => 7
+                                       type:     'cell',
+                                       format:   format1,
+                                       criteria: '==',
+                                       value:    7
                                      })
 
     workbook.close

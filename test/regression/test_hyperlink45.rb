@@ -18,7 +18,7 @@ class TestRegressionHyperlink45 < Minitest::Test
 
     worksheet.insert_image(
       'E9', 'test/regression/images/red.png',
-      :url => %q(external:\\\\Vboxsvr\share\foo bar.xlsx#'Some Sheet'!A1)
+      url: %q(external:\\\\Vboxsvr\share\foo bar.xlsx#'Some Sheet'!A1)
     )
 
     workbook.close

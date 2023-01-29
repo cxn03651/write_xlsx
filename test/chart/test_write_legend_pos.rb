@@ -17,7 +17,7 @@ class TestWriteLegendPos < Minitest::Test
 
   def test_write_legend_overlay_top_right
     expected = '<c:legend><c:legendPos val="tr"/><c:layout/><c:overlay val="1"/></c:legend>'
-    @chart.set_legend(:position => 'overlay_top_right')
+    @chart.set_legend(position: 'overlay_top_right')
     @chart.__send__('write_legend')
     result = @chart.instance_variable_get(:@writer).string
 

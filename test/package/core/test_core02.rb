@@ -6,16 +6,16 @@ require 'write_xlsx/package/core'
 class TestCore02 < Minitest::Test
   def test_assemble_xml_file
     properties = {
-      :title    => 'This is an example spreadsheet',
-      :subject  => 'With document properties',
-      :author   => 'John McNamara',
-      :manager  => 'Dr. Heinz Doofenshmirtz',
-      :company  => 'of Wolves',
-      :category => 'Example spreadsheets',
-      :keywords => 'Sample, Example, Properties',
-      :comments => 'Created with Ruby and WriteXLSX',
-      :status   => 'Quo',
-      :created  => Time.local(2011, 4, 6, 19, 45, 15)
+      title:    'This is an example spreadsheet',
+      subject:  'With document properties',
+      author:   'John McNamara',
+      manager:  'Dr. Heinz Doofenshmirtz',
+      company:  'of Wolves',
+      category: 'Example spreadsheets',
+      keywords: 'Sample, Example, Properties',
+      comments: 'Created with Ruby and WriteXLSX',
+      status:   'Quo',
+      created:  Time.local(2011, 4, 6, 19, 45, 15)
     }
 
     @obj = Writexlsx::Package::Core.new

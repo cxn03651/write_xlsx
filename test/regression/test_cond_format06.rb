@@ -17,9 +17,9 @@ class TestRegressionCondFormat06 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     format1 = workbook.add_format(
-      :pattern  => 15,
-      :fg_color => '#FF0000',
-      :bg_color => '#FFFF00'
+      pattern:  15,
+      fg_color: '#FF0000',
+      bg_color: '#FFFF00'
     )
 
     worksheet.write('A1', 10)
@@ -29,10 +29,10 @@ class TestRegressionCondFormat06 < Minitest::Test
 
     worksheet.conditional_formatting('A1',
                                      {
-                                       :type     => 'cell',
-                                       :format   => format1,
-                                       :criteria => '>',
-                                       :value    => 7
+                                       type:     'cell',
+                                       format:   format1,
+                                       criteria: '>',
+                                       value:    7
                                      })
 
     workbook.close

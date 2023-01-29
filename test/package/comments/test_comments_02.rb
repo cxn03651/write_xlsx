@@ -15,8 +15,8 @@ class TestComments02 < Minitest::Test
   def test_assemble_xml_file
     @worksheet.write_comment(
       1, 1, 'Some text',
-      :author => 'John', :visible => nil, :color => 81,
-      :font => 'Calibri', :font_size => 20, :font_family => 2
+      author: 'John', visible: nil, color: 81,
+      font: 'Calibri', font_size: 20, font_family: 2
     )
 
     comments = @worksheet.comments

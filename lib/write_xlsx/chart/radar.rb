@@ -32,10 +32,10 @@ module Writexlsx
       def initialize(subtype)
         super(subtype)
         @subtype = subtype || 'marker'
-        @default_marker = Marker.new(:type => 'none') if @subtype == 'marker'
+        @default_marker = Marker.new(type: 'none') if @subtype == 'marker'
 
         # Override and reset the default axis values.
-        @x_axis.defaults[:major_gridlines] = { :visible => 1 }
+        @x_axis.defaults[:major_gridlines] = { visible: 1 }
         set_x_axis
 
         # Hardcode major_tick_mark for now untill there is an accessor.

@@ -683,7 +683,7 @@ module Writexlsx
     end
 
     def line_fill_properties(params)
-      return { :_defined => 0 } unless params
+      return { _defined: 0 } unless params
 
       ret = params.dup
       ret[:dash_type] = yield if block_given? && ret[:dash_type]
@@ -693,17 +693,17 @@ module Writexlsx
 
     def dash_types
       {
-        :solid               => 'solid',
-        :round_dot           => 'sysDot',
-        :square_dot          => 'sysDash',
-        :dash                => 'dash',
-        :dash_dot            => 'dashDot',
-        :long_dash           => 'lgDash',
-        :long_dash_dot       => 'lgDashDot',
-        :long_dash_dot_dot   => 'lgDashDotDot',
-        :dot                 => 'dot',
-        :system_dash_dot     => 'sysDashDot',
-        :system_dash_dot_dot => 'sysDashDotDot'
+        solid:               'solid',
+        round_dot:           'sysDot',
+        square_dot:          'sysDash',
+        dash:                'dash',
+        dash_dot:            'dashDot',
+        long_dash:           'lgDash',
+        long_dash_dot:       'lgDashDot',
+        long_dash_dot_dot:   'lgDashDotDot',
+        dot:                 'dot',
+        system_dash_dot:     'sysDashDot',
+        system_dash_dot_dot: 'sysDashDotDot'
       }
     end
 
@@ -766,16 +766,16 @@ module Writexlsx
 
     def params_to_font(params)
       {
-        :_name         => params[:name],
-        :_color        => params[:color],
-        :_size         => params[:size],
-        :_bold         => params[:bold],
-        :_italic       => params[:italic],
-        :_underline    => params[:underline],
-        :_pitch_family => params[:pitch_family],
-        :_charset      => params[:charset],
-        :_baseline     => params[:baseline] || 0,
-        :_rotation     => params[:rotation]
+        _name:         params[:name],
+        _color:        params[:color],
+        _size:         params[:size],
+        _bold:         params[:bold],
+        _italic:       params[:italic],
+        _underline:    params[:underline],
+        _pitch_family: params[:pitch_family],
+        _charset:      params[:charset],
+        _baseline:     params[:baseline] || 0,
+        _rotation:     params[:rotation]
       }
     end
 
@@ -862,7 +862,7 @@ module Writexlsx
 
       if !latin_attributes.empty? || has_color
         @writer.tag_elements(tag, style_attributes) do
-          write_a_solid_fill(:color => font[:_color]) if has_color
+          write_a_solid_fill(color: font[:_color]) if has_color
           write_a_latin(latin_attributes) unless latin_attributes.empty?
         end
       else

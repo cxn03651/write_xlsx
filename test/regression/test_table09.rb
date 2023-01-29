@@ -41,18 +41,18 @@ class TestRegressionTable09 < Minitest::Test
     worksheet.add_table(
       'B3:K6',
       {
-        :total_row => 1,
-        :columns   => [
-          { :total_string => 'Total' },
+        total_row: 1,
+        columns:   [
+          { total_string: 'Total' },
           {},
-          { :total_function => 'Average' },
-          { :total_function => 'COUNT' },
-          { :total_function => 'count_nums' },
-          { :total_function => 'max' },
-          { :total_function => 'min' },
-          { :total_function => 'sum' },
-          { :total_function => 'std Dev' },
-          { :total_function => 'var' }
+          { total_function: 'Average' },
+          { total_function: 'COUNT' },
+          { total_function: 'count_nums' },
+          { total_function: 'max' },
+          { total_function: 'min' },
+          { total_function: 'sum' },
+          { total_function: 'std Dev' },
+          { total_function: 'var' }
         ]
       }
     )

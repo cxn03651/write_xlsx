@@ -15,7 +15,7 @@ class TestRegressionHyperlink31 < Minitest::Test
     @xlsx = 'hyperlink31.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    format1   = workbook.add_format(:bold => 1)
+    format1   = workbook.add_format(bold: 1)
 
     worksheet.write('A1', 'Test', format1)
     worksheet.write('A3', 'http://www.python.org/')

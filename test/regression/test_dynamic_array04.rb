@@ -15,7 +15,7 @@ class TestRegressionDynamicArray04 < Minitest::Test
     @xlsx = 'dynamic_array04.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    bold      = workbook.add_format(:bold => 1)
+    bold      = workbook.add_format(bold: 1)
 
     worksheet.write_dynamic_array_formula(
       'A1', '=AVERAGE(TIMEVALUE(B1:B2))', bold, 0.5

@@ -16,7 +16,7 @@ class TestRegressionHeader02 < Minitest::Test
     workbook    = WriteXLSX.new(@io)
     worksheet   = workbook.add_worksheet
 
-    worksheet.set_header('&L&P', nil, { :align_with_margins => 0 })
+    worksheet.set_header('&L&P', nil, { align_with_margins: 0 })
 
     workbook.close
 

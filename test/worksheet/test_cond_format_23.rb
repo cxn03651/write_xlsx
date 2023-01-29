@@ -37,64 +37,64 @@ class TestCondFormat23 < Minitest::Test
     @worksheet.conditional_formatting(
       'A1',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_arrows_gray'
+        type:       'icon_set',
+        icon_style: '3_arrows_gray'
       }
     )
 
     @worksheet.conditional_formatting(
       'A2',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_traffic_lights'
+        type:       'icon_set',
+        icon_style: '3_traffic_lights'
       }
     )
 
     @worksheet.conditional_formatting(
       'A3',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_signs'
+        type:       'icon_set',
+        icon_style: '3_signs'
       }
     )
 
     @worksheet.conditional_formatting(
       'A4',
       {
-        :type       => 'icon_set',
-        :icon_style => '3_symbols'
+        type:       'icon_set',
+        icon_style: '3_symbols'
       }
     )
 
     @worksheet.conditional_formatting(
       'A5',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_arrows_gray'
+        type:       'icon_set',
+        icon_style: '4_arrows_gray'
       }
     )
 
     @worksheet.conditional_formatting(
       'A6',
       {
-        :type       => 'icon_set',
-        :icon_style => '4_ratings'
+        type:       'icon_set',
+        icon_style: '4_ratings'
       }
     )
 
     @worksheet.conditional_formatting(
       'A7',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_arrows'
+        type:       'icon_set',
+        icon_style: '5_arrows'
       }
     )
 
     @worksheet.conditional_formatting(
       'A8',
       {
-        :type       => 'icon_set',
-        :icon_style => '5_ratings'
+        type:       'icon_set',
+        icon_style: '5_ratings'
       }
     )
 

@@ -17,12 +17,12 @@ class TestRegressionShapeStencil01 < Minitest::Test
     worksheet   = workbook.add_worksheet
     worksheet.hide_gridlines(2)
 
-    format      = workbook.add_format(:font => 'Arial', :size => 8)
+    format      = workbook.add_format(font: 'Arial', size: 8)
     shape       = workbook.add_shape(
-      :type   => 'rect',
-      :width  => 90,
-      :height => 90,
-      :format => format
+      type:   'rect',
+      width:  90,
+      height: 90,
+      format: format
     )
 
     (1..10).each do |n|

@@ -9,9 +9,9 @@ class TestStyles03 < Minitest::Test
   def test_styles_03
     workbook = WriteXLSX.new(StringIO.new)
 
-    format1 = workbook.add_format(:num_format => 2)
-    format2 = workbook.add_format(:num_format => 2, :bold => 1)
-    format3 = workbook.add_format(:num_format => '0.0')
+    format1 = workbook.add_format(num_format: 2)
+    format2 = workbook.add_format(num_format: 2, bold: 1)
+    format3 = workbook.add_format(num_format: '0.0')
 
     workbook.__send__('set_default_xf_indices')
     workbook.__send__('prepare_format_properties')

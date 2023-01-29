@@ -25,8 +25,8 @@ class TestRegressionTable21 < Minitest::Test
     worksheet.add_table(
       'C3:D13',
       {
-        :columns => [
-          { :header => "Column" }
+        columns: [
+          { header: "Column" }
         ]
       }
     )

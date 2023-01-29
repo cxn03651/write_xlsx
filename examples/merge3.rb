@@ -25,11 +25,11 @@ worksheet.set_column('B:D', 20)
 # Example: Merge cells containing a hyperlink using merge_range().
 #
 format = workbook.add_format(
-  :border    => 1,
-  :underline => 1,
-  :color     => 'blue',
-  :align     => 'center',
-  :valign    => 'vcenter'
+  border:    1,
+  underline: 1,
+  color:     'blue',
+  align:     'center',
+  valign:    'vcenter'
 )
 
 # Merge 3 cells

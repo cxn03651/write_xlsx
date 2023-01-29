@@ -22,9 +22,9 @@ class TestSparkline04 < Minitest::Test
 
     @worksheet.add_sparkline(
       {
-        :location => 'F1',
-        :range    => 'Sheet1!A1:E1',
-        :type     => 'column'
+        location: 'F1',
+        range:    'Sheet1!A1:E1',
+        type:     'column'
       }
     )
 

@@ -35,10 +35,10 @@ class TestCondFormat16 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type      => '3_color_scale',
-                                        :min_color => '#C5D9F1',
-                                        :mid_color => '#8DB4E3',
-                                        :max_color => '#538ED5'
+                                        type:      '3_color_scale',
+                                        min_color: '#C5D9F1',
+                                        mid_color: '#8DB4E3',
+                                        max_color: '#538ED5'
                                       })
 
     @worksheet.assemble_xml_file

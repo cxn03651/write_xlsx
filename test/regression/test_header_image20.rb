@@ -20,7 +20,7 @@ class TestRegressionHeaderImage20 < Minitest::Test
       '&C&G',
       nil,
       {
-        :image_center => 'test/regression/images/watermark.png'
+        image_center: 'test/regression/images/watermark.png'
       }
     )
 

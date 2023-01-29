@@ -24,7 +24,7 @@ worksheet5 = workbook.add_worksheet('Outline Columns')
 worksheet6 = workbook.add_worksheet('Collapsed Columns')
 
 # Add a general format
-bold = workbook.add_format(:bold => 1)
+bold = workbook.add_format(bold: 1)
 
 ###############################################################################
 #

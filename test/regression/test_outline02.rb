@@ -17,7 +17,7 @@ class TestRegressionOutline02 < Minitest::Test
     worksheet2  = workbook.add_worksheet('Collapsed Rows')
 
     # Add a general format
-    bold = workbook.add_format(:bold => 1)
+    bold = workbook.add_format(bold: 1)
 
     # Create a worksheet with outlined rows. This is the same as the
     # previous example except that the rows are collapsed.

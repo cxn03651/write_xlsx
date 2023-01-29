@@ -28,13 +28,13 @@ chart_types.each do |chart_type|
   0.step(89, 15) do |row_num|
     0.step(63, 8) do |col_num|
       chart = workbook.add_chart(
-        :type     => chart_type,
-        :embedded => 1
+        type:     chart_type,
+        embedded: 1
       )
 
-      chart.add_series(:values => '=Data!$A$1:$A$6')
-      chart.set_title(:name => "Style #{style_number}")
-      chart.set_legend(:none => 1)
+      chart.add_series(values: '=Data!$A$1:$A$6')
+      chart.set_title(name: "Style #{style_number}")
+      chart.set_legend(none: 1)
       chart.set_style(style_number)
 
       worksheet.insert_chart(row_num, col_num, chart)

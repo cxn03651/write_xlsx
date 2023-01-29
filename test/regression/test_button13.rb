@@ -18,8 +18,8 @@ class TestRegressionButton13 < Minitest::Test
     worksheet.insert_button(
       'C2',
       {
-        :macro   => 'say_hello',
-        :caption => 'Hello'
+        macro:   'say_hello',
+        caption: 'Hello'
       }
     )
 

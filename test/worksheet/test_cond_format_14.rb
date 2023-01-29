@@ -35,7 +35,7 @@ class TestCondFormat14 < Minitest::Test
 
     @worksheet.conditional_formatting('A1:A12',
                                       {
-                                        :type => 'data_bar'
+                                        type: 'data_bar'
                                       })
 
     @worksheet.assemble_xml_file

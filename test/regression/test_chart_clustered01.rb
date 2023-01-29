@@ -15,7 +15,7 @@ class TestRegressionChartClustered01 < Minitest::Test
     @xlsx = 'chart_clustered01.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
-    chart     = workbook.add_chart(:type => 'column', :embedded => 1)
+    chart     = workbook.add_chart(type: 'column', embedded: 1)
 
     # For testing, copy the randomly generated axis ids in the target xlsx file.
     chart.instance_variable_set(:@axis_ids, [45886080, 45928832])
@@ -37,22 +37,22 @@ class TestRegressionChartClustered01 < Minitest::Test
     worksheet.write_col('A1', data)
 
     chart.add_series(
-      :name            => '=Sheet1!$C$1',
-      :categories      => '=Sheet1!$A$2:$B$6',
-      :values          => '=Sheet1!$C$2:$C$6',
-      :categories_data => cat_data
+      name:            '=Sheet1!$C$1',
+      categories:      '=Sheet1!$A$2:$B$6',
+      values:          '=Sheet1!$C$2:$C$6',
+      categories_data: cat_data
     )
 
     chart.add_series(
-      :name       => '=Sheet1!$D$1',
-      :categories => '=Sheet1!$A$2:$B$6',
-      :values     => '=Sheet1!$D$2:$D$6'
+      name:       '=Sheet1!$D$1',
+      categories: '=Sheet1!$A$2:$B$6',
+      values:     '=Sheet1!$D$2:$D$6'
     )
 
     chart.add_series(
-      :name       => '=Sheet1!$E$1',
-      :categories => '=Sheet1!$A$2:$B$6',
-      :values     => '=Sheet1!$E$2:$E$6'
+      name:       '=Sheet1!$E$1',
+      categories: '=Sheet1!$A$2:$B$6',
+      values:     '=Sheet1!$E$2:$E$6'
     )
 
     worksheet.insert_chart('E9', chart)

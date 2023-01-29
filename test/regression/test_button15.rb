@@ -17,7 +17,7 @@ class TestRegressionButton15 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     worksheet.insert_button(
-      'C2', { :description => 'Some alternative text' }
+      'C2', { description: 'Some alternative text' }
     )
 
     workbook.close

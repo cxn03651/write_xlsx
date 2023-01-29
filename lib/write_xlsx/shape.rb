@@ -204,11 +204,11 @@ module Writexlsx
     def auto_locate_connectors(shapes, shape_hash)
       # Valid connector shapes.
       connector_shapes = {
-        :straightConnector => 1,
-        :Connector         => 1,
-        :bentConnector     => 1,
-        :curvedConnector   => 1,
-        :line              => 1
+        straightConnector: 1,
+        Connector:         1,
+        bentConnector:     1,
+        curvedConnector:   1,
+        line:              1
       }
 
       shape_base = @type.chop.to_sym # Remove the number of segments from end of type.

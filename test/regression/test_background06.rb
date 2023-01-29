@@ -20,7 +20,7 @@ class TestRegressionBackground06 < Minitest::Test
     worksheet.set_background('test/regression/images/logo.jpg')
 
     worksheet.set_header(
-      '&C&G', nil, :image_center => 'test/regression/images/blue.jpg'
+      '&C&G', nil, image_center: 'test/regression/images/blue.jpg'
     )
 
     workbook.close

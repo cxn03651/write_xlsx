@@ -15,7 +15,7 @@ class TestTable05 < Minitest::Test
     @worksheet.add_table(
       'C4:F13',
       {
-        :header_row => 0
+        header_row: 0
       }
     )
     @worksheet.__send__(:prepare_tables, 1, {})

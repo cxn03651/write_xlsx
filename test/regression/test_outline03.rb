@@ -17,7 +17,7 @@ class TestRegressionOutline03 < Minitest::Test
     worksheet3  = workbook.add_worksheet('Outline Columns')
 
     # Add a general format
-    bold = workbook.add_format(:bold => 1)
+    bold = workbook.add_format(bold: 1)
 
     # Example 3: Create a worksheet with outlined columns.
     data = [

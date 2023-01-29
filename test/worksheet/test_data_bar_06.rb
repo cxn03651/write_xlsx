@@ -19,22 +19,22 @@ class TestWorksheetDataBar06 < Minitest::Test
 
     @worksheet.conditional_formatting(
       'A1',
-      :type                    => 'data_bar',
-      :bar_negative_color_same => 1
+      type:                    'data_bar',
+      bar_negative_color_same: 1
     )
 
     @worksheet.conditional_formatting(
       'A2:B2',
-      :type                      => 'data_bar',
-      :bar_color                 => '#63C384',
-      :bar_negative_border_color => '#92D050'
+      type:                      'data_bar',
+      bar_color:                 '#63C384',
+      bar_negative_border_color: '#92D050'
     )
 
     @worksheet.conditional_formatting(
       'A3:C3',
-      :type                           => 'data_bar',
-      :bar_color                      => '#FF555A',
-      :bar_negative_border_color_same => 1
+      type:                           'data_bar',
+      bar_color:                      '#FF555A',
+      bar_negative_border_color_same: 1
     )
 
     @worksheet.assemble_xml_file

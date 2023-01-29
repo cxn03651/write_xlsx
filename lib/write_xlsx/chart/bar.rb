@@ -86,14 +86,14 @@ module Writexlsx
 
       def axis_defaults_set
         if @x_axis.defaults
-          @x_axis.defaults[:major_gridlines] = { :visible => 1 }
+          @x_axis.defaults[:major_gridlines] = { visible: 1 }
         else
-          @x_axis.defaults = { :major_gridlines => { :visible => 1 } }
+          @x_axis.defaults = { major_gridlines: { visible: 1 } }
         end
         if @y_axis.defaults
-          @y_axis.defaults[:major_gridlines] = { :visible => 0 }
+          @y_axis.defaults[:major_gridlines] = { visible: 0 }
         else
-          @y_axis.defaults = { :major_gridlines => { :visible => 0 } }
+          @y_axis.defaults = { major_gridlines: { visible: 0 } }
         end
         @x_axis.defaults[:num_format] = '0%' if @subtype == 'percent_stacked'
       end

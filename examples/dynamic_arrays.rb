@@ -59,8 +59,8 @@ worksheet7  = workbook.add_worksheet('Randarray')
 worksheet8  = workbook.add_worksheet('Sequence')
 worksheet9  = workbook.add_worksheet('Spill ranges')
 worksheet10 = workbook.add_worksheet('Older functions')
-header1     = workbook.add_format(:fg_color => '#74AC4C', :color => '#FFFFFF')
-header2     = workbook.add_format(:fg_color => '#528FD3', :color => '#FFFFFF')
+header1     = workbook.add_format(fg_color: '#74AC4C', color: '#FFFFFF')
+header2     = workbook.add_format(fg_color: '#528FD3', color: '#FFFFFF')
 
 #
 # Example of using the FILTER() function.
