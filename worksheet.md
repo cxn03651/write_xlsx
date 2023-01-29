@@ -46,6 +46,7 @@ The following methods are available through a new worksheet:
 * [protect](#protect)
 * [unprotect_range](#unprotect_range)
 * [set_selection](#set_selection)
+* [set_top_left_cell](#set_top_left_cell)
 * [set_row](#set_row)
 * [set_row_pixels](#set_row_pixels)
 * [set_default_row](#set_default_row)
@@ -1462,6 +1463,18 @@ Examples:
     worksheet6.set_selection('G7:D4')       # Same as 3.
 
 The default cell selections is (0, 0), 'A1'.
+
+#### <a name="set_top_left_cell" class="anchor" href="#set_top_left_cell"><span class="octicon octicon-link" /></a>set_top_left_cell(row, col)
+
+This method can be used to set the top leftmost visible cell in the worksheet:
+
+    worksheet.set_top_left_cell(31, 26)
+
+    # Same as:
+    worksheet.set_top_left_cell('AA32')
+
+You can also use A1 notation, as shown above, see the note about [CELL NOTATION][].
+
 
 #### <a name="set_row" class="anchor" href="#set_row"><span class="octicon octicon-link" /></a>set_row(row, height, format, hidden, level, collapsed)
 
