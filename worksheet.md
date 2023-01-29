@@ -46,6 +46,7 @@ The following methods are available through a new worksheet:
 * [protect](#protect)
 * [unprotect_range](#unprotect_range)
 * [set_selection](#set_selection)
+* [set_top_left_cell](#set_top_left_cell)
 * [set_row](#set_row)
 * [set_row_pixels](#set_row_pixels)
 * [set_default_row](#set_default_row)
@@ -1028,7 +1029,9 @@ The optional `options` parameter can be used to set various options for the char
       :y_offset         => 0,
       :x_scale          => 1,
       :y_scale          => 1,
-      :objerct_position => 1
+      :object_position  => 1,
+      :description      => nil,
+      :decorative       => 0
     }
 
 The parameters `:x_offset` and `:y_offset` can be used to specify an offset from the top left hand corner of the cell specified by `row` and `col`. The offset values are in pixels.
@@ -1052,6 +1055,20 @@ The `:object_position` parameter can have one of the following allowable values:
     4. Same as Option 1, see below.
 
 Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
+
+The `:description` parameter can be used to specify a description or "alt text" string for the chart.
+In general this would be used to provide a text description of the chart to help accessibility.
+It is an optional parameter and has no default.
+It can be used as follows:
+
+    worksheet.insert_chart('E9', chart, { :description => 'Some alternative text' })
+
+The optional `:decorative` parameter is also used to help accessibility.
+It is used to mark the chart as decorative, and thus uninformative, for automated screen readers.
+As in Excel, if this parameter is in use the `:description` field isn't written.
+It is used as follows:
+
+    worksheet.insert_chart('E9', chart, { :decorative => 1 })
 
 
 #### <a name="insert_shape" class="anchor" href="#insert_shape"><span class="octicon octicon-link" /></a>insert_shape(row, col, shape, x, y, x_scale, y_scale)
@@ -1096,12 +1113,24 @@ The `:object_position` parameter can have one of the following allowable values:
     3. Don’t move or size with cells.
     4. Same as Option 1, see below.
 
-+Option 4 appears in Excel as Option 1. However, the worksheet object is sized to take hidden rows or columns into account. This is generally only useful for images and not for charts.
-+
+Option 4 appears in Excel as Option 1.
+However, the worksheet object is sized to take hidden rows or columns into account.
+This is generally only useful for images and not for charts.
 
-See also the
-[`shape\*.rb`](examples.html#shape1)
-programs in the examples directory of the distro.
+The `:description` parameter can be used to specify a description or "alt text" string for the chart.
+In general this would be used to provide a text description of the chart to help accessibility.
+It is an optional parameter and has no default.
+It can be used as follows:
+
+    worksheet.insert_chart('E9', chart, { :description => 'Some alternative text' })
+
+The optional `:decorative` parameter is also used to help accessibility.
+It is used to mark the chart as decorative, and thus uninformative, for automated screen readers.
+As in Excel, if this parameter is in use the `:description` field isn't written.
+It is used as follows:
+
+    worksheet.insert_chart('E9', chart, { :decorative => 1 })
+
 
 #### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, options)
 
@@ -1128,6 +1157,7 @@ The options of the button that can be set are:
     :y_scale
     :x_offset
     :y_offset
+    :description
 
 ##### Option: macro
 This option is used to set the macro that the button will invoke when the user
@@ -1175,6 +1205,10 @@ This option is used to change the x offset, in pixels, of a button within a cell
 
 ##### Option: y_offset
 This option is used to change the y offset, in pixels, of a comment within a cell.
+
+##### Option: description
+
+The option is used to specify a description or "alt texxt" string for the button.
 
 Note: Button is the only Excel form element that is available in WriteXLSX.
 Form elements represent a lot of work to implement and the underlying VML syntax
@@ -1429,6 +1463,18 @@ Examples:
     worksheet6.set_selection('G7:D4')       # Same as 3.
 
 The default cell selections is (0, 0), 'A1'.
+
+#### <a name="set_top_left_cell" class="anchor" href="#set_top_left_cell"><span class="octicon octicon-link" /></a>set_top_left_cell(row, col)
+
+This method can be used to set the top leftmost visible cell in the worksheet:
+
+    worksheet.set_top_left_cell(31, 26)
+
+    # Same as:
+    worksheet.set_top_left_cell('AA32')
+
+You can also use A1 notation, as shown above, see the note about [CELL NOTATION][].
+
 
 #### <a name="set_row" class="anchor" href="#set_row"><span class="octicon octicon-link" /></a>set_row(row, height, format, hidden, level, collapsed)
 
