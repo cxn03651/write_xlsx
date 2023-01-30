@@ -1295,7 +1295,7 @@ module Writexlsx
       # Convert single cell to range
       if args.first.to_s =~ /^([A-Za-z]+[0-9]+)$/
         range = "#{::Regexp.last_match(1)}:#{::Regexp.last_match(1)}"
-        params = [range] + args[1..]
+        params = [range] + args[1..-1]
       else
         params = args
       end
