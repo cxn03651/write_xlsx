@@ -891,48 +891,53 @@ module Writexlsx
     #
     def write(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      row_col_args = row_col_notation(args)
-      token = row_col_args[2] || ''
+      row, col, token, fmt, add_val1, add_val2 = row_col_notation(args)
+      write_item(row, col, token, fmt, add_val1, add_val2)
+    end
+
+    # This version does not additional memory allocation comparing with #write
+    # because arguments send directly, not by splat operator.
+    # Calling with Splat internal will make new Array for arguments
+    def write_item(row, col, token, fmt, value = nil, value2 = nil)
+      token ||= ''
       token = token.to_s if token.instance_of?(Time)
 
-      fmt = row_col_args[3]
       if fmt.respond_to?(:force_text_format?) && fmt.force_text_format?
-        write_string(*args) # Force text format
+        write_str(row, col, token, fmt) # Force text format
       # Match an array ref.
       elsif token.respond_to?(:to_ary)
-        write_row(*args)
+        write_row(row, col, token, fmt)
       elsif token.respond_to?(:coerce)  # Numeric
-        write_number(*args)
+        write_number(row, col, token, fmt)
       # Match integer with leading zero(s)
       elsif @leading_zeros && token =~ /^0\d*$/
-        write_string(*args)
+        write_str(row, col, token, fmt)
       elsif token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
-        write_number(*args)
+        write_number(row, col, token, fmt)
       # Match formula
       elsif token =~ /^=/
-        write_formula(*args)
+        write_formula(row, col, token, fmt, value)
       # Match array formula
       elsif token =~ /^\{=.*\}$/
-        write_formula(*args)
+        write_formula(row, col, token, fmt, value)
       # Match blank
       elsif token == ''
-        row_col_args.delete_at(2)     # remove the empty string from the parameter list
-        write_blank(*row_col_args)
+        write_blank(row, col, fmt)
       elsif @workbook.strings_to_urls
         # Match http, https or ftp URL
         if token =~ %r{\A[fh]tt?ps?://}
-          write_url(*args)
+          write_url(row, col, token, fmt, value, value2)
         # Match mailto:
         elsif token =~ /\Amailto:/
-          write_url(*args)
+          write_url(row, col, token, fmt, value, value2)
         # Match internal or external sheet link
         elsif token =~ /\A(?:in|ex)ternal:/
-          write_url(*args)
+          write_url(row, col, token, fmt, value, value2)
         else
-          write_string(*args)
+          write_str(row, col, token, fmt)
         end
       else
-        write_string(*args)
+        write_str(row, col, token, fmt)
       end
     end
 
@@ -1027,6 +1032,11 @@ module Writexlsx
     def write_string(*args)
       # Check for a cell reference in A1 notation and substitute row and column
       row, col, str, xf = row_col_notation(args)
+      write_str(row, col, str, xf)
+    end
+
+    # This version is faster than #write_string because arguments send by name, not by splat operator
+    def write_str(row, col, str, xf)
       str &&= str.to_s
       raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || str.nil?
 
@@ -1502,7 +1512,7 @@ module Writexlsx
       xf ||= @default_url_format
 
       # Write the hyperlink string.
-      write_string(row, col, hyperlink.str, xf)
+      write_str(row, col, hyperlink.str, xf)
     end
 
     #
@@ -1527,7 +1537,7 @@ module Writexlsx
         store_data_to_table(NumberCellData.new(date_time, xf), row, col)
       else
         # If the date isn't valid then write it as a string.
-        write_string(*args)
+        write_str(row, col, str, xf)
       end
     end
 

@@ -148,7 +148,7 @@ module Writexlsx
           j = 0    # For indexing the col data.
           (@col1..@col2).each do |col|
             token = data[i][j]
-            @worksheet.write(row, col, token, @col_formats[j]) if token
+            @worksheet.write_item(row, col, token, @col_formats[j]) if token
             j += 1
           end
           i += 1
