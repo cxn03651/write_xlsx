@@ -53,7 +53,12 @@ module Writexlsx
 
     def xl_col_to_name(col, col_absolute)
       col_str = ColName.instance.col_str(col)
-      "#{absolute_char(col_absolute)}#{col_str}"
+      if col_absolute
+        "#{absolute_char(col_absolute)}#{col_str}"
+      else
+        # Do not allocate new string
+        col_str
+      end
     end
 
     def xl_range(row_1, row_2, col_1, col_2,
@@ -253,7 +258,7 @@ module Writexlsx
 
     # Check for a cell reference in A1 notation and substitute row and column
     def row_col_notation(args)   # :nodoc:
-      if args[0].to_s =~ /^\D/
+      if args[0].respond_to?(:match) && args[0] =~ /^\D/
         substitute_cellref(*args)
       else
         args

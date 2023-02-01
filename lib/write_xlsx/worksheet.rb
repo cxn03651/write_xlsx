@@ -2228,10 +2228,14 @@ module Writexlsx
     # Write the cell value <v> element.
     #
     def write_cell_value(value = '') # :nodoc:
-      return write_cell_formula('=NA()') if !value.nil? && value.is_a?(Float) && value.nan?
+      return write_cell_formula('=NA()') if value.is_a?(Float) && value.nan?
 
       value ||= ''
-      value = value.to_i if value == value.to_i
+
+      int_value = value.to_i
+      if value == int_value
+        value = int_value
+      end
       @writer.data_element('v', value)
     end
 
@@ -3333,8 +3337,11 @@ EOS
     end
 
     def write_cell_column_dimension(row_num)  # :nodoc:
+      row = @cell_data_table[row_num]
       (@dim_colmin..@dim_colmax).each do |col_num|
-        @cell_data_table[row_num][col_num].write_cell(self, row_num, col_num) if @cell_data_table[row_num][col_num]
+        if (cell = row[col_num])
+          cell.write_cell(self, row_num, col_num)
+        end
       end
     end
 
