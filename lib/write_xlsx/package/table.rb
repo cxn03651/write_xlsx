@@ -162,41 +162,50 @@ module Writexlsx
 
       private
 
-      def handle_args(*args)
+      def handle_args(row1, col1 = nil, row2 = nil, col2 = nil, param = nil)
         # Check for a cell reference in A1 notation and substitute row and column
-        row1, col1, row2, col2, param = row_col_notation(args)
+        if (row_col_array = row_col_notation(row1))
+          _row1, _col1, _row2, _col2 = row_col_array
+          _param = col1
+        else
+          _row1 = row1
+          _col1 = col1
+          _row2 = row2
+          _col2 = col2
+          _param = param
+        end
 
         # Check for a valid number of args.
-        raise "Not enough parameters to add_table()" if [row1, col1, row2, col2].include?(nil)
+        raise "Not enough parameters to add_table()" if [_row1, _col1, _row2, _col2].include?(nil)
 
         # Check that row and col are valid without storing the values.
-        check_dimensions_and_update_max_min_values(row1, col1, 1, 1)
-        check_dimensions_and_update_max_min_values(row2, col2, 1, 1)
+        check_dimensions_and_update_max_min_values(_row1, _col1, 1, 1)
+        check_dimensions_and_update_max_min_values(_row2, _col2, 1, 1)
 
         # Swap last row/col for first row/col as necessary.
-        row1, row2 = row2, row1 if row1 > row2
-        col1, col2 = col2, col1 if col1 > col2
+        _row1, _row2 = _row2, _row1 if _row1 > _row2
+        _col1, _col2 = _col2, _col1 if _col1 > _col2
 
         # The final hash contains the validation parameters.
-        param ||= {}
+        _param ||= {}
 
         # Turn on Excel's defaults.
-        param[:banded_rows] ||= 1
-        param[:header_row]  ||= 1
-        param[:autofilter]  ||= 1
+        _param[:banded_rows] ||= 1
+        _param[:header_row]  ||= 1
+        _param[:autofilter]  ||= 1
 
         # Check that there are enough rows.
-        num_rows = row2 - row1
-        num_rows -= 1 if ptrue?(param[:header_row])
+        num_rows = _row2 - _row1
+        num_rows -= 1 if ptrue?(_param[:header_row])
 
         raise "Must have at least one data row in in add_table()" if num_rows < 0
 
         # If the header row if off the default is to turn autofilter off.
-        param[:autofilter] = 0 if param[:header_row] == 0
+        _param[:autofilter] = 0 if _param[:header_row] == 0
 
-        check_parameter(param, valid_table_parameter, 'add_table')
+        check_parameter(_param, valid_table_parameter, 'add_table')
 
-        [row1, row2, col1, col2, param]
+        [_row1, _row2, _col1, _col2, _param]
       end
 
       # List of valid input parameters.

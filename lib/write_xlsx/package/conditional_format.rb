@@ -409,12 +409,23 @@ module Writexlsx
 
       def row_col_param_for_conditional_formatting(*args)
         # Check for a cell reference in A1 notation and substitute row and column
-        if args[0].to_s =~ (/^\D/) && (args[0] =~ /,/)
-          # Check for a user defined multiple range like B3:K6,B8:K11.
-          user_range = args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '')
+        user_range = if args[0].to_s =~ (/^\D/) && (args[0] =~ /,/)
+                       # Check for a user defined multiple range like B3:K6,B8:K11.
+                       args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '')
+                     end
+
+        if (row_col_array = row_col_notation(args.first))
+          if row_col_array.size == 2
+            row1, col1 = row_col_array
+            row2 = args[1]
+          elsif row_col_array.size == 4
+            row1, col1, row2, col2 = row_col_array
+            param = args[1]
+          end
+        else
+          row1, col1, row2, col2, param = args
         end
 
-        row1, col1, row2, col2, param = row_col_notation(args)
         if row2.respond_to?(:keys)
           param = row2
           row2 = row1

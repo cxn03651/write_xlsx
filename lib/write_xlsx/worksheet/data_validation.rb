@@ -13,7 +13,19 @@ module Writexlsx
 
       def initialize(*args)
         # Check for a cell reference in A1 notation and substitute row and column.
-        row1, col1, row2, col2, options = row_col_notation(args)
+        if (row_col_array = row_col_notation(args.first))
+          case row_col_array.size
+          when 2
+            row1, col1 = row_col_array
+            row2, col2, options = args[1..-1]
+          when 4
+            row1, col1, row2, col2 = row_col_array
+            options = args[1]
+          end
+        else
+          row1, col1, row2, col2, options = args
+        end
+
         if row2.respond_to?(:keys)
           options_to_instance_variable(row2.dup)
           row2 = row1

@@ -395,7 +395,12 @@ module Writexlsx
     def set_selection(*args)
       return if args.empty?
 
-      row_first, col_first, row_last, col_last = row_col_notation(args)
+      if (row_col_array = row_col_notation(args.first))
+        row_first, col_first, row_last, col_last = row_col_array
+      else
+        row_first, col_first, row_last, col_last = args
+      end
+
       active_cell = xl_rowcol_to_cell(row_first, col_first)
 
       if row_last  # Range selection.
@@ -420,10 +425,15 @@ module Writexlsx
     #
     # Set the first visible cell at the top left of the worksheet.
     #
-    def set_top_left_cell(*args)
-      row, col = row_col_notation(args)
+    def set_top_left_cell(row, col = nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+      else
+        _row = row
+        _col = col
+      end
 
-      @top_left_cell = xl_rowcol_to_cell(row, col)
+      @top_left_cell = xl_rowcol_to_cell(_row, _col)
     end
 
     #
@@ -439,7 +449,12 @@ module Writexlsx
       return if args.empty?
 
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, top_row, left_col, type = row_col_notation(args)
+      if (row_col_array = row_col_notation(args.first))
+        row, col, top_row, left_col = row_col_array
+        type = args[1]
+      else
+        row, col, top_row, left_col, type = args
+      end
 
       col      ||= 0
       top_row  ||= row
@@ -772,7 +787,12 @@ module Writexlsx
     def print_area(*args)
       return @page_setup.print_area.dup if args.empty?
 
-      row1, col1, row2, col2 = row_col_notation(args)
+      if (row_col_array = row_col_notation(args.first))
+        row1, col1, row2, col2 = row_col_array
+      else
+        row1, col1, row2, col2 = args
+      end
+
       return if [row1, col1, row2, col2].include?(nil)
 
       # Ignore max print area since this is the same as no print area for Excel.
@@ -889,50 +909,62 @@ module Writexlsx
     # data the {#write()}[#method-i-write] method acts as a general alias for several more
     # specific methods:
     #
-    def write(*args)
+    def write(row, col, token = nil, format = nil, value1 = nil, value2 = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row_col_args = row_col_notation(args)
-      token = row_col_args[2] || ''
-      token = token.to_s if token.instance_of?(Time)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _token     = col
+        _format    = token
+        _value1    = format
+        _value2    = value1
+      else
+        _row = row
+        _col = col
+        _token = token
+        _format = format
+        _value1 = value1
+        _value2 = value2
+      end
+      _token ||= ''
+      _token = _token.to_s if token.instance_of?(Time)
 
-      fmt = row_col_args[3]
-      if fmt.respond_to?(:force_text_format?) && fmt.force_text_format?
-        write_string(*args) # Force text format
+      if _format.respond_to?(:force_text_format?) && _format.force_text_format?
+        write_string(_row, _col, _token, _format) # Force text format
       # Match an array ref.
-      elsif token.respond_to?(:to_ary)
-        write_row(*args)
-      elsif token.respond_to?(:coerce)  # Numeric
-        write_number(*args)
+      elsif _token.respond_to?(:to_ary)
+        write_row(_row, _col, _token, _format, _value1, _value2)
+      elsif _token.respond_to?(:coerce)  # Numeric
+        write_number(_row, _col, _token, _format)
       # Match integer with leading zero(s)
-      elsif @leading_zeros && token =~ /^0\d*$/
-        write_string(*args)
-      elsif token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
-        write_number(*args)
+      elsif @leading_zeros && _token =~ /^0\d*$/
+        write_string(_row, _col, _token, _format)
+      elsif _token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
+        write_number(_row, _col, _token, _format)
       # Match formula
-      elsif token =~ /^=/
-        write_formula(*args)
+      elsif _token =~ /^=/
+        write_formula(_row, _col, _token, _format, _value1)
       # Match array formula
-      elsif token =~ /^\{=.*\}$/
-        write_formula(*args)
+      elsif _token =~ /^\{=.*\}$/
+        write_formula(_row, _col, _token, _format, _value1)
       # Match blank
-      elsif token == ''
-        row_col_args.delete_at(2)     # remove the empty string from the parameter list
-        write_blank(*row_col_args)
+      elsif _token == ''
+        #        row_col_args.delete_at(2)     # remove the empty string from the parameter list
+        write_blank(_row, _col, _format)
       elsif @workbook.strings_to_urls
         # Match http, https or ftp URL
-        if token =~ %r{\A[fh]tt?ps?://}
-          write_url(*args)
+        if _token =~ %r{\A[fh]tt?ps?://}
+          write_url(_row, _col, _token, _format, _value1, _value2)
         # Match mailto:
-        elsif token =~ /\Amailto:/
-          write_url(*args)
+        elsif _token =~ /\Amailto:/
+          write_url(_row, _col, _token, _format, _value1, _value2)
         # Match internal or external sheet link
-        elsif token =~ /\A(?:in|ex)ternal:/
-          write_url(*args)
+        elsif _token =~ /\A(?:in|ex)ternal:/
+          write_url(_row, _col, _token, _format, _value1, _value2)
         else
-          write_string(*args)
+          write_string(_row, _col, _token, _format)
         end
       else
-        write_string(*args)
+        write_string(_row, _col, _token, _format)
       end
     end
 
@@ -944,19 +976,28 @@ module Writexlsx
     # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
-    def write_row(*args)
+    def write_row(row, col, tokens = nil, *options)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, tokens, *options = row_col_notation(args)
-      raise "Not an array ref in call to write_row()$!" unless tokens.respond_to?(:to_ary)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _tokens    = col
+        _options   = [tokens] + options
+      else
+        _row = row
+        _col = col
+        _tokens = tokens
+        _options = options
+      end
+      raise "Not an array ref in call to write_row()$!" unless _tokens.respond_to?(:to_ary)
 
-      tokens.each do |token|
+      _tokens.each do |_token|
         # Check for nested arrays
-        if token.respond_to?(:to_ary)
-          write_col(row, col, token, *options)
+        if _token.respond_to?(:to_ary)
+          write_col(_row, _col, _token, *_options)
         else
-          write(row, col, token, *options)
+          write(_row, _col, _token, *_options)
         end
-        col += 1
+        _col += 1
       end
     end
 
@@ -968,13 +1009,22 @@ module Writexlsx
     # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
-    def write_col(*args)
-      row, col, tokens, *options = row_col_notation(args)
+    def write_col(row, col, tokens = nil, *options)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _tokens    = col
+        _options   = [tokens] + options if options
+      else
+        _row = row
+        _col = col
+        _tokens = tokens
+        _options = options
+      end
 
-      tokens.each do |token|
+      _tokens.each do |_token|
         # write() will deal with any nested arrays
-        write(row, col, token, *options)
-        row += 1
+        write(_row, _col, _token, *_options)
+        _row += 1
       end
     end
 
@@ -984,19 +1034,28 @@ module Writexlsx
     #
     # Write a comment to the specified row and column (zero indexed).
     #
-    def write_comment(*args)
+    def write_comment(row, col, string = nil, options = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, string, options = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, string].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _string    = col
+        _options   = string
+      else
+        _row = row
+        _col = col
+        _string = string
+        _options = options
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _string].include?(nil)
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
       @has_vml = true
 
       # Process the properties of the cell comment.
-      @comments.add(@workbook, self, row, col, string, options)
+      @comments.add(@workbook, self, _row, _col, _string, _options)
     end
 
     #
@@ -1005,16 +1064,25 @@ module Writexlsx
     #
     # Write an integer or a float to the cell specified by row and column:
     #
-    def write_number(*args)
+    def write_number(row, col, number, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, num, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || num.nil?
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _number = col
+        _format = number
+      else
+        _row = row
+        _col = col
+        _number = number
+        _format = format
+      end
+      raise WriteXLSXInsufficientArgumentError if _row.nil? || _col.nil? || _number.nil?
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      store_data_to_table(NumberCellData.new(num, xf), row, col)
+      store_data_to_table(NumberCellData.new(_number, _format), _row, _col)
     end
 
     #
@@ -1024,19 +1092,28 @@ module Writexlsx
     # Write a string to the specified row and column (zero indexed).
     # +format+ is optional.
     #
-    def write_string(*args)
+    def write_string(row, col, string = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, str, xf = row_col_notation(args)
-      str &&= str.to_s
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || str.nil?
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _string = col
+        _format = string
+      else
+        _row = row
+        _col = col
+        _string = string
+        _format = format
+      end
+      _string &&= _string.to_s
+      raise WriteXLSXInsufficientArgumentError if _row.nil? || _col.nil? || _string.nil?
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      index = shared_string_index(str.length > STR_MAX ? str[0, STR_MAX] : str)
+      index = shared_string_index(_string.length > STR_MAX ? _string[0, STR_MAX] : _string)
 
-      store_data_to_table(StringCellData.new(index, xf), row, col)
+      store_data_to_table(StringCellData.new(index, _format), _row, _col)
     end
 
     #
@@ -1047,24 +1124,31 @@ module Writexlsx
     # The method receives string fragments prefixed by format objects. The final
     # format object is used as the cell format.
     #
-    def write_rich_string(*args)
+    def write_rich_string(row, col, *rich_strings)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, *rich_strings = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, rich_strings[0]].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col    = row_col_array
+        _rich_strings = [col] + rich_strings
+      else
+        _row = row
+        _col = col
+        _rich_strings = rich_strings
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _rich_strings[0]].include?(nil)
 
-      xf = cell_format_of_rich_string(rich_strings)
+      _xf = cell_format_of_rich_string(_rich_strings)
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      fragments, _length = rich_strings_fragments(rich_strings)
+      _fragments, _length = rich_strings_fragments(_rich_strings)
       # can't allow 2 formats in a row
-      return -4 unless fragments
+      return -4 unless _fragments
 
-      index = shared_string_index(xml_str_of_rich_string(fragments))
+      index = shared_string_index(xml_str_of_rich_string(_fragments))
 
-      store_data_to_table(StringCellData.new(index, xf), row, col)
+      store_data_to_table(StringCellData.new(index, _xf), _row, _col)
     end
 
     #
@@ -1075,19 +1159,26 @@ module Writexlsx
     # A blank cell is used to specify formatting without adding a string
     # or a number.
     #
-    def write_blank(*args)
+    def write_blank(row, col, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _format = col
+      else
+        _row = row
+        _col = col
+        _format = format
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col].include?(nil)
 
       # Don't write a blank cell unless it has a format
-      return unless xf
+      return unless _format
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      store_data_to_table(BlankCellData.new(xf), row, col)
+      store_data_to_table(BlankCellData.new(_format), _row, _col)
     end
 
     def expand_formula(formula, function, addition = '')
@@ -1261,28 +1352,39 @@ module Writexlsx
     #
     # Write a formula or function to the cell specified by +row+ and +column+:
     #
-    def write_formula(*args)
+    def write_formula(row, col, formula = nil, format = nil, value = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, formula, format, value = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _formula   = col
+        _format    = formula
+        _value     = format
+      else
+        _row = row
+        _col = col
+        _formula = formula
+        _format = format
+        _value = value
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _formula].include?(nil)
 
       # Check for dynamic array functions.
       regex = /\bLET\(|\bSORT\(|\bLAMBDA\(|\bSINGLE\(|\bSORTBY\(|\bUNIQUE\(|\bXMATCH\(|\bFILTER\(|\bXLOOKUP\(|\bSEQUENCE\(|\bRANDARRAY\(|\bANCHORARRAY\(/
-      if formula =~ regex
+      if _formula =~ regex
         return write_dynamic_array_formula(
-          row, col, row, col, formula, format, value
+          _row, _col, _row, _col, _formula, _format, _value
         )
       end
 
       # Hand off array formulas.
-      if formula =~ /^\{=.*\}$/
-        write_array_formula(row, col, row, col, formula, format, value)
+      if _formula =~ /^\{=.*\}$/
+        write_array_formula(_row, _col, _row, _col, _formula, _format, _value)
       else
-        check_dimensions(row, col)
-        store_row_col_max_min_values(row, col)
-        formula = formula.sub(/^=/, '')
+        check_dimensions(_row, _col)
+        store_row_col_max_min_values(_row, _col)
+        _formula = _formula.sub(/^=/, '')
 
-        store_data_to_table(FormulaCellData.new(formula, format, value), row, col)
+        store_data_to_table(FormulaCellData.new(_formula, _format, _value), _row, _col)
       end
     end
 
@@ -1300,7 +1402,12 @@ module Writexlsx
         params = args
       end
 
-      row1, col1, row2, col2, formula, xf, value = row_col_notation(params)
+      if (row_col_array = row_col_notation(params.first))
+        row1, col1, row2, col2 = row_col_array
+        formula, xf, value = params[1..-1]
+      else
+        row1, col1, row2, col2, formula, xf, value = params
+      end
       raise WriteXLSXInsufficientArgumentError if [row1, col1, row2, col2, formula].include?(nil)
 
       # Swap last row/col with first row/col as necessary
@@ -1349,8 +1456,8 @@ module Writexlsx
     #
     # Write an array formula to the specified row and column (zero indexed).
     #
-    def write_array_formula(*args)
-      write_array_formula_base('a', *args)
+    def write_array_formula(row1, col1, row2 = nil, col2 = nil, formula = nil, format = nil, value = nil)
+      write_array_formula_base('a', row1, col1, row2, col2, formula, format, value)
     end
 
     #
@@ -1358,8 +1465,8 @@ module Writexlsx
     #
     # Write a dynamic formula to the specified row and column (zero indexed).
     #
-    def write_dynamic_array_formula(*args)
-      write_array_formula_base('d', *args)
+    def write_dynamic_array_formula(row1, col1, row2 = nil, col2 = nil, formula = nil, format = nil, value = nil)
+      write_array_formula_base('d', row1, col1, row2, col2, formula, format, value)
       @has_dynamic_arrays = true
     end
 
@@ -1368,18 +1475,27 @@ module Writexlsx
     #
     # Write a boolean value to the specified row and column (zero indexed).
     #
-    def write_boolean(*args)
-      row, col, val, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil?
+    def write_boolean(row, col, val = nil, format = nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _val       = col
+        _format    = val
+      else
+        _row = row
+        _col = col
+        _val = val
+        _format = format
+      end
+      raise WriteXLSXInsufficientArgumentError if _row.nil? || _col.nil?
 
-      val = val ? 1 : 0  # Boolean value.
+      _val = _val ? 1 : 0  # Boolean value.
       # xf : cell format.
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      store_data_to_table(BooleanCellData.new(val, xf), row, col)
+      store_data_to_table(BooleanCellData.new(_val, _format), _row, _col)
     end
 
     #
@@ -1388,28 +1504,35 @@ module Writexlsx
     #
     # Update formatting of the cell to the specified row and column (zero indexed).
     #
-    def update_format_with_params(*args)
-      row, col, params = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || params.nil?
+    def update_format_with_params(row, col, params = nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _params = args[1]
+      else
+        _row = row
+        _col = col
+        _params = params
+      end
+      raise WriteXLSXInsufficientArgumentError if _row.nil? || _col.nil? || _params.nil?
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
       format = nil
       cell_data = nil
-      if @cell_data_table[row].nil? || @cell_data_table[row][col].nil?
-        format = @workbook.add_format(params)
-        write_blank(row, col, format)
+      if @cell_data_table[_row].nil? || @cell_data_table[_row][_col].nil?
+        format = @workbook.add_format(_params)
+        write_blank(_row, _col, format)
       else
-        if @cell_data_table[row][col].xf.nil?
-          format = @workbook.add_format(params)
-          cell_data = @cell_data_table[row][col]
+        if @cell_data_table[_row][_col].xf.nil?
+          format = @workbook.add_format(_params)
+          cell_data = @cell_data_table[_row][_col]
         else
           format = @workbook.add_format
-          cell_data = @cell_data_table[row][col]
+          cell_data = @cell_data_table[_row][_col]
           format.copy(cell_data.xf)
-          format.set_format_properties(params)
+          format.set_format_properties(_params)
         end
         # keep original value of cell
         value = if cell_data.is_a? FormulaCellData
@@ -1421,7 +1544,7 @@ module Writexlsx
                 else
                   cell_data.data
                 end
-        write(row, col, value, format)
+        write(_row, _col, value, format)
       end
     end
 
@@ -1431,22 +1554,31 @@ module Writexlsx
     #
     # Update formatting of cells in range to the specified row and column (zero indexed).
     #
-    def update_range_format_with_params(*args)
-      row_first, col_first, row_last, col_last, params = row_col_notation(args)
+    def update_range_format_with_params(row_first, col_first, row_last = nil, col_last = nil, params = nil)
+      if (row_col_array = row_col_notation(row_first))
+        _row_first, _col_first, _row_last, _col_last = row_col_array
+        params = args[1..-1]
+      else
+        _row_first = row_first
+        _col_first = col_first
+        _row_last  = row_last
+        _col_last  = col_last
+        _params    = params
+      end
 
-      raise WriteXLSXInsufficientArgumentError if [row_first, col_first, row_last, col_last, params].include?(nil)
+      raise WriteXLSXInsufficientArgumentError if [_row_first, _col_first, _row_last, _col_last, _params].include?(nil)
 
       # Swap last row/col with first row/col as necessary
-      row_first,  row_last = row_last,  row_first  if row_first > row_last
-      col_first, col_last = col_last, col_first if col_first > col_last
+      _row_first, _row_last = _row_last, _row_first if _row_first > _row_last
+      _col_first, _col_last = _col_last, _col_first if _col_first > _col_last
 
       # Check that column number is valid and store the max value
-      check_dimensions(row_last, col_last)
-      store_row_col_max_min_values(row_last, col_last)
+      check_dimensions(_row_last, _col_last)
+      store_row_col_max_min_values(_row_last, _col_last)
 
-      (row_first..row_last).each do |row|
-        (col_first..col_last).each do |col|
-          update_format_with_params(row, col, params)
+      (_row_first.._row_last).each do |row|
+        (_col_first.._col_last).each do |col|
+          update_format_with_params(row, col, _params)
         end
       end
     end
@@ -1483,26 +1615,39 @@ module Writexlsx
     # The label is written using the {#write()}[#method-i-write] method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
-    def write_url(*args)
+    def write_url(row, col, url = nil, format = nil, str = nil, tip = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, url, xf, str, tip = row_col_notation(args)
-      xf, str = str, xf if str.respond_to?(:xf_index) || !xf.respond_to?(:xf_index)
-      raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _url       = col
+        _format    = url
+        _str       = format
+        _tip       = str
+      else
+        _row = row
+        _col = col
+        _url = url
+        _format = format
+        _str = str
+        _tip = tip
+      end
+      _format, _str = _str, _format if _str.respond_to?(:xf_index) || !_format.respond_to?(:xf_index)
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _url].include?(nil)
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      hyperlink = Hyperlink.factory(url, str, tip)
-      store_hyperlink(row, col, hyperlink)
+      hyperlink = Hyperlink.factory(_url, _str, _tip)
+      store_hyperlink(_row, _col, hyperlink)
 
       raise "URL '#{url}' added but URL exceeds Excel's limit of 65,530 URLs per worksheet." if hyperlinks_count > 65_530
 
       # Add the default URL format.
-      xf ||= @default_url_format
+      _format ||= @default_url_format
 
       # Write the hyperlink string.
-      write_string(row, col, hyperlink.str, xf)
+      write_string(_row, _col, hyperlink.str, _format)
     end
 
     #
@@ -1512,22 +1657,31 @@ module Writexlsx
     # Write a datetime string in ISO8601 "yyyy-mm-ddThh:mm:ss.ss" format as a
     # number representing an Excel date. format is optional.
     #
-    def write_date_time(*args)
+    def write_date_time(row, col, str, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, str, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, str].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _str       = col
+        _format    = str
+      else
+        _row = row
+        _col = col
+        _str = str
+        _format = format
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _str].include?(nil)
 
       # Check that row and col are valid and store max and min values
-      check_dimensions(row, col)
-      store_row_col_max_min_values(row, col)
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
 
-      date_time = convert_date_time(str)
+      date_time = convert_date_time(_str)
 
       if date_time
-        store_data_to_table(NumberCellData.new(date_time, xf), row, col)
+        store_data_to_table(NumberCellData.new(date_time, _format), _row, _col)
       else
         # If the date isn't valid then write it as a string.
-        write_string(*args)
+        write_string(_row, _col, _str, _format)
       end
     end
 
@@ -1539,13 +1693,22 @@ module Writexlsx
     # The Chart must be created by the add_chart() Workbook method and
     # it must have the embedded option set.
     #
-    def insert_chart(*args)
+    def insert_chart(row, col, chart = nil, *options)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, chart, *options = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, chart].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _chart     = col
+        _options   = [chart] + options
+      else
+        _row = row
+        _col = col
+        _chart = chart
+        _options = options
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _chart].include?(nil)
 
-      if options.first.instance_of?(Hash)
-        params = options.first
+      if _options.first.instance_of?(Hash)
+        params = _options.first
         x_offset    = params[:x_offset]
         y_offset    = params[:y_offset]
         x_scale     = params[:x_scale]
@@ -1554,7 +1717,7 @@ module Writexlsx
         description = params[:description]
         decorative  = params[:decorative]
       else
-        x_offset, y_offset, x_scale, y_scale, anchor = options
+        x_offset, y_offset, x_scale, y_scale, anchor = _options
       end
       x_offset ||= 0
       y_offset ||= 0
@@ -1562,24 +1725,24 @@ module Writexlsx
       y_scale  ||= 1
       anchor   ||= 1
 
-      raise "Not a Chart object in insert_chart()" unless chart.is_a?(Chart) || chart.is_a?(Chartsheet)
-      raise "Not a embedded style Chart object in insert_chart()" if chart.respond_to?(:embedded) && chart.embedded == 0
+      raise "Not a Chart object in insert_chart()" unless _chart.is_a?(Chart) || _chart.is_a?(Chartsheet)
+      raise "Not a embedded style Chart object in insert_chart()" if _chart.respond_to?(:embedded) && _chart.embedded == 0
 
-      if chart.already_inserted? || (chart.combined && chart.combined.already_inserted?)
+      if _chart.already_inserted? || (_chart.combined && _chart.combined.already_inserted?)
         raise "Chart cannot be inserted in a worksheet more than once"
       else
-        chart.already_inserted          = true
-        chart.combined.already_inserted = true if chart.combined
+        _chart.already_inserted          = true
+        _chart.combined.already_inserted = true if _chart.combined
       end
 
       # Use the values set with chart.set_size, if any.
-      x_scale  = chart.x_scale  if chart.x_scale  != 1
-      y_scale  = chart.y_scale  if chart.y_scale  != 1
-      x_offset = chart.x_offset if ptrue?(chart.x_offset)
-      y_offset = chart.y_offset if ptrue?(chart.y_offset)
+      x_scale  = _chart.x_scale  if _chart.x_scale  != 1
+      y_scale  = _chart.y_scale  if _chart.y_scale  != 1
+      x_offset = _chart.x_offset if ptrue?(_chart.x_offset)
+      y_offset = _chart.y_offset if ptrue?(_chart.y_offset)
 
       @charts << [
-        row,     col,     chart,  x_offset,    y_offset,
+        _row,    _col,    _chart, x_offset,    y_offset,
         x_scale, y_scale, anchor, description, decorative
       ]
     end
@@ -1588,14 +1751,23 @@ module Writexlsx
     # :call-seq:
     #   insert_image(row, column, filename, options)
     #
-    def insert_image(*args)
+    def insert_image(row, col, image = nil, *options)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, image, *options = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col, image].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _image     = col
+        _options   = [image] + options
+      else
+        _row = row
+        _col = col
+        _image = image
+        _options = options
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, _image].include?(nil)
 
-      if options.first.instance_of?(Hash)
+      if _options.first.instance_of?(Hash)
         # Newer hash bashed options
-        params      = options.first
+        params      = _options.first
         x_offset    = params[:x_offset]
         y_offset    = params[:y_offset]
         x_scale     = params[:x_scale]
@@ -1606,7 +1778,7 @@ module Writexlsx
         description = params[:description]
         decorative  = params[:decorative]
       else
-        x_offset, y_offset, x_scale, y_scale, anchor = options
+        x_offset, y_offset, x_scale, y_scale, anchor = _options
       end
       x_offset ||= 0
       y_offset ||= 0
@@ -1615,7 +1787,7 @@ module Writexlsx
       anchor   ||= 2
 
       @images << [
-        row, col, image, x_offset, y_offset,
+        _row, _col, _image, x_offset, y_offset,
         x_scale, y_scale, url, tip, anchor, description, decorative
       ]
     end
@@ -1627,32 +1799,43 @@ module Writexlsx
     # Deprecated. This is a writeexcel gem's method that is no longer
     # required by WriteXLSX.
     #
-    def repeat_formula(*args)
+    def repeat_formula(row, col, formula, format, *pairs)
       # Check for a cell reference in A1 notation and substitute row and column.
-      row, col, formula, format, *pairs = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _formula   = col
+        _format    = formula
+        _pairs     = [format] + pairs
+      else
+        _row = row
+        _col = col
+        _formula = formula
+        _format = format
+        _pairs = pairs
+      end
+      raise WriteXLSXInsufficientArgumentError if [_row, _col].include?(nil)
 
-      raise "Odd number of elements in pattern/replacement list" unless pairs.size.even?
-      raise "Not a valid formula" unless formula.respond_to?(:to_ary)
+      raise "Odd number of elements in pattern/replacement list" unless _pairs.size.even?
+      raise "Not a valid formula" unless _formula.respond_to?(:to_ary)
 
-      tokens  = formula.join("\t").split("\t")
+      tokens  = _formula.join("\t").split("\t")
       raise "No tokens in formula" if tokens.empty?
 
-      value = nil
-      if pairs[-2] == 'result'
-        value = pairs.pop
-        pairs.pop
+      _value = nil
+      if _pairs[-2] == 'result'
+        _value = _pairs.pop
+        _pairs.pop
       end
-      until pairs.empty?
-        pattern = pairs.shift
-        replace = pairs.shift
+      until _pairs.empty?
+        pattern = _pairs.shift
+        replace = _pairs.shift
 
         tokens.each do |token|
           break if token.sub!(pattern, replace)
         end
       end
-      formula = tokens.join('')
-      write_formula(row, col, formula, format, value)
+      _formula = tokens.join('')
+      write_formula(_row, _col, _formula, _format, _value)
     end
 
     #
@@ -1741,7 +1924,13 @@ module Writexlsx
     # others should be blank. All cells should contain the same format.
     #
     def merge_range(*args)
-      row_first, col_first, row_last, col_last, string, format, *extra_args = row_col_notation(args)
+      if (row_col_array = row_col_notation(args.first))
+        row_first, col_first, row_last, col_last = row_col_array
+        string, format, *extra_args = args[1..-1]
+      else
+        row_first, col_first, row_last, col_last,
+        string, format, *extra_args = args
+      end
 
       raise "Incorrect number of arguments" if [row_first, col_first, row_last, col_last, format].include?(nil)
       raise "Fifth parameter must be a format object" unless format.respond_to?(:xf_index)
@@ -1774,10 +1963,21 @@ module Writexlsx
     def merge_range_type(type, *args)
       case type
       when 'array_formula', 'blank', 'rich_string'
-        row_first, col_first, row_last, col_last, *others = row_col_notation(args)
+        if (row_col_array = row_col_notation(args.first))
+          row_first, col_first, row_last, col_last = row_col_array
+          *others = args[1..-1]
+        else
+          row_first, col_first, row_last, col_last, *others = args
+        end
         format = others.pop
       else
-        row_first, col_first, row_last, col_last, token, format, *others = row_col_notation(args)
+        if (row_col_array = row_col_notation(args.first))
+          row_first, col_first, row_last, col_last = row_col_array
+          token, format, *others = args[1..-1]
+        else
+          row_first, col_first, row_last, col_last,
+          token, format, *others = args
+        end
       end
 
       raise "Format object missing or in an incorrect position" unless format.respond_to?(:xf_index)
@@ -1870,8 +2070,16 @@ module Writexlsx
     # The insert_button() method can be used to insert an Excel form button
     # into a worksheet.
     #
-    def insert_button(*args)
-      @buttons_array << button_params(*row_col_notation(args))
+    def insert_button(row, col, properties = nil)
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        _properties = col
+      else
+        _row = row
+        _col = col
+        _properties = properties
+      end
+      @buttons_array << button_params(_row, _col, _properties)
       @has_vml = 1
     end
 
@@ -1937,17 +2145,24 @@ module Writexlsx
     #
     # Set the autofilter area in the worksheet.
     #
-    def autofilter(*args)
-      row1, col1, row2, col2 = row_col_notation(args)
-      return if [row1, col1, row2, col2].include?(nil)
+    def autofilter(row1, col1 = nil, row2 = nil, col2 = nil)
+      if (row_col_array = row_col_notation(row1))
+        _row1, _col1, _row2, _col2 = row_col_array
+      else
+        _row1 = row1
+        _col1 = col1
+        _row2 = row2
+        _col2 = col2
+      end
+      return if [_row1, _col1, _row2, _col2].include?(nil)
 
       # Reverse max and min values if necessary.
-      row1, row2 = row2, row1 if row2 < row1
-      col1, col2 = col2, col1 if col2 < col1
+      _row1, _row2 = _row2, _row1 if _row2 < _row1
+      _col1, _col2 = _col2, _col1 if _col2 < _col1
 
-      @autofilter_area = convert_name_area(row1, col1, row2, col2)
-      @autofilter_ref  = xl_range(row1, row2, col1, col2)
-      @filter_range    = [col1, col2]
+      @autofilter_area = convert_name_area(_row1, _col1, _row2, _col2)
+      @autofilter_ref  = xl_range(_row1, _row2, _col1, _col2)
+      @filter_range    = [_col1, _col2]
     end
 
     #
@@ -2902,19 +3117,38 @@ EOS
     #
     # Insert a shape into the worksheet.
     #
-    def insert_shape(*args)
+    def insert_shape(
+          row_start, column_start, shape = nil, x_offset = nil, y_offset = nil,
+          x_scale = nil, y_scale = nil, anchor = nil
+        )
       # Check for a cell reference in A1 notation and substitute row and column.
-      row_start, column_start, shape, x_offset, y_offset, x_scale, y_scale, anchor =
-        row_col_notation(args)
-      raise "Insufficient arguments in insert_shape()" if [row_start, column_start, shape].include?(nil)
+      if (row_col_array = row_col_notation(row_start))
+        _row_start, _column_start = row_col_array
+        _shape    = column_start
+        _x_offset = shape
+        _y_offset = x_offset
+        _x_scale  = y_offset
+        _y_scale  = x_scale
+        _anchor   = y_scale
+      else
+        _row_start = row_start
+        _column_start = column_start
+        _shape = shape
+        _x_offset = x_offset
+        _y_offset = y_offset
+        _x_scale = x_scale
+        _y_scale = y_scale
+        _anchor = anchor
+      end
+      raise "Insufficient arguments in insert_shape()" if [_row_start, _column_start, _shape].include?(nil)
 
-      shape.set_position(
-        row_start, column_start, x_offset, y_offset,
-        x_scale, y_scale, anchor
+      _shape.set_position(
+        _row_start, _column_start, _x_offset, _y_offset,
+        _x_scale, _y_scale, _anchor
       )
       # Assign a shape ID.
       while true
-        id = shape.id || 0
+        id = _shape.id || 0
         used = @shape_hash[id]
 
         # Test if shape ID is already used. Otherwise assign a new one.
@@ -2922,20 +3156,20 @@ EOS
           break
         else
           @last_shape_id += 1
-          shape.id = @last_shape_id
+          _shape.id = @last_shape_id
         end
       end
 
       # Allow lookup of entry into shape array by shape ID.
-      @shape_hash[shape.id] = shape.element = @shapes.size
+      @shape_hash[_shape.id] = _shape.element = @shapes.size
 
-      insert = if ptrue?(shape.stencil)
+      insert = if ptrue?(_shape.stencil)
                  # Insert a copy of the shape, not a reference so that the shape is
                  # used as a stencil. Previously stamped copies don't get modified
                  # if the stencil is modified.
-                 shape.dup
+                 _shape.dup
                else
-                 shape
+                 _shape
                end
 
       # For connectors change x/y coords based on location of connected shapes.

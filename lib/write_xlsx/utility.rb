@@ -252,12 +252,8 @@ module Writexlsx
     end
 
     # Check for a cell reference in A1 notation and substitute row and column
-    def row_col_notation(args)   # :nodoc:
-      if args[0].to_s =~ /^\D/
-        substitute_cellref(*args)
-      else
-        args
-      end
+    def row_col_notation(row_or_a1)   # :nodoc:
+      substitute_cellref(row_or_a1) if row_or_a1.to_s =~ /^\D/
     end
 
     #
@@ -267,7 +263,7 @@ module Writexlsx
     # Ex: ("A4", "Hello") is converted to (3, 0, "Hello").
     #
     def substitute_cellref(cell, *args)       # :nodoc:
-      return [*args] if cell.respond_to?(:coerce) # Numeric
+      #      return [*args] if cell.respond_to?(:coerce) # Numeric
 
       normalized_cell = cell.upcase
 
