@@ -889,50 +889,52 @@ module Writexlsx
     # data the {#write()}[#method-i-write] method acts as a general alias for several more
     # specific methods:
     #
-    def write(*args)
+    def write(row, col = nil, token = nil, format = nil, option1 = nil, option2 = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row_col_args = row_col_notation(args)
-      token = row_col_args[2] || ''
+
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, token, format, option1, option2 =
+          [*row_col_notation(row), col, token, format, option1, option2]
+      end
+      token ||= ''
       token = token.to_s if token.instance_of?(Time)
 
-      fmt = row_col_args[3]
-      if fmt.respond_to?(:force_text_format?) && fmt.force_text_format?
-        write_string(*args) # Force text format
+      if format.respond_to?(:force_text_format?) && format.force_text_format?
+        write_string(row, col, token, format) # Force text format
       # Match an array ref.
       elsif token.respond_to?(:to_ary)
-        write_row(*args)
+        write_row(row, col, token, format)
       elsif token.respond_to?(:coerce)  # Numeric
-        write_number(*args)
+        write_number(row, col, token, format)
       # Match integer with leading zero(s)
       elsif @leading_zeros && token =~ /^0\d*$/
-        write_string(*args)
+        write_string(row, col, token, format)
       elsif token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
-        write_number(*args)
+        write_number(row, col, token, format)
       # Match formula
       elsif token =~ /^=/
-        write_formula(*args)
+        write_formula(row, col, token, format, option1)
       # Match array formula
       elsif token =~ /^\{=.*\}$/
-        write_formula(*args)
+        write_formula(row, col, token, format, option1)
       # Match blank
       elsif token == ''
-        row_col_args.delete_at(2)     # remove the empty string from the parameter list
-        write_blank(*row_col_args)
+        write_blank(row, col, format)
       elsif @workbook.strings_to_urls
         # Match http, https or ftp URL
         if token =~ %r{\A[fh]tt?ps?://}
-          write_url(*args)
+          write_url(row, col, token, format, option1, option2)
         # Match mailto:
         elsif token =~ /\Amailto:/
-          write_url(*args)
+          write_url(row, col, token, format, option1, option2)
         # Match internal or external sheet link
         elsif token =~ /\A(?:in|ex)ternal:/
-          write_url(*args)
+          write_url(row, col, token, format, option1, option2)
         else
-          write_string(*args)
+          write_string(row, col, token, format)
         end
       else
-        write_string(*args)
+        write_string(row, col, token, format)
       end
     end
 
@@ -944,17 +946,20 @@ module Writexlsx
     # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
-    def write_row(*args)
+    def write_row(row, col, array = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, tokens, *options = row_col_notation(args)
-      raise "Not an array ref in call to write_row()$!" unless tokens.respond_to?(:to_ary)
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, array, format = [*row_col_notation(row), col, array]
+      end
 
-      tokens.each do |token|
+      raise "Not an array ref in call to write_row()$!" unless array.respond_to?(:to_ary)
+
+      array.each do |token|
         # Check for nested arrays
         if token.respond_to?(:to_ary)
-          write_col(row, col, token, *options)
+          write_col(row, col, token, format)
         else
-          write(row, col, token, *options)
+          write(row, col, token, format)
         end
         col += 1
       end
@@ -968,12 +973,14 @@ module Writexlsx
     # the elements of the array are in turn array. This allows the writing
     # of 1D or 2D arrays of data in one go.
     #
-    def write_col(*args)
-      row, col, tokens, *options = row_col_notation(args)
+    def write_col(row, col, array = nil, format = nil)
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, array, format = [*row_col_notation(row), col, array]
+      end
 
-      tokens.each do |token|
+      array.each do |token|
         # write() will deal with any nested arrays
-        write(row, col, token, *options)
+        write(row, col, token, format)
         row += 1
       end
     end
@@ -1005,38 +1012,42 @@ module Writexlsx
     #
     # Write an integer or a float to the cell specified by row and column:
     #
-    def write_number(*args)
+    def write_number(row, col, number = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, num, xf = row_col_notation(args)
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || num.nil?
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, number, format = [*row_col_notation(row), col, number]
+      end
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || number.nil?
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      store_data_to_table(NumberCellData.new(num, xf), row, col)
+      store_data_to_table(NumberCellData.new(number, format), row, col)
     end
 
     #
     # :call-seq:
     #   write_string(row, column, string [, format ])
     #
-    # Write a string to the specified row and column (zero indexed).
-    # +format+ is optional.
+    #   write_string(0, 0, 'excel', format)
+    #   write_string('A1', 'excel', format)
     #
-    def write_string(*args)
+    def write_string(row, col, string = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, str, xf = row_col_notation(args)
-      str &&= str.to_s
-      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || str.nil?
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, string, format = [*row_col_notation(row), col, string]
+      end
+      string &&= string.to_s
+      raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || string.nil?
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      index = shared_string_index(str.length > STR_MAX ? str[0, STR_MAX] : str)
+      index = shared_string_index(string.length > STR_MAX ? string[0, STR_MAX] : string)
 
-      store_data_to_table(StringCellData.new(index, xf), row, col)
+      store_data_to_table(StringCellData.new(index, format), row, col)
     end
 
     #
@@ -1075,19 +1086,21 @@ module Writexlsx
     # A blank cell is used to specify formatting without adding a string
     # or a number.
     #
-    def write_blank(*args)
+    def write_blank(row, col = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, xf = row_col_notation(args)
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, format = [*row_col_notation(row), col]
+      end
       raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
 
       # Don't write a blank cell unless it has a format
-      return unless xf
+      return unless format
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      store_data_to_table(BlankCellData.new(xf), row, col)
+      store_data_to_table(BlankCellData.new(format), row, col)
     end
 
     def expand_formula(formula, function, addition = '')
@@ -1261,9 +1274,11 @@ module Writexlsx
     #
     # Write a formula or function to the cell specified by +row+ and +column+:
     #
-    def write_formula(*args)
+    def write_formula(row, col, formula = nil, format = nil, value = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, formula, format, value = row_col_notation(args)
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, formula, format, value = [*row_col_notation(row), col, formula, format]
+      end
       raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
 
       # Check for dynamic array functions.
@@ -1483,26 +1498,30 @@ module Writexlsx
     # The label is written using the {#write()}[#method-i-write] method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
-    def write_url(*args)
+    def write_url(row, col, url = nil, format = nil, label = nil, tip = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      row, col, url, xf, str, tip = row_col_notation(args)
-      xf, str = str, xf if str.respond_to?(:xf_index) || !xf.respond_to?(:xf_index)
+      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+        row, col, url, format, label, tip =
+          [*row_col_notation(row), col, url, format, label, tip]
+      end
+
+      format, label = label, format if label.respond_to?(:xf_index) || !format.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [row, col, url].include?(nil)
 
       # Check that row and col are valid and store max and min values
       check_dimensions(row, col)
       store_row_col_max_min_values(row, col)
 
-      hyperlink = Hyperlink.factory(url, str, tip)
+      hyperlink = Hyperlink.factory(url, label, tip)
       store_hyperlink(row, col, hyperlink)
 
       raise "URL '#{url}' added but URL exceeds Excel's limit of 65,530 URLs per worksheet." if hyperlinks_count > 65_530
 
       # Add the default URL format.
-      xf ||= @default_url_format
+      format ||= @default_url_format
 
       # Write the hyperlink string.
-      write_string(row, col, hyperlink.str, xf)
+      write_string(row, col, hyperlink.str, format)
     end
 
     #

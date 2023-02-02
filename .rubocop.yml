@@ -93,6 +93,9 @@ Style/HashSyntax:
   EnforceStyle: ruby19_no_mixed_keys
   EnforcedShorthandSyntax: either
 
+Style/IfUnlessModifier:
+  Enabled: false
+
 Style/NumericLiterals:
   MinDigits: 10
 

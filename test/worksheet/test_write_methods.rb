@@ -12,7 +12,7 @@ class TestWriteMethods < Minitest::Test
 
   def test_write_with_insufficient_args_raise_InsufficientArgumentError
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write
+      @worksheet.write(nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write(0)
@@ -21,16 +21,16 @@ class TestWriteMethods < Minitest::Test
 
   def test_write_number_with_insufficient_args_raise_InsufficientArgumentError
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_number
+      @worksheet.write_number(nil, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_number(0)
+      @worksheet.write_number(0, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_number(0, 0)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_number('A1')
+      @worksheet.write_number('A1', nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_number(0, 0, nil)
@@ -39,16 +39,16 @@ class TestWriteMethods < Minitest::Test
 
   def test_write_string_with_insufficient_args_raise_InsufficientArgumentError
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_string
+      @worksheet.write_string(nil, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_string(0)
+      @worksheet.write_string(0, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_string(0, 0)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_string('A1')
+      @worksheet.write_string('A1', nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_string(0, 0, nil)
@@ -75,7 +75,7 @@ class TestWriteMethods < Minitest::Test
 
   def test_write_blank_with_insufficient_args_raise_InsufficientArgumentError
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_blank
+      @worksheet.write_blank(nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_blank(0)
@@ -111,16 +111,16 @@ class TestWriteMethods < Minitest::Test
 
   def test_write_url_with_insufficient_args_raise_InsufficientArgumentError
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_url
+      @worksheet.write_url(nil, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_url(0)
+      @worksheet.write_url(0, nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_url(0, 0)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
-      @worksheet.write_url('A1')
+      @worksheet.write_url('A1', nil)
     end
     assert_raises(WriteXLSXInsufficientArgumentError) do
       @worksheet.write_url(0, 0, nil)
