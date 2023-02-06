@@ -892,7 +892,7 @@ module Writexlsx
     def write(row, col = nil, token = nil, format = nil, option1 = nil, option2 = nil)
       # Check for a cell reference in A1 notation and substitute row and column
 
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, token, format, option1, option2 =
           [*row_col_notation(row), col, token, format, option1, option2]
       end
@@ -948,7 +948,7 @@ module Writexlsx
     #
     def write_row(row, col, array = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, array, format = [*row_col_notation(row), col, array]
       end
 
@@ -974,7 +974,7 @@ module Writexlsx
     # of 1D or 2D arrays of data in one go.
     #
     def write_col(row, col, array = nil, format = nil)
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, array, format = [*row_col_notation(row), col, array]
       end
 
@@ -1014,7 +1014,7 @@ module Writexlsx
     #
     def write_number(row, col, number = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, number, format = [*row_col_notation(row), col, number]
       end
       raise WriteXLSXInsufficientArgumentError if row.nil? || col.nil? || number.nil?
@@ -1035,7 +1035,7 @@ module Writexlsx
     #
     def write_string(row, col, string = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, string, format = [*row_col_notation(row), col, string]
       end
       string &&= string.to_s
@@ -1088,7 +1088,7 @@ module Writexlsx
     #
     def write_blank(row, col = nil, format = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, format = [*row_col_notation(row), col]
       end
       raise WriteXLSXInsufficientArgumentError if [row, col].include?(nil)
@@ -1276,7 +1276,7 @@ module Writexlsx
     #
     def write_formula(row, col, formula = nil, format = nil, value = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, formula, format, value = [*row_col_notation(row), col, formula, format]
       end
       raise WriteXLSXInsufficientArgumentError if [row, col, formula].include?(nil)
@@ -1500,7 +1500,7 @@ module Writexlsx
     #
     def write_url(row, col, url = nil, format = nil, label = nil, tip = nil)
       # Check for a cell reference in A1 notation and substitute row and column
-      if row.respond_to?(:=~) && row =~ /^\D/  # row is A1 notation.
+      if row.respond_to?(:match) && row =~ /^\D/  # row is A1 notation.
         row, col, url, format, label, tip =
           [*row_col_notation(row), col, url, format, label, tip]
       end
