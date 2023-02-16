@@ -15,6 +15,7 @@ require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/hyperlink'
 require 'write_xlsx/worksheet/page_setup'
 require 'tempfile'
+require 'date'
 
 module Writexlsx
   class Worksheet
@@ -926,7 +927,7 @@ module Writexlsx
         _value2 = value2
       end
       _token ||= ''
-      _token = _token.to_s if token.instance_of?(Time)
+      _token = _token.to_s if token.instance_of?(Time) || token.instance_of?(Date)
 
       if _format.respond_to?(:force_text_format?) && _format.force_text_format?
         write_string(_row, _col, _token, _format) # Force text format
