@@ -2449,9 +2449,7 @@ module Writexlsx
       value ||= ''
 
       int_value = value.to_i
-      if value == int_value
-        value = int_value
-      end
+      value = int_value if value == int_value
       @writer.data_element('v', value)
     end
 
