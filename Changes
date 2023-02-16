@@ -1,5 +1,11 @@
 Change history of write_xlsx rubygem.
 
+2023-02-16 v1.10.2
+    Fixed issue #104. Worksheet#write Ruby 3.2 removed Object#=~
+    making it impossible to write Date objects
+
+    Memory usage optimization.
+
 2023-01-31 v1.10.1
     Fixed PR #99. Remove range [1..] style to work on Ruby 2.5.
 
