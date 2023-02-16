@@ -38,6 +38,9 @@ Lint/DuplicateBranch:
   Exclude:
     - 'lib/write_xlsx/worksheet.rb'
 
+Lint/UnderscorePrefixedVariableName:
+  Enabled: false
+
 Lint/UselessSetterCall:
   Exclude:
     - 'lib/write_xlsx/worksheet.rb'
