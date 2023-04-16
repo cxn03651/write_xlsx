@@ -305,7 +305,8 @@ module Writexlsx
     #
     def set_column(*args)
       # Check for a cell reference in A1 notation and substitute row and column
-      if args[0].to_s =~ /^\D/
+      # ruby 3.2 no longer handles =~ for various types
+      if args[0].respond_to?(:=~) && args[0].to_s =~ /^\D/
         _row1, firstcol, _row2, lastcol, *data = substitute_cellref(*args)
       else
         firstcol, lastcol, *data = args
