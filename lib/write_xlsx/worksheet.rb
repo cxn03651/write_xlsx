@@ -31,7 +31,7 @@ module Writexlsx
     attr_reader :vml_data_id                                      # :nodoc:
     attr_reader :vml_header_id                                    # :nodoc:
     attr_reader :autofilter_area                                  # :nodoc:
-    attr_reader :writer, :set_rows, :col_formats                  # :nodoc:
+    attr_reader :writer, :set_rows, :col_info                     # :nodoc:
     attr_reader :vml_shape_id                                     # :nodoc:
     attr_reader :comments, :comments_author                       # :nodoc:
     attr_accessor :data_bars_2010, :dxf_priority                  # :nodoc:
@@ -44,7 +44,7 @@ module Writexlsx
       @workbook = workbook
       @index = index
       @name = name
-      @colinfo = {}
+      @col_info = {}
       @cell_data_table = []
       @excel_version = 2007
       @palette = workbook.palette
@@ -79,9 +79,7 @@ module Writexlsx
       @filter_cols  = {}
       @filter_type  = {}
 
-      @col_sizes = {}
       @row_sizes = {}
-      @col_formats = {}
 
       @last_shape_id          = 1
       @rel_count              = 0
@@ -342,19 +340,14 @@ module Writexlsx
       @outline_col_level = level if level > @outline_col_level
 
       # Store the column data based on the first column. Padded for sorting.
-      @colinfo[sprintf("%05d", firstcol)] = [firstcol, lastcol, width, format, hidden, level, collapsed]
+      (firstcol..lastcol).each do |col|
+        @col_info[col] =
+          Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed)
+            .new(width, format, hidden, level, collapsed)
+      end
 
       # Store the column change to allow optimisations.
       @col_size_changed = 1
-
-      # Store the col sizes for use when calculating image vertices taking
-      # hidden columns into account. Also store the column formats.
-      width ||= @default_col_width
-
-      (firstcol..lastcol).each do |col|
-        @col_sizes[col]   = [width, hidden]
-        @col_formats[col] = format if format
-      end
     end
 
     #
@@ -2640,6 +2633,33 @@ module Writexlsx
     private
 
     #
+    # Compare adjacent column information structures.
+    #
+    def compare_col_info(col_options, previous_options)
+      if !col_options.width.nil? != !previous_options.width.nil?
+        return nil
+      end
+      if col_options.width && previous_options.width &&
+         col_options.width != previous_options.width
+        return nil
+      end
+
+      if !col_options.format.nil? != !previous_options.format.nil?
+        return nil
+      end
+      if col_options.format && previous_options.format &&
+         col_options.format != previous_options.format
+        return nil
+      end
+
+      return nil if col_options.hidden    != previous_options.hidden
+      return nil if col_options.level     != previous_options.level
+      return nil if col_options.collapsed != previous_options.collapsed
+
+      true
+    end
+
+    #
     # Get the index used to address a drawing rel link.
     #
     def drawing_rel_index(target = nil)
@@ -2949,8 +2969,9 @@ module Writexlsx
     #
     def size_col(col, anchor = 0) # :nodoc:
       # Look up the cell value to see if it has been changed.
-      if @col_sizes[col]
-        width, hidden = @col_sizes[col]
+      if @col_info[col]
+        width  = @col_info[col].width || @default_col_width
+        hidden = @col_info[col].hidden
 
         # Convert to pixels.
         pixels = if hidden == 1 && anchor != 4
@@ -3480,10 +3501,42 @@ EOS
     #
     def write_cols # :nodoc:
       # Exit unless some column have been formatted.
-      return if @colinfo.empty?
+      return if @col_info.empty?
 
       @writer.tag_elements('cols') do
-        @colinfo.keys.sort.each { |col| write_col_info(@colinfo[col]) }
+        # Use the first element of the column informatin structure to set
+        # the initial/previous properties.
+        first_col           = @col_info.keys.min
+        last_col            = first_col
+        previous_options    = @col_info[first_col]
+        deleted_col         = first_col
+        deleted_col_options = previous_options
+
+        @col_info.delete(first_col)
+
+        @col_info.keys.sort.each do |col|
+          col_options = @col_info[col]
+
+          # Check if the column number is contiguous with the previous
+          # column and if the properties are the same.
+          if (col == last_col + 1) &&
+             compare_col_info(col_options, previous_options)
+            last_col = col
+          else
+            # If not contiguous/equal then we write out the current range
+            # of columns and start again.
+            write_col_info([first_col, last_col, previous_options])
+            first_col = col
+            last_col  = first_col
+            previous_options = col_options
+          end
+        end
+
+        # We will exit the previous loop with one unhandled column range.
+        write_col_info([first_col, last_col, previous_options])
+
+        # Put back the deleted first column information structure:
+        @col_info[deleted_col] = deleted_col_options
       end
     end
 
@@ -3495,13 +3548,13 @@ EOS
     end
 
     def col_info_attributes(args)
-      min    = args[0] || 0     # First formatted column.
-      max    = args[1] || 0     # Last formatted column.
-      width  = args[2]          # Col width in user units.
-      format = args[3]          # Format index.
-      hidden = args[4] || 0     # Hidden flag.
-      level  = args[5] || 0     # Outline level.
-      collapsed = args[6] || 0  # Outline level.
+      min       = args[0]           || 0 # First formatted column.
+      max       = args[1]           || 0 # Last formatted column.
+      width     = args[2].width          # Col width in user units.
+      format    = args[2].format         # Format index.
+      hidden    = args[2].hidden    || 0 # Hidden flag.
+      level     = args[2].level     || 0 # Outline level.
+      collapsed = args[2].collapsed || 0 # Collapsed
       xf_index = format ? format.get_xf_index : 0
 
       custom_width = true

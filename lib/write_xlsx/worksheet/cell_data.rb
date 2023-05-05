@@ -24,8 +24,8 @@ module Writexlsx
         elsif worksheet.set_rows[row] && worksheet.set_rows[row][1]
           row_xf = worksheet.set_rows[row][1]
           attributes << ['s', row_xf.get_xf_index]
-        elsif worksheet.col_formats[col]
-          col_xf = worksheet.col_formats[col]
+        elsif worksheet.col_info[col] && worksheet.col_info[col].format
+          col_xf = worksheet.col_info[col].format
           attributes << ['s', col_xf.get_xf_index]
         end
         attributes
