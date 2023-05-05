@@ -12,7 +12,7 @@ module Writexlsx
     attr_reader :diag_type, :diag_color, :font_only, :color_indexed                        # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color # :nodoc:
     attr_reader :font_scheme                                                                       # :nodoc:
-    attr_accessor :num_format_index, :border_index, :font_index                                    # :nodoc:
+    attr_accessor :quote_prefix, :num_format_index, :border_index, :font_index                                    # :nodoc:
     attr_accessor :fill_index, :font_condense, :font_extend, :diag_border                          # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern                                                   # :nodoc:
 
@@ -84,6 +84,7 @@ module Writexlsx
       @just_distrib   = 0
       @color_indexed  = 0
       @font_only      = 0
+      @quote_prefix   = 0
 
       set_format_properties(params) unless params.empty?
     end
@@ -213,7 +214,7 @@ module Writexlsx
     # Returns a unique hash key for the Format object.
     #
     def get_format_key
-      [get_font_key, get_border_key, get_fill_key, get_alignment_key, @num_format, @locked, @hidden].join(':')
+      [get_font_key, get_border_key, get_fill_key, get_alignment_key, @num_format, @locked, @hidden, @quote_prefix].join(':')
     end
 
     #
@@ -642,6 +643,7 @@ module Writexlsx
         ['borderId', border_index],
         ['xfId', xf_id]
       ]
+      attributes << ['quotePrefix', 1] if ptrue?(quote_prefix)
       attributes << ['applyNumberFormat', 1] if num_format_index > 0
       # Add applyFont attribute if XF format uses a font element.
       attributes << ['applyFont', 1] if font_index > 0 && !ptrue?(@hyperlink)
