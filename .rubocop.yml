@@ -8,6 +8,9 @@ AllCops:
   TargetRubyVersion: 2.6
   NewCops: enable
 
+Gemspec/DevelopmentDependencies:
+  Enabled: false
+
 Gemspec/RequiredRubyVersion:
   Enabled: false
 
@@ -32,6 +35,9 @@ Layout/HeredocIndentation:
 
 Layout/LineLength:
   Max: 7000
+
+Layout/MultilineMethodCallIndentation:
+  Enabled: false
 
 Lint/DuplicateBranch:
   IgnoreLiteralBranches: true
