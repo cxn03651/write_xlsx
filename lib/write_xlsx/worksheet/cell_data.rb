@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
-# frozen_string_literal: true
+
+# frozen__literal: true
 
 module Writexlsx
   class Worksheet
@@ -56,11 +57,12 @@ module Writexlsx
     end
 
     class StringCellData < CellData # :nodoc:
-      attr_reader :token
+      attr_reader :token, :raw_string
 
-      def initialize(index, xf)
+      def initialize(index, xf, raw_string)
         @token = index
         @xf = xf
+        @raw_string = raw_string
       end
 
       def data
@@ -79,6 +81,12 @@ module Writexlsx
       def display_url_string?
         false
       end
+    end
+
+    class RichStringCellData < StringCellData # :nodoc:
+    end
+
+    class DateTimeCellData < NumberCellData # :nodoc:
     end
 
     class FormulaCellData < CellData # :nodoc:

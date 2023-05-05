@@ -11,11 +11,14 @@ module Writexlsx
 
       PRESERVE_SPACE_ATTRIBUTES = ['xml:space', 'preserve'].freeze
 
+      attr_reader :strings
+
       def initialize
         @writer        = Package::XMLWriterSimple.new
         @strings       = [] # string table
         @strings_index = {} # string table index
         @count         = 0 # count
+        @str_unique    = 0
       end
 
       def index(string, params = {})
@@ -25,10 +28,9 @@ module Writexlsx
 
       def add(string)
         unless @strings_index[string]
-          # Only first time the string will be append to list
-          # next time we only check and not #dup it
           str = string.frozen? ? string : string.freeze
           @strings << str
+          @str_unique += 1
           @strings_index[str] = @strings.size - 1
         end
         @count += 1
@@ -128,7 +130,7 @@ module Writexlsx
       end
 
       def unique_count
-        @strings.size
+        @str_unique
       end
     end
   end

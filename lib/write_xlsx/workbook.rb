@@ -869,6 +869,9 @@ module Writexlsx
       @activesheet = @worksheets.visible_first.index if @activesheet == 0
       @worksheets[@activesheet].activate
 
+      # Convert the SST strings data structure.
+      prepare_sst_string_data
+
       # Prepare the worksheet VML elements such as comments and buttons.
       prepare_vml_objects
       # Set the defined names for the worksheets such as Print Titles.
@@ -916,6 +919,11 @@ module Writexlsx
     def parts
       Dir.glob(File.join(tempdir, "**", "*"), File::FNM_DOTMATCH).select { |f| File.file?(f) }
     end
+
+    #
+    # prepare_sst_string_data
+    #
+    def prepare_sst_string_data; end
 
     #
     # Prepare all of the format properties prior to passing them to Styles.rb.

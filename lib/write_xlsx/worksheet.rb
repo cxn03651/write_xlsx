@@ -39,6 +39,10 @@ module Writexlsx
     attr_writer :excel_version
 
     def initialize(workbook, index, name) # :nodoc:
+      rowmax   = 1_048_576
+      colmax   = 16_384
+      strmax   = 32_767
+
       @writer = Package::XMLWriterSimple.new
 
       @workbook = workbook
@@ -55,6 +59,10 @@ module Writexlsx
 
       @screen_gridlines     = true
       @show_zeros           = true
+
+      @xls_rowmax           = rowmax
+      @xls_colmax           = colmax
+      @xls_strmax           = strmax
       @dim_rowmin           = nil
       @dim_rowmax           = nil
       @dim_colmin           = nil
@@ -119,6 +127,7 @@ module Writexlsx
       @default_col_width      = 8.43
       @default_col_pixels     = 64
       @default_row_rezoed     = 0
+      @default_date_pixels    = 68
 
       @merge = []
 
@@ -320,6 +329,7 @@ module Writexlsx
       firstcol, lastcol = lastcol, firstcol if firstcol > lastcol
 
       width, format, hidden, level, collapsed = data
+      autofit = 0
 
       # Check that cols are valid and store max and min values with default row.
       # NOTE: The check shouldn't modify the row dimensions and should only modify
@@ -337,13 +347,16 @@ module Writexlsx
       level = 0 if level < 0
       level = 7 if level > 7
 
+      # Excel has a maximum column width of 255 characters.
+      width = 255.0 if width && width > 255.0
+
       @outline_col_level = level if level > @outline_col_level
 
       # Store the column data based on the first column. Padded for sorting.
       (firstcol..lastcol).each do |col|
         @col_info[col] =
-          Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed)
-            .new(width, format, hidden, level, collapsed)
+          Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
+            .new(width, format, hidden, level, collapsed, autofit)
       end
 
       # Store the column change to allow optimisations.
@@ -379,6 +392,106 @@ module Writexlsx
       width = pixels_to_width(pixels) if ptrue?(pixels)
 
       set_column(first_col, last_col, width, format, hidden, level)
+    end
+
+    #
+    # autofit()
+    #
+    # Simulate autofit based on the data, and datatypes in each column. We do this
+    # by estimating a pixel width for each cell data.
+    #
+    def autofit
+      col_width = {}
+
+      # Iterate through all the data in the worksheet.
+      (@dim_rowmin..@dim_rowmax).each do |row_num|
+        # Skip row if it doesn't contain cell data.
+        next unless @cell_data_table[row_num]
+
+        (@dim_colmin..@dim_colmax).each do |col_num|
+          length = 0
+          case (cell_data = @cell_data_table[row_num][col_num])
+          when StringCellData, RichStringCellData
+            # Handle strings and rich strings.
+            #
+            # For standard shared strings we do a reverse lookup
+            # from the shared string id to the actual string. For
+            # rich strings we use the unformatted string. We also
+            # split multiline strings and handle each part
+            # separately.
+            string = cell_data.raw_string
+
+            if string =~ /\n/
+              # Handle multiline strings.
+              length = max = string.split("\n").collect do |str|
+                xl_string_pixel_width(str)
+              end.max
+            else
+              length = xl_string_pixel_width(string)
+            end
+          when DateTimeCellData
+
+            # Handle dates.
+            #
+            # The following uses the default width for mm/dd/yyyy
+            # dates. It isn't feasible to parse the number format
+            # to get the actual string width for all format types.
+            length = @default_date_pixels
+          when NumberCellData
+
+            # Handle numbers.
+            #
+            # We use a workaround/optimization for numbers since
+            # digits all have a pixel width of 7. This gives a
+            # slightly greater width for the decimal place and
+            # minus sign but only by a few pixels and
+            # over-estimation is okay.
+            length = 7 * cell_data.token.to_s.length
+          when BooleanCellData
+
+            # Handle boolean values.
+            #
+            # Use the Excel standard widths for TRUE and FALSE.
+            if ptrue?(cell_data.token)
+              length = 31
+            else
+              length = 36
+            end
+          when FormulaCellData, FormulaArrayCellData, DynamicFormulaArrayCellData
+            # Handle formulas.
+            #
+            # We only try to autofit a formula if it has a
+            # non-zero value.
+            if ptrue?(cell_data.data)
+              length = xl_string_pixel_width(cell_data.data)
+            end
+          end
+
+          # Add the string lenght to the lookup hash.
+          max                = col_width[col_num] || 0
+          col_width[col_num] = length if length > max
+        end
+      end
+
+      # Apply the width to the column.
+      col_width.each do |col_num, pixel_width|
+        # Convert the string pixel width to a character width using an
+        # additional padding of 7 pixels, like Excel.
+        width = pixels_to_width(pixel_width + 7)
+
+        # The max column character width in Excel is 255.
+        width = 255.0 if width > 255.0
+
+        # Add the width to an existing col info structure or add a new one.
+        if @col_info[col_num]
+          @col_info[col_num].width   = width
+          @col_info[col_num].autofit = 1
+        else
+          @col_info[col_num] =
+            Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
+              .new(width, nil, 0, 0, 0, 1)
+        end
+      end
     end
 
     #
@@ -1112,7 +1225,7 @@ module Writexlsx
 
       index = shared_string_index(_string.length > STR_MAX ? _string[0, STR_MAX] : _string)
 
-      store_data_to_table(StringCellData.new(index, _format), _row, _col)
+      store_data_to_table(StringCellData.new(index, _format, _string), _row, _col)
     end
 
     #
@@ -1141,13 +1254,16 @@ module Writexlsx
       check_dimensions(_row, _col)
       store_row_col_max_min_values(_row, _col)
 
-      _fragments, _length = rich_strings_fragments(_rich_strings)
+      _fragments, _raw_string = rich_strings_fragments(_rich_strings)
       # can't allow 2 formats in a row
       return -4 unless _fragments
 
+      # Check that the string si < 32767 chars.
+      return 3 if _raw_string.size > @xls_strmax
+
       index = shared_string_index(xml_str_of_rich_string(_fragments))
 
-      store_data_to_table(StringCellData.new(index, _xf), _row, _col)
+      store_data_to_table(RichStringCellData.new(index, _xf, _raw_string), _row, _col)
     end
 
     #
@@ -1677,7 +1793,7 @@ module Writexlsx
       date_time = convert_date_time(_str)
 
       if date_time
-        store_data_to_table(NumberCellData.new(date_time, _format), _row, _col)
+        store_data_to_table(DateTimeCellData.new(date_time, _format), _row, _col)
       else
         # If the date isn't valid then write it as a string.
         write_string(_row, _col, _str, _format)
@@ -2710,9 +2826,9 @@ module Writexlsx
       # Create a temp format with the default font for unformatted fragments.
       default = Format.new(0)
 
-      length = 0                     # String length.
       last = 'format'
       pos  = 0
+      raw_string = ''
 
       fragments = []
       rich_strings.each do |token|
@@ -2733,12 +2849,12 @@ module Writexlsx
             fragments << default << token
           end
 
-          length += token.size    # Keep track of actual string length.
+          raw_string += token    # Keep track of actual string length.
           last = 'string'
         end
         pos += 1
       end
-      [fragments, length]
+      [fragments, raw_string]
     end
 
     def xml_str_of_rich_string(fragments)
@@ -3554,7 +3670,8 @@ EOS
       format    = args[2].format         # Format index.
       hidden    = args[2].hidden    || 0 # Hidden flag.
       level     = args[2].level     || 0 # Outline level.
-      collapsed = args[2].collapsed || 0 # Collapsed
+      collapsed = args[2].collapsed || 0 # Outline Collapsed
+      autofit   = args[2].autofit   || 0 # Best fit for autofit numbers.
       xf_index = format ? format.get_xf_index : 0
 
       custom_width = true
@@ -3577,10 +3694,11 @@ EOS
         ['width', width]
       ]
 
-      attributes << ['style',        xf_index] if xf_index != 0
-      attributes << ['hidden',       1]        if hidden != 0
+      attributes << ['style',        xf_index] if xf_index  != 0
+      attributes << ['hidden',       1]        if hidden    != 0
+      attributes << ['bestFit',      1]        if autofit   != 0
       attributes << ['customWidth',  1]        if custom_width
-      attributes << ['outlineLevel', level]    if level != 0
+      attributes << ['outlineLevel', level]    if level     != 0
       attributes << ['collapsed',    1]        if collapsed != 0
       attributes
     end
