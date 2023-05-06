@@ -51,6 +51,7 @@ module Writexlsx
 
         add_the_table_columns
         write_the_cell_data_if_supplied
+        store_filter_cell_positions
       end
 
       def set_xml_writer(filename)
@@ -152,6 +153,14 @@ module Writexlsx
             j += 1
           end
           i += 1
+        end
+      end
+
+      def store_filter_cell_positions
+        if ptrue?(@param[:autofilter])
+          (@col1..@col2).each do |col|
+            @worksheet.filter_cells["#{@row1}:#{col}"] = 1
+          end
         end
       end
 

@@ -36,7 +36,8 @@ module Writexlsx
     attr_reader :comments, :comments_author                       # :nodoc:
     attr_accessor :data_bars_2010, :dxf_priority                  # :nodoc:
     attr_reader :vba_codename                                     # :nodoc:
-    attr_writer :excel_version
+    attr_writer :excel_version                                    # :nodoc:
+    attr_reader :filter_cells                                     # :nodoc:
 
     def initialize(workbook, index, name) # :nodoc:
       rowmax   = 1_048_576
@@ -85,6 +86,7 @@ module Writexlsx
       @filter_on    = false
       @filter_range = []
       @filter_cols  = {}
+      @filter_cells = {}
       @filter_type  = {}
 
       @row_sizes = {}
@@ -96,8 +98,8 @@ module Writexlsx
       @external_drawing_links = []
       @external_comment_links = []
       @external_vml_links     = []
-      @external_table_links   = []
       @external_background_links = []
+      @external_table_links   = []
       @drawing_links          = []
       @vml_drawing_links      = []
       @charts                 = []
@@ -465,6 +467,13 @@ module Writexlsx
             if ptrue?(cell_data.data)
               length = xl_string_pixel_width(cell_data.data)
             end
+          end
+
+          # If the cell is in an autofilter header we add an
+          # additional 16 pixels for the dropdown arrow.
+          if length > 0 &&
+             @filter_cells["#{row_num}:#{col_num}"]
+            length += 16
           end
 
           # Add the string lenght to the lookup hash.
@@ -2278,6 +2287,11 @@ module Writexlsx
       @autofilter_area = convert_name_area(_row1, _col1, _row2, _col2)
       @autofilter_ref  = xl_range(_row1, _row2, _col1, _col2)
       @filter_range    = [_col1, _col2]
+
+      # Store the filter cell positions for use in the autofit calculation.
+      (_col1.._col2).each do |col|
+        @filter_cells["#{_row1}:#{col}"] = 1
+      end
     end
 
     #
@@ -2620,8 +2634,8 @@ module Writexlsx
         @external_hyper_links,
         @external_drawing_links,
         @external_vml_links,
-        @external_table_links,
         @external_background_links,
+        @external_table_links,
         @external_comment_links
       ].reject { |a| a.empty? }
     end
