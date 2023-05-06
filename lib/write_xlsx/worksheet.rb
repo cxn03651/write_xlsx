@@ -3432,28 +3432,22 @@ EOS
     end
 
     #
-    # Based on the algorithm provided by Daniel Rentz of OpenOffice.
-    #
+    # Hash a worksheet password. Based on the algorithm in ECMA-376-4:2016,
+    # Office Open XML File Foemats -- Transitional Migration Features,
+    # Additional attributes for workbookProtection element (Part 1, §18.2.29).   #
     def encode_password(password) # :nodoc:
-      i = 0
-      chars = password.split(//)
-      count = chars.size
+      hash = 0
 
-      chars.collect! do |char|
-        i += 1
-        char     = char.ord << i
-        low_15   = char & 0x7fff
-        high_15  = char & (0x7fff << 15)
-        high_15  = high_15 >> 15
-        char     = low_15 | high_15
+      password.reverse.split(//).each do |char|
+        hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
+        hash ^= char.ord
       end
 
-      encoded_password = 0x0000
-      chars.each { |c| encoded_password ^= c }
-      encoded_password ^= count
-      encoded_password ^= 0xCE4B
+      hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
+      hash ^= password.length
+      hash ^= 0xCE4B
 
-      sprintf("%X", encoded_password)
+      sprintf("%X", hash)
     end
 
     #
