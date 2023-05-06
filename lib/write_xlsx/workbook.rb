@@ -58,7 +58,7 @@ module Writexlsx
       @xf_formats          = []
       @dxf_formats         = []
       @font_count          = 0
-      @num_format_count    = 0
+      @num_formats         = []
       @defined_names       = []
       @named_ranges        = []
       @custom_colors       = []
@@ -560,7 +560,7 @@ module Writexlsx
         @xf_formats,
         @palette,
         @font_count,
-        @num_format_count,
+        @num_formats,
         @border_count,
         @fill_count,
         @custom_colors,
@@ -985,9 +985,10 @@ module Writexlsx
     # User defined records start from index 0xA4.
     #
     def prepare_num_formats # :nodoc:
-      num_formats      = {}
-      index            = 164
-      num_format_count = 0
+      num_formats        = []
+      unique_num_formats = {}
+      index              = 164
+      num_format_count   = 0
 
       (@xf_formats + @dxf_formats).each do |format|
         num_format = format.num_format
@@ -1008,21 +1009,22 @@ module Writexlsx
           next
         end
 
-        if num_formats[num_format]
+        if unique_num_formats[num_format]
           # Number format has already been used.
-          format.num_format_index = num_formats[num_format]
+          format.num_format_index = unique_num_formats[num_format]
         else
           # Add a new number format.
-          num_formats[num_format] = index
+          unique_num_formats[num_format] = index
           format.num_format_index = index
           index += 1
 
-          # Only increase font count for XF formats (not for DXF formats).
-          num_format_count += 1 if ptrue?(format.xf_index)
+          # Only store/increase number format count for XF formats
+          # (not for DXF formats).
+          num_formats << num_format if ptrue?(format.xf_index)
         end
       end
 
-      @num_format_count = num_format_count
+      @num_formats = num_formats
     end
 
     #

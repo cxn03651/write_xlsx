@@ -14,7 +14,7 @@ module Writexlsx
         @xf_formats        = nil
         @palette           = []
         @font_count        = 0
-        @num_format_count  = 0
+        @num_formats       = []
         @border_count      = 0
         @fill_count        = 0
         @custom_colors     = []
@@ -38,18 +38,18 @@ module Writexlsx
       # Pass in the Format objects and other properties used to set the styles.
       #
       def set_style_properties(
-            xf_formats, palette, font_count, num_format_count, border_count,
+            xf_formats, palette, font_count, num_formats, border_count,
             fill_count, custom_colors, dxf_formats, has_comments
           )
-        @xf_formats       = xf_formats
-        @palette          = palette
-        @font_count       = font_count
-        @num_format_count = num_format_count
-        @border_count     = border_count
-        @fill_count       = fill_count
-        @custom_colors    = custom_colors
-        @dxf_formats      = dxf_formats
-        @has_comments     = has_comments
+        @xf_formats    = xf_formats
+        @palette       = palette
+        @font_count    = font_count
+        @num_formats   = num_formats
+        @border_count  = border_count
+        @fill_count    = fill_count
+        @custom_colors = custom_colors
+        @dxf_formats   = dxf_formats
+        @has_comments  = has_comments
       end
 
       #
@@ -77,7 +77,7 @@ module Writexlsx
       # Write the <numFmts> element.
       #
       def write_num_fmts
-        count = @num_format_count
+        count = @num_formats.size
 
         return if count == 0
 
@@ -85,11 +85,10 @@ module Writexlsx
 
         @writer.tag_elements('numFmts', attributes) do
           # Write the numFmts elements.
-          @xf_formats.each do |format|
-            # Ignore built-in number formats, i.e., < 164.
-            next unless format.num_format_index >= 164
-
-            write_num_fmt(format.num_format_index, format.num_format)
+          index = 164
+          @num_formats.each do |num_format|
+            write_num_fmt(index, num_format)
+            index += 1
           end
         end
       end
