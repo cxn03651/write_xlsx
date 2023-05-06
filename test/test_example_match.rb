@@ -343,6 +343,34 @@ class TestExampleMatch < Minitest::Test
 EOS
   end
 
+  def test_autofit
+    @xlsx = 'autofit.xlsx'
+    workbook = WriteXLSX.new(@io)
+    worksheet  = workbook.add_worksheet
+
+    # Write some worksheet data to demonstrate autofitting.
+    worksheet.write(0, 0, "Foo")
+    worksheet.write(1, 0, "Food")
+    worksheet.write(2, 0, "Foody")
+    worksheet.write(3, 0, "Froody")
+
+    worksheet.write(0, 1, 12345)
+    worksheet.write(1, 1, 12345678)
+    worksheet.write(2, 1, 12345)
+
+    worksheet.write(0, 2, "Some longer text")
+
+    worksheet.write(0, 3, 'http://www.google.com')
+    worksheet.write(1, 3, 'https://github.com')
+
+    # Autofit the worksheet
+    worksheet.autofit
+
+    workbook.close
+    store_to_tempfile
+    compare_xlsx(File.join(@perl_output, @xlsx), @tempfile.path)
+  end
+
   def test_background
     @xlsx     = 'background.xlsx'
     workbook  = WriteXLSX.new(@io)
