@@ -1,5 +1,20 @@
 Change history of write_xlsx rubygem.
 
+2023-05-06 v1.11.0
+    Added support for simulated worksheet `autofit()`.
+
+    Refactored internal column property handling to allow column ranges
+    to be overridden (a common UX expectation).
+
+    Add `quote_prefix` format property.
+
+    Fix for duplicate number formats. Issue #283(excel-write-xlsx)
+
+    Add fix for worksheets with tables and background images.
+
+    Replace/fix the worksheet protection password algorithm
+    so that is works correctly for strings over 24 chars.
+
 2023-02-16 v1.10.2
     Fixed issue #104. Worksheet#write Ruby 3.2 removed Object#=~
     making it impossible to write Date objects
