@@ -48,6 +48,8 @@ The following Format methods are available:
 * [set_diag_type](#set_diag_type)
 * [set_diag_border](#set_diag_border)
 * [set_diag_color](#set_diag_color)
+* [set_quote_prefix](#set_quote_prefix)
+* [copy](#copy)
 
 The above methods can also be applied directly as properties.
 For example `format.set_bold()` is equivalent to
@@ -689,6 +691,20 @@ Set the colour of the diagonal cell border:
     format.set_diag_type(3)
     format.set_diag_border(7)
     format.set_diag_color('red')
+
+#### <a name="set_quote_prefix" class="anchor" href="#set_quote_prefix"><span class="octicon octicon-link" /></a>set_quote_prefix()
+
+    Default state:     quote prefix is off
+    Defalut action:    Turn quote prefix on
+    Valid args:        0, 1
+
+Set the quote prefix property of a format to ensure a string is treated as a string after editing.
+This is the same as prefixing the string with a single quote in Excel.
+You don't need to add the quote to the string but you do need to add the format.
+
+Set the quote prefix property of the format:
+
+    format.set_quote_prefix    # Turn quote prefix on
 
 #### <a name="copy" class="anchor" href="#copy"><span class="octicon octicon-link" /></a>copy(format)
 
