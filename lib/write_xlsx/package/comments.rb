@@ -57,7 +57,8 @@ module Writexlsx
       # Minor modification to allow comparison testing. Change RGB colors
       # from long format, ffcc00 to short format fc0 used by VML.
       def rgb_color(rgb)
-        result = sprintf("%02x%02x%02x", *rgb)
+        r, g, b = rgb
+        result = sprintf("%02x%02x%02x", r, g, b)
         result = "#{::Regexp.last_match(1)}#{::Regexp.last_match(2)}#{::Regexp.last_match(3)}" if result =~ /^([0-9a-f])\1([0-9a-f])\2([0-9a-f])\3$/
         result
       end

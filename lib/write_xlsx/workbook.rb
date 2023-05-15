@@ -988,7 +988,6 @@ module Writexlsx
       num_formats        = []
       unique_num_formats = {}
       index              = 164
-      num_format_count   = 0
 
       (@xf_formats + @dxf_formats).each do |format|
         num_format = format.num_format

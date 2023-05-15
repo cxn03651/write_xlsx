@@ -2677,7 +2677,6 @@ EOS
     #
     txt = 'Select a value from a drop down list'
     row += 2
-    bp = 1
     worksheet.write(row, 0, txt)
     worksheet.data_validation(row, 1,
                               {
@@ -5209,8 +5208,6 @@ EOS
     # Add a plus sign at 4 different positions around the circle.
     pw = 20
     ph = 20
-    px = 120
-    py = 250
 
     plus = workbook.add_shape(
       type:   'plus',
@@ -5274,8 +5271,6 @@ EOS
     # Add a plus sign at 4 different positionos around the circle.
     pw = 20
     ph = 20
-    px = 120
-    py = 250
 
     plus = workbook.add_shape(
       type:   'plus',

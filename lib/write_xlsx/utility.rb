@@ -751,8 +751,8 @@ module Writexlsx
       # Adjust the colour index.
       idx = index - 8
 
-      rgb = @palette[idx]
-      sprintf("%02X%02X%02X", *rgb)
+      r, g, b = @palette[idx]
+      sprintf("%02X%02X%02X", r, g, b)
     end
 
     #

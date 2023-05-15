@@ -15,7 +15,7 @@ class TestConvertDateTime02 < Minitest::Test
       next unless line =~ /\S/
       next if     line =~ /^#/
 
-      dummy, dummy, count, date, expected = line.split
+      date, expected = line.split[3, 2]
       expected = expected.to_i
 
       result = worksheet.convert_date_time(date)
