@@ -23,6 +23,7 @@ module Writexlsx
 
     MAX_DIGIT_WIDTH = 7    # For Calabri 11.  # :nodoc:
     PADDING         = 5                       # :nodoc:
+    COLINFO         = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
 
     attr_reader :index                                            # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawings     # :nodoc:
@@ -357,8 +358,7 @@ module Writexlsx
       # Store the column data based on the first column. Padded for sorting.
       (firstcol..lastcol).each do |col|
         @col_info[col] =
-          Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
-            .new(width, format, hidden, level, collapsed, autofit)
+          COLINFO.new(width, format, hidden, level, collapsed, autofit)
       end
 
       # Store the column change to allow optimisations.
@@ -497,8 +497,7 @@ module Writexlsx
           @col_info[col_num].autofit = 1
         else
           @col_info[col_num] =
-            Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
-              .new(width, nil, 0, 0, 0, 1)
+            COLINFO.new(width, nil, 0, 0, 0, 1)
         end
       end
     end
