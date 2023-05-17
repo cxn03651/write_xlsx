@@ -2018,20 +2018,25 @@ module Writexlsx
         attributes << ['w', width]
       end
 
-      @writer.tag_elements('a:ln', attributes) do
-        # Write the line fill.
-        if ptrue?(line[:none])
-          # Write the a:noFill element.
-          write_a_no_fill
-        elsif ptrue?(line[:color])
-          # Write the a:solidFill element.
-          write_a_solid_fill(line)
+      if ptrue?(line[:none]) || ptrue?(line[:color]) || line[:dash_type]
+        @writer.tag_elements('a:ln', attributes) do
+          # Write the line fill.
+          if ptrue?(line[:none])
+            # Write the a:noFill element.
+            write_a_no_fill
+          elsif ptrue?(line[:color])
+            # Write the a:solidFill element.
+            write_a_solid_fill(line)
+          end
+
+          # Write the line/dash type.
+          if line[:dash_type]
+            # Write the a:prstDash element.
+            write_a_prst_dash(line[:dash_type])
+          end
         end
-        # Write the line/dash type.
-        if line[:dash_type]
-          # Write the a:prstDash element.
-          write_a_prst_dash(line[:dash_type])
-        end
+      else
+        @writer.empty_tag('a:ln', attributes)
       end
     end
 
