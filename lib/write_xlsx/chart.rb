@@ -950,8 +950,34 @@ module Writexlsx
         write_val(series)
         # Write the c:smooth element.
         write_c_smooth(series.smooth) if ptrue?(@smooth_allowed)
+        write_ext_lst(series.inverted_color) if series.inverted_color
       end
       @series_index += 1
+    end
+
+    def write_ext_lst(color)
+      uri = '{6F2FDCE9-48DA-4B69-8628-5D25D57E5C99}'
+      xmlns_c_14 =
+        'http://schemas.microsoft.com/office/drawing/2007/8/2/chart'
+
+      attributes_1 = [
+        ['uri', uri],
+        ['xmlns:c14', xmlns_c_14]
+      ]
+
+      attributes_2 = [
+        ['xmlns:c14', xmlns_c_14]
+      ]
+
+      @writer.tag_elements('c:extLst') do
+        @writer.tag_elements('c:ext', attributes_1) do
+          @writer.tag_elements('c14:invertSolidFillFmt') do
+            @writer.tag_elements('c14:spPr', attributes_2) do
+              write_a_solid_fill(color: color)
+            end
+          end
+        end
+      end
     end
 
     def write_ser_base(series)

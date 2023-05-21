@@ -182,6 +182,7 @@ module Writexlsx
       attr_reader :values, :categories, :name, :name_formula, :name_id
       attr_reader :cat_data_id, :val_data_id, :fill, :pattern, :gradient
       attr_reader :trendline, :smooth, :labels, :invert_if_negative
+      attr_reader :inverted_color
       attr_reader :x2_axis, :y2_axis, :error_bars, :points
       attr_accessor :line, :marker
 
@@ -217,10 +218,12 @@ module Writexlsx
 
         @label_positions = chart.label_positions
         @label_position_default = chart.label_position_default
-        @labels     = labels_properties(params[:data_labels])
+        @labels = labels_properties(params[:data_labels])
+        @inverted_color = params[:invert_if_negative_color]
 
-        %i[smooth invert_if_negative x2_axis y2_axis]
-          .each { |key| instance_variable_set("@#{key}", params[key]) }
+        %i[
+          smooth invert_if_negative x2_axis y2_axis
+        ].each { |key| instance_variable_set("@#{key}", params[key]) }
       end
 
       def ==(other)
@@ -228,7 +231,7 @@ module Writexlsx
           categories values name name_formula name_id
           cat_data_id val_data_id
           line fill gradient marker trendline
-          smooth labels invert_if_neg
+          smooth labels inverted_color
           x2_axis y2_axis error_bars points
         ]
         methods.each do |method|
