@@ -584,14 +584,16 @@ module Writexlsx
         if theme == -1
         # Ignore for excel2003_style
         elsif ptrue?(theme)
-          write_color(writer, 'theme', theme)
+          write_color('theme', theme, writer)
         elsif ptrue?(@color_indexed)
-          write_color(writer, 'indexed', @color_indexed)
+          write_color('indexed', @color_indexed, writer)
         elsif ptrue?(@color)
           color = worksheet.palette_color(@color)
-          write_color(writer, 'rgb', color)
+          if color != 'Automatic'
+            write_color('rgb', color, writer)
+          end
         elsif !ptrue?(dxf_format)
-          write_color(writer, 'theme', 1)
+          write_color('theme', 1, writer)
         end
 
         unless ptrue?(dxf_format)
@@ -607,12 +609,12 @@ module Writexlsx
         writer.empty_tag('sz', [['val', size]])
 
         if ptrue?(theme)
-          write_color(writer, 'theme', theme)
+          write_color('theme', theme, writer)
         elsif ptrue?(@color)
           color = worksheet.palette_color(@color)
-          write_color(writer, 'rgb', color)
+          write_color('rgb', color, writer)
         else
-          write_color(writer, 'theme', 1)
+          write_color('theme', 1, writer)
         end
 
         writer.empty_tag('rFont', [['val', @font]])

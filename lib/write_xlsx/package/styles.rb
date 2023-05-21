@@ -59,6 +59,8 @@ module Writexlsx
       def palette_color(index)
         if index.to_s =~ /^#([0-9A-F]{6})$/i
           "FF#{::Regexp.last_match(1).upcase}"
+        elsif index == 0x40
+          "Automatic"
         else
           "FF#{super(index)}"
         end
@@ -187,15 +189,6 @@ module Writexlsx
       end
 
       #
-      # Write the <color> element.
-      #
-      def write_color(name, value)
-        attributes = [[name, value]]
-
-        @writer.empty_tag('color', attributes)
-      end
-
-      #
       # Write the <fills> element.
       #
       def write_fills
@@ -284,10 +277,14 @@ module Writexlsx
       def write_pattern_fill(format, dxf_format)
         bg_color, fg_color = bg_and_fg_color(format, dxf_format)
 
-        @writer.empty_tag('fgColor', [['rgb', palette_color(fg_color)]]) if fg_color && fg_color != 0
+        if fg_color && fg_color != 0 && fg_color != 0x40  # 'Automatic'
+          @writer.empty_tag('fgColor', [['rgb', palette_color(fg_color)]])
+        end
 
         if bg_color && bg_color != 0
-          @writer.empty_tag('bgColor', [['rgb', palette_color(bg_color)]])
+          if bg_color != 0x40 # 'Automatic'
+            @writer.empty_tag('bgColor', [['rgb', palette_color(bg_color)]])
+          end
         elsif !dxf_format && format.pattern <= 1
           @writer.empty_tag('bgColor', [['indexed', 64]])
         end
@@ -390,10 +387,11 @@ module Writexlsx
         attributes = [[:style, BORDER_STYLES[style]]]
 
         @writer.tag_elements(type, attributes) do
-          if color == 0
+          if [0, 0x40].include?(color) # 'Automatic'
             @writer.empty_tag('color', [['auto', 1]])
-          else
+          elsif color != 0 && color != 0x40 # 'Automatic'
             color = palette_color(color)
+
             @writer.empty_tag('color', [['rgb', color]])
           end
         end

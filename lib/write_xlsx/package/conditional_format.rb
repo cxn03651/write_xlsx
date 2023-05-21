@@ -818,9 +818,9 @@ module Writexlsx
           write_cfvo(min_type, min_value)
           write_cfvo(mid_type, mid_value) if mid_type
           write_cfvo(max_type, max_value)
-          write_color(@writer, 'rgb', min_color)
-          write_color(@writer, 'rgb', mid_color)  if mid_color
-          write_color(@writer, 'rgb', max_color)
+          write_color('rgb', min_color)
+          write_color('rgb', mid_color)  if mid_color
+          write_color('rgb', max_color)
         end
       end
     end
@@ -844,7 +844,7 @@ module Writexlsx
           write_cfvo(min_type, min_value)
           write_cfvo(max_type, max_value)
 
-          write_color(@writer, 'rgb', bar_color)
+          write_color('rgb', bar_color)
         end
       end
 

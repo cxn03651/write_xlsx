@@ -341,7 +341,7 @@ module Writexlsx
     #
     # Write the <color> element.
     #
-    def write_color(writer, name, value) # :nodoc:
+    def write_color(name, value, writer = @writer) # :nodoc:
       attributes = [[name, value]]
 
       writer.empty_tag('color', attributes)
