@@ -855,7 +855,7 @@ This option is used to change the x offset, in pixels, of a comment within a cel
 ##### Option: y_offset
 This option is used to change the y offset, in pixels, of a comment within a cell:
 
-    worksheet.write_comment('C3', comment, x_offset: 30)
+    worksheet.write_comment('C3', comment, y_offset: 30)
 
 ##### Option: font
 This option is used to change the font used in the comment from 'Tahoma' which is the default.
