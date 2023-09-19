@@ -18,7 +18,7 @@ class TestRegressionAutofilter10 < Minitest::Test
 
     # Extract the data embedded at the end of this file.
     data = []
-    data_lines.split(/\n/).each { |line| data << line.split }
+    data_lines.split("\n").each { |line| data << line.split }
 
     worksheet.write('A1', headings)
 

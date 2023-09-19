@@ -53,7 +53,7 @@ module Writexlsx
 
       # Convert base26 column string to number
       # All your Base are belong to us.
-      chars = col.split(//)
+      chars = col.split("")
       expn = 0
       col = 0
 
@@ -112,7 +112,7 @@ module Writexlsx
     #
     def xl_string_pixel_width(string)
       length = 0
-      string.to_s.split(//).each { |char| length += CHAR_WIDTHS[char] || 8 }
+      string.to_s.split("").each { |char| length += CHAR_WIDTHS[char] || 8 }
 
       length
     end
@@ -128,7 +128,7 @@ module Writexlsx
       name = sheetname.dup
       if name =~ /\W/ && !(name =~ /^'/)
         # Double quote and single quoted strings.
-        name = name.gsub(/'/, "''")
+        name = name.gsub("'", "''")
         name = "'#{name}'"
       end
       name
@@ -159,7 +159,7 @@ module Writexlsx
       seconds   = 0 # Time expressed as fraction of 24h hours in seconds
 
       # Split into date and time.
-      date, time = date_time.split(/T/)
+      date, time = date_time.split("T")
 
       # We allow the time portion of the input DateTime to be optional.
       if time
@@ -207,7 +207,7 @@ module Writexlsx
       # becomes 100 for 4 and 100 year leapdays and 400 for 400 year leapdays.
       #
       epoch   = date_1904? ? 1904 : 1900
-      offset  = date_1904? ?    4 :    0
+      offset  = date_1904? ? 4 : 0
       norm    = 300
       range   = year - epoch
 
@@ -248,7 +248,7 @@ module Writexlsx
     def escape_url(url)
       unless url =~ /%[0-9a-fA-F]{2}/
         # Escape the URL escape symbol.
-        url = url.gsub(/%/, "%25")
+        url = url.gsub("%", "%25")
 
         # Escape whitespae in URL.
         url = url.gsub(/[\s\x00]/, '%20')

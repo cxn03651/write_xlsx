@@ -17,7 +17,7 @@ class TestRegressionAutofilter03 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     data = []
-    data_lines.split(/\n/).each { |line| data << line.split }
+    data_lines.split("\n").each { |line| data << line.split }
 
     worksheet.write('A1', headings)
     worksheet.autofilter(0, 0, 50, 3)

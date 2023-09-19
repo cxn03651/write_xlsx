@@ -20,7 +20,7 @@ class TestRegressionAutofilter07 < Minitest::Test
     headings = %w[Region Item Volume Month]
 
     data = []
-    data_lines.split(/\n/).each { |line| data << line.split }
+    data_lines.split("\n").each { |line| data << line.split }
 
     worksheet.write('D3', headings)
     worksheet.autofilter('D3:G53')

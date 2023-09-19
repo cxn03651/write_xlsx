@@ -139,18 +139,18 @@ module Writexlsx
         return str unless str.to_s =~ /["&<>\n]/
 
         str
-          .gsub(/&/, "&amp;")
-          .gsub(/"/, "&quot;")
-          .gsub(/</, "&lt;")
-          .gsub(/>/, "&gt;")
-          .gsub(/\n/, "&#xA;")
+          .gsub("&", "&amp;")
+          .gsub('"', "&quot;")
+          .gsub("<", "&lt;")
+          .gsub(">", "&gt;")
+          .gsub("\n", "&#xA;")
       end
 
       def escape_data(str = '')
         if str.to_s =~ /[&<>]/
-          str.gsub(/&/, '&amp;')
-             .gsub(/</, '&lt;')
-             .gsub(/>/, '&gt;')
+          str.gsub("&", '&amp;')
+             .gsub("<", '&lt;')
+             .gsub(">", '&gt;')
         else
           str
         end

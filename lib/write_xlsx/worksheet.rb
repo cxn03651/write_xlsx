@@ -271,7 +271,7 @@ module Writexlsx
       if range.nil?
         raise "The range must be defined in unprotect_range())\n"
       else
-        range = range.gsub(/\$/, "")
+        range = range.gsub("$", "")
         range = range.sub(/^=/, "")
         @num_protected_ranges += 1
       end
@@ -657,7 +657,7 @@ module Writexlsx
       raise 'Header string must be less than 255 characters' if string.length > 255
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
-      @page_setup.header = string.gsub(/&\[Picture\]/, '&G')
+      @page_setup.header = string.gsub("&[Picture]", '&G')
 
       @page_setup.header_footer_aligns = options[:align_with_margins] if options[:align_with_margins]
 
@@ -673,7 +673,7 @@ module Writexlsx
       end
 
       # placeholeder /&G/ の数
-      placeholder_count = @page_setup.header.scan(/&G/).count
+      placeholder_count = @page_setup.header.scan("&G").count
 
       image_count = @header_images.count
 
@@ -694,7 +694,7 @@ module Writexlsx
       @page_setup.footer = string.dup
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
-      @page_setup.footer = string.gsub(/&\[Picture\]/, '&G')
+      @page_setup.footer = string.gsub("&[Picture]", '&G')
 
       @page_setup.header_footer_aligns = options[:align_with_margins] if options[:align_with_margins]
 
@@ -710,7 +710,7 @@ module Writexlsx
       end
 
       # placeholeder /&G/ の数
-      placeholder_count = @page_setup.footer.scan(/&G/).count
+      placeholder_count = @page_setup.footer.scan("&G").count
 
       image_count = @footer_images.count
 
@@ -2935,7 +2935,7 @@ module Writexlsx
       tokens.map! do |token|
         token.sub!(/^"/, '')
         token.sub!(/"$/, '')
-        token.gsub!(/""/, '"')
+        token.gsub!('""', '"')
 
         # if token is number, convert to numeric.
         if token =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/
@@ -3217,13 +3217,13 @@ module Writexlsx
           target = escape_url(url.sub(/^external:/, ''))
 
           # Additional escape not required in worksheet hyperlinks
-          target = target.gsub(/#/, '%23')
+          target = target.gsub("#", '%23')
 
           # Prefix absolute paths (not relative) with file:///
           target = if target =~ /^\w:/ || target =~ /^\\\\/
                      "file:///#{target}"
                    else
-                     target.gsub(/\\/, '/')
+                     target.gsub("\\", '/')
                    end
         end
 
@@ -3446,7 +3446,7 @@ EOS
     def encode_password(password) # :nodoc:
       hash = 0
 
-      password.reverse.split(//).each do |char|
+      password.reverse.split("").each do |char|
         hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
         hash ^= char.ord
       end

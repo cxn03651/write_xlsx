@@ -6,7 +6,7 @@ require 'stringio'
 
 class TestConvertDateTime02 < Minitest::Test
   def test_convert_date_time
-    data_for_test.split(/\n/).each do |line|
+    data_for_test.split("\n").each do |line|
       workbook = WriteXLSX.new(StringIO.new)
       workbook.set_1904(false) if line =~ /Excel 1900/
       workbook.set_1904(true)  if line =~ /Excel 1904/

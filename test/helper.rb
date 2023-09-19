@@ -65,15 +65,15 @@ class Minitest::Test
     vml_str.split(/[\r\n]+/).each do |vml|
       str = vml.sub(/^\s+/, '')     # Remove leading whitespace.
                .sub(/\s+$/, '')             # Remove trailing whitespace.
-               .gsub(/'/, '"')             # Convert VMLs attribute quotes.
+               .gsub("'", '"')             # Convert VMLs attribute quotes.
                .gsub(%r{([^ ])/>$}, '\1 />') # Add space before element end like XML::Writer.
                .sub(/"$/, '" ')        # Add space between attributes.
                .sub(/>$/, ">\n")       # Add newline after element end.
-               .gsub(/></, ">\n<")      # Split multiple elements.
+               .gsub("><", ">\n<")      # Split multiple elements.
       str.chomp! if str == "<x:Anchor>\n" # Put all of Anchor on one line.
       ret += str
     end
-    ret.split(/\n/)
+    ret.split("\n")
   end
 
   def entrys(xlsx)
@@ -156,13 +156,13 @@ class Minitest::Test
       # Remove printer specific settings from Worksheet pageSetup elements.
       if exp_members[i].name =~ %r{xl/worksheets/sheet\d.xml}
         exp_xml_str = exp_xml_str
-                      .sub(/horizontalDpi="200" /, '')
-                      .sub(/verticalDpi="200" /, '')
+                      .sub('horizontalDpi="200" ', '')
+                      .sub('verticalDpi="200" ', '')
                       .sub(/(<pageSetup[^>]* )r:id="rId1"/, '\1')
                       .sub(%r{ +/>}, ' />')
         got_xml_str = got_xml_str
-                      .sub(/horizontalDpi="200" /, '')
-                      .sub(/verticalDpi="200" /, '')
+                      .sub('horizontalDpi="200" ', '')
+                      .sub('verticalDpi="200" ', '')
       end
 
       # Remove Chart pageMargin dimensions which are almost always different.

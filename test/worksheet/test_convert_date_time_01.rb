@@ -12,7 +12,7 @@ class TestConvertDateTime01 < Minitest::Test
   end
 
   def test_convert_date_time
-    lines = data_for_test.split(/\n/)
+    lines = data_for_test.split("\n")
     until lines.empty?
       line = lines.shift
       next unless line =~ /"DateTime">([^<]+)/

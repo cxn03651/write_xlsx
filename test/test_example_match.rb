@@ -5321,7 +5321,7 @@ EOS
       line = line.chomp
       next unless line =~ /^\w/    # Skip blank lines and comments.
 
-      sheet, name = line.split(/\t/)
+      sheet, name = line.split("\t")
       if last_sheet != sheet
         worksheet = workbook.add_worksheet(sheet)
         row       = 2

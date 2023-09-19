@@ -324,7 +324,7 @@ module Writexlsx
         return colors[color_code.downcase.to_sym] if colors[color_code.downcase.to_sym]
 
         # or the default color if string is unrecognised,
-        return 0x00 if color_code =~ /\D/
+        0x00 if color_code =~ /\D/
       else
         # or an index < 8 mapped into the correct range,
         return color_code + 8 if color_code < 8

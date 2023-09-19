@@ -17,7 +17,7 @@ class TestRegressionAutofilter06 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     data = []
-    data_lines.split(/\n/).each { |line| data << line.split }
+    data_lines.split("\n").each { |line| data << line.split }
 
     # Create a blank cell in our test data.
     data[5][0] = ''

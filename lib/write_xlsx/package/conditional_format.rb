@@ -411,7 +411,7 @@ module Writexlsx
         # Check for a cell reference in A1 notation and substitute row and column
         user_range = if args[0].to_s =~ (/^\D/) && (args[0] =~ /,/)
                        # Check for a user defined multiple range like B3:K6,B8:K11.
-                       args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub(/\$/, '')
+                       args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub("$", '')
                      end
 
         if (row_col_array = row_col_notation(args.first))

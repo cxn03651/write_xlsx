@@ -17,7 +17,7 @@ class TestAutofilter01 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     data = []
-    data_lines.split(/\n/).each { |line| data << line.split }
+    data_lines.split("\n").each { |line| data << line.split }
 
     worksheet.autofilter('A1:D51')
     worksheet.write('A1', [data])

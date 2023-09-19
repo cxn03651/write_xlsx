@@ -17,7 +17,7 @@ class TestRegressionAutofilter11 < Minitest::Test
     worksheet = workbook.add_worksheet
 
     # Extract the data embedded at the end of this file.
-    data = data_lines.split(/\n/).collect(&:split)
+    data = data_lines.split("\n").collect(&:split)
 
     worksheet.write('A1', headings)
     worksheet.autofilter('A1:D51')

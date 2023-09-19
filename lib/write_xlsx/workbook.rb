@@ -715,7 +715,7 @@ module Writexlsx
 
       # Split the cell range into 2 cells or else use single cell for both.
       if cells =~ /:/
-        cell_1, cell_2 = cells.split(/:/)
+        cell_1, cell_2 = cells.split(":")
       else
         cell_1 = cells
         cell_2 = cells
@@ -724,7 +724,7 @@ module Writexlsx
       # Remove leading/trailing apostrophes and convert escaped quotes to single.
       sheetname.sub!(/^'/, '')
       sheetname.sub!(/'$/, '')
-      sheetname.gsub!(/''/, "'")
+      sheetname.gsub!("''", "'")
 
       row_start, col_start = xl_cell_to_rowcol(cell_1)
       row_end,   col_end   = xl_cell_to_rowcol(cell_2)

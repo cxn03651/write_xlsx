@@ -43,13 +43,13 @@ module Writexlsx
       # Cleanup the input ranges.
       @ranges.collect! do |range|
         # Remove the absolute reference $ symbols.
-        range = range.gsub(/\$/, '')
+        range = range.gsub("$", '')
         # Convert a simple range into a full Sheet1!A1:D1 range.
         range = "#{sheetname}!#{range}" unless range =~ /!/
         range
       end
       # Cleanup the input locations.
-      @locations.collect! { |location| location.gsub(/\$/, '') }
+      @locations.collect! { |location| location.gsub("$", '') }
 
       # Map options.
       @high      = param[:high_point]

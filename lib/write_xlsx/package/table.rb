@@ -260,10 +260,10 @@ module Writexlsx
       # Convert a table total function to a worksheet formula.
       #
       def table_function_to_formula(function, col_name)
-        col_name = col_name.gsub(/'/, "''")
-                           .gsub(/#/, "'#")
-                           .gsub(/\[/, "'[")
-                           .gsub(/\]/, "']")
+        col_name = col_name.gsub("'", "''")
+                           .gsub("#", "'#")
+                           .gsub("[", "'[")
+                           .gsub("]", "']")
 
         subtotals = {
           average:   101,
