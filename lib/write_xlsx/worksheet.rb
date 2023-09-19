@@ -612,8 +612,17 @@ module Writexlsx
     #
     # This method is used to display the worksheet in "Page View/Layout" mode.
     #
-    def set_page_view(flag = true)
-      @page_view = !!flag
+    def set_page_view(flag = 1)
+      @page_view = flag
+    end
+
+    #
+    # set_pagebreak_view
+    #
+    # Set the page view mode.
+    #
+    def set_pagebreak_view
+      @page_view = 2
     end
 
     #
@@ -3559,16 +3568,27 @@ EOS
       attributes << ["showOutlineSymbols", 0] if @outline_on
 
       # Set the page view/layout mode if required.
-      # TODO. Add pageBreakPreview mode when requested.
-      attributes << %w[view pageLayout] if page_view?
+      case @page_view
+      when 1
+        attributes << %w[view pageLayout]
+      when 2
+        attributes << %w[view pageBreakPreview]
+      end
 
       # Set the first visible cell.
       attributes << ['topLeftCell', @top_left_cell] if ptrue?(@top_left_cell)
 
       # Set the zoom level.
       if @zoom != 100
-        attributes << ['zoomScale', @zoom] unless page_view?
-        attributes << ['zoomScaleNormal', @zoom] if zoom_scale_normal?
+        attributes << ['zoomScale', @zoom]
+
+        if @page_view == 1
+          attributes << ['zoomScalePageLayoutView', @zoom]
+        elsif @page_view == 2
+          attributes << ['zoomScaleSheetLayoutView', @zoom]
+        elsif ptrue?(@zoom_scale_normal)
+          attributes << ['zoomScaleNormal', @zoom]
+        end
       end
 
       attributes << ['workbookViewId', 0]
@@ -4753,10 +4773,6 @@ EOS
 
     def zoom_scale_normal? # :nodoc:
       ptrue?(@zoom_scale_normal)
-    end
-
-    def page_view? # :nodoc:
-      !!@page_view
     end
 
     def right_to_left? # :nodoc:
