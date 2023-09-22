@@ -20,7 +20,7 @@ class TestPageView02 < Minitest::Test
     worksheet.zoom = 75
 
     # Options to match automatic page setup.
-    worksheet.set_paper(9)
+    worksheet.paper = 9
     worksheet.vertical_dpi = 200
 
     worksheet.write('A1', 'Foo')
