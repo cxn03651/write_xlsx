@@ -12,13 +12,14 @@ module Writexlsx
       class ColumnData
         attr_reader :id
         attr_accessor :name, :format, :formula, :name_format
-        attr_accessor :total_string, :total_function
+        attr_accessor :total_string, :total_function, :custom_total
 
         def initialize(id, param = {})
           @id             = id
           @name           = "Column#{id}"
           @total_string   = ''
           @total_function = ''
+          @custom_total   = ''
           @formula        = ''
           @format         = nil
           @name_format    = nil
@@ -245,14 +246,32 @@ module Writexlsx
       end
 
       def handle_the_function_for_the_table_row(row2, col_data, col_num, user_data)
-        function = user_data[:total_function].downcase.gsub(/[_\s]/, '')
+        formula = ''
+        function = user_data[:total_function]
+        function = 'countNums' if function == 'count_nums'
+        function = 'stdDev'    if function == 'std_dev'
 
-        function = 'countNums' if function == 'countnums'
-        function = 'stdDev'    if function == 'stddev'
+        subtotals = {
+          average:   101,
+          countNums: 102,
+          count:     103,
+          max:       104,
+          min:       105,
+          stdDev:    106,
+          sum:       109,
+          var:       110
+        }
+
+        if subtotals[function.to_sym]
+          formula = table_function_to_formula(function, col_data.name)
+        else
+          formula = function
+          formula = formula.sub(/^=/, '')
+          col_data.custom_total = formula
+          function = 'custom'
+        end
 
         col_data.total_function = function
-
-        formula = table_function_to_formula(function, col_data.name)
         @worksheet.write_formula(row2, col_num, formula, user_data[:format], user_data[:total_value])
       end
 
@@ -395,10 +414,16 @@ module Writexlsx
 
         attributes << [:dataDxfId, col_data.format] if col_data.format
 
-        if ptrue?(col_data.formula)
+        if ptrue?(col_data.formula) || ptrue?(col_data.custom_total)
           @writer.tag_elements('tableColumn', attributes) do
-            # Write the calculatedColumnFormula element.
-            write_calculated_column_formula(col_data.formula)
+            if ptrue?(col_data.formula)
+              # Write the calculatedColumnFormula element.
+              write_calculated_column_formula(col_data.formula)
+            end
+            if ptrue?(col_data.custom_total)
+              # Write the totalsRowFormula element.
+              write_totals_row_formula(col_data.custom_total)
+            end
           end
         else
           @writer.empty_tag('tableColumn', attributes)
@@ -424,6 +449,15 @@ module Writexlsx
       #
       def write_calculated_column_formula(formula)
         @writer.data_element('calculatedColumnFormula', formula)
+      end
+
+      #
+      # _write_totals_row_formula()
+      #
+      # Write the <totalsRowFormula> element.
+      #
+      def write_totals_row_formula(formula)
+        @writer.data_element('totalsRowFormula', formula)
       end
     end
   end

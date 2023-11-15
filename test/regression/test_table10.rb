@@ -46,13 +46,13 @@ class TestRegressionTable10 < Minitest::Test
         columns:   [
           { total_string: 'Total' },
           {},
-          { total_function: 'Average' },
-          { total_function: 'COUNT' },
+          { total_function: 'average' },
+          { total_function: 'count' },
           { total_function: 'count_nums' },
           { total_function: 'max' },
           { total_function: 'min' },
           { total_function: 'sum' },
-          { total_function: 'std Dev' },
+          { total_function: 'std_dev' },
           { total_function: 'var',
             formula: 'SUM(Table1[[#This Row],[Column1]:[Column3]])', format: format }
         ]

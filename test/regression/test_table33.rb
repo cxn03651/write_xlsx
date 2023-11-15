@@ -2,21 +2,22 @@
 
 require 'helper'
 
-class TestRegressionTable17 < Minitest::Test
+class TestRegressionTable33 < Minitest::Test
   def setup
     setup_dir_var
   end
 
   def teardown
-    @tempfile.close(true)
+    @tempfile.close(true) if @tempfile
   end
 
-  def test_table17
-    @xlsx = 'table17.xlsx'
+  def test_table33
+    @xlsx = 'table33.xlsx'
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
+    format    = workbook.add_format(num_format: 2)
 
-    # Set the column width to match the taget worksheet.
+    # Set the column width to match the target worksheet.
     worksheet.set_column('B:K', 10.288)
 
     # Write some strings to order the string table.
@@ -37,11 +38,6 @@ class TestRegressionTable17 < Minitest::Test
     worksheet.write_row('B4', data)
     worksheet.write_row('B5', data)
 
-    worksheet.write('G4', 4)
-    worksheet.write('G5', 5)
-    worksheet.write('I4', 1)
-    worksheet.write('I5', 2)
-
     # Add the table.
     worksheet.add_table(
       'B3:K6',
@@ -53,19 +49,27 @@ class TestRegressionTable17 < Minitest::Test
           { total_function: 'average' },
           { total_function: 'count' },
           { total_function: 'count_nums' },
-          { total_function: 'max', total_value: 5 },
+          { total_function: 'max' },
           { total_function: 'min' },
-          { total_function: 'sum', total_value: 3 },
+          { total_function: 'sum' },
           { total_function: 'std_dev' },
-          { total_function: 'var' }
+          {
+            total_function: '=SUM([Column10])',
+            formula:        'SUM(Table1[[#This Row],[Column1]:[Column3]])',
+            format:         format
+          }
         ]
       }
     )
 
     workbook.close
     compare_for_regression(
-      ['xl/calcChain.xml', '[Content_Types].xml', 'xl/_rels/workbook.xml.rels'],
-      { 'xl/workbook.xml' => ['<workbookView'] }
+      [
+        'xl/calcChain.xml',
+        '[Content_Types].xml',
+        'xl/_rels/workbook.xml.rels'
+      ],
+      {  'xl/workbook.xml' => ['<workbookView'] }
     )
   end
 end
