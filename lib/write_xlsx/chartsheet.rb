@@ -54,6 +54,8 @@ module Writexlsx
           write_header_footer
           # Write the drawing element.
           write_drawings
+          # Write the legaacyDrawingHF element.
+          write_legacy_drawing_hf
           # Close the worksheet tag.
         end
       end
@@ -185,7 +187,10 @@ module Writexlsx
     end
 
     def external_links
-      [@external_drawing_links]
+      [
+        @external_drawing_links,
+        @external_vml_links
+      ]
     end
 
     private
