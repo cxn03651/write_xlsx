@@ -568,6 +568,13 @@ module Writexlsx
       @is_secondary
     end
 
+    #
+    # Set the option for displaying #N/A as an empty cell in a chart.
+    #
+    def show_na_as_empty_cell
+      @show_na_as_empty = true
+    end
+
     private
 
     def axis_setup
@@ -598,6 +605,7 @@ module Writexlsx
       @cross_between     = 'between'
       @date_category     = false
       @show_blanks       = 'gap'
+      @show_na_as_empty  = false
       @show_hidden_data  = false
       @show_crosses      = true
     end
@@ -782,6 +790,9 @@ module Writexlsx
 
         # Write the c:dispBlanksAs element.
         write_disp_blanks_as
+
+        # Write the c:extLst element.
+        write_ext_lst_display_na if @show_na_as_empty
       end
     end
 
@@ -950,12 +961,13 @@ module Writexlsx
         write_val(series)
         # Write the c:smooth element.
         write_c_smooth(series.smooth) if ptrue?(@smooth_allowed)
-        write_ext_lst(series.inverted_color) if series.inverted_color
+        # Write the c:extLst element.
+        write_ext_lst_inverted_fill(series.inverted_color) if series.inverted_color
       end
       @series_index += 1
     end
 
-    def write_ext_lst(color)
+    def write_ext_lst_inverted_fill(color)
       uri = '{6F2FDCE9-48DA-4B69-8628-5D25D57E5C99}'
       xmlns_c_14 =
         'http://schemas.microsoft.com/office/drawing/2007/8/2/chart'
@@ -975,6 +987,31 @@ module Writexlsx
             @writer.tag_elements('c14:spPr', attributes_2) do
               write_a_solid_fill(color: color)
             end
+          end
+        end
+      end
+    end
+
+    #
+    # Write the <c:extLst> element for the display N/A as empty cell option.
+    #
+    def write_ext_lst_display_na
+      uri        = '{56B9EC1D-385E-4148-901F-78D8002777C0}'
+      xmlns_c_16 = 'http://schemas.microsoft.com/office/drawing/2017/03/chart'
+
+      attributes1 = [
+        ['uri', uri],
+        ['xmlns:c16r3',xmlns_c_16]
+      ]
+
+      attributes2 = [
+        ['val', 1]
+      ]
+
+      @writer.tag_elements('c:extLst' ) do
+        @writer.tag_elements('c:ext', attributes1) do
+          @writer.tag_elements('c16r3:dataDisplayOptions16') do
+            @writer.empty_tag('c16r3:dispNaAsBlank', attributes2)
           end
         end
       end

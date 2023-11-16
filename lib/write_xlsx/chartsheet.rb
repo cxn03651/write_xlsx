@@ -147,6 +147,10 @@ module Writexlsx
       @chart.show_blanks_as(*args)
     end
 
+    def show_na_as_empty_cell
+      @chart.show_na_as_empty_cell(*args)
+    end
+
     def show_hidden_data(*args)
       @chart.show_hidden_data(*args)
     end
