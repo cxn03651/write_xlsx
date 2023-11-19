@@ -79,7 +79,7 @@ module Writexlsx
           # Set up the default column data.
           col_data = Package::Table::ColumnData.new(col_id + 1, @param[:columns])
 
-          overrite_the_defaults_with_any_use_defined_values(col_id, col_data, col_num)
+          overwrite_the_defaults_with_any_use_defined_values(col_id, col_data, col_num)
 
           # Store the column data.
           @columns << col_data
@@ -90,7 +90,7 @@ module Writexlsx
         end    # Table columns.
       end
 
-      def overrite_the_defaults_with_any_use_defined_values(col_id, col_data, col_num)
+      def overwrite_the_defaults_with_any_use_defined_values(col_id, col_data, col_num)
         # Check if there are user defined values for this column.
         if @param[:columns] && (user_data = @param[:columns][col_id])
           # Map user defined values to internal values.
