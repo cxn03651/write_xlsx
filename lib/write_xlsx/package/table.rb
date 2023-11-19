@@ -52,6 +52,7 @@ module Writexlsx
 
         add_the_table_columns
         write_the_cell_data_if_supplied
+        write_any_columns_formulas_after_the_user_supplied_table_data
         store_filter_cell_positions
       end
 
@@ -154,6 +155,23 @@ module Writexlsx
             j += 1
           end
           i += 1
+        end
+      end
+
+      def write_any_columns_formulas_after_the_user_supplied_table_data
+        col_id = 0
+
+        (@col1..@col2).each do |col|
+          column_data = @columns[col_id]
+          if ptrue?(column_data) && ptrue?(column_data.formula)
+            formula_format = @col_formats[col_id]
+            formula        = column_data.formula
+
+            (@first_data_row..@last_data_row).each do |row|
+              @worksheet.write_formula(row, col, formula, formula_format)
+            end
+          end
+          col_id += 1
         end
       end
 
