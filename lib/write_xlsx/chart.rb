@@ -1001,14 +1001,14 @@ module Writexlsx
 
       attributes1 = [
         ['uri', uri],
-        ['xmlns:c16r3',xmlns_c_16]
+        ['xmlns:c16r3', xmlns_c_16]
       ]
 
       attributes2 = [
         ['val', 1]
       ]
 
-      @writer.tag_elements('c:extLst' ) do
+      @writer.tag_elements('c:extLst') do
         @writer.tag_elements('c:ext', attributes1) do
           @writer.tag_elements('c16r3:dataDisplayOptions16') do
             @writer.empty_tag('c16r3:dispNaAsBlank', attributes2)
@@ -2581,11 +2581,25 @@ module Writexlsx
       @writer.data_element('c:separator', data)
     end
 
-    #
-    # Write the <c:showLeaderLines> element.
-    #
+    # Write the <c:showLeaderLines> element. This is different for Pie/Doughnut
+    # charts. Other chart types only supported leader lines after Excel 2015 via
+    # an extension element.
     def write_show_leader_lines
-      @writer.empty_tag('c:showLeaderLines', [['val', 1]])
+      uri        = '{CE6537A1-D6FC-4f65-9D91-7224C49458BB}'
+      xmlns_c_15 = 'http://schemas.microsoft.com/office/drawing/2012/chart'
+
+      attributes1 = [
+        ['uri', uri],
+        ['xmlns:c15', xmlns_c_15]
+      ]
+
+      attributes2 = [['val',  1]]
+
+      @writer.tag_elements('c:extLst') do
+        @writer.tag_elements('c:ext', attributes1) do
+          @writer.empty_tag('c15:showLeaderLines', attributes2)
+        end
+      end
     end
 
     #

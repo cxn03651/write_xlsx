@@ -207,6 +207,19 @@ module Writexlsx
       def write_first_slice_ang
         @writer.empty_tag('c:firstSliceAng', [['val', @rotation]])
       end
+
+      #
+      # Write the <c:showLeaderLines> element. This is for Pie/Doughnut charts.
+      # Other chart types only supported leader lines after Excel 2015 via an
+      # extension element.
+      #
+      def write_show_leader_lines
+        val  = 1
+
+        attributes = [['val', val]]
+
+        @writer.empty_tag('c:showLeaderLines', attributes)
+      end
     end
   end
 end

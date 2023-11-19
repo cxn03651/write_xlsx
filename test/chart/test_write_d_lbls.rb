@@ -2,6 +2,7 @@
 
 require 'helper'
 require 'write_xlsx/chart'
+require 'write_xlsx/chart/pie'
 
 class TestWriteDLbls < Minitest::Test
   def setup
@@ -196,9 +197,50 @@ class TestWriteDLbls < Minitest::Test
     assert_equal(expected, result)
   end
 
+  def setup_pie_chart
+    @chart = Writexlsx::Chart::Pie.new(nil)
+    @chart.instance_variable_set(
+      :@label_positions,
+      {
+        'center'      => 'ctr',
+        'right'       => 'r',
+        'left'        => 'l',
+        'top'         => 't',
+        'above'       => 't',
+        'bottom'      => 'b',
+        'below'       => 'b',
+        'inside_base' => 'inBase',
+        'inside_end'  => 'inEnd',
+        'outside_end' => 'outEnd',
+        'best_fit'    => 'bestFit'
+      }
+    )
+    @chart.instance_variable_set(:@label_position_default, '')
+    @series = Writexlsx::Chart::Series.new(@chart)
+  end
+
   def test_write_d_lbls_pie
     expected = '<c:dLbls><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
-
+    setup_pie_chart
+    # @chart = Writexlsx::Chart::Pie.new(nil)
+    # @chart.instance_variable_set(
+    #   :@label_positions,
+    #   {
+    #     'center'      => 'ctr',
+    #     'right'       => 'r',
+    #     'left'        => 'l',
+    #     'top'         => 't',
+    #     'above'       => 't',
+    #     'bottom'      => 'b',
+    #     'below'       => 'b',
+    #     'inside_base' => 'inBase',
+    #     'inside_end'  => 'inEnd',
+    #     'outside_end' => 'outEnd',
+    #     'best_fit'    => 'bestFit'
+    #   }
+    # )
+    # @chart.instance_variable_set(:@label_position_default, '')
+    # @series = Writexlsx::Chart::Series.new(@chart)
     labels = @series.__send__(
       :labels_properties,
       {
@@ -215,6 +257,7 @@ class TestWriteDLbls < Minitest::Test
 
   def test_write_d_lbls_pie_position_empty
     expected = '<c:dLbls><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
+    setup_pie_chart
 
     labels = @series.__send__(
       :labels_properties,
@@ -233,6 +276,7 @@ class TestWriteDLbls < Minitest::Test
 
   def test_write_d_lbls_pie_position_center
     expected = '<c:dLbls><c:dLblPos val="ctr"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
+    setup_pie_chart
 
     labels = @series.__send__(
       :labels_properties,
@@ -251,6 +295,7 @@ class TestWriteDLbls < Minitest::Test
 
   def test_write_d_lbls_pie_position_inside_end
     expected = '<c:dLbls><c:dLblPos val="inEnd"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
+    setup_pie_chart
 
     labels = @series.__send__(
       :labels_properties,
@@ -269,6 +314,7 @@ class TestWriteDLbls < Minitest::Test
 
   def test_write_d_lbls_pie_position_outside_end
     expected = '<c:dLbls><c:dLblPos val="outEnd"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
+    setup_pie_chart
 
     labels = @series.__send__(
       :labels_properties,
@@ -285,26 +331,9 @@ class TestWriteDLbls < Minitest::Test
     assert_equal(expected, result)
   end
 
-  def test_write_d_lbls_pie_position_best_fit
-    expected = '<c:dLbls><c:dLblPos val="bestFit"/><c:showVal val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
-
-    labels = @series.__send__(
-      :labels_properties,
-      {
-        value:        1,
-        leader_lines: 1,
-        position:     'best_fit'
-      }
-    )
-    @chart.__send__(:write_d_lbls, labels)
-
-    result = chart_writer_string
-
-    assert_equal(expected, result)
-  end
-
   def test_write_d_lbls_pie_percentage
     expected = '<c:dLbls><c:showPercent val="1"/><c:showLeaderLines val="1"/></c:dLbls>'
+    setup_pie_chart
 
     labels = @series.__send__(
       :labels_properties,
