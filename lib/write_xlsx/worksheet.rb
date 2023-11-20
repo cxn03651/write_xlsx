@@ -228,15 +228,26 @@ module Writexlsx
     #
     # Hide this worksheet.
     #
-    def hide
-      @hidden = true
+    def hide(hidden = :hidden)
+      @hidden = hidden
       @selected = false
       @workbook.activesheet = 0 if @workbook.activesheet == @index
       @workbook.firstsheet  = 0 if @workbook.firstsheet  == @index
     end
 
+    #
+    # Hide this worksheet. This can only be unhidden from VBA.
+    #
+    def very_hidden
+      hide(:very_hidden)
+    end
+
     def hidden? # :nodoc:
-      @hidden
+      @hidden == :hidden
+    end
+
+    def very_hidden? # :nodoc:
+      @hidden == :very_hidden
     end
 
     #

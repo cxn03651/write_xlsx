@@ -46,7 +46,9 @@ module Writexlsx
         add_heading_pair(
           [
             'Worksheets',
-            @workbook.worksheets.reject { |s| s.is_chartsheet? }.count
+            @workbook.worksheets.reject do |s|
+              s.is_chartsheet? || s.very_hidden?
+            end.count
           ]
         )
       end
@@ -57,14 +59,16 @@ module Writexlsx
 
       def add_worksheet_part_names
         @workbook.worksheets
-                 .reject { |sheet| sheet.is_chartsheet? }
-                 .each   { |sheet| add_part_name(sheet.name) }
+          .reject { |sheet| sheet.is_chartsheet? || sheet.very_hidden? }
+          .each  do |sheet|
+          add_part_name(sheet.name)
+        end
       end
 
       def add_chartsheet_part_names
         @workbook.worksheets
-                 .select { |sheet| sheet.is_chartsheet? }
-                 .each   { |sheet| add_part_name(sheet.name) }
+          .select { |sheet| sheet.is_chartsheet? }
+          .each   { |sheet| add_part_name(sheet.name) }
       end
 
       def add_part_name(part_name)

@@ -142,13 +142,12 @@ module Writexlsx
       def write_app_file
         app = Package::App.new(@workbook)
 
+        # Add the Worksheet parts.
+        app.add_worksheet_part_names
         # Add the Worksheet heading pairs.
         app.add_worksheet_heading_pairs
         # Add the Chartsheet heading pairs.
         app.add_chartsheet_heading_pairs
-
-        # Add the Worksheet parts.
-        app.add_worksheet_part_names
         # Add the Chartsheet parts.
         app.add_chartsheet_part_names
         # Add the Named Range heading pairs.

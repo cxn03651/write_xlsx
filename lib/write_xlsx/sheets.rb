@@ -252,7 +252,11 @@ module Writexlsx
         ['sheetId', sheet_id]
       ]
 
-      attributes << %w[state hidden] if sheet.hidden?
+      if sheet.hidden?
+        attributes << %w[state hidden]
+      elsif sheet.very_hidden?
+        attributes << %w[state veryHidden]
+      end
       attributes << r_id_attributes(sheet_id)
       writer.empty_tag_encoded('sheet', attributes)
     end
