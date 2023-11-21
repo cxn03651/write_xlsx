@@ -253,14 +253,17 @@ module Writexlsx
         ]
       end
 
-      def handle_the_column_formula(col_data, col_num, formula, format)
+      def handle_the_column_formula(col_data, _col_num, formula, _format)
         return unless formula
 
-        col_data.formula = formula.sub(/^=/, '').gsub(/@/, '[#This Row],')
+        formula = formula.sub(/^=/, '').gsub(/@/, '[#This Row],')
 
-        (@first_data_row..@last_data_row).each do |row|
-          @worksheet.write_formula(row, col_num, col_data.formula, format)
-        end
+        # Escape any future functions.
+        col_data.formula = @worksheet.prepare_formula(formula, 1)
+
+        # (@first_data_row..@last_data_row).each do |row|
+        #   @worksheet.write_formula(row, col_num, col_data.formula, format)
+        # end
       end
 
       def handle_the_function_for_the_table_row(row2, col_data, col_num, user_data)
@@ -283,8 +286,7 @@ module Writexlsx
         if subtotals[function.to_sym]
           formula = table_function_to_formula(function, col_data.name)
         else
-          formula = function
-          formula = formula.sub(/^=/, '')
+          formula = @worksheet.prepare_formula(function, 1)
           col_data.custom_total = formula
           function = 'custom'
         end

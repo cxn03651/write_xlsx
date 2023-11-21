@@ -1340,7 +1340,7 @@ module Writexlsx
     # Utility method to strip equal sign and array braces from a formula
     # and also expand out future and dynamic array formulas.
     #
-    def prepare_formula(given_formula)
+    def prepare_formula(given_formula, expand_future_functions = nil)
       # Ignore empty/null formulas.
       return given_formula unless ptrue?(given_formula)
 
@@ -1351,26 +1351,46 @@ module Writexlsx
       return formula if formula =~ /_xlfn\./
 
       # Expand dynamic array formulas.
-      formula = expand_formula(formula, 'LET\(')
-      formula = expand_formula(formula, 'LAMBDA\(')
-      formula = expand_formula(formula, 'SINGLE\(')
-      formula = expand_formula(formula, 'SORTBY\(')
-      formula = expand_formula(formula, 'UNIQUE\(')
-      formula = expand_formula(formula, 'XMATCH\(')
-      formula = expand_formula(formula, 'XLOOKUP\(')
-      formula = expand_formula(formula, 'SEQUENCE\(')
-      formula = expand_formula(formula, 'RANDARRAY\(')
-      formula = expand_formula(formula, 'SORT\(', '._xlws')
       formula = expand_formula(formula, 'ANCHORARRAY\(')
+      formula = expand_formula(formula, 'BYCOL\(')
+      formula = expand_formula(formula, 'BYROW\(')
+      formula = expand_formula(formula, 'CHOOSECOLS\(')
+      formula = expand_formula(formula, 'CHOOSEROWS\(')
+      formula = expand_formula(formula, 'DROP\(')
+      formula = expand_formula(formula, 'EXPAND\(')
       formula = expand_formula(formula, 'FILTER\(', '._xlws')
+      formula = expand_formula(formula, 'HSTACK\(')
+      formula = expand_formula(formula, 'LAMBDA\(')
+      formula = expand_formula(formula, 'MAKEARRAY\(')
+      formula = expand_formula(formula, 'MAP\(')
+      formula = expand_formula(formula, 'RANDARRAY\(')
+      formula = expand_formula(formula, 'REDUCE\(')
+      formula = expand_formula(formula, 'SCAN\(')
+      formula = expand_formula(formula, 'SEQUENCE\(')
+      formula = expand_formula(formula, 'SINGLE\(')
+      formula = expand_formula(formula, 'SORT\(', '._xlws')
+      formula = expand_formula(formula, 'SORTBY\(')
+      formula = expand_formula(formula, 'SWITCH\(')
+      formula = expand_formula(formula, 'TAKE\(')
+      formula = expand_formula(formula, 'TEXTSPLIT\(')
+      formula = expand_formula(formula, 'TOCOL\(')
+      formula = expand_formula(formula, 'TOROW\(')
+      formula = expand_formula(formula, 'UNIQUE\(')
+      formula = expand_formula(formula, 'VSTACK\(')
+      formula = expand_formula(formula, 'WRAPCOLS\(')
+      formula = expand_formula(formula, 'WRAPROWS\(')
+      formula = expand_formula(formula, 'XLOOKUP\(')
 
-      return formula unless @use_future_functions
+      if !@use_future_functions && !ptrue?(expand_future_functions)
+        return formula
+      end
 
       # Future functions.
       formula = expand_formula(formula, 'ACOTH\(')
       formula = expand_formula(formula, 'ACOT\(')
       formula = expand_formula(formula, 'AGGREGATE\(')
       formula = expand_formula(formula, 'ARABIC\(')
+      formula = expand_formula(formula, 'ARRAYTOTEXT\(')
       formula = expand_formula(formula, 'BASE\(')
       formula = expand_formula(formula, 'BETA.DIST\(')
       formula = expand_formula(formula, 'BETA.INV\(')
@@ -1435,7 +1455,9 @@ module Writexlsx
       formula = expand_formula(formula, 'IMSINH\(')
       formula = expand_formula(formula, 'IMTAN\(')
       formula = expand_formula(formula, 'ISFORMULA\(')
+      formula = expand_formula(formula, 'ISOMITTED\(')
       formula = expand_formula(formula, 'ISOWEEKNUM\(')
+      formula = expand_formula(formula, 'LET\(')
       formula = expand_formula(formula, 'LOGNORM.DIST\(')
       formula = expand_formula(formula, 'LOGNORM.INV\(')
       formula = expand_formula(formula, 'MAXIFS\(')
@@ -1470,24 +1492,26 @@ module Writexlsx
       formula = expand_formula(formula, 'SKEW.P\(')
       formula = expand_formula(formula, 'STDEV.P\(')
       formula = expand_formula(formula, 'STDEV.S\(')
-      formula = expand_formula(formula, 'SWITCH\(')
       formula = expand_formula(formula, 'T.DIST.2T\(')
       formula = expand_formula(formula, 'T.DIST.RT\(')
       formula = expand_formula(formula, 'T.DIST\(')
       formula = expand_formula(formula, 'T.INV.2T\(')
       formula = expand_formula(formula, 'T.INV\(')
       formula = expand_formula(formula, 'T.TEST\(')
+      formula = expand_formula(formula, 'TEXTAFTER\(')
+      formula = expand_formula(formula, 'TEXTBEFORE\(')
       formula = expand_formula(formula, 'TEXTJOIN\(')
       formula = expand_formula(formula, 'UNICHAR\(')
       formula = expand_formula(formula, 'UNICODE\(')
+      formula = expand_formula(formula, 'VALUETOTEXT\(')
       formula = expand_formula(formula, 'VAR.P\(')
       formula = expand_formula(formula, 'VAR.S\(')
       formula = expand_formula(formula, 'WEBSERVICE\(')
       formula = expand_formula(formula, 'WEIBULL.DIST\(')
+      formula = expand_formula(formula, 'XMATCH\(')
       formula = expand_formula(formula, 'XOR\(')
       expand_formula(formula, 'Z.TEST\(')
     end
-    private :prepare_formula
 
     #
     # :call-seq:
@@ -1571,7 +1595,7 @@ module Writexlsx
               end
 
       # Modify the formula string, as needed.
-      formula = prepare_formula(formula)
+      formula = prepare_formula(formula, 1)
 
       store_data_to_table(
         if type == 'a'
