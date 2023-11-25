@@ -34,7 +34,8 @@ module Writexlsx
     def xl_rowcol_to_cell(row, col, row_absolute = false, col_absolute = false)
       row += 1      # Change from 0-indexed to 1 indexed.
       col_str = xl_col_to_name(col, col_absolute)
-      "#{col_str}#{absolute_char(row_absolute)}#{row}"
+      row_str = ColName.instance.row_str(row)
+      "#{col_str}#{absolute_char(row_absolute)}#{row_str}"
     end
 
     #
