@@ -3785,9 +3785,10 @@ EOS
 
     def write_cell_column_dimension(row_num)  # :nodoc:
       row = @cell_data_table[row_num]
+      row_name = (row_num+1).to_s
       (@dim_colmin..@dim_colmax).each do |col_num|
         if (cell = row[col_num])
-          cell.write_cell(self, row_num, col_num)
+          cell.write_cell(self, row_num, row_name, col_num)
         end
       end
     end

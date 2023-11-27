@@ -31,10 +31,12 @@ module Writexlsx
     #
     # xl_rowcol_to_cell($row, col, row_absolute, col_absolute)
     #
-    def xl_rowcol_to_cell(row, col, row_absolute = false, col_absolute = false)
-      row += 1      # Change from 0-indexed to 1 indexed.
+    def xl_rowcol_to_cell(row_or_name, col, row_absolute = false, col_absolute = false)
+      if row_or_name.is_a?(Integer)
+        row_or_name += 1      # Change from 0-indexed to 1 indexed.
+      end
       col_str = xl_col_to_name(col, col_absolute)
-      "#{col_str}#{absolute_char(row_absolute)}#{row}"
+      "#{col_str}#{absolute_char(row_absolute)}#{row_or_name}"
     end
 
     #
