@@ -126,17 +126,23 @@ module Writexlsx
 
       private
 
-      def key_val(key, val)
-        %( #{key}="#{val}")
-      end
-
       def key_vals(attribute)
-        attribute
-          &.inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
+        if attribute
+          result = "".dup
+          attribute.each do |attr|
+            # Generate and concat %( #{key}="#{val}") values for attribute pair
+            result << " "
+            result << attr.first.to_s
+            result << '="'
+            result << escape_attributes(attr.last).to_s
+            result << '"'
+          end
+          result
+        end
       end
 
       def escape_attributes(str = '')
-        return str unless str.to_s =~ /["&<>\n]/
+        return str unless str.respond_to?(:match) && str =~ /["&<>\n]/
 
         str
           .gsub("&", "&amp;")
@@ -147,7 +153,7 @@ module Writexlsx
       end
 
       def escape_data(str = '')
-        if str.to_s =~ /[&<>]/
+        if str.respond_to?(:match) && str =~ /[&<>]/
           str.gsub("&", '&amp;')
              .gsub("<", '&lt;')
              .gsub(">", '&gt;')
