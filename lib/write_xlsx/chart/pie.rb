@@ -123,7 +123,6 @@ module Writexlsx
       # Write the <c:legend> element.
       #
       def write_legend
-        position = @legend.position
         allowed  = %w[right left top bottom]
         delete_series = @legend.delete_series || []
 

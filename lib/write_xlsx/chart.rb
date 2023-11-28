@@ -2913,8 +2913,6 @@ module Writexlsx
     # Write the <a:fillToRect> element.
     #
     def write_a_fill_to_rect(type)
-      attributes = []
-
       attributes = if type == 'shape'
                      [
                        ['l', 50000],
@@ -2936,8 +2934,6 @@ module Writexlsx
     # Write the <a:tileRect> element.
     #
     def write_a_tile_rect(type)
-      attributes = []
-
       attributes = if type == 'shape'
                      []
                    else
