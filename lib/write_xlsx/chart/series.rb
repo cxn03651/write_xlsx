@@ -59,9 +59,12 @@ module Writexlsx
     class Trendline < Chartline
       attr_reader :name, :forward, :backward, :order, :period
       attr_reader :intercept, :display_equation, :display_r_squared
+      attr_reader :label
 
       def initialize(params)
         super(params)
+
+        @label = trendline_label_properties(params[:label])
 
         @name              = params[:name]
         @forward           = params[:forward]
@@ -75,6 +78,51 @@ module Writexlsx
       end
 
       private
+
+      #
+      # Convert user defined trendline label properties to the structure required
+      # internally.
+      #
+      def trendline_label_properties(_label)
+        return unless _label || _label.is_a?(Hash)
+
+        # Copy the user supplied properties.
+        label = {}
+
+        # Set the font properties for the label.
+        label[:font] = convert_font_args(_label[:font]) if ptrue?(_label[:font])
+
+        # Set the line properties for the label.
+        line = line_properties(_label[:line])
+
+        # Allow 'border' as a synonym for 'line'.
+        line = line_properties(_label[:border]) if ptrue?(_label[:border])
+
+        # Set the fill properties for the label.
+        fill = fill_properties(_label[:fill])
+
+        # Set the pattern properties for the label.
+        pattern = pattern_properties(_label[:pattern])
+
+        # Set the gradient fill properties for the label.
+        gradient = gradient_properties(_label[:gradient])
+
+        # Pattern fill overrides solid fill.
+        fill = nil if ptrue?(pattern)
+
+        # Gradient fill overrides solid and pattern fills.
+        if ptrue?(gradient)
+          pattern = nil
+          fill    = nil
+        end
+
+        label[:line]     = line
+        label[:fill]     = fill
+        label[:pattern]  = pattern
+        label[:gradient] = gradient
+
+        label
+      end
 
       def types
         {

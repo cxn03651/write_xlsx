@@ -2159,7 +2159,7 @@ module Writexlsx
           # Write the c:dispEq element.
           write_disp_eq
           # Write the c:trendlineLbl element.
-          write_trendline_lbl
+          write_trendline_lbl(trendline)
         end
       end
     end
@@ -2236,12 +2236,18 @@ module Writexlsx
     #
     # Write the <c:trendlineLbl> element.
     #
-    def write_trendline_lbl
+    def write_trendline_lbl(trendline)
       @writer.tag_elements('c:trendlineLbl') do
         # Write the c:layout element.
         write_layout
         # Write the c:numFmt element.
         write_trendline_num_fmt
+        # Write the c:spPr element for the label formatting.
+        write_sp_pr(trendline.label)
+        # Write the data label font elements.
+        if trendline.label && ptrue?(trendline.label[:font])
+          write_axis_font(trendline.label[:font])
+        end
       end
     end
 
