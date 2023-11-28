@@ -29,24 +29,24 @@ module Writexlsx
         io_write(str)
       end
 
-      def tag_elements(tag, attributes = [])
+      def tag_elements(tag, attributes = nil)
         start_tag(tag, attributes)
         yield
         end_tag(tag)
       end
 
-      def tag_elements_str(tag, attributes = [])
+      def tag_elements_str(tag, attributes = nil)
         start_tag_str(tag, attributes) +
           yield +
           end_tag_str(tag)
       end
 
-      def start_tag(tag, attr = [])
+      def start_tag(tag, attr = nil)
         io_write(start_tag_str(tag, attr))
       end
 
-      def start_tag_str(tag, attr = [])
-        if attr.empty?
+      def start_tag_str(tag, attr = nil)
+        if attr.nil? || attr.empty?
           result = @tag_start_cache[tag]
           unless result
             result = "<#{tag}>"
@@ -71,20 +71,20 @@ module Writexlsx
         result
       end
 
-      def empty_tag(tag, attr = [])
+      def empty_tag(tag, attr = nil)
         str = "<#{tag}#{key_vals(attr)}/>"
         io_write(str)
       end
 
-      def empty_tag_encoded(tag, attr = [])
+      def empty_tag_encoded(tag, attr = nil)
         io_write(empty_tag_encoded_str(tag, attr))
       end
 
-      def empty_tag_encoded_str(tag, attr = [])
+      def empty_tag_encoded_str(tag, attr = nil)
         "<#{tag}#{key_vals(attr)}/>"
       end
 
-      def data_element(tag, data, attr = [])
+      def data_element(tag, data, attr = nil)
         tag_elements(tag, attr) { io_write(escape_data(data)) }
       end
 
@@ -132,7 +132,7 @@ module Writexlsx
 
       def key_vals(attribute)
         attribute
-          .inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
+          &.inject('') { |str, attr| str + key_val(attr.first, escape_attributes(attr.last)) }
       end
 
       def escape_attributes(str = '')
