@@ -258,7 +258,7 @@ module Writexlsx
         attributes << %w[state veryHidden]
       end
       attributes << r_id_attributes(sheet_id)
-      writer.empty_tag_encoded('sheet', attributes)
+      writer.empty_tag('sheet', attributes)
     end
   end
 end

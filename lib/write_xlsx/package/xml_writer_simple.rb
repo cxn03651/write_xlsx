@@ -47,15 +47,10 @@ module Writexlsx
 
       def start_tag_str(tag, attr = nil)
         if attr.nil? || attr.empty?
-          result = @tag_start_cache[tag]
-          unless result
-            result = "<#{tag}>"
-            @tag_start_cache[tag] = result
-          end
+          @tag_start_cache[tag] ||= "<#{tag}>"
         else
-          result = "<#{tag}#{key_vals(attr)}>"
+          "<#{tag}#{key_vals(attr)}>"
         end
-        result
       end
 
       def end_tag(tag)
@@ -63,25 +58,12 @@ module Writexlsx
       end
 
       def end_tag_str(tag)
-        result = @tag_end_cache[tag]
-        unless result
-          result = "</#{tag}>"
-          @tag_end_cache[tag] = result
-        end
-        result
+        @tag_end_cache[tag] ||= "</#{tag}>"
       end
 
       def empty_tag(tag, attr = nil)
         str = "<#{tag}#{key_vals(attr)}/>"
         io_write(str)
-      end
-
-      def empty_tag_encoded(tag, attr = nil)
-        io_write(empty_tag_encoded_str(tag, attr))
-      end
-
-      def empty_tag_encoded_str(tag, attr = nil)
-        "<#{tag}#{key_vals(attr)}/>"
       end
 
       def data_element(tag, data, attr = nil)
