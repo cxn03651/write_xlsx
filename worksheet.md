@@ -42,6 +42,7 @@ The following methods are available through a new worksheet:
 * [activate](#activate)
 * [select](#select)
 * [hide](#hide)
+* [very_hidden](#very_hidden)
 * [set_first_sheet](#set_first_sheet)
 * [protect](#protect)
 * [unprotect_range](#unprotect_range)
@@ -1359,6 +1360,13 @@ you cannot hide the first worksheet without activating another sheet:
 
     worksheet2.activate
     worksheet1.hide
+
+#### <a name="very_hidden" class="anchor" href="#hide"><span class="octicon octicon-link" /></a>very_hidden()
+
+The `very_hidden()` method can be used to hide a worksheet similar to the
+`hide()` method. The difference is that the worksheet cannot be unhidden in
+the the Excel user interface. The Excel worksheet "xlSheetVeryHidden" option
+can only be unset programmatically by VBA.
 
 #### <a name="set_first_sheet" class="anchor" href="#set_first_sheet"><span class="octicon octicon-link" /></a>set_first_sheet()
 
