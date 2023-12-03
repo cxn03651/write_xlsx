@@ -15,6 +15,7 @@ The following methods are available for page set-up:
 * [set_landscape](#set_landscape)
 * [set_portrait](#set_portrait)
 * [set_page_view](#set_page_view)
+* [set_pagebreak_view](#set_pagebreak_view)
 * [paper=](#paper=)
 * [center_horizontally](#center_horizontally)
 * [center_vertically](#center_vertically)
@@ -81,6 +82,12 @@ to call this method.
 This method is used to display the worksheet in "Page View/Layout" mode.
 
     worksheet.set_page_view
+
+#### <a name="set_pagebreak_view" class="anchor" href="#set_page_view"><span class="octicon octicon-link" /></a>set_pagebreak_view()
+
+This method is used to display the worksheet in "Page Break Preview" mode.
+
+    worksheet.set_pagebreak_view
 
 #### <a name="paper=" class="anchor" href="#paper="><span class="octicon octicon-link" /></a>paper=(index)
 
