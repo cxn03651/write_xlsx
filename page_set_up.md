@@ -39,8 +39,8 @@ The following methods are available for page set-up:
 * [start_page=](#start_page=)
 * [print_scale=](#print_scale=)
 * [print_black_and_white](#print_black_and_white)
-* [set_h_pagebreaks]*
-(#set_h_pagebreaks) [set_v_pagebreaks](#set_v_pagebreaks)
+* [set_h_pagebreaks](#set_h_pagebreaks)
+* [set_v_pagebreaks](#set_v_pagebreaks)
 * [set_paper](#set_paper)(deprecated)
 * [set_margins](#set_margins)(deprecated)
 * [set_margins_LR](#set_margins_LR)(deprecated)
