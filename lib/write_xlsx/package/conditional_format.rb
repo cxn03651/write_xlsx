@@ -769,7 +769,7 @@ module Writexlsx
         attr = super
         attr << ['percent', 1]             if criteria == '%'
         attr << ['bottom',  1]             if direction
-        attr << ['rank',    (value || 10)]
+        attr << ['rank',    value || 10]
         attr
       end
     end
