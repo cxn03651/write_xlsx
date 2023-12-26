@@ -20,9 +20,11 @@ Gem::Specification.new do |gem|
   end
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.require_paths = ['lib']
+  gem.add_runtime_dependency 'nkf'
   gem.add_runtime_dependency 'rubyzip', '>= 1.0.0'
   gem.add_development_dependency 'byebug'
   gem.add_development_dependency 'minitest'
+  gem.add_development_dependency 'mutex_m'
   gem.add_development_dependency 'rake'
   gem.add_development_dependency 'rubocop'
   gem.add_development_dependency 'rubocop-minitest'
