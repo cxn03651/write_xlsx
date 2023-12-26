@@ -125,6 +125,7 @@ See the documentation for each of the above chart modules for chart specific inf
 * [set_high_low_lines](#set_high_low_lines)
 * [show_blanks_as](#show_blanks_as)
 * [show_hidden_data](#show_hidden_data)
+* [show_na_as_empty_cell](#show_na_as_empty_cell)
 
 #### <a name="add_series" class="anchor" href="#add_series"><span class="octicon octicon-link" /></a>add_series()
 
@@ -900,11 +901,16 @@ The available options are:
         zero   # Blank data is displayed as zero.
         span   # Blank data is connected with a line.
 
-#### <a name="sjhow_hidden_data" class="anchor" href="#show_hidden_data"><span class="octicon octicon-link" /></a>show_hidden_data()
+#### <a name="show_hidden_data" class="anchor" href="#show_hidden_data"><span class="octicon octicon-link" /></a>show_hidden_data()
 
 Display data in hidden rows or columns on the chart.
 
     chart.show_hidden_data
+
+#### <a name="show_na_as_empty_cell" class="anchor" href="#show_na_as_empty_cell"><span class="octicon octicon-link" /></a>show_na_as_empty_cell()
+
+The `show_na_as_empty_cell` method enables the option to display `#N/A` as a blank cell in a chart.
+
 
 ### <a name="series_options" class="anchor" href="#series_options"><span class="octicon octicon-link" /></a>SERIES OPTIONS
 
