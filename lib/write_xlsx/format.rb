@@ -146,10 +146,10 @@ module Writexlsx
         return
       end
 
-      # Indent is only allowed for horizontal left, right and distributed. If it
-      # is defined for any other alignment or no alignment has been set then
-      # default to left alignment.
-      @text_h_align = 1 if @indent != 0 && ![1, 3, 7].include?(@text_h_align)
+      # Indent is only allowed for some alignment properties. If it is defined
+      # for any other alignment or no alignment has been set then default to
+      # left alignment.
+      @text_h_align = 1 if @indent != 0 && ![1, 3, 7].include?(@text_h_align) && ![1, 3, 5].include?(@text_v_align)
 
       # Check for properties that are mutually exclusive.
       @shrink       = 0 if @text_wrap != 0
@@ -178,8 +178,8 @@ module Writexlsx
       align << %w[vertical justify]     if @text_v_align == 4
       align << %w[vertical distributed] if @text_v_align == 5
 
-      align << ['indent',       @indent]   if @indent   != 0
       align << ['textRotation', @rotation] if @rotation != 0
+      align << ['indent',       @indent]   if @indent   != 0
 
       align << ['wrapText',     1] if @text_wrap != 0
       align << ['shrinkToFit',  1] if @shrink    != 0
