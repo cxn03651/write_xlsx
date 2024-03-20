@@ -71,6 +71,7 @@ class TestPrepareFormula < Minitest::Test
       ['F.INV()', '_xlfn.F.INV()'],
       ['GAMMA()', '_xlfn.GAMMA()'],
       ['GAUSS()', '_xlfn.GAUSS()'],
+      ['IMAGE()', '_xlfn.IMAGE()'],
       ['IMCOT()', '_xlfn.IMCOT()'],
       ['IMCSC()', '_xlfn.IMCSC()'],
       ['IMSEC()', '_xlfn.IMSEC()'],

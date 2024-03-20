@@ -1446,6 +1446,7 @@ module Writexlsx
       formula = expand_formula(formula, 'HYPGEOM.DIST\(')
       formula = expand_formula(formula, 'IFNA\(')
       formula = expand_formula(formula, 'IFS\(')
+      formula = expand_formula(formula, 'IMAGE\(')
       formula = expand_formula(formula, 'IMCOSH\(')
       formula = expand_formula(formula, 'IMCOT\(')
       formula = expand_formula(formula, 'IMCSCH\(')
@@ -1536,7 +1537,7 @@ module Writexlsx
       raise WriteXLSXInsufficientArgumentError if [_row, _col, _formula].include?(nil)
 
       # Check for dynamic array functions.
-      regex = /\bLET\(|\bSORT\(|\bLAMBDA\(|\bSINGLE\(|\bSORTBY\(|\bUNIQUE\(|\bXMATCH\(|\bFILTER\(|\bXLOOKUP\(|\bSEQUENCE\(|\bRANDARRAY\(|\bANCHORARRAY\(/
+      regex = /\bANCHORARRAY\(|\bBYCOL\(|\bBYROW\(|\bCHOOSECOLS\(|\bCHOOSEROWS\(|\bDROP\(|\bEXPAND\(|\bFILTER\(|\bHSTACK\(|\bLAMBDA\(|\bMAKEARRAY\(|\bMAP\(|\bRANDARRAY\(|\bREDUCE\(|\bSCAN\(|\bSEQUENCE\(|\bSINGLE\(|\bSORT\(|\bSORTBY\(|\bSWITCH\(|\bTAKE\(|\bTEXTSPLIT\(|\bTOCOL\(|\bTOROW\(|\bUNIQUE\(|\bVSTACK\(|\bWRAPCOLS\(|\bWRAPROWS\(|\bXLOOKUP\(/
       if _formula =~ regex
         return write_dynamic_array_formula(
           _row, _col, _row, _col, _formula, _format, _value
@@ -1549,7 +1550,7 @@ module Writexlsx
       else
         check_dimensions(_row, _col)
         store_row_col_max_min_values(_row, _col)
-        _formula = _formula.sub(/^=/, '')
+        _formula = prepare_formula(_formula)
 
         store_data_to_table(FormulaCellData.new(_formula, _format, _value), _row, _col)
       end
