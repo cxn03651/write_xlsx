@@ -988,6 +988,176 @@ module Writexlsx
     def write_a_end_para_rpr # :nodoc:
       @writer.empty_tag('a:endParaRPr', [%w[lang en-US]])
     end
+
+    #
+    # Extract information from the image file such as dimension, type, filename,
+    # and extension. Also keep track of previously seen images to optimise out
+    # any duplicates.
+    #
+    def get_image_properties(filename)
+      # Note the image_id, and previous_images mechanism isn't currently used.
+      x_dpi = 96
+      y_dpi = 96
+
+      # Open the image file and import the data.
+      data = File.binread(filename)
+      md5  = Digest::MD5.hexdigest(data)
+      if data.unpack1('x A3') == 'PNG'
+        # Test for PNGs.
+        type, width, height, x_dpi, y_dpi = process_png(data)
+        @image_types[:png] = 1
+      elsif data.unpack1('n') == 0xFFD8
+        # Test for JPEG files.
+        type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
+        @image_types[:jpeg] = 1
+      elsif data.unpack1('A4') == 'GIF8'
+        # Test for GIFs.
+        type, width, height, x_dpi, y_dpi = process_gif(data, filename)
+        @image_types[:gif] = 1
+      elsif data.unpack1('A2') == 'BM'
+        # Test for BMPs.
+        type, width, height = process_bmp(data, filename)
+        @image_types[:bmp] = 1
+      else
+        # TODO. Add Image::Size to support other types.
+        raise "Unsupported image format for file: #{filename}\n"
+      end
+
+      # Set a default dpi for images with 0 dpi.
+      x_dpi = 96 if x_dpi == 0
+      y_dpi = 96 if y_dpi == 0
+
+      [type, width, height, File.basename(filename), x_dpi, y_dpi, md5]
+    end
+
+    #
+    # Extract width and height information from a PNG file.
+    #
+    def process_png(data)
+      type   = 'png'
+      width  = 0
+      height = 0
+      x_dpi  = 96
+      y_dpi  = 96
+
+      offset = 8
+      data_length = data.size
+
+      # Search through the image data to read the height and width in th the
+      # IHDR element. Also read the DPI in the pHYs element.
+      while offset < data_length
+
+        length = data[offset + 0, 4].unpack1("N")
+        png_type   = data[offset + 4, 4].unpack1("A4")
+
+        case png_type
+        when "IHDR"
+          width  = data[offset + 8, 4].unpack1("N")
+          height = data[offset + 12, 4].unpack1("N")
+        when "pHYs"
+          x_ppu = data[offset +  8, 4].unpack1("N")
+          y_ppu = data[offset + 12, 4].unpack1("N")
+          units = data[offset + 16, 1].unpack1("C")
+
+          if units == 1
+            x_dpi = x_ppu * 0.0254
+            y_dpi = y_ppu * 0.0254
+          end
+        end
+
+        offset = offset + length + 12
+
+        break if png_type == "IEND"
+      end
+      raise "#{filename}: no size data found in png image.\n" unless height
+
+      [type, width, height, x_dpi, y_dpi]
+    end
+
+    def process_jpg(data, filename)
+      type     = 'jpeg'
+      x_dpi    = 96
+      y_dpi    = 96
+
+      offset = 2
+      data_length = data.bytesize
+
+      # Search through the image data to read the JPEG markers.
+      while offset < data_length
+        marker  = data[offset + 0, 2].unpack1("n")
+        length  = data[offset + 2, 2].unpack1("n")
+
+        # Read the height and width in the 0xFFCn elements
+        # (Except C4, C8 and CC which aren't SOF markers).
+        if (marker & 0xFFF0) == 0xFFC0 &&
+           marker != 0xFFC4 && marker != 0xFFCC
+          height = data[offset + 5, 2].unpack1("n")
+          width  = data[offset + 7, 2].unpack1("n")
+        end
+
+        # Read the DPI in the 0xFFE0 element.
+        if marker == 0xFFE0
+          units     = data[offset + 11, 1].unpack1("C")
+          x_density = data[offset + 12, 2].unpack1("n")
+          y_density = data[offset + 14, 2].unpack1("n")
+
+          if units == 1
+            x_dpi = x_density
+            y_dpi = y_density
+          elsif units == 2
+            x_dpi = x_density * 2.54
+            y_dpi = y_density * 2.54
+          end
+        end
+
+        offset += length + 2
+        break if marker == 0xFFDA
+      end
+
+      raise "#{filename}: no size data found in jpeg image.\n" unless height
+
+      [type, width, height, x_dpi, y_dpi]
+    end
+
+    #
+    # Extract width and height information from a GIF file.
+    #
+    def process_gif(data, filename)
+      type  = 'gif'
+      x_dpi = 96
+      y_dpi = 96
+
+      width  = data[6, 2].unpack1("v")
+      height = data[8, 2].unpack1("v")
+
+      raise "#{filename}: no size data found in gif image.\n" if height.nil?
+
+      [type, width, height, x_dpi, y_dpi]
+    end
+
+    # Extract width and height information from a BMP file.
+    def process_bmp(data, filename)       # :nodoc:
+      type     = 'bmp'
+
+      # Check that the file is big enough to be a bitmap.
+      raise "#{filename} doesn't contain enough data." if data.bytesize <= 0x36
+
+      # Read the bitmap width and height. Verify the sizes.
+      width, height = data.unpack("x18 V2")
+      raise "#{filename}: largest image width #{width} supported is 65k." if width > 0xFFFF
+      raise "#{filename}: largest image height supported is 65k." if height > 0xFFFF
+
+      # Read the bitmap planes and bpp data. Verify them.
+      planes, bitcount = data.unpack("x26 v2")
+      raise "#{filename} isn't a 24bit true color bitmap." unless bitcount == 24
+      raise "#{filename}: only 1 plane supported in bitmap image." unless planes == 1
+
+      # Read the bitmap compression. Verify compression.
+      compression = data.unpack1("x30 V")
+      raise "#{filename}: compression not supported in bitmap image." unless compression == 0
+
+      [type, width, height]
+    end
   end
 
   module WriteDPtPoint
