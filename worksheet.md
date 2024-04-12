@@ -31,6 +31,7 @@ The following methods are available through a new worksheet:
 * [update_range_format_with_params](#update_range_format_with_params)
 * [set_comments_author](#set_comments_author)
 * [insert_image](#insert_image)
+* [embed_image](#embed_image)
 * [insert_chart](#insert_chart)
 * [insert_shape](#insert_shape)
 * [insert_button](#insert_button)
@@ -1002,6 +1003,75 @@ if it contains a font size that will change the row height.
 
 BMP images must be 24 bit, true colour, bitmaps.
 In general it is best to avoid BMP images since they aren't compressed.
+
+#### <a name="embed_image" class="anchor" href="#embed_image"><span class="octicon octicon-link" /></a>embed_image(row, col, filename, options)
+
+
+This method can be used to embed an image into a worksheet.
+The image can be in PNG, JPEG, GIF or BMP format.
+
+    worksheet1.embed_image('A1', 'ruby.bmp')
+    worksheet2.embed_image('A1', '../images/ruby.bmp')
+    worksheet3.embed_image('A1', 'c:\images\ruby.bmp')
+
+This method can be used to embed a image into a worksheet cell and have the
+image automatically scale to the width and height of the cell.
+The X/Y scaling of the image is preserved but the size of the image is adjusted to fit the largest possible width or height depending on the cell dimensions.
+
+This is the equivalent of Excel's menu option to insert an image using the option to "Place in Cell".
+See `insert_image()` for the equivalent method to "Place over Cells".
+
+The optional `options` hash/hashref parameter can be used to set various options for the image. The defaults are:
+
+    options = {
+      cell_format: format,
+      url:         nil,
+      tip:         nil,
+      description: filename,
+      decorative:  0
+    }
+
+The `cell_format` parameters can be an standard Format to set the formatting of the cell behind the image.
+
+The `url` option can be use to used to add a hyperlink to an image:
+
+    worksheet.insert_image('A1', 'logo.png',
+        { url: 'https://github.com/jmcnamara' } )
+
+The supported url formats are the same as those supported by the `write_url()` method and the same rules/limits apply.
+
+The `tip` option can be use to used to add a mouseover tip to the hyperlink:
+
+    worksheet.insert_image('A1', 'logo.png',
+      {
+        url: 'https://github.com/jmcnamara',
+        tip: 'GitHub'
+      }
+    )
+
+The `description` parameter can be used to specify a description or "alt text" string for the image.
+In general this would be used to provide a text description of the image to help accessibility.
+It is an optional parameter and defaults to the filename of the image.
+It can be used as follows:
+
+    worksheet.insert_image('E9', 'logo.png',
+      { description: "This is some alternative text" })
+
+The optional `decorative` parameter is also used to help accessibility.
+It is used to mark the image as decorative, and thus uninformative, for automated screen readers.
+As in Excel, if this parameter is in use the `description` field isn't written.
+It is used as follows:
+
+    worksheet.insert_image('E9', 'logo.png', { decorative: 1 } )
+
+Note: you must call `set_row()` or `set_column()` before `insert_image()` if you wish to change the default dimensions of any of the rows or columns that the image occupies.
+The height of a row can also change if you use a font that is larger than the default.
+This in turn will affect the scaling of your image.
+To avoid this you should explicitly set the height of the row using `set_row()` if it contains a font size that will change the row height.
+
+BMP images must be 24 bit, true colour, bitmaps.
+In general it is best to avoid BMP images since they aren't compressed.
+
 
 #### <a name="insert_chart" class="anchor" href="#insert_chart"><span class="octicon octicon-link" /></a>insert_chart(row, col, chart, options)
 
