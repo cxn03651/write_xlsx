@@ -206,5 +206,24 @@ module Writexlsx
         worksheet.writer.empty_tag('c', cell_attributes(worksheet, row, row_name, col))
       end
     end
+
+    class EmbedImageCellData < CellData # :nodoc:
+      def initialize(image_index, xf)
+        @image_index = image_index
+        @xf          = xf
+      end
+
+      def write_cell(worksheet, row, row_name, col)
+        attributes = cell_attributes(worksheet, row, row_name, col)
+
+        # Write a error value (mainly for embedded images).
+        attributes << %w[t e]
+        attributes << ['vm', @image_index]
+
+        worksheet.writer.tag_elements('c', attributes) do
+          worksheet.write_cell_value('#VALUE!')
+        end
+      end
+    end
   end
 end

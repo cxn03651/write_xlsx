@@ -35,6 +35,9 @@ module Writexlsx
     attr_reader :max_url_length                 # :nodoc:
     attr_reader :strings_to_urls                # :nodoc:
     attr_reader :read_only                      # :nodoc:
+    attr_reader :embedded_image_indexes         # :nodec:
+    attr_reader :embedded_images                # :nodoc:
+    attr_reader :embedded_descriptions          # :nodoc:
 
     def initialize(file, *option_params)
       options, default_formats = process_workbook_options(*option_params)
@@ -80,6 +83,9 @@ module Writexlsx
       @has_comments        = false
       @read_only           = 0
       @has_metadata        = false
+      @has_embedded_images = false
+      @has_embedded_descriptions = false
+
       if options[:max_url_length]
         @max_url_length = options[:max_url_length]
 
@@ -87,6 +93,10 @@ module Writexlsx
       end
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
+
+      # Structures for embedded images.
+      @embedded_image_indexes = {}
+      @embedded_images        = []
 
       # Formula calculation default settings.
       @calc_id             = 124519
@@ -530,6 +540,10 @@ module Writexlsx
       !!@date_1904
     end
 
+    def has_dynamic_functions?
+      @has_dynamic_functions
+    end
+
     #
     # Add a string to the shared string table, if it isn't already there, and
     # return the string index.
@@ -595,6 +609,14 @@ module Writexlsx
 
     def has_metadata?
       @has_metadata
+    end
+
+    def has_embedded_images?
+      @has_embedded_images
+    end
+
+    def has_embedded_descriptions?
+      @has_embedded_descriptions
     end
 
     private
@@ -1226,10 +1248,11 @@ module Writexlsx
     #
     def prepare_metadata
       @worksheets.each do |sheet|
-        if sheet.has_dynamic_arrays?
-          @has_metadata = true
-          break
-        end
+        next unless sheet.has_dynamic_functions? || sheet.has_embedded_images?
+
+        @has_metadata = true
+        @has_dynamic_functions ||= sheet.has_dynamic_functions?
+        @has_embedded_images   ||= sheet.has_embedded_images?
       end
     end
 
@@ -1380,12 +1403,22 @@ module Writexlsx
     #
     def prepare_drawings # :nodoc:
       chart_ref_id     = 0
-      image_ref_id     = 0
       drawing_id       = 0
       ref_id           = 0
       image_ids        = {}
       header_image_ids = {}
       background_ids   = {}
+
+      # Store the image types for any embedded images.
+      @embedded_images.each do |image_data|
+        store_image_types(image_data[1])
+
+        @has_embedded_descriptions = true if ptrue?(image_data[2])
+      end
+
+      # The image IDs start from after the embedded images.
+      image_ref_id = @embedded_images.size
+
       @worksheets.each do |sheet|
         chart_count = sheet.charts.size
         image_count = sheet.images.size
@@ -1505,6 +1538,23 @@ module Writexlsx
                        .sort_by { |chart| chart.id }
 
       @drawing_count = drawing_id
+    end
+
+    #
+    # Store the image types (PNG/JPEG/etc) used in the workbook to use in these
+    # Content_Types file.
+    #
+    def store_image_types(type)
+      case type
+      when 'png'
+        @image_types[:png] = 1
+      when 'jpeg'
+        @image_types[:jpeg] = 1
+      when 'gif'
+        @image_types[:gif] = 1
+      when 'bmp'
+        @image_types[:bmp] = 1
+      end
     end
   end
 end

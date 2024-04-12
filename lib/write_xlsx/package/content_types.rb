@@ -199,6 +199,28 @@ module Writexlsx
         )
       end
 
+      def add_richvalue
+        add_override(
+          '/xl/richData/rdRichValueTypes.xml',
+          'application/vnd.ms-excel.rdrichvaluetypes+xml'
+        )
+
+        add_override(
+          '/xl/richData/rdrichvalue.xml',
+          'application/vnd.ms-excel.rdrichvalue+xml'
+        )
+
+        add_override(
+          '/xl/richData/rdrichvaluestructure.xml',
+          'application/vnd.ms-excel.rdrichvaluestructure+xml'
+        )
+
+        add_override(
+          '/xl/richData/richValueRel.xml',
+          'application/vnd.ms-excel.richvaluerel+xml'
+        )
+      end
+
       private
 
       def change_the_workbook_xml_content_type_from_xlsx_to_xlsm

@@ -58,7 +58,8 @@ module Writexlsx
       end
 
       def display_on
-        @display = @url_str
+        # @display = @url_str
+        @display = @str
       end
     end
 

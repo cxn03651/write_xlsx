@@ -10,6 +10,10 @@ require 'write_xlsx/package/core'
 require 'write_xlsx/package/custom'
 require 'write_xlsx/package/metadata'
 require 'write_xlsx/package/relationships'
+require 'write_xlsx/package/rich_value'
+require 'write_xlsx/package/rich_value_rel'
+require 'write_xlsx/package/rich_value_structure'
+require 'write_xlsx/package/rich_value_types'
 require 'write_xlsx/package/shared_strings'
 require 'write_xlsx/package/styles'
 require 'write_xlsx/package/table'
@@ -56,9 +60,11 @@ module Writexlsx
         write_worksheet_rels_files
         write_chartsheet_rels_files
         write_drawing_rels_files
+        write_rich_value_rels_files
         add_image_files
         add_vba_project
         write_metadata_file
+        write_rich_value_files
       end
 
       private
@@ -184,10 +190,79 @@ module Writexlsx
 
         return unless @workbook.has_metadata?
 
+        metadata.has_dynamic_functions = @workbook.has_dynamic_functions?
+        metadata.num_embedded_images   = @workbook.embedded_images.size
+
         FileUtils.mkdir_p("#{@package_dir}/xl")
 
         metadata.set_xml_writer("#{@package_dir}/xl/metadata.xml")
         metadata.assemble_xml_file
+      end
+
+      #
+      # Write the rdrichvalue(*).xml file.
+      #
+      def write_rich_value_files
+        dir = @package_dir
+
+        return unless @workbook.has_embedded_images?
+
+        FileUtils.mkdir_p("#{dir}/xl/richData")
+
+        write_rich_value_file
+        write_rich_value_structure_file
+        write_rich_value_types_file
+        write_rich_value_rel
+      end
+
+      #
+      # Write the rdrichvalue.xml file.
+      #
+      def write_rich_value_file
+        dir        = @package_dir
+        rich_value = Package::RichValue.new
+
+        rich_value.embedded_images = @workbook.embedded_images
+
+        rich_value.set_xml_writer("#{dir}/xl/richData/rdrichvalue.xml")
+        rich_value.assemble_xml_file
+      end
+
+      #
+      # Write the rdrichvaluestructure.xml file.
+      #
+      def write_rich_value_structure_file
+        dir        = @package_dir
+        rich_value = Package::RichValueStructure.new
+
+        rich_value.has_embedded_descriptions = @workbook.has_embedded_descriptions?
+
+        rich_value.set_xml_writer("#{dir}/xl/richData/rdrichvaluestructure.xml")
+        rich_value.assemble_xml_file
+      end
+
+      #
+      # Write the rdRichValueTypes.xml file.
+      #
+      def write_rich_value_types_file
+        rich_value = Package::RichValueTypes.new
+        dir        = @package_dir
+
+        rich_value.set_xml_writer("#{dir}/xl/richData/rdRichValueTypes.xml")
+        rich_value.assemble_xml_file
+      end
+
+      #
+      # Write the rdrichvalue.xml file.
+      #
+      def write_rich_value_rel
+        dir        = @package_dir
+        rich_value = Package::RichValueRel.new
+
+        rich_value.value_count = @workbook.embedded_images.size
+
+        rich_value.set_xml_writer("#{dir}/xl/richData/richValueRel.xml")
+        rich_value.assemble_xml_file
       end
 
       #
@@ -226,8 +301,10 @@ module Writexlsx
         content.add_vba_project if @workbook.vba_project
         # Add the custom properties if present.
         content.add_custom_properties unless @workbook.custom_properties.empty?
-        # Add the metadata file if present.
+        # Add the RichValue file if present.
         content.add_metadata if @workbook.has_metadata?
+        # Add the metadata file if present.
+        content.add_richvalue if @workbook.has_embedded_images?
 
         content.set_xml_writer("#{@package_dir}/[Content_Types].xml")
         content.assemble_xml_file
@@ -340,6 +417,11 @@ module Writexlsx
           )
         end
 
+        # Add the RichValue files if present.
+        if @workbook.has_embedded_images?
+          rels.add_rich_value_relationships
+        end
+
         rels.set_xml_writer("#{@package_dir}/xl/_rels/workbook.xml.rels")
         rels.assemble_xml_file
       end
@@ -368,14 +450,49 @@ module Writexlsx
       end
 
       #
+      # Write the richValueRel.xml.rels files for worksheets that contain embedded
+      # images.
+      #
+      def write_rich_value_rels_files
+        return if @workbook.embedded_images.empty?
+
+        dir  = @package_dir
+
+        # Create the .rels dirs.
+        FileUtils.mkdir_p("#{dir}/xl/richData/_rels")
+
+        rels = Package::Relationships.new
+
+        @workbook.embedded_images.each_with_index do |image_data, index|
+          file_type  = image_data[1]
+          image_file = "../media/image#{index + 1}.#{file_type}"
+
+          rels.add_worksheet_relationship('/image', image_file)
+        end
+
+        # Create the .rels file.
+        rels.set_xml_writer("#{dir}/xl/richData/_rels/richValueRel.xml.rels")
+        rels.assemble_xml_file
+      end
+
+      #
       # Write the /xl/media/image?.xml files.
       #
       def add_image_files
+        index = 1
+
         dir = "#{@package_dir}/xl/media"
 
-        @workbook.images.each_with_index do |image, index|
+        @workbook.embedded_images.each do |image|
           FileUtils.mkdir_p(dir)
-          FileUtils.cp(image[0], "#{dir}/image#{index + 1}.#{image[1]}")
+          FileUtils.cp(image[0], "#{dir}/image#{index}.#{image[1]}")
+          index += 1
+        end
+
+        @workbook.images.each do |image|
+          FileUtils.mkdir_p(dir)
+          FileUtils.cp(image[0], "#{dir}/image#{index}.#{image[1]}")
+          index += 1
         end
       end
 

@@ -999,25 +999,27 @@ module Writexlsx
       x_dpi = 96
       y_dpi = 96
 
+      workbook = @workbook || self
+
       # Open the image file and import the data.
       data = File.binread(filename)
       md5  = Digest::MD5.hexdigest(data)
       if data.unpack1('x A3') == 'PNG'
         # Test for PNGs.
         type, width, height, x_dpi, y_dpi = process_png(data)
-        @image_types[:png] = 1
+        workbook.image_types[:png] = 1
       elsif data.unpack1('n') == 0xFFD8
         # Test for JPEG files.
         type, width, height, x_dpi, y_dpi = process_jpg(data, filename)
-        @image_types[:jpeg] = 1
+        workbook.image_types[:jpeg] = 1
       elsif data.unpack1('A4') == 'GIF8'
         # Test for GIFs.
         type, width, height, x_dpi, y_dpi = process_gif(data, filename)
-        @image_types[:gif] = 1
+        workbook.image_types[:gif] = 1
       elsif data.unpack1('A2') == 'BM'
         # Test for BMPs.
         type, width, height = process_bmp(data, filename)
-        @image_types[:bmp] = 1
+        workbook.image_types[:bmp] = 1
       else
         # TODO. Add Image::Size to support other types.
         raise "Unsupported image format for file: #{filename}\n"

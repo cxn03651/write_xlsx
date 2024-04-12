@@ -58,6 +58,31 @@ module Writexlsx
         @rels.push([Document_schema + type, target, target_mode])
       end
 
+      #
+      # Add relationships for RichValue files.
+      #
+      def add_rich_value_relationships
+        @rels << [
+          'http://schemas.microsoft.com/office/2022/10/relationships/richValueRel',
+          'richData/richValueRel.xml'
+        ]
+
+        @rels << [
+          'http://schemas.microsoft.com/office/2017/06/relationships/rdRichValue',
+          'richData/rdrichvalue.xml'
+        ]
+
+        @rels << [
+          'http://schemas.microsoft.com/office/2017/06/relationships/rdRichValueStructure',
+          'richData/rdrichvaluestructure.xml'
+        ]
+
+        @rels << [
+          'http://schemas.microsoft.com/office/2017/06/relationships/rdRichValueTypes',
+          'richData/rdRichValueTypes.xml'
+        ]
+      end
+
       private
 
       #

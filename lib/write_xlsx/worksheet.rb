@@ -113,7 +113,8 @@ module Writexlsx
       @drawing_rels_id        = 0
       @vml_drawing_rels       = {}
       @vml_drawing_rels_id    = 0
-      @has_dynamic_arrays     = false
+      @has_dynamic_functions  = false
+      @has_embedded_images    = false
 
       @use_future_functions  = false
 
@@ -160,6 +161,8 @@ module Writexlsx
         @page_setup.margin_footer = 0.5
         @page_setup.header_footer_aligns = false
       end
+
+      @embedded_image_indexes = @workbook.embedded_image_indexes
     end
 
     def set_xml_writer(filename) # :nodoc:
@@ -1635,7 +1638,7 @@ module Writexlsx
     #
     def write_dynamic_array_formula(row1, col1, row2 = nil, col2 = nil, formula = nil, format = nil, value = nil)
       write_array_formula_base('d', row1, col1, row2, col2, formula, format, value)
-      @has_dynamic_arrays = true
+      @has_dynamic_functions = true
     end
 
     #
@@ -1783,21 +1786,23 @@ module Writexlsx
     # The label is written using the {#write()}[#method-i-write] method. Therefore it is
     # possible to write strings, numbers or formulas as labels.
     #
-    def write_url(row, col, url = nil, format = nil, str = nil, tip = nil)
+    def write_url(row, col, url = nil, format = nil, str = nil, tip = nil, ignore_write_string = false)
       # Check for a cell reference in A1 notation and substitute row and column
       if (row_col_array = row_col_notation(row))
-        _row, _col = row_col_array
-        _url       = col
-        _format    = url
-        _str       = format
-        _tip       = str
+        _row, _col           = row_col_array
+        _url                 = col
+        _format              = url
+        _str                 = format
+        _tip                 = str
+        _ignore_write_string = tip
       else
-        _row = row
-        _col = col
-        _url = url
-        _format = format
-        _str = str
-        _tip = tip
+        _row                 = row
+        _col                 = col
+        _url                 = url
+        _format              = format
+        _str                 = str
+        _tip                 = tip
+        _ignore_write_string = ignore_write_string
       end
       _format, _str = _str, _format if _str.respond_to?(:xf_index) || !_format.respond_to?(:xf_index)
       raise WriteXLSXInsufficientArgumentError if [_row, _col, _url].include?(nil)
@@ -1815,7 +1820,7 @@ module Writexlsx
       _format ||= @default_url_format
 
       # Write the hyperlink string.
-      write_string(_row, _col, hyperlink.str, _format)
+      write_string(_row, _col, hyperlink.str, _format) unless _ignore_write_string
     end
 
     #
@@ -1958,6 +1963,65 @@ module Writexlsx
         _row, _col, _image, x_offset, y_offset,
         x_scale, y_scale, url, tip, anchor, description, decorative
       ]
+    end
+
+    #
+    # Embed an image into the worksheet.
+    #
+    def embed_image(row, col, filename, options = nil)
+      # Check for a cell reference in A1 notation and substitute row and column.
+      if (row_col_array = row_col_notation(row))
+        _row, _col = row_col_array
+        image      = col
+        _options   = filename
+      else
+        _row     = row
+        _col     = col
+        image    = filename
+        _options = options
+      end
+      xf, url, tip, description, decorative = []
+
+      raise WriteXLSXInsufficientArgumentError if [_row, _col, image].include?(nil)
+      raise "Couldn't locate #{image}" unless File.exist?(image)
+
+      # Check that row and col are valid and store max and min values
+      check_dimensions(_row, _col)
+      store_row_col_max_min_values(_row, _col)
+
+      if options
+        xf          = options[:cell_format]
+        url         = options[:url]
+        tip         = options[:tip]
+        description = options[:description]
+        decorative  = options[:decorative]
+      end
+
+      # Write the url without writing a string.
+      if url
+        xf ||= @default_url_format
+
+        write_url(row, col, url, xf, nil, tip, true)
+      end
+
+      # Get the image properties, mainly for the type and checksum.
+      image_properties = get_image_properties(image)
+      type = image_properties[0]
+      md5  = image_properties[6]
+
+      # Check for duplicate images.
+      image_index = @embedded_image_indexes[md5]
+
+      unless ptrue?(image_index)
+        @workbook.embedded_images << [image, type, description, decorative]
+
+        image_index = @workbook.embedded_images.size
+        @embedded_image_indexes[md5] = image_index
+      end
+
+      # Write the cell placeholder.
+      store_data_to_table(EmbedImageCellData.new(image_index, xf), _row, _col)
+      @has_embedded_images = true
     end
 
     #
@@ -2800,8 +2864,12 @@ module Writexlsx
       end
     end
 
-    def has_dynamic_arrays?
-      @has_dynamic_arrays
+    def has_dynamic_functions?
+      @has_dynamic_functions
+    end
+
+    def has_embedded_images?
+      @has_embedded_images
     end
 
     private
@@ -3279,6 +3347,7 @@ EOS
       end
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"] unless @drawing_rels[md5]
+
       drawing.rel_index = drawing_rel_index(md5)
     end
     public :prepare_image
@@ -4257,9 +4326,10 @@ EOS
 
           # If the cell isn't a string then we have to add the url as
           # the string to display
-          if ptrue?(@cell_data_table)          &&
-             ptrue?(@cell_data_table[row_num]) &&
-             ptrue?(@cell_data_table[row_num][col_num]) && @cell_data_table[row_num][col_num].display_url_string?
+          if ptrue?(@cell_data_table)                   &&
+             ptrue?(@cell_data_table[row_num])          &&
+             ptrue?(@cell_data_table[row_num][col_num]) &&
+             @cell_data_table[row_num][col_num].display_url_string?
             link.display_on
           end
 
