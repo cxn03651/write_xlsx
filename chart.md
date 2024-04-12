@@ -124,6 +124,7 @@ See the documentation for each of the above chart modules for chart specific inf
 * [set_drop_lines](#set_drop_lines)
 * [set_high_low_lines](#set_high_low_lines)
 * [show_blanks_as](#show_blanks_as)
+* [show_na_as_empty_cell](#show_na_as_empty_cell)
 * [show_hidden_data](#show_hidden_data)
 * [show_na_as_empty_cell](#show_na_as_empty_cell)
 
@@ -900,6 +901,10 @@ The available options are:
         gap    # Blank data is shown as a gap. The default.
         zero   # Blank data is displayed as zero.
         span   # Blank data is connected with a line.
+
+#### <a name="show_na_as_empty_cell" class="anchor" href="#show_hidden_data"><span class="octicon octicon-link" /></a>show_na_as_empty_cell()
+
+The `show_na_as_empty_cell` method enables the option to display `#N/A` as a blank cell in a chart.
 
 #### <a name="show_hidden_data" class="anchor" href="#show_hidden_data"><span class="octicon octicon-link" /></a>show_hidden_data()
 
