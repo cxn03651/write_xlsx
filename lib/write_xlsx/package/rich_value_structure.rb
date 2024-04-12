@@ -12,7 +12,7 @@ module Writexlsx
     #
     # Used in conjunction with Excel::Writer::XLSX
     #
-    # Copyright 2000-2023, John McNamara, jmcnamara@cpan.org
+    # Copyright 2000-2024, John McNamara, jmcnamara@cpan.org
     #
     # Convert to Ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
     #

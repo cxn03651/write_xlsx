@@ -1,3 +1,3 @@
 # frozen_string_literal: true
 
-WriteXLSX_VERSION = "1.11.2"
+WriteXLSX_VERSION = "1.12.0"
