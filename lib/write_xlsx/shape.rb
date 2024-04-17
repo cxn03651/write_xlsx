@@ -158,6 +158,7 @@ module Writexlsx
       xx1, yy1, c_end, r_end,
       xx2, yy2, x_abslt, y_abslt =
         worksheet.position_object_pixels(
+          worksheet,
           @column_start,
           @row_start,
           @x_offset,

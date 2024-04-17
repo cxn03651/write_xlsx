@@ -8,13 +8,67 @@ module Writexlsx
     class Button
       include Writexlsx::Utility
 
-      attr_accessor :font, :macro, :vertices, :description
+      def initialize(worksheet, row, col, params, default_row_pixels, button_number)
+        @worksheet = worksheet
+        @default_row_pixels = default_row_pixels
+
+        # Set the button caption.
+        caption = params[:caption] || "Button #{button_number}"
+
+        @font = { _caption: caption }
+
+        # Set the macro name.
+        @macro = if params[:macro]
+                   "[0]!#{params[:macro]}"
+                 else
+                   "[0]!Button#{button_number}_Click"
+                 end
+
+        # Set the alt text for the button.
+        @description = params[:description]
+
+        # Ensure that a width and height have been set.
+        default_height = @default_row_pixels
+        width  = params[:width]  || DEFAULT_COL_PIXELS
+        height = params[:height] || default_row_pixels
+
+        # Scale the size of the button box if required.
+        width  *= params[:x_scale] if params[:x_scale]
+        height *= params[:y_scale] if params[:y_scale]
+
+        # Round the dimensions to the nearest pixel.
+        width  = (0.5 + width).to_i
+        height = (0.5 + height).to_i
+
+        # Set the x/y offsets.
+        x_offset = params[:x_offset] || 0
+        y_offset = params[:y_offset] || 0
+
+        start_row = row
+        start_col = col
+
+        # Calculate the positions of button object.
+        vertices = position_object_pixels(
+          @worksheet,
+          start_col,
+          start_row,
+          x_offset,
+          y_offset,
+          width,
+          height
+        )
+
+        # Add the width and height for VML.
+        vertices << [width, height]
+
+        @vertices = vertices
+      end
 
       def v_shape_attributes(id, z_index)
         attributes = v_shape_attributes_base(id)
-        attributes << ['alt', description] if description
+        attributes << ['alt', @description] if @description
 
-        attributes << ['style', (v_shape_style_base(z_index, vertices) + style_addition).join]
+        attributes << ['style', (v_shape_style_base(z_index, @vertices) + style_addition).join]
         attributes << ['o:button',    't']
         attributes << ['fillcolor',   color]
         attributes << ['strokecolor', 'windowText [64]']
@@ -81,7 +135,7 @@ module Writexlsx
 
         @writer.tag_elements('v:textbox', attributes) do
           # Write the div element.
-          write_div('center', font)
+          write_div('center', @font)
         end
       end
 
@@ -118,7 +172,7 @@ module Writexlsx
       # Write the <x:FmlaMacro> element.
       #
       def write_fmla_macro
-        @writer.data_element('x:FmlaMacro', macro)
+        @writer.data_element('x:FmlaMacro', @macro)
       end
 
       #
