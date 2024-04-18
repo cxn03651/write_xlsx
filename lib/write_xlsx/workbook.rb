@@ -7,6 +7,7 @@ require 'write_xlsx/sheets'
 require 'write_xlsx/worksheet'
 require 'write_xlsx/chartsheet'
 require 'write_xlsx/formats'
+require 'write_xlsx/image_property'
 require 'write_xlsx/format'
 require 'write_xlsx/shape'
 require 'write_xlsx/utility'
@@ -1438,37 +1439,38 @@ module Writexlsx
         end
 
         # Prepare the background images.
-        if ptrue?(has_background)
+        unless sheet.background_image.empty?
           filename = sheet.background_image
-          type, width, height, name, x_dpi, y_dpi, md5 = get_image_properties(filename)
+          image_property = ImageProperty.new(filename)
+          image_types[image_property.type.to_sym] = 1
 
-          if background_ids[md5]
-            ref_id = background_ids[md5]
+          if background_ids[image_property.md5]
+            ref_id = background_ids[image_property.md5]
           else
             image_ref_id += 1
             ref_id = image_ref_id
-            background_ids[md5] = ref_id
-            @images << [filename, type]
+            background_ids[image_property.md5] = ref_id
+            @images << [filename, image_property.type]
           end
 
-          sheet.prepare_background(ref_id, type)
+          sheet.prepare_background(ref_id, image_property.type)
         end
 
         # Prepare the worksheet images.
         sheet.images.each_with_index do |image, index|
           filename = image[2]
-          type, width, height, name, x_dpi, y_dpi, md5 = get_image_properties(image[2])
-          if image_ids[md5]
-            ref_id = image_ids[md5]
+          image_property = ImageProperty.new(filename)
+          image_types[image_property.type.to_sym] = 1
+
+          if image_ids[image_property.md5]
+            ref_id = image_ids[image_property.md5]
           else
             image_ref_id += 1
-            image_ids[md5] = ref_id = image_ref_id
-            @images << [filename, type]
+            image_ids[image_property.md5] = ref_id = image_ref_id
+            @images << [filename, image_property.type]
           end
-          sheet.prepare_image(
-            index, ref_id, drawing_id, width, height,
-            name,  type,   x_dpi,      y_dpi, md5
-          )
+
+          sheet.prepare_image(index, ref_id, drawing_id, image_property)
         end
 
         # Prepare the worksheet charts.
@@ -1487,21 +1489,18 @@ module Writexlsx
           filename = sheet.header_images[index][0]
           position = sheet.header_images[index][1]
 
-          type, width, height, name, x_dpi, y_dpi, md5 =
-            get_image_properties(filename)
+          image_property = ImageProperty.new(filename)
+          image_types[image_property.type.to_sym] = 1
 
-          if header_image_ids[md5]
-            ref_id = header_image_ids[md5]
+          if header_image_ids[image_property.md5]
+            ref_id = header_image_ids[image_property.md5]
           else
             image_ref_id += 1
-            header_image_ids[md5] = ref_id = image_ref_id
-            @images << [filename, type]
+            header_image_ids[image_property.md5] = ref_id = image_ref_id
+            @images << [filename, image_property.type]
           end
 
-          sheet.prepare_header_image(
-            ref_id,   width, height, name, type,
-            position, x_dpi, y_dpi,  md5
-          )
+          sheet.prepare_header_image(ref_id, image_property, position)
         end
 
         # Prepare the footer images.
@@ -1509,26 +1508,22 @@ module Writexlsx
           filename = sheet.footer_images[index][0]
           position = sheet.footer_images[index][1]
 
-          type, width, height, name, x_dpi, y_dpi, md5 =
-            get_image_properties(filename)
+          image_property = ImageProperty.new(filename)
+          image_types[image_property.type.to_sym] = 1
 
-          if header_image_ids[md5]
-            ref_id = header_image_ids[md5]
+          if header_image_ids[image_property.md5]
+            ref_id = header_image_ids[image_property.md5]
           else
             image_ref_id += 1
-            header_image_ids[md5] = ref_id = image_ref_id
-            @images << [filename, type]
+            header_image_ids[image_property.md5] = ref_id = image_ref_id
+            @images << [filename, image_property.type]
           end
 
-          sheet.prepare_header_image(
-            ref_id,   width, height, name, type,
-            position, x_dpi, y_dpi,  md5
-          )
+          sheet.prepare_header_image(ref_id, image_property, position)
         end
 
         if has_drawings
-          drawings = sheet.drawings
-          @drawings << drawings
+          @drawings << sheet.drawings
         end
       end
 

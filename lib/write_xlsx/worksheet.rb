@@ -1,15 +1,16 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
-require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/package/button'
 require 'write_xlsx/colors'
-require 'write_xlsx/format'
-require 'write_xlsx/drawing'
-require 'write_xlsx/sparkline'
 require 'write_xlsx/compatibility'
-require 'write_xlsx/utility'
+require 'write_xlsx/drawing'
+require 'write_xlsx/format'
+require 'write_xlsx/image_property'
+require 'write_xlsx/package/button'
 require 'write_xlsx/package/conditional_format'
+require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/sparkline'
+require 'write_xlsx/utility'
 require 'write_xlsx/worksheet/cell_data'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/hyperlink'
@@ -2003,9 +2004,10 @@ module Writexlsx
       end
 
       # Get the image properties, mainly for the type and checksum.
-      image_properties = get_image_properties(image)
-      type = image_properties[0]
-      md5  = image_properties[6]
+      image_properties = ImageProperty.new(image)
+      @workbook.image_types[image_properties.type.to_sym] = 1
+      type = image_properties.type
+      md5  = image_properties.md5
 
       # Check for duplicate images.
       image_index = @embedded_image_indexes[md5]
@@ -3151,9 +3153,14 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, image_id, drawing_id, width, height, name, image_type, x_dpi = 96, y_dpi = 96, md5 = nil) # :nodoc:
-      x_dpi ||= 96
-      y_dpi ||= 96
+    def prepare_image(index, image_id, drawing_id, image_property) # :nodoc:
+      image_type = image_property.type
+      width  = image_property.width
+      height = image_property.height
+      name   = image_property.name
+      x_dpi  = image_property.x_dpi || 96
+      y_dpi  = image_property.y_dpi || 96
+      md5    = image_property.md5
       drawing_type = 2
 
       row, col, _image, x_offset, y_offset,
@@ -3226,7 +3233,15 @@ EOS
     end
     public :prepare_image
 
-    def prepare_header_image(image_id, width, height, name, image_type, position, x_dpi, y_dpi, md5)
+    def prepare_header_image(image_id, image_property, position)
+      image_type = image_property.type
+      width      = image_property.width
+      height     = image_property.height
+      name       = image_property.name
+      x_dpi      = image_property.x_dpi
+      y_dpi      = image_property.y_dpi
+      md5        = image_property.md5
+
       # Strip the extension from the filename.
       body = name.dup
       body[/\.[^.]+$/, 0] = ''
