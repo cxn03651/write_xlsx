@@ -243,10 +243,10 @@ deprecated. use [margin_top=](#margin_top=)
 
 deprecated. use [margin_bottom=](#margin_bottom=)
 
-#### <a name="set_header" class="anchor" href="#set_header"><span class="octicon octicon-link" /></a>set_header(string, margin)
+#### <a name="set_header" class="anchor" href="#set_header"><span class="octicon octicon-link" /></a>set_header(string, margin = 0.3, options = {})
 
 Headers and footers are generated using a `string` which is a combination of
-plain text and control characters. The `margin` parameter is optional.
+plain text and control characters. The `margin` and `option`parameters are optional.
 
 The available control character are:
 
@@ -271,6 +271,9 @@ The available control character are:
     &S                                      Strikethrough
     &X                                      Superscript
     &Y                                      Subscript
+
+    &[Picture]          Images              Image Placeholder
+    &G                                      Same as &[Picture]
 
     &&                  Miscellaneous       Literal ampersand &
 
@@ -340,6 +343,11 @@ the workbook or worksheet changes. Times and dates are in the users default form
     |                    Updated at 12:30 PM                        |
     |                                                               |
 
+Inmages can be inserted using the options shown below.
+Each image must have a placeholder in header string using the &[Picture] or &G control characters.
+
+    worksheet.set_header('&L&G', 0.3, image_left: 'logo.jpg')
+
 You can specify the font size of a section of the text by prefixing it with the
 control character &n where n is the font size:
 
@@ -381,14 +389,37 @@ be set as follows:
 
 The header and footer margins are independent of the top and bottom margins.
 
+The available options are:
+* image_left The path to the image. Requires a &G or &[Picture] placeholder.
+* image_center Same as above
+* image_right Same as above
+* scale_with_doc Scale header with document. Default to true.
+* align_with_margins Align header to margins. Default to true.
+
+The umage options must have an accompanying &[Picture] or &G control character in the header string.
+
+    worksheet.set_header(
+      '&L&[Picture]&C&[Picture]&R&[Picture]',
+      nil, # If you don't want to change the margin.
+      {
+        image_left:   'red.jpg',
+        image_center: 'blue.jpg',
+        image_right:  'yellow.jpg'
+      }
+    )
+
 Note, the header or footer string must be less than 255 characters.
 Strings longer than this will not be written and a warning will be generated.
+
+The `set_header` method can also handle Unicode strings in UTF-8 format.
+
+    worksheet.set_header("&C\x{263a}")
 
 See, also the
 [`headers.rb`](examples.html#headers)
 program in the examples directory of the distribution.
 
-#### <a name="set_footer" class="anchor" href="#set_footer"><span class="octicon octicon-link" /></a>set_footer(string, margin)
+#### <a name="set_footer" class="anchor" href="#set_footer"><span class="octicon octicon-link" /></a>set_footer(string, margin = 0.3, options = {})
 
 The syntax of the `set_footer()` method is the same as `set_header()`,
 see above.
