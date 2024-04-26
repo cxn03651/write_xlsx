@@ -621,6 +621,23 @@ module Writexlsx
       @has_embedded_descriptions
     end
 
+    #
+    # Store the image types (PNG/JPEG/etc) used in the workbook to use in these
+    # Content_Types file.
+    #
+    def store_image_types(type)
+      case type
+      when 'png'
+        @image_types[:png] = 1
+      when 'jpeg'
+        @image_types[:jpeg] = 1
+      when 'gif'
+        @image_types[:gif] = 1
+      when 'bmp'
+        @image_types[:bmp] = 1
+      end
+    end
+
     private
 
     def filename
@@ -1431,23 +1448,6 @@ module Writexlsx
       # written from the worksheets above.
       @charts = @charts.select { |chart| chart.id != -1 }
                   .sort_by { |chart| chart.id }
-    end
-
-    #
-    # Store the image types (PNG/JPEG/etc) used in the workbook to use in these
-    # Content_Types file.
-    #
-    def store_image_types(type)
-      case type
-      when 'png'
-        @image_types[:png] = 1
-      when 'jpeg'
-        @image_types[:jpeg] = 1
-      when 'gif'
-        @image_types[:gif] = 1
-      when 'bmp'
-        @image_types[:bmp] = 1
-      end
     end
   end
 end

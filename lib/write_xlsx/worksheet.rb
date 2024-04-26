@@ -1956,7 +1956,7 @@ module Writexlsx
       image_property = ImageProperty.new(
         image, description: description, decorative: decorative
       )
-      @workbook.image_types[image_property.type.to_sym] = 1
+      @workbook.store_image_types(image_property.type)
 
       # Check for duplicate images.
       image_index = @embedded_image_indexes[image_property.md5]
@@ -2528,16 +2528,6 @@ module Writexlsx
       !!@is_chartsheet
     end
 
-    def set_external_vml_links(vml_drawing_id) # :nodoc:
-      @external_vml_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
-    end
-
-    def set_external_comment_links(comment_id) # :nodoc:
-      @external_comment_links <<
-        ['/comments',   "../comments#{comment_id}.xml"]
-    end
-
     #
     # Set up chart/drawings.
     #
@@ -2903,6 +2893,16 @@ module Writexlsx
       true
     end
 
+    def set_external_vml_links(vml_drawing_id) # :nodoc:
+      @external_vml_links <<
+        ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
+    end
+
+    def set_external_comment_links(comment_id) # :nodoc:
+      @external_comment_links <<
+        ['/comments',   "../comments#{comment_id}.xml"]
+    end
+
     #
     # Get the index used to address a drawing rel link.
     #
@@ -3241,7 +3241,7 @@ module Writexlsx
       md5    = image_property.md5
       drawing_type = 2
 
-      @workbook.image_types[image_type.to_sym] = 1
+      @workbook.store_image_types(image_type)
 
       if image_ids[md5]
         image_id = image_ids[md5]
@@ -3343,7 +3343,7 @@ EOS
 
     def prepare_background_image(background_ids, image_ref_id)
       unless background_image.nil?
-        @workbook.image_types[background_image.type.to_sym] = 1
+        @workbook.store_image_types(background_image.type)
 
         if background_ids[background_image.md5]
           ref_id = background_ids[background_image.md5]
@@ -4828,7 +4828,7 @@ EOS
     end
 
     def prepare_header_footer_image(image, header_image_ids, image_ref_id)
-      @workbook.image_types[image.type.to_sym] = 1
+      @workbook.store_image_types(image.type)
 
       if header_image_ids[image.md5]
         ref_id = header_image_ids[image.md5]
