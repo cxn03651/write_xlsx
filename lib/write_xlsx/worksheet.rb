@@ -5,6 +5,7 @@ require 'write_xlsx/colors'
 require 'write_xlsx/compatibility'
 require 'write_xlsx/drawing'
 require 'write_xlsx/format'
+require 'write_xlsx/image'
 require 'write_xlsx/image_property'
 require 'write_xlsx/package/button'
 require 'write_xlsx/package/conditional_format'
@@ -22,9 +23,9 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
 
-    COLINFO         = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
+    COLINFO = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
 
-    attr_reader :index                                            # :nodoc:
+    attr_reader :index, :name                                     # :nodoc:
     attr_reader :charts, :images, :tables, :shapes, :drawings     # :nodoc:
     attr_reader :header_images, :footer_images, :background_image # :nodoc:
     attr_reader :vml_drawing_links                                # :nodoc:
@@ -78,6 +79,7 @@ module Writexlsx
 
       @set_cols = {}
       @set_rows = {}
+      @col_size_changed = false
       @zoom = 100
       @zoom_scale_normal = true
       @right_to_left = false
@@ -94,7 +96,6 @@ module Writexlsx
 
       @last_shape_id          = 1
       @rel_count              = 0
-      @hlink_count            = 0
       @external_hyper_links   = []
       @external_drawing_links = []
       @external_comment_links = []
@@ -116,14 +117,14 @@ module Writexlsx
       @has_dynamic_functions  = false
       @has_embedded_images    = false
 
-      @use_future_functions  = false
+      @use_future_functions   = false
 
       @header_images          = []
       @footer_images          = []
-      @background_image       = ''
+      @background_image       = nil
 
-      @outline_row_level = 0
-      @outline_col_level = 0
+      @outline_row_level      = 0
+      @outline_col_level      = 0
 
       @original_row_height    = 15
       @default_row_height     = 15
@@ -134,8 +135,7 @@ module Writexlsx
 
       @merge = []
 
-      @has_vml        = false
-      @has_header_vml = false
+      @has_vml  = false
       @comments = Package::Comments.new(self)
       @buttons_array          = []
       @header_images_array    = []
@@ -154,8 +154,8 @@ module Writexlsx
         @original_row_height      = 12.75
         @default_row_height       = 12.75
         @default_row_pixels       = 17
-        self.margins_left_right  = 0.75
-        self.margins_top_bottom  = 1
+        self.margins_left_right   = 0.75
+        self.margins_top_bottom   = 1
         @page_setup.margin_header = 0.5
         @page_setup.margin_footer = 0.5
         @page_setup.header_footer_aligns = false
@@ -202,11 +202,6 @@ module Writexlsx
         end
       end
     end
-
-    #
-    # The name method is used to retrieve the name of a worksheet.
-    #
-    attr_reader :name
 
     #
     # Set this worksheet as a selected worksheet, i.e. the worksheet has its tab
@@ -295,29 +290,6 @@ module Writexlsx
       @protected_ranges << [range, range_name, password]
     end
 
-    def protect_default_settings  # :nodoc:
-      {
-        sheet:                 true,
-        content:               false,
-        objects:               false,
-        scenarios:             false,
-        format_cells:          false,
-        format_columns:        false,
-        format_rows:           false,
-        insert_columns:        false,
-        insert_rows:           false,
-        insert_hyperlinks:     false,
-        delete_columns:        false,
-        delete_rows:           false,
-        select_locked_cells:   true,
-        sort:                  false,
-        autofilter:            false,
-        pivot_tables:          false,
-        select_unlocked_cells: true
-      }
-    end
-    private :protect_default_settings
-
     #
     # :call-seq:
     #   set_column(firstcol, lastcol, width, format, hidden, level, collapsed)
@@ -375,7 +347,7 @@ module Writexlsx
       end
 
       # Store the column change to allow optimisations.
-      @col_size_changed = 1
+      @col_size_changed = true
     end
 
     #
@@ -397,12 +369,8 @@ module Writexlsx
       # Ensure at least $first_col, $last_col and $width
       return if data.size < 3
 
-      first_col = data[0]
-      last_col  = data[1]
-      pixels    = data[2]
-      format    = data[3]
-      hidden    = data[4] || 0
-      level     = data[5]
+      first_col, last_col, pixels, format, hidden, level = data
+      hidden ||= 0
 
       width = pixels_to_width(pixels) if ptrue?(pixels)
 
@@ -670,7 +638,10 @@ module Writexlsx
       raise 'Header string must be less than 255 characters' if string.length > 255
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
-      @page_setup.header = string.gsub("&[Picture]", '&G')
+      header_footer_string = string.gsub("&[Picture]", '&G')
+      # placeholeder /&G/ の数
+      placeholder_count = header_footer_string.scan("&G").count
+      @page_setup.header = header_footer_string
 
       @page_setup.header_footer_aligns = options[:align_with_margins] if options[:align_with_margins]
 
@@ -682,17 +653,13 @@ module Writexlsx
       [
         [:image_left, 'LH'], [:image_center, 'CH'], [:image_right, 'RH']
       ].each do |p|
-        @header_images << [options[p.first], p.last] if options[p.first]
+        @header_images << ImageProperty.new(options[p.first], position: p.last) if options[p.first]
       end
 
-      # placeholeder /&G/ の数
-      placeholder_count = @page_setup.header.scan("&G").count
+      # # placeholeder /&G/ の数
+      # placeholder_count = @page_setup.header.scan("&G").count
 
-      image_count = @header_images.count
-
-      raise "Number of header image (#{image_count}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.header}" if image_count != placeholder_count
-
-      @has_header_vml = true if image_count > 0
+      raise "Number of header image (#{@header_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.header}" if @header_images.size != placeholder_count
 
       @page_setup.margin_header         = margin || 0.3
       @page_setup.header_footer_changed = true
@@ -703,8 +670,6 @@ module Writexlsx
     #
     def set_footer(string = '', margin = 0.3, options = {})
       raise 'Footer string must be less than 255 characters' if string.length > 255
-
-      @page_setup.footer = string.dup
 
       # Replace the Excel placeholder &[Picture] with the internal &G.
       @page_setup.footer = string.gsub("&[Picture]", '&G')
@@ -719,17 +684,13 @@ module Writexlsx
       [
         [:image_left, 'LF'], [:image_center, 'CF'], [:image_right, 'RF']
       ].each do |p|
-        @footer_images << [options[p.first], p.last] if options[p.first]
+        @footer_images << ImageProperty.new(options[p.first], position: p.last) if options[p.first]
       end
 
       # placeholeder /&G/ の数
       placeholder_count = @page_setup.footer.scan("&G").count
 
-      image_count = @footer_images.count
-
-      raise "Number of footer image (#{image_count}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.footer}" if image_count != placeholder_count
-
-      @has_header_vml = true if image_count > 0
+      raise "Number of footer image (#{@footer_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.footer}" if @footer_images.size != placeholder_count
 
       @page_setup.margin_footer         = margin
       @page_setup.header_footer_changed = true
@@ -1325,18 +1286,6 @@ module Writexlsx
 
       store_data_to_table(BlankCellData.new(_format), _row, _col)
     end
-
-    def expand_formula(formula, function, addition = '')
-      if formula =~ /\b(#{function})/
-        formula.gsub(
-          ::Regexp.last_match(1),
-          "_xlfn#{addition}.#{::Regexp.last_match(1)}"
-        )
-      else
-        formula
-      end
-    end
-    private :expand_formula
 
     #
     # Utility method to strip equal sign and array braces from a formula
@@ -1958,10 +1907,10 @@ module Writexlsx
       y_scale  ||= 1
       anchor   ||= 2
 
-      @images << [
+      @images << Image.new(
         _row, _col, _image, x_offset, y_offset,
         x_scale, y_scale, url, tip, anchor, description, decorative
-      ]
+      )
     end
 
     #
@@ -2004,24 +1953,94 @@ module Writexlsx
       end
 
       # Get the image properties, mainly for the type and checksum.
-      image_properties = ImageProperty.new(image)
-      @workbook.image_types[image_properties.type.to_sym] = 1
-      type = image_properties.type
-      md5  = image_properties.md5
+      image_property = ImageProperty.new(
+        image, description: description, decorative: decorative
+      )
+      @workbook.image_types[image_property.type.to_sym] = 1
 
       # Check for duplicate images.
-      image_index = @embedded_image_indexes[md5]
+      image_index = @embedded_image_indexes[image_property.md5]
 
       unless ptrue?(image_index)
-        @workbook.embedded_images << [image, type, description, decorative]
+        @workbook.embedded_images << image_property
 
         image_index = @workbook.embedded_images.size
-        @embedded_image_indexes[md5] = image_index
+        @embedded_image_indexes[image_property.md5] = image_index
       end
 
       # Write the cell placeholder.
       store_data_to_table(EmbedImageCellData.new(image_index, xf), _row, _col)
       @has_embedded_images = true
+    end
+
+    #
+    # :call-seq:
+    #   insert_shape(row, col, shape [ , x, y, x_scale, y_scale ])
+    #
+    # Insert a shape into the worksheet.
+    #
+    def insert_shape(
+          row_start, column_start, shape = nil, x_offset = nil, y_offset = nil,
+          x_scale = nil, y_scale = nil, anchor = nil
+        )
+      # Check for a cell reference in A1 notation and substitute row and column.
+      if (row_col_array = row_col_notation(row_start))
+        _row_start, _column_start = row_col_array
+        _shape    = column_start
+        _x_offset = shape
+        _y_offset = x_offset
+        _x_scale  = y_offset
+        _y_scale  = x_scale
+        _anchor   = y_scale
+      else
+        _row_start = row_start
+        _column_start = column_start
+        _shape = shape
+        _x_offset = x_offset
+        _y_offset = y_offset
+        _x_scale = x_scale
+        _y_scale = y_scale
+        _anchor = anchor
+      end
+      raise "Insufficient arguments in insert_shape()" if [_row_start, _column_start, _shape].include?(nil)
+
+      _shape.set_position(
+        _row_start, _column_start, _x_offset, _y_offset,
+        _x_scale, _y_scale, _anchor
+      )
+      # Assign a shape ID.
+      while true
+        id = _shape.id || 0
+        used = @shape_hash[id]
+
+        # Test if shape ID is already used. Otherwise assign a new one.
+        if !used && id != 0
+          break
+        else
+          @last_shape_id += 1
+          _shape.id = @last_shape_id
+        end
+      end
+
+      # Allow lookup of entry into shape array by shape ID.
+      @shape_hash[_shape.id] = _shape.element = @shapes.size
+
+      insert = if ptrue?(_shape.stencil)
+                 # Insert a copy of the shape, not a reference so that the shape is
+                 # used as a stencil. Previously stamped copies don't get modified
+                 # if the stencil is modified.
+                 _shape.dup
+               else
+                 _shape
+               end
+
+      # For connectors change x/y coords based on location of connected shapes.
+      insert.auto_locate_connectors(@shapes, @shape_hash)
+
+      # Insert a link to the shape on the list of shapes. Connection to
+      # the parent shape is maintained.
+      @shapes << insert
+      insert
     end
 
     #
@@ -2087,9 +2106,6 @@ module Writexlsx
       level  = args[4] || 0
       collapsed = args[5] || 0
 
-      # Get the default row height.
-      default_height = @default_row_height
-
       # Use min col in check_dimensions. Default to 0 if undefined.
       min_col = @dim_colmin || 0
 
@@ -2097,12 +2113,12 @@ module Writexlsx
       check_dimensions(row, min_col)
       store_row_col_max_min_values(row, min_col)
 
-      height ||= default_height
+      height ||= @default_row_height
 
       # If the height is 0 the row is hidden and the height is the default.
       if height == 0
         hidden = 1
-        height = default_height
+        height = @default_row_height
       end
 
       # Set the limits for the outline levels (0 <= x <= 7).
@@ -2315,7 +2331,7 @@ module Writexlsx
       @buttons_array << Writexlsx::Package::Button.new(
         self, _row, _col, _properties, @default_row_pixels, @buttons_array.size + 1
       )
-      @has_vml = 1
+      @has_vml = true
     end
 
     #
@@ -2497,7 +2513,7 @@ module Writexlsx
     end
 
     def has_header_vml?  # :nodoc:
-      @has_header_vml
+      !(@header_images.empty? && @footer_images.empty?)
     end
 
     def has_comments? # :nodoc:
@@ -2794,6 +2810,68 @@ module Writexlsx
 
     def has_embedded_images?
       @has_embedded_images
+    end
+
+    # Check that some image or drawing needs to be processed.
+    def some_image_or_drawing_to_be_processed?
+      charts.size + images.size + shapes.size + header_images.size + footer_images.size + (background_image ? 1 : 0) == 0
+    end
+
+    def prepare_drawings(chart_ref_id, drawing_id, ref_id, image_ref_id, image_ids, header_image_ids, background_ids)
+      has_drawings = false
+
+      # Check that some image or drawing needs to be processed.
+      unless some_image_or_drawing_to_be_processed?
+
+        # Don't increase the drawing_id header/footer images.
+        unless charts.empty? && images.empty? && shapes.empty?
+          drawing_id += 1
+          has_drawings = true
+        end
+
+        # Prepare the background images.
+        image_ref_id = prepare_background_image(background_ids, image_ref_id)
+
+        # Prepare the worksheet images.
+        images.each_with_index do |image, index|
+          image_ref_id = prepare_image(index, drawing_id, image, image_ids, image_ref_id)
+        end
+
+        # Prepare the worksheet charts.
+        charts.each_with_index do |_chart, index|
+          chart_ref_id += 1
+          prepare_chart(index, chart_ref_id, drawing_id)
+        end
+
+        # Prepare the worksheet shapes.
+        shapes.each_with_index do |_shape, index|
+          prepare_shape(index, drawing_id)
+        end
+
+        # Prepare the header and footer images.
+        [header_images, footer_images].each do |images|
+          images.each do |image|
+            image_ref_id = prepare_header_footer_image(
+              image, header_image_ids, image_ref_id
+            )
+          end
+        end
+
+        if has_drawings
+          @workbook.drawings << drawings
+        end
+      end
+
+      [chart_ref_id, drawing_id, ref_id, image_ref_id]
+    end
+
+    #
+    # Set the background image for the worksheet.
+    #
+    def set_background(image)
+      raise "Couldn't locate #{image}: $!" unless File.exist?(image)
+
+      @background_image = ImageProperty.new(image)
     end
 
     private
@@ -3153,7 +3231,7 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, image_id, drawing_id, image_property) # :nodoc:
+    def prepare_image(index, drawing_id, image_property, image_ids, image_ref_id) # :nodoc:
       image_type = image_property.type
       width  = image_property.width
       height = image_property.height
@@ -3163,23 +3241,32 @@ module Writexlsx
       md5    = image_property.md5
       drawing_type = 2
 
-      row, col, _image, x_offset, y_offset,
-      x_scale, y_scale, url, tip, anchor, description, decorative = @images[index]
+      @workbook.image_types[image_type.to_sym] = 1
 
-      width  *= x_scale
-      height *= y_scale
+      if image_ids[md5]
+        image_id = image_ids[md5]
+      else
+        image_ref_id += 1
+        image_ids[md5] = image_id = image_ref_id
+        @workbook.images << image_property
+      end
+
+      image = @images[index]
+
+      width  *= image.x_scale
+      height *= image.y_scale
 
       width  *= 96.0 / x_dpi
       height *= 96.0 / y_dpi
 
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, anchor)
+      dimensions = position_object_emus(image.col, image.row, image.x_offset, image.y_offset, width, height, image.anchor)
 
       # Convert from pixels to emus.
       width  = (0.5 + (width  * 9_525)).to_i
       height = (0.5 + (height * 9_525)).to_i
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, width, height, nil, anchor, 0, 0, tip, name, description, decorative)
+      drawing = Drawing.new(drawing_type, dimensions, width, height, nil, image.anchor, 0, 0, image.tip, name, image.description, image.decorative)
       if drawings?
         drawings = @drawings
       else
@@ -3192,14 +3279,14 @@ module Writexlsx
       end
       drawings.add_drawing_object(drawing)
 
-      drawing.description = name unless description
+      drawing.description = name unless image.description
 
-      if url
+      if image.url
         rel_type = '/hyperlink'
         target_mode = 'External'
-        target = escape_url(url) if url =~ %r{^[fh]tt?ps?://} || url =~ /^mailto:/
-        if url =~ /^external:/
-          target = escape_url(url.sub(/^external:/, ''))
+        target = escape_url(image.url) if image.url =~ %r{^[fh]tt?ps?://} || image.url =~ /^mailto:/
+        if image.url =~ /^external:/
+          target = escape_url(image.url.sub(/^external:/, ''))
 
           # Additional escape not required in worksheet hyperlinks
           target = target.gsub("#", '%23')
@@ -3212,8 +3299,8 @@ module Writexlsx
                    end
         end
 
-        if url =~ /^internal:/
-          target      = url.sub(/^internal:/, '#')
+        if image.url =~ /^internal:/
+          target      = image.url.sub(/^internal:/, '#')
           target_mode = nil
         end
 
@@ -3223,45 +3310,28 @@ Ignoring URL #{target} where link or anchor > 255 characters since it exceeds Ex
 EOS
         end
 
-        @drawing_links << [rel_type, target, target_mode] if target && !@drawing_rels[url]
-        drawing.url_rel_index = drawing_rel_index(url)
+        @drawing_links << [rel_type, target, target_mode] if target && !@drawing_rels[image.url]
+        drawing.url_rel_index = drawing_rel_index(image.url)
       end
 
       @drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"] unless @drawing_rels[md5]
 
       drawing.rel_index = drawing_rel_index(md5)
+
+      image_ref_id
     end
-    public :prepare_image
 
-    def prepare_header_image(image_id, image_property, position)
-      image_type = image_property.type
-      width      = image_property.width
-      height     = image_property.height
-      name       = image_property.name
-      x_dpi      = image_property.x_dpi
-      y_dpi      = image_property.y_dpi
-      md5        = image_property.md5
-
+    def prepare_header_image(image_id, image_property)
       # Strip the extension from the filename.
-      body = name.dup
+      body = image_property.name.dup
       body[/\.[^.]+$/, 0] = ''
+      image_property.body = body
 
-      @vml_drawing_links << ['/image', "../media/image#{image_id}.#{image_type}"] unless @vml_drawing_rels[md5]
+      @vml_drawing_links << ['/image', "../media/image#{image_id}.#{image_property.type}"] unless @vml_drawing_rels[image_property.md5]
 
-      ref_id = get_vml_drawing_rel_index(md5)
-      @header_images_array << [width, height, body, position, x_dpi, y_dpi, ref_id]
+      image_property.ref_id = get_vml_drawing_rel_index(image_property.md5)
+      @header_images_array << image_property
     end
-    public :prepare_header_image
-
-    #
-    # Set the background image for the worksheet.
-    #
-    def set_background(image)
-      raise "Couldn't locate #{image}: $!" unless File.exist?(image)
-
-      @background_image = image
-    end
-    public :set_background
 
     #
     # Set up an image without a drawing object for the background image.
@@ -3270,78 +3340,25 @@ EOS
       @external_background_links <<
         ['/image', "../media/image#{image_id}.#{image_type}"]
     end
-    public :prepare_background
 
-    #
-    # :call-seq:
-    #   insert_shape(row, col, shape [ , x, y, x_scale, y_scale ])
-    #
-    # Insert a shape into the worksheet.
-    #
-    def insert_shape(
-          row_start, column_start, shape = nil, x_offset = nil, y_offset = nil,
-          x_scale = nil, y_scale = nil, anchor = nil
-        )
-      # Check for a cell reference in A1 notation and substitute row and column.
-      if (row_col_array = row_col_notation(row_start))
-        _row_start, _column_start = row_col_array
-        _shape    = column_start
-        _x_offset = shape
-        _y_offset = x_offset
-        _x_scale  = y_offset
-        _y_scale  = x_scale
-        _anchor   = y_scale
-      else
-        _row_start = row_start
-        _column_start = column_start
-        _shape = shape
-        _x_offset = x_offset
-        _y_offset = y_offset
-        _x_scale = x_scale
-        _y_scale = y_scale
-        _anchor = anchor
-      end
-      raise "Insufficient arguments in insert_shape()" if [_row_start, _column_start, _shape].include?(nil)
+    def prepare_background_image(background_ids, image_ref_id)
+      unless background_image.nil?
+        @workbook.image_types[background_image.type.to_sym] = 1
 
-      _shape.set_position(
-        _row_start, _column_start, _x_offset, _y_offset,
-        _x_scale, _y_scale, _anchor
-      )
-      # Assign a shape ID.
-      while true
-        id = _shape.id || 0
-        used = @shape_hash[id]
-
-        # Test if shape ID is already used. Otherwise assign a new one.
-        if !used && id != 0
-          break
+        if background_ids[background_image.md5]
+          ref_id = background_ids[background_image.md5]
         else
-          @last_shape_id += 1
-          _shape.id = @last_shape_id
+          image_ref_id += 1
+          ref_id = image_ref_id
+          background_ids[background_image.md5] = ref_id
+          @workbook.images << background_image
         end
+
+        prepare_background(ref_id, background_image.type)
       end
 
-      # Allow lookup of entry into shape array by shape ID.
-      @shape_hash[_shape.id] = _shape.element = @shapes.size
-
-      insert = if ptrue?(_shape.stencil)
-                 # Insert a copy of the shape, not a reference so that the shape is
-                 # used as a stencil. Previously stamped copies don't get modified
-                 # if the stencil is modified.
-                 _shape.dup
-               else
-                 _shape
-               end
-
-      # For connectors change x/y coords based on location of connected shapes.
-      insert.auto_locate_connectors(@shapes, @shape_hash)
-
-      # Insert a link to the shape on the list of shapes. Connection to
-      # the parent shape is maintained.
-      @shapes << insert
-      insert
+      image_ref_id
     end
-    public :insert_shape
 
     #
     # Set up drawing shapes
@@ -3368,7 +3385,6 @@ EOS
       )
       drawings.add_drawing_object(drawing)
     end
-    public :prepare_shape
 
     #
     # Hash a worksheet password. Based on the algorithm in ECMA-376-4:2016,
@@ -4297,7 +4313,7 @@ EOS
     # Write the <picture> element.
     #
     def write_picture
-      return unless ptrue?(@background_image)
+      return unless @background_image
 
       # Increment the relationship id.
       @rel_count += 1
@@ -4809,6 +4825,55 @@ EOS
       ]
 
       @writer.empty_tag('ignoredError', attributes)
+    end
+
+    def prepare_header_footer_image(image, header_image_ids, image_ref_id)
+      @workbook.image_types[image.type.to_sym] = 1
+
+      if header_image_ids[image.md5]
+        ref_id = header_image_ids[image.md5]
+      else
+        image_ref_id += 1
+        header_image_ids[image.md5] = ref_id = image_ref_id
+        @workbook.images << image
+      end
+
+      prepare_header_image(ref_id, image)
+
+      image_ref_id
+    end
+
+    def protect_default_settings  # :nodoc:
+      {
+        sheet:                 true,
+        content:               false,
+        objects:               false,
+        scenarios:             false,
+        format_cells:          false,
+        format_columns:        false,
+        format_rows:           false,
+        insert_columns:        false,
+        insert_rows:           false,
+        insert_hyperlinks:     false,
+        delete_columns:        false,
+        delete_rows:           false,
+        select_locked_cells:   true,
+        sort:                  false,
+        autofilter:            false,
+        pivot_tables:          false,
+        select_unlocked_cells: true
+      }
+    end
+
+    def expand_formula(formula, function, addition = '')
+      if formula =~ /\b(#{function})/
+        formula.gsub(
+          ::Regexp.last_match(1),
+          "_xlfn#{addition}.#{::Regexp.last_match(1)}"
+        )
+      else
+        formula
+      end
     end
   end
 end

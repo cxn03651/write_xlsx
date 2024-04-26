@@ -25,7 +25,8 @@ module Writexlsx
 
     attr_writer :firstsheet                     # :nodoc:
     attr_reader :palette                        # :nodoc:
-    attr_reader :worksheets, :charts, :drawings # :nodoc:
+    attr_reader :worksheets                     # :nodoc:
+    attr_accessor :drawings                     # :nodoc:
     attr_reader :named_ranges                   # :nodoc:
     attr_reader :doc_properties                 # :nodoc:
     attr_reader :custom_properties              # :nodoc:
@@ -39,6 +40,8 @@ module Writexlsx
     attr_reader :embedded_image_indexes         # :nodec:
     attr_reader :embedded_images                # :nodoc:
     attr_reader :embedded_descriptions          # :nodoc:
+    attr_writer :has_embedded_descriptions      # :nodoc:
+    attr_accessor :charts                       # :nodoc:
 
     def initialize(file, *option_params)
       options, default_formats = process_workbook_options(*option_params)
@@ -61,7 +64,6 @@ module Writexlsx
       @formats             = Formats.new
       @xf_formats          = []
       @dxf_formats         = []
-      @font_count          = 0
       @num_formats         = []
       @defined_names       = []
       @named_ranges        = []
@@ -75,7 +77,6 @@ module Writexlsx
       @window_height       = 9660
       @tab_ratio           = 600
       @excel2003_style     = options[:excel2003_style] || false
-      @table_count         = 0
       @image_types         = {}
       @images              = []
       @strings_to_urls     = options[:strings_to_urls].nil? || options[:strings_to_urls] ? true : false
@@ -1189,7 +1190,6 @@ module Writexlsx
       vml_data_id    = 1
       vml_header_id  = 0
       vml_shape_id   = 1024
-      comment_files  = 0
       has_button     = false
 
       @worksheets.each do |sheet|
@@ -1197,8 +1197,7 @@ module Writexlsx
 
         if sheet.has_vml?
           if sheet.has_comments?
-            comment_files += 1
-            comment_id    += 1
+            comment_id += 1
             @has_comments = true
           end
           vml_drawing_id += 1
@@ -1411,128 +1410,27 @@ module Writexlsx
       background_ids   = {}
 
       # Store the image types for any embedded images.
-      @embedded_images.each do |image_data|
-        store_image_types(image_data[1])
+      @embedded_images.each do |image|
+        store_image_types(image.type)
 
-        @has_embedded_descriptions = true if ptrue?(image_data[2])
+        @has_embedded_descriptions = true if ptrue?(image.description)
       end
 
       # The image IDs start from after the embedded images.
       image_ref_id = @embedded_images.size
 
       @worksheets.each do |sheet|
-        chart_count = sheet.charts.size
-        image_count = sheet.images.size
-        shape_count = sheet.shapes.size
-        header_image_count = sheet.header_images.size
-        footer_image_count = sheet.footer_images.size
-        has_background     = sheet.background_image.size
-        has_drawings       = false
-
-        # Check that some image or drawing needs to be processed.
-        next if chart_count + image_count + shape_count + header_image_count + footer_image_count + has_background == 0
-
-        # Don't increase the drawing_id header/footer images.
-        if chart_count + image_count + shape_count > 0
-          drawing_id += 1
-          has_drawings = true
-        end
-
-        # Prepare the background images.
-        unless sheet.background_image.empty?
-          filename = sheet.background_image
-          image_property = ImageProperty.new(filename)
-          image_types[image_property.type.to_sym] = 1
-
-          if background_ids[image_property.md5]
-            ref_id = background_ids[image_property.md5]
-          else
-            image_ref_id += 1
-            ref_id = image_ref_id
-            background_ids[image_property.md5] = ref_id
-            @images << [filename, image_property.type]
-          end
-
-          sheet.prepare_background(ref_id, image_property.type)
-        end
-
-        # Prepare the worksheet images.
-        sheet.images.each_with_index do |image, index|
-          filename = image[2]
-          image_property = ImageProperty.new(filename)
-          image_types[image_property.type.to_sym] = 1
-
-          if image_ids[image_property.md5]
-            ref_id = image_ids[image_property.md5]
-          else
-            image_ref_id += 1
-            image_ids[image_property.md5] = ref_id = image_ref_id
-            @images << [filename, image_property.type]
-          end
-
-          sheet.prepare_image(index, ref_id, drawing_id, image_property)
-        end
-
-        # Prepare the worksheet charts.
-        sheet.charts.each_with_index do |_chart, index|
-          chart_ref_id += 1
-          sheet.prepare_chart(index, chart_ref_id, drawing_id)
-        end
-
-        # Prepare the worksheet shapes.
-        sheet.shapes.each_with_index do |_shape, index|
-          sheet.prepare_shape(index, drawing_id)
-        end
-
-        # Prepare the header images.
-        header_image_count.times do |index|
-          filename = sheet.header_images[index][0]
-          position = sheet.header_images[index][1]
-
-          image_property = ImageProperty.new(filename)
-          image_types[image_property.type.to_sym] = 1
-
-          if header_image_ids[image_property.md5]
-            ref_id = header_image_ids[image_property.md5]
-          else
-            image_ref_id += 1
-            header_image_ids[image_property.md5] = ref_id = image_ref_id
-            @images << [filename, image_property.type]
-          end
-
-          sheet.prepare_header_image(ref_id, image_property, position)
-        end
-
-        # Prepare the footer images.
-        footer_image_count.times do |index|
-          filename = sheet.footer_images[index][0]
-          position = sheet.footer_images[index][1]
-
-          image_property = ImageProperty.new(filename)
-          image_types[image_property.type.to_sym] = 1
-
-          if header_image_ids[image_property.md5]
-            ref_id = header_image_ids[image_property.md5]
-          else
-            image_ref_id += 1
-            header_image_ids[image_property.md5] = ref_id = image_ref_id
-            @images << [filename, image_property.type]
-          end
-
-          sheet.prepare_header_image(ref_id, image_property, position)
-        end
-
-        if has_drawings
-          @drawings << sheet.drawings
-        end
+        chart_ref_id, drawing_id, ref_id, image_ref_id =
+          sheet.prepare_drawings(
+            chart_ref_id, drawing_id, ref_id, image_ref_id, image_ids,
+            header_image_ids, background_ids
+          )
       end
 
       # Sort the workbook charts references into the order that the were
       # written from the worksheets above.
       @charts = @charts.select { |chart| chart.id != -1 }
-                       .sort_by { |chart| chart.id }
-
-      @drawing_count = drawing_id
+                  .sort_by { |chart| chart.id }
     end
 
     #

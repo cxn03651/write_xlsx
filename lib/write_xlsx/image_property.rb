@@ -4,10 +4,15 @@
 module Writexlsx
   class ImageProperty
     attr_reader :type, :width, :height, :name, :x_dpi, :y_dpi, :md5
+    attr_reader :filename, :description, :decorative
+    attr_accessor :ref_id, :body, :position
 
-    def initialize(filename)
-      @filename = filename
-      @name     = File.basename(filename)
+    def initialize(filename, options = {})
+      @filename    = filename
+      @description = options[:description]
+      @decorative  = options[:decorative]
+      @position    = options[:position]
+      @name        = File.basename(filename)
 
       # Open the image file and import the data.
       data = File.binread(filename)

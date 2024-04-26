@@ -265,21 +265,10 @@ module Writexlsx
       #
       # Write the <v:shape> element.
       #
-      def write_image_shape(id, index, image_data)
-        type       = '#_x0000_t75'
-
-        # Get the image parameters
-        width    = image_data[0]
-        height   = image_data[1]
-        name     = image_data[2]
-        position = image_data[3]
-        x_dpi    = image_data[4]
-        y_dpi    = image_data[5]
-        ref_id   = image_data[6]
-
+      def write_image_shape(id, index, image_property)
         # Scale the height/width by the resolution, relative to 72dpi.
-        width  = width  * 72.0 / x_dpi
-        height = height * 72.0 / y_dpi
+        width  = image_property.width  * 72.0 / image_property.x_dpi
+        height = image_property.height * 72.0 / image_property.y_dpi
 
         # Excel uses a rounding based around 72 and 96 dpi.
         width  = 72 / 96.0 * ((width  * 96 / 72.0) + 0.25).to_i
@@ -288,13 +277,15 @@ module Writexlsx
         width = width.to_i if (width - width.to_i).abs < 0.1
         height = height.to_i if (height - height.to_i).abs < 0.1
 
+        type = '#_x0000_t75'
+
         style = [
           "position:absolute", "margin-left:0", "margin-top:0",
           "width:#{width}pt", "height:#{height}pt",
           "z-index:#{index}"
         ].join(';')
         attributes = [
-          ['id',     position],
+          ['id',     image_property.position],
           ['o:spid', "_x0000_s#{id}"],
           ['type',   type],
           ['style',  style]
@@ -302,7 +293,7 @@ module Writexlsx
 
         @writer.tag_elements('v:shape', attributes) do
           # Write the v:imagedata element.
-          write_imagedata(ref_id, name)
+          write_imagedata(image_property)
 
           # Write the o:lock element.
           write_rotation_lock
@@ -312,10 +303,10 @@ module Writexlsx
       #
       # Write the <v:imagedata> element.
       #
-      def write_imagedata(index, o_title)
+      def write_imagedata(image_property)
         attributes = [
-          ['o:relid', "rId#{index}"],
-          ['o:title', o_title]
+          ['o:relid', "rId#{image_property.ref_id}"],
+          ['o:title', image_property.body]
         ]
 
         @writer.empty_tag('v:imagedata', attributes)

@@ -464,7 +464,7 @@ module Writexlsx
         rels = Package::Relationships.new
 
         @workbook.embedded_images.each_with_index do |image_data, index|
-          file_type  = image_data[1]
+          file_type  = image_data.type
           image_file = "../media/image#{index + 1}.#{file_type}"
 
           rels.add_worksheet_relationship('/image', image_file)
@@ -485,13 +485,13 @@ module Writexlsx
 
         @workbook.embedded_images.each do |image|
           FileUtils.mkdir_p(dir)
-          FileUtils.cp(image[0], "#{dir}/image#{index}.#{image[1]}")
+          FileUtils.cp(image.filename, "#{dir}/image#{index}.#{image.type}")
           index += 1
         end
 
         @workbook.images.each do |image|
           FileUtils.mkdir_p(dir)
-          FileUtils.cp(image[0], "#{dir}/image#{index}.#{image[1]}")
+          FileUtils.cp(image.filename, "#{dir}/image#{index}.#{image.type}")
           index += 1
         end
       end

@@ -38,7 +38,7 @@ module Writexlsx
 
         @writer.tag_elements('rvData', attributes) do
           @embedded_images.each_with_index do |image, index|
-            write_rv(index, image[2], image[3])
+            write_rv(index, image.description, image.decorative)
           end
         end
       end
