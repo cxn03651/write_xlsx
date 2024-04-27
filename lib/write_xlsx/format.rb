@@ -9,10 +9,10 @@ module Writexlsx
 
     attr_reader :xf_index, :dxf_index, :num_format                                                 # :nodoc:
     attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink, :xf_id   # :nodoc:
-    attr_reader :diag_type, :diag_color, :font_only, :color_indexed                        # :nodoc:
+    attr_reader :diag_type, :diag_color, :font_only, :color_indexed                                # :nodoc:
     attr_reader :left, :left_color, :right, :right_color, :top, :top_color, :bottom, :bottom_color # :nodoc:
     attr_reader :font_scheme                                                                       # :nodoc:
-    attr_accessor :quote_prefix, :num_format_index, :border_index, :font_index                                    # :nodoc:
+    attr_accessor :quote_prefix, :num_format_index, :border_index, :font_index                     # :nodoc:
     attr_accessor :fill_index, :font_condense, :font_extend, :diag_border                          # :nodoc:
     attr_accessor :bg_color, :fg_color, :pattern                                                   # :nodoc:
 
@@ -166,7 +166,7 @@ module Writexlsx
       align << %w[horizontal right]       if @text_h_align == 3
       align << %w[horizontal fill]        if @text_h_align == 4
       align << %w[horizontal justify]     if @text_h_align == 5
-      align << ['horizontal', continuous]    if @text_h_align == 6
+      align << ['horizontal', continuous] if @text_h_align == 6
       align << %w[horizontal distributed] if @text_h_align == 7
 
       align << ['justifyLastLine', 1] if @just_distrib != 0
@@ -345,28 +345,24 @@ module Writexlsx
 
       location = location.downcase
 
-      set_text_h_align(1) if location == 'left'
-      set_text_h_align(2) if location == 'centre'
-      set_text_h_align(2) if location == 'center'
-      set_text_h_align(3) if location == 'right'
-      set_text_h_align(4) if location == 'fill'
-      set_text_h_align(5) if location == 'justify'
-      set_text_h_align(6) if location == 'center_across'
-      set_text_h_align(6) if location == 'centre_across'
-      set_text_h_align(6) if location == 'merge'              # Legacy.
-      set_text_h_align(7) if location == 'distributed'
-      set_text_h_align(7) if location == 'equal_space'        # S::PE.
-      set_text_h_align(7) if location == 'justify_distributed'
+      case location
+      when 'left'                         then set_text_h_align(1)
+      when 'centre', 'center'             then set_text_h_align(2)
+      when 'right'                        then set_text_h_align(3)
+      when 'fill'                         then set_text_h_align(4)
+      when 'justify'                      then set_text_h_align(5)
+      when 'center_across', 'centre_across', 'merge'
+        set_text_h_align(6)
+      when 'distributed', 'equal_space', 'justify_distributed'
+        set_text_h_align(7)
+      when 'top'                          then set_text_v_align(1)
+      when 'vcentre', 'vcenter'           then set_text_v_align(2)
+      when 'bottom'                       then set_text_v_align(3)
+      when 'vjustify'                     then set_text_v_align(4)
+      when 'vdistributed', 'vequal_space' then set_text_v_align(5)
+      end
 
       @just_distrib = 1 if location == 'justify_distributed'
-
-      set_text_v_align(1) if location == 'top'
-      set_text_v_align(2) if location == 'vcentre'
-      set_text_v_align(2) if location == 'vcenter'
-      set_text_v_align(3) if location == 'bottom'
-      set_text_v_align(4) if location == 'vjustify'
-      set_text_v_align(5) if location == 'vdistributed'
-      set_text_v_align(5) if location == 'vequal_space'    # S::PE.
     end
 
     #
