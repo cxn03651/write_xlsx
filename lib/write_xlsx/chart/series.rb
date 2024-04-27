@@ -98,17 +98,15 @@ module Writexlsx
         # Allow 'border' as a synonym for 'line'.
         line = line_properties(_label[:border]) if ptrue?(_label[:border])
 
-        # Set the fill properties for the label.
-        fill = fill_properties(_label[:fill])
-
         # Set the pattern properties for the label.
         pattern = pattern_properties(_label[:pattern])
 
         # Set the gradient fill properties for the label.
         gradient = gradient_properties(_label[:gradient])
 
+        # Set the fill properties for the label.
         # Pattern fill overrides solid fill.
-        fill = nil if ptrue?(pattern)
+        fill = pattern ? nil : fill_properties(_label[:fill])
 
         # Gradient fill overrides solid and pattern fills.
         if ptrue?(gradient)
@@ -354,13 +352,7 @@ module Writexlsx
         end
 
         # Set the line properties for the data labels.
-        line = line_properties(labels[:line])
-
-        # Allow 'border' as a synonym for 'line'.
-        line = line_properties(labels[:border]) if labels[:border]
-
-        # Set the fill properties for the labels.
-        fill = fill_properties(labels[:fill])
+        line = line_properties(labels[:border] || labels[:line])
 
         # Set the pattern properties for the labels.
         pattern = pattern_properties(labels[:pattern])
@@ -368,8 +360,8 @@ module Writexlsx
         # Set the gradient fill properties for the labels.
         gradient = gradient_properties(labels[:gradient])
 
-        # Pattern fill overrides solid fill.
-        fill = nil if pattern
+        # Set the fill properties for the labels.
+        fill = pattern ? nil : fill_properties(labels[:fill])
 
         # Gradient fill overrides solid and pattern fills.
         if gradient
@@ -412,16 +404,14 @@ module Writexlsx
             line = line_properties(property[:border] || property[:line])
 
             # Set the fill properties for the labels.
-            fill = fill_properties(property[:fill])
+            # Pattern fill overrides solid fill.
+            fill = pattern ? nil : fill_properties(property[:fill])
 
             # Set the pattern properties for the labels.
             pattern = pattern_properties(property[:pattern])
 
             # Set the gradient fill properties for the labels.
             gradient = gradient_properties(property[:gradient])
-
-            # Pattern fill overrides solid fill.
-            fill = nil if pattern
 
             # Gradient fill overrides solid and pattern fills.
             if gradient

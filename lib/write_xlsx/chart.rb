@@ -17,9 +17,9 @@ module Writexlsx
 
     def initialize(params = {})
       @horizontal = true
-      @vertical = true
-      @outline = true
-      @show_keys = false
+      @vertical   = true
+      @outline    = true
+      @show_keys  = false
       @horizontal = params[:horizontal] if params.has_key?(:horizontal)
       @vertical   = params[:vertical]   if params.has_key?(:vertical)
       @outline    = params[:outline]    if params.has_key?(:outline)
@@ -218,7 +218,7 @@ module Writexlsx
       @subtype           = subtype
       @sheet_type        = 0x0200
       @series            = []
-      @embedded          = 0
+      @embedded          = false
       @id                = -1
       @series_index      = 0
       @style_id          = 2
@@ -257,7 +257,7 @@ module Writexlsx
           # Write the c:spPr element for the chartarea formatting.
           write_sp_pr(@chartarea)
           # Write the c:printSettings element.
-          write_print_settings if @embedded && @embedded != 0
+          write_print_settings if @embedded
         end
       end
     end
@@ -462,7 +462,7 @@ module Writexlsx
     # Setup the default configuration data for an embedded chart.
     #
     def set_embedded_config_data
-      @embedded = 1
+      @embedded = true
     end
 
     #
@@ -1814,20 +1814,13 @@ module Writexlsx
     # Write the <c:pageMargins> element.
     #
     def write_page_margins # :nodoc:
-      b      = 0.75
-      l      = 0.7
-      r      = 0.7
-      t      = 0.75
-      header = 0.3
-      footer = 0.3
-
       attributes = [
-        ['b',      b],
-        ['l',      l],
-        ['r',      r],
-        ['t',      t],
-        ['header', header],
-        ['footer', footer]
+        ['b',      0.75],
+        ['l',      0.7],
+        ['r',      0.7],
+        ['t',      0.75],
+        ['header', 0.3],
+        ['footer', 0.3]
       ]
 
       @writer.empty_tag('c:pageMargins', attributes)

@@ -1706,7 +1706,7 @@ module Writexlsx
     # The outline_settings() method is used to control the appearance of
     # outlines in Excel.
     #
-    def outline_settings(visible = 1, symbols_below = 1, symbols_right = 1, auto_style = 0)
+    def outline_settings(visible = 1, symbols_below = 1, symbols_right = 1, auto_style = false)
       @outline_on    = visible
       @outline_below = symbols_below
       @outline_right = symbols_right
@@ -2560,7 +2560,7 @@ module Writexlsx
       else
         @drawings = Drawings.new
         @drawings.add_drawing_object(drawing)
-        @drawings.embedded = 1
+        @drawings.embedded = true
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
       end
@@ -3267,17 +3267,16 @@ module Writexlsx
 
       # Create a Drawing object to use with worksheet unless one already exists.
       drawing = Drawing.new(drawing_type, dimensions, width, height, nil, image.anchor, 0, 0, image.tip, name, image.description, image.decorative)
-      if drawings?
-        drawings = @drawings
-      else
+      unless drawings?
+
         drawings = Drawings.new
-        drawings.embedded = 1
+        drawings.embedded = true
 
         @drawings = drawings
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
       end
-      drawings.add_drawing_object(drawing)
+      @drawings.add_drawing_object(drawing)
 
       drawing.description = name unless image.description
 
@@ -3369,7 +3368,7 @@ EOS
       # Create a Drawing object to use with worksheet unless one already exists.
       unless drawings?
         @drawings = Drawings.new
-        @drawings.embedded = 1
+        @drawings.embedded = true
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
         @has_shapes = true
       end
@@ -4216,7 +4215,7 @@ EOS
       return unless outline_changed?
 
       attributes = []
-      attributes << ["applyStyles",  1] if @outline_style != 0
+      attributes << ["applyStyles",  1] if @outline_style
       attributes << ["summaryBelow", 0] if @outline_below == 0
       attributes << ["summaryRight", 0] if @outline_right == 0
       attributes << ["showOutlineSymbols", 0] if @outline_on == 0

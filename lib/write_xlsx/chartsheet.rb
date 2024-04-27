@@ -203,9 +203,9 @@ module Writexlsx
     # Write the <chartsheet> element. This is the root element of Chartsheet.
     #
     def write_chartsheet(&block) # :nodoc:
-      schema                 = 'http://schemas.openxmlformats.org/'
-      xmlns                  = schema + 'spreadsheetml/2006/main'
-      xmlns_r                = schema + 'officeDocument/2006/relationships'
+      schema  = 'http://schemas.openxmlformats.org/'
+      xmlns   = schema + 'spreadsheetml/2006/main'
+      xmlns_r = schema + 'officeDocument/2006/relationships'
 
       attributes = [
         ['xmlns',   xmlns],
