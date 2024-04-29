@@ -73,15 +73,15 @@ module Writexlsx
       @optimization        = options[:optimization] || 0
       @x_window            = 240
       @y_window            = 15
-      @window_width        = 16095
-      @window_height       = 9660
+      @window_width        = 16_095
+      @window_height       = 9_660
       @tab_ratio           = 600
       @excel2003_style     = options[:excel2003_style] || false
       @image_types         = {}
       @images              = []
       @strings_to_urls     = options[:strings_to_urls].nil? || options[:strings_to_urls] ? true : false
 
-      @max_url_length      = 2079
+      @max_url_length      = 2_079
       @has_comments        = false
       @read_only           = 0
       @has_metadata        = false

@@ -752,7 +752,7 @@ module Writexlsx
       hash[key.to_sym]
     end
 
-    def palette_color(index)
+    def palette_color_from_index(index)
       # Adjust the colour index.
       idx = index - 8
 
@@ -963,7 +963,7 @@ module Writexlsx
         index = Format.color(color_code)
         raise "Unknown color '#{color_code}' used in chart formatting." unless index
 
-        palette_color(index)
+        palette_color_from_index(index)
       end
     end
 

@@ -62,7 +62,7 @@ module Writexlsx
         elsif index == 0x40
           "Automatic"
         else
-          "FF#{super(index)}"
+          "FF#{palette_color_from_index(index)}"
         end
       end
 

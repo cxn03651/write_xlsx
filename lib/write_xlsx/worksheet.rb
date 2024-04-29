@@ -2655,7 +2655,7 @@ module Writexlsx
       if index.to_s =~ /^#([0-9A-F]{6})$/i
         "FF#{::Regexp.last_match(1).upcase}"
       else
-        "FF#{super(index)}"
+        "FF#{palette_color_from_index(index)}"
       end
     end
 
