@@ -943,22 +943,8 @@ module Writexlsx
       Writexlsx::Utility.delete_files(tempdir)
     end
 
-    def write_parts(zip)
-      parts.each do |part|
-        zip.put_next_entry(zip_entry_for_part(part.sub(Regexp.new("#{tempdir}/?"), '')))
-        zip.puts(File.read(part))
-      end
-    end
-
     def zip_entry_for_part(part)
       Zip::Entry.new("", part)
-    end
-
-    #
-    # files
-    #
-    def parts
-      Dir.glob(File.join(tempdir, "**", "*"), File::FNM_DOTMATCH).select { |f| File.file?(f) }
     end
 
     #
