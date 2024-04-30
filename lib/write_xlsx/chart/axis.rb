@@ -45,7 +45,7 @@ module Writexlsx
         set_axis_line(args)
         set_axis_fill(args)
         if ptrue?(args[:text_axis])
-          @chart.date_category = false
+          chart.date_category = false
           @text_axis = true
         end
 
@@ -178,15 +178,15 @@ module Writexlsx
       end
 
       def set_axis_name_layout(args)
-        @layout    = @chart.layout_properties(args[:name_layout], 1)
+        @layout    = chart.layout_properties(args[:name_layout], 1)
       end
 
       def set_axis_line(args)
-        @line = @chart.line_properties(args[:line])
+        @line = chart.line_properties(args[:line])
       end
 
       def set_axis_fill(args)
-        @fill = @chart.fill_properties(args[:fill])
+        @fill = chart.fill_properties(args[:fill])
       end
     end
   end
