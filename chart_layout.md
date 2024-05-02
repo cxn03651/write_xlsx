@@ -35,29 +35,27 @@ Here are some examples:
       }
     )
 
-    chartset_title(
+    chart.set_title(
       name:   'Title',
       layout: {
-        x:      0.80,
-        y:      0.37,
-        width:  0.12,
-        height: 0.25
+        x:      0.42,
+        y:      0.14
       }
     )
 
-    chartset_x_axis(
+    chart.set_x_axis(
       name:        'X axis,
       name_layout: {
-        x: 0.80,
-        y: 0.37
+        x: 0.34,
+        y: 0.85
       }
     )
 
-Note that it is only possible to change the width and height for the plotarea
-and legend objects. For the other text based objects the width and height are
+Note that it is only possible to change the width and height for the `plotarea` and `legend` objects.
+For the other text based objects the width and height are
 chaged by the font dimensions.
 
-The layout units must be a float in the range 0 < x <= 1 and are expressed
+The layout units must be a float in the range `0 < x <= 1` and are expressed
 as a percentage of the chart dimensions as shown below:
 
 ![Chart object layout.](images/examples/layout.png)
@@ -70,8 +68,6 @@ From this the layout units are calculated as follows:
       x      = a / W
       y      = b / H
 
-These units area slightly cumbersome but are required by Excel so that the chart object positions
-remain relative to each other if the cahrt is resized by the user.
+These units area slightly cumbersome but are required by Excel so that the chart object positions remain relative to each other if the cahrt is resized by the user.
 
-Note that for plotarea the origin is the top left corner in the plotarea itself
-and does not take into account the axes.
+Note that for `plotarea` the origin is the top left corner in the plotarea itself and does not take into account the axes.

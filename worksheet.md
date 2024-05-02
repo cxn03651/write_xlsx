@@ -62,6 +62,7 @@ The following methods are available through a new worksheet:
 * [set_zoom](#set_zoom)
 * [right_to_left](#right_to_left)
 * [hide_zero](#hide_zero)
+* [set_background](#set_background)
 * [set_tab_color](#set_tab_color)
 * [autofilter](#autofilter)
 * [filter_column](#filter_column)
@@ -972,14 +973,14 @@ Option 4 appears in Excel as Option 1. However, the worksheet object is sized to
 The `:url` option can be use to used to add a hyperlink to an image:
 
     worksheet.insert_image('A1', 'logo.png',
-        url: 'https://github.com/jmcnamara')
+        url: 'https://github.com/cxn03651')
 
 The supported url formats are the same as those supported by the `write_url()` method and the same rules/limits apply.
 
 The `:tip` option can be use to used to add a mouseover tip to the hyperlink:
 
     worksheet.insert_image('A1', 'logo.png',
-        url: 'https://github.com/jmcnamara',
+        url: 'https://github.com/cxn03651',
         tip: 'GitHub'
     )
 
@@ -990,7 +991,7 @@ The `:description` parameter can be used to specify a description or "alt text" 
       description: "This is some alternative text"
     )
 
-The optional `decorative` parameter is also used to help accessibility. It is used to mark the image as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the `description` field isn't written. It is used as follows:
+The optional `:decorative` parameter is also used to help accessibility. It is used to mark the image as decorative, and thus uninformative, for automated screen readers. As in Excel, if this parameter is in use the `description` field isn't written. It is used as follows:
 
     worksheet.insert_image('E9', 'logo.png', decorative: 1 )
 
@@ -1018,10 +1019,12 @@ This method can be used to embed a image into a worksheet cell and have the
 image automatically scale to the width and height of the cell.
 The X/Y scaling of the image is preserved but the size of the image is adjusted to fit the largest possible width or height depending on the cell dimensions.
 
-This is the equivalent of Excel's menu option to insert an image using the option to "Place in Cell".
+This is the equivalent of Excel's menu option to insert an image using the option to "Place in Cell" which is only available in Excel 365 versions from 2023 onwards.
+For older versions of Excel a `#VALUE!` error is displayed.
+
 See `insert_image()` for the equivalent method to "Place over Cells".
 
-The optional `options` hash/hashref parameter can be used to set various options for the image. The defaults are:
+The optional `options` hash parameter can be used to set various options for the image. The defaults are:
 
     options = {
       cell_format: format,
@@ -1031,38 +1034,36 @@ The optional `options` hash/hashref parameter can be used to set various options
       decorative:  0
     }
 
-The `cell_format` parameters can be an standard Format to set the formatting of the cell behind the image.
+The `:cell_format` parameters can be an standard Format to set the formatting of the cell behind the image.
 
-The `url` option can be use to used to add a hyperlink to an image:
+The `:url` option can be use to used to add a hyperlink to an image:
 
-    worksheet.insert_image('A1', 'logo.png',
-        { url: 'https://github.com/jmcnamara' } )
+    worksheet.embed_image('A1', 'logo.png',
+        url: 'https://github.com/cxn03651')
 
 The supported url formats are the same as those supported by the `write_url()` method and the same rules/limits apply.
 
-The `tip` option can be use to used to add a mouseover tip to the hyperlink:
+The `:tip` option can be use to used to add a mouseover tip to the hyperlink:
 
-    worksheet.insert_image('A1', 'logo.png',
-      {
-        url: 'https://github.com/jmcnamara',
+    worksheet.embed_image('A1', 'logo.png',
+        url: 'https://github.com/cxn03651',
         tip: 'GitHub'
-      }
     )
 
-The `description` parameter can be used to specify a description or "alt text" string for the image.
+The `:description` parameter can be used to specify a description or "alt text" string for the image.
 In general this would be used to provide a text description of the image to help accessibility.
 It is an optional parameter and defaults to the filename of the image.
 It can be used as follows:
 
-    worksheet.insert_image('E9', 'logo.png',
-      { description: "This is some alternative text" })
+    worksheet.embed_image('E9', 'logo.png',
+      description: "This is some alternative text")
 
-The optional `decorative` parameter is also used to help accessibility.
+The optional `:decorative` parameter is also used to help accessibility.
 It is used to mark the image as decorative, and thus uninformative, for automated screen readers.
-As in Excel, if this parameter is in use the `description` field isn't written.
+As in Excel, if this parameter is in use the `:description` field isn't written.
 It is used as follows:
 
-    worksheet.insert_image('E9', 'logo.png', { decorative: 1 } )
+    worksheet.embed_image('E9', 'logo.png', decorative: 1)
 
 Note: you must call `set_row()` or `set_column()` before `insert_image()` if you wish to change the default dimensions of any of the rows or columns that the image occupies.
 The height of a row can also change if you use a font that is larger than the default.
@@ -1173,40 +1174,10 @@ horizontally and vertically:
     # Scale the width by 120% and the height by 150%
     worksheet.insert_shape('E2', shape, 0, 0, 1.2, 1.5)
 
-The positioning of the chart when cells are resized can be set with the `:object_position` parameter:
-
-    worksheet.insert_chart('E2', chart, object_position: 2)
-
-The `:object_position` parameter can have one of the following allowable values:
-
-    1. Move and size with cells.
-    2. Move but don’t size with cells.
-    3. Don’t move or size with cells.
-    4. Same as Option 1, see below.
-
-Option 4 appears in Excel as Option 1.
-However, the worksheet object is sized to take hidden rows or columns into account.
-This is generally only useful for images and not for charts.
-
-The `:description` parameter can be used to specify a description or "alt text" string for the chart.
-In general this would be used to provide a text description of the chart to help accessibility.
-It is an optional parameter and has no default.
-It can be used as follows:
-
-    worksheet.insert_chart('E9', chart, { description: 'Some alternative text' })
-
-The optional `:decorative` parameter is also used to help accessibility.
-It is used to mark the chart as decorative, and thus uninformative, for automated screen readers.
-As in Excel, if this parameter is in use the `:description` field isn't written.
-It is used as follows:
-
-    worksheet.insert_chart('E9', chart, { decorative: 1 })
-
 
 #### <a name="insert_button" class="anchor" href="#insert_button"><span class="octicon octicon-link" /></a>insert_button(row, col, options)
 
-The `insert_button()` method can be used to insert an Excel form button into
-a worksheet.
+The `insert_button()` method can be used to insert an Excel form button into a worksheet.
 
 This method is generally only useful when used in conjunction with the
 [Workbook#add_vba_project()](workbook.html#add_vba_project) method to tie the
@@ -1509,6 +1480,13 @@ The default boolean values are shown above. Individual elements can be protected
 
     worksheet.protect('drowssap', insert_rows: 1)
 
+For chartsheets the allowable options and default values are:
+
+    options = {
+      objects: 1,
+      content: 1
+    }
+
 #### <a name="unprotect_range" class="anchor" href="#unprotect_range"><span class="octicon octicon-link" /></a>unprotect_range(cell_range, range_name)
 
 The `unprotect_range()` method is used to unprotect ranges in a protected worksheet. It can be used to set a single range or multiple ranges:
@@ -1526,8 +1504,8 @@ As in Excel the ranges are given sequential names like `Range1` and `Range2` but
 
 This method can be used to specify which cell or cells are selected in a worksheet.
 The most common requirement is to select a single cell, in which case
-`last_row` and `last_col` can be omitted. The active cell within a selected
-range is determined by the order in which `first` and `last` are specified.
+`last_row` and `last_col` can be omitted.
+The active cell within a selected range is determined by the order in which `first` and `last` are specified.
 It is also possible to specify a cell or a range using A1 notation.
 See the note about [CELL NOTATION][].
 
@@ -1620,7 +1598,7 @@ Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
 This method is the same as `set_row()` except that `height` is in pixels.
 
-    worksheet.set_row       (0, 24)    # Set row height in character units
+    worksheet.set_row(0, 24)           # Set row height in character units
     worksheet.set_row_pixels(1, 18)    # Set row to same height in pixels
 
 #### <a name="set_default_row" class="anchor" href="#set_default_row"><span class="octicon octicon-link" /></a>set_default_row(height, hide_unused_rows)
@@ -1729,8 +1707,8 @@ Therefore the `level` parameter should be in the range `0 <= level <= 7`.
 
 This method is the same as `set_column()` except that `width` is in pixels.
 
-    worksheet.set_column(0, 0, 10)    # Column A width set to 20 in character units
-    worksheet.set_column(1, 1, 75)    # Column B set to the same width in pixels
+    worksheet.set_column(0, 0, 10)        # Column A width set to 20 in character units
+    worksheet.set_column_pixels(1, 1, 75) # Column B set to the same width in pixels
 
 #### <a name="outline_settings" class="anchor" href="#outline_settings"><span class="octicon octicon-link" /></a>outline_settings(visible, symbols_below, symbols_right, auto_style)
 
@@ -1919,6 +1897,23 @@ The `hide_zero()` method is used to hide any zero values that appear in cells.
     worksheet.hide_zero
 
 In Excel this option is found under Tools->Options->View.
+
+#### <a name="set_background" class="anchor" href="#set_background"><span class="octicon octicon-link" /></a>set_background(filename)
+
+The `set_background()` method can be used to set the background image for the worksheet:
+
+    worksheet.set_background('logo.png')
+
+The `set_background()` method supports all the image formats supported by
+`insert_image()`.
+
+Some people use this method to add a watermark background to their document.
+However, Microsoft recommends using a header image [to set a watermark](https://support.microsoft.com/en-us/office/add-a-watermark-in-excel-a372182a-d733-484e-825c-18ddf3edf009).
+The choice of method depends on whether you want the watermark to be visible in normal viewing mode or just when the file is printed.
+In WriteXLSX you can get the header watermark effect using `set_header()`:
+
+    worksheet.set_header('&C&G', nil, image_center: 'watermark.png')
+
 
 #### <a name="set_tab_color" class="anchor" href="#set_tab_color"><span class="octicon octicon-link" /></a>set_tab_color()
 

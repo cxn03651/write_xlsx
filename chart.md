@@ -425,8 +425,8 @@ Position the axis on or between the axis tick marks. (Applicable to category axe
 
 There are two allowable values on_tick and between:
 
-    chart.set_x_axis( position_axis: 'on_tick' )
-    chart.set_x_axis( position_axis: 'between' )
+    chart.set_x_axis(position_axis: 'on_tick')
+    chart.set_x_axis(position_axis: 'between')
 
 ##### <a name="set_x_axis_reverse" class="anchor" href="#set_x_axis_reverse"><span class="octicon octicon-link" /></a>:reverse
 Reverse the order of the axis categories or values.
@@ -610,9 +610,9 @@ The size properties that can be set are:
      :x_offset
      :y_offset
 
-The width and height are in pixels.
+The `:width` and `:height` are in pixels.
 The default chart width is 480 pixels and the default height is 288 pixels.
-The size of the chart can be modified by setting the width and height
+The size of the chart can be modified by setting the `:width` and `:height`
 or by setting the `:x_scale` and `:y_scale`:
 
     chart.set_size(width: 720, height: 576)
@@ -749,7 +749,7 @@ Set the `(x, y)` position of the legend in chart relative units:
       }
     )
 
-See the CHART LAYOUT section below.
+See the [CHART LAYOUT][] section below.
 
 #### <a name="set_chartarea" class="anchor" href="#set_chartarea"><span class="octicon octicon-link" /></a>set_chartarea()
 
@@ -1849,7 +1849,7 @@ differently and exposes different properties for each.
 As such some of WriteXLSX axis properties can be set for a value axis,
 some can be set for a category axis and some properties can be set for both.
 
-For example the min and max properties can only be set for value axes and reverse
+For example the `min` and `max` properties can only be set for value axes and `reverse`
 can be set for both. The type of axis that a property applies to is shown in
 the [set_x_axis()][] section of the documentation above.
 
