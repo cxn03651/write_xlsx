@@ -6,8 +6,11 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Drawing
+    include Writexlsx::Utility
+
     attr_accessor :type, :dimensions, :width, :height, :shape, :anchor, :rel_index, :url_rel_index, :name, :description
     attr_reader :tip, :decorative
+    attr_writer :writer, :embedded, :orientation
 
     def initialize(type, dimensions, width, height, shape, anchor, rel_index = nil, url_rel_index = nil, tip = nil, name = nil, description = nil, decorative = nil)
       @type = type
@@ -23,93 +26,11 @@ module Writexlsx
       @description = description
       @decorative = decorative
     end
-  end
-
-  class Drawings
-    include Writexlsx::Utility
-
-    attr_writer :embedded, :orientation
-
-    def initialize
-      @writer = Package::XMLWriterSimple.new
-      @drawings    = []
-      @embedded    = false
-      @orientation = false
-    end
-
-    def xml_str
-      @writer.string
-    end
-
-    def set_xml_writer(filename)
-      @writer.set_xml_writer(filename)
-    end
-
-    #
-    # Assemble and write the XML file.
-    #
-    def assemble_xml_file
-      write_xml_declaration do
-        # Write the xdr:wsDr element.
-        write_drawing_workspace do
-          if @embedded
-            index = 0
-            @drawings.each do |drawing|
-              # Write the xdr:twoCellAnchor element.
-              index += 1
-              write_two_cell_anchor(index, drawing)
-            end
-          else
-            # Write the xdr:absoluteAnchor element.
-            write_absolute_anchor(1)
-          end
-        end
-      end
-    end
-
-    #
-    # Add a chart, image or shape sub object to the drawing.
-    #
-    def add_drawing_object(drawing)
-      @drawings << drawing
-    end
-
-    private
-
-    #
-    # Write the <xdr:wsDr> element.
-    #
-    def write_drawing_workspace(&block)
-      schema = 'http://schemas.openxmlformats.org/drawingml/'
-      attributes = [
-        ['xmlns:xdr', "#{schema}2006/spreadsheetDrawing"],
-        ['xmlns:a',    "#{schema}2006/main"]
-      ]
-
-      @writer.tag_elements('xdr:wsDr', attributes, &block)
-    end
 
     #
     # Write the <xdr:twoCellAnchor> element.
     #
-    def write_two_cell_anchor(*args)
-      index, drawing = args
-
-      type          = drawing.type
-      width         = drawing.width
-      height        = drawing.height
-      shape         = drawing.shape
-      anchor        = drawing.anchor
-      rel_index     = drawing.rel_index
-      url_rel_index = drawing.url_rel_index
-      tip           = drawing.tip
-      name          = drawing.name
-      description   = drawing.description
-      decorative    = drawing.decorative
-
-      col_from, row_from, col_from_offset, row_from_offset,
-      col_to, row_to, col_to_offset, row_to_offset, col_absolute, row_absolute = drawing.dimensions
-
+    def write_two_cell_anchor(index)
       attributes      = []
 
       # Add attribute for images.
@@ -124,9 +45,9 @@ module Writexlsx
 
       @writer.tag_elements('xdr:twoCellAnchor', attributes) do
         # Write the xdr:from element.
-        write_from(col_from, row_from, col_from_offset, row_from_offset)
+        write_from
         # Write the xdr:to element.
-        write_to(col_to, row_to, col_to_offset, row_to_offset)
+        write_to
 
         if type == 1
           # Graphic frame.
@@ -135,14 +56,10 @@ module Writexlsx
           write_graphic_frame(index, rel_index, name, description, decorative)
         elsif type == 2
           # Write the xdr:pic element.
-          write_pic(
-            index,        rel_index,      col_absolute,
-            row_absolute, width,          height,
-            description,  url_rel_index, tip, decorative
-          )
+          write_pic(index)
         else
           # Write the xdr:sp element for shapes.
-          write_sp(index, col_absolute, row_absolute, width, height, shape)
+          write_sp(index, shape)
         end
 
         # Write the xdr:clientData element.
@@ -182,7 +99,9 @@ module Writexlsx
     #
     # Write the <xdr:from> element.
     #
-    def write_from(col, row, col_offset, row_offset)
+    def write_from
+      col, row, col_offset, row_offset = dimensions
+
       @writer.tag_elements('xdr:from') do
         # Write the xdr:col element.
         write_col(col)
@@ -198,7 +117,9 @@ module Writexlsx
     #
     # Write the <xdr:to> element.
     #
-    def write_to(col, row, col_offset, row_offset)
+    def write_to
+      col, row, col_offset, row_offset = dimensions[4, 4]
+
       @writer.tag_elements('xdr:to') do
         # Write the xdr:col element.
         write_col(col)
@@ -522,7 +443,7 @@ module Writexlsx
     #
     # Write the <xdr:sp> element.
     #
-    def write_sp(index, col_absolute, row_absolute, width, height, shape)
+    def write_sp(index, shape)
       if shape.connect == 0
         # Add attribute for shapes.
         attributes = [
@@ -534,7 +455,7 @@ module Writexlsx
           write_nv_sp_pr(index, shape)
 
           # Write the xdr:spPr element.
-          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
+          write_xdr_sp_pr(shape)
 
           # Write the xdr:txBody element.
           write_tx_body(shape) if shape.text != 0
@@ -546,7 +467,7 @@ module Writexlsx
           write_nv_cxn_sp_pr(index, shape)
 
           # Write the xdr:spPr element.
-          write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
+          write_xdr_sp_pr(shape)
         end
       end
     end
@@ -601,26 +522,29 @@ module Writexlsx
     #
     # Write the <xdr:pic> element.
     #
-    def write_pic(index, rel_index, col_absolute, row_absolute, width, height, description, url_rel_index, tip, decorative)
+    def write_pic(index)
+      col_absolute, row_absolute = dimensions[8, 2]
+
       @writer.tag_elements('xdr:pic') do
         # Write the xdr:nvPicPr element.
-        write_nv_pic_pr(index, rel_index, description, url_rel_index, tip, decorative)
+        write_nv_pic_pr(index)
         # Write the xdr:blipFill element.
-        write_blip_fill(rel_index)
+        write_blip_fill
 
         # Pictures are rectangle shapes by default.
-        shape = Shape.new
-        shape.type = 'rect'
+        pic_shape = Shape.new
+        pic_shape.type = 'rect'
 
         # Write the xdr:spPr element.
-        write_sp_pr(col_absolute, row_absolute, width, height, shape)
+        write_sp_pr(pic_shape)
       end
     end
 
     #
     # Write the <xdr:nvPicPr> element.
     #
-    def write_nv_pic_pr(index, _rel_index, description, url_rel_index, tip, decorative)
+    # def write_nv_pic_pr(index, _rel_index, description, url_rel_index, tip, decorative)
+    def write_nv_pic_pr(index)
       @writer.tag_elements('xdr:nvPicPr') do
         # Write the xdr:cNvPr element.
         write_c_nv_pr(
@@ -656,10 +580,10 @@ module Writexlsx
     #
     # Write the <xdr:blipFill> element.
     #
-    def write_blip_fill(index)
+    def write_blip_fill
       @writer.tag_elements('xdr:blipFill') do
         # Write the a:blip element.
-        write_a_blip(index)
+        write_a_blip(rel_index)
         # Write the a:stretch element.
         write_a_stretch
       end
@@ -701,10 +625,10 @@ module Writexlsx
     #
     # Write the <xdr:spPr> element, for charts.
     #
-    def write_sp_pr(col_absolute, row_absolute, width, height, shape = {})
+    def write_sp_pr(shape)
       @writer.tag_elements('xdr:spPr') do
         # Write the a:xfrm element.
-        write_a_xfrm(col_absolute, row_absolute, width, height)
+        write_a_xfrm
         # Write the a:prstGeom element.
         write_a_prst_geom(shape)
       end
@@ -713,12 +637,12 @@ module Writexlsx
     #
     # Write the <xdr:spPr> element for shapes.
     #
-    def write_xdr_sp_pr(col_absolute, row_absolute, width, height, shape)
+    def write_xdr_sp_pr(shape)
       attributes = [%w[bwMode auto]]
 
       @writer.tag_elements('xdr:spPr', attributes) do
         # Write the a:xfrm element.
-        write_a_xfrm(col_absolute, row_absolute, width, height, shape)
+        write_a_xfrm(shape)
 
         # Write the a:prstGeom element.
         write_a_prst_geom(shape)
@@ -738,7 +662,7 @@ module Writexlsx
     #
     # Write the <a:xfrm> element.
     #
-    def write_a_xfrm(col_absolute, row_absolute, width, height, shape = nil)
+    def write_a_xfrm(shape = nil)
       attributes = []
 
       rotation = shape ? shape.rotation : 0
@@ -750,7 +674,7 @@ module Writexlsx
 
       @writer.tag_elements('a:xfrm', attributes) do
         # Write the a:off element.
-        write_a_off(col_absolute, row_absolute)
+        write_a_off
         # Write the a:ext element.
         write_a_ext(width, height)
       end
@@ -759,7 +683,9 @@ module Writexlsx
     #
     # Write the <a:off> element.
     #
-    def write_a_off(x, y)
+    def write_a_off
+      x, y = dimensions[8, 2]
+
       attributes = [
         ['x', x],
         ['y', y]
@@ -942,6 +868,75 @@ module Writexlsx
           end
         end
       end
+    end
+  end
+
+  class Drawings
+    include Writexlsx::Utility
+
+    attr_writer :embedded, :orientation
+
+    def initialize
+      @writer = Package::XMLWriterSimple.new
+      @drawings    = []
+      @embedded    = false
+      @orientation = false
+    end
+
+    def xml_str
+      @writer.string
+    end
+
+    def set_xml_writer(filename)
+      @writer.set_xml_writer(filename)
+    end
+
+    #
+    # Assemble and write the XML file.
+    #
+    def assemble_xml_file
+      write_xml_declaration do
+        # Write the xdr:wsDr element.
+        write_drawing_workspace do
+          if @embedded
+            @drawings.each_with_index do |drawing, index|
+              # Write the xdr:twoCellAnchor element.
+              drawing.writer = @writer
+              drawing.embedded = @embedded
+              drawing.write_two_cell_anchor(index + 1)
+            end
+          else
+            # Write the xdr:absoluteAnchor element.
+            drawing = Drawing.new(nil, nil, nil, nil, nil, nil)
+            drawing.writer = @writer
+            drawing.embedded = @embedded
+            drawing.orientation = @orientation
+            drawing.write_absolute_anchor(1)
+          end
+        end
+      end
+    end
+
+    #
+    # Add a chart, image or shape sub object to the drawing.
+    #
+    def add_drawing_object(drawing)
+      @drawings << drawing
+    end
+
+    private
+
+    #
+    # Write the <xdr:wsDr> element.
+    #
+    def write_drawing_workspace(&block)
+      schema = 'http://schemas.openxmlformats.org/drawingml/'
+      attributes = [
+        ['xmlns:xdr', "#{schema}2006/spreadsheetDrawing"],
+        ['xmlns:a',    "#{schema}2006/main"]
+      ]
+
+      @writer.tag_elements('xdr:wsDr', attributes, &block)
     end
   end
 end
