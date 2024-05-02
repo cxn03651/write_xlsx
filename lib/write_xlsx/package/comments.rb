@@ -36,7 +36,6 @@ module Writexlsx
         @width       = (0.5 + ((options[:width]  || DEFAULT_WIDTH)  * @x_scale)).to_i
         @height      = (0.5 + ((options[:height] || DEFAULT_HEIGHT) * @y_scale)).to_i
         @vertices    = @worksheet.position_object_pixels(
-          @worksheet,
           @start_col, @start_row, @x_offset, @y_offset,
           @width, @height
         ) << [@width, @height]

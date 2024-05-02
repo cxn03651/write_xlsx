@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'digest/md5'
+
 module Writexlsx
   class ImageProperty
     attr_reader :type, :width, :height, :name, :x_dpi, :y_dpi, :md5
@@ -33,8 +35,6 @@ module Writexlsx
       # Set a default dpi for images with 0 dpi.
       @x_dpi = 96 if @x_dpi == 0
       @y_dpi = 96 if @y_dpi == 0
-
-      [type, width, height, File.basename(filename), x_dpi, y_dpi, md5]
     end
 
     #

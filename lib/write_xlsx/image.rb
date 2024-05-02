@@ -26,6 +26,22 @@ module Writexlsx
       @decorative  = decorative
     end
 
+    def scaled_width
+      width * x_scale * 96.0 / x_dpi
+    end
+
+    def scaled_height
+      height * y_scale * 96.0 / y_dpi
+    end
+
+    def width_emus
+      (0.5 + (scaled_width * 9_525)).to_i
+    end
+
+    def height_emus
+      (0.5 + (scaled_height * 9_525)).to_i
+    end
+
     def image
       @image.filename
     end

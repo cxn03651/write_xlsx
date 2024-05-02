@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
-require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/package/packager'
-require 'write_xlsx/sheets'
-require 'write_xlsx/worksheet'
+require 'write_xlsx/chart'
 require 'write_xlsx/chartsheet'
+require 'write_xlsx/format'
 require 'write_xlsx/formats'
 require 'write_xlsx/image_property'
-require 'write_xlsx/format'
 require 'write_xlsx/shape'
+require 'write_xlsx/sheets'
 require 'write_xlsx/utility'
-require 'write_xlsx/chart'
+require 'write_xlsx/worksheet'
 require 'write_xlsx/zip_file_utils'
+require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/package/packager'
 require 'tmpdir'
 require 'tempfile'
 require 'digest/md5'
@@ -1405,13 +1405,6 @@ module Writexlsx
     # Iterate through the worksheets and set up any chart or image drawings.
     #
     def prepare_drawings # :nodoc:
-      chart_ref_id     = 0
-      drawing_id       = 0
-      ref_id           = 0
-      image_ids        = {}
-      header_image_ids = {}
-      background_ids   = {}
-
       # Store the image types for any embedded images.
       @embedded_images.each do |image|
         store_image_types(image.type)
@@ -1419,21 +1412,31 @@ module Writexlsx
         @has_embedded_descriptions = true if ptrue?(image.description)
       end
 
-      # The image IDs start from after the embedded images.
-      image_ref_id = @embedded_images.size
-
-      @worksheets.each do |sheet|
-        chart_ref_id, drawing_id, ref_id, image_ref_id =
-          sheet.prepare_drawings(
-            chart_ref_id, drawing_id, ref_id, image_ref_id, image_ids,
-            header_image_ids, background_ids
-          )
-      end
+      prepare_drawings_of_all_sheets
 
       # Sort the workbook charts references into the order that the were
       # written from the worksheets above.
       @charts = @charts.select { |chart| chart.id != -1 }
                   .sort_by { |chart| chart.id }
+    end
+
+    def prepare_drawings_of_all_sheets
+      drawing_id       = 0
+      chart_ref_id     = 0
+      image_ids        = {}
+      header_image_ids = {}
+      background_ids   = {}
+
+      # The image IDs start from after the embedded images.
+      image_ref_id = @embedded_images.size
+
+      @worksheets.each do |sheet|
+        drawing_id, chart_ref_id, image_ref_id =
+          sheet.prepare_drawings(
+            drawing_id, chart_ref_id, image_ref_id, image_ids,
+            header_image_ids, background_ids
+          )
+      end
     end
   end
 end

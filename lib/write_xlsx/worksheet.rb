@@ -7,6 +7,7 @@ require 'write_xlsx/drawing'
 require 'write_xlsx/format'
 require 'write_xlsx/image'
 require 'write_xlsx/image_property'
+require 'write_xlsx/inserted_chart'
 require 'write_xlsx/package/button'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/package/xml_writer_simple'
@@ -1862,10 +1863,10 @@ module Writexlsx
       x_offset = _chart.x_offset if ptrue?(_chart.x_offset)
       y_offset = _chart.y_offset if ptrue?(_chart.y_offset)
 
-      @charts << [
+      @charts << InsertedChart.new(
         _row,    _col,    _chart, x_offset,    y_offset,
         x_scale, y_scale, anchor, description, decorative
-      ]
+      )
     end
 
     #
@@ -2534,27 +2535,17 @@ module Writexlsx
     def prepare_chart(index, chart_id, drawing_id) # :nodoc:
       drawing_type = 1
 
-      row,     col,     chart,  x_offset,    y_offset,
-      x_scale, y_scale, anchor, description, decorative = @charts[index]
+      inserted_chart = @charts[index]
+      inserted_chart.chart.id = chart_id - 1
 
-      chart.id = chart_id - 1
-      x_scale ||= 0
-      y_scale ||= 0
-
-      # Use user specified dimensions, if any.
-      width  = chart.width  if ptrue?(chart.width)
-      height = chart.height if ptrue?(chart.height)
-
-      width  = (0.5 + (width  * x_scale)).to_i
-      height = (0.5 + (height * y_scale)).to_i
-
-      dimensions = position_object_emus(col, row, x_offset, y_offset, width, height, anchor)
-
-      # Set the chart name for the embedded object if it has been specified.
-      name = chart.name
+      dimensions = position_object_emus(inserted_chart)
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, 0, 0, nil, anchor, drawing_rel_index, 0, nil, name, description, decorative)
+      drawing = Drawing.new(
+        drawing_type, dimensions, 0, 0, nil, inserted_chart.anchor,
+        drawing_rel_index, 0, nil, inserted_chart.name,
+        inserted_chart.description, inserted_chart.decorative
+      )
       if drawings?
         @drawings.add_drawing_object(drawing)
       else
@@ -2807,7 +2798,7 @@ module Writexlsx
       charts.size + images.size + shapes.size + header_images.size + footer_images.size + (background_image ? 1 : 0) == 0
     end
 
-    def prepare_drawings(chart_ref_id, drawing_id, ref_id, image_ref_id, image_ids, header_image_ids, background_ids)
+    def prepare_drawings(drawing_id, chart_ref_id, image_ref_id, image_ids, header_image_ids, background_ids)
       has_drawings = false
 
       # Check that some image or drawing needs to be processed.
@@ -2823,8 +2814,8 @@ module Writexlsx
         image_ref_id = prepare_background_image(background_ids, image_ref_id)
 
         # Prepare the worksheet images.
-        images.each_with_index do |image, index|
-          image_ref_id = prepare_image(index, drawing_id, image, image_ids, image_ref_id)
+        images.each do |image|
+          image_ref_id = prepare_image(image, drawing_id, image_ids, image_ref_id)
         end
 
         # Prepare the worksheet charts.
@@ -2852,7 +2843,7 @@ module Writexlsx
         end
       end
 
-      [chart_ref_id, drawing_id, ref_id, image_ref_id]
+      [drawing_id, chart_ref_id, image_ref_id]
     end
 
     #
@@ -2864,7 +2855,135 @@ module Writexlsx
       @background_image = ImageProperty.new(image)
     end
 
+    #
+    # Calculate the vertices that define the position of a graphical object
+    # within the worksheet in pixels.
+    #
+    def position_object_pixels(col_start, row_start, x1, y1, width, height, anchor = nil) # :nodoc:
+      # Adjust start column for negative offsets.
+      while x1 < 0 && col_start > 0
+        x1 += size_col(col_start - 1)
+        col_start -= 1
+      end
+
+      # Adjust start row for negative offsets.
+      while y1 < 0 && row_start > 0
+        y1 += size_row(row_start - 1)
+        row_start -= 1
+      end
+
+      # Ensure that the image isn't shifted off the page at top left.
+      x1 = 0 if x1 < 0
+      y1 = 0 if y1 < 0
+
+      # Calculate the absolute x offset of the top-left vertex.
+      x_abs = if @col_size_changed
+                (0..col_start - 1).inject(0) { |sum, col| sum += size_col(col, anchor) }
+              else
+                # Optimisation for when the column widths haven't changed.
+                DEFAULT_COL_PIXELS * col_start
+              end
+      x_abs += x1
+
+      # Calculate the absolute y offset of the top-left vertex.
+      # Store the column change to allow optimisations.
+      y_abs = if @row_size_changed
+                (0..row_start - 1).inject(0) { |sum, row| sum += size_row(row, anchor) }
+              else
+                # Optimisation for when the row heights haven't changed.
+                @default_row_pixels * row_start
+              end
+      y_abs += y1
+
+      # Adjust start column for offsets that are greater than the col width.
+      while x1 >= size_col(col_start, anchor)
+        x1 -= size_col(col_start)
+        col_start += 1
+      end
+
+      # Adjust start row for offsets that are greater than the row height.
+      while y1 >= size_row(row_start, anchor)
+        y1 -= size_row(row_start)
+        row_start += 1
+      end
+
+      # Initialise end cell to the same as the start cell.
+      col_end = col_start
+      row_end = row_start
+
+      # Only offset the image in the cell if the row/col isn't hidden.
+      width  += x1 if size_col(col_start, anchor) > 0
+      height += y1 if size_row(row_start, anchor) > 0
+
+      # Subtract the underlying cell widths to find the end cell of the object.
+      while width >= size_col(col_end, anchor)
+        width -= size_col(col_end, anchor)
+        col_end += 1
+      end
+
+      # Subtract the underlying cell heights to find the end cell of the object.
+      while height >= size_row(row_end, anchor)
+        height -= size_row(row_end, anchor)
+        row_end += 1
+      end
+
+      # The end vertices are whatever is left from the width and height.
+      x2 = width
+      y2 = height
+
+      [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
+    end
+
     private
+
+    #
+    # Convert the width of a cell from user's units to pixels. Excel rounds
+    # the column width to the nearest pixel. If the width hasn't been set
+    # by the user we use the default value. A hidden column is treated as
+    # having a width of zero unless it has the special "object_position" of
+    # 4 (size with cells).
+    #
+    def size_col(col, anchor = 0) # :nodoc:
+      # Look up the cell value to see if it has been changed.
+      if col_info[col]
+        width  = col_info[col].width || @default_col_width
+        hidden = col_info[col].hidden
+
+        # Convert to pixels.
+        pixels = if hidden == 1 && anchor != 4
+                   0
+                 elsif width < 1
+                   ((width * (MAX_DIGIT_WIDTH + PADDING)) + 0.5).to_i
+                 else
+                   ((width * MAX_DIGIT_WIDTH) + 0.5).to_i + PADDING
+                 end
+      else
+        pixels = DEFAULT_COL_PIXELS
+      end
+      pixels
+    end
+
+    #
+    # Convert the height of a cell from user's units to pixels. If the height
+    # hasn't been set by the user we use the default value. A hidden row is
+    # treated as having a height of zero unless it has the special
+    # "object_position" of 4 (size with cells).
+    #
+    def size_row(row, anchor = 0) # :nodoc:
+      # Look up the cell value to see if it has been changed
+      if row_sizes[row]
+        height, hidden = row_sizes[row]
+
+        pixels = if hidden == 1 && anchor != 4
+                   0
+                 else
+                   (4 / 3.0 * height).to_i
+                 end
+      else
+        pixels = (4 / 3.0 * default_row_height).to_i
+      end
+      pixels
+    end
 
     #
     # Compare adjacent column information structures.
@@ -3187,12 +3306,13 @@ module Writexlsx
     end
 
     #
-    # Calculate the vertices that define the position of a graphical object within
-    # the worksheet in EMUs.
+    # Calculate the vertices that define the position of a graphical object
+    # within the worksheet in EMUs.
     #
-    def position_object_emus(col_start, row_start, x1, y1, width, height, anchor = nil) # :nodoc:
+    def position_object_emus(graphical_object) # :nodoc:
+      go = graphical_object
       col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels(self, col_start, row_start, x1, y1, width, height, anchor)
+        position_object_pixels(go.col, go.row, go.x_offset, go.y_offset, go.scaled_width, go.scaled_height, go.anchor)
 
       # Convert the pixel values to EMUs. See above.
       x1    = (0.5 + (9_525 * x1)).to_i
@@ -3231,14 +3351,11 @@ module Writexlsx
     #
     # Set up image/drawings.
     #
-    def prepare_image(index, drawing_id, image_property, image_ids, image_ref_id) # :nodoc:
-      image_type = image_property.type
-      width  = image_property.width
-      height = image_property.height
-      name   = image_property.name
-      x_dpi  = image_property.x_dpi || 96
-      y_dpi  = image_property.y_dpi || 96
-      md5    = image_property.md5
+    def prepare_image(image, drawing_id, image_ids, image_ref_id) # :nodoc:
+      image_type = image.type
+      x_dpi  = image.x_dpi || 96
+      y_dpi  = image.y_dpi || 96
+      md5    = image.md5
       drawing_type = 2
 
       @workbook.store_image_types(image_type)
@@ -3248,40 +3365,26 @@ module Writexlsx
       else
         image_ref_id += 1
         image_ids[md5] = image_id = image_ref_id
-        @workbook.images << image_property
+        @workbook.images << image
       end
 
-      image = @images[index]
-
-      width  *= image.x_scale
-      height *= image.y_scale
-
-      width  *= 96.0 / x_dpi
-      height *= 96.0 / y_dpi
-
-      dimensions = position_object_emus(image.col, image.row, image.x_offset, image.y_offset, width, height, image.anchor)
-
-      # Convert from pixels to emus.
-      width  = (0.5 + (width  * 9_525)).to_i
-      height = (0.5 + (height * 9_525)).to_i
+      dimensions = position_object_emus(image)
 
       # Create a Drawing object to use with worksheet unless one already exists.
-      drawing = Drawing.new(drawing_type, dimensions, width, height, nil, image.anchor, 0, 0, image.tip, name, image.description, image.decorative)
+      drawing = Drawing.new(
+        drawing_type, dimensions, image.width_emus, image.height_emus,
+        nil, image.anchor, 0, 0, image.tip, image.name,
+        image.description || image.name, image.decorative
+      )
       unless drawings?
-
-        drawings = Drawings.new
-        drawings.embedded = true
-
-        @drawings = drawings
+        @drawings = Drawings.new
+        @drawings.embedded = true
 
         @external_drawing_links << ['/drawing', "../drawings/drawing#{drawing_id}.xml"]
       end
       @drawings.add_drawing_object(drawing)
 
-      drawing.description = name unless image.description
-
       if image.url
-        rel_type = '/hyperlink'
         target_mode = 'External'
         target = escape_url(image.url) if image.url =~ %r{^[fh]tt?ps?://} || image.url =~ /^mailto:/
         if image.url =~ /^external:/
@@ -3309,7 +3412,7 @@ Ignoring URL #{target} where link or anchor > 255 characters since it exceeds Ex
 EOS
         end
 
-        @drawing_links << [rel_type, target, target_mode] if target && !@drawing_rels[image.url]
+        @drawing_links << ['/hyperlink', target, target_mode] if target && !@drawing_rels[image.url]
         drawing.url_rel_index = drawing_rel_index(image.url)
       end
 

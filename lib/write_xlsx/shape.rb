@@ -150,15 +150,15 @@ module Writexlsx
     # Calculate the vertices that define the position of a shape object within
     # the worksheet in EMUs.  Save the vertices with the object.
     #
-    # The vertices are expressed as English Metric Units (EMUs). There are 12,700
-    # EMUs per point. Therefore, 12,700 * 3 /4 = 9,525 EMUs per pixel.
+    # The vertices are expressed as English Metric Units (EMUs).
+    # There are 12,700 EMUs per point. Therefore, 12,700 * 3 /4 = 9,525
+    # EMUs per pixel.
     #
     def calc_position_emus(worksheet)
       c_start, r_start,
       xx1, yy1, c_end, r_end,
       xx2, yy2, x_abslt, y_abslt =
         worksheet.position_object_pixels(
-          worksheet,
           @column_start,
           @row_start,
           @x_offset,

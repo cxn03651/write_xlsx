@@ -48,8 +48,7 @@ module Writexlsx
         start_col = col
 
         # Calculate the positions of button object.
-        vertices = position_object_pixels(
-          @worksheet,
+        vertices = @worksheet.position_object_pixels(
           start_col,
           start_row,
           x_offset,
