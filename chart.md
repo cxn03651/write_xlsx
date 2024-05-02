@@ -1275,6 +1275,7 @@ The position property is used to position the data label for a series.
     )
 
 In Excel the data label positions vary for different chart types. The allowable positions are:
+
     |  Position     |  Line     |  Bar      |  Pie      |  Area     |
     |               |  Scatter  |  Column   |  Doughnut |  Radar    |
     |               |  Stock    |           |           |           |
