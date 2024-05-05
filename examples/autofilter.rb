@@ -28,8 +28,7 @@ bold = workbook.add_format(bold: 1)
 
 # Extract the data embedded at the end of this file.
 headings = DATA.gets.split
-data = []
-DATA.each { |line| data << line.split }
+data = DATA.map(&:split)
 
 # Set up several sheets with the same data.
 workbook.worksheets.each do |worksheet|

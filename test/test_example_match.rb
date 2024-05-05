@@ -112,8 +112,7 @@ class TestExampleMatch < Minitest::Test
     # Extract the data embedded at the end of this file.
     data_array = autofilter_data.split("\n")
     headings = data_array.shift.split
-    data = []
-    data_array.each { |line| data << line.split }
+    data = data_array.map(&:split)
 
     # Set up several sheets with the same data.
     workbook.worksheets.each do |worksheet|

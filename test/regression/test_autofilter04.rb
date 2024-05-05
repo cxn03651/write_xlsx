@@ -16,8 +16,7 @@ class TestRegressionAutofilter04 < Minitest::Test
     workbook  = WriteXLSX.new(@io)
     worksheet = workbook.add_worksheet
 
-    data = []
-    data_lines.split("\n").each { |line| data << line.split }
+    data = data_lines.split("\n").map(&:split)
 
     worksheet.write('A1', headings)
     worksheet.autofilter('A1:D51')
