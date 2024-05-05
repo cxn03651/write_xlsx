@@ -203,11 +203,9 @@ module Writexlsx
       # Write the rdrichvalue(*).xml file.
       #
       def write_rich_value_files
-        dir = @package_dir
-
         return unless @workbook.has_embedded_images?
 
-        FileUtils.mkdir_p("#{dir}/xl/richData")
+        FileUtils.mkdir_p("#{@package_dir}/xl/richData")
 
         write_rich_value_file
         write_rich_value_structure_file
@@ -219,12 +217,11 @@ module Writexlsx
       # Write the rdrichvalue.xml file.
       #
       def write_rich_value_file
-        dir        = @package_dir
         rich_value = Package::RichValue.new
 
         rich_value.embedded_images = @workbook.embedded_images
 
-        rich_value.set_xml_writer("#{dir}/xl/richData/rdrichvalue.xml")
+        rich_value.set_xml_writer("#{@package_dir}/xl/richData/rdrichvalue.xml")
         rich_value.assemble_xml_file
       end
 
@@ -232,12 +229,11 @@ module Writexlsx
       # Write the rdrichvaluestructure.xml file.
       #
       def write_rich_value_structure_file
-        dir        = @package_dir
         rich_value = Package::RichValueStructure.new
 
         rich_value.has_embedded_descriptions = @workbook.has_embedded_descriptions?
 
-        rich_value.set_xml_writer("#{dir}/xl/richData/rdrichvaluestructure.xml")
+        rich_value.set_xml_writer("#{@package_dir}/xl/richData/rdrichvaluestructure.xml")
         rich_value.assemble_xml_file
       end
 
@@ -246,9 +242,8 @@ module Writexlsx
       #
       def write_rich_value_types_file
         rich_value = Package::RichValueTypes.new
-        dir        = @package_dir
 
-        rich_value.set_xml_writer("#{dir}/xl/richData/rdRichValueTypes.xml")
+        rich_value.set_xml_writer("#{@package_dir}/xl/richData/rdRichValueTypes.xml")
         rich_value.assemble_xml_file
       end
 
@@ -256,12 +251,11 @@ module Writexlsx
       # Write the rdrichvalue.xml file.
       #
       def write_rich_value_rel
-        dir        = @package_dir
         rich_value = Package::RichValueRel.new
 
         rich_value.value_count = @workbook.embedded_images.size
 
-        rich_value.set_xml_writer("#{dir}/xl/richData/richValueRel.xml")
+        rich_value.set_xml_writer("#{@package_dir}/xl/richData/richValueRel.xml")
         rich_value.assemble_xml_file
       end
 
@@ -456,10 +450,9 @@ module Writexlsx
       def write_rich_value_rels_files
         return if @workbook.embedded_images.empty?
 
-        dir  = @package_dir
-
         # Create the .rels dirs.
-        FileUtils.mkdir_p("#{dir}/xl/richData/_rels")
+        rich_value_rels_dir = "#{@package_dir}/xl/richData/_rels"
+        FileUtils.mkdir_p(rich_value_rels_dir)
 
         rels = Package::Relationships.new
 
@@ -471,7 +464,7 @@ module Writexlsx
         end
 
         # Create the .rels file.
-        rels.set_xml_writer("#{dir}/xl/richData/_rels/richValueRel.xml.rels")
+        rels.set_xml_writer("#{rich_value_rels_dir}/richValueRel.xml.rels")
         rels.assemble_xml_file
       end
 
@@ -481,32 +474,34 @@ module Writexlsx
       def add_image_files
         index = 1
 
-        dir = "#{@package_dir}/xl/media"
-
         @workbook.embedded_images.each do |image|
-          FileUtils.mkdir_p(dir)
-          FileUtils.cp(image.filename, "#{dir}/image#{index}.#{image.type}")
-          index += 1
+          index = write_image_x_xml_files(image, index)
         end
 
         @workbook.images.each do |image|
-          FileUtils.mkdir_p(dir)
-          FileUtils.cp(image.filename, "#{dir}/image#{index}.#{image.type}")
-          index += 1
+          index = write_image_x_xml_files(image, index)
         end
+      end
+
+      def write_image_x_xml_files(image, index)
+        FileUtils.mkdir_p("#{@package_dir}/xl/media")
+        FileUtils.cp(
+          image.filename,
+          "#{@package_dir}/xl/media/image#{index}.#{image.type}"
+        )
+        index + 1
       end
 
       #
       # Write the vbaProject.bin file.
       #
       def add_vba_project
-        dir = @package_dir
         vba_project = @workbook.vba_project
 
         return unless vba_project
 
-        FileUtils.mkdir_p("#{dir}/xl")
-        FileUtils.copy(vba_project, "#{dir}/xl/vbaProject.bin")
+        FileUtils.mkdir_p("#{@package_dir}/xl")
+        FileUtils.copy(vba_project, "#{@package_dir}/xl/vbaProject.bin")
       end
     end
   end
