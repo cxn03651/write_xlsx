@@ -931,7 +931,11 @@ The image can be in PNG, JPEG or BMP format.
     worksheet2.insert_image('A1', '../images/ruby.bmp')
     worksheet3.insert_image('A1', '.c:\images\ruby.bmp')
 
-The `options` parameter can be used to set various options for the image. The defaults are:
+This is the equivalent of Excel's menu option to insert an image using the option to "Place over Cells".
+See `embed_image()` below for the equivalent method to "Place in Cell".
+
+The optional `options` parameter can be used to set various options for the image.
+The defaults are:
 
     options = {
       x_offset:        0,
@@ -1024,7 +1028,7 @@ For older versions of Excel a `#VALUE!` error is displayed.
 
 See `insert_image()` for the equivalent method to "Place over Cells".
 
-The optional `options` hash parameter can be used to set various options for the image. The defaults are:
+The optional `options` parameter can be used to set various options for the image. The defaults are:
 
     options = {
       cell_format: format,
