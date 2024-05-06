@@ -1760,7 +1760,7 @@ module Writexlsx
       check_dimensions(_row, _col)
       store_row_col_max_min_values(_row, _col)
 
-      hyperlink = Hyperlink.factory(_url, _str, _tip)
+      hyperlink = Hyperlink.factory(_url, _str, _tip, @max_url_length)
       store_hyperlink(_row, _col, hyperlink)
 
       raise "URL '#{url}' added but URL exceeds Excel's limit of 65,530 URLs per worksheet." if hyperlinks_count > 65_530

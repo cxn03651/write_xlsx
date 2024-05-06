@@ -18,7 +18,8 @@ require 'tempfile'
 require 'digest/md5'
 
 module Writexlsx
-  OFFICE_URL = 'http://schemas.microsoft.com/office/'   # :nodoc:
+  OFFICE_URL     = 'http://schemas.microsoft.com/office/'   # :nodoc:
+  MAX_URL_LENGTH = 2_079
 
   class Workbook
     include Writexlsx::Utility
@@ -45,6 +46,8 @@ module Writexlsx
 
     def initialize(file, *option_params)
       options, default_formats = process_workbook_options(*option_params)
+      @options = options.dup                    # for test
+      @default_formats = default_formats.dup    # for test
       @writer = Package::XMLWriterSimple.new
 
       @file = file
@@ -81,7 +84,7 @@ module Writexlsx
       @images              = []
       @strings_to_urls     = options[:strings_to_urls].nil? || options[:strings_to_urls] ? true : false
 
-      @max_url_length      = 2_079
+      @max_url_length      = MAX_URL_LENGTH
       @has_comments        = false
       @read_only           = 0
       @has_metadata        = false
@@ -89,10 +92,11 @@ module Writexlsx
       @has_embedded_descriptions = false
 
       if options[:max_url_length]
-        @max_url_length = options[:max_url_length]
+        @max_url_length = options[:max_url_length].to_i
 
-        @max_url_length = 2079 if @max_url_length < 250
+        @max_url_length = MAX_URL_LENGTH if @max_url_length < 255
       end
+
       # Structures for the shared strings data.
       @shared_strings = Package::SharedStrings.new
 
@@ -639,6 +643,32 @@ module Writexlsx
     end
 
     private
+
+    #
+    # Workbook の生成時のオプションハッシュを解析する
+    #
+    def process_workbook_options(*params)
+      case params.size
+      when 0
+        [{}, {}]
+      when 1 # one hash
+        options_keys = %i[tempdir date_1904 optimization excel2003_style strings_to_urls max_url_length]
+
+        hash = params.first
+        options = hash.reject { |k, _v| !options_keys.include?(k) }
+
+        default_format_properties =
+          hash[:default_format_properties] ||
+          hash.reject { |k, _v| options_keys.include?(k) }
+
+        [options, default_format_properties.dup]
+      when 2 # array which includes options and default_format_properties
+        options, default_format_properties = params
+        default_format_properties ||= {}
+
+        [options.dup, default_format_properties.dup]
+      end
+    end
 
     def filename
       setup_filename unless @filename

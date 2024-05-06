@@ -34,7 +34,7 @@ module Writexlsx
         url = escape_url(url)
 
         # Excel limits the escaped URL and location/anchor to 255 characters.
-        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
+        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the WriteXLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
 
         @url       = url
         @str       = normalized_str
@@ -123,7 +123,7 @@ module Writexlsx
         @url_str   = url_str
 
         # Excel limits the escaped URL and location/anchor to max_url_length characters.
-        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the Excel::Writer::XLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
+        raise "Ignoring URL '#{url}' where link or anchor > #{max_url_length} characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the WriteXLSX documentation." if url.bytesize > max_url_length || (!@url_str.nil? && @url_str.bytesize > max_url_length)
 
         @url       = url
         @str       = str

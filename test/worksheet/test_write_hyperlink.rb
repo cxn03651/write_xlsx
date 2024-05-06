@@ -33,4 +33,30 @@ class TestWriteHyperlink < Minitest::Test
 
     assert_equal(expected, result)
   end
+
+  def test_raise_if_url_size_is_longer_than_default_limit
+    base_url = "https://www.ruby-lang.org/"
+
+    exceed_url = base_url + ("a" * (@workbook.max_url_length - base_url.size + 1))
+    e = assert_raises RuntimeError do
+      @worksheet.write_url('A1', exceed_url)
+    end
+
+    assert_match(/characters since it exceeds Excel's limit for URLS\. See LIMITATIONS section of the WriteXLSX documentation\./, e.message)
+  end
+
+  def test_raise_if_url_size_is_longer_than_specified_limit
+    base_url = "https://www.ruby-lang.org/"
+    max_url_length = 255
+
+    @workbook  = WriteXLSX.new(StringIO.new, max_url_length: max_url_length)
+    @worksheet = @workbook.add_worksheet
+
+    exceed_url = base_url + ("a" * (max_url_length - base_url.size + 1))
+    e = assert_raises RuntimeError do
+      @worksheet.write_url('A1', exceed_url)
+    end
+
+    assert_match(/characters since it exceeds Excel's limit for URLS\. See LIMITATIONS section of the WriteXLSX documentation\./, e.message)
+  end
 end
