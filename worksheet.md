@@ -1681,7 +1681,7 @@ This can be used, for example, to hide intermediary steps in a complicated calcu
     worksheet.set_column('E:E', nil, nil,    1)
 
 The `level` parameter is used to set the outline level of the column.
-Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
+Outlines are described in [OUTLINES AND GROUPING IN EXCEL][].
 Adjacent columns with the same outline level are grouped together into a single outline.
 
 The following example sets an outline level of 1 for columns B to G:
