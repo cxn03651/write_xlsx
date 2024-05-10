@@ -1570,7 +1570,7 @@ calculation:
     worksheet.set_row(1, nil, nil,    1)
 
 The `level` parameter is used to set the outline level of the row.
-Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
+Outlines are described in [OUTLINES AND GROUPING IN EXCEL][].
 Adjacent rows with the same outline level are grouped together into a single outline.
 
 The following example sets an outline level of 1 for rows 2 and 3 (zero-indexed):
@@ -1717,7 +1717,7 @@ This method is the same as `set_column()` except that `width` is in pixels.
 #### <a name="outline_settings" class="anchor" href="#outline_settings"><span class="octicon octicon-link" /></a>outline_settings(visible, symbols_below, symbols_right, auto_style)
 
 The `outline_settings()` method is used to control the appearance of outlines in Excel.
-Outlines are described in "OUTLINES AND GROUPING IN EXCEL".
+Outlines are described in [OUTLINES AND GROUPING IN EXCEL][].
 
 The `visible` parameter is used to control whether or not outlines are visible.
 Setting this parameter to 0 will cause all outlines on the worksheet to be hidden.
@@ -2149,6 +2149,7 @@ The worksheet errors/warnings that can be ignored are:
 [DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
 [Chart Documentation]: chart.html#chart
 [FORMULAS AND FUNCTIONS IN EXCEL]: formulas_and_functions.html#formulas_and_functions
+[OUTLINE AND GROUPING IN EXCEL]: outline_and_grouping.html#outlines_and_grouping
 [CONDITIONAL FORMATTING IN EXCEL]: conditional_formatting.html#conditional_formatting
 [SPARKLINES IN EXCEL]: sparklines.html#sparklines
 [TABLES IN EXCEL]: tables.html#tables
