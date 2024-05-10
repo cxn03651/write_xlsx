@@ -2149,7 +2149,7 @@ The worksheet errors/warnings that can be ignored are:
 [DATES AND TIME IN EXCEL]: dates_and_time.html#dates_and_time
 [Chart Documentation]: chart.html#chart
 [FORMULAS AND FUNCTIONS IN EXCEL]: formulas_and_functions.html#formulas_and_functions
-[OUTLINE AND GROUPING IN EXCEL]: outline_and_grouping.html#outlines_and_grouping
+[OUTLINES AND GROUPING IN EXCEL]: outline_and_grouping.html#outlines_and_grouping
 [CONDITIONAL FORMATTING IN EXCEL]: conditional_formatting.html#conditional_formatting
 [SPARKLINES IN EXCEL]: sparklines.html#sparklines
 [TABLES IN EXCEL]: tables.html#tables
