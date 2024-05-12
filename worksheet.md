@@ -140,8 +140,8 @@ Here are some examples in both row-column and A1 notation:
     worksheet.write('A11', 'external:c:\foo.xlsx') # write_url()
     worksheet.write('A12', '=A3 + 3*A4'          ) # write_formula()
     worksheet.write('A13', '=SIN(PI()/4)'        ) # write_formula()
-    worksheet.write('A14', \@array               ) # write_row()
-    worksheet.write('A15', [\@array]             ) # write_col()
+    worksheet.write('A14', array               ) # write_row()
+    worksheet.write('A15', [array]             ) # write_col()
 
     # Write an array formula. Not available in WriteExcel gem.
     worksheet.write('A19', '{=SUM(A1:B1*A2:B2)}' ) # write_formula()
@@ -429,7 +429,7 @@ You can write 2D arrays of data in one go. For example:
                 ['shell',  'star',  'crab',  'stone']
            ]
 
-    worksheet.write_row('A1', @eec)
+    worksheet.write_row('A1', eec)
 
 Would produce a worksheet as follows:
 
