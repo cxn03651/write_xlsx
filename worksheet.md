@@ -190,7 +190,7 @@ The write methods return:
     -1 for insufficient number of arguments.
     -2 for row or column out of bounds.
     -3 for string too long.
-l
+
 #### <a name="write_number" class="anchor" href="#write_number"><span class="octicon octicon-link" /></a>write_number(row, column, number, format = nil)
 
 Write an integer or a float to the cell specified by `row` and `column`:
