@@ -239,7 +239,7 @@ See also the note about [CELL NOTATION][].
 #### <a name="write_rich_string" class="anchor" href="#write_rich_string"><span class="octicon octicon-link" /></a>write_rich_string(row, column, format, string, ..., cell_format = nil)
 
 The `write_rich_string()` method is used to write strings with multiple formats.
-For example to write the string "This is bold and this is italic" you would use the following:
+For example to write the string "This is **bold** and this is *italic*" you would use the following:
 
     bold   = workbook.add_format(bold:   1)
     italic = workbook.add_format(italic: 1)
@@ -264,7 +264,7 @@ that you want to format. For example:
       'This is an ', format, 'example', ' string')
 
 String fragments that don't have a format are given a default format. So for example when writing
-the string "Some bold text" you would use the first example below but it would be equivalent to the second:
+the string "Some **bold** text" you would use the first example below but it would be equivalent to the second:
 
     # With default formatting:
     bold    = workbook.add_format(bold: 1)
