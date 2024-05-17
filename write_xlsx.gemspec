@@ -15,7 +15,7 @@ Gem::Specification.new do |gem|
 
   gem.files = Dir.chdir(File.expand_path(__dir__)) do
     `git ls-files -z`.split("\x0").reject do |f|
-      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
+      (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor|docs)})
     end
   end
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
