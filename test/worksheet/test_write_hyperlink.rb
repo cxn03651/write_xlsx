@@ -59,4 +59,18 @@ class TestWriteHyperlink < Minitest::Test
 
     assert_match(/characters since it exceeds Excel's limit for URLS\. See LIMITATIONS section of the WriteXLSX documentation\./, e.message)
   end
+
+  def assert_nothing_raised
+    yield.tap { assert(true) }
+  rescue StandardError => e
+    raise Minitest::UnexpectedError.new(e)
+  end
+
+  def test_nothing_raise_when_nil_format_and_string_value1
+    @worksheet.write_url('A1', 'http://www.ruby-lang.org', nil, 'Ruby')
+
+    assert_nothing_raised do
+      @workbook.close
+    end
+  end
 end

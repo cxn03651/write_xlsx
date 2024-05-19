@@ -1753,7 +1753,8 @@ module Writexlsx
         _tip                 = tip
         _ignore_write_string = ignore_write_string
       end
-      _format, _str = _str, _format if _str.respond_to?(:xf_index) || !_format.respond_to?(:xf_index)
+
+      _format, _str = _str, _format if _str.respond_to?(:xf_index) || (_format && !_format.respond_to?(:xf_index))
       raise WriteXLSXInsufficientArgumentError if [_row, _col, _url].include?(nil)
 
       # Check that row and col are valid and store max and min values

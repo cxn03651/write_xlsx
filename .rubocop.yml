@@ -76,6 +76,9 @@ Metrics/ParameterLists:
 Metrics/PerceivedComplexity:
   Max: 50
 
+Minitest/UselessAssertion:
+  Enabled: false
+
 Naming/HeredocDelimiterNaming:
   Enabled: false
 
