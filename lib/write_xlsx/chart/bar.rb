@@ -22,7 +22,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype = subtype || 'clustered'
         @cat_axis_position = 'l'
         @val_axis_position = 'b'

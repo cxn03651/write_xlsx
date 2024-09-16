@@ -51,7 +51,7 @@ module Writexlsx
       attr_reader :visible
 
       def initialize(params)
-        super(params)
+        super
         @visible = params[:visible]
       end
     end
@@ -62,7 +62,7 @@ module Writexlsx
       attr_reader :label
 
       def initialize(params)
-        super(params)
+        super
 
         @label = trendline_label_properties(params[:label])
 
@@ -138,7 +138,7 @@ module Writexlsx
       attr_reader :size
 
       def initialize(params)
-        super(params)
+        super
 
         @type = value_or_raise(types, params[:type], 'maker type') if params[:type]
 

@@ -23,7 +23,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype = subtype || 'standard'
         @cross_between = 'midCat'
         @show_crosses  = false

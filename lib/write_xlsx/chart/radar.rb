@@ -31,7 +31,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype = subtype || 'marker'
         @default_marker = Marker.new(type: 'none') if @subtype == 'marker'
 

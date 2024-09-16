@@ -27,7 +27,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @show_crosses  = false
         @hi_low_lines  = Chartline.new({})
         @date_category = true

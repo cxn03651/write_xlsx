@@ -24,7 +24,7 @@ module Writexlsx
       include Writexlsx::WriteDPtPoint
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype           = subtype || 'marker_only'
         @cross_between     = 'midCat'
         @horiz_val_axis    = 0

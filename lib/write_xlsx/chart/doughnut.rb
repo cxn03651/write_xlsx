@@ -24,7 +24,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @vary_data_color = 1
         @hole_size       = 50
         @rotation        = 0

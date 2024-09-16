@@ -23,7 +23,7 @@ module Writexlsx
       include Writexlsx::WriteDPtPoint
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype ||= 'standard'
         @default_marker = Marker.new(type: 'none')
         @smooth_allowed = 1

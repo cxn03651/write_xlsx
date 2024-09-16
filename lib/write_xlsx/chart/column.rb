@@ -31,7 +31,7 @@ module Writexlsx
       include Writexlsx::Utility
 
       def initialize(subtype)
-        super(subtype)
+        super
         @subtype = subtype || 'clustered'
         @horiz_val_axis = 0
 
