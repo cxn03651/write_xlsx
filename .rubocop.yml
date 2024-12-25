@@ -17,6 +17,9 @@ Gemspec/RequiredRubyVersion:
 Gemspec/RequireMFA:
   Enabled: false
 
+Layout/ArgumentAlignment:
+  Enabled: false
+
 Layout/EndOfLine:
   EnforcedStyle: lf
 
