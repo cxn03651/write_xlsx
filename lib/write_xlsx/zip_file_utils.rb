@@ -16,7 +16,7 @@ module ZipFileUtils
     src = File.expand_path(src)
     dest = File.expand_path(dest)
     FileUtils.rm_f(dest)
-    Zip::File.open(dest, Zip::File::CREATE) do |zf|
+    Zip::File.open(dest, create: true) do |zf|
       if File.file?(src)
         zf.add(encode_path(File.basename(src), options[:fs_encoding]), src)
         break
