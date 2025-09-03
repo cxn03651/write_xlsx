@@ -211,7 +211,6 @@ module Writexlsx
     def write_nv_graphic_frame_pr(
           index, name = nil, description = nil, decorative = nil
         )
-
       name = "Chart #{index}" unless ptrue?(name)
 
       @writer.tag_elements('xdr:nvGraphicFramePr') do

@@ -409,7 +409,7 @@ module Writexlsx
 
       def row_col_param_for_conditional_formatting(*args)
         # Check for a cell reference in A1 notation and substitute row and column
-        user_range = if args[0].to_s =~ (/^\D/) && (args[0] =~ /,/)
+        user_range = if args[0].to_s =~ /^\D/ && (args[0] =~ /,/)
                        # Check for a user defined multiple range like B3:K6,B8:K11.
                        args[0].sub(/^=/, '').gsub(/\s*,\s*/, ' ').gsub("$", '')
                      end
@@ -516,7 +516,7 @@ module Writexlsx
         end
 
         # 'Between' and 'Not between' criteria require 2 values.
-        if param[:criteria] == 'between' || param[:criteria] == 'notBetween'
+        if %w[between notBetween].include?(param[:criteria])
           raise WriteXLSXOptionParameterError, "Invalid criteria : #{param[:criteria]}" unless param.has_key?(:minimum) || param.has_key?(:maximum)
         else
           param[:minimum] = nil
@@ -524,7 +524,7 @@ module Writexlsx
         end
 
         # Convert date/times value if required.
-        raise WriteXLSXOptionParameterError if (param[:type] == 'date' || param[:type] == 'time') && !(convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum))
+        raise WriteXLSXOptionParameterError if %w[date time].include?(param[:type]) && !(convert_date_time_value(param, :value) || convert_date_time_value(param, :maximum))
       end
 
       def convert_date_time_if_required(val)
@@ -697,7 +697,7 @@ module Writexlsx
           max_data = user_props.size
           max_data = total_icons - 1 if max_data >= total_icons
 
-          (0..max_data - 1).each do |i|
+          (0..(max_data - 1)).each do |i|
             # Set the user defined 'value' property.
             props[i][:value] = user_props[i][:value].to_s.sub(/^=/, '') if user_props[i][:value]
 

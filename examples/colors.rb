@@ -116,12 +116,12 @@ worksheet2.write(0, 3, "Name",  heading)
     border:   1
   )
 
-  worksheet2.write((i - 7), 0, i,                    center)
-  worksheet2.write((i - 7), 1, sprintf("0x%02X", i), center)
-  worksheet2.write((i - 7), 2, '',                   format)
+  worksheet2.write(i - 7, 0, i,                    center)
+  worksheet2.write(i - 7, 1, sprintf("0x%02X", i), center)
+  worksheet2.write(i - 7, 2, '',                   format)
 
   # Add the  color names
-  worksheet2.write((i - 7), 3, colors[i], center) if colors.has_key?(i)
+  worksheet2.write(i - 7, 3, colors[i], center) if colors.has_key?(i)
 end
 
 #

@@ -38,7 +38,7 @@ module Writexlsx
       def set_hole_size(size)
         return unless size
 
-        if size >= 10 && size <= 90
+        if size.between?(10, 90)
           @hole_size = size
         else
           raise "Hole size $size outside Excel range: 10 <= size <= 90"

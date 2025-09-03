@@ -172,7 +172,7 @@ module Writexlsx
         if time =~ /^(\d\d):(\d\d)(:(\d\d(\.\d+)?))?/
           hour   = ::Regexp.last_match(1).to_i
           min    = ::Regexp.last_match(2).to_i
-          sec    = ::Regexp.last_match(4).to_f || 0
+          sec    = ::Regexp.last_match(4).to_f
         else
           return nil # Not a valid time format.
         end
@@ -229,7 +229,7 @@ module Writexlsx
 
       # Accumulate the number of days since the epoch.
       days = day                               # Add days for current month
-      (0..month - 2).each do |m|
+      (0..(month - 2)).each do |m|
         days += mdays[m]                      # Add days for past months
       end
       days += range * 365                      # Add days for past years

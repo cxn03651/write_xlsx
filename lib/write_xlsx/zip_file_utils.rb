@@ -78,7 +78,7 @@ module ZipFileUtils
   end
 
   def self.relative(path, base_dir)
-    path[base_dir.length + 1..path.length] if path.index(base_dir) == 0
+    path[(base_dir.length + 1)..path.length] if path.index(base_dir) == 0
   end
 
   def self.encode_path(path, encode_s)

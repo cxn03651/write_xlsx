@@ -50,7 +50,7 @@ module Writexlsx
       def set_rotation(rotation)
         return unless rotation
 
-        if rotation >= 0 && rotation <= 360
+        if rotation.between?(0, 360)
           @rotation = rotation
         else
           raise "Chart rotation $rotation outside range: 0 <= rotation <= 360"

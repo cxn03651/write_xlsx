@@ -246,7 +246,7 @@ module Writexlsx
     def write_sparklines  # :nodoc:
       # Write the sparkline elements.
       @writer.tag_elements('x14:sparklines') do
-        (0..count - 1).each do |i|
+        (0..(count - 1)).each do |i|
           range    = @ranges[i]
           location = @locations[i]
 

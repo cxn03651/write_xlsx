@@ -2436,7 +2436,7 @@ module Writexlsx
 
       tokens = extract_filter_tokens(expression)
 
-      raise "Incorrect number of tokens in expression '#{expression}'" unless tokens.size == 3 || tokens.size == 7
+      raise "Incorrect number of tokens in expression '#{expression}'" unless [3, 7].include?(tokens.size)
 
       tokens = parse_filter_expression(expression, tokens)
 
@@ -2879,7 +2879,7 @@ module Writexlsx
 
       # Calculate the absolute x offset of the top-left vertex.
       x_abs = if @col_size_changed
-                (0..col_start - 1).inject(0) { |sum, col| sum += size_col(col, anchor) }
+                (0..(col_start - 1)).inject(0) { |sum, col| sum += size_col(col, anchor) }
               else
                 # Optimisation for when the column widths haven't changed.
                 DEFAULT_COL_PIXELS * col_start
@@ -2889,7 +2889,7 @@ module Writexlsx
       # Calculate the absolute y offset of the top-left vertex.
       # Store the column change to allow optimisations.
       y_abs = if @row_size_changed
-                (0..row_start - 1).inject(0) { |sum, row| sum += size_row(row, anchor) }
+                (0..(row_start - 1)).inject(0) { |sum, row| sum += size_row(row, anchor) }
               else
                 # Optimisation for when the row heights haven't changed.
                 @default_row_pixels * row_start
@@ -3813,7 +3813,7 @@ EOS
           end
         else
           # Row attributes only.
-          write_empty_row(row_num, span, *(@set_rows[row_num]))
+          write_empty_row(row_num, span, *@set_rows[row_num])
         end
       end
     end
@@ -4649,7 +4649,7 @@ EOS
     def write_sparklines(sparkline)
       # Write the sparkline elements.
       @writer.tag_elements('x14:sparklines') do
-        (0..sparkline[:count] - 1).each do |i|
+        (0..(sparkline[:count] - 1)).each do |i|
           range    = sparkline[:ranges][i]
           location = sparkline[:locations][i]
 

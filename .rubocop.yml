@@ -91,6 +91,9 @@ Naming/MethodName:
 Naming/MethodParameterName:
   Enabled: false
 
+Naming/PredicateMethod:
+  Enabled: false
+
 Naming/VariableNumber:
   Enabled: false
 
@@ -109,6 +112,9 @@ Style/FormatString:
 
 Style/FormatStringToken:
   EnforcedStyle: unannotated
+
+Style/HashSlice:
+  Enabled: false
 
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys

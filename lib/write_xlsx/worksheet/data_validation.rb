@@ -163,7 +163,7 @@ module Writexlsx
           attributes << %w[errorStyle information] if @error_type == 2
         end
         attributes << ['allowBlank',       1] if @ignore_blank != 0
-        attributes << ['showDropDown',     1] if @dropdown     == 0
+        attributes << ['showDropDown',     1] if @dropdown == 0
         attributes << ['showInputMessage', 1] if @show_input   != 0
         attributes << ['showErrorMessage', 1] if @show_error   != 0
 

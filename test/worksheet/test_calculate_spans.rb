@@ -47,7 +47,7 @@ class TestCalculateSpans < Minitest::Test
       worksheet = @workbook.add_worksheet('')
       r   = t.row
       col = t.col
-      (r..r + 16).each do |row|
+      (r..(r + 16)).each do |row|
         worksheet.write(row, col, 1)
         col += 1
       end

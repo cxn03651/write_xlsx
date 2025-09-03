@@ -147,12 +147,12 @@ def standard_colors(workbook, center, heading, colors)
       border:   1
     )
 
-    worksheet.write((i - 7), 0, i, center)
-    worksheet.write((i - 7), 1, sprintf("0x%02X", i), center)
-    worksheet.write((i - 7), 2, '', format)
+    worksheet.write(i - 7, 0, i, center)
+    worksheet.write(i - 7, 1, sprintf("0x%02X", i), center)
+    worksheet.write(i - 7, 2, '', format)
 
     # Add the  color names
-    worksheet.write((i - 7), 3, colors[i], center) if colors[i]
+    worksheet.write(i - 7, 3, colors[i], center) if colors[i]
   end
 end
 
@@ -294,11 +294,11 @@ def borders(workbook, center, heading, _colors)
     format.set_border_color('red')
     format.set_align('center')
 
-    worksheet.write((2 * (i + 1)), 0, i, center)
-    worksheet.write((2 * (i + 1)),
+    worksheet.write(2 * (i + 1), 0, i, center)
+    worksheet.write(2 * (i + 1),
                     1, sprintf("0x%02X", i), center)
 
-    worksheet.write((2 * (i + 1)), 3, "Border", format)
+    worksheet.write(2 * (i + 1), 3, "Border", format)
   end
 
   worksheet.write(30, 0, "Diag type",             heading)
@@ -313,11 +313,11 @@ def borders(workbook, center, heading, _colors)
     format.set_diag_color('red')
     format.set_align('center')
 
-    worksheet.write((2 * (i + 15)), 0, i, center)
-    worksheet.write((2 * (i + 15)),
+    worksheet.write(2 * (i + 15), 0, i, center)
+    worksheet.write(2 * (i + 15),
                     1, sprintf("0x%02X", i), center)
 
-    worksheet.write((2 * (i + 15)), 3, "Border", format)
+    worksheet.write(2 * (i + 15), 3, "Border", format)
   end
 end
 
@@ -348,14 +348,14 @@ def patterns(workbook, center, heading, _colors)
     format.set_fg_color('green')
     format.set_align('center')
 
-    worksheet.write((2 * (i + 1)), 0, i, center)
-    worksheet.write((2 * (i + 1)),
+    worksheet.write(2 * (i + 1), 0, i, center)
+    worksheet.write(2 * (i + 1),
                     1, sprintf("0x%02X", i), center)
 
-    worksheet.write((2 * (i + 1)), 3, "Pattern", format)
+    worksheet.write(2 * (i + 1), 3, "Pattern", format)
 
     if i == 1
-      worksheet.write((2 * (i + 1)),
+      worksheet.write(2 * (i + 1),
                       5, "This is solid colour, the most useful pattern.", heading)
     end
   end

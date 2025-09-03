@@ -781,7 +781,7 @@ module Writexlsx
 
       if pos > 0
         sheetname = range[0, pos]
-        cells = range[pos + 1..-1]
+        cells = range[(pos + 1)..-1]
       end
 
       # Split the cell range into 2 cells or else use single cell for both.

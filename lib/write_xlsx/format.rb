@@ -415,7 +415,7 @@ module Writexlsx
     def set_rotation(rotation)
       if rotation == 270
         rotation = 255
-      elsif rotation >= -90 && rotation <= 90
+      elsif rotation.between?(-90, 90)
         rotation = -rotation + 90 if rotation < 0
       else
         raise "Rotation #{rotation} outside range: -90 <= angle <= 90"
