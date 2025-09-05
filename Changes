@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2025-07-29
+    Bump rubyzip version to 3.x.
+
 2024-04-12 v1.12.1
     Added support for embedding images into worksheets with
     worksheet `embed_image()`.

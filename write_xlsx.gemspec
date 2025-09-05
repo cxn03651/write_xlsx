@@ -21,7 +21,7 @@ Gem::Specification.new do |gem|
   gem.executables   = gem.files.grep(%r{^bin/}).map { |f| File.basename(f) }
   gem.require_paths = ['lib']
   gem.add_dependency 'nkf'
-  gem.add_dependency 'rubyzip', '>= 1.0.0'
+  gem.add_dependency 'rubyzip', '>= 3.0.0'
   gem.add_development_dependency 'byebug'
   gem.add_development_dependency 'minitest'
   gem.add_development_dependency 'mutex_m'
