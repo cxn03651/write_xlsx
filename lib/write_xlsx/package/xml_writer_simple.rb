@@ -35,12 +35,6 @@ module Writexlsx
         end_tag(tag)
       end
 
-      def tag_elements_str(tag, attributes = nil)
-        start_tag_str(tag, attributes) +
-          yield +
-          end_tag_str(tag)
-      end
-
       def start_tag(tag, attr = nil)
         io_write(start_tag_str(tag, attr))
       end
