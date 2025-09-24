@@ -14,7 +14,7 @@ Change history of write_xlsx rubygem.
 
     This functionality is the equivalent of Excel's menu option to insert an
     image using the option to "Place in Cell" which is available in Excel
-    3t5 versions from 2023 onwardsd.
+    365 versions from 2023 onwards.
 
     Added support for Excel 365 `IMAGE()` future.
 
@@ -30,6 +30,7 @@ Change history of write_xlsx rubygem.
     it can only be unhidden by VBA.
 
     Fixed indentation and alignment property mismatch.
+
     Fix issue where a horizontal alignment format was ignored if the
     indentation was also set.
 
