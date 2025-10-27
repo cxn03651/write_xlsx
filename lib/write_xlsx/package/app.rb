@@ -8,6 +8,7 @@ module Writexlsx
   module Package
     class App
       include Writexlsx::Utility
+
       attr_writer :doc_security
 
       def initialize(workbook)

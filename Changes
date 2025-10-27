@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2025-10-28 v1.12.3
+    fix compatibility with rubyzip 3.x
+
 2025-09-08 v1.12.2
     Fix Update gemspec: require rubyzip ~> 2.4.0
 
