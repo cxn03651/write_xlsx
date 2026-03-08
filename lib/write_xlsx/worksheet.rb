@@ -17,12 +17,30 @@ require 'write_xlsx/worksheet/cell_data'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/hyperlink'
 require 'write_xlsx/worksheet/page_setup'
+require 'write_xlsx/worksheet/columns'
+require 'write_xlsx/worksheet/rows'
+require 'write_xlsx/worksheet/selection'
+require 'write_xlsx/worksheet/panes'
+require 'write_xlsx/worksheet/autofilter'
+require 'write_xlsx/worksheet/conditional_formats'
+require 'write_xlsx/worksheet/protection'
+require 'write_xlsx/worksheet/print_options'
+require 'write_xlsx/worksheet/drawings'
 require 'tempfile'
 require 'date'
 
 module Writexlsx
   class Worksheet
     include Writexlsx::Utility
+    include Columns
+    include Rows
+    include Selection
+    include Panes
+    include Autofilter
+    include ConditionalFormats
+    include Protection
+    include PrintOptions
+    include DrawingMethods
 
     COLINFO = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
 
@@ -292,333 +310,18 @@ module Writexlsx
     end
 
     #
-    # :call-seq:
-    #   set_column(firstcol, lastcol, width, format, hidden, level, collapsed)
-    #
-    # This method can be used to change the default properties of a single
-    # column or a range of columns. All parameters apart from +first_col+
-    # and +last_col+ are optional.
-    #
-    def set_column(*args)
-      # Check for a cell reference in A1 notation and substitute row and column
-      # ruby 3.2 no longer handles =~ for various types
-      if args[0].respond_to?(:=~) && args[0].to_s =~ /^\D/
-        _row1, firstcol, _row2, lastcol, *data = substitute_cellref(*args)
-      else
-        firstcol, lastcol, *data = args
-      end
-
-      # Ensure at least firstcol, lastcol and width
-      return unless firstcol && lastcol && !data.empty?
-
-      # Assume second column is the same as first if 0. Avoids KB918419 bug.
-      lastcol = firstcol unless ptrue?(lastcol)
-
-      # Ensure 2nd col is larger than first. Also for KB918419 bug.
-      firstcol, lastcol = lastcol, firstcol if firstcol > lastcol
-
-      width, format, hidden, level, collapsed = data
-      autofit = 0
-
-      # Check that cols are valid and store max and min values with default row.
-      # NOTE: The check shouldn't modify the row dimensions and should only modify
-      #       the column dimensions in certain cases.
-      ignore_row = 1
-      ignore_col = 1
-      ignore_col = 0 if format.respond_to?(:xf_index)   # Column has a format.
-      ignore_col = 0 if width && ptrue?(hidden)         # Column has a width but is hidden
-
-      check_dimensions_and_update_max_min_values(0, firstcol, ignore_row, ignore_col)
-      check_dimensions_and_update_max_min_values(0, lastcol,  ignore_row, ignore_col)
-
-      # Set the limits for the outline levels (0 <= x <= 7).
-      level ||= 0
-      level = 0 if level < 0
-      level = 7 if level > 7
-
-      # Excel has a maximum column width of 255 characters.
-      width = 255.0 if width && width > 255.0
-
-      @outline_col_level = level if level > @outline_col_level
-
-      # Store the column data based on the first column. Padded for sorting.
-      (firstcol..lastcol).each do |col|
-        @col_info[col] =
-          COLINFO.new(width, format, hidden, level, collapsed, autofit)
-      end
-
-      # Store the column change to allow optimisations.
-      @col_size_changed = true
-    end
+    # column-related methods have been moved to worksheet/columns.rb
+    # see Writexlsx::Worksheet::Columns for implementation
 
     #
-    # Set the width (and properties) of a single column or a range of columns in
-    # pixels rather than character units.
-    #
-    def set_column_pixels(*data)
-      cell = data[0]
+    # pixel-based column sizing moved to worksheet/columns.rb
+    # see Writexlsx::Worksheet::Columns#set_column_pixels
 
-      # Check for a cell reference in A1 notation and substitute row and column
-      if cell =~ /^\D/
-        data = substitute_cellref(*data)
+    # autofit logic moved to worksheet/columns.rb
+    # see Writexlsx::Worksheet::Columns#autofit
 
-        # Returned values row1 and row2 aren't required here. Remove them.
-        data.shift         # $row1
-        data.delete_at(1)  # $row2
-      end
-
-      # Ensure at least $first_col, $last_col and $width
-      return if data.size < 3
-
-      first_col, last_col, pixels, format, hidden, level = data
-      hidden ||= 0
-
-      width = pixels_to_width(pixels) if ptrue?(pixels)
-
-      set_column(first_col, last_col, width, format, hidden, level)
-    end
-
-    #
-    # autofit()
-    #
-    # Simulate autofit based on the data, and datatypes in each column. We do this
-    # by estimating a pixel width for each cell data.
-    #
-    def autofit
-      col_width = {}
-
-      # Iterate through all the data in the worksheet.
-      (@dim_rowmin..@dim_rowmax).each do |row_num|
-        # Skip row if it doesn't contain cell data.
-        next unless @cell_data_table[row_num]
-
-        (@dim_colmin..@dim_colmax).each do |col_num|
-          length = 0
-          case (cell_data = @cell_data_table[row_num][col_num])
-          when StringCellData, RichStringCellData
-            # Handle strings and rich strings.
-            #
-            # For standard shared strings we do a reverse lookup
-            # from the shared string id to the actual string. For
-            # rich strings we use the unformatted string. We also
-            # split multiline strings and handle each part
-            # separately.
-            string = cell_data.raw_string
-
-            if string =~ /\n/
-              # Handle multiline strings.
-              length = max = string.split("\n").collect do |str|
-                xl_string_pixel_width(str)
-              end.max
-            else
-              length = xl_string_pixel_width(string)
-            end
-          when DateTimeCellData
-
-            # Handle dates.
-            #
-            # The following uses the default width for mm/dd/yyyy
-            # dates. It isn't feasible to parse the number format
-            # to get the actual string width for all format types.
-            length = @default_date_pixels
-          when NumberCellData
-
-            # Handle numbers.
-            #
-            # We use a workaround/optimization for numbers since
-            # digits all have a pixel width of 7. This gives a
-            # slightly greater width for the decimal place and
-            # minus sign but only by a few pixels and
-            # over-estimation is okay.
-            length = 7 * cell_data.token.to_s.length
-          when BooleanCellData
-
-            # Handle boolean values.
-            #
-            # Use the Excel standard widths for TRUE and FALSE.
-            if ptrue?(cell_data.token)
-              length = 31
-            else
-              length = 36
-            end
-          when FormulaCellData, FormulaArrayCellData, DynamicFormulaArrayCellData
-            # Handle formulas.
-            #
-            # We only try to autofit a formula if it has a
-            # non-zero value.
-            if ptrue?(cell_data.data)
-              length = xl_string_pixel_width(cell_data.data)
-            end
-          end
-
-          # If the cell is in an autofilter header we add an
-          # additional 16 pixels for the dropdown arrow.
-          if length > 0 &&
-             @filter_cells["#{row_num}:#{col_num}"]
-            length += 16
-          end
-
-          # Add the string lenght to the lookup hash.
-          max                = col_width[col_num] || 0
-          col_width[col_num] = length if length > max
-        end
-      end
-
-      # Apply the width to the column.
-      col_width.each do |col_num, pixel_width|
-        # Convert the string pixel width to a character width using an
-        # additional padding of 7 pixels, like Excel.
-        width = pixels_to_width(pixel_width + 7)
-
-        # The max column character width in Excel is 255.
-        width = 255.0 if width > 255.0
-
-        # Add the width to an existing col info structure or add a new one.
-        if @col_info[col_num]
-          @col_info[col_num].width   = width
-          @col_info[col_num].autofit = 1
-        else
-          @col_info[col_num] =
-            COLINFO.new(width, nil, 0, 0, 0, 1)
-        end
-      end
-    end
-
-    #
-    # :call-seq:
-    #   set_selection(cell_or_cell_range)
-    #
-    # Set which cell or cells are selected in a worksheet.
-    #
-    def set_selection(*args)
-      return if args.empty?
-
-      if (row_col_array = row_col_notation(args.first))
-        row_first, col_first, row_last, col_last = row_col_array
-      else
-        row_first, col_first, row_last, col_last = args
-      end
-
-      active_cell = xl_rowcol_to_cell(row_first, col_first)
-
-      if row_last  # Range selection.
-        # Swap last row/col for first row/col as necessary
-        row_first, row_last = row_last, row_first if row_first > row_last
-        col_first, col_last = col_last, col_first if col_first > col_last
-
-        sqref = xl_range(row_first, row_last, col_first, col_last)
-      else          # Single cell selection.
-        sqref = active_cell
-      end
-
-      # Selection isn't set for cell A1.
-      return if sqref == 'A1'
-
-      @selections = [[nil, active_cell, sqref]]
-    end
-
-    ###############################################################################
-    #
-    # set_top_left_cell()
-    #
-    # Set the first visible cell at the top left of the worksheet.
-    #
-    def set_top_left_cell(row, col = nil)
-      if (row_col_array = row_col_notation(row))
-        _row, _col = row_col_array
-      else
-        _row = row
-        _col = col
-      end
-
-      @top_left_cell = xl_rowcol_to_cell(_row, _col)
-    end
-
-    #
-    # :call-seq:
-    #   freeze_panes(row, col [ , top_row, left_col ] )
-    #
-    # This method can be used to divide a worksheet into horizontal or
-    # vertical regions known as panes and to also "freeze" these panes so
-    # that the splitter bars are not visible. This is the same as the
-    # Window->Freeze Panes menu command in Excel
-    #
-    def freeze_panes(*args)
-      return if args.empty?
-
-      # Check for a cell reference in A1 notation and substitute row and column.
-      if (row_col_array = row_col_notation(args.first))
-        row, col, top_row, left_col = row_col_array
-        type = args[1]
-      else
-        row, col, top_row, left_col, type = args
-      end
-
-      col      ||= 0
-      top_row  ||= row
-      left_col ||= col
-      type     ||= 0
-
-      @panes   = [row, col, top_row, left_col, type]
-    end
-
-    #
-    # :call-seq:
-    #   split_panes(y, x, top_row, left_col)
-    #
-    # Set panes and mark them as split.
-    #
-    def split_panes(*args)
-      # Call freeze panes but add the type flag for split panes.
-      freeze_panes(args[0], args[1], args[2], args[3], 2)
-    end
-
-    #
-    # Set the page orientation as portrait.
-    # The default worksheet orientation is portrait, so you won't generally
-    # need to call this method.
-    #
-    def set_portrait
-      @page_setup.orientation        = true
-      @page_setup.page_setup_changed = true
-    end
-
-    #
-    # Set the page orientation as landscape.
-    #
-    def set_landscape
-      @page_setup.orientation         = false
-      @page_setup.page_setup_changed  = true
-    end
-
-    #
-    # This method is used to display the worksheet in "Page View/Layout" mode.
-    #
-    def set_page_view(flag = 1)
-      @page_view = flag
-    end
-
-    #
-    # set_pagebreak_view
-    #
-    # Set the page view mode.
-    #
-    def set_pagebreak_view
-      @page_view = 2
-    end
-
-    #
-    # Set the colour of the worksheet tab.
-    #
-    def tab_color=(color)
-      @tab_color = Colors.new.color(color)
-    end
-
-    # This method is deprecated. use tab_color=().
-    def set_tab_color(color)
-      put_deprecate_message("#{self}.set_tab_color")
-      self.tab_color = color
-    end
+    # print and display option methods moved to worksheet/print_options.rb
+    # see Writexlsx::Worksheet::PrintOptions for implementation
 
     #
     # Set the paper type. Ex. 1 = US Letter, 9 = A4
@@ -2091,81 +1794,8 @@ module Writexlsx
       write_formula(_row, _col, _formula, _format, _value)
     end
 
-    #
-    # :call-seq:
-    #   set_row(row [ , height, format, hidden, level, collapsed ])
-    #
-    # This method can be used to change the default properties of a row.
-    # All parameters apart from +row+ are optional.
-    #
-    def set_row(*args)
-      return unless args[0]
-
-      row = args[0]
-      height = args[1] || @default_height
-      xf     = args[2]
-      hidden = args[3] || 0
-      level  = args[4] || 0
-      collapsed = args[5] || 0
-
-      # Use min col in check_dimensions. Default to 0 if undefined.
-      min_col = @dim_colmin || 0
-
-      # Check that row and col are valid and store max and min values.
-      check_dimensions(row, min_col)
-      store_row_col_max_min_values(row, min_col)
-
-      height ||= @default_row_height
-
-      # If the height is 0 the row is hidden and the height is the default.
-      if height == 0
-        hidden = 1
-        height = @default_row_height
-      end
-
-      # Set the limits for the outline levels (0 <= x <= 7).
-      level = 0 if level < 0
-      level = 7 if level > 7
-
-      @outline_row_level = level if level > @outline_row_level
-
-      # Store the row properties.
-      @set_rows[row] = [height, xf, hidden, level, collapsed]
-
-      # Store the row change to allow optimisations.
-      @row_size_changed = true
-
-      # Store the row sizes for use when calculating image vertices.
-      @row_sizes[row] = [height, hidden]
-    end
-
-    #
-    # This method is used to set the height (in pixels) and the properties of the
-    # row.
-    #
-    def set_row_pixels(*data)
-      height = data[1]
-
-      data[1] = pixels_to_height(height) if ptrue?(height)
-      set_row(*data)
-    end
-
-    #
-    # Set the default row properties
-    #
-    def set_default_row(height = nil, zero_height = nil)
-      height      ||= @original_row_height
-      zero_height ||= 0
-
-      if height != @original_row_height
-        @default_row_height = height
-
-        # Store the row change to allow optimisations.
-        @row_size_changed = 1
-      end
-
-      @default_row_zeroed = 1 if ptrue?(zero_height)
-    end
+    # row-related methods have been moved to worksheet/rows.rb
+    # see Writexlsx::Worksheet::Rows for implementation
 
     #
     # merge_range(first_row, first_col, last_row, last_col, string, format)
@@ -2278,17 +1908,8 @@ module Writexlsx
     end
 
     #
-    # :call-seq:
-    #   conditional_formatting(cell_or_cell_range, options)
-    #
-    # Conditional formatting is a feature of Excel which allows you to apply a
-    # format to a cell or a range of cells based on a certain criteria.
-    #
-    def conditional_formatting(*args)
-      cond_format = Package::ConditionalFormat.factory(self, *args)
-      @cond_formats[cond_format.range] ||= []
-      @cond_formats[cond_format.range] << cond_format
-    end
+    # conditional formatting methods moved to worksheet/conditional_formats.rb
+    # see Writexlsx::Worksheet::ConditionalFormats for implementation
 
     #
     # :call-seq:
@@ -2392,102 +2013,12 @@ module Writexlsx
       @page_setup.page_setup_changed = true
     end
 
-    #
-    # :call-seq:
-    #   autofilter(first_row, first_col, last_row, last_col)
-    #
-    # Set the autofilter area in the worksheet.
-    #
-    def autofilter(row1, col1 = nil, row2 = nil, col2 = nil)
-      if (row_col_array = row_col_notation(row1))
-        _row1, _col1, _row2, _col2 = row_col_array
-      else
-        _row1 = row1
-        _col1 = col1
-        _row2 = row2
-        _col2 = col2
-      end
-      return if [_row1, _col1, _row2, _col2].include?(nil)
-
-      # Reverse max and min values if necessary.
-      _row1, _row2 = _row2, _row1 if _row2 < _row1
-      _col1, _col2 = _col2, _col1 if _col2 < _col1
-
-      @autofilter_area = convert_name_area(_row1, _col1, _row2, _col2)
-      @autofilter_ref  = xl_range(_row1, _row2, _col1, _col2)
-      @filter_range    = [_col1, _col2]
-
-      # Store the filter cell positions for use in the autofit calculation.
-      (_col1.._col2).each do |col|
-        @filter_cells["#{_row1}:#{col}"] = 1
-      end
-    end
-
-    #
-    # Set the column filter criteria.
-    #
-    # The filter_column method can be used to filter columns in a autofilter
-    # range based on simple conditions.
-    #
-    def filter_column(col, expression)
-      raise "Must call autofilter before filter_column" unless @autofilter_area
-
-      col = prepare_filter_column(col)
-
-      tokens = extract_filter_tokens(expression)
-
-      raise "Incorrect number of tokens in expression '#{expression}'" unless [3, 7].include?(tokens.size)
-
-      tokens = parse_filter_expression(expression, tokens)
-
-      # Excel handles single or double custom filters as default filters. We need
-      # to check for them and handle them accordingly.
-      if tokens.size == 2 && tokens[0] == 2
-        # Single equality.
-        filter_column_list(col, tokens[1])
-      elsif tokens.size == 5 && tokens[0] == 2 && tokens[2] == 1 && tokens[3] == 2
-        # Double equality with "or" operator.
-        filter_column_list(col, tokens[1], tokens[4])
-      else
-        # Non default custom filter.
-        @filter_cols[col] = Array.new(tokens)
-        @filter_type[col] = 0
-      end
-
-      @filter_on = 1
-    end
-
-    #
-    # Set the column filter criteria in Excel 2007 list style.
-    #
-    def filter_column_list(col, *tokens)
-      tokens.flatten!
-      raise "Incorrect number of arguments to filter_column_list" if tokens.empty?
-      raise "Must call autofilter before filter_column_list" unless @autofilter_area
-
-      col = prepare_filter_column(col)
-
-      @filter_cols[col] = tokens
-      @filter_type[col] = 1           # Default style.
-      @filter_on        = 1
-    end
+    # autofilter methods moved to worksheet/autofilter.rb
+    # see Writexlsx::Worksheet::Autofilter for implementation
 
     #
     # Store the horizontal page breaks on a worksheet.
     #
-    def set_h_pagebreaks(*args)
-      breaks = args.collect do |brk|
-        Array(brk)
-      end.flatten
-      @page_setup.hbreaks += breaks
-    end
-
-    #
-    # Store the vertical page breaks on a worksheet.
-    #
-    def set_v_pagebreaks(*args)
-      @page_setup.vbreaks += args
-    end
 
     #
     # This method is used to make all cell comments visible when a worksheet
@@ -4685,14 +4216,8 @@ EOS
       end
     end
 
-    #
-    # Write the <conditionalFormatting> element.
-    #
-    def write_conditional_formatting(range, cond_formats) # :nodoc:
-      @writer.tag_elements('conditionalFormatting', [['sqref', range]]) do
-        cond_formats.each { |cond_format| cond_format.write_cf_rule }
-      end
-    end
+    # conditional formatting XML writing moved to worksheet/conditional_formats.rb
+    # see Writexlsx::Worksheet::ConditionalFormats#write_conditional_formatting
 
     def store_data_to_table(cell_data, row, col) # :nodoc:
       if @cell_data_table[row]
