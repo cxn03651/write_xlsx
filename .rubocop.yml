@@ -46,6 +46,7 @@ Lint/DuplicateBranch:
   IgnoreLiteralBranches: true
   Exclude:
     - 'lib/write_xlsx/worksheet.rb'
+    - 'lib/write_xlsx/worksheet/data_writing.rb'
 
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
