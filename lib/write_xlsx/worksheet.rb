@@ -1053,7 +1053,7 @@ module Writexlsx
           write_blank(_row, _col, _format)
         elsif @workbook.strings_to_urls
           # Match http, https or ftp URL
-          if _token =~ %r{\A[fh]tt?ps?://}
+          if _token =~ %r{\A(?:https?|ftp)://}
             write_url(_row, _col, _token, _format, _value1, _value2)
           # Match mailto:
           elsif _token =~ /\Amailto:/
