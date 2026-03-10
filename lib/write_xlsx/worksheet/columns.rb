@@ -101,11 +101,11 @@ module Writexlsx
         # Iterate through all the data in the worksheet.
         (@dim_rowmin..@dim_rowmax).each do |row_num|
           # Skip row if it doesn't contain cell data.
-          next unless @cell_data_table[row_num]
+          next unless @cell_data_store[row_num]
 
           (@dim_colmin..@dim_colmax).each do |col_num|
             length = 0
-            case (cell_data = @cell_data_table[row_num][col_num])
+            case (cell_data = @cell_data_store[row_num][col_num])
             when StringCellData, RichStringCellData
               # Handle strings and rich strings.
               #

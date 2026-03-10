@@ -18,7 +18,7 @@ class TestRepeatFormula < Minitest::Test
     col = 0
     formula = @worksheet.store_formula('=SUM(A1:A10)')
     @worksheet.repeat_formula(row, col, formula, format)
-    result = @worksheet.instance_variable_get(:@cell_data_table)[row][col].token
+    result = @worksheet.instance_variable_get(:@cell_data_store)[row][col].token
 
     assert_equal(expected, result)
 
@@ -27,7 +27,7 @@ class TestRepeatFormula < Minitest::Test
     col = 0
     formula = @worksheet.store_formula('=SUM(A1:A10)')
     @worksheet.repeat_formula(row, col, formula, format, 'A1', 'A2')
-    result = @worksheet.instance_variable_get(:@cell_data_table)[row][col].token
+    result = @worksheet.instance_variable_get(:@cell_data_store)[row][col].token
 
     assert_equal(expected, result)
 
@@ -36,7 +36,7 @@ class TestRepeatFormula < Minitest::Test
     col = 0
     formula = @worksheet.store_formula('=SUM(A1:A10)')
     @worksheet.repeat_formula(row, col, formula, format, /^A1$/, 'A2')
-    result = @worksheet.instance_variable_get(:@cell_data_table)[row][col].token
+    result = @worksheet.instance_variable_get(:@cell_data_store)[row][col].token
 
     assert_equal(expected, result)
 
@@ -45,7 +45,7 @@ class TestRepeatFormula < Minitest::Test
     col = 0
     formula = @worksheet.store_formula('A1+A1')
     @worksheet.repeat_formula(row, col, formula, format, 'A1', 'A2', 'A1', 'A2')
-    result = @worksheet.instance_variable_get(:@cell_data_table)[row][col].token
+    result = @worksheet.instance_variable_get(:@cell_data_store)[row][col].token
 
     assert_equal(expected, result)
 
@@ -54,7 +54,7 @@ class TestRepeatFormula < Minitest::Test
     col = 0
     formula = @worksheet.store_formula('A1 + SIN(A1)')
     @worksheet.repeat_formula(row, col, formula, format, /^A1$/, 'A10', /^A1$/, 'A10')
-    result = @worksheet.instance_variable_get(:@cell_data_table)[row][col].token
+    result = @worksheet.instance_variable_get(:@cell_data_store)[row][col].token
 
     assert_equal(expected, result)
   end

@@ -395,11 +395,6 @@ module Writexlsx
       @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
     end
 
-    def store_data_to_table(cell_data, row, col) # :nodoc:
-      @cell_data_table[row] || @cell_data_table[row] = []
-      @cell_data_table[row][col] = cell_data
-    end
-
     def float_to_str(float)
       return '' unless float
 

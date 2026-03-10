@@ -653,16 +653,16 @@ module Writexlsx
 
         format = nil
         cell_data = nil
-        if @cell_data_table[_row].nil? || @cell_data_table[_row][_col].nil?
+        if @cell_data_store[_row].nil? || @cell_data_store[_row][_col].nil?
           format = @workbook.add_format(_params)
           write_blank(_row, _col, format)
         else
-          if @cell_data_table[_row][_col].xf.nil?
+          if @cell_data_store[_row][_col].xf.nil?
             format = @workbook.add_format(_params)
-            cell_data = @cell_data_table[_row][_col]
+            cell_data = @cell_data_store[_row][_col]
           else
             format = @workbook.add_format
-            cell_data = @cell_data_table[_row][_col]
+            cell_data = @cell_data_store[_row][_col]
             format.copy(cell_data.xf)
             format.set_format_properties(_params)
           end
@@ -965,14 +965,6 @@ module Writexlsx
 
       private
 
-      #
-      # Add a string to the shared string table, if it isn't already there, and
-      # return the string index.
-      #
-      def shared_string_index(str) # :nodoc:
-        @workbook.shared_string_index(str)
-      end
-
       def store_hyperlink(row, col, hyperlink)
         @hyperlinks      ||= {}
         @hyperlinks[row] ||= {}
@@ -992,11 +984,6 @@ module Writexlsx
             write_blank(row, col, format)
           end
         end
-      end
-
-      def store_row_col_max_min_values(row, col)
-        store_row_max_min_values(row)
-        store_col_max_min_values(col)
       end
     end
   end

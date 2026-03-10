@@ -392,7 +392,7 @@ module Writexlsx
           span       = @row_spans[span_index]
 
           # Write the cells if the row contains data.
-          if @cell_data_table[row_num]
+          if @cell_data_store[row_num]
             args = @set_rows[row_num] || []
             write_row_element(row_num, span, *args) do
               write_cell_column_dimension(row_num)
@@ -405,7 +405,7 @@ module Writexlsx
       end
 
       def not_contain_formatting_or_data?(row_num) # :nodoc:
-        !@set_rows[row_num] && !@cell_data_table[row_num] && !@comments.has_comment_in_row?(row_num)
+        !@set_rows[row_num] && !@cell_data_store[row_num] && !@comments.has_comment_in_row?(row_num)
       end
 
       #
@@ -416,7 +416,7 @@ module Writexlsx
       end
 
       def write_cell_column_dimension(row_num)  # :nodoc:
-        row = @cell_data_table[row_num]
+        row = @cell_data_store[row_num]
         row_name = (row_num + 1).to_s
         (@dim_colmin..@dim_colmax).each do |col_num|
           if (cell = row[col_num])
@@ -735,10 +735,10 @@ module Writexlsx
 
             # If the cell isn't a string then we have to add the url as
             # the string to display
-            if ptrue?(@cell_data_table)                   &&
-               ptrue?(@cell_data_table[row_num])          &&
-               ptrue?(@cell_data_table[row_num][col_num]) &&
-               @cell_data_table[row_num][col_num].display_url_string?
+            if ptrue?(@cell_data_store)                   &&
+               ptrue?(@cell_data_store[row_num])          &&
+               ptrue?(@cell_data_store[row_num][col_num]) &&
+               @cell_data_store[row_num][col_num].display_url_string?
               link.display_on
             end
 

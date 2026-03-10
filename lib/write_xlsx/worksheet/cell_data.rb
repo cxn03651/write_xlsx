@@ -105,20 +105,23 @@ module Writexlsx
         truefalse = { 'TRUE' => 1, 'FALSE' => 0 }
         error_code = ['#DIV/0!', '#N/A', '#NAME?', '#NULL!', '#NUM!', '#REF!', '#VALUE!']
 
+        value = @result
         attributes = cell_attributes(worksheet, row, row_name, col)
-        if @result && !(@result.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
-          if truefalse[@result]
+
+        if value && !(value.to_s =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/)
+          if truefalse[value]
             attributes << %w[t b]
-            @result = truefalse[@result]
-          elsif error_code.include?(@result)
+            value = truefalse[value]
+          elsif error_code.include?(value)
             attributes << %w[t e]
           else
             attributes << %w[t str]
           end
         end
+
         worksheet.writer.tag_elements('c', attributes) do
           worksheet.write_cell_formula(token)
-          worksheet.write_cell_value(result || 0)
+          worksheet.write_cell_value(value || 0)
         end
       end
     end

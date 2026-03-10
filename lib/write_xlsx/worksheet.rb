@@ -11,14 +11,16 @@ require 'write_xlsx/inserted_chart'
 require 'write_xlsx/package/button'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/package/xml_writer_simple'
+require 'write_xlsx/page_setup'
 require 'write_xlsx/sparkline'
 require 'write_xlsx/utility'
 require 'write_xlsx/worksheet/cell_data'
+require 'write_xlsx/worksheet/cell_data_manager'
+require 'write_xlsx/worksheet/cell_data_store'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/data_writing'
 require 'write_xlsx/worksheet/formatting'
 require 'write_xlsx/worksheet/hyperlink'
-require 'write_xlsx/worksheet/page_setup'
 require 'write_xlsx/worksheet/columns'
 require 'write_xlsx/worksheet/rows'
 require 'write_xlsx/worksheet/selection'
@@ -36,6 +38,7 @@ module Writexlsx
   class Worksheet
     include Writexlsx::Utility
     include Autofilter
+    include CellDataManager
     include Columns
     include ConditionalFormats
     include DataWriting
@@ -67,126 +70,21 @@ module Writexlsx
     attr_accessor :default_row_height                             # :nodoc:
 
     def initialize(workbook, index, name) # :nodoc:
-      rowmax   = 1_048_576
-      colmax   = 16_384
-      strmax   = 32_767
-
       @writer = Package::XMLWriterSimple.new
 
-      @workbook = workbook
-      @index = index
-      @name = name
-      @col_info = {}
-      @cell_data_table = []
-      @excel_version = 2007
-      @palette = workbook.palette
-      @default_url_format = workbook.default_url_format
-      @max_url_length = workbook.max_url_length
+      setup_identity(workbook, index, name)
+      setup_limits
+      setup_dependencies
+      setup_view_options
+      setup_sheet_geometry
+      setup_row_and_column_state
+      setup_filter_and_selection_state
+      setup_drawing_and_media
+      setup_cell_features
+      setup_protection
 
-      @page_setup = PageSetup.new
-
-      @screen_gridlines     = true
-      @show_zeros           = true
-
-      @xls_rowmax           = rowmax
-      @xls_colmax           = colmax
-      @xls_strmax           = strmax
-      @dim_rowmin           = nil
-      @dim_rowmax           = nil
-      @dim_colmin           = nil
-      @dim_colmax           = nil
-      @selections           = []
-      @panes                = []
-      @hide_row_col_headers = 0
-      @top_left_cell        = ''
-
-      @tab_color  = 0
-
-      @set_cols = {}
-      @set_rows = {}
-      @col_size_changed = false
-      @zoom = 100
-      @zoom_scale_normal = true
-      @right_to_left = false
-      @leading_zeros = false
-
-      @autofilter_area = nil
-      @filter_on    = false
-      @filter_range = []
-      @filter_cols  = {}
-      @filter_cells = {}
-      @filter_type  = {}
-
-      @row_sizes = {}
-
-      @last_shape_id          = 1
-      @rel_count              = 0
-      @external_hyper_links   = []
-      @external_drawing_links = []
-      @external_comment_links = []
-      @external_vml_links     = []
-      @external_background_links = []
-      @external_table_links   = []
-      @drawing_links          = []
-      @vml_drawing_links      = []
-      @charts                 = []
-      @images                 = []
-      @tables                 = []
-      @sparklines             = []
-      @shapes                 = []
-      @shape_hash             = {}
-      @drawing_rels           = {}
-      @drawing_rels_id        = 0
-      @vml_drawing_rels       = {}
-      @vml_drawing_rels_id    = 0
-      @has_dynamic_functions  = false
-      @has_embedded_images    = false
-
-      @use_future_functions   = false
-
-      @header_images          = []
-      @footer_images          = []
-      @background_image       = nil
-
-      @outline_row_level      = 0
-      @outline_col_level      = 0
-
-      @original_row_height    = 15
-      @default_row_height     = 15
-      @default_row_pixels     = 20
-      @default_col_width      = 8.43
-      @default_row_rezoed     = 0
-      @default_date_pixels    = 68
-
-      @merge = []
-
-      @has_vml  = false
-      @comments = Package::Comments.new(self)
-      @buttons_array          = []
-      @header_images_array    = []
-      @ignore_errors          = nil
-
-      @validations = []
-
-      @cond_formats   = {}
-      @data_bars_2010 = []
-      @dxf_priority   = 1
-
-      @protected_ranges     = []
-      @num_protected_ranges = 0
-
-      if excel2003_style?
-        @original_row_height      = 12.75
-        @default_row_height       = 12.75
-        @default_row_pixels       = 17
-        self.margins_left_right   = 0.75
-        self.margins_top_bottom   = 1
-        @page_setup.margin_header = 0.5
-        @page_setup.margin_footer = 0.5
-        @page_setup.header_footer_aligns = false
-      end
-
-      @embedded_image_indexes = @workbook.embedded_image_indexes
+      apply_excel2003_compatibility if excel2003_style?
+      setup_workbook_dependent_state
     end
 
     def set_xml_writer(filename) # :nodoc:
@@ -721,37 +619,6 @@ module Writexlsx
       @drawing_links << ['/chart', "../charts/chart#{chart_id}.xml"]
     end
 
-    #
-    # Returns a range of data from the worksheet _table to be used in chart
-    # cached data. Strings are returned as SST ids and decoded in the workbook.
-    # Return nils for data that doesn't exist since Excel can chart series
-    # with data missing.
-    #
-    def get_range_data(row_start, col_start, row_end, col_end) # :nodoc:
-      # TODO. Check for worksheet limits.
-
-      # Iterate through the table data.
-      data = []
-      (row_start..row_end).each do |row_num|
-        # Store nil if row doesn't exist.
-        unless @cell_data_table[row_num]
-          data << nil
-          next
-        end
-
-        (col_start..col_end).each do |col_num|
-          cell = @cell_data_table[row_num][col_num]
-          if cell
-            data << cell.data
-          else
-            data << nil
-          end
-        end
-      end
-
-      data
-    end
-
     def comments_visible? # :nodoc:
       !!@comments_visible
     end
@@ -1047,6 +914,153 @@ module Writexlsx
     end
 
     private
+
+    def setup_identity(workbook, index, name)
+      @workbook = workbook
+      @index = index
+      @name = name
+
+      @excel_version = 2007
+      @palette = workbook.palette
+      @default_url_format = workbook.default_url_format
+      @max_url_length = workbook.max_url_length
+    end
+
+    def setup_limits
+      @xls_rowmax = 1_048_576
+      @xls_colmax = 16_384
+      @xls_strmax = 32_767
+
+      @dim_rowmin = nil
+      @dim_rowmax = nil
+      @dim_colmin = nil
+      @dim_colmax = nil
+    end
+
+    def setup_dependencies
+      @page_setup = Writexlsx::PageSetup.new
+      @comments = Package::Comments.new(self)
+    end
+
+    def setup_view_options
+      @screen_gridlines = true
+      @show_zeros = true
+      @hide_row_col_headers = 0
+      @top_left_cell = ''
+
+      @tab_color = 0
+
+      @zoom = 100
+      @zoom_scale_normal = true
+      @right_to_left = false
+      @leading_zeros = false
+    end
+
+    def setup_sheet_geometry
+      @outline_row_level = 0
+      @outline_col_level = 0
+
+      @original_row_height = 15
+      @default_row_height = 15
+      @default_row_pixels = 20
+      @default_col_width = 8.43
+      @default_date_pixels = 68
+    end
+
+    def setup_row_and_column_state
+      @col_info = {}
+      @cell_data_store = CellDataStore.new
+
+      @set_cols = {}
+      @set_rows = {}
+      @row_sizes = {}
+
+      @col_size_changed = false
+    end
+
+    def setup_filter_and_selection_state
+      @selections = []
+      @panes = []
+
+      @autofilter_area = nil
+      @filter_on = false
+      @filter_range = []
+      @filter_cols = {}
+      @filter_cells = {}
+      @filter_type = {}
+    end
+
+    def setup_drawing_and_media
+      @last_shape_id = 1
+      @rel_count = 0
+
+      @external_hyper_links = []
+      @external_drawing_links = []
+      @external_comment_links = []
+      @external_vml_links = []
+      @external_background_links = []
+      @external_table_links = []
+
+      @drawing_links = []
+      @vml_drawing_links = []
+
+      @charts = []
+      @images = []
+      @tables = []
+      @sparklines = []
+      @shapes = []
+
+      @shape_hash = {}
+      @drawing_rels = {}
+      @drawing_rels_id = 0
+      @vml_drawing_rels = {}
+      @vml_drawing_rels_id = 0
+
+      @has_dynamic_functions = false
+      @has_embedded_images = false
+      @use_future_functions = false
+      @has_vml = false
+
+      @header_images = []
+      @footer_images = []
+      @background_image = nil
+
+      @buttons_array = []
+      @header_images_array = []
+    end
+
+    def setup_cell_features
+      @merge = []
+
+      @validations = []
+      @cond_formats = {}
+      @data_bars_2010 = []
+      @dxf_priority = 1
+
+      @ignore_errors = nil
+    end
+
+    def setup_protection
+      @protected_ranges = []
+      @num_protected_ranges = 0
+    end
+
+    def apply_excel2003_compatibility
+      @original_row_height = 12.75
+      @default_row_height = 12.75
+      @default_row_pixels = 17
+
+      self.margins_left_right = 0.75
+      self.margins_top_bottom = 1
+
+      @page_setup.margin_header = 0.5
+      @page_setup.margin_footer = 0.5
+      @page_setup.header_footer_aligns = false
+    end
+
+    def setup_workbook_dependent_state
+      @embedded_image_indexes = @workbook.embedded_image_indexes
+    end
 
     #
     # Convert the width of a cell from user's units to pixels. Excel rounds
@@ -1613,7 +1627,7 @@ EOS
       spans = []
 
       (@dim_rowmin..@dim_rowmax).each do |row_num|
-        span_min, span_max = calc_spans(@cell_data_table, row_num, span_min, span_max) if @cell_data_table[row_num]
+        span_min, span_max = calc_spans(@cell_data_store, row_num, span_min, span_max) if @cell_data_store[row_num]
 
         # Calculate spans for comments.
         span_min, span_max = calc_spans(@comments, row_num, span_min, span_max) if @comments[row_num]
