@@ -910,7 +910,7 @@ module Writexlsx
       # Write the <picture> element.
       #
       def write_picture
-        return unless @background_image
+        return unless background_image
 
         # Increment the relationship id.
         @rel_count += 1
@@ -925,7 +925,7 @@ module Writexlsx
       # Write the <tableParts> element.
       #
       def write_table_parts
-        return if @tables.empty?
+        return if @assets.tables.empty?
 
         @writer.tag_elements('tableParts', [['count', tables_count]]) do
           tables_count.times { increment_rel_id_and_write_r_id('tablePart') }
@@ -952,11 +952,11 @@ module Writexlsx
       # Write the <extLst> element for data bars and sparklines.
       #
       def write_ext_list  # :nodoc:
-        return if @data_bars_2010.empty? && @sparklines.empty?
+        return if @data_bars_2010.empty? && @assets.sparklines.empty?
 
         @writer.tag_elements('extLst') do
           write_ext_list_data_bars  unless @data_bars_2010.empty?
-          write_ext_list_sparklines unless @sparklines.empty?
+          write_ext_list_sparklines unless @assets.sparklines.empty?
         end
       end
 
@@ -1142,7 +1142,7 @@ module Writexlsx
         # Write the x14:sparklineGroups element.
         @writer.tag_elements('x14:sparklineGroups', sparkline_groups_attributes) do
           # Write the sparkline elements.
-          @sparklines.reverse.each do |sparkline|
+          @assets.sparklines.reverse.each do |sparkline|
             sparkline.write_sparkline_group(@writer)
           end
         end

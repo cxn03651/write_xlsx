@@ -36,18 +36,22 @@ module Writexlsx
         @page_setup.header_footer_scales = options[:scale_with_doc] if options[:scale_with_doc]
 
         # Reset the array in case the function is called more than once.
-        @header_images = []
+        @assets.reset_header_images
 
         [
           [:image_left, 'LH'], [:image_center, 'CH'], [:image_right, 'RH']
         ].each do |p|
-          @header_images << ImageProperty.new(options[p.first], position: p.last) if options[p.first]
+          next unless options[p.first]
+
+          @assets.add_header_image(
+            ImageProperty.new(options[p.first], position: p.last)
+          )
         end
 
         # # placeholeder /&G/ の数
         # placeholder_count = @page_setup.header.scan("&G").count
 
-        raise "Number of header image (#{@header_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.header}" if @header_images.size != placeholder_count
+        raise "Number of header image (#{@assets.header_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.header}" if @assets.header_images.size != placeholder_count
 
         @page_setup.margin_header         = margin || 0.3
         @page_setup.header_footer_changed = true
@@ -67,18 +71,22 @@ module Writexlsx
         @page_setup.header_footer_scales = options[:scale_with_doc] if options[:scale_with_doc]
 
         # Reset the array in case the function is called more than once.
-        @footer_images = []
+        @assets.reset_footer_images
 
         [
           [:image_left, 'LF'], [:image_center, 'CF'], [:image_right, 'RF']
         ].each do |p|
-          @footer_images << ImageProperty.new(options[p.first], position: p.last) if options[p.first]
+          next unless options[p.first]
+
+          @assets.add_footer_image(
+            ImageProperty.new(options[p.first], position: p.last)
+          )
         end
 
         # placeholeder /&G/ の数
         placeholder_count = @page_setup.footer.scan("&G").count
 
-        raise "Number of footer image (#{@footer_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.footer}" if @footer_images.size != placeholder_count
+        raise "Number of footer image (#{@assets.footer_images.size}) doesn't match placeholder count (#{placeholder_count}) in string: #{@page_setup.footer}" if @assets.footer_images.size != placeholder_count
 
         @page_setup.margin_footer         = margin
         @page_setup.header_footer_changed = true

@@ -24,9 +24,12 @@ module Writexlsx
       @drawings          = Drawings.new
       @is_chartsheet     = true
       @chart             = nil
-      @charts            = [1]
       @zoom_scale_normal = 0
       @page_setup.orientation = false
+    end
+
+    def charts
+      [@chart].compact
     end
 
     #
