@@ -21,6 +21,7 @@ require 'write_xlsx/worksheet/cell_data'
 require 'write_xlsx/worksheet/cell_data_manager'
 require 'write_xlsx/worksheet/cell_data_store'
 require 'write_xlsx/worksheet/columns'
+require 'write_xlsx/worksheet/comments_support'
 require 'write_xlsx/worksheet/conditional_formats'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/data_writing'
@@ -30,11 +31,13 @@ require 'write_xlsx/worksheet/drawing_relations'
 require 'write_xlsx/worksheet/drawing_xml_writer'
 require 'write_xlsx/worksheet/formatting'
 require 'write_xlsx/worksheet/hyperlink'
+require 'write_xlsx/worksheet/initialization'
 require 'write_xlsx/worksheet/rows'
 require 'write_xlsx/worksheet/selection'
 require 'write_xlsx/worksheet/panes'
 require 'write_xlsx/worksheet/protection'
 require 'write_xlsx/worksheet/print_options'
+require 'write_xlsx/worksheet/rich_text_helpers'
 require 'write_xlsx/worksheet/row_col_sizing'
 require 'write_xlsx/worksheet/xml_writer'
 require 'forwardable'
@@ -46,23 +49,36 @@ module Writexlsx
     extend Forwardable
 
     include Writexlsx::Utility
-    include Autofilter
+
+    # storage / initialization
+    include Initialization
     include CellDataManager
+
+    # sizing / positioning
+    include RowColSizing
+    include ObjectPositioning
+
+    # sheet features
     include Columns
+    include Rows
+    include Selection
+    include Panes
+    include Autofilter
     include ConditionalFormats
+    include Formatting
+    include Protection
+    include PrintOptions
+    include CommentsSupport
+    include RichTextHelpers
+    include DataWriting
+
+    # drawing stack
     include DrawingMethods
     include DrawingPreparation
     include DrawingRelations
     include DrawingXmlWriter
-    include DataWriting
-    include Formatting
-    include ObjectPositioning
-    include Panes
-    include Protection
-    include PrintOptions
-    include Rows
-    include RowColSizing
-    include Selection
+
+    # generic worksheet xml
     include XmlWriter
 
     COLINFO = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
@@ -81,6 +97,12 @@ module Writexlsx
     attr_writer :excel_version                                    # :nodoc:
     attr_reader :filter_cells                                     # :nodoc:
     attr_accessor :default_row_height                             # :nodoc:
+
+    ###########################################################################
+    #
+    # Lifecycle and core setup
+    #
+    ###########################################################################
 
     def initialize(workbook, index, name) # :nodoc:
       @writer = Package::XMLWriterSimple.new
@@ -103,6 +125,12 @@ module Writexlsx
     def set_xml_writer(filename) # :nodoc:
       @writer.set_xml_writer(filename)
     end
+
+    ###########################################################################
+    #
+    # Sheet visibility and activation
+    #
+    ###########################################################################
 
     #
     # Set this worksheet as a selected worksheet, i.e. the worksheet has its tab
@@ -158,6 +186,12 @@ module Writexlsx
       @workbook.firstsheet = @index
     end
 
+    ###########################################################################
+    #
+    # Sheet visibility and activation
+    #
+    ###########################################################################
+
     #
     # Set the worksheet protection flags to prevent modification of worksheet
     # objects.
@@ -203,6 +237,12 @@ module Writexlsx
 
       @outline_changed = 1
     end
+
+    ###########################################################################
+    #
+    # Data entry and interactive sheet features
+    #
+    ###########################################################################
 
     #
     # Deprecated. This is a writeexcel method that is no longer required
@@ -254,6 +294,34 @@ module Writexlsx
     end
 
     #
+    # Ignore worksheet errors/warnings in user defined ranges.
+    #
+    def ignore_errors(ignores)
+      # List of valid input parameters.
+      valid_parameter_keys = %i[
+        number_stored_as_text
+        eval_error
+        formula_differs
+        formula_range
+        formula_unlocked
+        empty_cell_reference
+        list_data_validation
+        calculated_column
+        two_digit_text_year
+      ]
+
+      raise "Unknown parameter '#{ignores.key - valid_parameter_keys}' in ignore_errors()." unless (ignores.keys - valid_parameter_keys).empty?
+
+      @ignore_errors = ignores
+    end
+
+    ###########################################################################
+    #
+    # Print and view options
+    #
+    ###########################################################################
+
+    #
     # Set the option to hide gridlines on the screen and the printed page.
     #
     def hide_gridlines(option = 1)
@@ -295,85 +363,19 @@ module Writexlsx
       @page_setup.page_setup_changed = true
     end
 
-    # autofilter methods moved to worksheet/autofilter.rb
-    # see Writexlsx::Worksheet::Autofilter for implementation
+    def horizontal_dpi=(val)
+      @page_setup.horizontal_dpi = val
+    end
 
+    def vertical_dpi=(val)
+      @page_setup.vertical_dpi = val
+    end
+
+    ###########################################################################
     #
-    # Store the horizontal page breaks on a worksheet.
+    # Drawing, media, and table operations
     #
-
-    #
-    # This method is used to make all cell comments visible when a worksheet
-    # is opened.
-    #
-    def show_comments(visible = true)
-      @comments_visible = visible
-    end
-
-    #
-    # This method is used to set the default author of all cell comments.
-    #
-    def comments_author=(author)
-      @comments_author = author || ''
-    end
-
-    # This method is deprecated. use comments_author=().
-    def set_comments_author(author)
-      put_deprecate_message("#{self}.set_comments_author")
-      self.comments_author = author
-    end
-
-    def has_vml?  # :nodoc:
-      @has_vml
-    end
-
-    def has_header_vml?  # :nodoc:
-      !(header_images.empty? && footer_images.empty?)
-    end
-
-    def has_comments? # :nodoc:
-      !@comments.empty?
-    end
-
-    def has_shapes?
-      @has_shapes
-    end
-
-    def is_chartsheet? # :nodoc:
-      !!@is_chartsheet
-    end
-
-    def comments_visible? # :nodoc:
-      !!@comments_visible
-    end
-
-    def sorted_comments # :nodoc:
-      @comments.sorted_comments
-    end
-
-    def excel2003_style? # :nodoc:
-      @workbook.excel2003_style
-    end
-
-    #
-    # Convert from an Excel internal colour index to a XML style #RRGGBB index
-    # based on the default or user defined values in the Workbook palette.
-    #
-    def palette_color(index) # :nodoc:
-      if index.to_s =~ /^#([0-9A-F]{6})$/i
-        "FF#{::Regexp.last_match(1).upcase}"
-      else
-        "FF#{palette_color_from_index(index)}"
-      end
-    end
-
-    def buttons_data  # :nodoc:
-      @buttons_array
-    end
-
-    def header_images_data  # :nodoc:
-      @header_images_array
-    end
+    ###########################################################################
 
     #
     # Set the table ids for the worksheet tables.
@@ -398,49 +400,12 @@ module Writexlsx
       tables_count || 0
     end
 
-    def num_comments_block
-      @comments.size / 1024
-    end
-
     def tables_count
       tables.size
     end
 
-    def horizontal_dpi=(val)
-      @page_setup.horizontal_dpi = val
-    end
-
-    def vertical_dpi=(val)
-      @page_setup.vertical_dpi = val
-    end
-
-    #
-    # set the vba name for the worksheet
-    #
-    def set_vba_name(vba_codename = nil)
-      @vba_codename = vba_codename || @name
-    end
-
-    #
-    # Ignore worksheet errors/warnings in user defined ranges.
-    #
-    def ignore_errors(ignores)
-      # List of valid input parameters.
-      valid_parameter_keys = %i[
-        number_stored_as_text
-        eval_error
-        formula_differs
-        formula_range
-        formula_unlocked
-        empty_cell_reference
-        list_data_validation
-        calculated_column
-        two_digit_text_year
-      ]
-
-      raise "Unknown parameter '#{ignores.key - valid_parameter_keys}' in ignore_errors()." unless (ignores.keys - valid_parameter_keys).empty?
-
-      @ignore_errors = ignores
+    def has_shapes?
+      @has_shapes
     end
 
     def has_dynamic_functions?
@@ -449,11 +414,6 @@ module Writexlsx
 
     def has_embedded_images?
       @has_embedded_images
-    end
-
-    # Check that some image or drawing needs to be processed.
-    def some_image_or_drawing_to_be_processed?
-      charts.size + images.size + shapes.size + header_images.size + footer_images.size + (background_image ? 1 : 0) == 0
     end
 
     #
@@ -465,175 +425,101 @@ module Writexlsx
       @assets.background_image = ImageProperty.new(image)
     end
 
+    ###########################################################################
+    #
+    # Worksheet metadata and workbook integration
+    #
+    ###########################################################################
+
+    #
+    # set the vba name for the worksheet
+    #
+    def set_vba_name(vba_codename = nil)
+      @vba_codename = vba_codename || @name
+    end
+
+    #
+    # Convert from an Excel internal colour index to a XML style #RRGGBB index
+    # based on the default or user defined values in the Workbook palette.
+    #
+    def palette_color(index) # :nodoc:
+      if index.to_s =~ /^#([0-9A-F]{6})$/i
+        "FF#{::Regexp.last_match(1).upcase}"
+      else
+        "FF#{palette_color_from_index(index)}"
+      end
+    end
+
+    def is_chartsheet? # :nodoc:
+      !!@is_chartsheet
+    end
+
+    def excel2003_style? # :nodoc:
+      @workbook.excel2003_style
+    end
+
     def date_1904? # :nodoc:
       @workbook.date_1904?
     end
 
+    ###########################################################################
+    #
+    # Worksheet state predicates
+    #
+    ###########################################################################
+
+    def fit_page? # :nodoc:
+      @page_setup.fit_page
+    end
+
+    def filter_on? # :nodoc:
+      ptrue?(@filter_on)
+    end
+
+    def tab_color? # :nodoc:
+      ptrue?(@tab_color)
+    end
+
+    def outline_changed?
+      ptrue?(@outline_changed)
+    end
+
+    def vba_codename?
+      ptrue?(@vba_codename)
+    end
+
+    def zoom_scale_normal? # :nodoc:
+      ptrue?(@zoom_scale_normal)
+    end
+
+    def right_to_left? # :nodoc:
+      !!@right_to_left
+    end
+
+    def show_zeros? # :nodoc:
+      !!@show_zeros
+    end
+
+    def drawings? # :nodoc:
+      !!@drawings
+    end
+
+    ###########################################################################
+    #
+    # private helpers
+    #
+    ###########################################################################
+
     private
 
-    def setup_identity(workbook, index, name)
-      @workbook = workbook
-      @index = index
-      @name = name
-
-      @excel_version = 2007
-      @palette = workbook.palette
-      @default_url_format = workbook.default_url_format
-      @max_url_length = workbook.max_url_length
-    end
-
-    def setup_limits
-      @xls_rowmax = 1_048_576
-      @xls_colmax = 16_384
-      @xls_strmax = 32_767
-
-      @dim_rowmin = nil
-      @dim_rowmax = nil
-      @dim_colmin = nil
-      @dim_colmax = nil
-    end
-
-    def setup_dependencies
-      @page_setup = Writexlsx::PageSetup.new
-      @comments   = Package::Comments.new(self)
-      @assets     = AssetManager.new
-    end
-
-    def setup_view_options
-      @screen_gridlines = true
-      @show_zeros = true
-      @hide_row_col_headers = 0
-      @top_left_cell = ''
-
-      @tab_color = 0
-
-      @zoom = 100
-      @zoom_scale_normal = true
-      @right_to_left = false
-      @leading_zeros = false
-    end
-
-    def setup_sheet_geometry
-      @outline_row_level = 0
-      @outline_col_level = 0
-
-      @original_row_height = 15
-      @default_row_height = 15
-      @default_row_pixels = 20
-      @default_col_width = 8.43
-      @default_date_pixels = 68
-    end
-
-    def setup_row_and_column_state
-      @col_info = {}
-      @cell_data_store = CellDataStore.new
-
-      @set_cols = {}
-      @set_rows = {}
-      @row_sizes = {}
-
-      @col_size_changed = false
-    end
-
-    def setup_filter_and_selection_state
-      @selections = []
-      @panes = []
-
-      @autofilter_area = nil
-      @filter_on = false
-      @filter_range = []
-      @filter_cols = {}
-      @filter_cells = {}
-      @filter_type = {}
-    end
-
-    def setup_drawing_and_media
-      @last_shape_id = 1
-      @rel_count = 0
-
-      @external_hyper_links = []
-      @external_drawing_links = []
-      @external_comment_links = []
-      @external_vml_links = []
-      @external_background_links = []
-      @external_table_links = []
-
-      @drawing_links = []
-      @vml_drawing_links = []
-
-      @shape_hash = {}
-      @drawing_rels = {}
-      @drawing_rels_id = 0
-      @vml_drawing_rels = {}
-      @vml_drawing_rels_id = 0
-
-      @has_dynamic_functions = false
-      @has_embedded_images = false
-      @use_future_functions = false
-      @has_vml = false
-
-      @buttons_array = []
-      @header_images_array = []
-    end
-
-    def setup_cell_features
-      @merge = []
-
-      @validations = []
-      @cond_formats = {}
-      @data_bars_2010 = []
-      @dxf_priority = 1
-
-      @ignore_errors = nil
-    end
-
-    def setup_protection
-      @protected_ranges = []
-      @num_protected_ranges = 0
-    end
-
-    def apply_excel2003_compatibility
-      @original_row_height = 12.75
-      @default_row_height = 12.75
-      @default_row_pixels = 17
-
-      self.margins_left_right = 0.75
-      self.margins_top_bottom = 1
-
-      @page_setup.margin_header = 0.5
-      @page_setup.margin_footer = 0.5
-      @page_setup.header_footer_aligns = false
-    end
-
-    def setup_workbook_dependent_state
-      @embedded_image_indexes = @workbook.embedded_image_indexes
-    end
-
+    ###########################################################################
     #
-    # Compare adjacent column information structures.
+    # Drawing and positioning adapters
     #
-    def compare_col_info(col_options, previous_options)
-      if !col_options.width.nil? != !previous_options.width.nil?
-        return nil
-      end
-      if col_options.width && previous_options.width &&
-         col_options.width != previous_options.width
-        return nil
-      end
+    ###########################################################################
 
-      if !col_options.format.nil? != !previous_options.format.nil?
-        return nil
-      end
-      if col_options.format && previous_options.format &&
-         col_options.format != previous_options.format
-        return nil
-      end
-
-      return nil if col_options.hidden    != previous_options.hidden
-      return nil if col_options.level     != previous_options.level
-      return nil if col_options.collapsed != previous_options.collapsed
-
-      true
+    def some_image_or_drawing_to_be_processed?
+      charts.size + images.size + shapes.size + header_images.size + footer_images.size + (background_image ? 1 : 0) == 0
     end
 
     def col_size_changed?
@@ -670,117 +556,37 @@ module Writexlsx
       }
     end
 
-    def cell_format_of_rich_string(rich_strings)
-      # If the last arg is a format we use it as the cell format.
-      rich_strings.pop if rich_strings[-1].respond_to?(:xf_index)
-    end
+    ###########################################################################
+    #
+    # Layout, spans, and sheet geometry helpers
+    #
+    ###########################################################################
 
     #
-    # Convert the list of format, string tokens to pairs of (format, string)
-    # except for the first string fragment which doesn't require a default
-    # formatting run. Use the default for strings without a leading format.
+    # Compare adjacent column information structures.
     #
-    def rich_strings_fragments(rich_strings) # :nodoc:
-      # Create a temp format with the default font for unformatted fragments.
-      default = Format.new(0)
-
-      last = 'format'
-      pos  = 0
-      raw_string = ''
-
-      fragments = []
-      rich_strings.each do |token|
-        if token.respond_to?(:xf_index)
-          # Can't allow 2 formats in a row
-          return nil if last == 'format' && pos > 0
-
-          # Token is a format object. Add it to the fragment list.
-          fragments << token
-          last = 'format'
-        else
-          # Token is a string.
-          if last == 'format'
-            # If previous token was a format just add the string.
-            fragments << token
-          else
-            # If previous token wasn't a format add one before the string.
-            fragments << default << token
-          end
-
-          raw_string += token    # Keep track of actual string length.
-          last = 'string'
-        end
-        pos += 1
+    def compare_col_info(col_options, previous_options)
+      if !col_options.width.nil? != !previous_options.width.nil?
+        return nil
       end
-      [fragments, raw_string]
-    end
-
-    def xml_str_of_rich_string(fragments)
-      # Create a temp XML::Writer object and use it to write the rich string
-      # XML to a string.
-      writer = Package::XMLWriterSimple.new
-
-      # If the first token is a string start the <r> element.
-      writer.start_tag('r') unless fragments[0].respond_to?(:xf_index)
-
-      # Write the XML elements for the format string fragments.
-      fragments.each do |token|
-        if token.respond_to?(:xf_index)
-          # Write the font run.
-          writer.start_tag('r')
-          token.write_font_rpr(writer, self)
-        else
-          # Write the string fragment part, with whitespace handling.
-          attributes = []
-
-          attributes << ['xml:space', 'preserve'] if token =~ /^\s/ || token =~ /\s$/
-          writer.data_element('t', token, attributes)
-          writer.end_tag('r')
-        end
-      end
-      writer.string
-    end
-
-    #
-    # This is an internal method that is used to filter elements of the array of
-    # pagebreaks used in the _store_hbreak() and _store_vbreak() methods. It:
-    #   1. Removes duplicate entries from the list.
-    #   2. Sorts the list.
-    #   3. Removes 0 from the list if present.
-    #
-    def sort_pagebreaks(*args) # :nodoc:
-      return [] if args.empty?
-
-      breaks = args.uniq.sort
-      breaks.delete(0)
-
-      # The Excel 2007 specification says that the maximum number of page breaks
-      # is 1026. However, in practice it is actually 1023.
-      max_num_breaks = 1023
-      if breaks.size > max_num_breaks
-        breaks[0, max_num_breaks]
-      else
-        breaks
-      end
-    end
-
-    #
-    # Hash a worksheet password. Based on the algorithm in ECMA-376-4:2016,
-    # Office Open XML File Foemats -- Transitional Migration Features,
-    # Additional attributes for workbookProtection element (Part 1, §18.2.29).   #
-    def encode_password(password) # :nodoc:
-      hash = 0
-
-      password.reverse.split("").each do |char|
-        hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
-        hash ^= char.ord
+      if col_options.width && previous_options.width &&
+         col_options.width != previous_options.width
+        return nil
       end
 
-      hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
-      hash ^= password.length
-      hash ^= 0xCE4B
+      if !col_options.format.nil? != !previous_options.format.nil?
+        return nil
+      end
+      if col_options.format && previous_options.format &&
+         col_options.format != previous_options.format
+        return nil
+      end
 
-      sprintf("%X", hash)
+      return nil if col_options.hidden    != previous_options.hidden
+      return nil if col_options.level     != previous_options.level
+      return nil if col_options.collapsed != previous_options.collapsed
+
+      true
     end
 
     def tab_outline_fit?
@@ -874,48 +680,27 @@ module Writexlsx
       "#{quote_sheetname(@name)}!#{area}"
     end
 
-    def fit_page? # :nodoc:
-      @page_setup.fit_page
-    end
+    #
+    # This is an internal method that is used to filter elements of the array of
+    # pagebreaks used in the _store_hbreak() and _store_vbreak() methods. It:
+    #   1. Removes duplicate entries from the list.
+    #   2. Sorts the list.
+    #   3. Removes 0 from the list if present.
+    #
+    def sort_pagebreaks(*args) # :nodoc:
+      return [] if args.empty?
 
-    def filter_on? # :nodoc:
-      ptrue?(@filter_on)
-    end
+      breaks = args.uniq.sort
+      breaks.delete(0)
 
-    def tab_color? # :nodoc:
-      ptrue?(@tab_color)
-    end
-
-    def outline_changed?
-      ptrue?(@outline_changed)
-    end
-
-    def vba_codename?
-      ptrue?(@vba_codename)
-    end
-
-    def zoom_scale_normal? # :nodoc:
-      ptrue?(@zoom_scale_normal)
-    end
-
-    def right_to_left? # :nodoc:
-      !!@right_to_left
-    end
-
-    def show_zeros? # :nodoc:
-      !!@show_zeros
-    end
-
-    def protect? # :nodoc:
-      !!@protect
-    end
-
-    def autofilter_ref? # :nodoc:
-      !!@autofilter_ref
-    end
-
-    def drawings? # :nodoc:
-      !!@drawings
+      # The Excel 2007 specification says that the maximum number of page breaks
+      # is 1026. However, in practice it is actually 1023.
+      max_num_breaks = 1023
+      if breaks.size > max_num_breaks
+        breaks[0, max_num_breaks]
+      else
+        breaks
+      end
     end
 
     def remove_white_space(margin) # :nodoc:
@@ -946,6 +731,30 @@ module Writexlsx
       active_pane
     end
 
+    ###########################################################################
+    #
+    # Protection internals
+    #
+    ###########################################################################
+    #
+    # Hash a worksheet password. Based on the algorithm in ECMA-376-4:2016,
+    # Office Open XML File Foemats -- Transitional Migration Features,
+    # Additional attributes for workbookProtection element (Part 1, §18.2.29).   #
+    def encode_password(password) # :nodoc:
+      hash = 0
+
+      password.reverse.split("").each do |char|
+        hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
+        hash ^= char.ord
+      end
+
+      hash = ((hash >> 14) & 0x01) | ((hash << 1) & 0x7fff)
+      hash ^= password.length
+      hash ^= 0xCE4B
+
+      sprintf("%X", hash)
+    end
+
     def protect_default_settings  # :nodoc:
       {
         sheet:                 true,
@@ -967,6 +776,26 @@ module Writexlsx
         select_unlocked_cells: true
       }
     end
+
+    def protect? # :nodoc:
+      !!@protect
+    end
+
+    ###########################################################################
+    #
+    # Internal worksheet state helpers
+    #
+    ###########################################################################
+
+    def autofilter_ref? # :nodoc:
+      !!@autofilter_ref
+    end
+
+    ###########################################################################
+    #
+    # Formula helpers
+    #
+    ###########################################################################
 
     def expand_formula(formula, function, addition = '')
       if formula =~ /\b(#{function})/
