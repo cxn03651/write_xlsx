@@ -62,7 +62,7 @@ module Writexlsx
         @workbook.worksheets
           .reject { |sheet| sheet.is_chartsheet? || sheet.very_hidden? }
           .each  do |sheet|
-          add_part_name(sheet.name)
+            add_part_name(sheet.name)
         end
       end
 

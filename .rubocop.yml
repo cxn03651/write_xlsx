@@ -48,6 +48,9 @@ Lint/DuplicateBranch:
     - 'lib/write_xlsx/worksheet.rb'
     - 'lib/write_xlsx/worksheet/data_writing.rb'
 
+Lint/FloatComparison:
+  Enabled: false
+
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
@@ -93,6 +96,9 @@ Naming/MethodParameterName:
   Enabled: false
 
 Naming/PredicateMethod:
+  Enabled: false
+
+Naming/PredicatePrefix:
   Enabled: false
 
 Naming/VariableNumber:

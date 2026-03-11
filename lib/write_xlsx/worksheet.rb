@@ -8,6 +8,7 @@ require 'write_xlsx/format'
 require 'write_xlsx/image'
 require 'write_xlsx/image_property'
 require 'write_xlsx/inserted_chart'
+require 'write_xlsx/object_positioning'
 require 'write_xlsx/package/button'
 require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/package/xml_writer_simple'
@@ -15,9 +16,12 @@ require 'write_xlsx/page_setup'
 require 'write_xlsx/sparkline'
 require 'write_xlsx/utility'
 require 'write_xlsx/worksheet/asset_manager'
+require 'write_xlsx/worksheet/autofilter'
 require 'write_xlsx/worksheet/cell_data'
 require 'write_xlsx/worksheet/cell_data_manager'
 require 'write_xlsx/worksheet/cell_data_store'
+require 'write_xlsx/worksheet/columns'
+require 'write_xlsx/worksheet/conditional_formats'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/data_writing'
 require 'write_xlsx/worksheet/drawing_methods'
@@ -26,14 +30,12 @@ require 'write_xlsx/worksheet/drawing_relations'
 require 'write_xlsx/worksheet/drawing_xml_writer'
 require 'write_xlsx/worksheet/formatting'
 require 'write_xlsx/worksheet/hyperlink'
-require 'write_xlsx/worksheet/columns'
 require 'write_xlsx/worksheet/rows'
 require 'write_xlsx/worksheet/selection'
 require 'write_xlsx/worksheet/panes'
-require 'write_xlsx/worksheet/autofilter'
-require 'write_xlsx/worksheet/conditional_formats'
 require 'write_xlsx/worksheet/protection'
 require 'write_xlsx/worksheet/print_options'
+require 'write_xlsx/worksheet/row_col_sizing'
 require 'write_xlsx/worksheet/xml_writer'
 require 'forwardable'
 require 'tempfile'
@@ -54,11 +56,13 @@ module Writexlsx
     include DrawingXmlWriter
     include DataWriting
     include Formatting
-    include Rows
-    include Selection
+    include ObjectPositioning
     include Panes
     include Protection
     include PrintOptions
+    include Rows
+    include RowColSizing
+    include Selection
     include XmlWriter
 
     COLINFO = Struct.new('ColInfo', :width, :format, :hidden, :level, :collapsed, :autofit)
@@ -461,85 +465,6 @@ module Writexlsx
       @assets.background_image = ImageProperty.new(image)
     end
 
-    #
-    # Calculate the vertices that define the position of a graphical object
-    # within the worksheet in pixels.
-    #
-    def position_object_pixels(col_start, row_start, x1, y1, width, height, anchor = nil) # :nodoc:
-      # Adjust start column for negative offsets.
-      while x1 < 0 && col_start > 0
-        x1 += size_col(col_start - 1)
-        col_start -= 1
-      end
-
-      # Adjust start row for negative offsets.
-      while y1 < 0 && row_start > 0
-        y1 += size_row(row_start - 1)
-        row_start -= 1
-      end
-
-      # Ensure that the image isn't shifted off the page at top left.
-      x1 = 0 if x1 < 0
-      y1 = 0 if y1 < 0
-
-      # Calculate the absolute x offset of the top-left vertex.
-      x_abs = if @col_size_changed
-                (0..(col_start - 1)).inject(0) { |sum, col| sum += size_col(col, anchor) }
-              else
-                # Optimisation for when the column widths haven't changed.
-                DEFAULT_COL_PIXELS * col_start
-              end
-      x_abs += x1
-
-      # Calculate the absolute y offset of the top-left vertex.
-      # Store the column change to allow optimisations.
-      y_abs = if @row_size_changed
-                (0..(row_start - 1)).inject(0) { |sum, row| sum += size_row(row, anchor) }
-              else
-                # Optimisation for when the row heights haven't changed.
-                @default_row_pixels * row_start
-              end
-      y_abs += y1
-
-      # Adjust start column for offsets that are greater than the col width.
-      while x1 >= size_col(col_start, anchor)
-        x1 -= size_col(col_start)
-        col_start += 1
-      end
-
-      # Adjust start row for offsets that are greater than the row height.
-      while y1 >= size_row(row_start, anchor)
-        y1 -= size_row(row_start)
-        row_start += 1
-      end
-
-      # Initialise end cell to the same as the start cell.
-      col_end = col_start
-      row_end = row_start
-
-      # Only offset the image in the cell if the row/col isn't hidden.
-      width  += x1 if size_col(col_start, anchor) > 0
-      height += y1 if size_row(row_start, anchor) > 0
-
-      # Subtract the underlying cell widths to find the end cell of the object.
-      while width >= size_col(col_end, anchor)
-        width -= size_col(col_end, anchor)
-        col_end += 1
-      end
-
-      # Subtract the underlying cell heights to find the end cell of the object.
-      while height >= size_row(row_end, anchor)
-        height -= size_row(row_end, anchor)
-        row_end += 1
-      end
-
-      # The end vertices are whatever is left from the width and height.
-      x2 = width
-      y2 = height
-
-      [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
-    end
-
     def date_1904? # :nodoc:
       @workbook.date_1904?
     end
@@ -685,55 +610,6 @@ module Writexlsx
     end
 
     #
-    # Convert the width of a cell from user's units to pixels. Excel rounds
-    # the column width to the nearest pixel. If the width hasn't been set
-    # by the user we use the default value. A hidden column is treated as
-    # having a width of zero unless it has the special "object_position" of
-    # 4 (size with cells).
-    #
-    def size_col(col, anchor = 0) # :nodoc:
-      # Look up the cell value to see if it has been changed.
-      if col_info[col]
-        width  = col_info[col].width || @default_col_width
-        hidden = col_info[col].hidden
-
-        # Convert to pixels.
-        pixels = if hidden == 1 && anchor != 4
-                   0
-                 elsif width < 1
-                   ((width * (MAX_DIGIT_WIDTH + PADDING)) + 0.5).to_i
-                 else
-                   ((width * MAX_DIGIT_WIDTH) + 0.5).to_i + PADDING
-                 end
-      else
-        pixels = DEFAULT_COL_PIXELS
-      end
-      pixels
-    end
-
-    #
-    # Convert the height of a cell from user's units to pixels. If the height
-    # hasn't been set by the user we use the default value. A hidden row is
-    # treated as having a height of zero unless it has the special
-    # "object_position" of 4 (size with cells).
-    #
-    def size_row(row, anchor = 0) # :nodoc:
-      # Look up the cell value to see if it has been changed
-      if row_sizes[row]
-        height, hidden = row_sizes[row]
-
-        pixels = if hidden == 1 && anchor != 4
-                   0
-                 else
-                   (4 / 3.0 * height).to_i
-                 end
-      else
-        pixels = (4 / 3.0 * default_row_height).to_i
-      end
-      pixels
-    end
-
-    #
     # Compare adjacent column information structures.
     #
     def compare_col_info(col_options, previous_options)
@@ -758,6 +634,40 @@ module Writexlsx
       return nil if col_options.collapsed != previous_options.collapsed
 
       true
+    end
+
+    def col_size_changed?
+      !!@col_size_changed
+    end
+
+    def row_size_changed?
+      !!@row_size_changed
+    end
+
+    attr_reader :default_row_pixels
+
+    def default_col_pixels
+      DEFAULT_COL_PIXELS
+    end
+
+    def positioned_col_size(col, anchor)
+      size_col(col, anchor)
+    end
+
+    def positioned_row_size(row, anchor)
+      size_row(row, anchor)
+    end
+
+    def object_positioning_context(anchor)
+      {
+        anchor:             anchor,
+        col_size_changed:   col_size_changed?,
+        row_size_changed:   row_size_changed?,
+        default_col_pixels: default_col_pixels,
+        default_row_pixels: default_row_pixels,
+        size_col:           ->(col, anchor_value) { positioned_col_size(col, anchor_value) },
+        size_row:           ->(row, anchor_value) { positioned_row_size(row, anchor_value) }
+      }
     end
 
     def cell_format_of_rich_string(rich_strings)
@@ -852,49 +762,6 @@ module Writexlsx
       else
         breaks
       end
-    end
-
-    #
-    # Calculate the vertices that define the position of a graphical object
-    # within the worksheet in EMUs.
-    #
-    def position_object_emus(graphical_object) # :nodoc:
-      go = graphical_object
-      col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs =
-        position_object_pixels(go.col, go.row, go.x_offset, go.y_offset, go.scaled_width, go.scaled_height, go.anchor)
-
-      # Convert the pixel values to EMUs. See above.
-      x1    = (0.5 + (9_525 * x1)).to_i
-      y1    = (0.5 + (9_525 * y1)).to_i
-      x2    = (0.5 + (9_525 * x2)).to_i
-      y2    = (0.5 + (9_525 * y2)).to_i
-      x_abs = (0.5 + (9_525 * x_abs)).to_i
-      y_abs = (0.5 + (9_525 * y_abs)).to_i
-
-      [col_start, row_start, x1, y1, col_end, row_end, x2, y2, x_abs, y_abs]
-    end
-
-    #
-    # Convert the width of a cell from pixels to character units.
-    #
-    def pixels_to_width(pixels)
-      max_digit_width = 7.0
-      padding         = 5.0
-
-      if pixels <= 12
-        pixels / (max_digit_width + padding)
-      else
-        (pixels - padding) / max_digit_width
-      end
-    end
-
-    #
-    # Convert the height of a cell from pixels to character units.
-    #
-    def pixels_to_height(pixels)
-      height = 0.75 * pixels
-      height = height.to_i if (height - height.to_i).abs < 0.1
-      height
     end
 
     #

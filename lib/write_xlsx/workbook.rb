@@ -1303,40 +1303,40 @@ module Writexlsx
       # Build an array of the worksheet charts including any combined charts.
       @charts.collect { |chart| [chart, chart.combined] }.flatten.compact
              .each do |chart|
-        chart.formula_ids.each do |range, id|
-          # Skip if the series has user defined data.
-          if chart.formula_data[id]
-            seen_ranges[range] = chart.formula_data[id] unless seen_ranges[range]
-            next
-          # Check to see if the data is already cached locally.
-          elsif seen_ranges[range]
-            chart.formula_data[id] = seen_ranges[range]
-            next
-          end
+               chart.formula_ids.each do |range, id|
+                 # Skip if the series has user defined data.
+                 if chart.formula_data[id]
+                   seen_ranges[range] = chart.formula_data[id] unless seen_ranges[range]
+                   next
+                 # Check to see if the data is already cached locally.
+                 elsif seen_ranges[range]
+                   chart.formula_data[id] = seen_ranges[range]
+                   next
+                 end
 
-          # Convert the range formula to a sheet name and cell range.
-          sheetname, *cells = get_chart_range(range)
+                 # Convert the range formula to a sheet name and cell range.
+                 sheetname, *cells = get_chart_range(range)
 
-          # Skip if we couldn't parse the formula.
-          next unless sheetname
+                 # Skip if we couldn't parse the formula.
+                 next unless sheetname
 
-          # Handle non-contiguous ranges: (Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5).
-          # We don't try to parse the ranges. We just return an empty list.
-          if sheetname =~ /^\([^,]+,/
-            chart.formula_data[id] = []
-            seen_ranges[range] = []
-            next
-          end
+                 # Handle non-contiguous ranges: (Sheet1!$A$1:$A$2,Sheet1!$A$4:$A$5).
+                 # We don't try to parse the ranges. We just return an empty list.
+                 if sheetname =~ /^\([^,]+,/
+                   chart.formula_data[id] = []
+                   seen_ranges[range] = []
+                   next
+                 end
 
-          # Raise if the name is unknown since it indicates a user error in
-          # a chart series formula.
-          raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n" unless worksheets[sheetname]
+                 # Raise if the name is unknown since it indicates a user error in
+                 # a chart series formula.
+                 raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n" unless worksheets[sheetname]
 
-          # Add the data to the chart.
-          # And store range data locally to avoid lookup if seen agein.
-          chart.formula_data[id] =
-            seen_ranges[range] = chart_data(worksheets[sheetname], cells)
-        end
+                 # Add the data to the chart.
+                 # And store range data locally to avoid lookup if seen agein.
+                 chart.formula_data[id] =
+                   seen_ranges[range] = chart_data(worksheets[sheetname], cells)
+               end
       end
     end
 

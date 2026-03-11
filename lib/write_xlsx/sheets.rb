@@ -91,9 +91,9 @@ module Writexlsx
     def write_comment_files(package_dir)
       self.select { |sheet| sheet.has_comments? }
           .each_with_index do |sheet, index|
-        FileUtils.mkdir_p("#{package_dir}/xl/drawings")
-        sheet.comments.set_xml_writer("#{package_dir}/xl/comments#{index + 1}.xml")
-        sheet.comments.assemble_xml_file
+            FileUtils.mkdir_p("#{package_dir}/xl/drawings")
+            sheet.comments.set_xml_writer("#{package_dir}/xl/comments#{index + 1}.xml")
+            sheet.comments.assemble_xml_file
       end
     end
 
