@@ -3,8 +3,23 @@
 
 module Writexlsx
   class Worksheet
-    # Drawing insertion operations extracted from Worksheet to slim the main class.
     module DrawingMethods
+      ###############################################################################
+      #
+      # DrawingMethods
+      #
+      # Provides high-level Worksheet APIs for inserting drawing-related objects
+      # such as charts, images, shapes, tables, and sparklines.
+      #
+      # Responsibilities:
+      # - Public insertion entry points used by Worksheet users
+      # - Argument normalization and option extraction
+      # - Shape insertion workflow and helper utilities
+      #
+      # This module handles *what gets added to the sheet*.
+      # It does not manage relationships or XML output.
+      #
+      ###############################################################################
       #
       # This method can be used to insert a Chart object into a worksheet.
       # The Chart must be created by the add_chart() Workbook method and

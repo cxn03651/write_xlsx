@@ -21,6 +21,9 @@ require 'write_xlsx/worksheet/cell_data_store'
 require 'write_xlsx/worksheet/data_validation'
 require 'write_xlsx/worksheet/data_writing'
 require 'write_xlsx/worksheet/drawing_methods'
+require 'write_xlsx/worksheet/drawing_preparation'
+require 'write_xlsx/worksheet/drawing_relations'
+require 'write_xlsx/worksheet/drawing_xml_writer'
 require 'write_xlsx/worksheet/formatting'
 require 'write_xlsx/worksheet/hyperlink'
 require 'write_xlsx/worksheet/columns'
@@ -46,6 +49,9 @@ module Writexlsx
     include Columns
     include ConditionalFormats
     include DrawingMethods
+    include DrawingPreparation
+    include DrawingRelations
+    include DrawingXmlWriter
     include DataWriting
     include Formatting
     include Rows
@@ -363,47 +369,6 @@ module Writexlsx
 
     def header_images_data  # :nodoc:
       @header_images_array
-    end
-
-    def external_links
-      [
-        @external_hyper_links,
-        @external_drawing_links,
-        @external_vml_links,
-        @external_background_links,
-        @external_table_links,
-        @external_comment_links
-      ].reject { |a| a.empty? }
-    end
-
-    def drawing_links
-      [@drawing_links]
-    end
-
-    #
-    # Turn the HoH that stores the comments into an array for easier handling
-    # and set the external links for comments and buttons.
-    #
-    def prepare_vml_objects(vml_data_id, vml_shape_id, vml_drawing_id, comment_id)
-      set_external_vml_links(vml_drawing_id)
-      set_external_comment_links(comment_id) if has_comments?
-
-      # The VML o:idmap data id contains a comma separated range when there is
-      # more than one 1024 block of comments, like this: data="1,2".
-      data = "#{vml_data_id}"
-      (1..num_comments_block).each do |i|
-        data += ",#{vml_data_id + i}"
-      end
-      @vml_data_id = data
-      @vml_shape_id = vml_shape_id
-    end
-
-    #
-    # Setup external linkage for VML header/footer images.
-    #
-    def prepare_header_vml_objects(vml_header_id, vml_drawing_id)
-      @vml_header_id = vml_header_id
-      @external_vml_links << ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
     end
 
     #
@@ -795,43 +760,6 @@ module Writexlsx
       true
     end
 
-    def set_external_vml_links(vml_drawing_id) # :nodoc:
-      @external_vml_links <<
-        ['/vmlDrawing', "../drawings/vmlDrawing#{vml_drawing_id}.vml"]
-    end
-
-    def set_external_comment_links(comment_id) # :nodoc:
-      @external_comment_links <<
-        ['/comments',   "../comments#{comment_id}.xml"]
-    end
-
-    #
-    # Get the index used to address a drawing rel link.
-    #
-    def drawing_rel_index(target = nil)
-      if !target
-        # Undefined values for drawings like charts will always be unique.
-        @drawing_rels_id += 1
-      elsif ptrue?(@drawing_rels[target])
-        @drawing_rels[target]
-      else
-        @drawing_rels_id += 1
-        @drawing_rels[target] = @drawing_rels_id
-      end
-    end
-
-    #
-    # Get the index used to address a vml_drawing rel link.
-    #
-    def get_vml_drawing_rel_index(target)
-      if @vml_drawing_rels[target]
-        @vml_drawing_rels[target]
-      else
-        @vml_drawing_rels_id += 1
-        @vml_drawing_rels[target] = @vml_drawing_rels_id
-      end
-    end
-
     def cell_format_of_rich_string(rich_strings)
       # If the last arg is a format we use it as the cell format.
       rich_strings.pop if rich_strings[-1].respond_to?(:xf_index)
@@ -901,147 +829,6 @@ module Writexlsx
         end
       end
       writer.string
-    end
-
-    #
-    # Extract the tokens from the filter expression. The tokens are mainly non-
-    # whitespace groups. The only tricky part is to extract string tokens that
-    # contain whitespace and/or quoted double quotes (Excel's escaped quotes).
-    #
-    def extract_filter_tokens(expression = nil) # :nodoc:
-      return [] unless expression
-
-      tokens = []
-      str = expression
-      while str =~ /"(?:[^"]|"")*"|\S+/
-        tokens << ::Regexp.last_match(0)
-        str = $~.post_match
-      end
-
-      # Remove leading and trailing quotes and unescape other quotes
-      tokens.map! do |token|
-        token.sub!(/^"/, '')
-        token.sub!(/"$/, '')
-        token.gsub!('""', '"')
-
-        # if token is number, convert to numeric.
-        if token =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/
-          token.to_f == token.to_i ? token.to_i : token.to_f
-        else
-          token
-        end
-      end
-
-      tokens
-    end
-
-    #
-    # Converts the tokens of a possibly conditional expression into 1 or 2
-    # sub expressions for further parsing.
-    #
-    def parse_filter_expression(expression, tokens) # :nodoc:
-      # The number of tokens will be either 3 (for 1 expression)
-      # or 7 (for 2  expressions).
-      #
-      if tokens.size == 7
-        conditional = tokens[3]
-        if conditional =~ /^(and|&&)$/
-          conditional = 0
-        elsif conditional =~ /^(or|\|\|)$/
-          conditional = 1
-        else
-          raise "Token '#{conditional}' is not a valid conditional " +
-                "in filter expression '#{expression}'"
-        end
-        expression_1 = parse_filter_tokens(expression, tokens[0..2])
-        expression_2 = parse_filter_tokens(expression, tokens[4..6])
-        [expression_1, conditional, expression_2].flatten
-      else
-        parse_filter_tokens(expression, tokens)
-      end
-    end
-
-    #
-    # Parse the 3 tokens of a filter expression and return the operator and token.
-    #
-    def parse_filter_tokens(expression, tokens)     # :nodoc:
-      operators = {
-        '==' => 2,
-        '='  => 2,
-        '=~' => 2,
-        'eq' => 2,
-
-        '!=' => 5,
-        '!~' => 5,
-        'ne' => 5,
-        '<>' => 5,
-
-        '<'  => 1,
-        '<=' => 3,
-        '>'  => 4,
-        '>=' => 6
-      }
-
-      operator = operators[tokens[1]]
-      token    = tokens[2]
-
-      # Special handling of "Top" filter expressions.
-      if tokens[0] =~ /^top|bottom$/i
-        value = tokens[1]
-        if value.to_s =~ /\D/ or value.to_i < 1 or value.to_i > 500
-          raise "The value '#{value}' in expression '#{expression}' " +
-                "must be in the range 1 to 500"
-        end
-        token.downcase!
-        if token != 'items' and token != '%'
-          raise "The type '#{token}' in expression '#{expression}' " +
-                "must be either 'items' or '%'"
-        end
-
-        operator = if tokens[0] =~ /^top$/i
-                     30
-                   else
-                     32
-                   end
-
-        operator += 1 if tokens[2] == '%'
-
-        token    = value
-      end
-
-      if !operator and tokens[0]
-        raise "Token '#{tokens[1]}' is not a valid operator " +
-              "in filter expression '#{expression}'"
-      end
-
-      # Special handling for Blanks/NonBlanks.
-      if token.to_s =~ /^blanks|nonblanks$/i
-        # Only allow Equals or NotEqual in this context.
-        if operator != 2 and operator != 5
-          raise "The operator '#{tokens[1]}' in expression '#{expression}' " +
-                "is not valid in relation to Blanks/NonBlanks'"
-        end
-
-        token.downcase!
-
-        # The operator should always be 2 (=) to flag a "simple" equality in
-        # the binary record. Therefore we convert <> to =.
-        if token == 'blanks'
-          token = ' ' if operator == 5
-        elsif operator == 5
-          operator = 2
-          token    = 'blanks'
-        else
-          operator = 5
-          token    = ' '
-        end
-      end
-
-      # if the string token contains an Excel match character then change the
-      # operator type to indicate a non "simple" equality.
-      operator = 22 if operator == 2 and token.to_s =~ /[*?]/
-
-      [operator, token]
     end
 
     #
@@ -1290,24 +1077,6 @@ module Writexlsx
         @selections << ['bottomLeft', active_cell, sqref]
       end
       active_pane
-    end
-
-    def prepare_filter_column(col) # :nodoc:
-      # Check for a column reference in A1 notation and substitute.
-      if col.to_s =~ /^\D/
-        col_letter = col
-
-        # Convert col ref to a cell ref and then to a col number.
-        _dummy, col = substitute_cellref("#{col}1")
-        raise "Invalid column '#{col_letter}'" if col >= COL_MAX
-      end
-
-      col_first, col_last = @filter_range
-
-      # Reject column if it is outside filter range.
-      raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})" if col < col_first or col > col_last
-
-      col
     end
 
     def protect_default_settings  # :nodoc:

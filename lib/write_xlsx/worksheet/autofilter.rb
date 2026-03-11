@@ -4,6 +4,8 @@ module Writexlsx
   class Worksheet
     # Autofilter-related operations extracted from Worksheet to slim the main class.
     module Autofilter
+      include Utility
+
       #
       # :call-seq:
       #   autofilter(first_row, first_col, last_row, last_col)
@@ -82,6 +84,24 @@ module Writexlsx
         @filter_cols[col] = tokens
         @filter_type[col] = 1           # Default style.
         @filter_on        = 1
+      end
+
+      def prepare_filter_column(col) # :nodoc:
+        # Check for a column reference in A1 notation and substitute.
+        if col.to_s =~ /^\D/
+          col_letter = col
+
+          # Convert col ref to a cell ref and then to a col number.
+          _dummy, col = substitute_cellref("#{col}1")
+          raise "Invalid column '#{col_letter}'" if col >= COL_MAX
+        end
+
+        col_first, col_last = @filter_range
+
+        # Reject column if it is outside filter range.
+        raise "Column '#{col}' outside autofilter column range (#{col_first} .. #{col_last})" if col < col_first || col > col_last
+
+        col
       end
 
       #
@@ -219,6 +239,149 @@ module Writexlsx
         ]
 
         @writer.empty_tag('customFilter', attributes)
+      end
+
+      private
+
+      #
+      # Extract the tokens from the filter expression. The tokens are mainly non-
+      # whitespace groups. The only tricky part is to extract string tokens that
+      # contain whitespace and/or quoted double quotes (Excel's escaped quotes).
+      #
+      def extract_filter_tokens(expression = nil) # :nodoc:
+        return [] unless expression
+
+        tokens = []
+        str = expression
+        while str =~ /"(?:[^"]|"")*"|\S+/
+          tokens << ::Regexp.last_match(0)
+          str = $LAST_MATCH_INFO.post_match
+        end
+
+        # Remove leading and trailing quotes and unescape other quotes
+        tokens.map! do |token|
+          token.sub!(/^"/, '')
+          token.sub!(/"$/, '')
+          token.gsub!('""', '"')
+
+          # if token is number, convert to numeric.
+          if token =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/
+            token.to_f == token.to_i ? token.to_i : token.to_f
+          else
+            token
+          end
+        end
+
+        tokens
+      end
+
+      #
+      # Converts the tokens of a possibly conditional expression into 1 or 2
+      # sub expressions for further parsing.
+      #
+      def parse_filter_expression(expression, tokens) # :nodoc:
+        # The number of tokens will be either 3 (for 1 expression)
+        # or 7 (for 2  expressions).
+        #
+        if tokens.size == 7
+          conditional = tokens[3]
+          if conditional =~ /^(and|&&)$/
+            conditional = 0
+          elsif conditional =~ /^(or|\|\|)$/
+            conditional = 1
+          else
+            raise "Token '#{conditional}' is not a valid conditional " \
+                  "in filter expression '#{expression}'"
+          end
+          expression_1 = parse_filter_tokens(expression, tokens[0..2])
+          expression_2 = parse_filter_tokens(expression, tokens[4..6])
+          [expression_1, conditional, expression_2].flatten
+        else
+          parse_filter_tokens(expression, tokens)
+        end
+      end
+
+      #
+      # Parse the 3 tokens of a filter expression and return the operator and token.
+      #
+      def parse_filter_tokens(expression, tokens)     # :nodoc:
+        operators = {
+          '==' => 2,
+          '='  => 2,
+          '=~' => 2,
+          'eq' => 2,
+
+          '!=' => 5,
+          '!~' => 5,
+          'ne' => 5,
+          '<>' => 5,
+
+          '<'  => 1,
+          '<=' => 3,
+          '>'  => 4,
+          '>=' => 6
+        }
+
+        operator = operators[tokens[1]]
+        token    = tokens[2]
+
+        # Special handling of "Top" filter expressions.
+        if tokens[0] =~ /^top|bottom$/i
+          value = tokens[1]
+          if value.to_s =~ /\D/ || value.to_i < 1 || value.to_i > 500
+            raise "The value '#{value}' in expression '#{expression}' " \
+                  "must be in the range 1 to 500"
+          end
+          token.downcase!
+          if token != 'items' && token != '%'
+            raise "The type '#{token}' in expression '#{expression}' " \
+                  "must be either 'items' or '%'"
+          end
+
+          operator = if tokens[0] =~ /^top$/i
+                       30
+                     else
+                       32
+                     end
+
+          operator += 1 if tokens[2] == '%'
+
+          token    = value
+        end
+
+        if !operator && tokens[0]
+          raise "Token '#{tokens[1]}' is not a valid operator " \
+                "in filter expression '#{expression}'"
+        end
+
+        # Special handling for Blanks/NonBlanks.
+        if token.to_s =~ /^blanks|nonblanks$/i
+          # Only allow Equals or NotEqual in this context.
+          if operator != 2 && operator != 5
+            raise "The operator '#{tokens[1]}' in expression '#{expression}' " \
+                  "is not valid in relation to Blanks/NonBlanks'"
+          end
+
+          token.downcase!
+
+          # The operator should always be 2 (=) to flag a "simple" equality in
+          # the binary record. Therefore we convert <> to =.
+          if token == 'blanks'
+            token = ' ' if operator == 5
+          elsif operator == 5
+            operator = 2
+            token    = 'blanks'
+          else
+            operator = 5
+            token    = ' '
+          end
+        end
+
+        # if the string token contains an Excel match character then change the
+        # operator type to indicate a non "simple" equality.
+        operator = 22 if operator == 2 && token.to_s =~ /[*?]/
+
+        [operator, token]
       end
     end
   end
