@@ -50,7 +50,7 @@ module Writexlsx
         ZipFileUtils.zip(tempdir.to_s, filename)
 
         IO.copy_stream(filename, fileobj) if fileobj
-        Writexlsx::Utility.delete_files(tempdir)
+        delete_tempdir(tempdir)
       end
 
       #
@@ -213,6 +213,19 @@ module Writexlsx
       # prepare_sst_string_data
       #
       def prepare_sst_string_data; end
+
+      def delete_tempdir(path)
+        if FileTest.file?(path)
+          File.delete(path)
+        elsif FileTest.directory?(path)
+          Dir.foreach(path) do |file|
+            next if file =~ /^\.\.?$/  # '.' or '..'
+
+            delete_tempdir(path.sub(%r{/+$}, "") + '/' + file)
+          end
+          Dir.rmdir(path)
+        end
+      end
     end
   end
 end

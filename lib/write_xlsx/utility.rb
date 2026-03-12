@@ -267,19 +267,6 @@ module Writexlsx
       @writer.string
     end
 
-    def self.delete_files(path)
-      if FileTest.file?(path)
-        File.delete(path)
-      elsif FileTest.directory?(path)
-        Dir.foreach(path) do |file|
-          next if file =~ /^\.\.?$/  # '.' or '..'
-
-          delete_files(path.sub(%r{/+$}, "") + '/' + file)
-        end
-        Dir.rmdir(path)
-      end
-    end
-
     def put_deprecate_message(method)
       warn("Warning: calling deprecated method #{method}. This method will be removed in a future release.")
     end
