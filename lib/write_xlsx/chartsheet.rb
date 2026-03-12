@@ -11,19 +11,40 @@
 # Convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 
+require 'forwardable'
 require 'write_xlsx/worksheet'
 
 module Writexlsx
   class Chartsheet < Worksheet
     include Writexlsx::Utility
+    extend Forwardable
 
     attr_writer :chart
 
+    def_delegators :@chart,
+                   :add_series,
+                   :set_x_axis,
+                   :set_y_axis,
+                   :set_x2_axis,
+                   :set_y2_axis,
+                   :set_title,
+                   :set_legend,
+                   :set_plotarea,
+                   :set_chartarea,
+                   :set_style,
+                   :show_blanks_as,
+                   :show_hidden_data,
+                   :set_size,
+                   :set_table,
+                   :set_up_down_bars,
+                   :set_drop_lines,
+                   :set_high_low_lines
+
     def initialize(workbook, index, name)
       super
-      @drawings          = Drawings.new
-      @is_chartsheet     = true
-      @chart             = nil
+      @drawings = Drawings.new
+      @is_chartsheet = true
+      @chart = nil
       @zoom_scale_normal = 0
       @page_setup.orientation = false
     end
@@ -94,88 +115,17 @@ module Writexlsx
       @chart.protection = 1
 
       # Turn off worksheet defaults.
-      options[:sheet]     = 0
+      options[:sheet] = 0
       options[:scenarios] = 1
 
       super(password, options)
     end
 
-    ###############################################################################
     #
-    # Encapsulated Chart methods.
+    # Set the option for displaying #N/A as an empty cell in a chart.
     #
-    ###############################################################################
-
-    def add_series(*args)
-      @chart.add_series(*args)
-    end
-
-    def set_x_axis(*args)
-      @chart.set_x_axis(*args)
-    end
-
-    def set_y_axis(*args)
-      @chart.set_y_axis(*args)
-    end
-
-    def set_x2_axis(*args)
-      @chart.set_x2_axis(*args)
-    end
-
-    def set_y2_axis(*args)
-      @chart.set_y2_axis(*args)
-    end
-
-    def set_title(*args)
-      @chart.set_title(*args)
-    end
-
-    def set_legend(*args)
-      @chart.set_legend(*args)
-    end
-
-    def set_plotarea(*args)
-      @chart.set_plotarea(*args)
-    end
-
-    def set_chartarea(*args)
-      @chart.set_chartarea(*args)
-    end
-
-    def set_style(*args)
-      @chart.set_style(*args)
-    end
-
-    def show_blanks_as(*args)
-      @chart.show_blanks_as(*args)
-    end
-
     def show_na_as_empty_cell
-      @chart.show_na_as_empty_cell(*args)
-    end
-
-    def show_hidden_data(*args)
-      @chart.show_hidden_data(*args)
-    end
-
-    def set_size(*args)
-      @chart.set_size(*args)
-    end
-
-    def set_table(*args)
-      @chart.set_table(*args)
-    end
-
-    def set_up_down_bars(*args)
-      @chart.set_up_down_bars(*args)
-    end
-
-    def set_drop_lines(*args)
-      @chart.set_drop_lines(*args)
-    end
-
-    def set_high_low_lines(*args)
-      @chart.set_high_low_lines(*args)
+      @chart.show_na_as_empty_cell
     end
 
     #
@@ -184,7 +134,7 @@ module Writexlsx
     def prepare_chart(_index, chart_id, drawing_id) # :nodoc:
       @chart.id = chart_id - 1
 
-      drawings  = Drawings.new
+      drawings = Drawings.new
       @drawings = drawings
       @drawings.orientation = @page_setup.orientation
 
@@ -206,12 +156,12 @@ module Writexlsx
     # Write the <chartsheet> element. This is the root element of Chartsheet.
     #
     def write_chartsheet(&block) # :nodoc:
-      schema  = 'http://schemas.openxmlformats.org/'
-      xmlns   = schema + 'spreadsheetml/2006/main'
+      schema = 'http://schemas.openxmlformats.org/'
+      xmlns = schema + 'spreadsheetml/2006/main'
       xmlns_r = schema + 'officeDocument/2006/relationships'
 
       attributes = [
-        ['xmlns',   xmlns],
+        ['xmlns', xmlns],
         ['xmlns:r', xmlns_r]
       ]
 
