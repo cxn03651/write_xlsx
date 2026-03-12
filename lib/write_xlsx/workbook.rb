@@ -1330,7 +1330,7 @@ module Writexlsx
 
                  # Raise if the name is unknown since it indicates a user error in
                  # a chart series formula.
-                 raise "Unknown worksheet reference '#{sheetname} in range '#{range}' passed to add_series()\n" unless worksheets[sheetname]
+                 raise "Unknown worksheet reference '#{sheetname}' in range '#{range}' passed to add_series()\n" unless worksheets[sheetname]
 
                  # Add the data to the chart.
                  # And store range data locally to avoid lookup if seen agein.
