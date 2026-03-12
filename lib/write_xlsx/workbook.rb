@@ -27,7 +27,9 @@ module Writexlsx
   MAX_URL_LENGTH = 2_079
 
   class Workbook
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
+    include Writexlsx::Utility::CellReference
+    include Writexlsx::Utility::XmlPrimitives
     include Initialization
     include PackagePreparation
     include FormatPreparation
