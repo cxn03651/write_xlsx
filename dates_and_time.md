@@ -20,7 +20,7 @@ If you write a date string with `write()` then all you will get is a string:
     worksheet.write('A1', '02/03/04')   # !! Writes a string not a date. !!
 
 Dates and times in Excel are represented by real numbers,
-for example "Jan 1 2001 12:30 AM" is represented by the number 36892.521.
+for example "Jan 1 2001 12:30 PM" is represented by the number 36892.521.
 
 The integer part of the number stores the number of days since the epoch
 and the fractional part stores the percentage of the day.

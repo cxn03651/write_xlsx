@@ -250,7 +250,7 @@ Using format strings you can define very sophisticated formatting of numbers.
     worksheet.write(8, 0, 36892.521, format09)    # 1 January 2001
 
     format10.set_num_format('dd/mm/yyyy hh:mm AM/PM')
-    worksheet.write(9, 0, 36892.521, format10)    # 01/01/2001 12:30 AM
+    worksheet.write(9, 0, 36892.521, format10)    # 01/01/2001 12:30 PM
 
     format11.set_num_format('0 "dollar and" .00 "cents"')
     worksheet.write(10, 0, 1.87, format11)        # 1 dollar and .87 cents
