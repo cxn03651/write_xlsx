@@ -2,10 +2,13 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/col_name'
+require 'write_xlsx/constants'
 
 module Writexlsx
   module Utility
     module CellReference
+      include Constants
+
       #
       # xl_rowcol_to_cell($row, col, row_absolute, col_absolute)
       #

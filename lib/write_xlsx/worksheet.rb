@@ -3,6 +3,7 @@
 
 require 'write_xlsx/colors'
 require 'write_xlsx/compatibility'
+require 'write_xlsx/constants'
 require 'write_xlsx/drawing'
 require 'write_xlsx/format'
 require 'write_xlsx/image'
@@ -48,6 +49,7 @@ module Writexlsx
   class Worksheet
     extend Forwardable
 
+    include Constants
     include Writexlsx::Utility
 
     # storage / initialization

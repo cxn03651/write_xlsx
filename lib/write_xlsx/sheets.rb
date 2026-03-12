@@ -2,10 +2,12 @@
 # frozen_string_literal: true
 
 require 'delegate'
+require 'write_xlsx/constants'
 require 'write_xlsx/package/xml_writer_simple'
 
 module Writexlsx
   class Sheets < DelegateClass(Array)
+    include Constants
     include Writexlsx::Utility
 
     BASE_NAME = { sheet: 'Sheet', chart: 'Chart' }  # :nodoc:

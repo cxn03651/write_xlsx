@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/constants'
 require 'write_xlsx/format'
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
@@ -8,6 +9,7 @@ require 'write_xlsx/utility'
 module Writexlsx
   module Package
     class Comment
+      include Constants
       include Writexlsx::Utility
 
       DEFAULT_COLOR  = 81  # what color ?

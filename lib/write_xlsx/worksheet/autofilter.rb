@@ -1,9 +1,12 @@
 # frozen_string_literal: true
 
+require 'write_xlsx/constants'
+
 module Writexlsx
   class Worksheet
     # Autofilter-related operations extracted from Worksheet to slim the main class.
     module Autofilter
+      include Constants
       include Utility
 
       #

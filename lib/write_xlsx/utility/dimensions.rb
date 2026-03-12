@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/constants'
+
 module Writexlsx
   module Utility
     module Dimensions
+      include Constants
+
       def check_dimensions(row, col)
         raise WriteXLSXDimensionError if !row || row >= ROW_MAX || !col || col >= COL_MAX
 

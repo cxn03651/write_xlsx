@@ -39,7 +39,9 @@ require 'write_xlsx/chart/formatting_writer'
 
 module Writexlsx
   class Chart
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
+    include Writexlsx::Utility::ChartFormatting
+    include Writexlsx::Utility::RichText
     include Writexlsx::Gradient
     include Initialization
     include Settings

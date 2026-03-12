@@ -26,10 +26,5 @@ module Writexlsx
     include Drawing
     include ChartFormatting
     include RichText
-
-    ROW_MAX       = 1048576  # :nodoc:
-    COL_MAX       = 16384    # :nodoc:
-    STR_MAX       = 32767    # :nodoc:
-    SHEETNAME_MAX = 31       # :nodoc:
   end
 end

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/constants'
+
 ###############################################################################
 #
 # Formatting - A module for worksheet layout and print/appearance settings.
@@ -13,6 +15,7 @@
 module Writexlsx
   class Worksheet
     module Formatting
+      include Constants
       include Utility
 
       #

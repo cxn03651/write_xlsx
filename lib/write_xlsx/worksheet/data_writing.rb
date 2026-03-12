@@ -10,10 +10,12 @@
 # Copyright 2000-2011, John McNamara, jmcnamara@cpan.org
 # Convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
+require 'write_xlsx/constants'
 
 module Writexlsx
   class Worksheet
     module DataWriting
+      include Constants
       include Writexlsx::Utility
 
       #
