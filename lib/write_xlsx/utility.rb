@@ -5,11 +5,18 @@ require 'write_xlsx/col_name'
 
 module Writexlsx
   module Utility
+    ###############################################################################
+    #
+    # Shared constants and low-level predicates
+    #
+    ###############################################################################
+
     ROW_MAX       = 1048576  # :nodoc:
     COL_MAX       = 16384    # :nodoc:
     STR_MAX       = 32767    # :nodoc:
-    SHEETNAME_MAX = 31  # :nodoc:
-    CHAR_WIDTHS   = {
+    SHEETNAME_MAX = 31       # :nodoc:
+
+    CHAR_WIDTHS = {
       ' '  =>  3, '!' =>  5, '"' =>  6, '#' =>  7, '$' =>  7, '%' => 11,
       '&'  => 10, "'" =>  3, '(' =>  5, ')' =>  5, '*' =>  7, '+' =>  7,
       ','  =>  4, '-' =>  5, '.' =>  4, '/' =>  6, '0' =>  7, '1' =>  7,
@@ -27,9 +34,51 @@ module Writexlsx
       't'  =>  5, 'u' =>  8, 'v' =>  7, 'w' => 11, 'x' =>  7, 'y' =>  7,
       'z'  =>  6, '{' =>  5, '|' =>  7, '}' =>  5, '~' =>  7
     }.freeze
+
     MAX_DIGIT_WIDTH    = 7    # For Calabri 11.  # :nodoc:
     PADDING            = 5                       # :nodoc:
     DEFAULT_COL_PIXELS = 64
+    PERL_TRUE_VALUES   = [false, nil, 0, "0", "", [], {}].freeze
+
+    #
+    # return perl's boolean result
+    #
+    def ptrue?(value)
+      if PERL_TRUE_VALUES.include?(value)
+        false
+      else
+        true
+      end
+    end
+
+    def check_parameter(params, valid_keys, method)
+      invalids = params.keys - valid_keys
+      unless invalids.empty?
+        raise WriteXLSXOptionParameterError,
+              "Unknown parameter '#{invalids.join(", ")}' in #{method}."
+      end
+      true
+    end
+
+    def absolute_char(absolute)
+      absolute ? '$' : ''
+    end
+
+    def float_to_str(float)
+      return '' unless float
+
+      if float == float.to_i
+        float.to_i.to_s
+      else
+        float.to_s
+      end
+    end
+
+    ###############################################################################
+    #
+    # Cell, column, and range reference helpers
+    #
+    ###############################################################################
 
     #
     # xl_rowcol_to_cell($row, col, row_absolute, col_absolute)
@@ -108,21 +157,6 @@ module Writexlsx
     end
 
     #
-    # xl_string_pixel_width($string)
-    #
-    # Get the pixel width of a string based on individual character widths taken
-    # from Excel. UTF8 characters are given a default width of 8.
-    #
-    # Note, Excel adds an additional 7 pixels padding to a cell.
-    #
-    def xl_string_pixel_width(string)
-      length = 0
-      string.to_s.split("").each { |char| length += CHAR_WIDTHS[char] || 8 }
-
-      length
-    end
-
-    #
     # Sheetnames used in references should be quoted if they contain any spaces,
     # special characters or if the look like something that isn't a sheet name.
     # TODO. We need to handle more special cases.
@@ -135,11 +169,152 @@ module Writexlsx
       "'#{escape_sheetname(name)}'"
     end
 
+    # Check for a cell reference in A1 notation and substitute row and column
+    def row_col_notation(row_or_a1)   # :nodoc:
+      substitute_cellref(row_or_a1) if row_or_a1.respond_to?(:match) && row_or_a1.to_s =~ /^\D/
+    end
+
+    #
+    # Substitute an Excel cell reference in A1 notation for  zero based row and
+    # column values in an argument list.
+    #
+    # Ex: ("A4", "Hello") is converted to (3, 0, "Hello").
+    #
+    def substitute_cellref(cell, *args)       # :nodoc:
+      normalized_cell = cell.upcase
+
+      case normalized_cell
+      # Convert a column range: 'A:A' or 'B:G'.
+      # A range such as A:A is equivalent to A1:65536, so add rows as required
+      when /\$?([A-Z]{1,3}):\$?([A-Z]{1,3})/
+        row1, col1 =  xl_cell_to_rowcol(::Regexp.last_match(1) + '1')
+        row2, col2 =  xl_cell_to_rowcol(::Regexp.last_match(2) + ROW_MAX.to_s)
+        [row1, col1, row2, col2, *args]
+      # Convert a cell range: 'A1:B7'
+      when /\$?([A-Z]{1,3}\$?\d+):\$?([A-Z]{1,3}\$?\d+)/
+        row1, col1 =  xl_cell_to_rowcol(::Regexp.last_match(1))
+        row2, col2 =  xl_cell_to_rowcol(::Regexp.last_match(2))
+        [row1, col1, row2, col2, *args]
+      # Convert a cell reference: 'A1' or 'AD2000'
+      when /\$?([A-Z]{1,3}\$?\d+)/
+        row1, col1 = xl_cell_to_rowcol(::Regexp.last_match(1))
+        [row1, col1, *args]
+      else
+        raise("Unknown cell reference #{normalized_cell}")
+      end
+    end
+
+    ###############################################################################
+    #
+    # Dimension and worksheet bounds helpers
+    #
+    ###############################################################################
+
     def check_dimensions(row, col)
       raise WriteXLSXDimensionError if !row || row >= ROW_MAX || !col || col >= COL_MAX
 
       0
     end
+
+    #
+    # Check that row and col are valid and store max and min values for use in
+    # other methods/elements.
+    #
+    def check_dimensions_and_update_max_min_values(row, col, ignore_row = 0, ignore_col = 0)       # :nodoc:
+      check_dimensions(row, col)
+      store_row_max_min_values(row) if ignore_row == 0
+      store_col_max_min_values(col) if ignore_col == 0
+
+      0
+    end
+
+    def store_row_max_min_values(row)
+      @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
+      @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
+    end
+
+    def store_col_max_min_values(col)
+      @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
+      @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
+    end
+
+    ###############################################################################
+    #
+    # String, URL, and filesystem helpers
+    #
+    ###############################################################################
+
+    def escape_url(url)
+      unless url =~ /%[0-9a-fA-F]{2}/
+        # Escape the URL escape symbol.
+        url = url.gsub("%", "%25")
+
+        # Escape whitespae in URL.
+        url = url.gsub(/[\s\x00]/, '%20')
+
+        # Escape other special characters in URL.
+        re = /(["<>\[\]`^{}])/
+        while re =~ url
+          match = $~[1]
+          url = url.sub(re, sprintf("%%%x", match.ord))
+        end
+      end
+
+      url
+    end
+
+    def xml_str
+      @writer.string
+    end
+
+    def self.delete_files(path)
+      if FileTest.file?(path)
+        File.delete(path)
+      elsif FileTest.directory?(path)
+        Dir.foreach(path) do |file|
+          next if file =~ /^\.\.?$/  # '.' or '..'
+
+          delete_files(path.sub(%r{/+$}, "") + '/' + file)
+        end
+        Dir.rmdir(path)
+      end
+    end
+
+    def put_deprecate_message(method)
+      warn("Warning: calling deprecated method #{method}. This method will be removed in a future release.")
+    end
+
+    ###############################################################################
+    #
+    # XML writing primitives
+    #
+    ###############################################################################
+
+    #
+    # Write the <color> element.
+    #
+    def write_color(name, value, writer = @writer) # :nodoc:
+      attributes = [[name, value]]
+
+      writer.empty_tag('color', attributes)
+    end
+
+    def r_id_attributes(id)
+      ['r:id', "rId#{id}"]
+    end
+
+    def write_xml_declaration
+      @writer.xml_decl
+      yield
+      @writer.crlf
+      @writer.close
+    end
+
+    ###############################################################################
+    #
+    # Date and time conversion helpers
+    #
+    ###############################################################################
 
     #
     # convert_date_time(date_time_string)
@@ -229,9 +404,9 @@ module Writexlsx
         days += mdays[m]                      # Add days for past months
       end
       days += range * 365                      # Add days for past years
-      days += (range / 4)    # Add leapdays
-      days -= ((range + offset) / 100)    # Subtract 100 year leapdays
-      days += ((range + offset + norm) / 400)    # Add 400 year leapdays
+      days += (range / 4)                      # Add leapdays
+      days -= ((range + offset) / 100)         # Subtract 100 year leapdays
+      days += ((range + offset + norm) / 400)  # Add 400 year leapdays
       days -= leap                             # Already counted above
 
       # Adjust for Excel erroneously treating 1900 as a leap year.
@@ -246,86 +421,166 @@ module Writexlsx
       end
     end
 
-    def escape_url(url)
-      unless url =~ /%[0-9a-fA-F]{2}/
-        # Escape the URL escape symbol.
-        url = url.gsub("%", "%25")
+    ###############################################################################
+    #
+    # String width and visual measurement helpers
+    #
+    ###############################################################################
 
-        # Escape whitespae in URL.
-        url = url.gsub(/[\s\x00]/, '%20')
+    #
+    # xl_string_pixel_width($string)
+    #
+    # Get the pixel width of a string based on individual character widths taken
+    # from Excel. UTF8 characters are given a default width of 8.
+    #
+    # Note, Excel adds an additional 7 pixels padding to a cell.
+    #
+    def xl_string_pixel_width(string)
+      length = 0
+      string.to_s.split("").each { |char| length += CHAR_WIDTHS[char] || 8 }
 
-        # Escape other special characters in URL.
-        re = /(["<>\[\]`^{}])/
-        while re =~ url
-          match = $~[1]
-          url = url.sub(re, sprintf("%%%x", match.ord))
+      length
+    end
+
+    #
+    # Convert vertices from pixels to points.
+    #
+    def pixels_to_points(vertices)
+      _col_start, _row_start, _x1,    _y1,
+      _col_end,   _row_end,   _x2,    _y2,
+      left,      top,       width, height  = vertices.flatten
+
+      left   *= 0.75
+      top    *= 0.75
+      width  *= 0.75
+      height *= 0.75
+
+      [left, top, width, height]
+    end
+
+    ###############################################################################
+    #
+    # Shape, VML, and drawing helpers
+    #
+    ###############################################################################
+
+    def v_shape_attributes_base(id)
+      [
+        ['id',    "_x0000_s#{id}"],
+        ['type',  type]
+      ]
+    end
+
+    def v_shape_style_base(z_index, vertices)
+      left, top, width, height = pixels_to_points(vertices)
+
+      left_str    = float_to_str(left)
+      top_str     = float_to_str(top)
+      width_str   = float_to_str(width)
+      height_str  = float_to_str(height)
+      z_index_str = float_to_str(z_index)
+
+      shape_style_base(left_str, top_str, width_str, height_str, z_index_str)
+    end
+
+    def shape_style_base(left_str, top_str, width_str, height_str, z_index_str)
+      [
+        'position:absolute;',
+        'margin-left:',
+        left_str, 'pt;',
+        'margin-top:',
+        top_str, 'pt;',
+        'width:',
+        width_str, 'pt;',
+        'height:',
+        height_str, 'pt;',
+        'z-index:',
+        z_index_str, ';'
+      ]
+    end
+
+    #
+    # Write the <v:fill> element.
+    #
+    def write_fill
+      @writer.empty_tag('v:fill', fill_attributes)
+    end
+
+    #
+    # Write the <v:path> element.
+    #
+    def write_comment_path(gradientshapeok, connecttype)
+      attributes = []
+
+      attributes << %w[gradientshapeok t] if gradientshapeok
+      attributes << ['o:connecttype', connecttype]
+
+      @writer.empty_tag('v:path', attributes)
+    end
+
+    #
+    # Write the <x:Anchor> element.
+    #
+    def write_anchor
+      col_start, row_start, x1, y1, col_end, row_end, x2, y2 = @vertices
+      data = [col_start, x1, row_start, y1, col_end, x2, row_end, y2].join(', ')
+
+      @writer.data_element('x:Anchor', data)
+    end
+
+    #
+    # Write the <x:AutoFill> element.
+    #
+    def write_auto_fill
+      @writer.data_element('x:AutoFill', 'False')
+    end
+
+    #
+    # Write the <div> element.
+    #
+    def write_div(align, font = nil)
+      style = "text-align:#{align}"
+      attributes = [['style', style]]
+
+      @writer.tag_elements('div', attributes) do
+        if font
+          # Write the font element.
+          write_font(font)
         end
       end
-
-      url
-    end
-
-    def absolute_char(absolute)
-      absolute ? '$' : ''
-    end
-
-    def xml_str
-      @writer.string
-    end
-
-    def self.delete_files(path)
-      if FileTest.file?(path)
-        File.delete(path)
-      elsif FileTest.directory?(path)
-        Dir.foreach(path) do |file|
-          next if file =~ /^\.\.?$/  # '.' or '..'
-
-          delete_files(path.sub(%r{/+$}, "") + '/' + file)
-        end
-        Dir.rmdir(path)
-      end
-    end
-
-    def put_deprecate_message(method)
-      warn("Warning: calling deprecated method #{method}. This method will be removed in a future release.")
-    end
-
-    # Check for a cell reference in A1 notation and substitute row and column
-    def row_col_notation(row_or_a1)   # :nodoc:
-      substitute_cellref(row_or_a1) if row_or_a1.respond_to?(:match) && row_or_a1.to_s =~ /^\D/
     end
 
     #
-    # Substitute an Excel cell reference in A1 notation for  zero based row and
-    # column values in an argument list.
+    # Write the <font> element.
     #
-    # Ex: ("A4", "Hello") is converted to (3, 0, "Hello").
-    #
-    def substitute_cellref(cell, *args)       # :nodoc:
-      #      return [*args] if cell.respond_to?(:coerce) # Numeric
+    def write_font(font)
+      caption = font[:_caption]
+      face    = 'Calibri'
+      size    = 220
+      color   = '#000000'
 
-      normalized_cell = cell.upcase
-
-      case normalized_cell
-      # Convert a column range: 'A:A' or 'B:G'.
-      # A range such as A:A is equivalent to A1:65536, so add rows as required
-      when /\$?([A-Z]{1,3}):\$?([A-Z]{1,3})/
-        row1, col1 =  xl_cell_to_rowcol(::Regexp.last_match(1) + '1')
-        row2, col2 =  xl_cell_to_rowcol(::Regexp.last_match(2) + ROW_MAX.to_s)
-        [row1, col1, row2, col2, *args]
-      # Convert a cell range: 'A1:B7'
-      when /\$?([A-Z]{1,3}\$?\d+):\$?([A-Z]{1,3}\$?\d+)/
-        row1, col1 =  xl_cell_to_rowcol(::Regexp.last_match(1))
-        row2, col2 =  xl_cell_to_rowcol(::Regexp.last_match(2))
-        [row1, col1, row2, col2, *args]
-      # Convert a cell reference: 'A1' or 'AD2000'
-      when /\$?([A-Z]{1,3}\$?\d+)/
-        row1, col1 = xl_cell_to_rowcol(::Regexp.last_match(1))
-        [row1, col1, *args]
-      else
-        raise("Unknown cell reference #{normalized_cell}")
-      end
+      attributes = [
+        ['face',  face],
+        ['size',  size],
+        ['color', color]
+      ]
+      @writer.data_element('font', caption, attributes)
     end
+
+    #
+    # Write the <v:stroke> element.
+    #
+    def write_stroke
+      attributes = [%w[joinstyle miter]]
+
+      @writer.empty_tag('v:stroke', attributes)
+    end
+
+    ###############################################################################
+    #
+    # Underline, font, and rich text helpers
+    #
+    ###############################################################################
 
     def underline_attributes(underline)
       if underline == 2
@@ -340,66 +595,173 @@ module Writexlsx
     end
 
     #
-    # Write the <color> element.
+    # Convert user defined font values into private hash values.
     #
-    def write_color(name, value, writer = @writer) # :nodoc:
-      attributes = [[name, value]]
+    def convert_font_args(params)
+      return unless params
 
-      writer.empty_tag('color', attributes)
+      font = params_to_font(params)
+
+      # Convert font size units.
+      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
+
+      # Convert rotation into 60,000ths of a degree.
+      font[:_rotation] = 60_000 * font[:_rotation].to_i if ptrue?(font[:_rotation])
+
+      font
     end
 
-    PERL_TRUE_VALUES = [false, nil, 0, "0", "", [], {}].freeze
+    def params_to_font(params)
+      {
+        _name:         params[:name],
+        _color:        params[:color],
+        _size:         params[:size],
+        _bold:         params[:bold],
+        _italic:       params[:italic],
+        _underline:    params[:underline],
+        _pitch_family: params[:pitch_family],
+        _charset:      params[:charset],
+        _baseline:     params[:baseline] || 0,
+        _rotation:     params[:rotation]
+      }
+    end
+
     #
-    # return perl's boolean result
+    # Get the font style attributes from a font hash.
     #
-    def ptrue?(value)
-      if PERL_TRUE_VALUES.include?(value)
-        false
+    def get_font_style_attributes(font)
+      return [] unless font
+      return [] unless font.respond_to?(:[])
+
+      attributes = []
+      attributes << ['sz', font[:_size]]      if ptrue?(font[:_size])
+      attributes << ['b',  font[:_bold]]      if font[:_bold]
+      attributes << ['i',  font[:_italic]]    if font[:_italic]
+      attributes << %w[u sng]                 if font[:_underline]
+
+      # Turn off baseline when testing fonts that don't have it.
+      attributes << ['baseline', font[:_baseline]] if font[:_baseline] != -1
+      attributes
+    end
+
+    #
+    # Get the font latin attributes from a font hash.
+    #
+    def get_font_latin_attributes(font)
+      return [] unless font
+      return [] unless font.respond_to?(:[])
+
+      attributes = []
+      attributes << ['typeface', font[:_name]]            if ptrue?(font[:_name])
+      attributes << ['pitchFamily', font[:_pitch_family]] if font[:_pitch_family]
+      attributes << ['charset', font[:_charset]]          if font[:_charset]
+
+      attributes
+    end
+
+    #
+    # Write the <c:txPr> element.
+    #
+    def write_tx_pr(font, is_y_axis = nil) # :nodoc:
+      rotation = nil
+      rotation = font[:_rotation] if font && font.respond_to?(:[]) && font[:_rotation]
+      @writer.tag_elements('c:txPr') do
+        # Write the a:bodyPr element.
+        write_a_body_pr(rotation, is_y_axis)
+        # Write the a:lstStyle element.
+        write_a_lst_style
+        # Write the a:p element.
+        write_a_p_formula(font)
+      end
+    end
+
+    #
+    # Write the <a:bodyPr> element.
+    #
+    def write_a_body_pr(rot, is_y_axis = nil) # :nodoc:
+      rot = -5400000 if !rot && ptrue?(is_y_axis)
+      attributes = []
+      if rot
+        if rot == 16_200_000
+          # 270 deg/stacked angle.
+          attributes << ['rot',  0]
+          attributes << %w[vert wordArtVert]
+        elsif rot == 16_260_000
+          # 271 deg/stacked angle.
+          attributes << ['rot',  0]
+          attributes << %w[vert eaVert]
+        else
+          attributes << ['rot',  rot]
+          attributes << %w[vert horz]
+        end
+      end
+
+      @writer.empty_tag('a:bodyPr', attributes)
+    end
+
+    #
+    # Write the <a:lstStyle> element.
+    #
+    def write_a_lst_style # :nodoc:
+      @writer.empty_tag('a:lstStyle')
+    end
+
+    #
+    # Write the <a:p> element for formula titles.
+    #
+    def write_a_p_formula(font = nil) # :nodoc:
+      @writer.tag_elements('a:p') do
+        # Write the a:pPr element.
+        write_a_p_pr_formula(font)
+        # Write the a:endParaRPr element.
+        write_a_end_para_rpr
+      end
+    end
+
+    #
+    # Write the <a:pPr> element for formula titles.
+    #
+    def write_a_p_pr_formula(font) # :nodoc:
+      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
+    end
+
+    #
+    # Write the <a:defRPr> element.
+    #
+    def write_a_def_rpr(font = nil) # :nodoc:
+      write_def_rpr_r_pr_common(
+        font,
+        get_font_style_attributes(font),
+        'a:defRPr'
+      )
+    end
+
+    def write_def_rpr_r_pr_common(font, style_attributes, tag)  # :nodoc:
+      latin_attributes = get_font_latin_attributes(font)
+      has_color = ptrue?(font) && ptrue?(font[:_color])
+
+      if !latin_attributes.empty? || has_color
+        @writer.tag_elements(tag, style_attributes) do
+          write_a_solid_fill(color: font[:_color]) if has_color
+          write_a_latin(latin_attributes) unless latin_attributes.empty?
+        end
       else
-        true
+        @writer.empty_tag(tag, style_attributes)
       end
-    end
-
-    def check_parameter(params, valid_keys, method)
-      invalids = params.keys - valid_keys
-      unless invalids.empty?
-        raise WriteXLSXOptionParameterError,
-              "Unknown parameter '#{invalids.join(", ")}' in #{method}."
-      end
-      true
     end
 
     #
-    # Check that row and col are valid and store max and min values for use in
-    # other methods/elements.
+    # Write the <a:endParaRPr> element.
     #
-    def check_dimensions_and_update_max_min_values(row, col, ignore_row = 0, ignore_col = 0)       # :nodoc:
-      check_dimensions(row, col)
-      store_row_max_min_values(row) if ignore_row == 0
-      store_col_max_min_values(col) if ignore_col == 0
-
-      0
+    def write_a_end_para_rpr # :nodoc:
+      @writer.empty_tag('a:endParaRPr', [%w[lang en-US]])
     end
 
-    def store_row_max_min_values(row)
-      @dim_rowmin = row if !@dim_rowmin || (row < @dim_rowmin)
-      @dim_rowmax = row if !@dim_rowmax || (row > @dim_rowmax)
-    end
-
-    def store_col_max_min_values(col)
-      @dim_colmin = col if !@dim_colmin || (col < @dim_colmin)
-      @dim_colmax = col if !@dim_colmax || (col > @dim_colmax)
-    end
-
-    def float_to_str(float)
-      return '' unless float
-
-      if float == float.to_i
-        float.to_i.to_s
-      else
-        float.to_s
-      end
-    end
+    ###############################################################################
+    #
+    # Color, line, fill, pattern, and layout helpers
+    #
+    ###############################################################################
 
     #
     # Convert user defined legend properties to the structure required internally.
@@ -478,145 +840,6 @@ module Writexlsx
     end
 
     #
-    # Convert vertices from pixels to points.
-    #
-    def pixels_to_points(vertices)
-      _col_start, _row_start, _x1,    _y1,
-      _col_end,   _row_end,   _x2,    _y2,
-      left,      top,       width, height  = vertices.flatten
-
-      left   *= 0.75
-      top    *= 0.75
-      width  *= 0.75
-      height *= 0.75
-
-      [left, top, width, height]
-    end
-
-    def v_shape_attributes_base(id)
-      [
-        ['id',    "_x0000_s#{id}"],
-        ['type',  type]
-      ]
-    end
-
-    def v_shape_style_base(z_index, vertices)
-      left, top, width, height = pixels_to_points(vertices)
-
-      left_str    = float_to_str(left)
-      top_str     = float_to_str(top)
-      width_str   = float_to_str(width)
-      height_str  = float_to_str(height)
-      z_index_str = float_to_str(z_index)
-
-      shape_style_base(left_str, top_str, width_str, height_str, z_index_str)
-    end
-
-    def shape_style_base(left_str, top_str, width_str, height_str, z_index_str)
-      [
-        'position:absolute;',
-        'margin-left:',
-        left_str, 'pt;',
-        'margin-top:',
-        top_str, 'pt;',
-        'width:',
-        width_str, 'pt;',
-        'height:',
-        height_str, 'pt;',
-        'z-index:',
-        z_index_str, ';'
-      ]
-    end
-
-    #
-    # Write the <v:fill> element.
-    #
-    def write_fill
-      @writer.empty_tag('v:fill', fill_attributes)
-    end
-
-    #
-    # Write the <v:path> element.
-    #
-    def write_comment_path(gradientshapeok, connecttype)
-      attributes      = []
-
-      attributes << %w[gradientshapeok t] if gradientshapeok
-      attributes << ['o:connecttype', connecttype]
-
-      @writer.empty_tag('v:path', attributes)
-    end
-
-    #
-    # Write the <x:Anchor> element.
-    #
-    def write_anchor
-      col_start, row_start, x1, y1, col_end, row_end, x2, y2 = @vertices
-      data = [col_start, x1, row_start, y1, col_end, x2, row_end, y2].join(', ')
-
-      @writer.data_element('x:Anchor', data)
-    end
-
-    #
-    # Write the <x:AutoFill> element.
-    #
-    def write_auto_fill
-      @writer.data_element('x:AutoFill', 'False')
-    end
-
-    #
-    # Write the <div> element.
-    #
-    def write_div(align, font = nil)
-      style = "text-align:#{align}"
-      attributes = [['style', style]]
-
-      @writer.tag_elements('div', attributes) do
-        if font
-          # Write the font element.
-          write_font(font)
-        end
-      end
-    end
-
-    #
-    # Write the <font> element.
-    #
-    def write_font(font)
-      caption = font[:_caption]
-      face    = 'Calibri'
-      size    = 220
-      color   = '#000000'
-
-      attributes = [
-        ['face',  face],
-        ['size',  size],
-        ['color', color]
-      ]
-      @writer.data_element('font', caption, attributes)
-    end
-
-    #
-    # Write the <v:stroke> element.
-    #
-    def write_stroke
-      attributes = [%w[joinstyle miter]]
-
-      @writer.empty_tag('v:stroke', attributes)
-    end
-
-    def r_id_attributes(id)
-      ['r:id', "rId#{id}"]
-    end
-
-    def write_xml_declaration
-      @writer.xml_decl
-      yield
-      @writer.crlf
-      @writer.close
-    end
-
-    #
     # Convert user defined line properties to the structure required internally.
     #
     def line_properties(line) # :nodoc:
@@ -644,7 +867,7 @@ module Writexlsx
       return nil unless args.has_key?(:pattern)
 
       # Check the foreground color is present.
-      retuen nil unless args.has_key?(:fg_color)
+      return nil unless args.has_key?(:fg_color)
 
       types = {
         'percent_5'                => 'pct5',
@@ -757,141 +980,18 @@ module Writexlsx
     end
 
     #
-    # Convert user defined font values into private hash values.
+    # Convert the user specified colour index or string to a rgb colour.
     #
-    def convert_font_args(params)
-      return unless params
-
-      font = params_to_font(params)
-
-      # Convert font size units.
-      font[:_size] *= 100 if font[:_size] && font[:_size] != 0
-
-      # Convert rotation into 60,000ths of a degree.
-      font[:_rotation] = 60_000 * font[:_rotation].to_i if ptrue?(font[:_rotation])
-
-      font
-    end
-
-    def params_to_font(params)
-      {
-        _name:         params[:name],
-        _color:        params[:color],
-        _size:         params[:size],
-        _bold:         params[:bold],
-        _italic:       params[:italic],
-        _underline:    params[:underline],
-        _pitch_family: params[:pitch_family],
-        _charset:      params[:charset],
-        _baseline:     params[:baseline] || 0,
-        _rotation:     params[:rotation]
-      }
-    end
-
-    #
-    # Write the <c:txPr> element.
-    #
-    def write_tx_pr(font, is_y_axis = nil) # :nodoc:
-      rotation = nil
-      rotation = font[:_rotation] if font && font.respond_to?(:[]) && font[:_rotation]
-      @writer.tag_elements('c:txPr') do
-        # Write the a:bodyPr element.
-        write_a_body_pr(rotation, is_y_axis)
-        # Write the a:lstStyle element.
-        write_a_lst_style
-        # Write the a:p element.
-        write_a_p_formula(font)
-      end
-    end
-
-    #
-    # Write the <a:bodyPr> element.
-    #
-    def write_a_body_pr(rot, is_y_axis = nil) # :nodoc:
-      rot = -5400000 if !rot && ptrue?(is_y_axis)
-      attributes = []
-      if rot
-        if rot == 16_200_000
-          # 270 deg/stacked angle.
-          attributes << ['rot',  0]
-          attributes << %w[vert wordArtVert]
-        elsif rot == 16_260_000
-          # 271 deg/stacked angle.
-          attributes << ['rot',  0]
-          attributes << %w[vert eaVert]
-        else
-          attributes << ['rot',  rot]
-          attributes << %w[vert horz]
-        end
-      end
-
-      @writer.empty_tag('a:bodyPr', attributes)
-    end
-
-    #
-    # Write the <a:lstStyle> element.
-    #
-    def write_a_lst_style # :nodoc:
-      @writer.empty_tag('a:lstStyle')
-    end
-
-    #
-    # Write the <a:p> element for formula titles.
-    #
-    def write_a_p_formula(font = nil) # :nodoc:
-      @writer.tag_elements('a:p') do
-        # Write the a:pPr element.
-        write_a_p_pr_formula(font)
-        # Write the a:endParaRPr element.
-        write_a_end_para_rpr
-      end
-    end
-
-    #
-    # Write the <a:pPr> element for formula titles.
-    #
-    def write_a_p_pr_formula(font) # :nodoc:
-      @writer.tag_elements('a:pPr') { write_a_def_rpr(font) }
-    end
-
-    #
-    # Write the <a:defRPr> element.
-    #
-    def write_a_def_rpr(font = nil) # :nodoc:
-      write_def_rpr_r_pr_common(
-        font,
-        get_font_style_attributes(font),
-        'a:defRPr'
-      )
-    end
-
-    def write_def_rpr_r_pr_common(font, style_attributes, tag)  # :nodoc:
-      latin_attributes = get_font_latin_attributes(font)
-      has_color = ptrue?(font) && ptrue?(font[:_color])
-
-      if !latin_attributes.empty? || has_color
-        @writer.tag_elements(tag, style_attributes) do
-          write_a_solid_fill(color: font[:_color]) if has_color
-          write_a_latin(latin_attributes) unless latin_attributes.empty?
-        end
+    def color(color_code) # :nodoc:
+      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
+        # Convert a HTML style #RRGGBB color.
+        color_code.sub(/^#/, '').upcase
       else
-        @writer.empty_tag(tag, style_attributes)
+        index = Format.color(color_code)
+        raise "Unknown color '#{color_code}' used in chart formatting." unless index
+
+        palette_color_from_index(index)
       end
-    end
-
-    #
-    # Get the font latin attributes from a font hash.
-    #
-    def get_font_latin_attributes(font)
-      return [] unless font
-      return [] unless font.respond_to?(:[])
-
-      attributes = []
-      attributes << ['typeface', font[:_name]]            if ptrue?(font[:_name])
-      attributes << ['pitchFamily', font[:_pitch_family]] if font[:_pitch_family]
-      attributes << ['charset', font[:_charset]]          if font[:_charset]
-
-      attributes
     end
 
     #
@@ -922,47 +1022,13 @@ module Writexlsx
       end
     end
 
-    #
-    # Convert the user specified colour index or string to a rgb colour.
-    #
-    def color(color_code) # :nodoc:
-      if color_code and color_code =~ /^#[0-9a-fA-F]{6}$/
-        # Convert a HTML style #RRGGBB color.
-        color_code.sub(/^#/, '').upcase
-      else
-        index = Format.color(color_code)
-        raise "Unknown color '#{color_code}' used in chart formatting." unless index
-
-        palette_color_from_index(index)
-      end
-    end
-
-    #
-    # Get the font style attributes from a font hash.
-    #
-    def get_font_style_attributes(font)
-      return [] unless font
-      return [] unless font.respond_to?(:[])
-
-      attributes = []
-      attributes << ['sz', font[:_size]]      if ptrue?(font[:_size])
-      attributes << ['b',  font[:_bold]]      if font[:_bold]
-      attributes << ['i',  font[:_italic]]    if font[:_italic]
-      attributes << %w[u sng]             if font[:_underline]
-
-      # Turn off baseline when testing fonts that don't have it.
-      attributes << ['baseline', font[:_baseline]] if font[:_baseline] != -1
-      attributes
-    end
-
-    #
-    # Write the <a:endParaRPr> element.
-    #
-    def write_a_end_para_rpr # :nodoc:
-      @writer.empty_tag('a:endParaRPr', [%w[lang en-US]])
-    end
-
     private
+
+    ###############################################################################
+    #
+    # Sheet name quoting helpers
+    #
+    ###############################################################################
 
     def already_quoted_sheetname?(name)
       name.start_with?("'")
@@ -1014,6 +1080,12 @@ module Writexlsx
       %w[R C RC].include?(name.upcase)
     end
   end
+
+  ###############################################################################
+  #
+  # Module override for chart data points
+  #
+  ###############################################################################
 
   module WriteDPtPoint
     #
