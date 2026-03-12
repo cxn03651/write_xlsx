@@ -19,6 +19,12 @@ module Writexlsx
     attr_accessor :dxf_bg_color, :dxf_fg_color                                                     # :nodoc:
     attr_reader :rotation, :bold, :italic, :font_strikeout                                         # :nodoc:
 
+    ###############################################################################
+    #
+    # Lifecycle and setup
+    #
+    ###############################################################################
+
     def initialize(formats, params = {})   # :nodoc:
       @formats = formats
 
@@ -132,209 +138,14 @@ module Writexlsx
       end
     end
 
+    ###############################################################################
     #
-    # Return properties for an Style xf <alignment> sub-element.
+    # Public formatting property API
     #
-    def get_align_properties
-      align = []    # Attributes to return
-
-      # Check if any alignment options in the format have been changed.
-      if @text_h_align != 0 || @text_v_align != 0 || @indent != 0 ||
-         @rotation != 0 || @text_wrap != 0 || @shrink != 0 || @reading_order != 0
-        changed = 1
-      else
-        return
-      end
-
-      # Indent is only allowed for some alignment properties. If it is defined
-      # for any other alignment or no alignment has been set then default to
-      # left alignment.
-      @text_h_align = 1 if @indent != 0 && ![1, 3, 7].include?(@text_h_align) && ![1, 3, 5].include?(@text_v_align)
-
-      # Check for properties that are mutually exclusive.
-      @shrink       = 0 if @text_wrap != 0
-      @shrink       = 0 if @text_h_align == 4    # Fill
-      @shrink       = 0 if @text_h_align == 5    # Justify
-      @shrink       = 0 if @text_h_align == 7    # Distributed
-      @just_distrib = 0 if @text_h_align != 7    # Distributed
-      @just_distrib = 0 if @indent != 0
-
-      continuous = 'centerContinuous'
-
-      align << %w[horizontal left]        if @text_h_align == 1
-      align << %w[horizontal center]      if @text_h_align == 2
-      align << %w[horizontal right]       if @text_h_align == 3
-      align << %w[horizontal fill]        if @text_h_align == 4
-      align << %w[horizontal justify]     if @text_h_align == 5
-      align << ['horizontal', continuous] if @text_h_align == 6
-      align << %w[horizontal distributed] if @text_h_align == 7
-
-      align << ['justifyLastLine', 1] if @just_distrib != 0
-
-      # Property 'vertical' => 'bottom' is a default. It sets applyAlignment
-      # without an alignment sub-element.
-      align << %w[vertical top]         if @text_v_align == 1
-      align << %w[vertical center]      if @text_v_align == 2
-      align << %w[vertical justify]     if @text_v_align == 4
-      align << %w[vertical distributed] if @text_v_align == 5
-
-      align << ['textRotation', @rotation] if @rotation != 0
-      align << ['indent',       @indent]   if @indent   != 0
-
-      align << ['wrapText',     1] if @text_wrap != 0
-      align << ['shrinkToFit',  1] if @shrink    != 0
-
-      align << ['readingOrder', 1] if @reading_order == 1
-      align << ['readingOrder', 2] if @reading_order == 2
-
-      [changed, align]
-    end
-
-    #
-    # Return properties for an Excel XML <Protection> element.
-    #
-    def get_protection_properties
-      attributes = []
-
-      attributes << ['locked', 0] unless ptrue?(@locked)
-      attributes << ['hidden', 1] if     ptrue?(@hidden)
-
-      attributes.empty? ? nil : attributes
-    end
+    ###############################################################################
 
     def set_bold(bold = 1)
       @bold = ptrue?(bold) ? 1 : 0
-    end
-
-    def inspect
-      to_s
-    end
-
-    #
-    # Returns a unique hash key for the Format object.
-    #
-    def get_format_key
-      [get_font_key, get_border_key, get_fill_key, get_alignment_key, @num_format, @locked, @hidden, @quote_prefix].join(':')
-    end
-
-    #
-    # Returns a unique hash key for a font. Used by Workbook.
-    #
-    def get_font_key
-      [
-        @bold,
-        @color,
-        @font_charset,
-        @font_family,
-        @font_outline,
-        @font_script,
-        @font_shadow,
-        @font_strikeout,
-        @font,
-        @italic,
-        @size,
-        @underline,
-        @theme
-      ].join(':')
-    end
-
-    #
-    # Returns a unique hash key for a border style. Used by Workbook.
-    #
-    def get_border_key
-      [
-        @bottom,
-        @bottom_color,
-        @diag_border,
-        @diag_color,
-        @diag_type,
-        @left,
-        @left_color,
-        @right,
-        @right_color,
-        @top,
-        @top_color
-      ].join(':')
-    end
-
-    #
-    # Returns a unique hash key for a fill style. Used by Workbook.
-    #
-    def get_fill_key
-      [
-        @pattern,
-        @bg_color,
-        @fg_color
-      ].join(':')
-    end
-
-    #
-    # Returns a unique hash key for alignment formats.
-    #
-    def get_alignment_key
-      [@text_h_align, @text_v_align, @indent, @rotation, @text_wrap, @shrink, @reading_order].join(':')
-    end
-
-    #
-    # Returns the index used by Worksheet->_XF()
-    #
-    def get_xf_index
-      if @xf_index
-        @xf_index
-      elsif @formats.xf_index_by_key(get_format_key)
-        @formats.xf_index_by_key(get_format_key)
-      else
-        @xf_index = @formats.set_xf_index_by_key(get_format_key)
-      end
-    end
-
-    #
-    # Returns the index used by Worksheet->_XF()
-    #
-    def get_dxf_index
-      if @dxf_index
-        @dxf_index
-      elsif @formats.dxf_index_by_key(get_format_key)
-        @formats.dxf_index_by_key(get_format_key)
-      else
-        @dxf_index = @formats.set_dxf_index_by_key(get_format_key)
-      end
-    end
-
-    def color(color_code)
-      Format.color(color_code)
-    end
-
-    #
-    # Used in conjunction with the set_xxx_color methods to convert a color
-    # string into a number. Color range is 0..63 but we will restrict it
-    # to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
-    #
-    def self.color(color_code)
-      colors = Colors::COLORS
-
-      # Return the default color if nil,
-      return 0x00 unless color_code
-
-      if color_code.respond_to?(:to_str)
-        # Return RGB style colors for processing later.
-        return color_code if color_code =~ /^#[0-9A-F]{6}$/i
-
-        # or the color string converted to an integer,
-        return colors[color_code.downcase.to_sym] if colors[color_code.downcase.to_sym]
-
-        # or the default color if string is unrecognised,
-        0x00 if color_code =~ /\D/
-      else
-        # or an index < 8 mapped into the correct range,
-        return color_code + 8 if color_code < 8
-
-        # or the default color if arg is outside range,
-        return 0x00 if color_code > 63
-
-        # or an integer in the valid range
-        color_code
-      end
     end
 
     #
@@ -437,6 +248,103 @@ module Writexlsx
       @hyperlink = hyperlink
     end
 
+    ###############################################################################
+    #
+    # Workbook integration and indexing
+    #
+    ###############################################################################
+
+    #
+    # Returns a unique hash key for the Format object.
+    #
+    def get_format_key
+      [get_font_key, get_border_key, get_fill_key, get_alignment_key, @num_format, @locked, @hidden, @quote_prefix].join(':')
+    end
+
+    #
+    # Returns a unique hash key for a font. Used by Workbook.
+    #
+    def get_font_key
+      [
+        @bold,
+        @color,
+        @font_charset,
+        @font_family,
+        @font_outline,
+        @font_script,
+        @font_shadow,
+        @font_strikeout,
+        @font,
+        @italic,
+        @size,
+        @underline,
+        @theme
+      ].join(':')
+    end
+
+    #
+    # Returns a unique hash key for a border style. Used by Workbook.
+    #
+    def get_border_key
+      [
+        @bottom,
+        @bottom_color,
+        @diag_border,
+        @diag_color,
+        @diag_type,
+        @left,
+        @left_color,
+        @right,
+        @right_color,
+        @top,
+        @top_color
+      ].join(':')
+    end
+
+    #
+    # Returns a unique hash key for a fill style. Used by Workbook.
+    #
+    def get_fill_key
+      [
+        @pattern,
+        @bg_color,
+        @fg_color
+      ].join(':')
+    end
+
+    #
+    # Returns a unique hash key for alignment formats.
+    #
+    def get_alignment_key
+      [@text_h_align, @text_v_align, @indent, @rotation, @text_wrap, @shrink, @reading_order].join(':')
+    end
+
+    #
+    # Returns the index used by Worksheet->_XF()
+    #
+    def get_xf_index
+      if @xf_index
+        @xf_index
+      elsif @formats.xf_index_by_key(get_format_key)
+        @formats.xf_index_by_key(get_format_key)
+      else
+        @xf_index = @formats.set_xf_index_by_key(get_format_key)
+      end
+    end
+
+    #
+    # Returns the index used by Worksheet->_XF()
+    #
+    def get_dxf_index
+      if @dxf_index
+        @dxf_index
+      elsif @formats.dxf_index_by_key(get_format_key)
+        @formats.dxf_index_by_key(get_format_key)
+      else
+        @dxf_index = @formats.set_dxf_index_by_key(get_format_key)
+      end
+    end
+
     def set_font_info(fonts)
       key = get_font_key
 
@@ -467,24 +375,18 @@ module Writexlsx
       end
     end
 
-    def method_missing(name, *args)  # :nodoc:
-      method = "#{name}"
+    ###############################################################################
+    #
+    # Format property queries and flags
+    #
+    ###############################################################################
 
-      # Check for a valid method names, i.e. "set_xxx_yyy".
-      method =~ /set_(\w+)/ or raise "Unknown method: #{method}\n"
+    def inspect
+      to_s
+    end
 
-      # Match the attribute, i.e. "@xxx_yyy".
-      attribute = "@#{::Regexp.last_match(1)}"
-
-      # Check that the attribute exists
-      # ........
-      value = if method =~ /set\w+color$/    # for "set_property_color" methods
-                color(args[0])
-              else                            # for "set_xxx" methods
-                args[0] || 1
-              end
-
-      instance_variable_set(attribute, value)
+    def color(color_code)
+      Format.color(color_code)
     end
 
     def color?
@@ -567,6 +469,92 @@ module Writexlsx
       instance_variable_get("@#{attr}")
     end
 
+    def force_text_format?
+      @num_format == 49 # Text format ('@')
+    end
+
+    ###############################################################################
+    #
+    # Alignment and protection serialization helpers
+    #
+    ###############################################################################
+
+    #
+    # Return properties for an Style xf <alignment> sub-element.
+    #
+    def get_align_properties
+      align = []    # Attributes to return
+
+      # Check if any alignment options in the format have been changed.
+      if @text_h_align != 0 || @text_v_align != 0 || @indent != 0 ||
+         @rotation != 0 || @text_wrap != 0 || @shrink != 0 || @reading_order != 0
+        changed = 1
+      else
+        return
+      end
+
+      # Indent is only allowed for some alignment properties. If it is defined
+      # for any other alignment or no alignment has been set then default to
+      # left alignment.
+      @text_h_align = 1 if @indent != 0 && ![1, 3, 7].include?(@text_h_align) && ![1, 3, 5].include?(@text_v_align)
+
+      # Check for properties that are mutually exclusive.
+      @shrink       = 0 if @text_wrap != 0
+      @shrink       = 0 if @text_h_align == 4    # Fill
+      @shrink       = 0 if @text_h_align == 5    # Justify
+      @shrink       = 0 if @text_h_align == 7    # Distributed
+      @just_distrib = 0 if @text_h_align != 7    # Distributed
+      @just_distrib = 0 if @indent != 0
+
+      continuous = 'centerContinuous'
+
+      align << %w[horizontal left]        if @text_h_align == 1
+      align << %w[horizontal center]      if @text_h_align == 2
+      align << %w[horizontal right]       if @text_h_align == 3
+      align << %w[horizontal fill]        if @text_h_align == 4
+      align << %w[horizontal justify]     if @text_h_align == 5
+      align << ['horizontal', continuous] if @text_h_align == 6
+      align << %w[horizontal distributed] if @text_h_align == 7
+
+      align << ['justifyLastLine', 1] if @just_distrib != 0
+
+      # Property 'vertical' => 'bottom' is a default. It sets applyAlignment
+      # without an alignment sub-element.
+      align << %w[vertical top]         if @text_v_align == 1
+      align << %w[vertical center]      if @text_v_align == 2
+      align << %w[vertical justify]     if @text_v_align == 4
+      align << %w[vertical distributed] if @text_v_align == 5
+
+      align << ['textRotation', @rotation] if @rotation != 0
+      align << ['indent',       @indent]   if @indent   != 0
+
+      align << ['wrapText',     1] if @text_wrap != 0
+      align << ['shrinkToFit',  1] if @shrink    != 0
+
+      align << ['readingOrder', 1] if @reading_order == 1
+      align << ['readingOrder', 2] if @reading_order == 2
+
+      [changed, align]
+    end
+
+    #
+    # Return properties for an Excel XML <Protection> element.
+    #
+    def get_protection_properties
+      attributes = []
+
+      attributes << ['locked', 0] unless ptrue?(@locked)
+      attributes << ['hidden', 1] if     ptrue?(@hidden)
+
+      attributes.empty? ? nil : attributes
+    end
+
+    ###############################################################################
+    #
+    # XML writing entry points
+    #
+    ###############################################################################
+
     def write_font(writer, worksheet, dxf_format = nil) # :nodoc:
       writer.tag_elements('font') do
         # The condense and extend elements are mainly used in dxf formats.
@@ -578,7 +566,7 @@ module Writexlsx
         writer.empty_tag('sz', [['val', size]]) unless dxf_format
 
         if theme == -1
-        # Ignore for excel2003_style
+          # Ignore for excel2003_style
         elsif ptrue?(theme)
           write_color('theme', theme, writer)
         elsif ptrue?(@color_indexed)
@@ -659,11 +647,74 @@ module Writexlsx
       attributes
     end
 
-    def force_text_format?
-      @num_format == 49 # Text format ('@')
+    ###############################################################################
+    #
+    # Dynamic setters and color conversion
+    #
+    ###############################################################################
+
+    def method_missing(name, *args)  # :nodoc:
+      method = "#{name}"
+
+      # Check for a valid method names, i.e. "set_xxx_yyy".
+      method =~ /set_(\w+)/ or raise "Unknown method: #{method}\n"
+
+      # Match the attribute, i.e. "@xxx_yyy".
+      attribute = "@#{::Regexp.last_match(1)}"
+
+      value = if method =~ /set\w+color$/    # for "set_property_color" methods
+                color(args[0])
+              else                            # for "set_xxx" methods
+                args[0] || 1
+              end
+
+      instance_variable_set(attribute, value)
     end
 
+    #
+    # Used in conjunction with the set_xxx_color methods to convert a color
+    # string into a number. Color range is 0..63 but we will restrict it
+    # to 8..63 to comply with Gnumeric. Colors 0..7 are repeated in 8..15.
+    #
+    def self.color(color_code)
+      colors = Colors::COLORS
+
+      # Return the default color if nil,
+      return 0x00 unless color_code
+
+      if color_code.respond_to?(:to_str)
+        # Return RGB style colors for processing later.
+        return color_code if color_code =~ /^#[0-9A-F]{6}$/i
+
+        # or the color string converted to an integer,
+        return colors[color_code.downcase.to_sym] if colors[color_code.downcase.to_sym]
+
+        # or the default color if string is unrecognised,
+        0x00 if color_code =~ /\D/
+      else
+        # or an index < 8 mapped into the correct range,
+        return color_code + 8 if color_code < 8
+
+        # or the default color if arg is outside range,
+        return 0x00 if color_code > 63
+
+        # or an integer in the valid range
+        color_code
+      end
+    end
+
+    ###############################################################################
+    #
+    # private helpers
+    #
+    ###############################################################################
     private
+
+    ###############################################################################
+    #
+    # Private XML font helpers
+    #
+    ###############################################################################
 
     def write_font_shapes(writer)
       writer.empty_tag('b')       if bold?
