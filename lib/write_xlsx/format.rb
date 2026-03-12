@@ -5,7 +5,8 @@ require 'write_xlsx/utility'
 
 module Writexlsx
   class Format
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
+    include Writexlsx::Utility::XmlPrimitives
 
     attr_reader :xf_index, :dxf_index, :num_format                                                 # :nodoc:
     attr_reader :underline, :font_script, :size, :theme, :font, :font_family, :hyperlink, :xf_id   # :nodoc:
