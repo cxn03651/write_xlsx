@@ -136,6 +136,9 @@ Style/NumericLiterals:
 Style/OptionalBooleanParameter:
   Enabled: false
 
+Style/PreferredHashMethods:
+  Enabled: false
+
 Style/RaiseArgs:
   Enabled: false
 
