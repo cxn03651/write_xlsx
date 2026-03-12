@@ -15,12 +15,13 @@
 
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/utility'
+require 'write_xlsx/chart/d_pt_point_writer'
 
 module Writexlsx
   class Chart
     class Line < self
       include Writexlsx::Utility
-      include Writexlsx::WriteDPtPoint
+      include DPtPointWriter
 
       def initialize(subtype)
         super
