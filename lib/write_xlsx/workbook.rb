@@ -53,6 +53,12 @@ module Writexlsx
     attr_writer :has_embedded_descriptions      # :nodoc:
     attr_accessor :charts                       # :nodoc:
 
+    ###############################################################################
+    #
+    # Lifecycle
+    #
+    ###############################################################################
+
     def initialize(file, *option_params)
       options, default_formats = process_workbook_options(*option_params)
 
@@ -74,62 +80,11 @@ module Writexlsx
       store_workbook
     end
 
+    ###############################################################################
     #
-    # get array of Worksheet objects
+    # Workbook object creation API
     #
-    # :call-seq:
-    #   sheets              -> array of all Wordsheet object
-    #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
-    #
-    def sheets(*args)
-      if args.empty?
-        @worksheets
-      else
-        args.collect { |i| @worksheets[i] }
-      end
-    end
-
-    #
-    # Return a worksheet object in the workbook using the sheetname.
-    #
-    def worksheet_by_name(sheetname = nil)
-      sheets.select { |s| s.name == sheetname }.first
-    end
-    alias get_worksheet_by_name worksheet_by_name
-
-    #
-    # Set the date system: false = 1900 (the default), true = 1904
-    #
-    def set_1904(mode = true)
-      raise "set_1904() must be called before add_worksheet()" unless sheets.empty?
-
-      @date_1904 = ptrue?(mode)
-    end
-
-    #
-    # return date system. false = 1900, true = 1904
-    #
-    def get_1904
-      @date_1904
-    end
-
-    def set_tempdir(dir)
-      @tempdir = dir.dup
-    end
-
-    #
-    # user must not use. it is internal method.
-    #
-    def set_xml_writer(filename)  # :nodoc:
-      @writer.set_xml_writer(filename)
-    end
-
-    #
-    # user must not use. it is internal method.
-    #
-    def xml_str  # :nodoc:
-      @writer.string
-    end
+    ###############################################################################
 
     #
     # At least one worksheet should be added to a new workbook. A worksheet is used to write data into cells:
@@ -207,6 +162,32 @@ module Writexlsx
       @shapes ||= []
       @shapes << shape  # Store shape reference.
       shape
+    end
+
+    ###############################################################################
+    #
+    # Workbook configuration API
+    #
+    ###############################################################################
+
+    #
+    # Set the date system: false = 1900 (the default), true = 1904
+    #
+    def set_1904(mode = true)
+      raise "set_1904() must be called before add_worksheet()" unless sheets.empty?
+
+      @date_1904 = ptrue?(mode)
+    end
+
+    #
+    # return date system. false = 1900, true = 1904
+    #
+    def get_1904
+      @date_1904
+    end
+
+    def set_tempdir(dir)
+      @tempdir = dir.dup
     end
 
     #
@@ -395,14 +376,6 @@ module Writexlsx
     end
 
     #
-    # Get the default url format used when a user defined format isn't specified
-    # with write_url(). The format is the hyperlink style defined by Excel for the
-    # default theme.
-    #
-    attr_reader :default_url_format
-    alias get_default_url_format default_url_format
-
-    #
     # Change the RGB components of the elements in the colour palette.
     #
     def set_custom_color(index, red = 0, green = 0, blue = 0)
@@ -434,9 +407,66 @@ module Writexlsx
       index + 8
     end
 
+    ###############################################################################
+    #
+    # Workbook accessors and lookup
+    #
+    ###############################################################################
+
+    #
+    # get array of Worksheet objects
+    #
+    # :call-seq:
+    #   sheets              -> array of all Wordsheet object
+    #   sheets(1, 3, 4)     -> array of spcified Worksheet object.
+    #
+    def sheets(*args)
+      if args.empty?
+        @worksheets
+      else
+        args.collect { |i| @worksheets[i] }
+      end
+    end
+
+    #
+    # Return a worksheet object in the workbook using the sheetname.
+    #
+    def worksheet_by_name(sheetname = nil)
+      sheets.select { |s| s.name == sheetname }.first
+    end
+    alias get_worksheet_by_name worksheet_by_name
+
+    #
+    # user must not use. it is internal method.
+    #
+    def set_xml_writer(filename)  # :nodoc:
+      @writer.set_xml_writer(filename)
+    end
+
+    #
+    # user must not use. it is internal method.
+    #
+    def xml_str  # :nodoc:
+      @writer.string
+    end
+
+    #
+    # Get the default url format used when a user defined format isn't specified
+    # with write_url(). The format is the hyperlink style defined by Excel for the
+    # default theme.
+    #
+    attr_reader :default_url_format
+    alias get_default_url_format default_url_format
+
     attr_writer :activesheet
 
     attr_reader :writer
+
+    ###############################################################################
+    #
+    # Workbook state queries
+    #
+    ###############################################################################
 
     def date_1904? # :nodoc:
       @date_1904 ||= false
@@ -452,6 +482,7 @@ module Writexlsx
     # return the string index.
     #
     EMPTY_HASH = {}.freeze
+
     def shared_string_index(str) # :nodoc:
       @shared_strings.index(str, EMPTY_HASH)
     end
@@ -539,7 +570,18 @@ module Writexlsx
       end
     end
 
+    ###############################################################################
+    #
+    # private helpers
+    #
+    ###############################################################################
     private
+
+    ###############################################################################
+    #
+    # Worksheet and chart naming helpers
+    #
+    ###############################################################################
 
     #
     # Check for valid worksheet names. We check the length, if it contains any
@@ -552,6 +594,12 @@ module Writexlsx
     def check_chart_sheetname(name)
       @worksheets.make_and_check_sheet_chart_name(:chart, name)
     end
+
+    ###############################################################################
+    #
+    # Internal utility helpers
+    #
+    ###############################################################################
 
     # for test
     def defined_names # :nodoc:
