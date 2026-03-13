@@ -1,6 +1,23 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+###############################################################################
+#
+# Workbook
+#
+# The Workbook class acts as a facade coordinating workbook state,
+# package preparation and XML generation.
+#
+# Responsibilities are delegated to specialized modules:
+#
+#   Initialization      - workbook setup and default state
+#   WorkbookWriter      - workbook XML generation
+#   PackagePreparation  - package assembly and workbook preparation
+#   FormatPreparation   - format, font, border and fill preparation
+#   ChartData           - chart cache data extraction and defined name helpers
+#
+###############################################################################
+
 require 'write_xlsx/workbook/initialization'
 require 'write_xlsx/workbook/workbook_writer'
 require 'write_xlsx/workbook/package_preparation'
