@@ -4,13 +4,17 @@
 require 'write_xlsx/constants'
 require 'write_xlsx/format'
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/drawing'
 
 module Writexlsx
   module Package
     class Comment
       include Constants
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::Drawing
 
       DEFAULT_COLOR  = 81  # what color ?
       DEFAULT_WIDTH  = 128
@@ -245,7 +249,9 @@ module Writexlsx
     end
 
     class Comments
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::XmlPrimitives
 
       def initialize(worksheet)
         @worksheet = worksheet

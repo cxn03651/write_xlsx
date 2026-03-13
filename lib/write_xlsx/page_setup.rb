@@ -1,9 +1,11 @@
 # -*- encoding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/common'
+
 module Writexlsx
   class PageSetup # :nodoc:
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
 
     attr_accessor :margin_left, :margin_right, :margin_top, :margin_bottom  # :nodoc:
     attr_accessor :margin_header, :margin_footer                            # :nodoc:

@@ -15,7 +15,6 @@ require 'write_xlsx/package/conditional_format'
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/page_setup'
 require 'write_xlsx/sparkline'
-require 'write_xlsx/utility'
 require 'write_xlsx/worksheet/asset_manager'
 require 'write_xlsx/worksheet/autofilter'
 require 'write_xlsx/worksheet/cell_data'
@@ -50,7 +49,6 @@ module Writexlsx
     extend Forwardable
 
     include Constants
-    include Writexlsx::Utility
 
     # storage / initialization
     include Initialization

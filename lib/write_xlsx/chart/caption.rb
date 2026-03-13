@@ -4,7 +4,8 @@
 module Writexlsx
   class Chart
     class Caption
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::RichText
 
       attr_accessor :name, :formula, :data_id, :name_font
       attr_reader :layout, :overlay, :none

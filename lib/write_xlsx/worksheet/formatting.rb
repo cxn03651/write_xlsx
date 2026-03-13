@@ -16,7 +16,6 @@ module Writexlsx
   class Worksheet
     module Formatting
       include Constants
-      include Utility
 
       #
       # Header/footer

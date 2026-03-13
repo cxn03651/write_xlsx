@@ -16,13 +16,10 @@
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/chart'
 require 'write_xlsx/chart/pie'
-require 'write_xlsx/utility'
 
 module Writexlsx
   class Chart
     class Doughnut < Pie
-      include Writexlsx::Utility
-
       def initialize(subtype)
         super
         @vary_data_color = 1

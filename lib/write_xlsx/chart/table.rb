@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/chart_formatting'
+require 'write_xlsx/utility/rich_text'
+
 module Writexlsx
   class Chart
     class Table
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::ChartFormatting
+      include Writexlsx::Utility::RichText
 
       attr_reader :horizontal, :vertical, :outline, :show_keys, :font
 

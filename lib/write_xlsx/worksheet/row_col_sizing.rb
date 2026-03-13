@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/string_width'
+
 module Writexlsx
   class Worksheet
     module RowColSizing
-      include Utility
+      include Writexlsx::Utility::StringWidth
 
       #
       # Convert the width of a cell from user's units to pixels. Excel rounds

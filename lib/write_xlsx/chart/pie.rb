@@ -15,7 +15,9 @@
 
 require 'write_xlsx/package/xml_writer_simple'
 require 'write_xlsx/chart'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/xml_primitives'
+require 'write_xlsx/utility/sheetname_quoting'
 
 module Writexlsx
   class Chart
@@ -26,7 +28,9 @@ module Writexlsx
     #     chart.set_y_axis
     #
     class Pie < self
-      include Writexlsx::Utility
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::XmlPrimitives
+      include Writexlsx::Utility::SheetnameQuoting
 
       def initialize(subtype)
         super

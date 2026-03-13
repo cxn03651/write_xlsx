@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
     class Relationships
-      include Writexlsx::Utility
+      include Writexlsx::Utility::XmlPrimitives
 
       Schema_root     = 'http://schemas.openxmlformats.org'
       Package_schema  = Schema_root + '/package/2006/relationships'

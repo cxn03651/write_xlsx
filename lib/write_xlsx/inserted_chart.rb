@@ -3,7 +3,7 @@
 
 module Writexlsx
   class InsertedChart
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
 
     attr_reader :row, :col, :chart, :x_offset, :y_offset
     attr_reader :x_scale, :y_scale

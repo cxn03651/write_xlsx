@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/string_width'
+
 module Writexlsx
   class Worksheet
     module XmlWriter
-      include Utility
+      include Writexlsx::Utility::StringWidth
 
       def assemble_xml_file # :nodoc:
         write_xml_declaration do

@@ -4,7 +4,11 @@
 module Writexlsx
   module Package
     class ConditionalFormat
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::Dimensions
+      include Writexlsx::Utility::DateTime
+      include Writexlsx::Utility::XmlPrimitives
 
       def self.factory(worksheet, *args)
         range, param  =

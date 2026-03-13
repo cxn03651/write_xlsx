@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   class Format

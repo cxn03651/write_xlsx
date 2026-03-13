@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/string_width'
+require 'write_xlsx/utility/drawing'
 
 module Writexlsx
   module Package
     class Button
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::StringWidth
+      include Writexlsx::Utility::Drawing
 
       def initialize(worksheet, row, col, params, default_row_pixels, button_number)
         @worksheet = worksheet

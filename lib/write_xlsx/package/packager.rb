@@ -2,7 +2,6 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
 require 'write_xlsx/package/app'
 require 'write_xlsx/package/comments'
 require 'write_xlsx/package/content_types'
@@ -23,8 +22,6 @@ require 'write_xlsx/package/vml'
 module Writexlsx
   module Package
     class Packager
-      include Writexlsx::Utility
-
       def initialize(workbook)
         @workbook     = workbook
         @package_dir  = ''

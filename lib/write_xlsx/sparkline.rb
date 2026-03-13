@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
 
 module Writexlsx
   ###############################################################################
@@ -14,7 +14,7 @@ module Writexlsx
   # Converted to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
   #
   class Sparkline
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
 
     def initialize(ws, param, sheetname)
       @color = {}

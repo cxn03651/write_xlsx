@@ -1,10 +1,14 @@
 # -*- encoding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/cell_reference'
+
 module Writexlsx
   class Worksheet
     class CellData   # :nodoc:
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
 
       attr_reader :xf
 

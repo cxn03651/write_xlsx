@@ -11,12 +11,13 @@
 # Convert to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
 #
 require 'write_xlsx/constants'
+require 'write_xlsx/utility/common'
 
 module Writexlsx
   class Worksheet
     module DataWriting
       include Constants
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
 
       #
       # :call-seq:

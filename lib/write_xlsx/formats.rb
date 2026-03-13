@@ -5,8 +5,6 @@ require 'write_xlsx/package/xml_writer_simple'
 
 module Writexlsx
   class Formats
-    include Writexlsx::Utility
-
     attr_reader :formats, :xf_format_indices, :dxf_format_indices
 
     def initialize

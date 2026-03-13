@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
@@ -10,7 +10,7 @@ module Writexlsx
     # Metadata - A class for writing the Excel XLSX metadata.xml file.
     #
     class Metadata
-      include Writexlsx::Utility
+      include Writexlsx::Utility::XmlPrimitives
 
       attr_writer :has_dynamic_functions
       attr_writer :num_embedded_images

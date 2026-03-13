@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
     class SharedStrings
-      include Writexlsx::Utility
+      include Writexlsx::Utility::XmlPrimitives
 
       PRESERVE_SPACE_ATTRIBUTES = ['xml:space', 'preserve'].freeze
 

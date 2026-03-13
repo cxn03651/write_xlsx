@@ -2,12 +2,13 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
     class Custom
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::XmlPrimitives
 
       def initialize
         @writer     = Package::XMLWriterSimple.new

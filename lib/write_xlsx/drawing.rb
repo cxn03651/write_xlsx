@@ -2,11 +2,13 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   class Drawing
-    include Writexlsx::Utility
+    include Writexlsx::Utility::Common
+    include Writexlsx::Utility::XmlPrimitives
 
     attr_accessor :type, :dimensions, :width, :height, :shape, :anchor, :rel_index, :url_rel_index, :name, :description
     attr_reader :tip, :decorative
@@ -871,7 +873,7 @@ module Writexlsx
   end
 
   class Drawings
-    include Writexlsx::Utility
+    include Writexlsx::Utility::XmlPrimitives
 
     attr_writer :embedded, :orientation
 

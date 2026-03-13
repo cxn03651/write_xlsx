@@ -14,12 +14,12 @@
 #
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   class Chart
     class Bar < self
-      include Writexlsx::Utility
+      include Writexlsx::Utility::XmlPrimitives
 
       def initialize(subtype)
         super

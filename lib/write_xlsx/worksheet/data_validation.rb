@@ -1,10 +1,18 @@
 # -*- encoding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/dimensions'
+require 'write_xlsx/utility/date_time'
+
 module Writexlsx
   class Worksheet
     class DataValidation   # :nodoc:
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::Dimensions
+      include Writexlsx::Utility::DateTime
 
       attr_reader :value, :source, :minimum, :maximum, :validate, :criteria
       attr_reader :error_type, :cells, :other_cells

@@ -3,10 +3,17 @@
 
 module Writexlsx
   class Chart
+    require 'write_xlsx/utility/common'
+    require 'write_xlsx/utility/cell_reference'
+    require 'write_xlsx/utility/chart_formatting'
+    require 'write_xlsx/utility/rich_text'
+    require 'write_xlsx/utility/sheetname_quoting'
     require 'write_xlsx/gradient'
 
     class Chartline
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::ChartFormatting
+      include Writexlsx::Utility::RichText
       include Writexlsx::Gradient
 
       attr_reader :line, :fill, :type, :gradient, :pattern
@@ -174,7 +181,7 @@ module Writexlsx
     end
 
     class Errorbars
-      include Writexlsx::Utility
+      include Writexlsx::Utility::ChartFormatting
 
       attr_reader :type, :direction, :endcap, :value, :line, :fill
       attr_reader :plus_values, :minus_values, :plus_data, :minus_data
@@ -223,7 +230,11 @@ module Writexlsx
     end
 
     class Series
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::ChartFormatting
+      include Writexlsx::Utility::RichText
+      include Writexlsx::Utility::SheetnameQuoting
       include Writexlsx::Gradient
 
       attr_reader :values, :categories, :name, :name_formula, :name_id

@@ -7,7 +7,6 @@ module Writexlsx
     # Autofilter-related operations extracted from Worksheet to slim the main class.
     module Autofilter
       include Constants
-      include Utility
 
       #
       # :call-seq:

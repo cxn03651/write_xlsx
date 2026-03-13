@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/chart_formatting'
+
 module Writexlsx
   ###############################################################################
   #
@@ -12,7 +14,7 @@ module Writexlsx
   # Converted to ruby by Hideo NAKAMURA, nakamura.hideo@gmail.com
   #
   class Shape
-    include Writexlsx::Utility
+    include Writexlsx::Utility::ChartFormatting
 
     attr_reader :edit_as, :drawing
     attr_reader :tx_box, :fill, :line, :format

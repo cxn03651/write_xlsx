@@ -2,12 +2,12 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
     class ContentTypes
-      include Writexlsx::Utility
+      include Writexlsx::Utility::XmlPrimitives
 
       App_package  = 'application/vnd.openxmlformats-package.'
       App_document = 'application/vnd.openxmlformats-officedocument.'

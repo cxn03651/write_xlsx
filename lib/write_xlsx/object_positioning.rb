@@ -1,9 +1,23 @@
 # -*- coding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/chart_formatting'
+require 'write_xlsx/utility/dimensions'
+require 'write_xlsx/utility/date_time'
+require 'write_xlsx/utility/url'
+require 'write_xlsx/utility/xml_primitives'
+require 'write_xlsx/utility/sheetname_quoting'
+
 module Writexlsx
   module ObjectPositioning
-    include Writexlsx::Utility
+    include Writexlsx::Utility::CellReference
+    include Writexlsx::Utility::ChartFormatting
+    include Writexlsx::Utility::Dimensions
+    include Writexlsx::Utility::DateTime
+    include Writexlsx::Utility::Url
+    include Writexlsx::Utility::XmlPrimitives
+    include Writexlsx::Utility::SheetnameQuoting
 
     #
     # Calculate the vertices that define the position of a graphical object

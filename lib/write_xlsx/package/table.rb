@@ -2,12 +2,18 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/dimensions'
+require 'write_xlsx/utility/xml_primitives'
 
 module Writexlsx
   module Package
     class Table
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::Dimensions
+      include Writexlsx::Utility::XmlPrimitives
 
       class ColumnData
         attr_reader :id

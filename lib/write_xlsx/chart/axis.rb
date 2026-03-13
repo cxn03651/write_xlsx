@@ -2,14 +2,11 @@
 # frozen_string_literal: true
 
 require 'write_xlsx/package/xml_writer_simple'
-require 'write_xlsx/utility'
 require 'write_xlsx/chart/caption'
 
 module Writexlsx
   class Chart
     class Axis < Caption
-      include Writexlsx::Utility
-
       attr_accessor :defaults
       attr_accessor :min, :max, :num_format, :position
       attr_accessor :major_tick_mark, :minor_tick_mark

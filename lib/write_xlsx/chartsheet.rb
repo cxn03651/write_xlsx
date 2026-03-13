@@ -16,7 +16,6 @@ require 'write_xlsx/worksheet'
 
 module Writexlsx
   class Chartsheet < Worksheet
-    include Writexlsx::Utility
     extend Forwardable
 
     attr_writer :chart

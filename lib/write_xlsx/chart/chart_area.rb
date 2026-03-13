@@ -4,7 +4,8 @@
 module Writexlsx
   class Chart
     class ChartArea
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::ChartFormatting
       include Writexlsx::Gradient
 
       attr_reader :line, :fill, :pattern, :gradient, :layout

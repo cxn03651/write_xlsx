@@ -1,10 +1,18 @@
 # -*- encoding: utf-8 -*-
 # frozen_string_literal: true
 
+require 'write_xlsx/utility/common'
+require 'write_xlsx/utility/cell_reference'
+require 'write_xlsx/utility/url'
+require 'write_xlsx/utility/xml_primitives'
+
 module Writexlsx
   class Worksheet
     class Hyperlink   # :nodoc:
-      include Writexlsx::Utility
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::CellReference
+      include Writexlsx::Utility::Url
+      include Writexlsx::Utility::XmlPrimitives
 
       attr_reader :str, :tip
 
