@@ -29,106 +29,11 @@ module Writexlsx
 
     def initialize(properties = {})
       @writer = Package::XMLWriterSimple.new
-      @name   = nil
-      @type   = 'rect'
 
-      # Is a Connector shape. 1/0 Value is a hash lookup from type.
-      @connect = 0
-
-      # Is a Drawing. Always 0, since a single shape never fills an entire sheet.
-      @drawing = 0
-
-      # OneCell or Absolute: options to move and/or size with cells.
-      @edit_as = nil
-
-      # Auto-incremented, unless supplied by user.
-      @id = 0
-
-      # Shape text (usually centered on shape geometry).
-      @text = 0
-
-      # Shape stencil mode.  A copy (child) is created when inserted.
-      # The link to parent is broken.
-      @stencil = 1
-
-      # Index to _shapes array when inserted.
-      @element = -1
-
-      # Shape ID of starting connection, if any.
-      @start = nil
-
-      # Shape vertex, starts at 0, numbered clockwise from 12 o'clock.
-      @start_index = nil
-
-      @end       = nil
-      @end_index = nil
-
-      # Number and size of adjustments for shapes (usually connectors).
-      @adjustments = []
-
-      # Start and end sides. t)op, b)ottom, l)eft, or r)ight.
-      @start_side = ''
-      @end_side   = ''
-
-      # Flip shape Horizontally. eg. arrow left to arrow right.
-      @flip_h = 0
-
-      # Flip shape Vertically. eg. up arrow to down arrow.
-      @flip_v = 0
-
-      # shape rotation (in degrees 0-360).
-      @rotation = 0
-
-      # An alternate way to create a text box, because Excel allows it.
-      # It is just a rectangle with text.
-      @tx_box = false
-
-      # Shape outline colour, or 0 for noFill (default black).
-      @line = '000000'
-
-      # Line type: dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot.
-      @line_type = ''
-
-      # Line weight (integer).
-      @line_weight = 1
-
-      # Shape fill colour, or 0 for noFill (default noFill).
-      @fill = 0
-
-      # Formatting for shape text, if any.
-      @format = {}
-
-      # copy of colour palette table from Workbook.pm.
-      @palette = []
-
-      # Vertical alignment: t, ctr, b.
-      @valign = 'ctr'
-
-      # Alignment: l, ctr, r, just
-      @align = 'ctr'
-
-      @x_offset = 0
-      @y_offset = 0
-
-      # Scale factors, which also may be set when the shape is inserted.
-      @scale_x = 1
-      @scale_y = 1
-
-      # Default size, which can be modified and/or scaled.
-      @width  = 50
-      @height = 50
-
-      # Initial assignment. May be modified when prepared.
-      @column_start = 0
-      @row_start    = 0
-      @x1           = 0
-      @y1           = 0
-      @column_end   = 0
-      @row_end      = 0
-      @x2           = 0
-      @y2           = 0
-      @x_abs        = 0
-      @y_abs        = 0
+      init_basic_attributes
+      init_connection_attributes
+      init_appearance_attributes
+      init_position_attributes
 
       set_properties(properties)
     end
@@ -299,6 +204,96 @@ module Writexlsx
         @x_abs,        @y_abs,
         @width_emu,    @height_emu
       ]
+    end
+
+    private
+
+    def init_basic_attributes
+      @name    = nil
+      @type    = 'rect'
+
+      # Is a Connector shape. 1/0 Value is a hash lookup from type.
+      @connect = 0
+      # Is a Drawing. Always 0, since a single shape never fills an entire sheet.
+      @drawing = 0
+      # OneCell or Absolute: options to move and/or size with cells.
+      @edit_as = nil
+      # Auto-incremented, unless supplied by user.
+      @id      = 0
+      # Shape text (usually centered on shape geometry).
+      @text    = 0
+      # Shape stencil mode.  A copy (child) is created when inserted.
+      # The link to parent is broken.
+      @stencil = 1
+      # Index to _shapes array when inserted.
+      @element = -1
+      # An alternate way to create a text box, because Excel allows it.
+      # It is just a rectangle with text.
+      @tx_box  = false
+      # copy of colour palette table from Workbook.pm.
+      @palette = []
+    end
+
+    def init_connection_attributes
+      # Shape ID of starting connection, if any.
+      @start       = nil
+      # Shape vertex, starts at 0, numbered clockwise from 12 o'clock.
+      @start_index = nil
+      @end         = nil
+      @end_index   = nil
+      # Number and size of adjustments for shapes (usually connectors).
+      @adjustments = []
+      # Start and end sides. t)op, b)ottom, l)eft, or r)ight.
+      @start_side  = ''
+      @end_side    = ''
+    end
+
+    def init_appearance_attributes
+      # Flip shape Horizontally. eg. arrow left to arrow right.
+      @flip_h      = 0
+      # Flip shape Vertically. eg. up arrow to down arrow.
+      @flip_v      = 0
+      # shape rotation (in degrees 0-360).
+      @rotation    = 0
+      # Shape outline colour, or 0 for noFill (default black).
+      @line        = '000000'
+      # Line type: dash, sysDot, dashDot, lgDash, lgDashDot, lgDashDotDot.
+      @line_type   = ''
+      # Line weight (integer).
+      @line_weight = 1
+      # Shape fill colour, or 0 for noFill (default noFill).
+      @fill        = 0
+      # Formatting for shape text, if any.
+      @format      = {}
+      # Vertical alignment: t, ctr, b.
+      @valign      = 'ctr'
+      # Alignment: l, ctr, r, just
+      @align       = 'ctr'
+    end
+
+    def init_position_attributes
+      @x_offset     = 0
+      @y_offset     = 0
+
+      # Scale factors, which also may be set when the shape is inserted.
+      @scale_x      = 1
+      @scale_y      = 1
+
+      # Default size, which can be modified and/or scaled.
+      @width        = 50
+      @height       = 50
+
+      # Initial assignment. May be modified when prepared.
+      @column_start = 0
+      @row_start    = 0
+      @x1           = 0
+      @y1           = 0
+      @column_end   = 0
+      @row_end      = 0
+      @x2           = 0
+      @y2           = 0
+      @x_abs        = 0
+      @y_abs        = 0
     end
   end
 end

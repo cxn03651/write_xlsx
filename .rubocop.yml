@@ -48,6 +48,9 @@ Lint/DuplicateBranch:
     - 'lib/write_xlsx/worksheet.rb'
     - 'lib/write_xlsx/worksheet/data_writing.rb'
 
+Lint/DuplicateMethods:
+  Enabled: false
+
 Lint/FloatComparison:
   Enabled: false
 
@@ -136,10 +139,16 @@ Style/NumericLiterals:
 Style/OptionalBooleanParameter:
   Enabled: false
 
+Style/ParallelAssignment:
+  Enabled: false
+
 Style/PreferredHashMethods:
   Enabled: false
 
 Style/RaiseArgs:
+  Enabled: false
+
+Style/RedundantSelf:
   Enabled: false
 
 Style/SlicingWithRange:
@@ -151,3 +160,6 @@ Style/StringLiterals:
 Style/StringLiteralsInInterpolation:
   Enabled: true
   EnforcedStyle: double_quotes
+
+Styles/TrivialAccessors:
+  Enabled: false
