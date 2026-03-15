@@ -642,7 +642,7 @@ module Writexlsx
       def update_format_with_params(row, col, params = nil)
         if (row_col_array = row_col_notation(row))
           _row, _col = row_col_array
-          _params = args[1]
+          _params = col
         else
           _row = row
           _col = col
@@ -937,25 +937,49 @@ module Writexlsx
       #
       # Update formatting of cells in range to the specified row and column (zero indexed).
       #
+      # def update_range_format_with_params(row_first, col_first, row_last = nil, col_last = nil, params = nil)
+      #   if (row_col_array = row_col_notation(row_first))
+      #     _row_first, _col_first, _row_last, _col_last = row_col_array
+      #     params = args[1..-1]
+      #   else
+      #     _row_first = row_first
+      #     _col_first = col_first
+      #     _row_last  = row_last
+      #     _col_last  = col_last
+      #     _params    = params
+      #   end
+
+      #   raise WriteXLSXInsufficientArgumentError if [_row_first, _col_first, _row_last, _col_last, _params].include?(nil)
+
+      #   # Swap last row/col with first row/col as necessary
+      #   _row_first, _row_last = _row_last, _row_first if _row_first > _row_last
+      #   _col_first, _col_last = _col_last, _col_first if _col_first > _col_last
+
+      #   # Check that column number is valid and store the max value
+      #   check_dimensions(_row_last, _col_last)
+      #   store_row_col_max_min_values(_row_last, _col_last)
+
+      #   (_row_first.._row_last).each do |row|
+      #     (_col_first.._col_last).each do |col|
+      #       update_format_with_params(row, col, _params)
+      #     end
+      #   end
+      # end
       def update_range_format_with_params(row_first, col_first, row_last = nil, col_last = nil, params = nil)
         if (row_col_array = row_col_notation(row_first))
           _row_first, _col_first, _row_last, _col_last = row_col_array
-          params = args[1..-1]
+          _params = col_first
         else
-          _row_first = row_first
-          _col_first = col_first
-          _row_last  = row_last
-          _col_last  = col_last
-          _params    = params
+          _row_first, _col_first = row_first, col_first
+          _row_last,  _col_last  = row_last, col_last
+          _params = params
         end
 
         raise WriteXLSXInsufficientArgumentError if [_row_first, _col_first, _row_last, _col_last, _params].include?(nil)
 
-        # Swap last row/col with first row/col as necessary
         _row_first, _row_last = _row_last, _row_first if _row_first > _row_last
         _col_first, _col_last = _col_last, _col_first if _col_first > _col_last
 
-        # Check that column number is valid and store the max value
         check_dimensions(_row_last, _col_last)
         store_row_col_max_min_values(_row_last, _col_last)
 

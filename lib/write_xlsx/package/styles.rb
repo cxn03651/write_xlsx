@@ -251,7 +251,7 @@ module Writexlsx
       def write_fill(format, dxf_format = nil)
         # Special handling for pattern only case.
         if pattern_only_case?(format, dxf_format)
-          write_default_fill(PATTERNS[format.pattern])
+          write_default_fill(PATTERNS[format.fill_style.pattern])
         else
           @writer.tag_elements('fill') do
             write_fill_base(format, dxf_format)
@@ -262,15 +262,15 @@ module Writexlsx
       def pattern_only_case?(format, dxf_format)
         bg_color, fg_color = bg_and_fg_color(format, dxf_format)
 
-        !ptrue?(fg_color) && !ptrue?(bg_color) && ptrue?(format.pattern)
+        !ptrue?(fg_color) && !ptrue?(bg_color) && ptrue?(format.fill_style.pattern)
       end
 
       def write_fill_base(format, dxf_format)
         # The "none" pattern is handled differently for dxf formats.
-        attributes = if dxf_format && format.pattern <= 1
+        attributes = if dxf_format && format.fill_style.pattern <= 1
                        []
                      else
-                       [['patternType', PATTERNS[format.pattern]]]
+                       [['patternType', PATTERNS[format.fill_style.pattern]]]
                      end
 
         @writer.tag_elements('patternFill', attributes) do
@@ -289,14 +289,14 @@ module Writexlsx
           if bg_color != 0x40 # 'Automatic'
             @writer.empty_tag('bgColor', [['rgb', palette_color(bg_color)]])
           end
-        elsif !dxf_format && format.pattern <= 1
+        elsif !dxf_format && format.fill_style.pattern <= 1
           @writer.empty_tag('bgColor', [['indexed', 64]])
         end
       end
 
       def bg_and_fg_color(format, dxf_format)
-        bg_color   = format.bg_color
-        fg_color   = format.fg_color
+        bg_color   = format.fill_style.bg_color
+        fg_color   = format.fill_style.fg_color
 
         # Colors for dxf formats are handled differently from normal formats since
         # the normal format reverses the meaning of BG and FG for solid fills.

@@ -142,11 +142,11 @@ module Writexlsx
 
         # Store the DXF colors separately since them may be reversed below.
         @dxf_formats.each do |format|
-          next unless format.pattern != 0 || format.bg_color != 0 || format.fg_color != 0
+          next unless format.fill_style.pattern != 0 || format.fill_style.bg_color != 0 || format.fill_style.fg_color != 0
 
           format.has_dxf_fill(true)
-          format.dxf_bg_color = format.bg_color
-          format.dxf_fg_color = format.fg_color
+          format.dxf_bg_color = format.fill_style.bg_color
+          format.dxf_fg_color = format.fill_style.fg_color
         end
 
         @xf_formats.each do |format|
@@ -158,15 +158,15 @@ module Writexlsx
           #    a pattern they probably wanted a solid fill, so we fill in the
           #    defaults.
           #
-          if format.pattern == 1 && ne_0?(format.bg_color) && ne_0?(format.fg_color)
-            format.fg_color, format.bg_color = format.bg_color, format.fg_color
-          elsif format.pattern <= 1 && ne_0?(format.bg_color) && eq_0?(format.fg_color)
-            format.fg_color = format.bg_color
-            format.bg_color = 0
-            format.pattern  = 1
-          elsif format.pattern <= 1 && eq_0?(format.bg_color) && ne_0?(format.fg_color)
-            format.bg_color = 0
-            format.pattern  = 1
+          if format.fill_style.pattern == 1 && ne_0?(format.fill_style.bg_color) && ne_0?(format.fill_style.fg_color)
+            format.fill_style.fg_color, format.fill_style.bg_color = format.fill_style.bg_color, format.fill_style.fg_color
+          elsif format.fill_style.pattern <= 1 && ne_0?(format.fill_style.bg_color) && eq_0?(format.fill_style.fg_color)
+            format.fill_style.fg_color = format.fill_style.bg_color
+            format.fill_style.bg_color = 0
+            format.fill_style.pattern  = 1
+          elsif format.fill_style.pattern <= 1 && eq_0?(format.fill_style.bg_color) && ne_0?(format.fill_style.fg_color)
+            format.fill_style.bg_color = 0
+            format.fill_style.pattern  = 1
           end
 
           key = format.get_fill_key
