@@ -9,92 +9,92 @@ module Writexlsx
       end
 
       def horizontal
-        @format.instance_variable_get(:@alignment_state).horizontal
+        @format.state.alignment.horizontal
       end
 
       def horizontal=(value)
-        @format.instance_variable_get(:@alignment_state).horizontal = value
+        @format.state.alignment.horizontal = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def wrap
-        @format.instance_variable_get(:@alignment_state).wrap
+        @format.state.alignment.wrap
       end
 
       def wrap=(value)
-        @format.instance_variable_get(:@alignment_state).wrap = value
+        @format.state.alignment.wrap = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def vertical
-        @format.instance_variable_get(:@alignment_state).vertical
+        @format.state.alignment.vertical
       end
 
       def vertical=(value)
-        @format.instance_variable_get(:@alignment_state).vertical = value
+        @format.state.alignment.vertical = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def justlast
-        @format.instance_variable_get(:@alignment_state).justlast
+        @format.state.alignment.justlast
       end
 
       def justlast=(value)
-        @format.instance_variable_get(:@alignment_state).justlast = value
+        @format.state.alignment.justlast = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def rotation
-        @format.instance_variable_get(:@alignment_state).rotation
+        @format.state.alignment.rotation
       end
 
       def rotation=(value)
-        @format.instance_variable_get(:@alignment_state).rotation = value
+        @format.state.alignment.rotation = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def indent
-        @format.instance_variable_get(:@alignment_state).indent
+        @format.state.alignment.indent
       end
 
       def indent=(value)
-        @format.instance_variable_get(:@alignment_state).indent = value
+        @format.state.alignment.indent = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def shrink
-        @format.instance_variable_get(:@alignment_state).shrink
+        @format.state.alignment.shrink
       end
 
       def shrink=(value)
-        @format.instance_variable_get(:@alignment_state).shrink = value
+        @format.state.alignment.shrink = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def merge_range
-        @format.instance_variable_get(:@alignment_state).merge_range
+        @format.state.alignment.merge_range
       end
 
       def merge_range=(value)
-        @format.instance_variable_get(:@alignment_state).merge_range = value
+        @format.state.alignment.merge_range = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def reading_order
-        @format.instance_variable_get(:@alignment_state).reading_order
+        @format.state.alignment.reading_order
       end
 
       def reading_order=(value)
-        @format.instance_variable_get(:@alignment_state).reading_order = value
+        @format.state.alignment.reading_order = value
         @format.send(:sync_alignment_ivars_from_state)
       end
 
       def just_distrib
-        @format.instance_variable_get(:@alignment_state).just_distrib
+        @format.state.alignment.just_distrib
       end
 
       def just_distrib=(value)
-        @format.instance_variable_get(:@alignment_state).just_distrib = value
+        @format.state.alignment.just_distrib = value
         @format.send(:sync_alignment_ivars_from_state)
       end
     end

@@ -9,182 +9,182 @@ module Writexlsx
       end
 
       def index
-        @format.instance_variable_get(:@font_state).index
+        @format.state.font.index
       end
 
       def index=(value)
-        @format.instance_variable_get(:@font_state).index = value
+        @format.state.font.index = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def name
-        @format.instance_variable_get(:@font_state).name
+        @format.state.font.name
       end
 
       def name=(value)
-        @format.instance_variable_get(:@font_state).name = value
+        @format.state.font.name = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def size
-        @format.instance_variable_get(:@font_state).size
+        @format.state.font.size
       end
 
       def size=(value)
-        @format.instance_variable_get(:@font_state).size = value
+        @format.state.font.size = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def bold
-        @format.instance_variable_get(:@font_state).bold
+        @format.state.font.bold
       end
 
       def bold=(value)
-        @format.instance_variable_get(:@font_state).bold = value
+        @format.state.font.bold = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def italic
-        @format.instance_variable_get(:@font_state).italic
+        @format.state.font.italic
       end
 
       def italic=(value)
-        @format.instance_variable_get(:@font_state).italic = value
+        @format.state.font.italic = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def color
-        @format.instance_variable_get(:@font_state).color
+        @format.state.font.color
       end
 
       def color=(value)
-        @format.instance_variable_get(:@font_state).color = value
+        @format.state.font.color = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def color_indexed
-        @format.instance_variable_get(:@font_state).color_indexed
+        @format.state.font.color_indexed
       end
 
       def color_indexed=(value)
-        @format.instance_variable_get(:@font_state).color_indexed = value
+        @format.state.font.color_indexed = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def underline
-        @format.instance_variable_get(:@font_state).underline
+        @format.state.font.underline
       end
 
       def underline=(value)
-        @format.instance_variable_get(:@font_state).underline = value
+        @format.state.font.underline = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def strikeout
-        @format.instance_variable_get(:@font_state).strikeout
+        @format.state.font.strikeout
       end
 
       def strikeout=(value)
-        @format.instance_variable_get(:@font_state).strikeout = value
+        @format.state.font.strikeout = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def outline
-        @format.instance_variable_get(:@font_state).outline
+        @format.state.font.outline
       end
 
       def outline=(value)
-        @format.instance_variable_get(:@font_state).outline = value
+        @format.state.font.outline = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def shadow
-        @format.instance_variable_get(:@font_state).shadow
+        @format.state.font.shadow
       end
 
       def shadow=(value)
-        @format.instance_variable_get(:@font_state).shadow = value
+        @format.state.font.shadow = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def script
-        @format.instance_variable_get(:@font_state).script
+        @format.state.font.script
       end
 
       def script=(value)
-        @format.instance_variable_get(:@font_state).script = value
+        @format.state.font.script = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def family
-        @format.instance_variable_get(:@font_state).family
+        @format.state.font.family
       end
 
       def family=(value)
-        @format.instance_variable_get(:@font_state).family = value
+        @format.state.font.family = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def charset
-        @format.instance_variable_get(:@font_state).charset
+        @format.state.font.charset
       end
 
       def charset=(value)
-        @format.instance_variable_get(:@font_state).charset = value
+        @format.state.font.charset = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def scheme
-        @format.instance_variable_get(:@font_state).scheme
+        @format.state.font.scheme
       end
 
       def scheme=(value)
-        @format.instance_variable_get(:@font_state).scheme = value
+        @format.state.font.scheme = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def condense
-        @format.instance_variable_get(:@font_state).condense
+        @format.state.font.condense
       end
 
       def condense=(value)
-        @format.instance_variable_get(:@font_state).condense = value
+        @format.state.font.condense = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def extend
-        @format.instance_variable_get(:@font_state).extend
+        @format.state.font.extend
       end
 
       def extend=(value)
-        @format.instance_variable_get(:@font_state).extend = value
+        @format.state.font.extend = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def theme
-        @format.instance_variable_get(:@font_state).theme
+        @format.state.font.theme
       end
 
       def theme=(value)
-        @format.instance_variable_get(:@font_state).theme = value
+        @format.state.font.theme = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def hyperlink
-        @format.instance_variable_get(:@font_state).hyperlink
+        @format.state.font.hyperlink
       end
 
       def hyperlink=(value)
-        @format.instance_variable_get(:@font_state).hyperlink = value
+        @format.state.font.hyperlink = value
         @format.send(:sync_font_ivars_from_state)
       end
 
       def color_indexed
-        @format.instance_variable_get(:@font_state).color_indexed
+        @format.state.font.color_indexed
       end
 
       def color_indexed=(value)
-        @format.instance_variable_get(:@font_state).color_indexed = value
+        @format.state.font.color_indexed = value
         @format.send(:sync_font_ivars_from_state)
       end
     end

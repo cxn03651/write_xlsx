@@ -15,6 +15,7 @@ require 'write_xlsx/format/protection_style'
 require 'write_xlsx/format/protection_state'
 require 'write_xlsx/format/number_format_style'
 require 'write_xlsx/format/number_format_state'
+require 'write_xlsx/format/format_state'
 
 module Writexlsx
   #
@@ -55,6 +56,7 @@ module Writexlsx
 
     def initialize(formats, params = {})   # :nodoc:
       @formats = formats
+      @state   = FormatState.new
 
       init_indexes
       init_number_format
@@ -82,12 +84,13 @@ module Writexlsx
       (instance_variables - reserve).each do |v|
         value = other.instance_variable_get(v)
         value = value.dup if %i[
-          @fill
-          @border
+          @fill_state
+          @border_state
           @font_state
           @alignment_state
           @protection_state
           @number_format_state
+          @state
         ].include?(v) && !value.nil?
 
         instance_variable_set(v, value)
@@ -99,6 +102,10 @@ module Writexlsx
     # Style facade accessors
     #
     ###########################################################################
+
+    def state
+      @state
+    end
 
     def number_format_style
       NumberFormatStyle.new(self)
@@ -1128,18 +1135,88 @@ module Writexlsx
       @has_dxf_fill
     end
 
+    # def [](attr)
+    #   case attr.to_sym
+    #   when :fg_color
+    #     @fill.fg_color
+    #   when :bg_color
+    #     @fill.bg_color
+    #   when :pattern
+    #     @fill.pattern
+    #   when :fill_index
+    #     @fill.index
+    #   when :fill_count
+    #     @fill.count
+    #   else
+    #     instance_variable_get("@#{attr}")
+    #   end
+    # end
     def [](attr)
       case attr.to_sym
-      when :fg_color
-        @fill.fg_color
-      when :bg_color
-        @fill.bg_color
-      when :pattern
-        @fill.pattern
-      when :fill_index
-        @fill.index
-      when :fill_count
-        @fill.count
+      when :fg_color      then fg_color
+      when :bg_color      then bg_color
+      when :pattern       then pattern
+      when :fill_index    then fill_index
+      when :fill_count    then fill_count
+
+      when :border_index  then border_index
+      when :border_count  then border_count
+      when :left          then left
+      when :left_color    then left_color
+      when :right         then right
+      when :right_color   then right_color
+      when :top           then top
+      when :top_color     then top_color
+      when :bottom        then bottom
+      when :bottom_color  then bottom_color
+      when :diag_border   then diag_border
+      when :diag_color    then diag_color
+      when :diag_type     then diag_type
+
+      when :font_index      then font_index
+      when :font            then font
+      when :size            then size
+      when :bold            then bold
+      when :italic          then italic
+      when :color           then font_color
+      when :underline       then underline
+      when :font_strikeout  then font_strikeout
+      when :font_outline    then font_outline
+      when :font_shadow     then font_shadow
+      when :font_script     then font_script
+      when :font_family     then font_family
+      when :font_charset    then font_charset
+      when :font_scheme     then font_scheme
+      when :font_condense   then font_condense
+      when :font_extend     then font_extend
+      when :theme           then theme
+      when :hyperlink       then hyperlink
+      when :color_indexed   then color_indexed
+
+      when :text_h_align   then text_h_align
+      when :text_v_align   then text_v_align
+      when :text_wrap      then text_wrap
+      when :text_justlast  then text_justlast
+      when :rotation       then rotation
+      when :indent         then indent
+      when :shrink         then shrink
+      when :merge_range    then merge_range
+      when :reading_order  then reading_order
+      when :just_distrib   then just_distrib
+
+      when :locked           then locked
+      when :hidden           then hidden
+
+      when :num_format       then num_format
+      when :num_format_index then num_format_index
+
+      when :xf_index       then xf_index
+      when :dxf_index      then dxf_index
+      when :xf_id          then xf_id
+      when :quote_prefix   then quote_prefix
+      when :has_fill       then has_fill
+      when :dxf_fg_color   then dxf_fg_color
+      when :dxf_bg_color   then dxf_bg_color
       else
         instance_variable_get("@#{attr}")
       end
@@ -1245,7 +1322,7 @@ module Writexlsx
         writer.empty_tag('sz', [['val', size]]) unless dxf_format
 
         if theme == -1
-          # Ignore for excel2003_style
+        # Ignore for excel2003_style
         elsif ptrue?(theme)
           write_color('theme', theme, writer)
         elsif ptrue?(color_indexed)
@@ -1360,6 +1437,10 @@ module Writexlsx
       @xf_index  = nil
       @dxf_index = nil
       @xf_id     = 0
+
+      @state.xf_index  = @xf_index
+      @state.dxf_index = @dxf_index
+      @state.xf_id     = @xf_id
     end
 
     def init_number_format
@@ -1368,6 +1449,7 @@ module Writexlsx
 
       @number_format_state = NumberFormatState.new
       sync_number_format_state_from_ivars
+      @state.number_format = @number_format_state
     end
 
     def init_font_properties
@@ -1391,8 +1473,9 @@ module Writexlsx
       @hyperlink      = 0
       @color_indexed  = 0
 
-      @font_state     = FontState.new
+      @font_state = FontState.new
       sync_font_state_from_ivars
+      @state.font = @font_state
     end
 
     def init_protection_properties
@@ -1401,6 +1484,7 @@ module Writexlsx
 
       @protection_state = ProtectionState.new
       sync_protection_state_from_ivars
+      @state.protection = @protection_state
     end
 
     def init_alignment_properties
@@ -1412,11 +1496,13 @@ module Writexlsx
 
       @alignment_state = AlignmentState.new
       sync_alignment_state_from_ivars
+      @state.alignment = @alignment_state
     end
 
     def init_fill_properties
-      @fill = FillState.new
+      @fill_state = FillState.new
       sync_fill_ivars_from_state
+      @state.fill = @fill_state
     end
 
     def init_border_properties
@@ -1435,8 +1521,9 @@ module Writexlsx
       @top          = 0
       @top_color    = 0x0
 
-      @border = BorderState.new
+      @border_state = BorderState.new
       sync_border_state_from_ivars
+      @state.border = @border_state
     end
 
     def init_misc_properties
@@ -1448,6 +1535,8 @@ module Writexlsx
       @color_indexed = 0
       @font_only     = 0
       @quote_prefix  = 0
+
+      @state.quote_prefix = @quote_prefix
     end
 
     ###########################################################################
@@ -1457,11 +1546,11 @@ module Writexlsx
     ###########################################################################
 
     def sync_fill_ivars_from_state
-      @fg_color   = @fill.fg_color
-      @bg_color   = @fill.bg_color
-      @pattern    = @fill.pattern
-      @fill_index = @fill.index
-      @fill_count = @fill.count
+      @fg_color   = @fill_state.fg_color
+      @bg_color   = @fill_state.bg_color
+      @pattern    = @fill_state.pattern
+      @fill_index = @fill_state.index
+      @fill_count = @fill_state.count
     end
 
     ###########################################################################
@@ -1474,35 +1563,35 @@ module Writexlsx
     ###########################################################################
 
     def sync_border_state_from_ivars
-      @border.index        = @border_index
-      @border.count        = @border_count
-      @border.bottom       = @bottom
-      @border.bottom_color = @bottom_color
-      @border.diag_border  = @diag_border
-      @border.diag_color   = @diag_color
-      @border.diag_type    = @diag_type
-      @border.left         = @left
-      @border.left_color   = @left_color
-      @border.right        = @right
-      @border.right_color  = @right_color
-      @border.top          = @top
-      @border.top_color    = @top_color
+      @border_state.index        = @border_index
+      @border_state.count        = @border_count
+      @border_state.bottom       = @bottom
+      @border_state.bottom_color = @bottom_color
+      @border_state.diag_border  = @diag_border
+      @border_state.diag_color   = @diag_color
+      @border_state.diag_type    = @diag_type
+      @border_state.left         = @left
+      @border_state.left_color   = @left_color
+      @border_state.right        = @right
+      @border_state.right_color  = @right_color
+      @border_state.top          = @top
+      @border_state.top_color    = @top_color
     end
 
     def sync_border_ivars_from_state
-      @border_index = @border.index
-      @border_count = @border.count
-      @bottom       = @border.bottom
-      @bottom_color = @border.bottom_color
-      @diag_border  = @border.diag_border
-      @diag_color   = @border.diag_color
-      @diag_type    = @border.diag_type
-      @left         = @border.left
-      @left_color   = @border.left_color
-      @right        = @border.right
-      @right_color  = @border.right_color
-      @top          = @border.top
-      @top_color    = @border.top_color
+      @border_index = @border_state.index
+      @border_count = @border_state.count
+      @bottom       = @border_state.bottom
+      @bottom_color = @border_state.bottom_color
+      @diag_border  = @border_state.diag_border
+      @diag_color   = @border_state.diag_color
+      @diag_type    = @border_state.diag_type
+      @left         = @border_state.left
+      @left_color   = @border_state.left_color
+      @right        = @border_state.right
+      @right_color  = @border_state.right_color
+      @top          = @border_state.top
+      @top_color    = @border_state.top_color
     end
 
     ###########################################################################
