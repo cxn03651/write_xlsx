@@ -22,7 +22,7 @@ module Writexlsx
   # A cell format in the workbook.
   #
   # Format represents the formatting properties associated with worksheet
-  # cells. These properties are later written to the workbook style tables
+  # cells. These properties are written to the workbook style tables
   # (styles.xml) and referenced by worksheet cell records.
   #
   # Responsibilities of this class include:
@@ -37,10 +37,6 @@ module Writexlsx
   #   records
   # * providing helper methods used when writing styles.xml
   #
-  # Fill formatting is backed by a dedicated FillState object accessed through
-  # FillStyle. Other grouped properties currently use facade objects over
-  # legacy instance variables as part of an incremental refactoring.
-  #
   # Format instances are created by Workbook#add_format and reused across
   # worksheets through their computed format keys.
   #
@@ -50,22 +46,13 @@ module Writexlsx
 
     ###########################################################################
     #
-    # Lifecycle and initialization
+    # Lifecycle
     #
     ###########################################################################
 
-    def initialize(formats, params = {})   # :nodoc:
+    def initialize(formats, params = {}) # :nodoc:
       @formats = formats
       @state   = FormatState.new
-
-      init_indexes
-      init_number_format
-      init_font_properties
-      init_protection_properties
-      init_fill_properties
-      init_border_properties
-      init_misc_properties
-      init_alignment_properties
 
       set_format_properties(params) unless params.empty?
     end
@@ -75,24 +62,13 @@ module Writexlsx
     #
     def copy(other)
       reserve = %i[
-        xf_index
-        dxf_index
-        xdf_format_indices
-        palette
+        @xdf_format_indices
+        @palette
       ]
 
       (instance_variables - reserve).each do |v|
         value = other.instance_variable_get(v)
-        value = value.dup if %i[
-          @fill_state
-          @border_state
-          @font_state
-          @alignment_state
-          @protection_state
-          @number_format_state
-          @state
-        ].include?(v) && !value.nil?
-
+        value = value.dup if v == :@state && !value.nil?
         instance_variable_set(v, value)
       end
     end
@@ -107,28 +83,28 @@ module Writexlsx
       @state
     end
 
-    def number_format_style
-      NumberFormatStyle.new(self)
-    end
-
-    def font_style
-      FontStyle.new(self)
-    end
-
-    def protection_style
-      ProtectionStyle.new(self)
-    end
-
-    def alignment_style
-      AlignmentStyle.new(self)
-    end
-
     def fill_style
       FillStyle.new(self)
     end
 
     def border_style
       BorderStyle.new(self)
+    end
+
+    def font_style
+      FontStyle.new(self)
+    end
+
+    def alignment_style
+      AlignmentStyle.new(self)
+    end
+
+    def protection_style
+      ProtectionStyle.new(self)
+    end
+
+    def number_format_style
+      NumberFormatStyle.new(self)
     end
 
     ###########################################################################
@@ -138,32 +114,35 @@ module Writexlsx
     ###########################################################################
 
     #
-    # Workbook indexes and miscellaneous flags
+    # Workbook indexes
     #
     def xf_index
-      @xf_index
+      state.xf_index
     end
 
     def xf_index=(value)
-      @xf_index = value
+      state.xf_index = value
     end
 
     def dxf_index
-      @dxf_index
+      state.dxf_index
     end
 
     def dxf_index=(value)
-      @dxf_index = value
+      state.dxf_index = value
     end
 
     def xf_id
-      @xf_id
+      state.xf_id
     end
 
     def xf_id=(value)
-      @xf_id = value
+      state.xf_id = value
     end
 
+    #
+    # Miscellaneous flags and compatibility ivars
+    #
     def has_fill
       @has_fill
     end
@@ -616,10 +595,7 @@ module Writexlsx
     #
     ###########################################################################
 
-    #
-    # General API
-    #
-    def set_format_properties(*properties)   # :nodoc:
+    def set_format_properties(*properties) # :nodoc:
       return if properties.empty?
 
       properties.each do |property|
@@ -924,7 +900,7 @@ module Writexlsx
 
     ###########################################################################
     #
-    # Workbook integration and indexing
+    # Workbook integration and key generation
     #
     ###########################################################################
 
@@ -1005,7 +981,7 @@ module Writexlsx
       elsif @formats.xf_index_by_key(get_format_key)
         @formats.xf_index_by_key(get_format_key)
       else
-        @xf_index = @formats.set_xf_index_by_key(get_format_key)
+        self.xf_index = @formats.set_xf_index_by_key(get_format_key)
       end
     end
 
@@ -1015,7 +991,7 @@ module Writexlsx
       elsif @formats.dxf_index_by_key(get_format_key)
         @formats.dxf_index_by_key(get_format_key)
       else
-        @dxf_index = @formats.set_dxf_index_by_key(get_format_key)
+        self.dxf_index = @formats.set_dxf_index_by_key(get_format_key)
       end
     end
 
@@ -1047,7 +1023,7 @@ module Writexlsx
 
     ###########################################################################
     #
-    # Format property queries and flags
+    # Queries and compatibility helpers
     #
     ###########################################################################
 
@@ -1135,88 +1111,21 @@ module Writexlsx
       @has_dxf_fill
     end
 
-    # def [](attr)
-    #   case attr.to_sym
-    #   when :fg_color
-    #     @fill.fg_color
-    #   when :bg_color
-    #     @fill.bg_color
-    #   when :pattern
-    #     @fill.pattern
-    #   when :fill_index
-    #     @fill.index
-    #   when :fill_count
-    #     @fill.count
-    #   else
-    #     instance_variable_get("@#{attr}")
-    #   end
-    # end
+    #
+    # Compatibility accessor used by older internal callers that treat Format
+    # like a hash.
+    #
     def [](attr)
       case attr.to_sym
-      when :fg_color      then fg_color
-      when :bg_color      then bg_color
-      when :pattern       then pattern
-      when :fill_index    then fill_index
-      when :fill_count    then fill_count
-
-      when :border_index  then border_index
-      when :border_count  then border_count
-      when :left          then left
-      when :left_color    then left_color
-      when :right         then right
-      when :right_color   then right_color
-      when :top           then top
-      when :top_color     then top_color
-      when :bottom        then bottom
-      when :bottom_color  then bottom_color
-      when :diag_border   then diag_border
-      when :diag_color    then diag_color
-      when :diag_type     then diag_type
-
-      when :font_index      then font_index
-      when :font            then font
-      when :size            then size
-      when :bold            then bold
-      when :italic          then italic
-      when :color           then font_color
-      when :underline       then underline
-      when :font_strikeout  then font_strikeout
-      when :font_outline    then font_outline
-      when :font_shadow     then font_shadow
-      when :font_script     then font_script
-      when :font_family     then font_family
-      when :font_charset    then font_charset
-      when :font_scheme     then font_scheme
-      when :font_condense   then font_condense
-      when :font_extend     then font_extend
-      when :theme           then theme
-      when :hyperlink       then hyperlink
-      when :color_indexed   then color_indexed
-
-      when :text_h_align   then text_h_align
-      when :text_v_align   then text_v_align
-      when :text_wrap      then text_wrap
-      when :text_justlast  then text_justlast
+      when :font           then font
+      when :size           then size
+      when :bold           then bold
+      when :italic         then italic
+      when :color          then font_color
+      when :underline      then underline
+      when :font_strikeout then font_strikeout
+      when :font_script    then font_script
       when :rotation       then rotation
-      when :indent         then indent
-      when :shrink         then shrink
-      when :merge_range    then merge_range
-      when :reading_order  then reading_order
-      when :just_distrib   then just_distrib
-
-      when :locked           then locked
-      when :hidden           then hidden
-
-      when :num_format       then num_format
-      when :num_format_index then num_format_index
-
-      when :xf_index       then xf_index
-      when :dxf_index      then dxf_index
-      when :xf_id          then xf_id
-      when :quote_prefix   then quote_prefix
-      when :has_fill       then has_fill
-      when :dxf_fg_color   then dxf_fg_color
-      when :dxf_bg_color   then dxf_bg_color
       else
         instance_variable_get("@#{attr}")
       end
@@ -1285,9 +1194,9 @@ module Writexlsx
       align << %w[vertical distributed] if v_align == 5
 
       align << ['textRotation', rotation_value] if rotation_value != 0
-      align << ['indent',       indent_value]   if indent_value != 0
+      align << ['indent', indent_value]         if indent_value != 0
 
-      align << ['wrapText',    1] if wrap != 0
+      align << ['wrapText', 1]    if wrap != 0
       align << ['shrinkToFit', 1] if shrink_value != 0
 
       align << ['readingOrder', 1] if reading_value == 1
@@ -1302,7 +1211,6 @@ module Writexlsx
       attributes = []
       attributes << ['locked', 0] if locked == 0
       attributes << ['hidden', 1] if hidden != 0
-
       attributes
     end
 
@@ -1322,7 +1230,7 @@ module Writexlsx
         writer.empty_tag('sz', [['val', size]]) unless dxf_format
 
         if theme == -1
-        # Ignore for excel2003_style
+          # Ignore for excel2003_style
         elsif ptrue?(theme)
           write_color('theme', theme, writer)
         elsif ptrue?(color_indexed)
@@ -1423,302 +1331,10 @@ module Writexlsx
 
     ###########################################################################
     #
-    # private helpers
+    # Private helpers
     #
     ###########################################################################
     private
-
-    ###########################################################################
-    #
-    # Private initialization helpers
-    #
-    ###########################################################################
-    def init_indexes
-      @xf_index  = nil
-      @dxf_index = nil
-      @xf_id     = 0
-
-      @state.xf_index  = @xf_index
-      @state.dxf_index = @dxf_index
-      @state.xf_id     = @xf_id
-    end
-
-    def init_number_format
-      @num_format       = 'General'
-      @num_format_index = 0
-
-      @number_format_state = NumberFormatState.new
-      sync_number_format_state_from_ivars
-      @state.number_format = @number_format_state
-    end
-
-    def init_font_properties
-      @font_index     = 0
-      @font           = 'Calibri'
-      @size           = 11
-      @bold           = 0
-      @italic         = 0
-      @color          = 0x0
-      @underline      = 0
-      @font_strikeout = 0
-      @font_outline   = 0
-      @font_shadow    = 0
-      @font_script    = 0
-      @font_family    = 2
-      @font_charset   = 0
-      @font_scheme    = 'minor'
-      @font_condense  = 0
-      @font_extend    = 0
-      @theme          = 0
-      @hyperlink      = 0
-      @color_indexed  = 0
-
-      @font_state = FontState.new
-      sync_font_state_from_ivars
-      @state.font = @font_state
-    end
-
-    def init_protection_properties
-      @hidden           = 0
-      @locked           = 1
-
-      @protection_state = ProtectionState.new
-      sync_protection_state_from_ivars
-      @state.protection = @protection_state
-    end
-
-    def init_alignment_properties
-      @text_h_align    = 0
-      @text_wrap       = 0
-      @text_v_align    = 0
-      @text_justlast   = 0
-      @rotation        = 0
-
-      @alignment_state = AlignmentState.new
-      sync_alignment_state_from_ivars
-      @state.alignment = @alignment_state
-    end
-
-    def init_fill_properties
-      @fill_state = FillState.new
-      sync_fill_ivars_from_state
-      @state.fill = @fill_state
-    end
-
-    def init_border_properties
-      @border_index = 0
-      @border_count = 0
-
-      @bottom       = 0
-      @bottom_color = 0x0
-      @diag_border  = 0
-      @diag_color   = 0x0
-      @diag_type    = 0
-      @left         = 0
-      @left_color   = 0x0
-      @right        = 0
-      @right_color  = 0x0
-      @top          = 0
-      @top_color    = 0x0
-
-      @border_state = BorderState.new
-      sync_border_state_from_ivars
-      @state.border = @border_state
-    end
-
-    def init_misc_properties
-      @indent        = 0
-      @shrink        = 0
-      @merge_range   = 0
-      @reading_order = 0
-      @just_distrib  = 0
-      @color_indexed = 0
-      @font_only     = 0
-      @quote_prefix  = 0
-
-      @state.quote_prefix = @quote_prefix
-    end
-
-    ###########################################################################
-    #
-    # Fill state synchronization helpers
-    #
-    ###########################################################################
-
-    def sync_fill_ivars_from_state
-      @fg_color   = @fill_state.fg_color
-      @bg_color   = @fill_state.bg_color
-      @pattern    = @fill_state.pattern
-      @fill_index = @fill_state.index
-      @fill_count = @fill_state.count
-    end
-
-    ###########################################################################
-    #
-    # Border synchronization helpers
-    #
-    # Border is currently kept primarily in legacy instance variables.
-    # These helpers remain for incremental refactoring.
-    #
-    ###########################################################################
-
-    def sync_border_state_from_ivars
-      @border_state.index        = @border_index
-      @border_state.count        = @border_count
-      @border_state.bottom       = @bottom
-      @border_state.bottom_color = @bottom_color
-      @border_state.diag_border  = @diag_border
-      @border_state.diag_color   = @diag_color
-      @border_state.diag_type    = @diag_type
-      @border_state.left         = @left
-      @border_state.left_color   = @left_color
-      @border_state.right        = @right
-      @border_state.right_color  = @right_color
-      @border_state.top          = @top
-      @border_state.top_color    = @top_color
-    end
-
-    def sync_border_ivars_from_state
-      @border_index = @border_state.index
-      @border_count = @border_state.count
-      @bottom       = @border_state.bottom
-      @bottom_color = @border_state.bottom_color
-      @diag_border  = @border_state.diag_border
-      @diag_color   = @border_state.diag_color
-      @diag_type    = @border_state.diag_type
-      @left         = @border_state.left
-      @left_color   = @border_state.left_color
-      @right        = @border_state.right
-      @right_color  = @border_state.right_color
-      @top          = @border_state.top
-      @top_color    = @border_state.top_color
-    end
-
-    ###########################################################################
-    #
-    # Font synchronization helpers
-    #
-    # Font is currently kept primarily in legacy instance variables.
-    # These helpers remain for incremental refactoring.
-    #
-    ###########################################################################
-
-    def sync_font_state_from_ivars
-      @font_state.index         = @font_index
-      @font_state.name          = @font
-      @font_state.size          = @size
-      @font_state.bold          = @bold
-      @font_state.italic        = @italic
-      @font_state.color         = @color
-      @font_state.underline     = @underline
-      @font_state.strikeout     = @font_strikeout
-      @font_state.outline       = @font_outline
-      @font_state.shadow        = @font_shadow
-      @font_state.script        = @font_script
-      @font_state.family        = @font_family
-      @font_state.charset       = @font_charset
-      @font_state.scheme        = @font_scheme
-      @font_state.condense      = @font_condense
-      @font_state.extend        = @font_extend
-      @font_state.theme         = @theme
-      @font_state.hyperlink     = @hyperlink
-      @font_state.color_indexed = @color_indexed
-    end
-
-    def sync_font_ivars_from_state
-      @font_index     = @font_state.index
-      @font           = @font_state.name
-      @size           = @font_state.size
-      @bold           = @font_state.bold
-      @italic         = @font_state.italic
-      @color          = @font_state.color
-      @underline      = @font_state.underline
-      @font_strikeout = @font_state.strikeout
-      @font_outline   = @font_state.outline
-      @font_shadow    = @font_state.shadow
-      @font_script    = @font_state.script
-      @font_family    = @font_state.family
-      @font_charset   = @font_state.charset
-      @font_scheme    = @font_state.scheme
-      @font_condense  = @font_state.condense
-      @font_extend    = @font_state.extend
-      @theme          = @font_state.theme
-      @hyperlink      = @font_state.hyperlink
-      @color_indexed  = @font_state.color_indexed
-    end
-
-    ###########################################################################
-    #
-    # Alignment synchronization helpers
-    #
-    # Alignment is currently kept primarily in legacy instance variables.
-    # These helpers remain for incremental refactoring.
-    #
-    ###########################################################################
-
-    def sync_alignment_state_from_ivars
-      @alignment_state.horizontal    = @text_h_align
-      @alignment_state.vertical      = @text_v_align
-      @alignment_state.wrap          = @text_wrap
-      @alignment_state.justlast      = @text_justlast
-      @alignment_state.rotation      = @rotation
-      @alignment_state.indent        = @indent
-      @alignment_state.shrink        = @shrink
-      @alignment_state.merge_range   = @merge_range
-      @alignment_state.reading_order = @reading_order
-      @alignment_state.just_distrib  = @just_distrib
-    end
-
-    def sync_alignment_ivars_from_state
-      @text_h_align  = @alignment_state.horizontal
-      @text_v_align  = @alignment_state.vertical
-      @text_wrap     = @alignment_state.wrap
-      @text_justlast = @alignment_state.justlast
-      @rotation      = @alignment_state.rotation
-      @indent        = @alignment_state.indent
-      @shrink        = @alignment_state.shrink
-      @merge_range   = @alignment_state.merge_range
-      @reading_order = @alignment_state.reading_order
-      @just_distrib  = @alignment_state.just_distrib
-    end
-
-    ###########################################################################
-    #
-    # Protection synchronization helpers
-    #
-    # Protection is currently kept primarily in legacy instance variables.
-    # These helpers remain for incremental refactoring.
-    #
-    ###########################################################################
-
-    def sync_protection_state_from_ivars
-      @protection_state.locked = @locked
-      @protection_state.hidden = @hidden
-    end
-
-    def sync_protection_ivars_from_state
-      @locked = @protection_state.locked
-      @hidden = @protection_state.hidden
-    end
-
-    ###########################################################################
-    #
-    # NumberFormat synchronization helpers
-    #
-    # NumberFormat is currently kept primarily in legacy instance variables.
-    # These helpers remain for incremental refactoring.
-    #
-    ###########################################################################
-
-    def sync_number_format_state_from_ivars
-      @number_format_state.format_code = @num_format
-      @number_format_state.index = @num_format_index
-    end
-
-    def sync_number_format_ivars_from_state
-      @num_format       = @number_format_state.format_code
-      @num_format_index = @number_format_state.index
-    end
 
     def normalize_format_property_value(value)
       if value.respond_to?(:to_str) || !value.respond_to?(:+)

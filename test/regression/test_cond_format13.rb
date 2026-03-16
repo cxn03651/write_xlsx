@@ -18,10 +18,10 @@ class TestRegressionCondFormat13 < Minitest::Test
 
     # We manually set the indices to get the same order as the target file.
     format1 = workbook.add_format(num_format: 2)
-    format1.instance_variable_set(:@dxf_index, 1)
+    format1.dxf_index = 1
 
     format2 = workbook.add_format(num_format: '0.000')
-    format2.instance_variable_set(:@dxf_index, 0)
+    format2.dxf_index = 0
 
     worksheet.write('A1', 10)
     worksheet.write('A2', 20)

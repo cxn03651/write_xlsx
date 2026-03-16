@@ -10,18 +10,20 @@ module Writexlsx
       attr_accessor :has_fill, :has_font, :has_border
       attr_accessor :has_dxf_fill, :has_dxf_font, :has_dxf_border
       attr_accessor :dxf_fg_color, :dxf_bg_color
+      attr_accessor :used_as_dxf
 
       def initialize
-        @fill          = nil
-        @border        = nil
-        @font          = nil
-        @alignment     = nil
-        @protection    = nil
-        @number_format = nil
+        @fill          = FillState.new
+        @border        = BorderState.new
+        @font          = FontState.new
+        @alignment     = AlignmentState.new
+        @protection    = ProtectionState.new
+        @number_format = NumberFormatState.new
 
         @xf_index       = nil
         @dxf_index      = nil
         @xf_id          = 0
+
         @quote_prefix   = 0
         @has_fill       = false
         @has_font       = false
@@ -31,6 +33,8 @@ module Writexlsx
         @has_dxf_border = false
         @dxf_fg_color   = nil
         @dxf_bg_color   = nil
+
+        @used_as_dxf    = false
       end
 
       def initialize_copy(other)
@@ -41,18 +45,21 @@ module Writexlsx
         @protection    = other.protection&.dup
         @number_format = other.number_format&.dup
 
-        @xf_index       = other.xf_index
-        @dxf_index      = other.dxf_index
+        @xf_index       = nil
+        @dxf_index      = nil
         @xf_id          = other.xf_id
         @quote_prefix   = other.quote_prefix
-        @has_fill       = other.has_fill
-        @has_font       = other.has_font
-        @has_border     = other.has_border
-        @has_dxf_fill   = other.has_dxf_fill
-        @has_dxf_font   = other.has_dxf_font
-        @has_dxf_border = other.has_dxf_border
+        @has_fill       = false
+        @has_font       = false
+        @has_border     = false
+        @has_dxf_fill   = false
+        @has_dxf_font   = false
+        @has_dxf_border = false
         @dxf_fg_color   = other.dxf_fg_color
         @dxf_bg_color   = other.dxf_bg_color
+
+        @used_as_dxf    = other.used_as_dxf
+
       end
     end
   end

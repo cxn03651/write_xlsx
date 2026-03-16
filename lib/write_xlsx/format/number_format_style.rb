@@ -14,7 +14,6 @@ module Writexlsx
 
       def format_code=(value)
         @format.state.number_format.format_code = value
-        @format.send(:sync_number_format_ivars_from_state)
       end
 
       def index
@@ -23,7 +22,6 @@ module Writexlsx
 
       def index=(value)
         @format.state.number_format.index = value
-        @format.send(:sync_number_format_ivars_from_state)
       end
     end
   end

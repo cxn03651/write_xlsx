@@ -14,7 +14,6 @@ module Writexlsx
 
       def index=(value)
         @format.state.font.index = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def name
@@ -23,7 +22,6 @@ module Writexlsx
 
       def name=(value)
         @format.state.font.name = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def size
@@ -32,7 +30,6 @@ module Writexlsx
 
       def size=(value)
         @format.state.font.size = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def bold
@@ -41,7 +38,6 @@ module Writexlsx
 
       def bold=(value)
         @format.state.font.bold = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def italic
@@ -50,7 +46,6 @@ module Writexlsx
 
       def italic=(value)
         @format.state.font.italic = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def color
@@ -59,7 +54,6 @@ module Writexlsx
 
       def color=(value)
         @format.state.font.color = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def color_indexed
@@ -68,7 +62,6 @@ module Writexlsx
 
       def color_indexed=(value)
         @format.state.font.color_indexed = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def underline
@@ -77,7 +70,6 @@ module Writexlsx
 
       def underline=(value)
         @format.state.font.underline = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def strikeout
@@ -86,7 +78,6 @@ module Writexlsx
 
       def strikeout=(value)
         @format.state.font.strikeout = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def outline
@@ -95,7 +86,6 @@ module Writexlsx
 
       def outline=(value)
         @format.state.font.outline = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def shadow
@@ -104,7 +94,6 @@ module Writexlsx
 
       def shadow=(value)
         @format.state.font.shadow = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def script
@@ -113,7 +102,6 @@ module Writexlsx
 
       def script=(value)
         @format.state.font.script = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def family
@@ -122,7 +110,6 @@ module Writexlsx
 
       def family=(value)
         @format.state.font.family = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def charset
@@ -131,7 +118,6 @@ module Writexlsx
 
       def charset=(value)
         @format.state.font.charset = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def scheme
@@ -140,7 +126,6 @@ module Writexlsx
 
       def scheme=(value)
         @format.state.font.scheme = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def condense
@@ -149,7 +134,6 @@ module Writexlsx
 
       def condense=(value)
         @format.state.font.condense = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def extend
@@ -158,7 +142,6 @@ module Writexlsx
 
       def extend=(value)
         @format.state.font.extend = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def theme
@@ -167,7 +150,6 @@ module Writexlsx
 
       def theme=(value)
         @format.state.font.theme = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def hyperlink
@@ -176,7 +158,6 @@ module Writexlsx
 
       def hyperlink=(value)
         @format.state.font.hyperlink = value
-        @format.send(:sync_font_ivars_from_state)
       end
 
       def color_indexed
@@ -185,7 +166,6 @@ module Writexlsx
 
       def color_indexed=(value)
         @format.state.font.color_indexed = value
-        @format.send(:sync_font_ivars_from_state)
       end
     end
   end

@@ -30,27 +30,22 @@ module Writexlsx
 
       def fg_color=(value)
         @format.state.fill.fg_color = value
-        @format.send(:sync_fill_ivars_from_state)
       end
 
       def bg_color=(value)
         @format.state.fill.bg_color = value
-        @format.send(:sync_fill_ivars_from_state)
       end
 
       def pattern=(value)
         @format.state.fill.pattern = value
-        @format.send(:sync_fill_ivars_from_state)
       end
 
       def index=(value)
         @format.state.fill.index = value
-        @format.send(:sync_fill_ivars_from_state)
       end
 
       def count=(value)
         @format.state.fill.count = value
-        @format.send(:sync_fill_ivars_from_state)
       end
     end
   end

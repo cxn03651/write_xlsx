@@ -14,7 +14,6 @@ module Writexlsx
 
       def horizontal=(value)
         @format.state.alignment.horizontal = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def wrap
@@ -23,7 +22,6 @@ module Writexlsx
 
       def wrap=(value)
         @format.state.alignment.wrap = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def vertical
@@ -32,7 +30,6 @@ module Writexlsx
 
       def vertical=(value)
         @format.state.alignment.vertical = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def justlast
@@ -41,7 +38,6 @@ module Writexlsx
 
       def justlast=(value)
         @format.state.alignment.justlast = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def rotation
@@ -50,7 +46,6 @@ module Writexlsx
 
       def rotation=(value)
         @format.state.alignment.rotation = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def indent
@@ -59,7 +54,6 @@ module Writexlsx
 
       def indent=(value)
         @format.state.alignment.indent = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def shrink
@@ -68,7 +62,6 @@ module Writexlsx
 
       def shrink=(value)
         @format.state.alignment.shrink = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def merge_range
@@ -77,7 +70,6 @@ module Writexlsx
 
       def merge_range=(value)
         @format.state.alignment.merge_range = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def reading_order
@@ -86,7 +78,6 @@ module Writexlsx
 
       def reading_order=(value)
         @format.state.alignment.reading_order = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
 
       def just_distrib
@@ -95,7 +86,6 @@ module Writexlsx
 
       def just_distrib=(value)
         @format.state.alignment.just_distrib = value
-        @format.send(:sync_alignment_ivars_from_state)
       end
     end
   end

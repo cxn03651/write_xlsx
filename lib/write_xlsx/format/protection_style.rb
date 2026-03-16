@@ -14,7 +14,6 @@ module Writexlsx
 
       def locked=(value)
         @format.state.protection.locked = value
-        @format.send(:sync_protection_ivars_from_state)
       end
 
       def hidden
@@ -23,7 +22,6 @@ module Writexlsx
 
       def hidden=(value)
         @format.state.protection.hidden = value
-        @format.send(:sync_protection_ivars_from_state)
       end
     end
   end

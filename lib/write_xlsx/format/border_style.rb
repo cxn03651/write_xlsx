@@ -14,7 +14,6 @@ module Writexlsx
 
       def index=(value)
         @format.state.border.index = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def count
@@ -23,7 +22,6 @@ module Writexlsx
 
       def count=(value)
         @format.state.border.count = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def left
@@ -32,7 +30,6 @@ module Writexlsx
 
       def left=(value)
         @format.state.border.left = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def left_color
@@ -41,7 +38,6 @@ module Writexlsx
 
       def left_color=(value)
         @format.state.border.left_color = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def right
@@ -50,7 +46,6 @@ module Writexlsx
 
       def right=(value)
         @format.state.border.right = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def right_color
@@ -59,7 +54,6 @@ module Writexlsx
 
       def right_color=(value)
         @format.state.border.right_color = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def top
@@ -68,7 +62,6 @@ module Writexlsx
 
       def top=(value)
         @format.state.border.top = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def top_color
@@ -77,7 +70,6 @@ module Writexlsx
 
       def top_color=(value)
         @format.state.border.top_color = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def bottom
@@ -86,7 +78,6 @@ module Writexlsx
 
       def bottom=(value)
         @format.state.border.bottom = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def bottom_color
@@ -95,7 +86,6 @@ module Writexlsx
 
       def bottom_color=(value)
         @format.state.border.bottom_color = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def diag_border
@@ -104,7 +94,6 @@ module Writexlsx
 
       def diag_border=(value)
         @format.state.border.diag_border = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def diag_color
@@ -113,7 +102,6 @@ module Writexlsx
 
       def diag_color=(value)
         @format.state.border.diag_color = value
-        @format.send(:sync_border_ivars_from_state)
       end
 
       def diag_type
@@ -122,7 +110,6 @@ module Writexlsx
 
       def diag_type=(value)
         @format.state.border.diag_type = value
-        @format.send(:sync_border_ivars_from_state)
       end
     end
   end
