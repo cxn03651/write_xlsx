@@ -442,13 +442,16 @@ module Writexlsx
         xf_index = format ? format.get_xf_index : 0
 
         attributes = [['r',  r + 1]]
-
         attributes << ['spans',        spans]    if spans
         attributes << ['s',            xf_index] if ptrue?(xf_index)
         attributes << ['customFormat', 1]        if ptrue?(format)
-        attributes << ['ht',           height]   if height != @original_row_height
+        if height != @original_row_height || height != @default_row_height
+          attributes << ['ht',           height]
+        end
         attributes << ['hidden',       1]        if ptrue?(hidden)
-        attributes << ['customHeight', 1]        if height != @original_row_height
+        if height != @original_row_height || height != @default_row_height
+          attributes << ['customHeight', 1]
+        end
         attributes << ['outlineLevel', level]    if ptrue?(level)
         attributes << ['collapsed',    1]        if ptrue?(collapsed)
 
