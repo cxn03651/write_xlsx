@@ -2,9 +2,12 @@
 # frozen_string_literal: true
 
 require 'digest/md5'
+require 'write_xlsx/utility/common'
 
 module Writexlsx
   class ImageProperty
+    include Utility::Common
+
     attr_reader :type, :width, :height, :name, :x_dpi, :y_dpi, :md5
     attr_reader :filename, :description, :decorative
     attr_accessor :ref_id, :body, :position
@@ -66,7 +69,7 @@ module Writexlsx
           y_ppu = data[offset + 12, 4].unpack1("N")
           units = data[offset + 16, 1].unpack1("C")
 
-          if units == 1
+          if units == 1 && ptrue?(x_ppu) && ptrue?(y_ppu)
             @x_dpi = x_ppu * 0.0254
             @y_dpi = y_ppu * 0.0254
           end
