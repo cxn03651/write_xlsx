@@ -59,7 +59,6 @@ module Writexlsx
         @dxf_bg_color   = other.dxf_bg_color
 
         @used_as_dxf    = other.used_as_dxf
-
       end
     end
   end
