@@ -95,8 +95,13 @@ module Writexlsx
       # Simulate autofit based on the data, and datatypes in each column. We do this
       # by estimating a pixel width for each cell data.
       #
-      def autofit
+      def autofit(max_width = 255.0)
         col_width = {}
+
+        # Convert the autofit maximum pixel width to a column/character width, but
+        # limit it to the Excel max limit.
+        max_width = pixels_to_width(max_width)
+        max_width = 255.0 if max_width > 255.0
 
         # Iterate through all the data in the worksheet.
         (@dim_rowmin..@dim_rowmax).each do |row_num|
@@ -181,8 +186,8 @@ module Writexlsx
           # additional padding of 7 pixels, like Excel.
           width = pixels_to_width(pixel_width + 7)
 
-          # The max column character width in Excel is 255.
-          width = 255.0 if width > 255.0
+          # Limit the width to the maximum user or Excel value.
+          width = max_width if width > max_width
 
           # Add the width to an existing col info structure or add a new one.
           if @col_info[col_num]
