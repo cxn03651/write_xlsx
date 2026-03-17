@@ -63,14 +63,14 @@ class Minitest::Test
   def vml_str_to_array(vml_str)
     ret = ''
     vml_str.split(/[\r\n]+/).each do |vml|
-      str = vml.sub(/^\s+/, '')     # Remove leading whitespace.
-               .sub(/\s+$/, '')             # Remove trailing whitespace.
-               .gsub("'", '"')             # Convert VMLs attribute quotes.
+      str = vml.sub(/^\s+/, '')              # Remove leading whitespace.
+               .sub(/\s+$/, '')              # Remove trailing whitespace.
+               .gsub("'", '"')               # Convert VMLs attribute quotes.
                .gsub(%r{([^ ])/>$}, '\1 />') # Add space before element end like XML::Writer.
-               .sub(/"$/, '" ')        # Add space between attributes.
-               .sub(/>$/, ">\n")       # Add newline after element end.
-               .gsub("><", ">\n<")      # Split multiple elements.
-      str.chomp! if str == "<x:Anchor>\n" # Put all of Anchor on one line.
+               .sub(/"$/, '" ')              # Add space between attributes.
+               .sub(/>$/, ">\n")             # Add newline after element end.
+               .gsub("><", ">\n<")           # Split multiple elements.
+      str.chomp! if str == "<x:Anchor>\n"    # Put all of Anchor on one line.
       ret += str
     end
     ret.split("\n")
@@ -98,106 +98,166 @@ class Minitest::Test
     compare_xlsx(exp_filename, got_filename, ignore_members, ignore_elements, true)
   end
 
+  #
+  # Compare two xlsx files by normalizing and comparing each entry.
+  #
   def compare_xlsx(exp_filename, got_filename, ignore_members = nil, ignore_elements = nil, regression = false)
-    # The zip "members" are the files in the XLSX container.
-    got_members = entrys(got_filename).sort_by { |member| member.name }
-    exp_members = entrys(exp_filename).sort_by { |member| member.name }
+    got_members = filtered_xlsx_entries(got_filename, ignore_members)
+    exp_members = filtered_xlsx_entries(exp_filename, ignore_members)
 
-    # Ignore some test specific filenames.
-    if ignore_members
-      got_members.reject! { |member| ignore_members.include?(member.name) }
-      exp_members.reject! { |member| ignore_members.include?(member.name) }
-    end
+    assert_same_member_names(exp_members, got_members)
 
-    # Check that each XLSX container has the same file members.
-    assert_equal(
-      exp_members.collect { |member| member.name },
-      got_members.collect { |member| member.name },
-      "file members differs."
-    )
-
-    # Compare each file in the XLSX containers.
     exp_members.each_index do |i|
-      begin
-        got_str = got_members[i].get_input_stream.read
-        got_xml_str = got_str.gsub(%r{(\S)/>}, '\1 />')
-        #        exp_xml_str = exp_members[i].get_input_stream.read.gsub(%r!(\S)/>!, '\1 />')
-        exp_str = exp_members[i].get_input_stream.read
-        ruby_19 do
-          exp_str.force_encoding("ASCII-8BIT") if got_str.encoding == Encoding::ASCII_8BIT
-        end
-        exp_xml_str = exp_str.gsub(%r{(\S)/>}, '\1 />')
-      rescue StandardError
-        p ruby_19 { got_str.encoding } || ruby_18 { got_str }
-        p ruby_19 { exp_str.encoding } || ruby_18 { exp_str }
-      end
-      # Remove dates and user specific data from the core.xml data.
-      if exp_members[i].name == 'docProps/core.xml'
-        exp_xml_str = if regression
-                        exp_xml_str.gsub(/ ?John/, '').gsub(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
-                      else
-                        exp_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
-                      end
-        got_xml_str = got_xml_str.gsub(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
-      end
-
-      # Remove workbookView dimensions which are almost always different.
-      if exp_members[i].name == 'xl/workbook.xml'
-        exp_xml_str.sub!(/<workbookView[^>]*>/, '<workbookView/>')
-        got_xml_str.sub!(/<workbookView[^>]*>/, '<workbookView/>')
-      end
-
-      # Remove the calcpr elements which may have different Excel version ids.
-      if exp_members[i].name == 'xl/workbook.xml'
-        exp_xml_str.sub!(/<calcPr[^>]*>/, '<calcPr/>')
-        got_xml_str.sub!(/<calcPr[^>]*>/, '<calcPr/>')
-      end
-
-      # Remove printer specific settings from Worksheet pageSetup elements.
-      if exp_members[i].name =~ %r{xl/worksheets/sheet\d.xml}
-        exp_xml_str = exp_xml_str
-                      .sub('horizontalDpi="200" ', '')
-                      .sub('verticalDpi="200" ', '')
-                      .sub(/(<pageSetup[^>]* )r:id="rId1"/, '\1')
-                      .sub(%r{ +/>}, ' />')
-        got_xml_str = got_xml_str
-                      .sub('horizontalDpi="200" ', '')
-                      .sub('verticalDpi="200" ', '')
-      end
-
-      # Remove Chart pageMargin dimensions which are almost always different.
-      if exp_members[i].name =~ %r{xl/charts/chart\d.xml}
-        exp_xml_str = exp_xml_str.sub(/<c:pageMargins[^>]*>/, '<c:pageMargins/>')
-        got_xml_str = got_xml_str.sub(/<c:pageMargins[^>]*>/, '<c:pageMargins/>')
-      end
-
-      if exp_members[i].name =~ /.vml$/
-        got_xml = got_to_array(got_xml_str)
-        exp_xml = vml_str_to_array(exp_xml_str)
-      else
-        got_xml = got_to_array(got_xml_str)
-        exp_xml = got_to_array(exp_xml_str)
-      end
-
-      # Ignore test specific XML elements for defined filenames.
-      if ignore_elements && ignore_elements[exp_members[i].name]
-        str = ignore_elements[exp_members[i].name].join('|')
-        regex = Regexp.new(str)
-
-        got_xml = got_xml.reject { |s| s =~ regex }
-        exp_xml = exp_xml.reject { |s| s =~ regex }
-      end
-
-      # Reorder the XML elements in the XLSX relationship files.
-      case exp_members[i].name
-      when '[Content_Types].xml', /.rels$/
-        got_xml = sort_rel_file_data(got_xml)
-        exp_xml = sort_rel_file_data(exp_xml)
-      end
-
-      # Comparison of the XML elements in each file.
-      assert_equal(exp_xml, got_xml, "#{exp_members[i].name} differs.")
+      compare_xlsx_entry(
+        exp_members[i],
+        got_members[i],
+        ignore_elements,
+        regression
+      )
     end
+  end
+
+  #
+  # Return sorted xlsx entries and remove ignored members when requested.
+  #
+  def filtered_xlsx_entries(filename, ignore_members = nil)
+    members = entrys(filename).sort_by(&:name)
+    return members unless ignore_members
+
+    members.reject { |member| ignore_members.include?(member.name) }
+  end
+
+  #
+  # Assert that two xlsx containers have the same member names.
+  #
+  def assert_same_member_names(exp_members, got_members)
+    assert_equal(
+      exp_members.map(&:name),
+      got_members.map(&:name),
+      'file members differs.'
+    )
+  end
+
+  #
+  # Compare a single entry in two xlsx containers.
+  #
+  def compare_xlsx_entry(exp_member, got_member, ignore_elements, regression)
+    got_xml_str = normalized_member_xml(got_member, regression)
+    exp_xml_str = normalized_member_xml(exp_member, regression, expected: true)
+
+    got_xml = xml_to_comparable_array(got_xml_str, got_member.name)
+    exp_xml = xml_to_comparable_array(exp_xml_str, exp_member.name)
+
+    if ignore_elements && ignore_elements[exp_member.name]
+      got_xml = reject_ignored_elements(got_xml, ignore_elements[exp_member.name])
+      exp_xml = reject_ignored_elements(exp_xml, ignore_elements[exp_member.name])
+    end
+
+    case exp_member.name
+    when '[Content_Types].xml', /.rels$/
+      got_xml = sort_rel_file_data(got_xml)
+      exp_xml = sort_rel_file_data(exp_xml)
+    end
+
+    assert_equal(exp_xml, got_xml, "#{exp_member.name} differs.")
+  end
+
+  #
+  # Read and normalize a single xlsx entry.
+  #
+  def normalized_member_xml(member, regression = false, expected: false)
+    raw = member.get_input_stream.read
+    xml = normalize_xml_empty_tags(raw)
+
+    if member.name == 'docProps/core.xml'
+      xml = normalize_core_xml(xml, regression, expected)
+    end
+
+    if member.name == 'xl/workbook.xml'
+      xml = normalize_workbook_xml(xml)
+    end
+
+    if member.name =~ %r{xl/worksheets/sheet\d.xml}
+      xml = normalize_worksheet_xml(xml, expected)
+    end
+
+    if member.name =~ %r{xl/charts/chart\d.xml}
+      xml = normalize_chart_xml(xml)
+    end
+
+    xml
+  rescue StandardError
+    p ruby_19 { raw.encoding } || ruby_18 { raw }
+    raise
+  end
+
+  #
+  # Normalize empty tags in XML so comparisons are stable.
+  #
+  def normalize_xml_empty_tags(xml)
+    xml.gsub(%r{(\S)/>}, '\1 />')
+  end
+
+  #
+  # Remove dates and user specific data from core.xml.
+  #
+  def normalize_core_xml(xml, regression, expected)
+    if expected && regression
+      xml = xml.gsub(/ ?John/, '')
+    end
+
+    xml.gsub(/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ/, '')
+  end
+
+  #
+  # Normalize workbook.xml elements that commonly differ across environments.
+  #
+  def normalize_workbook_xml(xml)
+    xml = xml.sub(/<workbookView[^>]*>/, '<workbookView/>')
+    xml.sub(/<calcPr[^>]*>/, '<calcPr/>')
+  end
+
+  #
+  # Normalize worksheet xml elements that commonly contain environment-specific
+  # printer settings.
+  #
+  def normalize_worksheet_xml(xml, expected)
+    xml = xml
+          .sub('horizontalDpi="200" ', '')
+          .sub('verticalDpi="200" ', '')
+
+    if expected
+      xml = xml.sub(/(<pageSetup[^>]* )r:id="rId1"/, '\1')
+               .sub(%r{ +/>}, ' />')
+    end
+
+    xml
+  end
+
+  #
+  # Normalize chart xml elements that often differ.
+  #
+  def normalize_chart_xml(xml)
+    xml.sub(/<c:pageMargins[^>]*>/, '<c:pageMargins/>')
+  end
+
+  #
+  # Convert xml text into the comparable array form used by existing tests.
+  #
+  def xml_to_comparable_array(xml, member_name)
+    if member_name =~ /.vml$/
+      vml_str_to_array(xml)
+    else
+      got_to_array(xml)
+    end
+  end
+
+  #
+  # Remove ignored XML lines for test-specific comparisons.
+  #
+  def reject_ignored_elements(xml_array, ignored_patterns)
+    regex = Regexp.new(ignored_patterns.join('|'))
+    xml_array.reject { |s| s =~ regex }
   end
 
   def sort_rel_file_data(xml_array)
