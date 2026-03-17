@@ -485,7 +485,7 @@ module Writexlsx
         param[:criteria] = valid_criteria_type_for_conditional_formatting[param[:criteria].downcase] if param.has_key?(:criteria) && valid_criteria_type_for_conditional_formatting.has_key?(param[:criteria].downcase)
 
         # Convert date/times value if required.
-        if %w[date time cellIs].include?(param[:type])
+        if %w[date time].include?(param[:type])
           param[:type] = 'cellIs'
 
           param[:value]   = convert_date_time_if_required(param[:value])
