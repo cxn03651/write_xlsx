@@ -748,7 +748,7 @@ module Writexlsx
           quoted_value = value.to_s
           numeric_regex = /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/
           # String "Cell" values must be quoted, apart from ranges.
-          if !(quoted_value =~ /(\$?)([A-Z]{1,3})(\$?)(\d+)/) &&
+          if !(quoted_value =~ /^(\$?)([A-Z]{1,3})(\$?)(\d+)/) &&
              !(quoted_value =~ numeric_regex) &&
              !(quoted_value =~ /^".*"$/)
             quoted_value = %("#{value}")
