@@ -1428,6 +1428,7 @@ The property elements of the `custom` lists should be dicts with the following a
     :pattern
     :gradient
     :delete
+    :position
 
 The `:value` property should be a string, number or formula string that refers to a cell from which the value will be taken:
 
@@ -1480,6 +1481,8 @@ The `:delete` property can be used to delete labels in a series. This can be use
         { delete: 1 },
         nil
     ]
+
+The `:positin` property is used to position the custom data such as "center" or "left" relative to the data point. See the explanation for the `:position` property of series data labels above.
 
 ##### <a name="points" class="anchor" href="#points"><span class="octicon octicon-link" /></a>Points
 
