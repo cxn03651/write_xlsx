@@ -23,7 +23,7 @@ class TestCondFormat25 < Minitest::Test
       <formula>"Test A2"</formula>
     </cfRule>
   </conditionalFormatting>
-XML
+    XML
 
     assert_worksheet_xml_includes(xml, expected)
     refute_includes(xml, 'dxfId')

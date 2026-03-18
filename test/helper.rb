@@ -320,6 +320,6 @@ class Minitest::Test
   # Extract the first conditionalFormatting element from worksheet XML.
   #
   def extract_conditional_formatting_xml(xml)
-    xml[/<conditionalFormatting\b.*?<\/conditionalFormatting>/m]
+    xml[%r{<conditionalFormatting\b.*?</conditionalFormatting>}m]
   end
 end
