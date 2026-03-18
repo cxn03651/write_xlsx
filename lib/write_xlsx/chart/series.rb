@@ -333,19 +333,10 @@ module Writexlsx
       def labels_properties(labels) # :nodoc:
         return nil unless labels
 
+        labels = labels.dup
+
         # Map user defined label positions to Excel positions.
-        position = labels[:position]
-        if ptrue?(position)
-          if @label_positions[position]
-            labels[:position] = if position == @label_position_default
-                                  nil
-                                else
-                                  @label_positions[position]
-                                end
-          else
-            raise "Unsupported label position '#{position}' for this chart type"
-          end
-        end
+        map_label_position!(labels)
 
         # Map the user defined label separator to the Excel separator.
         separators = {
@@ -411,6 +402,9 @@ module Writexlsx
 
             property[:font] = convert_font_args(property[:font]) if property[:font]
 
+            # Map user defined label positions to Excel positions.
+            map_label_position!(property)
+
             # Allow 'border' as a synonym for 'line'.
             line = line_properties(property[:border] || property[:line])
 
@@ -441,6 +435,21 @@ module Writexlsx
         end
 
         labels
+      end
+
+      def map_label_position!(property)
+        position = property[:position]
+        return unless ptrue?(position)
+
+        if @label_positions[position]
+          property[:position] = if position == @label_position_default
+                                  nil
+                                else
+                                  @label_positions[position]
+                                end
+        else
+          raise "Unsupported label position '#{position}' for this chart type"
+        end
       end
     end
   end

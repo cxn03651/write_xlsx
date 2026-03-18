@@ -458,28 +458,38 @@ module Writexlsx
           index += 1
           next unless ptrue?(label)
 
+          use_custom_formatting = true
+
           @writer.tag_elements('c:dLbl') do
             # Write the c:idx element.
             write_idx(index - 1)
 
             if label[:delete]
+              # Delete/hide label.
               write_delete(1)
-            elsif label[:formula]
-              write_custom_label_formula(label)
+            elsif label[:formula] || label[:value] || label[:position]
+              # Write the c:layout element.
+              write_layout
 
-              write_d_lbl_pos(parent[:position]) if parent[:position]
-              write_show_val      if parent[:value]
-              write_show_cat_name if parent[:category]
-              write_show_ser_name if parent[:series_name]
-            elsif label[:value]
-              write_custom_label_str(label)
+              if label[:formula]
+                write_custom_label_formula(label)
+              elsif label[:value]
+                write_custom_label_str(label)
 
-              write_d_lbl_pos(parent[:position]) if parent[:position]
+                # String values use spPr formatting.
+                use_custom_formatting = false
+              end
+
+              write_custom_label_format(label) if use_custom_formatting
+
+              position = label[:position] || parent[:position]
+              write_d_lbl_pos(position) if position
+
               write_show_val      if parent[:value]
               write_show_cat_name if parent[:category]
               write_show_ser_name if parent[:series_name]
             else
-              write_custom_label_format_only(label)
+              write_custom_label_format(label)
             end
           end
         end
@@ -493,9 +503,6 @@ module Writexlsx
         font           = label[:font]
         is_y_axis      = 0
         has_formatting = has_fill_formatting(label)
-
-        # Write the c:layout element.
-        write_layout
 
         @writer.tag_elements('c:tx') do
           # Write the c:rich element.
@@ -515,23 +522,16 @@ module Writexlsx
 
         data = @formula_data[data_id] if data_id
 
-        # Write the c:layout element.
-        write_layout
-
         @writer.tag_elements('c:tx') do
           # Write the c:strRef element.
           write_str_ref(formula, data, 'str')
         end
-
-        # Write the data label formatting, if any.
-        write_custom_label_format_only(label)
       end
 
       #
-      # Write parts of the <c:dLbl> element for labels where only the formatting has
-      # changed.
+      # Write the formatting and font elements for custom labels.
       #
-      def write_custom_label_format_only(label)
+      def write_custom_label_format(label)
         font           = label[:font]
         has_formatting = has_fill_formatting(label)
 
