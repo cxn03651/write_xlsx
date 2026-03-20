@@ -270,8 +270,12 @@ The properties that can be set are:
     :name
     :name_font
     :name_layout
-    :num_font
+    :num_line
+    :num_fill
+    :num_pattern
+    :num_gradient
     :num_format
+    :num_font
     :pattern
     :gradient
     :min
@@ -352,24 +356,40 @@ See
 in WriteXLSX for more information.
 
 ##### <a name="set_x_axis_line" class="anchor" href="#set_x_axis_line"><span class="octicon octicon-link" /></a>:line
-Set the properties of the axis line type such as color and width.
+Set the properties of the axis line/border type such as color and width.
 See the [CHART FORMATTING][] section below.
 
     chart.set_x_axis(line: { none: 1 })
 
 ##### <a name="set_x_axis_fill" class="anchor" href="#set_x_axis_fill"><span class="octicon octicon-link" /></a>:fill
-Set the fill properties of the axis such as color.
+Set the fill properties of the axis.
 See the [CHART FORMATTING][] section below.
 Note, in the Excel the axis fill is applied to the area of the numbers of
 the axis and not to the area of the axis bounding box.
 That background is set from the chartarea fill.
 
 ##### <a name="set_x_axis_pattern" class="anchor" href="#set_x_axis_pattern"><span class="octicon octicon-link" /></a>:pattern
-Set the pattern properties of the axis such as color.
+Set the pattern properties of the axis.
 See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_x_axis_gradient" class="anchor" href="#set_x_axis_gradient"><span class="octicon octicon-link" /></a>:gradient
-Set the gradient properties of the axis such as color.
+Set the gradient properties of the axis.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_x_axis_name_line" class="anchor" href="#set_x_axis_name_line"><span class="octicon octicon-link" /></a>:name_line
+Set the properties of the axis title/name line/border.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_x_axis_name_fill" class="anchor" href="#set_x_axis_name_fill"><span class="octicon octicon-link" /></a>:name_fill
+Set the fill properties of the axis title/name.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_x_axis_name_pattern" class="anchor" href="#set_x_axis_name_pattern"><span class="octicon octicon-link" /></a>:name_pattern
+Set the pattern properties of the axis title/name.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_x_axis_name_gradient" class="anchor" href="#set_x_axis_name_gradient"><span class="octicon octicon-link" /></a>:name_gradient
+Set the gradient properties of the axis title/name.
 See the [CHART FORMATTING][] section below.
 
 ##### <a name="set_x_axis_min" class="anchor" href="#set_x_axis_min"><span class="octicon octicon-link" /></a>:min
