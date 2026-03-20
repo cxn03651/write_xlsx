@@ -15,7 +15,7 @@ module Writexlsx
         @chart = chart
       end
 
-      def apply_options(params) # :nodoc:
+      def apply_text_options(params) # :nodoc:
         @name, @formula = chart.process_names(params[:name], params[:name_formula])
         @name = nil if @name.respond_to?(:empty?) && @name.empty?
         @data_id = chart.data_id(@formula, params[:data])

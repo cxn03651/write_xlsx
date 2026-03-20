@@ -6,7 +6,10 @@ require 'write_xlsx/chart/caption'
 
 module Writexlsx
   class Chart
-    class Axis < Caption
+    class Axis
+      include Writexlsx::Utility::Common
+      include Writexlsx::Utility::RichText
+
       attr_accessor :defaults
       attr_accessor :min, :max, :num_format, :position
       attr_accessor :major_tick_mark, :minor_tick_mark
@@ -19,7 +22,7 @@ module Writexlsx
       attr_reader :title
 
       def initialize(chart)
-        super
+        @chart = chart
         @title = Caption.new(chart)
       end
 
@@ -27,9 +30,16 @@ module Writexlsx
       # Convert user defined axis values into axis instance.
       #
       def apply_options(params) # :nodoc:
-        super
         args      = (defaults || {}).merge(params)
 
+        apply_axis_options(args)
+        apply_axis_display_options(args)
+        apply_axis_format_options(args)
+        apply_axis_tick_options(args)
+        apply_axis_title_options(args)
+      end
+
+      def apply_axis_options(args)
         %i[
           reverse min max minor_unit major_unit minor_unit_type
           major_unit_type log_base crossing position_axis
@@ -37,31 +47,36 @@ module Writexlsx
           interval_tick line fill label_align
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
 
-        set_major_minor_gridlines(args)
         @visible = args[:visible] || 1
+      end
+
+      def apply_axis_display_options(args)
+        set_major_minor_gridlines(args)
         set_display_units(args)
         set_display_units_visible(args)
         set_position(args)
         set_position_axis
 
-        # font for axis label
-        @num_font = convert_font_args(args[:num_font])
-
-        # axis
-        set_axis_line(args)
-        set_axis_fill(args)
-
         if ptrue?(args[:text_axis])
-          chart.date_category = false
+          @chart.date_category = false
           @text_axis = true
         end
+      end
 
-        # Set the tick marker types.
-        @major_tick_mark = get_tick_type(params[:major_tick_mark])
-        @minor_tick_mark = get_tick_type(params[:minor_tick_mark])
+      def apply_axis_format_options(args)
+        @num_font = convert_font_args(args[:num_font])
+        @line = @chart.line_properties(args[:line])
+        @fill = @chart.fill_properties(args[:fill])
+      end
 
+      def apply_axis_tick_options(args)
+        @major_tick_mark = get_tick_type(args[:major_tick_mark])
+        @minor_tick_mark = get_tick_type(args[:minor_tick_mark])
+      end
+
+      def apply_axis_title_options(args)
         # Set the axis title properties.
-        @title.apply_options(
+        @title.apply_text_options(
           name:         args[:name],
           name_formula: args[:name_formula],
           data:         args[:data],
@@ -195,23 +210,6 @@ module Writexlsx
             @position_axis = nil
           end
         end
-      end
-
-      def set_font_properties(args)
-        @num_font  = convert_font_args(args[:num_font])
-        @name_font = convert_font_args(args[:name_font])
-      end
-
-      def set_axis_name_layout(args)
-        @layout    = chart.layout_properties(args[:name_layout], 1)
-      end
-
-      def set_axis_line(args)
-        @line = chart.line_properties(args[:line])
-      end
-
-      def set_axis_fill(args)
-        @fill = chart.fill_properties(args[:fill])
       end
     end
   end
