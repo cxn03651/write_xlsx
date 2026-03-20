@@ -1623,6 +1623,34 @@ See the
 [`hide_row_col.rb`](examples.html#hide_row_col)
 example program.
 
+#### <a name="autofit" class="anchor" href="#autofit"><span class="octicon octicon-link" /></a>autofit(max_width)
+
+Autofit the worksheet column widths to the widest data in the column, approximately.
+
+    worksheet.autorit
+
+Excel autofits columns at runtime when it has access to all of the required worksheet information
+as well as the Windows functions for calculating display areas based on fonts and formatting.
+WriteXLSX doesn't have access to these Windows functions so it simulates autofit by calculating string widths based on metrics taken from Excel.
+This isn't perfect but for most cases it should be sufficient and indistinguishable from the output of Excel.
+However there are some limitations to be aware of when using this method:
+
+* It is based on the default Excel font type and size of Calibri 11. It will not give accurate results for other fonts or font sizes.
+* It doesn't take formatting of numbers or dates account, although this may be addressed in a later version.
+* Autofit is a relatively expensive operation since it performs a calculation for all the populated cells in a worksheet. See the note on performance below.
+
+For cases that don't match your desired output you can set explicit column widths via `set_column` or `set_column_pixels` method ignores columns
+that have already been explicitly set if the width is greater than the calculated autofit width.
+Alternatively, setting the column width explicitly after calling `autofit` will override the autofit value.
+You can also set an upper limit using the optional `max_width` parameter as explained below.
+
+Excel autofits very long strings up to limit of 1790 pixels/255 characters.
+This is often too wide to display on a single screen at normal zoom.
+As such the optional `max_width` parameter is provided to enable a smaller upper pixel limit for autofitting long strings.
+A value of 300 pixels is recommended as a good compromise between column width and readability:
+
+    worksheet.autofit(300)
+
 #### <a name="set_column" class="anchor" href="#set_column"><span class="octicon octicon-link" /></a>set_column(first_col, last_col, width, format, hidden, level, collapsed)
 
 This method can be used to change the default properties of a single column or
@@ -1647,8 +1675,7 @@ The width corresponds to the column width value that is specified in Excel.
 It is approximately equal to the length of a string in the default font of Calibri 11.
 To set the width in pixels use the `set_column_pixels` method, see below.
 
-Unfortunately, there is no way to specify "Autofit" for a column in Excel file format.
-This feature is only available at runtime from within Excel.
+See also the `autofit` method to set the column widths based on the data in the column, approximately.
 
 As usual the format parameter is optional, for additional information,
 see [CELL FORMATTING][].
