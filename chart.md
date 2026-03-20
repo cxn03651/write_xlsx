@@ -648,9 +648,21 @@ The name can also be a formula such as `=Sheet1!$A$1`.
 The name property is optional.
 The default is to have no chart title.
 
-##### <a name="set_title_name_font" class="anchor" href="#set_title_name_font"><span class="octicon octicon-link" /></a>:name_font
+##### <a name="set_title_font" class="anchor" href="#set_title_font"><span class="octicon octicon-link" /></a>:font
 Set the font properties for the chart title.
 See the [CHART FONTS][] section below.
+
+##### <a name="set_title_fill" class="anchor" href="#set_title_fill"><span class="octicon octicon-link" /></a>:fill
+Set the fill properties of the legend such as colour.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_title_pattern" class="anchor" href="#set_title_pattern"><span class="octicon octicon-link" /></a>:pattern
+Set the pattern fill properties of the legend.
+See the [CHART FORMATTING][] section below.
+
+##### <a name="set_title_gradient" class="anchor" href="#set_title_gradient"><span class="octicon octicon-link" /></a>:gradient
+Set the gradient fill properties of the legend.
+See the [CHART FORMATTING][] section below.
 
 #### <a name="set_title_overlay" class="anchor" href="#set_title_overlay"><span class="octicon octicon-link" /></a>:overlay
 Allow the title to be overlaid on the chart. Generally used with the layout property below.
@@ -2047,7 +2059,10 @@ There are some limitations on combined charts:
   axis. This is an Excel limitation.
 
 
-[CHART FONTS]: chart_fonts.html#chart_fonts
+[CHART FONTS]: chart.html#chart_fonts
+[CHART FILL]: chart.html#set_title_fill
+[CHART PATTERN]: chart.html#set_title_pattern
+[CHART GRADIENT]: chart.html#set_title_gradient
 [CHART FORMATTING]: chart.html#chart_formatting
 [CHART LAYOUT]: chart_layout.html#chart_layout
 [SERIES OPTIONS]: chart.html#series_options
