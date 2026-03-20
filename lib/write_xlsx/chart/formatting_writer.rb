@@ -12,19 +12,38 @@ module Writexlsx
     module FormattingWriter
       private
 
+      def write_chart_title(title, is_y_axis = nil, allow_none: false)
+        return unless title
+
+        if allow_none && title.none
+          write_auto_title_deleted
+        elsif ptrue?(title.name)
+          write_title_rich(title, is_y_axis)
+        elsif title.formula
+          write_title_formula(title, is_y_axis)
+        elsif has_formatting(title)
+          write_title_format_only(title)
+        end
+      end
+
       #
       # Write the <c:title> element for a rich string.
       #
-      def write_title_formula(title, is_y_axis = nil, axis = nil, layout = nil, overlay = nil) # :nodoc:
+      def write_title_formula(title, is_y_axis = nil)
         @writer.tag_elements('c:title') do
-          # Write the c:tx element.
-          write_tx_formula(title.formula, axis ? axis.data_id : title.data_id)
-          # Write the c:layout element.
-          write_layout(layout, 'text')
-          # Write the c:overlay element.
-          write_overlay if overlay
-          # Write the c:txPr element.
-          write_tx_pr(axis ? axis.name_font : title.name_font, is_y_axis)
+          write_tx_formula(title.formula, title.data_id)
+          write_layout(title.layout, 'text')
+          write_overlay if title.overlay
+          write_sp_pr(title)
+          write_tx_pr(title.font, is_y_axis)
+        end
+      end
+
+      def write_title_format_only(title)
+        @writer.tag_elements('c:title') do
+          write_layout(title.layout, 'text')
+          write_overlay if title.overlay
+          write_sp_pr(title)
         end
       end
 
@@ -165,13 +184,13 @@ module Writexlsx
       #
       # Write the <c:spPr> element.
       #
-      def write_sp_pr(series) # :nodoc:
-        return unless has_fill_formatting(series)
+      def write_sp_pr(object) # :nodoc:
+        return unless has_formatting(object)
 
-        line     = series_property(series, :line)
-        fill     = series_property(series, :fill)
-        pattern  = series_property(series, :pattern)
-        gradient = series_property(series, :gradient)
+        line     = series_property(object, :line)
+        fill     = series_property(object, :fill)
+        pattern  = series_property(object, :pattern)
+        gradient = series_property(object, :gradient)
 
         @writer.tag_elements('c:spPr') do
           # Write the fill elements for solid charts such as pie/doughnut and bar.
@@ -184,12 +203,9 @@ module Writexlsx
               write_a_solid_fill(fill)
             end
           end
+
           write_a_patt_fill(pattern) if ptrue?(pattern)
-          if ptrue?(gradient)
-            # Write the a:gradFill element.
-            write_a_grad_fill(gradient)
-          end
-          # Write the a:ln element.
+          write_a_grad_fill(gradient) if ptrue?(gradient)
           write_a_ln(line) if line && ptrue?(line[:_defined])
         end
       end
@@ -502,7 +518,7 @@ module Writexlsx
         value          = label[:value]
         font           = label[:font]
         is_y_axis      = 0
-        has_formatting = has_fill_formatting(label)
+        has_formatting = has_formatting(label)
 
         @writer.tag_elements('c:tx') do
           # Write the c:rich element.
@@ -533,7 +549,7 @@ module Writexlsx
       #
       def write_custom_label_format(label)
         font           = label[:font]
-        has_formatting = has_fill_formatting(label)
+        has_formatting = has_formatting(label)
 
         if has_formatting
           # Write the c:spPr element.
@@ -615,7 +631,7 @@ module Writexlsx
         @writer.empty_tag('c:dLblPos', [['val', val]])
       end
 
-      def has_fill_formatting(element)
+      def has_formatting(element)
         line     = series_property(element, :line)
         fill     = series_property(element, :fill)
         pattern  = series_property(element, :pattern)

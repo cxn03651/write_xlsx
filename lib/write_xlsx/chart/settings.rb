@@ -54,7 +54,7 @@ module Writexlsx
       #
       def set_x_axis(params = {})
         @date_category = true if ptrue?(params[:date_axis])
-        @x_axis.merge_with_hash(params)
+        @x_axis.apply_options(params)
       end
 
       #
@@ -65,7 +65,7 @@ module Writexlsx
       #
       def set_y_axis(params = {})
         @date_category = true if ptrue?(params[:date_axis])
-        @y_axis.merge_with_hash(params)
+        @y_axis.apply_options(params)
       end
 
       #
@@ -73,7 +73,7 @@ module Writexlsx
       #
       def set_x2_axis(params = {})
         @date_category = true if ptrue?(params[:date_axis])
-        @x2_axis.merge_with_hash(params)
+        @x2_axis.apply_options(params)
       end
 
       #
@@ -81,14 +81,15 @@ module Writexlsx
       #
       def set_y2_axis(params = {})
         @date_category = true if ptrue?(params[:date_axis])
-        @y2_axis.merge_with_hash(params)
+        @y2_axis.apply_options(params)
       end
 
       #
       # Set the properties of the chart title.
       #
       def set_title(params)
-        @title.merge_with_hash(params)
+        @title ||= Caption.new(self)
+        @title.apply_options(params)
       end
 
       #

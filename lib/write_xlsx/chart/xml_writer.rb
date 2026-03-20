@@ -74,25 +74,15 @@ module Writexlsx
       def write_chart # :nodoc:
         @writer.tag_elements('c:chart') do
           # Write the chart title elements.
-          if @title.none
-            # Turn off the title.
-            write_auto_title_deleted
-          elsif @title.formula
-            write_title_formula(@title, nil, nil, @title.layout, @title.overlay)
-          elsif @title.name
-            write_title_rich(@title, nil, @title.name_font, @title.layout, @title.overlay)
-          end
-
+          write_chart_title(@title, nil, allow_none: true)
           # Write the c:plotArea element.
           write_plot_area
           # Write the c:legend element.
           write_legend
           # Write the c:plotVisOnly element.
           write_plot_vis_only
-
           # Write the c:dispBlanksAs element.
           write_disp_blanks_as
-
           # Write the c:extLst element.
           write_ext_lst_display_na if @show_na_as_empty
         end

@@ -16,11 +16,17 @@ module Writexlsx
       attr_reader :num_format_linked, :num_font, :layout, :interval_unit
       attr_reader :interval_tick, :major_gridlines, :minor_gridlines, :reverse
       attr_reader :line, :fill, :text_axis, :label_align
+      attr_reader :title
+
+      def initialize(chart)
+        super
+        @title = Caption.new(chart)
+      end
 
       #
       # Convert user defined axis values into axis instance.
       #
-      def merge_with_hash(params) # :nodoc:
+      def apply_options(params) # :nodoc:
         super
         args      = (defaults || {}).merge(params)
 
@@ -30,17 +36,21 @@ module Writexlsx
           label_position num_format num_format_linked interval_unit
           interval_tick line fill label_align
         ].each { |val| instance_variable_set("@#{val}", args[val]) }
-        set_major_minor_gridlines(args)
 
-        @visible           = args[:visible] || 1
+        set_major_minor_gridlines(args)
+        @visible = args[:visible] || 1
         set_display_units(args)
         set_display_units_visible(args)
         set_position(args)
         set_position_axis
-        set_font_properties(args)
-        set_axis_name_layout(args)
+
+        # font for axis label
+        @num_font = convert_font_args(args[:num_font])
+
+        # axis
         set_axis_line(args)
         set_axis_fill(args)
+
         if ptrue?(args[:text_axis])
           chart.date_category = false
           @text_axis = true
@@ -49,6 +59,15 @@ module Writexlsx
         # Set the tick marker types.
         @major_tick_mark = get_tick_type(params[:major_tick_mark])
         @minor_tick_mark = get_tick_type(params[:minor_tick_mark])
+
+        # axis title
+        @title.apply_options(
+          name:         args[:name],
+          name_formula: args[:name_formula],
+          data:         args[:data],
+          name_font:    args[:name_font],
+          layout:       args[:name_layout]
+        )
       end
 
       #

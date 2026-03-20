@@ -47,11 +47,7 @@ module Writexlsx
           write_minor_gridlines(x_axis.minor_gridlines)
 
           # Write the axis title elements.
-          if x_axis.formula
-            write_title_formula(x_axis, is_y_axis, @x_axis, x_axis.layout)
-          elsif x_axis.name
-            write_title_rich(x_axis, is_y_axis, x_axis.name_font, x_axis.layout)
-          end
+          write_chart_title(x_axis.title, is_y_axis)
 
           # Write the c:numFmt element.
           write_cat_number_format(x_axis)
@@ -122,11 +118,7 @@ module Writexlsx
           write_minor_gridlines(y_axis.minor_gridlines)
 
           # Write the axis title elements.
-          if y_axis.formula
-            write_title_formula(y_axis, @horiz_val_axis, nil, y_axis.layout)
-          elsif y_axis.name
-            write_title_rich(y_axis, @horiz_val_axis, y_axis.name_font, y_axis.layout)
-          end
+          write_chart_title(y_axis.title, @horiz_val_axis)
 
           # Write the c:numberFormat element.
           write_number_format(y_axis)
@@ -197,11 +189,8 @@ module Writexlsx
           write_minor_gridlines(x_axis.minor_gridlines)
 
           # Write the axis title elements.
-          if x_axis.formula
-            write_title_formula(x_axis, nil, nil, x_axis.layout)
-          elsif x_axis.name
-            write_title_rich(x_axis, nil, x_axis.name_font, x_axis.layout)
-          end
+          write_chart_title(x_axis.title)
+
           # Write the c:numFmt element.
           write_number_format(x_axis)
           # Write the c:majorTickMark element.

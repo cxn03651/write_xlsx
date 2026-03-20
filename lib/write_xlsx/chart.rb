@@ -366,14 +366,15 @@ module Writexlsx
     #
     # Write the <c:title> element for a rich string.
     #
-    def write_title_rich(title, is_y_axis, font, layout, overlay = nil) # :nodoc:
+    def write_title_rich(title, is_y_axis = nil)
       @writer.tag_elements('c:title') do
         # Write the c:tx element.
-        write_tx_rich(title, is_y_axis, font)
+        write_tx_rich(title.name, is_y_axis, title.font)
         # Write the c:layout element.
-        write_layout(layout, 'text')
+        write_layout(title.layout, 'text')
         # Write the c:overlay element.
-        write_overlay if overlay
+        write_overlay if title.overlay
+        write_sp_pr(title)
       end
     end
 
