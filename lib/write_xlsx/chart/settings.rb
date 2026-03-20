@@ -90,6 +90,7 @@ module Writexlsx
       def set_title(params)
         @title ||= Caption.new(self)
         @title.apply_options(params)
+        @title.apply_format_options(params)
       end
 
       #

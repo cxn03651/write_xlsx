@@ -60,13 +60,22 @@ module Writexlsx
         @major_tick_mark = get_tick_type(params[:major_tick_mark])
         @minor_tick_mark = get_tick_type(params[:minor_tick_mark])
 
-        # axis title
+        # Set the axis title properties.
         @title.apply_options(
           name:         args[:name],
           name_formula: args[:name_formula],
           data:         args[:data],
           name_font:    args[:name_font],
           layout:       args[:name_layout]
+        )
+
+        # Set the format properties.
+        @title.apply_format_options(
+          line:     args[:name_line],
+          border:   args[:name_border],
+          fill:     args[:name_fill],
+          pattern:  args[:name_pattern],
+          gradient: args[:name_gradient]
         )
       end
 
