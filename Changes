@@ -1,5 +1,25 @@
 Change history of write_xlsx rubygem.
 
+2026-03-20 v1.15.0
+    Add the option to position custom data labels in the same way that the
+    data labels can be positioned for the entire series.
+
+    Add border, fill, gradient and pattern formatting options for
+    chart titles and also chart axis titles.
+
+    Added documentation for the Worksheet `autofit()` method.
+
+    Fix failed match for range string in conditional format.
+    Strings used in a cell equality must be quoted. In order to
+    ensure this there is a check for non-range/non-numeric strings.
+    However this test wasn't anchored properly and gave a false
+    positive.
+
+    Fixed an issue where `set_row()` with the default height of 15 was
+    ignored if `set_default_row()` was also used.
+
+    Fixed issue with 0 DPI in PNG images.
+
 2026-03-12 v1.13.0
     fix sheet name quoting with upstream Perl implementation.
 
