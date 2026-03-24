@@ -113,7 +113,7 @@ class Minitest::Test
         exp_member,
         got_member,
         ignore_elements: ignore_elements,
-        regression: regression
+        regression:      regression
       )
     end
   end
@@ -122,6 +122,63 @@ class Minitest::Test
     header = xml_array.shift
     tail   = xml_array.pop
     xml_array.sort.unshift(header).push(tail)
+  end
+
+  #
+  # Build worksheet XML from a block and return it as a string.
+  #
+  def worksheet_xml_string
+    workbook  = WriteXLSX.new(StringIO.new(''.dup))
+    worksheet = workbook.add_worksheet
+
+    yield(workbook, worksheet)
+
+    worksheet.assemble_xml_file
+    worksheet.instance_variable_get(:@writer).string
+  end
+
+  #
+  # Compare worksheet XML strings using the same normalization style as the
+  # existing xlsx regression helpers.
+  #
+  def compare_worksheet_xml(expected_xml, actual_xml)
+    exp_xml = got_to_array(expected_xml)
+    got_xml = got_to_array(actual_xml)
+
+    assert_equal(exp_xml, got_xml, 'worksheet xml differs.')
+  end
+
+  #
+  # Assert that a worksheet XML string includes all lines in an expected
+  # XML fragment after normalization.
+  #
+  def assert_worksheet_xml_includes(actual_xml, expected_fragment)
+    got_xml = got_to_array(actual_xml)
+    exp_xml = got_to_array(expected_fragment)
+
+    exp_xml.each do |line|
+      assert_includes(got_xml, line, "worksheet xml does not include: #{line}")
+    end
+  end
+
+  #
+  # Assert that a worksheet XML string does not include any lines in an
+  # unexpected XML fragment after normalization.
+  #
+  def refute_worksheet_xml_includes(actual_xml, unexpected_fragment)
+    got_xml = got_to_array(actual_xml)
+    exp_xml = got_to_array(unexpected_fragment)
+
+    exp_xml.each do |line|
+      refute_includes(got_xml, line, "worksheet xml unexpectedly includes: #{line}")
+    end
+  end
+
+  #
+  # Extract the first conditionalFormatting element from worksheet XML.
+  #
+  def extract_conditional_formatting_xml(xml)
+    xml[%r{<conditionalFormatting\b.*?</conditionalFormatting>}m]
   end
 
   private
