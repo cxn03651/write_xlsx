@@ -45,8 +45,8 @@ Layout/MultilineMethodCallIndentation:
 Lint/DuplicateBranch:
   IgnoreLiteralBranches: true
   Exclude:
-    - 'lib/write_xlsx/worksheet.rb'
-    - 'lib/write_xlsx/worksheet/data_writing.rb'
+    - "lib/write_xlsx/worksheet.rb"
+    - "lib/write_xlsx/worksheet/data_writing.rb"
 
 Lint/DuplicateMethods:
   Enabled: false
@@ -57,9 +57,12 @@ Lint/FloatComparison:
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
+Lint/UselessNumericOperation:
+  Enabled: false
+
 Lint/UselessSetterCall:
   Exclude:
-    - 'lib/write_xlsx/worksheet.rb'
+    - "lib/write_xlsx/worksheet.rb"
 
 Metrics/AbcSize:
   Max: 350
@@ -112,7 +115,7 @@ Style/AccessorGrouping:
 
 Style/ConditionalAssignment:
   Exclude:
-    - 'lib/write_xlsx/worksheet.rb'
+    - "lib/write_xlsx/worksheet.rb"
 
 Style/Encoding:
   Enabled: false
@@ -135,6 +138,9 @@ Style/IfUnlessModifier:
 
 Style/NumericLiterals:
   MinDigits: 10
+
+Style/OneClassPerFile:
+  Enabled: false
 
 Style/OptionalBooleanParameter:
   Enabled: false

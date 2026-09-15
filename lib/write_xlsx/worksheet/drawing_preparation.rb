@@ -159,7 +159,7 @@ module Writexlsx
           end
 
           if target.length > 255
-            raise <<"EOS"
+            raise <<EOS
 Ignoring URL #{target} where link or anchor > 255 characters since it exceeds Excel's limit for URLS. See LIMITATIONS section of the WriteXLSX documentation.
 EOS
           end
