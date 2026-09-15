@@ -31,6 +31,11 @@ class TestPrepareFormula < Minitest::Test
       ['{foo()}', 'foo()'],
       ['{=foo()}', 'foo()'],
 
+      # Braces and a leading "=" should only be removed at the very
+      # start/end of the formula string, not at embedded line boundaries.
+      ["SUM(A1)\n=1", "SUM(A1)\n=1"],
+      ["{=SUM(A1)}\n=1", "{=SUM(A1)}\n=1"],
+
       # Dynamic array functions.
       ['LET()', '_xlfn.LET()'],
       ['SEQUENCE(10)', '_xlfn.SEQUENCE(10)'],

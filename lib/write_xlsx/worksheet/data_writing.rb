@@ -56,15 +56,15 @@ module Writexlsx
           write_number(_row, _col, _token, _format)
         elsif _token.respond_to?(:=~)  # String
           # Match integer with leading zero(s)
-          if @leading_zeros && _token =~ /^0\d*$/
+          if @leading_zeros && _token =~ /\A0\d*\Z/
             write_string(_row, _col, _token, _format)
           elsif _token =~ /\A([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?\Z/
             write_number(_row, _col, _token, _format)
           # Match formula
-          elsif _token =~ /^=/
+          elsif _token =~ /\A=/
             write_formula(_row, _col, _token, _format, _value1)
           # Match array formula
-          elsif _token =~ /^\{=.*\}$/
+          elsif _token =~ /\A\{=.*\}\Z/
             write_formula(_row, _col, _token, _format, _value1)
           # Match blank
           elsif _token == ''
@@ -312,7 +312,7 @@ module Writexlsx
         return given_formula unless ptrue?(given_formula)
 
         # Remove array formula braces and the leading =.
-        formula = given_formula.sub(/^\{(.*)\}$/, '\1').sub(/^=/, '')
+        formula = given_formula.sub(/\A\{(.*)\}\Z/, '\1').sub(/\A=/, '')
 
         # # Don't expand formulas that the user has already expanded.
         return formula if formula =~ /_xlfn\./
@@ -512,7 +512,7 @@ module Writexlsx
         end
 
         # Hand off array formulas.
-        if _formula =~ /^\{=.*\}$/
+        if _formula =~ /\A\{=.*\}\Z/
           write_array_formula(_row, _col, _row, _col, _formula, _format, _value)
         else
           check_dimensions(_row, _col)
