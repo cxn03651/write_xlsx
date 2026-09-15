@@ -1,5 +1,8 @@
 Change history of write_xlsx rubygem.
 
+2026-09-16 v1.15.1
+    fix multiline string formula misdetection
+
 2026-03-20 v1.15.0
     Add the option to position custom data labels in the same way that the
     data labels can be positioned for the entire series.
