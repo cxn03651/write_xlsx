@@ -169,6 +169,8 @@ module Writexlsx
 
         # Check that row and col are valid and store max and min values
         check_dimensions(_row, _col)
+        return -2 if row_already_written?(_row)
+
         store_row_col_max_min_values(_row, _col)
 
         @has_vml = true
@@ -230,7 +232,9 @@ module Writexlsx
         check_dimensions(_row, _col)
         store_row_col_max_min_values(_row, _col)
 
-        index = shared_string_index(_string.length > STR_MAX ? _string[0, STR_MAX] : _string)
+        _truncated = _string.length > STR_MAX ? _string[0, STR_MAX] : _string
+        # In optimization mode, strings are written inline instead of into the shared string table.
+        index = optimization? ? _truncated : shared_string_index(_truncated)
 
         store_data_to_table(StringCellData.new(index, _format, _string), _row, _col)
       end
@@ -268,7 +272,8 @@ module Writexlsx
         # Check that the string si < 32767 chars.
         return 3 if _raw_string.size > @xls_strmax
 
-        index = shared_string_index(xml_str_of_rich_string(_fragments))
+        rich_string = xml_str_of_rich_string(_fragments)
+        index = optimization? ? rich_string : shared_string_index(rich_string)
 
         store_data_to_table(RichStringCellData.new(index, _xf, _raw_string), _row, _col)
       end
@@ -577,6 +582,8 @@ module Writexlsx
         )
 
         # Pad out the rest of the area with formatted zeroes.
+        return if optimization?
+
         (row1..row2).each do |row|
           (col1..col2).each do |col|
             next if row == row1 && col == col1
@@ -675,7 +682,7 @@ module Writexlsx
                   when FormulaArrayCellData
                     "{=#{cell_data.token}}"
                   when StringCellData
-                    @workbook.shared_strings.string(cell_data.data[:sst_id])
+                    optimization? ? cell_data.raw_string : @workbook.shared_strings.string(cell_data.data[:sst_id])
                   else
                     cell_data.data
                   end
@@ -718,6 +725,8 @@ module Writexlsx
 
         # Check that row and col are valid and store max and min values
         check_dimensions(_row, _col)
+        return -2 if row_already_written?(_row)
+
         store_row_col_max_min_values(_row, _col)
 
         hyperlink = Hyperlink.factory(_url, _str, _tip, @max_url_length)
@@ -801,6 +810,8 @@ module Writexlsx
         # Check that the data range is valid and store the max and min values.
         check_dimensions(row_first, col_first)
         check_dimensions(row_last,  col_last)
+        return -2 if row_already_written?(row_first)
+
         store_row_col_max_min_values(row_first, col_first)
         store_row_col_max_min_values(row_last,  col_last)
 
@@ -848,6 +859,8 @@ module Writexlsx
         # Check that the data range is valid and store the max and min values.
         check_dimensions(row_first, col_first)
         check_dimensions(row_last,  col_last)
+        return -2 if row_already_written?(row_first)
+
         store_row_col_max_min_values(row_first, col_first)
         store_row_col_max_min_values(row_last,  col_last)
 

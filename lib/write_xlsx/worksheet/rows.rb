@@ -26,6 +26,8 @@ module Writexlsx
 
         # Check that row and col are valid and store max and min values.
         check_dimensions(row, min_col)
+        return -2 if row_already_written?(row)
+
         store_row_col_max_min_values(row, min_col)
 
         height ||= @default_row_height

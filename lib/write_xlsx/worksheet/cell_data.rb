@@ -73,8 +73,15 @@ module Writexlsx
       end
 
       TYPE_STR_ATTRS = %w[t s].freeze
+      TYPE_INLINE_STR_ATTRS = %w[t inlineStr].freeze
       def write_cell(worksheet, row, row_name, col)
         attributes = cell_attributes(worksheet, row, row_name, col)
+        if worksheet.optimization?
+          attributes << TYPE_INLINE_STR_ATTRS
+          worksheet.writer.inline_string_element(token, attributes)
+          return
+        end
+
         attributes << TYPE_STR_ATTRS
         worksheet.writer.tag_elements('c', attributes) do
           worksheet.write_cell_value(token)

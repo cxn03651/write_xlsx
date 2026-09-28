@@ -81,6 +81,8 @@ module Writexlsx
 
         # Check that row and col are valid and store max and min values
         check_dimensions(normalize_row, normalize_col)
+        return -2 if row_already_written?(normalize_row)
+
         store_row_col_max_min_values(normalize_row, normalize_col)
 
         if options
@@ -159,6 +161,12 @@ module Writexlsx
       # Add an Excel table to a worksheet.
       #
       def add_table(*args)
+        # Writing a table would need the cells of all its rows at the same time.
+        if optimization?
+          warn "add_table() isn't supported when set_optimization() is on"
+          return -1
+        end
+
         # Table count is a member of Workbook, global to all Worksheet.
         table = Package::Table.new(self, *args)
         @assets.add_table(table)

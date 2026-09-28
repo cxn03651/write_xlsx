@@ -49,6 +49,7 @@ require 'write_xlsx/worksheet/drawing_xml_writer'
 require 'write_xlsx/worksheet/formatting'
 require 'write_xlsx/worksheet/hyperlink'
 require 'write_xlsx/worksheet/initialization'
+require 'write_xlsx/worksheet/optimization'
 require 'write_xlsx/worksheet/rows'
 require 'write_xlsx/worksheet/selection'
 require 'write_xlsx/worksheet/panes'
@@ -70,6 +71,7 @@ module Writexlsx
     # storage / initialization
     include Initialization
     include CellDataManager
+    include Optimization
 
     # sizing / positioning
     include RowColSizing
@@ -137,9 +139,11 @@ module Writexlsx
 
       apply_excel2003_compatibility if excel2003_style?
       setup_workbook_dependent_state
+      setup_optimization
     end
 
     def set_xml_writer(filename) # :nodoc:
+      finish_optimized_rows if optimization?
       @writer.set_xml_writer(filename)
     end
 

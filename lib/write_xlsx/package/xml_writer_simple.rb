@@ -11,8 +11,10 @@ module Writexlsx
     class XMLWriterSimple
       XMLNS = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main'
 
-      def initialize
-        @io = StringIO.new
+      def initialize(io = StringIO.new)
+        @io = io
+        # Files to be copied into the output on #close, see #append_file.
+        @parts = []
         # Will allocate new string once, then use allocated string
         # Key is tag name
         # Only tags without attributes will be cached
@@ -84,6 +86,31 @@ module Writexlsx
         io_write("<si>#{data}</si>")
       end
 
+      #
+      # Optimised tag writer for inline string <c> elements, used instead of
+      # shared strings when the workbook optimization mode is on.
+      #
+      def inline_string_element(data, attr)
+        string = escape_control_characters(data)
+
+        # Write any rich strings without further tags.
+        if string =~ /^<r>/ && string =~ %r{</r>$}
+          io_write("<c#{key_vals(attr)}><is>#{string}</is></c>")
+        else
+          t_attr = string =~ /\A\s|\s\Z/ ? ' xml:space="preserve"' : ''
+          io_write("<c#{key_vals(attr)}><is><t#{t_attr}>#{escape_data(string)}</t></is></c>")
+        end
+      end
+
+      #
+      # Append the content of +file+ at the current position. It is copied into
+      # the output file on #close instead of being read into memory.
+      #
+      def append_file(file)
+        @parts << @io << file
+        @io = StringIO.new
+      end
+
       def characters(data)
         io_write(escape_data(data))
       end
@@ -93,7 +120,15 @@ module Writexlsx
       end
 
       def close
-        File.open(@filename, "wb:utf-8:utf-8") { |f| f << string } if @filename
+        if @filename
+          File.open(@filename, "wb:utf-8:utf-8") do |f|
+            @parts.each do |part|
+              part.rewind
+              IO.copy_stream(part, f)
+            end
+            f << string
+          end
+        end
         @io.close
       end
 
@@ -132,6 +167,22 @@ module Writexlsx
           .gsub("<", "&lt;")
           .gsub(">", "&gt;")
           .gsub("\n", "&#xA;")
+      end
+
+      #
+      # Excel escapes control characters with _xHHHH_ and also escapes any
+      # literal strings of that type by encoding the leading underscore. So
+      # "\0" -> _x0000_ and "_x0000_" -> _x005F_x0000_.
+      #
+      def escape_control_characters(str)
+        str = str.gsub(/(_x[0-9a-fA-F]{4}_)/, '_x005F\1')
+        str = str.gsub(/[\x00-\x08\x0B-\x1F]/) { |char| format("_x%04X_", char.ord) }
+
+        # Convert a single byte character to its UTF-8 encoding.
+        if str.bytesize == 1 && str.ord >= 0x80
+          str = [str.ord].pack('U')
+        end
+        str
       end
 
       def escape_data(str = '')

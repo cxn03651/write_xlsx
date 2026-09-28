@@ -27,7 +27,7 @@ module Writexlsx
         @firstsheet      = 0
         @selected        = 0
         @fileclosed      = false
-        @optimization    = options[:optimization] || 0
+        @optimization    = ptrue?(options[:optimization]) ? 1 : 0
         @excel2003_style = options[:excel2003_style] || false
         @read_only       = 0
 
