@@ -69,6 +69,9 @@ class TestOptimization < Minitest::Test
     workbook  = WriteXLSX.new(StringIO.new, optimization: true)
     worksheet = workbook.add_worksheet
 
+    # Kernel#warn prints nothing when warnings are disabled, e.g. with ruby -W0.
+    verbose = $VERBOSE
+    $VERBOSE = false
     _, err = capture_io do
       assert_equal(-1, worksheet.add_table('B3:F7'))
     end
@@ -76,6 +79,8 @@ class TestOptimization < Minitest::Test
     assert_match(/add_table\(\) isn't supported/, err)
 
     workbook.close
+  ensure
+    $VERBOSE = verbose
   end
 
   def test_chartsheet_is_not_optimized
