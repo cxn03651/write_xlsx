@@ -40,6 +40,7 @@ module Writexlsx
             write_ext_list
           end
         end
+        remove_optimized_rows
       end
 
       #
@@ -372,7 +373,9 @@ module Writexlsx
       # Write the <sheetData> element.
       #
       def write_sheet_data # :nodoc:
-        if @dim_rowmin
+        if @dim_rowmin && optimization?
+          write_optimized_sheet_data
+        elsif @dim_rowmin
           @writer.tag_elements('sheetData') { write_rows }
         else
           # If the dimensions aren't defined then there is no data to write.

@@ -201,6 +201,26 @@ module Writexlsx
     end
 
     #
+    # Turn on the memory optimization mode: each row is written to a temporary
+    # file as soon as a later row is started, so only the current row is kept
+    # in memory. This is the same as passing <tt>optimization: true</tt> to
+    # WriteXLSX.new.
+    #
+    # Rows have to be written in order then: data for a row before the current
+    # one is ignored. Strings are written inline instead of into the shared
+    # string table, add_table() isn't supported and charts get no cached data.
+    #
+    def set_optimization(level = true)
+      raise "set_optimization() must be called before add_worksheet()" unless sheets.empty?
+
+      @optimization = ptrue?(level) ? 1 : 0
+    end
+
+    def optimization? # :nodoc:
+      @optimization == 1
+    end
+
+    #
     # return date system. false = 1900, true = 1904
     #
     def get_1904

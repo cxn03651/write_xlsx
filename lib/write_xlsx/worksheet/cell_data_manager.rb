@@ -8,6 +8,9 @@ module Writexlsx
       # Store a CellData object in the worksheet cell table.
       #
       def store_data_to_table(cell_data, row, col) # :nodoc:
+        return if row_already_written?(row)
+
+        write_single_row(row) if optimization? && row > @previous_row
         @cell_data_store.store(cell_data, row, col)
       end
 
@@ -15,6 +18,8 @@ module Writexlsx
       # Track row/col min/max used for range calculation.
       #
       def store_row_col_max_min_values(row, col)
+        return if row_already_written?(row)
+
         store_row_max_min_values(row)
         store_col_max_min_values(col)
       end
@@ -34,6 +39,8 @@ module Writexlsx
       # series with data missing.
       #
       def get_range_data(row_start, col_start, row_end, col_end)
+        return [] if optimization?
+
         @cell_data_store.get_range_data(row_start, col_start, row_end, col_end)
       end
 

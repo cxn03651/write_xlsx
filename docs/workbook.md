@@ -26,6 +26,7 @@ The following methods are available through a new workbook.
 * [sheets](#sheets)
 * [worksheet_by_name](#worksheet_by_name)
 * [set_1904](#set_1904)
+* [set_optimization](#set_optimization)
 * [set_calc_mode](#set_calc_mode)
 * [default_url_format](#default_url_format)
 * [read_only_recommended](#read_only_recommended)
@@ -80,6 +81,11 @@ You can also pass directory path in which write_xlsx store temporary files.
 To write url/link string as string (not hyperlink), pass strings_as_urls option.
 
     workbook = WriteXLSX.new(filename, strings_as_urls: false, ...)
+
+To reduce memory use for large worksheets, pass the optimization option.
+See [set_optimization](#set_optimization) for what it does and its restrictions.
+
+    workbook = WriteXLSX.new(filename, optimization: true, ...)
 
 The `new()` constructor returns a Workbook object that you can use to add worksheets and store data.
 
@@ -441,6 +447,35 @@ This returns `false` for 1900 and `true` for 1904.
 See also [DATES AND TIME IN EXCEL][] for more information about working with Excel's date system.
 
 In general you probably won't need to use `set_1904()`.
+
+#### <a name="set_optimization" class="anchor" href="#set_optimization"><span class="octicon octicon-link" /></a>set_optimization(level = true)
+
+The `set_optimization()` method is used to turn on optimizations in the WriteXLSX module.
+Currently there is only one optimization available and that is to reduce memory usage.
+
+    workbook.set_optimization
+
+It is the same as passing the `optimization` option to `new()`:
+
+    workbook = WriteXLSX.new(filename, optimization: true)
+
+Normally, WriteXLSX keeps the data of all cells in memory until the workbook is closed.
+With the optimization on, each row is written to a temporary file as soon as data is written to a later row,
+so only the data of the current row is kept in memory.
+This makes it possible to write very large worksheets with a small, constant amount of memory.
+
+The optimization comes with some restrictions:
+
+* Data has to be written in sequential row order.
+  Once a later row has been written to, data, formats, comments, hyperlinks and merged ranges
+  for an earlier row are ignored and the methods return `-2`.
+* Strings are written inline in each cell instead of in the shared string table of the workbook.
+  Excel reads them the same way, but the file can get larger when the same strings are repeated a lot.
+* `add_table()` isn't supported and returns `-1`.
+* Charts that refer to data in an optimized worksheet get no cached data.
+  Excel recalculates it when the file is opened.
+
+`set_optimization()` must be called before `add_worksheet()`.
 
 
 #### <a name="set_calc_mode" class="anchor" href="#set_calc_mode"><span class="octicon octicon-link" /></a>set_calc_mode(mode)

@@ -52,6 +52,11 @@ module Writexlsx
       [@chart].compact
     end
 
+    # A chartsheet has no cells, so the optimization mode doesn't apply to it.
+    def optimization? # :nodoc:
+      false
+    end
+
     #
     # Assemble and write the XML file.
     #
